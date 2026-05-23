@@ -43,8 +43,8 @@ export default function SPVSection() {
 
       {/* PODMIEŃ: /images/fantasy-gate.png – orientalna brama/świątynia jako tło sekcji */}
       <div
-        className="absolute inset-0 opacity-5 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/fantasy-gate.png')" }}
+        className="absolute inset-0 opacity-25 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/fantasy-gate.svg')" }}
       />
 
       {/* Glow accent */}

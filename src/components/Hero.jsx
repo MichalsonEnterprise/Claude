@@ -25,11 +25,11 @@ export default function Hero() {
       {/* PODMIEŃ: /images/dragon-bg.png – klimatyczne tło z mgłą, smokiem lub świątynią */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/dragon-bg.png')" }}
+        style={{ backgroundImage: "url('/images/dragon-bg.svg')" }}
       />
 
       {/* Dark overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-orient-900/85 via-orient-900/70 to-orient-900/95" />
+      <div className="absolute inset-0 bg-gradient-to-b from-orient-900/60 via-orient-900/50 to-orient-900/90" />
 
       {/* Radial glow center */}
       <div className="absolute inset-0 bg-gradient-radial from-gold-700/10 via-transparent to-transparent" />

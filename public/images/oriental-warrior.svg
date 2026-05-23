@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="60%" r="70%">
+      <stop offset="0%" stop-color="#1f0a0a"/>
+      <stop offset="100%" stop-color="#060206"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#7f1d1d" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#7f1d1d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="goldGlow" cx="50%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#d4a017" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#d4a017" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur3"><feGaussianBlur stdDeviation="20"/></filter>
+    <filter id="blur1"><feGaussianBlur stdDeviation="6"/></filter>
+    <linearGradient id="swordGlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d4a017" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#fbbf16" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#d4a017" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="1080" fill="url(#bg2)"/>
+  <ellipse cx="400" cy="420" rx="350" ry="350" fill="url(#glow2)" filter="url(#blur3)"/>
+  <ellipse cx="400" cy="300" rx="250" ry="200" fill="url(#goldGlow)" filter="url(#blur3)"/>
+
+  <!-- Warrior silhouette - full figure, facing forward slightly angled -->
+  <g fill="#0d0208" transform="translate(400,100)">
+    <!-- Head -->
+    <ellipse cx="0" cy="60" rx="28" ry="32" fill="#0d0208"/>
+    <!-- Helmet top knot / kabuto crest -->
+    <path d="M-8,28 Q0,5 8,28" stroke="#1a0a0a" stroke-width="3" fill="none"/>
+    <ellipse cx="0" cy="30" rx="32" ry="18" fill="#0d0208"/>
+    <!-- Helmet side guards (menpō) -->
+    <path d="M-30,45 Q-38,70 -28,80 L-20,75 Q-22,62 -20,50 Z" fill="#0d0208"/>
+    <path d="M30,45 Q38,70 28,80 L20,75 Q22,62 20,50 Z" fill="#0d0208"/>
+
+    <!-- Neck / collar -->
+    <rect x="-14" y="88" width="28" height="20" rx="4" fill="#0d0208"/>
+
+    <!-- Shoulders - wide armoured pauldrons -->
+    <path d="M-14,108 Q-80,100 -90,130 Q-85,160 -60,165 L-30,155 L-20,135 Z" fill="#0d0208"/>
+    <path d="M14,108 Q80,100 90,130 Q85,160 60,165 L30,155 L20,135 Z" fill="#0d0208"/>
+
+    <!-- Torso - lamellar armour -->
+    <path d="M-30,155 L-28,108 L28,108 L30,155 Q20,200 0,210 Q-20,200 -30,155 Z" fill="#0d0208"/>
+    <!-- Armour plate lines (lamellar detail) -->
+    <line x1="-26" y1="130" x2="26" y2="130" stroke="#1f0d14" stroke-width="1.5"/>
+    <line x1="-26" y1="148" x2="26" y2="148" stroke="#1f0d14" stroke-width="1.5"/>
+    <line x1="-26" y1="166" x2="26" y2="166" stroke="#1f0d14" stroke-width="1.5"/>
+
+    <!-- Left arm - raised holding sword up -->
+    <path d="M-60,165 Q-75,180 -70,220 Q-60,240 -50,235 Q-45,200 -48,175 Z" fill="#0d0208"/>
+    <path d="M-50,235 Q-48,270 -52,310 Q-44,320 -38,315 Q-36,275 -40,240 Z" fill="#0d0208"/>
+    <!-- Gauntlet -->
+    <ellipse cx="-42" cy="318" rx="10" ry="8" fill="#0d0208"/>
+
+    <!-- Right arm - lowered, scabbard hand -->
+    <path d="M60,165 Q72,178 68,215 Q58,238 48,233 Q43,198 46,172 Z" fill="#0d0208"/>
+    <path d="M48,233 Q46,265 50,305 Q42,315 36,310 Q34,270 38,235 Z" fill="#0d0208"/>
+    <ellipse cx="40" cy="312" rx="10" ry="8" fill="#0d0208"/>
+
+    <!-- Hips / tassets (armour skirt) -->
+    <path d="M-30,205 Q-50,210 -55,260 L-35,265 L-20,240 Z" fill="#0d0208"/>
+    <path d="M30,205 Q50,210 55,260 L35,265 L20,240 Z" fill="#0d0208"/>
+    <path d="M-20,210 L-18,310 L18,310 L20,210 Q0,220 -20,210 Z" fill="#0d0208"/>
+
+    <!-- Legs -->
+    <path d="M-18,310 L-20,480 Q-14,490 -6,488 L-4,315 Z" fill="#0d0208"/>
+    <path d="M18,310 L20,480 Q14,490 6,488 L4,315 Z" fill="#0d0208"/>
+
+    <!-- Boots -->
+    <path d="M-20,480 Q-22,520 -18,535 Q-5,545 8,535 L10,520 L6,488 Q-4,495 -20,480 Z" fill="#0d0208"/>
+    <path d="M20,480 Q22,520 18,535 Q5,545 -8,535 L-10,520 L-6,488 Q4,495 20,480 Z" fill="#0d0208"/>
+
+    <!-- SWORD - raised diagonally above left shoulder -->
+    <!-- Blade -->
+    <path d="M-52,310 L-110,50 L-102,46 L-44,306 Z" fill="url(#swordGlow)" opacity="0.9"/>
+    <!-- Guard (tsuba) -->
+    <ellipse cx="-48" cy="312" rx="14" ry="6" fill="#8b6914" opacity="0.9" transform="rotate(-70, -48, 312)"/>
+    <!-- Handle -->
+    <rect x="-56" y="305" width="9" height="28" rx="3" fill="#3d1a00" transform="rotate(-70, -52, 319)"/>
+
+    <!-- Scabbard on right side -->
+    <path d="M42,308 Q48,350 46,430 Q40,436 36,430 Q34,355 38,308 Z" fill="#1a0a0a"/>
+  </g>
+
+  <!-- Energy/chi particles around warrior -->
+  <circle cx="330" cy="350" r="3" fill="#d4a017" opacity="0.6"/>
+  <circle cx="290" cy="420" r="2" fill="#d4a017" opacity="0.4"/>
+  <circle cx="470" cy="380" r="4" fill="#dc2626" opacity="0.5"/>
+  <circle cx="500" cy="310" r="2" fill="#d4a017" opacity="0.6"/>
+  <circle cx="310" cy="280" r="3" fill="#dc2626" opacity="0.4"/>
+  <circle cx="490" cy="480" r="2" fill="#d4a017" opacity="0.5"/>
+  <circle cx="340" cy="520" r="3" fill="#dc2626" opacity="0.3"/>
+
+  <!-- Sword energy glow -->
+  <line x1="348" y1="150" x2="290" y2="460" stroke="#d4a017" stroke-width="2" opacity="0.3" filter="url(#blur1)"/>
+
+  <!-- Ground fog -->
+  <ellipse cx="400" cy="950" rx="350" ry="120" fill="#1a0514" opacity="0.8" filter="url(#blur3)"/>
+  <rect x="0" y="850" width="800" height="230" fill="#0d0210" opacity="0.7" filter="url(#blur1)"/>
+</svg>

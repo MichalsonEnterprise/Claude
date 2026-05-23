@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bgCta" cx="50%" cy="60%" r="80%">
+      <stop offset="0%" stop-color="#1f0808"/>
+      <stop offset="60%" stop-color="#0f0310"/>
+      <stop offset="100%" stop-color="#050108"/>
+    </radialGradient>
+    <radialGradient id="fireCore" cx="50%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#ff6b00" stop-opacity="0.6"/>
+      <stop offset="40%" stop-color="#dc2626" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7f1d1d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="goldHorizon" cx="50%" cy="100%" r="50%">
+      <stop offset="0%" stop-color="#d4a017" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#d4a017" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dragonGlow" cx="55%" cy="40%" r="40%">
+      <stop offset="0%" stop-color="#dc2626" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bigBlur"><feGaussianBlur stdDeviation="30"/></filter>
+    <filter id="medBlur"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="smBlur"><feGaussianBlur stdDeviation="4"/></filter>
+    <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#050108" stop-opacity="1"/>
+      <stop offset="30%" stop-color="#050108" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="70%" stop-color="#0f0310" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0f0310" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bgCta)"/>
+
+  <!-- Fire/lava horizon glow -->
+  <ellipse cx="960" cy="1100" rx="1200" ry="400" fill="url(#fireCore)" filter="url(#bigBlur)"/>
+  <ellipse cx="960" cy="1080" rx="800" ry="250" fill="url(#goldHorizon)" filter="url(#bigBlur)"/>
+
+  <!-- Stars -->
+  <g fill="#fff" opacity="0.7">
+    <circle cx="80" cy="60" r="1.2"/><circle cx="220" cy="35" r="0.8"/><circle cx="380" cy="85" r="1.5"/>
+    <circle cx="550" cy="45" r="0.9"/><circle cx="710" cy="75" r="1.1"/><circle cx="870" cy="28" r="1"/>
+    <circle cx="1060" cy="65" r="1.3"/><circle cx="1220" cy="40" r="0.8"/><circle cx="1400" cy="90" r="1.2"/>
+    <circle cx="1570" cy="30" r="0.9"/><circle cx="1740" cy="70" r="1.4"/><circle cx="1880" cy="50" r="0.8"/>
+    <circle cx="160" cy="160" r="0.7"/><circle cx="430" cy="140" r="1.0"/><circle cx="770" cy="130" r="0.8"/>
+    <circle cx="1020" cy="150" r="1.1"/><circle cx="1320" cy="120" r="0.9"/><circle cx="1640" cy="145" r="0.7"/>
+  </g>
+
+  <!-- Dragon body - large serpentine shape in the sky -->
+  <g opacity="0.85">
+    <!-- Dragon glow aura -->
+    <ellipse cx="1050" cy="380" rx="380" ry="220" fill="url(#dragonGlow)" filter="url(#bigBlur)"/>
+
+    <!-- Main serpentine body -->
+    <path d="M400,700 C500,600 580,500 680,450 C780,400 840,380 920,360
+             C1000,340 1060,320 1130,290 C1200,260 1260,230 1310,200
+             C1360,170 1390,150 1410,140"
+          stroke="#1a0808" stroke-width="55" fill="none" stroke-linecap="round"/>
+    <path d="M400,700 C500,600 580,500 680,450 C780,400 840,380 920,360
+             C1000,340 1060,320 1130,290 C1200,260 1260,230 1310,200
+             C1360,170 1390,150 1410,140"
+          stroke="#0d0405" stroke-width="45" fill="none" stroke-linecap="round"/>
+
+    <!-- Dorsal spines along body -->
+    <g fill="#1a0808" opacity="0.8">
+      <polygon points="688,445 678,415 668,445"/>
+      <polygon points="760,408 750,378 740,408"/>
+      <polygon points="840,375 830,342 820,375"/>
+      <polygon points="925,352 915,320 905,352"/>
+      <polygon points="1010,328 1000,296 990,328"/>
+      <polygon points="1100,298 1088,265 1076,298"/>
+      <polygon points="1190,268 1178,235 1166,268"/>
+      <polygon points="1275,238 1263,205 1251,238"/>
+    </g>
+
+    <!-- Dragon head -->
+    <g transform="translate(1410,140) rotate(-30)">
+      <!-- Snout -->
+      <path d="M0,0 Q40,-20 65,-10 Q75,5 60,20 Q40,30 0,25 Z" fill="#150508"/>
+      <!-- Head body -->
+      <ellipse cx="-10" cy="12" rx="45" ry="30" fill="#0d0405"/>
+      <!-- Eye glow -->
+      <circle cx="28" cy="5" r="8" fill="#dc2626" opacity="0.9"/>
+      <circle cx="28" cy="5" r="4" fill="#ff6b00" opacity="0.8"/>
+      <circle cx="28" cy="5" r="12" fill="#dc2626" opacity="0.25" filter="url(#smBlur)"/>
+      <!-- Horn -->
+      <path d="M-5,-18 Q10,-55 20,-45 Q14,-30 5,-12 Z" fill="#1a0808"/>
+      <path d="M10,-22 Q25,-58 34,-48 Q28,-33 18,-16 Z" fill="#1a0808"/>
+      <!-- Jaw/teeth -->
+      <path d="M5,28 Q35,38 60,18 L55,28 Q30,44 5,35 Z" fill="#150508"/>
+      <!-- Whiskers/barbels -->
+      <path d="M50,-8 Q85,-15 100,-5" stroke="#3d1a00" stroke-width="3" fill="none"/>
+      <path d="M48,5 Q82,8 98,22" stroke="#3d1a00" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- Tail tip -->
+    <path d="M400,700 C380,730 350,760 320,800 C300,830 290,860 280,890"
+          stroke="#0d0405" stroke-width="30" fill="none" stroke-linecap="round"/>
+    <path d="M280,890 C270,920 265,940 270,960"
+          stroke="#0d0405" stroke-width="15" fill="none" stroke-linecap="round"/>
+    <!-- Tail spike -->
+    <polygon points="268,958 258,998 280,962" fill="#1a0808"/>
+
+    <!-- Wings -->
+    <path d="M850,370 C800,300 720,240 650,200 C600,175 560,170 540,185
+             C580,200 620,220 670,260 C720,300 780,350 830,400 Z"
+          fill="#120406" opacity="0.9"/>
+    <path d="M850,370 C800,300 720,240 650,200 C600,175 560,170 540,185
+             C580,200 620,220 670,260 C720,300 780,350 830,400 Z"
+          stroke="#1a0808" stroke-width="2" fill="none"/>
+    <!-- Wing membrane lines -->
+    <line x1="850" y1="370" x2="650" y2="200" stroke="#1a0808" stroke-width="4" opacity="0.5"/>
+    <line x1="850" y1="370" x2="680" y2="215" stroke="#1a0808" stroke-width="3" opacity="0.4"/>
+    <line x1="850" y1="370" x2="710" y2="228" stroke="#1a0808" stroke-width="2" opacity="0.35"/>
+
+    <!-- Second wing, far side -->
+    <path d="M1000,330 C1050,265 1120,210 1180,185 C1220,168 1260,165 1275,178
+             C1240,192 1205,215 1168,248 C1130,282 1080,325 1040,370 Z"
+          fill="#100305" opacity="0.75"/>
+  </g>
+
+  <!-- Fire breath from dragon -->
+  <path d="M1460,195 C1520,230 1580,280 1560,350 C1545,400 1490,420 1520,470"
+        stroke="#ff6b00" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.15" filter="url(#medBlur)"/>
+  <path d="M1455,200 C1515,232 1570,275 1550,345"
+        stroke="#d4a017" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.2" filter="url(#smBlur)"/>
+
+  <!-- Floating embers/sparks -->
+  <g fill="#d4a017">
+    <circle cx="1500" cy="280" r="3" opacity="0.7"/>
+    <circle cx="1530" cy="240" r="2" opacity="0.5"/>
+    <circle cx="1480" cy="310" r="2.5" opacity="0.6"/>
+    <circle cx="1560" cy="290" r="1.5" opacity="0.8"/>
+    <circle cx="1510" cy="260" r="2" opacity="0.5"/>
+  </g>
+  <g fill="#dc2626">
+    <circle cx="1490" cy="300" r="2" opacity="0.5"/>
+    <circle cx="1545" cy="265" r="1.5" opacity="0.4"/>
+    <circle cx="1470" cy="330" r="2.5" opacity="0.5"/>
+  </g>
+
+  <!-- Dark mountain silhouettes at bottom -->
+  <path d="M0,800 L200,620 L400,680 L600,560 L800,640 L960,530 L1120,610 L1320,540 L1520,620 L1720,550 L1920,600 L1920,1080 L0,1080 Z" fill="#0d0210" opacity="0.9"/>
+
+  <!-- Overlay gradients -->
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#topFade)"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#bottomFade)"/>
+</svg>

@@ -52,8 +52,8 @@ export default function ForWho() {
 
       {/* PODMIEŃ: /images/oriental-warrior.png – sylwetka wojownika lub mgła świątyni w tle */}
       <div
-        className="absolute right-0 top-0 bottom-0 w-1/2 opacity-5 bg-cover bg-right bg-no-repeat"
-        style={{ backgroundImage: "url('/images/oriental-warrior.png')" }}
+        className="absolute right-0 top-0 bottom-0 w-1/2 opacity-30 bg-cover bg-right bg-no-repeat"
+        style={{ backgroundImage: "url('/images/oriental-warrior.svg')" }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

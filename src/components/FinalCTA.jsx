@@ -10,8 +10,8 @@ export default function FinalCTA() {
 
       {/* PODMIEŃ: /images/dragon-cta.png – dramatyczna grafika smoka lub wschodu słońca nad świątynią */}
       <div
-        className="absolute inset-0 opacity-8 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/dragon-cta.png')" }}
+        className="absolute inset-0 opacity-40 bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/dragon-cta.svg')" }}
       />
 
       {/* Glow */}
