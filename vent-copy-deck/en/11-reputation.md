@@ -51,7 +51,7 @@ Together with locked VENT, it determines membership tier, access depth, voting i
 EARNING
 
 **Headline:**
-Five ways in. All of them are work.
+Six ways in. All of them are work.
 
 **Earning cards:**
 - **Startup sourcing** — Submit companies that pass screening and progress through research.
