@@ -23,7 +23,7 @@ VENT RESEARCH
 Research built to institutional standards.
 
 **Subheadline:**
-Fourteen sections per company. Eight scored dimensions. A methodology you can read, applied by analysts you can evaluate — with community intelligence alongside, never instead.
+Fourteen sections per company. Eight published scores. A methodology you can read, applied by analysts you can evaluate — with community intelligence alongside, never instead.
 
 **Primary CTA:**
 Discover Companies
@@ -81,10 +81,10 @@ Every profile is built through the same sequence: structured founder input, inde
 SCORING
 
 **Headline:**
-Eight dimensions. One composite. Zero black boxes.
+Eight published scores. Zero black boxes.
 
 **Body:**
-Each full profile carries a VENT Score (0–100), composed from seven scored dimensions. Every dimension shows its rationale — a score you can disagree with is a score you can use.
+Each full profile publishes eight scores: seven scored dimensions — Market through IP — and the VENT Score (0–100), their weighted composite. Every dimension shows its rationale — a score you can disagree with is a score you can use.
 
 **Score cards:**
 - **Market Score** — Size, structure, timing, and accessibility of the opportunity.
