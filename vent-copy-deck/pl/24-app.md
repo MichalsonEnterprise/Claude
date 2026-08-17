@@ -44,7 +44,7 @@ Panel · Research · Watchlista · Governance · Reputacja · VENT & Lock · Nag
 
 **Card title:** VENT Lock
 **Row template:** {n} VENT · lock {90/180/365} dni · odblokowanie {date} · naliczone nagrody {n} VENT
-**Tooltip (rewards accrued):** „Nagrody ekosystemowe z puli o stałej wielkości. To nie odsetki ani yield; parametry mogą być korygowane w sposób ogłaszany w dokumentacji.” `[LEGAL REVIEW REQUIRED]`
+**Tooltip (rewards accrued):** „Nagrody ekosystemowe z puli o stałej wielkości. To nie odsetki ani oprocentowanie; parametry mogą być korygowane w sposób ogłaszany w dokumentacji.” `[LEGAL REVIEW REQUIRED]`
 **Empty state:** „Nie masz jeszcze żadnego locka. Lock podnosi Twój poziom członkostwa, wagę głosu w governance i zakres dostępu — a przy tym nalicza nagrody ekosystemowe.” — [Zablokuj VENT]
 **Countdown microcopy:** „Odblokowanie za {n} dni” *(dla 1: „za 1 dzień”)*
 **Unlock-ready state:** „Lock zakończony. Odbierz swoje VENT i nagrody.” — [Odbierz]

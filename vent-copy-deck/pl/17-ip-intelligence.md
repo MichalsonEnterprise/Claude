@@ -2,13 +2,13 @@
 *(Sugerowana ścieżka: samodzielna strona linkowana z Researchu i strony głównej. Alternatywnie może istnieć pod /research/ip-intelligence.)*
 
 **SEO TITLE:**
-IP Intelligence na silniku PatentChain — analiza obronności technologii
+IP Intelligence oparte na PatentChain — analiza obronności technologii
 
 **META DESCRIPTION:**
 Jak VENT bada, czy technologię startupu da się obronić: stan techniki, własność IP, krajobraz patentowy, weryfikacja dowodów i IP Score w każdym pełnym profilu researchowym.
 
 **SUGGESTED H1:**
-IP Intelligence na silniku PatentChain.
+IP Intelligence oparte na PatentChain.
 
 **OPENGRAPH HEADLINE:**
 IP Intelligence — badamy, czy technologię da się obronić.
@@ -18,7 +18,7 @@ IP Intelligence — badamy, czy technologię da się obronić.
 ## SECTION 01 — HERO
 
 **Eyebrow:**
-IP INTELLIGENCE · NA SILNIKU PATENTCHAIN
+IP INTELLIGENCE · OPARTE NA PATENTCHAIN
 
 **Headline:**
 Pitch ocenić potrafi każdy. My badamy, czy technologię da się obronić.

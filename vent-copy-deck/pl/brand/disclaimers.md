@@ -32,7 +32,7 @@ Profesjonalne brzmienia robocze przygotowane do przeglądu compliance. **Każdy 
 
 `[LEGAL REVIEW REQUIRED]`
 
-> Nagrody z VENT Lock są nagrodami ekosystemowymi za uczestnictwo, dystrybuowanymi z puli o stałej, z góry wydzielonej wielkości. Wskazane parametry nagród są wartościami docelowymi, nie zobowiązaniami, i mogą podlegać korektom ogłaszanym w dokumentacji ekosystemu. Nagrody są denominowane w VENT, którego wartość nie jest gwarantowana i może wynosić zero. VENT Lock nie jest produktem oszczędnościowym, depozytem ani programem inwestycyjnym, a nagrody nie stanowią odsetek ani jakiejkolwiek formy yieldu.
+> Nagrody z VENT Lock są nagrodami ekosystemowymi za uczestnictwo, dystrybuowanymi z puli o stałej, z góry wydzielonej wielkości. Wskazane parametry nagród są wartościami docelowymi, nie zobowiązaniami, i mogą podlegać korektom ogłaszanym w dokumentacji ekosystemu. Nagrody są denominowane w VENT, którego wartość nie jest gwarantowana i może wynosić zero. VENT Lock nie jest produktem oszczędnościowym, depozytem ani programem inwestycyjnym, a nagrody nie stanowią odsetek ani jakiejkolwiek formy oprocentowania.
 
 ## D6 — Forward-looking statements (roadmap, /ventures, /about)
 

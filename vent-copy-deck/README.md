@@ -32,10 +32,10 @@ Complete, implementation-ready website copywriting for the VENT venture intellig
 `01-home.md` (/) · `02-vent.md` (/vent) · `03-tokenomics.md` · `04-sale.md` · `05-roadmap.md` · `06-discover.md` · `07-research.md` (incl. /research/[company] template) · `08-portfolio.md` · `09-community.md` · `10-governance.md` · `11-reputation.md` · `12-startups.md` · `13-startups-apply.md` · `14-ventures.md` · `15-ventures-i.md` · `16-thesis.md` · `17-ip-intelligence.md` · `18-intelligence.md` (incl. /intelligence/[article] template) · `19-about.md` · `20-team.md` · `21-transparency.md` · `22-documents.md` · `23-security.md` · `24-app.md`
 
 ### pl/ — Polish localization
-Same file numbering as `en/`, plus `STYLE-GUIDE.md` (localization rules and glossary).
+Same file numbering as `en/`, plus `STYLE-GUIDE.md` (binding localization rules, glossary, banned PL vocabulary, canonical PL CTA labels) and `pl/brand/` (localized global microcopy and disclaimer library).
 
 ### qa/
-`final-audit.md` — the 15-point compliance and quality audit performed on this deck, with findings.
+`final-audit.md` — the 15-point compliance and quality audit performed on this deck: verdicts, evidence, the audit-time change log, and residual items requiring human decisions.
 
 ---
 
