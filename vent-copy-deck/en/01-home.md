@@ -329,7 +329,7 @@ Explore IP Intelligence
 THE VENT TOKEN
 
 **Headline:**
-A utility token with a defined job.
+A utility token with real work to do.
 
 **Subheadline:**
 VENT powers access, membership, governance, and rewards across the ecosystem. Nothing more is promised — and nothing less is delivered.
@@ -539,7 +539,7 @@ Three audiences. One ecosystem.
 VENT INTELLIGENCE
 
 **Headline:**
-Analysis worth your reading time.
+Analysis with a methodology behind it.
 
 **Body:**
 VENT Intelligence publishes market analysis, company research, sector theses, and founder resources — written to the same standard as our company profiles, with methodology disclosed and no sponsored coverage disguised as research.

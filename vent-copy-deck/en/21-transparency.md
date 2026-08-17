@@ -30,7 +30,7 @@ This page is the ledger of VENT's claims: live data where it exists, and an expl
 - **Pending** — Exists, publication in progress
 - **Not yet deployed** — Will exist at a defined milestone
 - **Scheduled for publication** — Committed, with a stated timeframe
-- **Coming before TGE** — Guaranteed to precede token generation
+- **Coming before TGE** — Committed to precede token generation
 
 ---
 
