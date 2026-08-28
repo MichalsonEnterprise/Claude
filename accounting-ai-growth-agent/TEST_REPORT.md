@@ -2,7 +2,7 @@
 
 ## Unit tests (`npm test`, vitest)
 
-All 52 tests pass as of this writing (`npx vitest run`):
+All 54 tests pass as of this writing (`npx vitest run`):
 
 ```
 ✓ tests/claimVerifier.test.ts (9 tests)
@@ -11,13 +11,13 @@ All 52 tests pass as of this writing (`npx vitest run`):
 ✓ tests/llmProviderFactory.test.ts (3 tests)
 ✓ tests/scoring.test.ts (3 tests)
 ✓ tests/calendar.test.ts (4 tests)
-✓ tests/blocklist.test.ts (7 tests)
+✓ tests/blocklist.test.ts (9 tests)
 ✓ tests/llmJson.test.ts (4 tests)
 ✓ tests/fetcher.test.ts (3 tests)
 ✓ tests/postizClient.test.ts (5 tests)
 
 Test Files  10 passed (10)
-     Tests  52 passed (52)
+     Tests  54 passed (54)
 ```
 
 No test ever calls a real Postiz endpoint or a real social platform — the
