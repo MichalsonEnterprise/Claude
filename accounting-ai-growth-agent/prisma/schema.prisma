@@ -1,0 +1,349 @@
+// accounting-ai-growth-agent database schema
+// Single-tenant, single-operator system. No multi-tenancy, no billing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Research
+// ---------------------------------------------------------------------------
+
+enum SourceTier {
+  TIER1_PRIMARY
+  TIER2_TRUSTED
+  TIER3_MEDIA
+}
+
+enum SourceKind {
+  RSS
+  HTML
+  API
+}
+
+model ResearchSource {
+  id        String     @id @default(cuid())
+  name      String
+  url       String     @unique
+  kind      SourceKind
+  tier      SourceTier
+  enabled   Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  items ResearchItem[]
+
+  @@index([tier])
+  @@index([enabled])
+}
+
+enum ResearchItemStatus {
+  NEW
+  SCORED
+  SELECTED
+  REJECTED
+  ARCHIVED
+}
+
+model ResearchItem {
+  id                  String             @id @default(cuid())
+  title               String
+  url                 String
+  sourceId             String
+  sourceName          String
+  sourceTier          SourceTier
+  publishedAt         DateTime?
+  discoveredAt        DateTime           @default(now())
+  rawSummary          String
+  relevanceScore      Float?
+  freshnessScore      Float?
+  authorityScore      Float?
+  accountingRelevance Float?
+  productRelevance    Float?
+  finalScore          Float?
+  status              ResearchItemStatus @default(NEW)
+  contentHash         String             @unique
+
+  source ResearchSource @relation(fields: [sourceId], references: [id])
+  topics Topic[]
+
+  @@index([status])
+  @@index([contentHash])
+  @@index([discoveredAt])
+}
+
+// ---------------------------------------------------------------------------
+// Topics
+// ---------------------------------------------------------------------------
+
+enum TopicStatus {
+  CANDIDATE
+  SELECTED
+  BRIEFED
+  VERIFIED
+  REJECTED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TopicKind {
+  NEWS
+  EVERGREEN
+  PRODUCT_LED
+}
+
+model Topic {
+  id             String      @id @default(cuid())
+  title          String
+  summary        String
+  kind           TopicKind
+  contentPillar  String // education | news | product | problems | case_study | direct_marketing
+  score          Float
+  novelty        Float
+  status         TopicStatus @default(CANDIDATE)
+  semanticKey    String // normalized topic fingerprint used for dedup
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  researchItems ResearchItem[]
+  claims        Claim[]
+  drafts        ContentDraft[]
+
+  @@index([status])
+  @@index([semanticKey])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Fact verification
+// ---------------------------------------------------------------------------
+
+enum ClaimVerificationStatus {
+  VERIFIED
+  PARTIALLY_VERIFIED
+  UNVERIFIED
+  CONFLICTING
+}
+
+enum LegalStatus {
+  DRAFT
+  CONSULTATION
+  PROPOSAL
+  SIGNED_LAW
+  IN_FORCE
+  UNKNOWN
+}
+
+model Claim {
+  id             String                   @id @default(cuid())
+  topicId        String
+  text           String
+  effectiveDate  DateTime?
+  legalStatus    LegalStatus              @default(UNKNOWN)
+  confidence     Float
+  verification   ClaimVerificationStatus
+  reasoning      String
+  createdAt      DateTime                 @default(now())
+
+  topic    Topic            @relation(fields: [topicId], references: [id])
+  evidence SourceEvidence[]
+
+  @@index([topicId])
+  @@index([verification])
+}
+
+model SourceEvidence {
+  id          String     @id @default(cuid())
+  claimId     String
+  sourceName  String
+  sourceTier  SourceTier
+  url         String
+  quote       String
+  supports    Boolean // true = supports claim, false = contradicts it
+  createdAt   DateTime   @default(now())
+
+  claim Claim @relation(fields: [claimId], references: [id])
+
+  @@index([claimId])
+}
+
+// ---------------------------------------------------------------------------
+// Content
+// ---------------------------------------------------------------------------
+
+enum Platform {
+  LINKEDIN
+  LINKEDIN_PAGE
+  X
+  FACEBOOK
+  INSTAGRAM
+  TIKTOK
+}
+
+enum DraftStatus {
+  GENERATED
+  SAFETY_CHECKED
+  APPROVED
+  REJECTED
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+model ContentDraft {
+  id            String      @id @default(cuid())
+  topicId       String
+  platform      Platform
+  body          String
+  hook          String?
+  hashtags      String[]
+  slideCount    Int         @default(0)
+  status        DraftStatus @default(GENERATED)
+  safetyVerdict String? // ALLOW | ALLOW_WITH_CAUTION | REQUIRE_APPROVAL | BLOCK
+  safetyReasons String[]
+  semanticSummary String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  topic     Topic            @relation(fields: [topicId], references: [id])
+  media     MediaAsset[]
+  scheduled ScheduledContent?
+  approvals Approval[]
+
+  @@index([topicId])
+  @@index([platform])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  draftId    String
+  slideIndex Int
+  filePath   String
+  width      Int
+  height     Int
+  postizId   String? // id returned by Postiz /upload, once uploaded
+  createdAt  DateTime @default(now())
+
+  draft ContentDraft @relation(fields: [draftId], references: [id])
+
+  @@index([draftId])
+}
+
+enum ScheduleStatus {
+  PLANNED
+  SENT_TO_POSTIZ
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+model ScheduledContent {
+  id           String         @id @default(cuid())
+  draftId      String         @unique
+  platform     Platform
+  scheduledFor DateTime
+  status       ScheduleStatus @default(PLANNED)
+  postizPostId String?
+  postizIntegrationId String?
+  lastError    String?
+  attempts     Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  draft     ContentDraft       @relation(fields: [draftId], references: [id])
+  published PublishedContent?
+
+  @@index([scheduledFor])
+  @@index([status])
+}
+
+model PublishedContent {
+  id                 String   @id @default(cuid())
+  scheduledContentId String   @unique
+  platform           Platform
+  postizPostId        String
+  releaseUrl         String?
+  publishedAt        DateTime @default(now())
+
+  // Analytics (P2, populated best-effort)
+  impressions   Int?
+  likes         Int?
+  comments      Int?
+  shares        Int?
+  engagementRate Float?
+  metricsFetchedAt DateTime?
+
+  scheduled ScheduledContent @relation(fields: [scheduledContentId], references: [id])
+
+  @@index([platform])
+  @@index([publishedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Approvals (DRAFT autopilot mode)
+// ---------------------------------------------------------------------------
+
+enum ApprovalDecision {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Approval {
+  id        String           @id @default(cuid())
+  draftId   String
+  decision  ApprovalDecision @default(PENDING)
+  reason    String?
+  decidedAt DateTime?
+  createdAt DateTime         @default(now())
+
+  draft ContentDraft @relation(fields: [draftId], references: [id])
+
+  @@index([draftId])
+  @@index([decision])
+}
+
+// ---------------------------------------------------------------------------
+// Ops / observability
+// ---------------------------------------------------------------------------
+
+enum RunKind {
+  RESEARCH
+  PLAN
+  GENERATE_WEEK
+  FULL_PIPELINE
+  QUEUE_CHECK
+}
+
+enum RunStatus {
+  RUNNING
+  SUCCESS
+  PARTIAL_FAILURE
+  FAILED
+}
+
+model AgentRun {
+  id          String    @id @default(cuid())
+  kind        RunKind
+  status      RunStatus @default(RUNNING)
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+  log         Json[] // ordered list of {ts, stage, message, data?}
+  errorSummary String?
+
+  @@index([kind])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
