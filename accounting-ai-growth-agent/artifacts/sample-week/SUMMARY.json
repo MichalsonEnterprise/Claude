@@ -1,0 +1,390 @@
+{
+  "generatedAt": "2026-08-28T23:12:31.194Z",
+  "weekResult": {
+    "weekStart": "2026-08-31T00:00:00.000Z",
+    "slots": 28,
+    "sent": 0,
+    "waiting": 28,
+    "failed": 0
+  },
+  "drafts": [
+    {
+      "platform": "LINKEDIN",
+      "topic": "Częste błędy przedsiębiorców przy rozliczeniach VAT",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh59y000lvcvifr7ljh95.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Częste błędy przedsiębiorców przy rozliczeniach VAT",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5af000pvcvimdkggggs.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Częste błędy przedsiębiorców przy rozliczeniach VAT",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5at000tvcvit0qnhuah.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Częste błędy przedsiębiorców przy rozliczeniach VAT",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5b8000xvcviq40yw8bb.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Częste błędy przedsiębiorców przy rozliczeniach VAT",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5cj0011vcvihjmqf684.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Częste błędy przedsiębiorców przy rozliczeniach VAT",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5d10015vcviod5k9cvh.md"
+    },
+    {
+      "platform": "LINKEDIN",
+      "topic": "Jak działa JPK i dlaczego budzi tyle pytań",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh5dt0019vcvirdycouwl.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Jak działa JPK i dlaczego budzi tyle pytań",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5e0001dvcvi0gbeiwhr.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Jak działa JPK i dlaczego budzi tyle pytań",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5eb001hvcviqsla1gr9.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Jak działa JPK i dlaczego budzi tyle pytań",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5el001lvcvi6k8fgr0k.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Jak działa JPK i dlaczego budzi tyle pytań",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5f4001pvcviz9kbnmh4.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Jak działa JPK i dlaczego budzi tyle pytań",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5ff001tvcvi8qyeh2iv.md"
+    },
+    {
+      "platform": "LINKEDIN",
+      "topic": "Dlaczego reconciliation dokumentów jest trudne",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh5g5001xvcvibu4husd3.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Dlaczego reconciliation dokumentów jest trudne",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5gk0021vcviivia8jdy.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Dlaczego reconciliation dokumentów jest trudne",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5gs0025vcviwuvvgbqq.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Dlaczego reconciliation dokumentów jest trudne",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5h90029vcvidf0pyjmu.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Dlaczego reconciliation dokumentów jest trudne",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5hl002dvcvibb9pgosp.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Dlaczego reconciliation dokumentów jest trudne",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5ht002hvcvik1lak51y.md"
+    },
+    {
+      "platform": "LINKEDIN",
+      "topic": "Ręczne vs automatyczne zamknięcie miesiąca",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh5ih002lvcvief9gn70k.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Ręczne vs automatyczne zamknięcie miesiąca",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5ip002pvcvi2pce16vb.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Ręczne vs automatyczne zamknięcie miesiąca",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5jd002tvcviqtpappu0.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Ręczne vs automatyczne zamknięcie miesiąca",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5jk002xvcvixx5airtm.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Ręczne vs automatyczne zamknięcie miesiąca",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5js0031vcvib56qukqf.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Ręczne vs automatyczne zamknięcie miesiąca",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5k90035vcvip9jebc62.md"
+    },
+    {
+      "platform": "LINKEDIN",
+      "topic": "Kontrola kontrahenta — na co zwrócić uwagę",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh5kp0039vcvij6psnknr.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Kontrola kontrahenta — na co zwrócić uwagę",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5l6003dvcvicw9xcxqv.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Kontrola kontrahenta — na co zwrócić uwagę",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5lo003hvcvi0lv0so76.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Kontrola kontrahenta — na co zwrócić uwagę",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5m8003lvcvik5wmc2qf.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Kontrola kontrahenta — na co zwrócić uwagę",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5mk003pvcvibbzed05x.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Kontrola kontrahenta — na co zwrócić uwagę",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5mv003tvcvi45soy4yy.md"
+    },
+    {
+      "platform": "LINKEDIN",
+      "topic": "Workflow dokumentów księgowych krok po kroku",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh5nl003xvcvilksuapyi.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Workflow dokumentów księgowych krok po kroku",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5o00041vcvikkf07eg2.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Workflow dokumentów księgowych krok po kroku",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5oa0045vcvikawwjirz.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Workflow dokumentów księgowych krok po kroku",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5oo0049vcviicwp2kq7.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Workflow dokumentów księgowych krok po kroku",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5ou004dvcvi3myyh1f2.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Workflow dokumentów księgowych krok po kroku",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5p6004hvcviq4l2quqi.md"
+    },
+    {
+      "platform": "LINKEDIN",
+      "topic": "Problemy tradycyjnych systemów księgowych",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN-cmtdkh5q2004lvcvifz0gob7a.md"
+    },
+    {
+      "platform": "LINKEDIN_PAGE",
+      "topic": "Problemy tradycyjnych systemów księgowych",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "LINKEDIN_PAGE-cmtdkh5q8004pvcvitzvgk9w1.md"
+    },
+    {
+      "platform": "X",
+      "topic": "Problemy tradycyjnych systemów księgowych",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "X-cmtdkh5qo004tvcviejms6mvn.md"
+    },
+    {
+      "platform": "FACEBOOK",
+      "topic": "Problemy tradycyjnych systemów księgowych",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "FACEBOOK-cmtdkh5qt004xvcvi0yh50qdf.md"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "topic": "Problemy tradycyjnych systemów księgowych",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "INSTAGRAM-cmtdkh5qz0051vcviyegbmg2b.md"
+    },
+    {
+      "platform": "TIKTOK",
+      "topic": "Problemy tradycyjnych systemów księgowych",
+      "pillar": "education",
+      "safetyVerdict": "ALLOW",
+      "scheduledFor": null,
+      "mediaSlides": 0,
+      "file": "TIKTOK-cmtdkh5r50055vcvi8yulnasf.md"
+    }
+  ]
+}

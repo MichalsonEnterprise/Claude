@@ -1,0 +1,48 @@
+# accounting-ai-growth-agent — standalone compose file.
+#
+# This does NOT bundle Postiz. Run Postiz separately from its own official
+# docker-compose (see SETUP.md / SOCIAL_SETUP.md) — the brief is explicit
+# that we should not reimplement or fork Postiz's own deployment. Point
+# POSTIZ_BASE_URL at wherever that instance ends up listening.
+#
+# Usage:
+#   cp .env.example .env   # then edit .env
+#   docker compose up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: growth_agent
+      POSTGRES_PASSWORD: growth_agent
+      POSTGRES_DB: growth_agent
+    ports:
+      - '5433:5432'
+    volumes:
+      - growth_agent_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U growth_agent']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  growth-agent:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '8090:8090'
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://growth_agent:growth_agent@postgres:5432/growth_agent
+    volumes:
+      - ./knowledge:/app/knowledge
+      - growth_agent_media:/app/artifacts
+
+volumes:
+  growth_agent_pg:
+  growth_agent_media:
