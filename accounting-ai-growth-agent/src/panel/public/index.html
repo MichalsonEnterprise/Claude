@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<title>Accounting AI Growth Agent</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, sans-serif; background: #0B1220; color: #E7ECF3; margin: 0; padding: 24px; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .sub { color: #9CA9BD; font-size: 13px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .card { background: #131C2E; border: 1px solid #223049; border-radius: 8px; padding: 14px; }
+  .card .label { color: #9CA9BD; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+  .status-pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .ok { background: #14321f; color: #22C55E; }
+  .bad { background: #3a1414; color: #f87171; }
+  .mock { background: #332a10; color: #eab308; }
+  button { background: #3D8BFD; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-size: 13px; cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
+  button.secondary { background: #223049; }
+  button.danger { background: #7f1d1d; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #223049; }
+  th { color: #9CA9BD; font-weight: 600; }
+  section { margin-bottom: 28px; }
+  pre { background: #0d1420; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+  #log { max-height: 160px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<h1>Accounting AI — Growth Agent</h1>
+<div class="sub">Prywatny, autonomiczny agent marketingowy. Panel wyłącznie do podglądu i kontroli operacyjnej.</div>
+
+<section>
+  <div id="status-line" style="margin-bottom: 12px;"></div>
+  <button onclick="callAction('/agent/run', 'POST')">RUN RESEARCH + PLAN NOW</button>
+  <button onclick="callAction('/agent/research', 'POST')">RUN RESEARCH NOW</button>
+  <button onclick="callAction('/agent/generate-week', 'POST')">GENERATE WEEK</button>
+  <button class="secondary" onclick="callAction('/autopilot/pause', 'POST')">PAUSE</button>
+  <button class="secondary" onclick="callAction('/autopilot/resume', 'POST')">RESUME</button>
+  <button class="secondary" onclick="loadAll()">REFRESH</button>
+</section>
+
+<div class="grid" id="today-grid"></div>
+
+<section>
+  <h3>Upcoming posts</h3>
+  <table id="scheduled-table"><thead><tr><th>Platform</th><th>When</th><th>Status</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section>
+  <h3>Failed jobs</h3>
+  <table id="failures-table"><thead><tr><th>Platform</th><th>Error</th><th>Updated</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section>
+  <h3>Drafts awaiting approval</h3>
+  <table id="drafts-table"><thead><tr><th>Platform</th><th>Hook</th><th>Safety</th><th>Actions</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section>
+  <h3>Recent research</h3>
+  <table id="research-table"><thead><tr><th>Title</th><th>Source</th><th>Score</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section>
+  <h3>Recent published posts</h3>
+  <table id="published-table"><thead><tr><th>Platform</th><th>Published</th><th>Link</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section>
+  <h3>Logs (recent runs)</h3>
+  <div id="log"></div>
+</section>
+
+<script>
+const token = localStorage.getItem('panelToken') || '';
+function headers() { return token ? { 'x-panel-token': token, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' }; }
+
+async function callAction(path, method) {
+  const res = await fetch(path, { method, headers: headers() });
+  const body = await res.json().catch(() => ({}));
+  alert(res.ok ? 'OK: ' + JSON.stringify(body).slice(0, 300) : 'ERROR: ' + JSON.stringify(body));
+  loadAll();
+}
+
+async function approve(id) { await fetch('/drafts/' + id + '/approve', { method: 'POST', headers: headers() }); loadAll(); }
+async function reject(id) { await fetch('/drafts/' + id + '/reject', { method: 'POST', headers: headers() }); loadAll(); }
+
+async function loadAll() {
+  const status = await fetch('/status', { headers: headers() }).then(r => r.json()).catch(() => null);
+  if (status) {
+    document.getElementById('status-line').innerHTML =
+      'Autopilot: <b>' + status.autopilotMode + '</b> ' + (status.paused ? '<span class="status-pill bad">PAUSED</span>' : '<span class="status-pill ok">RUNNING</span>') +
+      ' &nbsp; DRY_RUN: <b>' + status.dryRun + '</b>' +
+      ' &nbsp; Postiz: <span class="status-pill ' + (status.postiz === 'MOCK' ? 'mock' : 'ok') + '">' + status.postiz + '</span>' +
+      ' &nbsp; AI: <span class="status-pill ' + (status.ai.status === 'MOCK' ? 'mock' : 'ok') + '">' + status.ai.provider + '</span>';
+
+    const t = status.today;
+    document.getElementById('today-grid').innerHTML = [
+      ['Research items', t.researchItems], ['Topics selected', t.topicsSelected], ['Drafts', t.drafts],
+      ['Scheduled', t.scheduled], ['Published', t.published], ['Failed', t.failed],
+    ].map(([label, value]) => '<div class="card"><div class="label">' + label + '</div><div class="value">' + value + '</div></div>').join('');
+  }
+
+  const scheduled = await fetch('/scheduled?limit=20', { headers: headers() }).then(r => r.json()).catch(() => []);
+  document.querySelector('#scheduled-table tbody').innerHTML = scheduled.map(s =>
+    '<tr><td>' + s.platform + '</td><td>' + new Date(s.scheduledFor).toLocaleString() + '</td><td>' + s.status + '</td></tr>').join('');
+
+  const failures = await fetch('/failures?limit=20', { headers: headers() }).then(r => r.json()).catch(() => []);
+  document.querySelector('#failures-table tbody').innerHTML = failures.map(f =>
+    '<tr><td>' + f.platform + '</td><td>' + (f.lastError || '').slice(0, 80) + '</td><td>' + new Date(f.updatedAt).toLocaleString() + '</td></tr>').join('');
+
+  const drafts = await fetch('/drafts?limit=20', { headers: headers() }).then(r => r.json()).catch(() => []);
+  document.querySelector('#drafts-table tbody').innerHTML = drafts
+    .filter(d => d.approvals.some(a => a.decision === 'PENDING'))
+    .map(d => '<tr><td>' + d.platform + '</td><td>' + (d.hook || '').slice(0, 60) + '</td><td>' + d.safetyVerdict + '</td>' +
+      '<td><button onclick="approve(\\'' + d.id + '\\')">APPROVE</button><button class="danger" onclick="reject(\\'' + d.id + '\\')">REJECT</button></td></tr>').join('');
+
+  const research = await fetch('/research?limit=15', { headers: headers() }).then(r => r.json()).catch(() => []);
+  document.querySelector('#research-table tbody').innerHTML = research.map(r =>
+    '<tr><td>' + r.title.slice(0, 70) + '</td><td>' + r.sourceName + '</td><td>' + (r.finalScore ?? '-') + '</td></tr>').join('');
+
+  const published = await fetch('/published?limit=15', { headers: headers() }).then(r => r.json()).catch(() => []);
+  document.querySelector('#published-table tbody').innerHTML = published.map(p =>
+    '<tr><td>' + p.platform + '</td><td>' + new Date(p.publishedAt).toLocaleString() + '</td><td>' + (p.releaseUrl ? '<a href="' + p.releaseUrl + '" target="_blank">link</a>' : '-') + '</td></tr>').join('');
+
+  const runs = await fetch('/runs?limit=10', { headers: headers() }).then(r => r.json()).catch(() => []);
+  document.getElementById('log').innerHTML = '<pre>' + runs.map(r => r.kind + ' [' + r.status + '] ' + new Date(r.startedAt).toLocaleString()).join('\\n') + '</pre>';
+}
+
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>
