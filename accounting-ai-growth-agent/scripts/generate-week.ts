@@ -77,6 +77,12 @@ async function main() {
 }
 
 main()
+  .then(() => {
+    // Explicit exit: the research fetchers leave open keep-alive sockets
+    // (undici's fetch connection pool) that would otherwise keep this
+    // one-shot CLI process alive indefinitely after the real work is done.
+    process.exit(0);
+  })
   .catch((err) => {
     logger.error('Sample week generation failed', { error: (err as Error).message, stack: (err as Error).stack });
     process.exit(1);

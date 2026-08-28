@@ -9,6 +9,7 @@ async function main() {
 }
 
 main()
+  .then(() => process.exit(0))
   .catch((err) => {
     logger.error('Seed failed', { error: (err as Error).message });
     process.exit(1);
