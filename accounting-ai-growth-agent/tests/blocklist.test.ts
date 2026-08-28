@@ -29,4 +29,12 @@ describe('checkBlocklist', () => {
   it('does not flag clean, hedged product content', () => {
     expect(checkBlocklist('System wykrywa niespójności w dokumentach i oznacza je do przeglądu przez księgowego.').length).toBe(0);
   });
+
+  it('does not flag the correct hedge "nie zastępuje księgowego" (does NOT replace)', () => {
+    expect(checkBlocklist('To nie zastępuje księgowego — przyspiesza jego pracę na etapie wstępnej weryfikacji.').length).toBe(0);
+  });
+
+  it('still flags an unhedged claim that the product replaces an accountant', () => {
+    expect(checkBlocklist('Accounting AI w pełni zastępuje księgowego.').length).toBeGreaterThan(0);
+  });
 });

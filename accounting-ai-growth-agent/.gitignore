@@ -4,3 +4,8 @@ dist/
 *.log
 .DS_Store
 coverage/
+
+# Working scratch dir the pipeline writes generated media to before
+# publishing (per-topic PNGs). Not the deliverable — that's
+# artifacts/sample-week/, which IS committed (brief #34).
+artifacts/media/

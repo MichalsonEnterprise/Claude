@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T23:12:31.194Z",
+  "generatedAt": "2026-08-28T23:24:14.430Z",
   "weekResult": {
     "weekStart": "2026-08-31T00:00:00.000Z",
     "slots": 28,
@@ -15,7 +15,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh59y000lvcvifr7ljh95.md"
+      "file": "LINKEDIN-cmtdkw7ag000lb6h4afpp32pj.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -24,7 +24,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5af000pvcvimdkggggs.md"
+      "file": "LINKEDIN_PAGE-cmtdkw7ap000pb6h4jmccztlp.md"
     },
     {
       "platform": "X",
@@ -33,7 +33,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5at000tvcvit0qnhuah.md"
+      "file": "X-cmtdkw7av000tb6h4dqwhgain.md"
     },
     {
       "platform": "FACEBOOK",
@@ -42,7 +42,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5b8000xvcviq40yw8bb.md"
+      "file": "FACEBOOK-cmtdkw7b0000xb6h4uzmwzbyc.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -50,8 +50,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5cj0011vcvihjmqf684.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw7b50011b6h4i5wxdbd8.md"
     },
     {
       "platform": "TIKTOK",
@@ -59,8 +59,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5d10015vcviod5k9cvh.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw7e3001bb6h4cafptgna.md"
     },
     {
       "platform": "LINKEDIN",
@@ -69,7 +69,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh5dt0019vcvirdycouwl.md"
+      "file": "LINKEDIN-cmtdkw7h4001lb6h49idx7xij.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -78,7 +78,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5e0001dvcvi0gbeiwhr.md"
+      "file": "LINKEDIN_PAGE-cmtdkw7ha001pb6h441a62ph2.md"
     },
     {
       "platform": "X",
@@ -87,7 +87,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5eb001hvcviqsla1gr9.md"
+      "file": "X-cmtdkw7hg001tb6h47w1zyrja.md"
     },
     {
       "platform": "FACEBOOK",
@@ -96,7 +96,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5el001lvcvi6k8fgr0k.md"
+      "file": "FACEBOOK-cmtdkw7hm001xb6h4od35q5bq.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -104,8 +104,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5f4001pvcviz9kbnmh4.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw7hr0021b6h451ql8fxb.md"
     },
     {
       "platform": "TIKTOK",
@@ -113,8 +113,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5ff001tvcvi8qyeh2iv.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw7ju002bb6h48xgk0xxb.md"
     },
     {
       "platform": "LINKEDIN",
@@ -123,7 +123,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh5g5001xvcvibu4husd3.md"
+      "file": "LINKEDIN-cmtdkw7mr002lb6h4z4xc7ejk.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -132,7 +132,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5gk0021vcviivia8jdy.md"
+      "file": "LINKEDIN_PAGE-cmtdkw7mx002pb6h45goinyj8.md"
     },
     {
       "platform": "X",
@@ -141,7 +141,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5gs0025vcviwuvvgbqq.md"
+      "file": "X-cmtdkw7n3002tb6h4c49vmjp3.md"
     },
     {
       "platform": "FACEBOOK",
@@ -150,7 +150,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5h90029vcvidf0pyjmu.md"
+      "file": "FACEBOOK-cmtdkw7n8002xb6h4ftjzwko7.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -158,8 +158,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5hl002dvcvibb9pgosp.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw7ne0031b6h411rp0083.md"
     },
     {
       "platform": "TIKTOK",
@@ -167,8 +167,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5ht002hvcvik1lak51y.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw7pf003bb6h4m5sanjoo.md"
     },
     {
       "platform": "LINKEDIN",
@@ -177,7 +177,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh5ih002lvcvief9gn70k.md"
+      "file": "LINKEDIN-cmtdkw7s6003lb6h444wdj929.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -186,7 +186,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5ip002pvcvi2pce16vb.md"
+      "file": "LINKEDIN_PAGE-cmtdkw7sc003pb6h4gl4lex18.md"
     },
     {
       "platform": "X",
@@ -195,7 +195,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5jd002tvcviqtpappu0.md"
+      "file": "X-cmtdkw7sh003tb6h469b4w59w.md"
     },
     {
       "platform": "FACEBOOK",
@@ -204,7 +204,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5jk002xvcvixx5airtm.md"
+      "file": "FACEBOOK-cmtdkw7sn003xb6h47mg8kowv.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -212,8 +212,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5js0031vcvib56qukqf.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw7st0041b6h4ez8j8d4a.md"
     },
     {
       "platform": "TIKTOK",
@@ -221,8 +221,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5k90035vcvip9jebc62.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw7uu004bb6h4bb46qdya.md"
     },
     {
       "platform": "LINKEDIN",
@@ -231,7 +231,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh5kp0039vcvij6psnknr.md"
+      "file": "LINKEDIN-cmtdkw7xk004lb6h4bgjb3mcx.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -240,7 +240,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5l6003dvcvicw9xcxqv.md"
+      "file": "LINKEDIN_PAGE-cmtdkw7xp004pb6h4ppp1sggh.md"
     },
     {
       "platform": "X",
@@ -249,7 +249,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5lo003hvcvi0lv0so76.md"
+      "file": "X-cmtdkw7xv004tb6h4uel9x2na.md"
     },
     {
       "platform": "FACEBOOK",
@@ -258,7 +258,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5m8003lvcvik5wmc2qf.md"
+      "file": "FACEBOOK-cmtdkw7y0004xb6h4bpw96jqb.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -266,8 +266,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5mk003pvcvibbzed05x.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw7y60051b6h4hn5ymx9p.md"
     },
     {
       "platform": "TIKTOK",
@@ -275,8 +275,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5mv003tvcvi45soy4yy.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw807005bb6h4kn342jpn.md"
     },
     {
       "platform": "LINKEDIN",
@@ -285,7 +285,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh5nl003xvcvilksuapyi.md"
+      "file": "LINKEDIN-cmtdkw82v005lb6h43o34u21i.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -294,7 +294,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5o00041vcvikkf07eg2.md"
+      "file": "LINKEDIN_PAGE-cmtdkw831005pb6h46vdke4kx.md"
     },
     {
       "platform": "X",
@@ -303,7 +303,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5oa0045vcvikawwjirz.md"
+      "file": "X-cmtdkw838005tb6h4fdnfttbh.md"
     },
     {
       "platform": "FACEBOOK",
@@ -312,7 +312,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5oo0049vcviicwp2kq7.md"
+      "file": "FACEBOOK-cmtdkw83e005xb6h4me51e57d.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -320,8 +320,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5ou004dvcvi3myyh1f2.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw83l0061b6h4mj41jc6z.md"
     },
     {
       "platform": "TIKTOK",
@@ -329,8 +329,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5p6004hvcviq4l2quqi.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw85s006bb6h4cc0vbybw.md"
     },
     {
       "platform": "LINKEDIN",
@@ -339,7 +339,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN-cmtdkh5q2004lvcvifz0gob7a.md"
+      "file": "LINKEDIN-cmtdkw88p006lb6h4ju7viz9d.md"
     },
     {
       "platform": "LINKEDIN_PAGE",
@@ -348,7 +348,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "LINKEDIN_PAGE-cmtdkh5q8004pvcvitzvgk9w1.md"
+      "file": "LINKEDIN_PAGE-cmtdkw88v006pb6h44wekk2ye.md"
     },
     {
       "platform": "X",
@@ -357,7 +357,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "X-cmtdkh5qo004tvcviejms6mvn.md"
+      "file": "X-cmtdkw891006tb6h4y97c6oqo.md"
     },
     {
       "platform": "FACEBOOK",
@@ -366,7 +366,7 @@
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
       "mediaSlides": 0,
-      "file": "FACEBOOK-cmtdkh5qt004xvcvi0yh50qdf.md"
+      "file": "FACEBOOK-cmtdkw896006xb6h4ngg3qr8b.md"
     },
     {
       "platform": "INSTAGRAM",
@@ -374,8 +374,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "INSTAGRAM-cmtdkh5qz0051vcviyegbmg2b.md"
+      "mediaSlides": 3,
+      "file": "INSTAGRAM-cmtdkw89d0071b6h484x5qrzs.md"
     },
     {
       "platform": "TIKTOK",
@@ -383,8 +383,8 @@
       "pillar": "education",
       "safetyVerdict": "ALLOW",
       "scheduledFor": null,
-      "mediaSlides": 0,
-      "file": "TIKTOK-cmtdkh5r50055vcvi8yulnasf.md"
+      "mediaSlides": 3,
+      "file": "TIKTOK-cmtdkw8bh007bb6h4qew34spa.md"
     }
   ]
 }

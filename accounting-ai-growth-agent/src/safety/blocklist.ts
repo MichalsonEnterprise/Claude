@@ -18,7 +18,10 @@ const RULES: BlocklistRule[] = [
   { name: 'individual-tax-advice-en', pattern: /\bhow to (avoid|dodge|reduce) (your\s+)?tax(es)?\b/i },
   { name: 'guaranteed-savings', pattern: /(gwarantuj\w*|na pewno).{0,20}(oszczędnoś|zapłacisz mniej)/i },
   { name: 'guaranteed-compliance', pattern: /gwarantuj\w*.{0,20}(zgodność|zgodności|zgodne z prawem)/i },
-  { name: 'replaces-advisor', pattern: /(zastępuje|zastąpi|w pełni zastępuje).{0,20}(księgow|doradc[eę] podatkow)/i },
+  // Negative lookbehind excludes "nie zastępuje" (does NOT replace) — that's
+  // the correct, hedged claim the tone-of-voice guide asks for, not a
+  // violation. Only an unhedged/positive "zastępuje" claim should BLOCK.
+  { name: 'replaces-advisor', pattern: /(?<!nie\s)(zastępuje|zastąpi)\s+(księgow\w*|doradc\w*\s+podatkow\w*)/i },
   { name: 'invented-accuracy-stat', pattern: /\b(99[.,]?\d*\s?%|100\s?%)\s*(dokładnoś|accuracy|skutecznoś)/i },
   { name: 'unsourced-competitor-attack', pattern: /\b(gorszy|gorsza|gorsze|słabszy|beznadziejny)\s+(niż|od)\s+(konkurenc|inne systemy)/i },
   { name: 'personal-data-pesel', pattern: /\bPESEL\b.{0,5}\d{11}\b/i },

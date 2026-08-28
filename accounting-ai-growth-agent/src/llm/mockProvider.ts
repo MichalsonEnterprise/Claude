@@ -16,10 +16,17 @@ export class MockLlmProvider implements LlmProvider {
   }
 
   private mockJsonFor(options: LlmCallOptions, prompt: string): string {
-    // Heuristics on prompt content let unit tests exercise different shapes
-    // without a real model. Each pipeline stage documents the shape it needs
-    // in its own prompt-builder, and this switch mirrors that contract.
-    if (/claim ledger|verify|verification/i.test(prompt)) {
+    // Dispatch on the trailing "Respond with JSON only: {...}" instruction
+    // each prompt-builder appends, NOT the whole prompt — the whole prompt
+    // includes the full knowledge base (via knowledgeBaseAsPromptBlock),
+    // which can itself contain words like "verify" or "duplicate" and would
+    // otherwise misroute every call to the same branch. Falls back to
+    // whole-prompt heuristics only if no such marker is found (e.g. a
+    // hand-written test prompt).
+    const markerIndex = prompt.lastIndexOf('Respond with JSON only');
+    const dispatchText = markerIndex >= 0 ? prompt.slice(markerIndex) : prompt;
+
+    if (/"claims"/i.test(dispatchText) || (markerIndex < 0 && /claim ledger|verify|verification/i.test(prompt))) {
       return JSON.stringify({
         claims: [
           {
@@ -32,7 +39,7 @@ export class MockLlmProvider implements LlmProvider {
         ],
       });
     }
-    if (/topic brief|content strategist/i.test(prompt)) {
+    if (/"title","summary"|"contentPillar"/i.test(dispatchText) || (markerIndex < 0 && /topic brief|content strategist/i.test(prompt))) {
       return JSON.stringify({
         title: 'Jak AI wspiera zamknięcie miesiąca w księgowości',
         summary: 'Evergreen edukacyjny temat o roli automatyzacji w zamknięciu miesiąca.',
@@ -45,7 +52,7 @@ export class MockLlmProvider implements LlmProvider {
         ],
       });
     }
-    if (/platform.?specific|writer|linkedin|instagram|tiktok|facebook|"x"/i.test(prompt)) {
+    if (/"hook","body"/i.test(dispatchText) || (markerIndex < 0 && /platform.?specific|writer|linkedin|instagram|tiktok|facebook|"x"/i.test(prompt))) {
       return JSON.stringify({
         hook: 'Zamknięcie miesiąca zajmuje zespołom księgowym średnio kilka dni.',
         body:
@@ -60,13 +67,13 @@ export class MockLlmProvider implements LlmProvider {
         ],
       });
     }
-    if (/safety gate|risk assessment/i.test(prompt)) {
+    if (/"verdict"/i.test(dispatchText) || (markerIndex < 0 && /safety gate|risk assessment/i.test(prompt))) {
       return JSON.stringify({
         verdict: 'ALLOW',
         reasons: ['No invented numbers detected.', 'No individual tax advice detected.'],
       });
     }
-    if (/duplicate/i.test(prompt)) {
+    if (/"isDuplicate"/i.test(dispatchText) || (markerIndex < 0 && /duplicate/i.test(prompt))) {
       return JSON.stringify({ isDuplicate: false, reasoning: 'Mock provider: no overlapping topic found.' });
     }
     return JSON.stringify({ note: 'mock response', prompt: prompt.slice(0, 120) });
