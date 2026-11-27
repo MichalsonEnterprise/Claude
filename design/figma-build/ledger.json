@@ -1,0 +1,2942 @@
+[
+ {
+  "id": "DS-01",
+  "name": "Brand / logo / cover",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-02",
+  "name": "Colour primitives + semantic variables (incl. balance colours, chain colours)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-03",
+  "name": "Gradients and effects",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-04",
+  "name": "Typography styles (incl. Number & Mono)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-05",
+  "name": "Spacing, radius, elevation, grids per breakpoint",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-06",
+  "name": "Icon set (nav, status, chain, token, game)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-07",
+  "name": "Motion specs",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-08",
+  "name": "Data-viz style guide",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DS-09",
+  "name": "DEMO badge + compliance notice specs",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "01",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-01",
+  "name": "Buttons",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-02",
+  "name": "Inputs & form controls (incl. amount, address, OTP, upload)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-03",
+  "name": "Selects / dropdowns (network, token)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-04",
+  "name": "Cards (stat, balance, jackpot, game, winner, round, VIP, network, notification)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-05",
+  "name": "Tables (all cell types, density, toolbar, skeleton)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-06",
+  "name": "Modals, drawers, bottom sheets",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-07",
+  "name": "Tabs, badges, tooltips",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-08",
+  "name": "Toasts & alerts (incl. regulatory/region/security)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-09",
+  "name": "Navigation (public header variants, dashboard sidebar, mobile tab bar, breadcrumb, stepper, pagination)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-10",
+  "name": "Footer variants",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-11",
+  "name": "Charts",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-12",
+  "name": "Wallet components",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-13",
+  "name": "Transaction components",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-14",
+  "name": "Jackpot components",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-15",
+  "name": "Game components (per game sets: roulette, crash, dice, coin, cards)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-16",
+  "name": "User components",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-17",
+  "name": "Admin components",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CMP-18",
+  "name": "Responsible-gaming components (limit setter, session bar, reality-check modal)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "02",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-01",
+  "name": "HomePage",
+  "states": "sections H1–H12 as modular frames + states: logged-out, logged-in, wallet-disconnected, wallet-connected, insufficient funds, active round, no active round, restricted region",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-02",
+  "name": "Global Pool (public)",
+  "states": "live, no round, restricted",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-03",
+  "name": "Games Lobby",
+  "states": "filters, search, restricted games, empty",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-04",
+  "name": "Game Details (instances ×6)",
+  "states": "per game",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-05",
+  "name": "Winners Hall",
+  "states": "filters, empty",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-06",
+  "name": "Leaderboard",
+  "states": "daily/weekly/monthly",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-07",
+  "name": "Provably Fair (explainer + verifier)",
+  "states": "verified, failed, empty",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-08",
+  "name": "How It Works",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-09",
+  "name": "Supported Networks",
+  "states": "per-chain details",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-10",
+  "name": "VIP Program",
+  "states": "tiers",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-11",
+  "name": "Affiliate Program",
+  "states": "calculator",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-12",
+  "name": "About Us",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-13",
+  "name": "Security Center",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-14",
+  "name": "FAQ",
+  "states": "search, categories",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-15",
+  "name": "Contact",
+  "states": "form states",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-16",
+  "name": "Terms & Conditions",
+  "states": "long-form",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-17",
+  "name": "Privacy Policy",
+  "states": "long-form",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-18",
+  "name": "Responsible Gaming",
+  "states": "resources",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-19",
+  "name": "AML/KYC Policy",
+  "states": "long-form",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-20",
+  "name": "Restricted Countries",
+  "states": "search, list",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-21",
+  "name": "Geo-block interstitial",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-22",
+  "name": "Age gate + licence notice modal",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-23",
+  "name": "Cookie consent (banner + preferences)",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-24",
+  "name": "404",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-25",
+  "name": "500",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PUB-26",
+  "name": "Maintenance",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "03",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-01",
+  "name": "Register (email + password)",
+  "states": "validation, loading, error, success",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-02",
+  "name": "Register — wallet-first",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-03",
+  "name": "Login",
+  "states": "error, locked, loading",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-04",
+  "name": "Email Verification",
+  "states": "sent, code entry, resend cooldown, expired, success",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-05",
+  "name": "Forgot Password",
+  "states": "sent, error",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-06",
+  "name": "Reset Password",
+  "states": "strength, expired link, success",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-07",
+  "name": "2FA Enrollment",
+  "states": "scan → confirm → backup codes",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-08",
+  "name": "2FA Challenge (login / withdrawal)",
+  "states": "wrong code, locked",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-09",
+  "name": "Connect Wallet modal",
+  "states": "list, WalletConnect QR, connecting, rejected, wrong network, success",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-10",
+  "name": "Wallet Verification (sign message)",
+  "states": "request, success, rejected, expired",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-11",
+  "name": "KYC Intro & levels",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-12",
+  "name": "KYC Personal Details",
+  "states": "validation",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-13",
+  "name": "KYC Document Upload",
+  "states": "requirements, preview, error",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-14",
+  "name": "KYC Liveness / Selfie",
+  "states": "permission denied, retake",
+  "pri": "P1",
+  "sizes": "M·D",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-15",
+  "name": "KYC Pending",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-16",
+  "name": "KYC Approved",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-17",
+  "name": "KYC Rejected",
+  "states": "reasons, resubmit",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-18",
+  "name": "Restricted Account",
+  "states": "suspended, under review, self-excluded, geo-restricted",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-19",
+  "name": "Account Recovery",
+  "states": "start, verify identity, wallet recovery, cooling-off notice, success",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-20",
+  "name": "Session expired / re-auth modal",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "AUTH-21",
+  "name": "New-device login alert",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "04",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-00",
+  "name": "Dashboard shell (sidebar expanded/collapsed, topbar)",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "05",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-01",
+  "name": "Dashboard Overview",
+  "states": "new user empty, active, restricted",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "05",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-02",
+  "name": "Notification Center",
+  "states": "empty, unread",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G1",
+  "name": "My Games",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G2",
+  "name": "My Entries",
+  "states": "empty, filters",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G3",
+  "name": "My Active Rounds",
+  "states": "live, empty",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G4",
+  "name": "My Results",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G5",
+  "name": "My Winnings (claim/settlement)",
+  "states": "owed, settled",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G6",
+  "name": "Game History",
+  "states": "filters, export",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-G7",
+  "name": "Favorites",
+  "states": "empty",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A1",
+  "name": "Personal Information",
+  "states": "edit, saved",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A2",
+  "name": "Security Settings (security score)",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A3",
+  "name": "Two-Factor Authentication mgmt",
+  "states": "enable/disable/reset",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A4",
+  "name": "KYC Status",
+  "states": "all statuses",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A5",
+  "name": "Verification Documents",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A6",
+  "name": "Login History",
+  "states": "suspicious flag",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A7",
+  "name": "Connected Devices",
+  "states": "revoke",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A8",
+  "name": "Session Management",
+  "states": "end all",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A9",
+  "name": "Notification Preferences",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-A10",
+  "name": "Anti-Phishing Code",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Account",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-F1",
+  "name": "Deposits",
+  "states": "empty, filters",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Financial History",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-F2",
+  "name": "Withdrawals",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Financial History",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-F3",
+  "name": "Fees",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Financial History",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-F4",
+  "name": "Rewards",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Financial History",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-F5",
+  "name": "Refunds",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Financial History",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-F6",
+  "name": "Complete Transaction History + export",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "05",
+  "group": "Financial History",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-V1",
+  "name": "Current Level & Progress",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "VIP",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-V2",
+  "name": "Points & points history",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "VIP",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-V3",
+  "name": "Rewards (claim states)",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "VIP",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-V4",
+  "name": "Benefits / tier comparison",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "VIP",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-R1",
+  "name": "Referral Link & overview",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Referrals",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-R2",
+  "name": "Referral Statistics",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Referrals",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-R3",
+  "name": "Invited Users",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Referrals",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-R4",
+  "name": "Affiliate Earnings",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Referrals",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-R5",
+  "name": "Payout History (+ request payout)",
+  "states": "—",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Referrals",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG1",
+  "name": "RG Hub / overview",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG2",
+  "name": "Deposit Limits",
+  "states": "pending increase cool-down",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG3",
+  "name": "Participation Limits",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG4",
+  "name": "Time Limits",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG5",
+  "name": "Reality Checks (settings + popup)",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG6",
+  "name": "Cooling-Off Period",
+  "states": "confirm, active",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "USR-RG7",
+  "name": "Self-Exclusion",
+  "states": "multi-step, active",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "05",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-01",
+  "name": "Wallet Overview (balance breakdown: available/locked/pending/owed)",
+  "states": "empty, loading",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-02",
+  "name": "Connected Wallets",
+  "states": "add, remove, primary, error",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-03",
+  "name": "Deposit — Step 1 Select Network",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-04",
+  "name": "Deposit — Step 2 Select Token",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-05",
+  "name": "Deposit — Step 3 Deposit Address",
+  "states": "wrong-network warning, min deposit",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-06",
+  "name": "Deposit — Step 4 QR Code",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-07",
+  "name": "Deposit — Step 5 Transaction Pending (confirmations n/N)",
+  "states": "delayed",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-08",
+  "name": "Deposit — Step 6 Confirmation",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-09",
+  "name": "Deposit — Step 7 Successful (receipt)",
+  "states": "failed/unrecognised",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-10",
+  "name": "Withdraw — Step 1 Select Asset",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-11",
+  "name": "Withdraw — Step 2 Select Network",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-12",
+  "name": "Withdraw — Step 3 Enter Address",
+  "states": "invalid, whitelisted, new-address cooldown",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-13",
+  "name": "Withdraw — Step 4 Enter Amount",
+  "states": "min/max, over balance, limit reached",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-14",
+  "name": "Withdraw — Step 5 Fees & Summary",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-15",
+  "name": "Withdraw — Step 6 Risk Validation",
+  "states": "pass, KYC required, flagged",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-16",
+  "name": "Withdraw — Step 7 Two-Factor Confirmation",
+  "states": "wrong code, locked",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-17",
+  "name": "Withdraw — Step 8 Pending",
+  "states": "processing, queued, manual review",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-18",
+  "name": "Withdraw — Step 9 Successful",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-19",
+  "name": "Withdraw — Step 9 Failed",
+  "states": "reasons + actions",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-20",
+  "name": "Transaction History",
+  "states": "filters, empty, loading",
+  "pri": "P0",
+  "sizes": "D·T·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-21",
+  "name": "Transaction Detail drawer",
+  "states": "pending / failed / successful",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-22",
+  "name": "Withdrawal Status tracker",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-23",
+  "name": "Whitelisted Addresses",
+  "states": "add (cooldown), remove",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "WAL-24",
+  "name": "Insufficient-funds / limit / maintenance banners & modals",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "06",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-01",
+  "name": "Global Pool Hub (pool balance, current round, participants, real countdown, threshold)",
+  "states": "active, no round, restricted, wallet disconnected",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-02",
+  "name": "Participation Preview modal (amount, entries, 0.05 USDT fee, network fee, odds disclosure, limit check, licence notice)",
+  "states": "insufficient funds, limit reached, wrong network",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-03",
+  "name": "Participation Pending",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-04",
+  "name": "Participation Success (entry receipt)",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-05",
+  "name": "Round Drawing (VRF stepper: requested → fulfilled → settled)",
+  "states": "delayed",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-06",
+  "name": "Round Result — winner view",
+  "states": "win / not selected",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-07",
+  "name": "Round Result — public view (winner info, prize distribution, PF result)",
+  "states": "—",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-08",
+  "name": "Round History",
+  "states": "filters",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-09",
+  "name": "Round Detail",
+  "states": "cancelled → refunds",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-10",
+  "name": "Entry History",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-11",
+  "name": "Prize Distribution breakdown",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-12",
+  "name": "Provably Fair Result verification",
+  "states": "verified/failed",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GP-13",
+  "name": "Edge states: round closed, round cancelled (refund owed), VRF delayed",
+  "states": "—",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "07",
+  "group": "Responsible Gaming",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-01",
+  "name": "Table (felt + chips + bet slip)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-02",
+  "name": "Number selection (inside bets)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-03",
+  "name": "Outside bets (Red/Black, Odd/Even, dozens, columns, 1–18/19–36)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-04",
+  "name": "Spinning state",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-05",
+  "name": "Result Screen (win/lose)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-06",
+  "name": "Bet History",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-07",
+  "name": "Rules & payouts",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-08",
+  "name": "Provably-fair verification",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "RL-09",
+  "name": "Error/limit/region states",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Roulette",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-01",
+  "name": "Pre-round betting",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-02",
+  "name": "Active run (multiplier curve, cash-out)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-03",
+  "name": "Cashed-out state",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-04",
+  "name": "Crashed / Result screen",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-05",
+  "name": "Round History + Game Statistics",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-06",
+  "name": "Auto cash-out settings",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-07",
+  "name": "Provably-fair verification",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CR-08",
+  "name": "Error/connection-lost/limit/region states",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Crash",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-01",
+  "name": "Dice interface (slider, over/under, bet panel)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-02",
+  "name": "Number selection + live probability/payout display",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-03",
+  "name": "Rolling state",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-04",
+  "name": "Result Screen (win/lose)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-05",
+  "name": "History",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-06",
+  "name": "Provably-fair verification",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "DI-07",
+  "name": "Error/limit/region states",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Dice",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CF-01",
+  "name": "Bet interface (Heads/Tails)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "08",
+  "group": "Coinflip",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CF-02",
+  "name": "Flipping state",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Coinflip",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CF-03",
+  "name": "Result Screen (win/lose)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Coinflip",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CF-04",
+  "name": "History",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Coinflip",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CF-05",
+  "name": "Provably-fair verification",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Coinflip",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "CF-06",
+  "name": "Error/limit/region states",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Coinflip",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-01",
+  "name": "Table + betting interface",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·T·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-02",
+  "name": "Dealing state",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-03",
+  "name": "Player decision (Hit/Stand/Double/Split/Insurance)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-04",
+  "name": "Dealer turn",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-05",
+  "name": "Result Screen variants (win/lose/push/blackjack/bust)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-06",
+  "name": "History",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-07",
+  "name": "Rules",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-08",
+  "name": "Provably-fair verification",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "BJ-09",
+  "name": "Reconnect/recovery, error/limit/region states",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Blackjack",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "GM-01",
+  "name": "Game session RG bar + reality-check popup (as designed within games)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·M",
+  "page": "08",
+  "group": "Shared",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-00",
+  "name": "Admin shell (sidebar, topbar, command palette, role-based \"no permission\" state)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Shared",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-01",
+  "name": "Admin Login + 2FA + session timeout",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Shared",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-02",
+  "name": "Overview (all KPIs + system health) (M)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "09",
+  "group": "Shared",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U1",
+  "name": "Users List",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U2",
+  "name": "User Profile (summary)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U3",
+  "name": "Account Details",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U4",
+  "name": "Wallet Addresses",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U5",
+  "name": "KYC Status",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U6",
+  "name": "AML Risk",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U7",
+  "name": "Transaction History",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U8",
+  "name": "Account Restrictions (apply/lift with reason + 2FA)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U9",
+  "name": "Responsible Gaming Status",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-U10",
+  "name": "Audit History",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "User Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F1",
+  "name": "Deposits",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F2",
+  "name": "Withdrawals queue + detail (controlled approve/reject, four-eyes) (M)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F3",
+  "name": "Platform Fees",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F4",
+  "name": "Pool Accounting",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F5",
+  "name": "Financial Ledger (append-only)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F6",
+  "name": "Reconciliation (match/mismatch)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F7",
+  "name": "Refunds",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F8",
+  "name": "Revenue Reports",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-F9",
+  "name": "Export CSV (modal + states)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Finance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G1",
+  "name": "Games List",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G2",
+  "name": "Game Configuration (versioned, dual-approved)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G3",
+  "name": "Game Status",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G4",
+  "name": "Game Statistics",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G5",
+  "name": "Round Management (monitor + permitted controls)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G6",
+  "name": "Game History",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-G7",
+  "name": "Provably Fair Logs",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Game Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P1",
+  "name": "Pool Overview",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P2",
+  "name": "Pool Balance",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P3",
+  "name": "Active Round (monitoring) (M)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P4",
+  "name": "Historical Rounds",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P5",
+  "name": "Participant List",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P6",
+  "name": "Prize Distribution",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P7",
+  "name": "VRF Status",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P8",
+  "name": "Settlement Status",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P9",
+  "name": "Refund Status",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-P10",
+  "name": "\"Immutable by design\" policy panel / circuit-breaker (dual approval)",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Global Pool Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B1",
+  "name": "Supported Networks",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B2",
+  "name": "Smart Contracts",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B3",
+  "name": "Contract Addresses",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B4",
+  "name": "Transaction Monitoring",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B5",
+  "name": "Blockchain Events",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B6",
+  "name": "Network Health",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B7",
+  "name": "Failed Transactions",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-B8",
+  "name": "Gas Statistics",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Blockchain Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C1",
+  "name": "KYC Queue + review detail (M)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C2",
+  "name": "AML Alerts (M)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T·M",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C3",
+  "name": "Suspicious Transactions",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C4",
+  "name": "Sanctions Screening",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C5",
+  "name": "Restricted Countries",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C6",
+  "name": "Self-Exclusion",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-C7",
+  "name": "Responsible Gaming Reports",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Compliance",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-A1",
+  "name": "Affiliates",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Affiliate Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-A2",
+  "name": "Referral Statistics",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Affiliate Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-A3",
+  "name": "Commissions",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Affiliate Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-A4",
+  "name": "Payouts",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Affiliate Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-A5",
+  "name": "Fraud Detection",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Affiliate Management",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-M1",
+  "name": "Banners",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Marketing",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-M2",
+  "name": "Promotions",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Marketing",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-M3",
+  "name": "Announcements",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Marketing",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-M4",
+  "name": "Notifications",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Marketing",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-M5",
+  "name": "Referral Campaigns",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Marketing",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-M6",
+  "name": "CMS (with compliance review step)",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "Marketing",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-S1",
+  "name": "Admin Roles",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-S2",
+  "name": "Permissions matrix",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-S3",
+  "name": "Audit Logs",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-S4",
+  "name": "API Settings",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-S5",
+  "name": "Security",
+  "states": "",
+  "pri": "P1",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-S6",
+  "name": "System Configuration",
+  "states": "",
+  "pri": "P2",
+  "sizes": "D·L",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ADM-X1",
+  "name": "Four-eyes approval modal + confirm-with-reason + re-auth pattern",
+  "states": "",
+  "pri": "P0",
+  "sizes": "D·L·T",
+  "page": "09",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-01",
+  "name": "Mobile public header + full-screen menu",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-02",
+  "name": "Bottom tab bar (Home, Pool, Games, Wallet, Account) states",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-03",
+  "name": "Mobile Home — all sections stacked",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-04",
+  "name": "Mobile Global Pool hub + sticky participate bar",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-05",
+  "name": "Mobile Wallet overview + quick actions",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-06",
+  "name": "Mobile Deposit (bottom-sheet pattern, all steps)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-07",
+  "name": "Mobile Withdraw (bottom-sheet pattern, all steps)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-08",
+  "name": "Mobile Games lobby + game screens (thumb-reach controls)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-09",
+  "name": "Mobile Account Security (2FA, devices, sessions)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-10",
+  "name": "Mobile tables→cards patterns (transactions, entries)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-11",
+  "name": "Mobile admin subset: overview, approvals, alerts",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "MOB-12",
+  "name": "Tablet (768) behaviour sheet: navigation, grids, tables",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "10",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-01",
+  "name": "Homepage → Register → Verification → Dashboard",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-02",
+  "name": "Dashboard → Connect Wallet",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-03",
+  "name": "Wallet → Deposit → Confirmation",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-04",
+  "name": "Wallet → Withdrawal → Confirmation",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-05",
+  "name": "Global Pool → Participation Preview → Result",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-06",
+  "name": "Games Lobby → Game → Result",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-07",
+  "name": "Profile → KYC",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-08",
+  "name": "Admin → User Management",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-09",
+  "name": "Admin → Finance",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "PRO-10",
+  "name": "Admin → Pool Monitoring",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "11",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-01",
+  "name": "Empty-state matrix per module (wallet, transactions, entries, winnings, referrals, notifications, devices, admin tables)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-02",
+  "name": "Error matrix: network error, 4xx/5xx, timeout, validation, chain congestion, tx failed/dropped/replaced",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-03",
+  "name": "Loading matrix: skeletons, spinners, progress, optimistic UI",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-04",
+  "name": "Permission / role denied, session expired, offline",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-05",
+  "name": "Regulatory states: restricted region, licence required, self-excluded, age-gate fail",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-06",
+  "name": "Maintenance / degraded chain / VRF delayed / contract paused banners",
+  "states": "",
+  "pri": "P1",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ },
+ {
+  "id": "ERR-07",
+  "name": "Security warnings library (wrong network, new address, phishing warning, suspicious login)",
+  "states": "",
+  "pri": "P0",
+  "sizes": "",
+  "page": "12",
+  "group": "System",
+  "status": "NOT STARTED"
+ }
+]

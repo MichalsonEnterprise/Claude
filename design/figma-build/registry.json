@@ -1,0 +1,340 @@
+{
+ "_note": "Component registry for GLOBAL POOL file QHF8iRUMFgGMcEn3bD25jl. Use I(id, {variant props}, {Label:'..', 'Show leading icon':true, 'Leading icon': ICONS['plus']}) from helpers.js. Agents append their new components to registry-<agent>.json; the orchestrator merges.",
+ "Badge/Status": {
+  "id": "6:119",
+  "variants": {
+   "Status": [
+    "Pending",
+    "Processing",
+    "Confirmed",
+    "Approved",
+    "Failed",
+    "Rejected",
+    "Under review",
+    "Restricted",
+    "Live",
+    "New",
+    "Expired",
+    "Neutral"
+   ],
+   "Size": [
+    "S",
+    "M"
+   ]
+  }
+ },
+ "Badge/DEMO": {
+  "id": "6:130",
+  "variants": {
+   "Size": [
+    "XS",
+    "S",
+    "M"
+   ]
+  },
+  "note": "XS inline in table cells, S beside values/cards, M (DEMO DATA) in section headers"
+ },
+ "Notice/Licence": {
+  "id": "6:158",
+  "variants": {
+   "Variant": [
+    "Inline",
+    "Compact",
+    "Card"
+   ]
+  }
+ },
+ "Badge/VIP": {
+  "id": "6:211",
+  "variants": {
+   "Tier": [
+    "Bronze",
+    "Silver",
+    "Gold",
+    "Platinum",
+    "Diamond"
+   ],
+   "Size": [
+    "S",
+    "M"
+   ]
+  }
+ },
+ "Badge/Count": {
+  "id": "6:216",
+  "variants": {
+   "Size": [
+    "S",
+    "M"
+   ]
+  },
+  "props": {
+   "Count": "TEXT"
+  }
+ },
+ "Button/Primary": {
+  "id": "7:193",
+  "variants": {
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled",
+    "Loading"
+   ]
+  },
+  "props": {
+   "Label": "TEXT",
+   "Show leading icon": "BOOLEAN",
+   "Leading icon": "INSTANCE_SWAP",
+   "Show trailing icon": "BOOLEAN",
+   "Trailing icon": "INSTANCE_SWAP"
+  }
+ },
+ "Button/Secondary": {
+  "id": "7:308",
+  "variants": {
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled",
+    "Loading"
+   ]
+  },
+  "props": {
+   "Label": "TEXT",
+   "Show leading icon": "BOOLEAN",
+   "Leading icon": "INSTANCE_SWAP",
+   "Show trailing icon": "BOOLEAN",
+   "Trailing icon": "INSTANCE_SWAP"
+  }
+ },
+ "Button/Ghost": {
+  "id": "7:423",
+  "variants": {
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled",
+    "Loading"
+   ]
+  },
+  "props": {
+   "Label": "TEXT",
+   "Show leading icon": "BOOLEAN",
+   "Leading icon": "INSTANCE_SWAP",
+   "Show trailing icon": "BOOLEAN",
+   "Trailing icon": "INSTANCE_SWAP"
+  }
+ },
+ "Button/Danger": {
+  "id": "7:538",
+  "variants": {
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled",
+    "Loading"
+   ]
+  },
+  "props": {
+   "Label": "TEXT",
+   "Show leading icon": "BOOLEAN",
+   "Leading icon": "INSTANCE_SWAP",
+   "Show trailing icon": "BOOLEAN",
+   "Trailing icon": "INSTANCE_SWAP"
+  }
+ },
+ "Button/Gold": {
+  "id": "7:653",
+  "variants": {
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled",
+    "Loading"
+   ]
+  },
+  "props": {
+   "Label": "TEXT",
+   "Show leading icon": "BOOLEAN",
+   "Leading icon": "INSTANCE_SWAP",
+   "Show trailing icon": "BOOLEAN",
+   "Trailing icon": "INSTANCE_SWAP"
+  },
+  "note": "Jackpot/Global Pool participation CTA only"
+ },
+ "Button/Icon": {
+  "id": "7:774",
+  "variants": {
+   "Type": [
+    "Ghost",
+    "Secondary"
+   ],
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled"
+   ]
+  },
+  "props": {
+   "Icon": "INSTANCE_SWAP"
+  }
+ },
+ "Button/Wallet": {
+  "id": "7:859",
+  "variants": {
+   "Size": [
+    "M",
+    "S"
+   ],
+   "State": [
+    "Disconnected",
+    "Hover",
+    "Connecting",
+    "Connected",
+    "Wrong network",
+    "Disabled"
+   ]
+  }
+ },
+ "Button/Group": {
+  "id": "7:919",
+  "variants": {
+   "Items": [
+    "2",
+    "3",
+    "4"
+   ]
+  }
+ },
+ "Chain/BNB Chain": {
+  "id": "4:754"
+ },
+ "Chain/Polygon": {
+  "id": "4:760"
+ },
+ "Chain/Arbitrum": {
+  "id": "4:766"
+ },
+ "Chain/Ethereum": {
+  "id": "4:772"
+ },
+ "Chain/Solana": {
+  "id": "4:779"
+ },
+ "Token/USDT": {
+  "id": "4:785"
+ },
+ "Brand/Logo Mark": {
+  "id": "4:792"
+ },
+ "Brand/Logo": {
+  "id": "4:797"
+ },
+ "Notice/Demo Data": {
+  "id": "6:131",
+  "props": {
+   "Message": "TEXT"
+  },
+  "note": "first child of every screen frame, FILL width"
+ },
+ "Badge/18+": {
+  "id": "6:159"
+ },
+ "User/Avatar": {
+  "id": "9:238",
+  "variants": {
+   "Size": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL"
+   ]
+  },
+  "props": {
+   "Initials": "TEXT",
+   "Show status": "BOOLEAN"
+  }
+ },
+ "Wallet/Network Pill": {
+  "id": "9:377",
+  "variants": {
+   "Chain": [
+    "BNB Chain",
+    "Polygon",
+    "Arbitrum",
+    "Ethereum",
+    "Solana"
+   ],
+   "Status": [
+    "Operational",
+    "Degraded",
+    "Down"
+   ]
+  },
+  "props": {
+   "Show status label": "BOOLEAN",
+   "Show chevron": "BOOLEAN"
+  }
+ },
+ "Wallet/Address Chip": {
+  "id": "9:418",
+  "variants": {
+   "Size": [
+    "S",
+    "M"
+   ],
+   "State": [
+    "Default",
+    "Copied"
+   ]
+  },
+  "props": {
+   "Address": "TEXT",
+   "Show DEMO": "BOOLEAN"
+  }
+ }
+}
