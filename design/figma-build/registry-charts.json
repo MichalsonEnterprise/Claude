@@ -1,0 +1,101 @@
+{
+ "_note": "Agent charts — CMP-11 Charts on page '02 — Components', section 'CMP-11 Charts' (25:17228) at X=60000, Y=0 (5016 wide, 3 columns). DS-08 Data visualisation on page '01 — Design System', section 32:22899 at X=0, Y=6000. Use I(id, {variant}, {props}) from helpers.js. All chart text is per-variant (not TEXT props) except Chart/Legend Item — override text layers by name on the instance (Title, Subtitle, Headline value, Unit, Delta value, Delta context, Header, Value, Name, Footnote text, Center value, Center label). Every chart card is 720 wide (Donut 600, Gauge 360) with a nested Badge/DEMO S; tooltips carry Badge/DEMO XS. Colours bind to the new Color aliases chart/series-1..5, chart/other, chart/prize-1..4, chart/grid, chart/baseline, chart/crosshair (see tokens below).",
+ "Chart/Legend Item": {
+  "id": "25:17311",
+  "variants": { "Key": ["Line", "Rect", "Dot"], "State": ["Default", "Hover", "Focus", "Off"] },
+  "props": { "Label": "TEXT", "Value": "TEXT", "Show value": "BOOLEAN" },
+  "note": "Recolour the nested 'Key' layer with the series token. Off = text/disabled key + strikethrough label. Root is SPACE_BETWEEN: give the instance a fixed width to right-align the value."
+ },
+ "Chart/Legend": {
+  "id": "25:17362",
+  "variants": { "Layout": ["Horizontal", "Vertical"] },
+  "note": "Horizontal = deposits by network (BNB / Arbitrum / Ethereum / Other — Polygon + Solana). Vertical 300 wide = prize distribution with values (1st 93,200.00 · 2nd 37,280.00 · 3rd 18,640.00 · runners-up 37,280.00)."
+ },
+ "Chart/Tooltip": {
+  "id": "25:17433",
+  "variants": { "Type": ["Single", "Delta", "Multi", "Bin"] },
+  "note": "256 wide, surface/overlay + Elevation/3. Line keys (12x2). Override Header, Value, Name, Delta, Delta context, Total by layer name; recolour 'Key'."
+ },
+ "Chart/Line-Area": {
+  "id": "27:15865",
+  "variants": { "State": ["Default", "Hover", "Loading", "Empty", "Error"] },
+  "variantIds": { "Default": "27:15603", "Hover": "27:15656", "Loading": "27:15729", "Empty": "27:15786", "Error": "27:15820" },
+  "note": "Pool balance 14–27 Nov 2026 (closing pool per daily round #1,235–#1,248), min-pool 50K reference, #1,245 cancelled annotation, live end 186,400.00, +7.8% vs #1,247."
+ },
+ "Chart/Bar": {
+  "id": "28:17855",
+  "variants": { "Type": ["Vertical", "Stacked"], "State": ["Default", "Hover", "Pattern"] },
+  "variantIds": { "Vertical/Default": "28:17216", "Vertical/Hover": "28:17276", "Stacked/Default": "28:17349", "Stacked/Hover": "28:17471", "Stacked/Pattern": "28:17625" },
+  "note": "Sparse matrix: Pattern exists for Stacked only. Vertical = platform fees per round (pool × 0.5%; total 10,984.65; #1,248 932.00 accruing in chart/series-4; #1,245 Refunded). Stacked = deposits by network 14–27 Nov, total 5,841,000.00 (+3.1%)."
+ },
+ "Chart/Donut": {
+  "id": "28:19543",
+  "variants": { "State": ["Default", "Hover"] },
+  "variantIds": { "Default": "28:19444", "Hover": "28:19491" },
+  "note": "600 wide. Prize split 50/20/10/20 of 186,400.00 on the ordinal ramp chart/prize-1..4; centre readout swaps on hover."
+ },
+ "Chart/Sparkline": {
+  "id": "28:19568",
+  "variants": { "Trend": ["Up", "Down", "Neutral"], "Size": ["M", "S"] },
+  "note": "M 120x36, S 80x24, no axes. Up status/success, Down status/danger, Neutral chart/other — always pair with a signed delta + icon."
+ },
+ "Chart/Multiplier Curve": {
+  "id": "29:16462",
+  "variants": { "State": ["Running", "Cashed out", "Crashed"] },
+  "variantIds": { "Running": "29:16296", "Cashed out": "29:16343", "Crashed": "29:16395" },
+  "note": "Orbit Rush round #88,214, m(t)=e^(0.1117t) (same as Game/Crash Curve 25:17535 in CMP-15, which is the live game stage). Running 2.47x @ 8.1 s; cash-out @nova.k 1.85x +17.00; crashed 3.12x @ 10.2 s with 3 cash-out labels."
+ },
+ "Chart/Heat Strip": {
+  "id": "29:17011",
+  "variants": { "Layout": ["Strip", "Grid"], "State": ["Default", "Hover"] },
+  "note": "Pool Roulette last 50 spins (#88,141–#88,190): 23 red · 23 black · 4 zero. Wheel tokens shared with Game/Roulette Cell. Independence footnote mandatory."
+ },
+ "Chart/Histogram": {
+  "id": "30:17260",
+  "variants": { "State": ["Default", "Hover"] },
+  "variantIds": { "Default": "30:17117", "Hover": "30:17180" },
+  "note": "Pool Dice last 1,000 rolls in 20 bins (46–55 per bin), expected 50 reference, roll-over-50.50 target band (49.50%)."
+ },
+ "Chart/Gauge": {
+  "id": "30:17353",
+  "variants": { "Status": ["Operational", "Degraded", "Outage"] },
+  "variantIds": { "Operational": "30:17261", "Degraded": "30:17290", "Outage": "30:17322" },
+  "note": "360 wide. Zoomed scale 98.00–100%, SLO tick 99.90%. 99.97 / 99.62 / 98.40 with icon + label chip."
+ },
+ "Chart/Progress Ring": {
+  "id": "30:23014",
+  "variants": { "Type": ["VIP", "KYC"], "Value": ["25", "50", "75", "100"] },
+  "note": "72x72 ring only (centre prints the %, 100 = check). Always place a label + exact figures beside it."
+ },
+ "Chart/Timeline": {
+  "id": "30:23292",
+  "variants": { "Status": ["Open", "Drawing", "Settled", "Cancelled"] },
+  "variantIds": { "Open": "30:23015", "Drawing": "30:23079", "Settled": "30:23147", "Cancelled": "30:23220" },
+  "note": "720 wide, 5 equal steps. #1,248: 08:00:00 open → 20:00:00 close → VRF 0x9f2c…e71a 20:00:04 → fulfilled 20:00:41 → settled 20:02:10 UTC. Cancelled = #1,245 (412/500 players, 46,850.00/50,000.00 pool → refunds, 300.00 USDT owed to @nova.k)."
+ },
+ "tokens": {
+  "chart/series-1": "VariableID:25:15162 → brand/primary",
+  "chart/series-2": "VariableID:25:15163 → status/info",
+  "chart/series-3": "VariableID:25:15164 → accent/gold",
+  "chart/series-4": "VariableID:25:15165 → brand/secondary (tonal companion of slot 1 only)",
+  "chart/series-5": "VariableID:25:15166 → status/success (success meaning only)",
+  "chart/other": "VariableID:25:15167 → ink/400",
+  "chart/prize-1": "VariableID:25:15168 → gold/200",
+  "chart/prize-2": "VariableID:25:15169 → accent/gold",
+  "chart/prize-3": "VariableID:25:15170 → accent/gold-strong",
+  "chart/prize-4": "VariableID:25:15171 → gold/600",
+  "chart/grid": "VariableID:25:15172 → border/subtle",
+  "chart/baseline": "VariableID:25:15173 → border/default",
+  "chart/crosshair": "VariableID:25:15174 → border/strong"
+ },
+ "DS-08 Data visualisation": {
+  "id": "32:22899",
+  "type": "SECTION",
+  "frames": {
+   "1 Principles & palette": "32:22900",
+   "2 Anatomy, marks & do / don't": "32:31415",
+   "3 Formatting, accessibility, DEMO & states": "32:37271",
+   "4 Examples in context": "32:52164"
+  }
+ }
+}

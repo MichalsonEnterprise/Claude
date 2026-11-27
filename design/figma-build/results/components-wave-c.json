@@ -1,0 +1,727 @@
+{
+  "summary": "Build GLOBAL POOL component families / DS docs / cover in Figma, one agent per family (args = list of family keys)",
+  "agentCount": 4,
+  "logs": [],
+  "result": [
+    {
+      "key": "cover",
+      "section": "Page \"00 — Cover & Overview\" sections: Cover 13:71 · Overview 14:2063 · Screen Ledger 14:2064 · Decisions log 14:2065 · Resume here 14:2066",
+      "created": [
+        {
+          "name": "Section/Cover",
+          "id": "13:71"
+        },
+        {
+          "name": "Frame/Cover (1920x1080: Brand/Logo, title, subtitle, v1.0 · 27 Nov 2026, Hero Radial + Gold Radial glows, orbit rings, chain/USDT satellites, DEMO jackpot card, Notice/Demo Data bar, DEMO statement, licence + 18+ footer)",
+          "id": "13:72"
+        },
+        {
+          "name": "Section/Overview",
+          "id": "14:2063"
+        },
+        {
+          "name": "Frame/Overview (product summary, page index with 13 NODE hyperlinks to pages, naming conventions, 10 compliance rules, demo data sheet, handoff notes, v1.0 changelog, jump links)",
+          "id": "15:3619"
+        },
+        {
+          "name": "Section/Screen Ledger",
+          "id": "14:2064"
+        },
+        {
+          "name": "Frame/Ledger header",
+          "id": "17:3897"
+        },
+        {
+          "name": "Frame/Ledger summary (counts by status, priority, page + progress bar)",
+          "id": "17:3926"
+        },
+        {
+          "name": "Frame/Ledger legend",
+          "id": "17:4148"
+        },
+        {
+          "name": "Frame/Ledger — 01 — Design System (9 rows)",
+          "id": "17:4196"
+        },
+        {
+          "name": "Frame/Ledger — 02 — Components (18 rows)",
+          "id": "17:4362"
+        },
+        {
+          "name": "Frame/Ledger — 03 — Public Website (26 rows)",
+          "id": "17:4672"
+        },
+        {
+          "name": "Frame/Ledger — 04 — Authentication (21 rows)",
+          "id": "17:5112"
+        },
+        {
+          "name": "Frame/Ledger — 05 — User Dashboard (42 rows)",
+          "id": "20:4470"
+        },
+        {
+          "name": "Frame/Ledger — 06 — Wallet & Transactions (24 rows)",
+          "id": "20:5184"
+        },
+        {
+          "name": "Frame/Ledger — 07 — Global Pool (13 rows)",
+          "id": "20:5590"
+        },
+        {
+          "name": "Frame/Ledger — 08 — Games (40 rows)",
+          "id": "20:7513"
+        },
+        {
+          "name": "Frame/Ledger — 09 — Admin Panel (72 rows)",
+          "id": "20:9607"
+        },
+        {
+          "name": "Frame/Ledger — 10 — Mobile Experience (12 rows)",
+          "id": "20:6982"
+        },
+        {
+          "name": "Frame/Ledger — 11 — Prototypes (10 rows)",
+          "id": "20:7197"
+        },
+        {
+          "name": "Frame/Ledger — 12 — Empty & Error States (7 rows)",
+          "id": "20:7379"
+        },
+        {
+          "name": "Section/Decisions log",
+          "id": "14:2065"
+        },
+        {
+          "name": "Frame/Decisions log (Decision/01..17, mirrors decisions.md)",
+          "id": "22:5712"
+        },
+        {
+          "name": "Section/Resume here",
+          "id": "14:2066"
+        },
+        {
+          "name": "Frame/Resume here",
+          "id": "22:6171"
+        },
+        {
+          "name": "File/registry-cover.json",
+          "id": "/home/user/Claude/design/figma-build/registry-cover.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "DS-01",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-02",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-03",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-04",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-05",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-06",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-07",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-08",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "DS-09",
+          "status": "IN PROGRESS"
+        },
+        {
+          "id": "CMP-01",
+          "status": "BUILT"
+        }
+      ],
+      "issues": [
+        "NEEDS ATTENTION: the Color variables changed during this session, and not by this agent. Dark mode now resolves brand/primary to #2CD97D (spec #8B5CF6), text/brand to #5BE89C and bg/base to #232626 (spec #09090F); Light mode brand/primary is #17A35A. Screenshots taken early (Cover, first Overview, ledger header) render violet on #09090F; later ones render green on grey. decisions.md has no entry explaining it. Page 00 nodes are 100% token-bound, so they will follow whatever palette is final. I did not touch the variables (design-system scope); the orchestrator or DS agent should confirm this is intended or revert it.",
+        "The file thumbnail was not set: figma.setFileThumbnailNodeAsync returns 'not a supported API' in the MCP runtime. Set the Cover frame 13:72 as the thumbnail manually in Figma. This is also documented in the Resume card's Known limitations.",
+        "ledger.json data artifact: the 'group' field carries over from the previous section. Pages 06 and 07 rows are tagged 'Responsible Gaming', pages 10, 11 and 12 are tagged 'System', and ADM-00..02 are tagged 'Shared'; none of these is a group header in the master prompt. On canvas these rows are shown ungrouped (ADM-X1 stays under System, as the prompt lists it). ledger.json was NOT edited; the orchestrator should clear those group values.",
+        "The Ledger summary counts (status tiles, priority tiles, by-page table, progress bar) are a static snapshot: 284 NOT STARTED / 9 IN PROGRESS / 1 BUILT / 0 VERIFIED / 0 BLOCKED, total 294; P0 126, P1 129, P2 39. Whoever updates statuses must also refresh these. Node names: 'Count/Status/<S> value', 'Count/Status/<S> pct', 'Count/Priority/<P> value', 'Sum/<page>/<COLUMN>', 'PageStatus/<page>', 'Bar/<S>' (StatusDot/<ID> recolours as described in the Resume card).",
+        "Verification: Cover, Overview (after the fix), Decisions log, Resume here, the Ledger header, and ledger groups 01, 05, 08 and 12 were each checked with a passing close-up screenshot. Groups 02, 03, 04, 06, 07, 09, 10 and 11 were checked only through a low-resolution screenshot of the whole section plus structural counts: 294 Ledger/<ID> rows, 294 Status/<ID> texts, 294 StatusDot/<ID> ellipses, all 12 frames present, no overlapping sections.",
+        "Defect found and fixed: the first Overview (1,328 px tall) would have run into the Screen Ledger at Y=1300. It was rebuilt at 1,079 px; the section now ends at Y=1159. An equal-height pass then clipped the last card in two columns (Handoff notes, Changelog); fixed by restoring HUG, measuring and applying fixed equal column heights, with a check that every card fits its content.",
+        "Not appended to decisions.md, to avoid clashing with concurrent edits; for the orchestrator to add: (a) the ledger group carry-over is corrected at render time on page 00; (b) the file thumbnail must be set manually because the API is unsupported.",
+        "The 'Next ledger IDs' on the Resume card is a snapshot as of 27 Nov 2026: DS-01..09 verify, CMP-01 QA, then CMP-02, 03, 07, 04, 05, 06, 08, 09, 10, 12, then the P0 slice. Other agents working in parallel may already have moved past it.",
+        "The task brief says 'one frame per page group (00/01..12)', but ledger.json has no page-00 rows, so 12 group frames (01–12) were built. Page 00 itself is covered by the Overview page index.",
+        "Memory: nothing in the user's memory notes bore on this task (the only indexed note is about an unrelated LegalTechAnalyses Figma file); no memory content was used."
+      ]
+    },
+    {
+      "key": "ds",
+      "section": "Page '01 — Design System' (1:2). Sections: DS-01 Brand & logo 13:2 (X0), DS-02 Colour 15:1216 (X2200), DS-03 Gradients & effects 20:4226 (X5200), DS-04 Typography 22:467 (X7400), DS-05 Spacing, radius, elevation & grids 22:5906 (X9600), DS-06 Iconography 23:10036 (X14000), DS-07 Motion 23:15575 (X16400), DS-09 DEMO & compliance notices 23:21106 (X19000); all at Y=0 with no overlaps. DS-01 ends at Y=4888, so X 0–2000 at Y=6000 is free for the charts agent. Registry written to /home/user/Claude/design/figma-build/registry-ds.json. Mid-run, the user's re-theme (decision #18: charcoal plus mint, gold for jackpots) changed the variables. I rebuilt DS-02.1, DS-02.2, DS-02.4 and DS-03, and edited DS-01 copy, so all printed hex values, aliases, gradient stops and contrast ratios are read live from the re-themed file. The task's quoted ratios (18.9, 6.5, 4.05:1 and so on) belong to the superseded violet palette. Current values include text/primary on bg/base 14.09:1, text/on-primary (dark) on mint 9.71:1, and text/on-gold on gold 11.50:1.",
+      "created": [
+        {
+          "name": "DS-01 Brand & logo / Cover hero",
+          "id": "13:3"
+        },
+        {
+          "name": "DS-01 Brand & logo / Usage",
+          "id": "14:606"
+        },
+        {
+          "name": "DS-02 Colour / 1 Primitives (94 bound swatches)",
+          "id": "22:7753"
+        },
+        {
+          "name": "DS-02 Colour / 2 Semantic tokens (81 rows, live alias/value)",
+          "id": "22:8713"
+        },
+        {
+          "name": "DS-02 Colour / 3 Balance semantics",
+          "id": "17:3173"
+        },
+        {
+          "name": "DS-02 Colour / 4 Contrast (28 WCAG pairs computed in-script)",
+          "id": "22:9831"
+        },
+        {
+          "name": "DS-03 Gradients & effects / Styles (14 gradients incl. 6 tile, 9 effects, glass, recipes)",
+          "id": "23:7065"
+        },
+        {
+          "name": "DS-04 Typography / Type system (24 styles, tabular-nums dev note, formatting)",
+          "id": "22:468"
+        },
+        {
+          "name": "DS-05 / 1 Spacing, radius & elevation (bars width-bound to space/*, size/* squares bound)",
+          "id": "22:5907"
+        },
+        {
+          "name": "DS-05 / 2 Layout grids (Breakpoint table + 1440/1280/768/390 frames with Grid styles + modes)",
+          "id": "22:6667"
+        },
+        {
+          "name": "Grid sample Desktop 1440",
+          "id": "22:6743"
+        },
+        {
+          "name": "Grid sample Laptop 1280",
+          "id": "22:6804"
+        },
+        {
+          "name": "Grid sample Tablet 768",
+          "id": "22:6865"
+        },
+        {
+          "name": "Grid sample Mobile 390",
+          "id": "22:6914"
+        },
+        {
+          "name": "DS-06 Iconography / Icons & marks (121-icon catalogue, grid/stroke rule, sizes, colours, do/don't, chain/token marks, game glyphs)",
+          "id": "23:10037"
+        },
+        {
+          "name": "DS-07 Motion / Tokens & storyboards (13 durations, 6 plotted easings, 8 storyboards x4 keyframes, reduced-motion table)",
+          "id": "23:15576"
+        },
+        {
+          "name": "DS-09 DEMO & compliance notices / Spec (DEMO XS/S/M spec, placement rules, examples on number/address/hash/user/table/chart, Demo Data bar, Licence Inline/Compact/Card, 18+, risk line, 10 §1.2 rules)",
+          "id": "23:21107"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "DS-01",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-02",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-03",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-04",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-05",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-06",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-07",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-09",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "ACCESSIBILITY (foundations owner): text/on-danger (#F5F6F6 after re-theme) on status/danger-strong #DC2626 is 4.46:1, which fails AA for 14 px danger-button labels. Fix: alias text/on-danger to paper/0 #FFFFFF (4.83:1) or use red/700 as the fill. Documented as an action card in DS-02.4; I did not change the token because foundations are outside this section.",
+        "ACCESSIBILITY: text/danger on surface/raised is 4.37:1 (fails small text). Documented as: keep validation/error text on surface/default or bg (4.89:1), not inside raised tiles or inputs.",
+        "ACCESSIBILITY (documented, decorative): border/default on bg/base is 1.46:1. Inputs rely on surface/raised fill + visible label; focus uses border/focus at 9.78:1.",
+        "HELPERS: paint() in helpers.js binds variables with a black {0,0,0} fallback colour. Headless renders and screenshots intermittently show that fallback, so icons appear black. In all DS sections I rewrote the fallback of every bound icon stroke/fill to its resolved Dark value (bindings kept). Recommend paint() use the resolved value as fallback for every agent.",
+        "FOUNDATIONS: the Gradient/Brand Solid paint style's gradientTransform puts the whole node past the end stop, so it renders as flat #1FBF69 rather than a gradient. Gradient/Brand Glow similarly renders near its end colour. Documented as-is; fix belongs to the foundations owner.",
+        "SCOPE NOTE: DS-08 (data-viz) is not in my assignment and was not built.",
+        "Copy changed in DS-01 for decisions #18–19: personality 'Composed' replaced by 'Energetic'; 'We are not' list reworded (no copying other casinos; no bonus pressure, VPN hints or wagering hype); misuse recolour example now uses sky/red so it can't be mistaken for brand mint."
+      ]
+    },
+    {
+      "key": "admin",
+      "section": "23:5438 — 'CMP-16/17 User & admin components' on page '02 — Components' at X=55000, Y=0 (2496 × 12067, no overlap with other sections). Inside: section title 23:5439, group headers 23:5442 (CMP-16) and 23:15198 (CMP-17, with a 'Controlled operations only' compliance callout), and a Doc/ header (usage line) above every set. Registry written to /home/user/Claude/design/figma-build/registry-admin.json (key: admin, 20 entries). Every set has a full description (usage, anatomy, do/don't, dev notes). Every set except KYC chip, Role chip and Permission cell has a 'Show DEMO' BOOLEAN bound to a nested Badge/DEMO XS. Existing components are reused as nested instances: Badge/Status, Badge/DEMO, Buttons, Button/Icon, User/Avatar, Wallet/Address Chip, Wallet/Network Pill, Input/Search, Menu/Filter Chip, Select/Field, Input/Textarea, Input/OTP and the icon set. All colours and spacing use tokens.",
+      "created": [
+        {
+          "name": "User/KYC Status Chip (Status×Level, 15)",
+          "id": "23:5565"
+        },
+        {
+          "name": "User/2FA Status (On|Off|Backup codes low)",
+          "id": "23:5644"
+        },
+        {
+          "name": "User/Device Row (State Current|Trusted|New × Interaction Default|Hover, 6)",
+          "id": "23:9199"
+        },
+        {
+          "name": "User/Session Row (Status Active|Expired × Interaction, 4)",
+          "id": "23:9317"
+        },
+        {
+          "name": "User/Notification Item (Type×Read, 8)",
+          "id": "23:11317"
+        },
+        {
+          "name": "Admin/KPI Tile (Trend Up|Down|Flat, sparkline+delta+DEMO)",
+          "id": "23:15270"
+        },
+        {
+          "name": "Admin/Queue Card (Queue KYC 214|Withdrawals 37 × SLA On track|At risk|Breached, 6)",
+          "id": "23:15571"
+        },
+        {
+          "name": "Admin/Risk Score Meter (Level Low|Medium|High|Critical)",
+          "id": "23:18374"
+        },
+        {
+          "name": "Admin/Role Chip (Role×Size S|M, 10)",
+          "id": "23:18440"
+        },
+        {
+          "name": "Admin/Permission Cell (Value×State Default|Hover|Focus, 12)",
+          "id": "23:18516"
+        },
+        {
+          "name": "Admin/Audit Log Header",
+          "id": "23:22005"
+        },
+        {
+          "name": "Admin/Audit Log Row (Default|Hover|Chain alert)",
+          "id": "23:22145"
+        },
+        {
+          "name": "Admin/Reconciliation Header",
+          "id": "23:22164"
+        },
+        {
+          "name": "Admin/Reconciliation Row (Match|Mismatch|Pending)",
+          "id": "23:22254"
+        },
+        {
+          "name": "Admin/Approval Request Card (four-eyes; Pending|Approved|Rejected|Expired)",
+          "id": "23:24500"
+        },
+        {
+          "name": "Admin/Contract Card (Active|Paused|Deprecated)",
+          "id": "24:14297"
+        },
+        {
+          "name": "Admin/Event Stream Header",
+          "id": "24:14325"
+        },
+        {
+          "name": "Admin/Event Stream Row (7 events)",
+          "id": "24:14528"
+        },
+        {
+          "name": "Admin/Filter Bar (Default|Filtered)",
+          "id": "24:16268"
+        },
+        {
+          "name": "Admin/Confirm With Reason Dialog (Default|Ready|Error|Submitted)",
+          "id": "25:16172"
+        },
+        {
+          "name": "Section",
+          "id": "23:5438"
+        },
+        {
+          "name": "Section title",
+          "id": "23:5439"
+        },
+        {
+          "name": "Group/CMP-16 header",
+          "id": "23:5442"
+        },
+        {
+          "name": "Group/CMP-17 header + compliance callout",
+          "id": "23:15198"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-16",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-17",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "User/KYC Status Chip",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "User/2FA Status",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "User/Device Row",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "User/Session Row",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "User/Notification Item",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/KPI Tile",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Queue Card",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Risk Score Meter",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Audit Log Row (+Header)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Permission Cell",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Role Chip",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Approval Request Card",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Reconciliation Row (+Header)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Contract Card",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Event Stream Row (+Header)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Filter Bar",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Admin/Confirm With Reason Dialog",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Verification: every set was screenshotted after it was built. Clipping and overlap were fixed and re-screenshotted: risk-meter band labels and outcome text; audit-log, reconciliation and event-stream column widths; reconciliation sub-row wrapping; filter-bar overflow, fixed by splitting it into a controls row and a filters row and collapsing the spacers; OTP resend and status rows in the dialog; placeholder colours. The final screenshot of each set passes.",
+        "Gotcha for other agents: the text fill override on the nested Select/Field Error variant's 'Value' layer rendered black, although it was bound to text/tertiary through paint(). Re-binding it with setBoundVariableForPaint on a paint that already carries the resolved colour fixed it. When a token override on text inside a nested instance looks black, re-bind it the same way.",
+        "An empty figma.createAutoLayout() frame used as a FILL spacer defaults to about 100 px tall, which inflates rows. Set layoutSizingVertical='FIXED' and resize the height to 1.",
+        "Width assumption: admin table rows and their headers (Audit Log, Reconciliation, Event Stream, Filter Bar) are 1136 wide, which assumes the admin content area at 1440 with a sidebar. Use FILL inside tables.",
+        "Extras beyond the brief: three column-header components (Admin/Audit Log Header, Admin/Reconciliation Header, Admin/Event Stream Header). Some sets have extra state axes: Interaction=Hover on the device and session rows, SLA axis on the queue card, Focus/Hover on the permission cell, Chain alert on the audit row.",
+        "Example values not on the demo sheet: all are DEMO-badged and don't conflict with it. They are: AR-1039/1042/1043, INV-0192, AML-3317/AML-3342, SCR-5521, audit entries #88213/#88241/#88244, block numbers and tx hashes for VRF/settlement/refund events, WD-20950, deprecated GlobalPool v1.2.4 0x61e0…b3a8, masked device IPs, 2FA enabled 3 Mar 2026, queue SLA metrics.",
+        "Compliance by design: no component offers result editing, winner selection, arbitrary payouts, ledger edits or balance adjustments. Sensitive actions route through the confirm-with-reason dialog and the four-eyes approval card. The circuit-breaker pause affects new entries only and needs dual approval. Reconciliation mismatches open an investigation and never edit the ledger. Audit rows have no edit or delete affordances.",
+        "Memory: the only indexed note (a LegalTechAnalyses Figma file) is unrelated to this task and was not used. Nothing new to save from this run."
+      ]
+    },
+    {
+      "key": "charts",
+      "section": "CMP-11 Charts: section 25:17228 on page '02 — Components' at X=60000, Y=0 (5016 × 4093, 3 columns, ends before CASINO-01 at 66000). DS-08 Data visualisation: section 32:22899 on page '01 — Design System' at X=0, Y=6000 (1864 × 11582, clear of DS-02 at X=2200). Registry: /home/user/Claude/design/figma-build/registry-charts.json. Decision #25 appended to /home/user/Claude/design/figma-build/decisions.md.",
+      "created": [
+        {
+          "name": "Chart/Legend Item (Key × State, 12 variants; props Label, Value, Show value)",
+          "id": "25:17311"
+        },
+        {
+          "name": "Chart/Legend (Horizontal, Vertical)",
+          "id": "25:17362"
+        },
+        {
+          "name": "Chart/Tooltip (Single, Delta, Multi, Bin)",
+          "id": "25:17433"
+        },
+        {
+          "name": "Chart/Line-Area (Default, Hover, Loading, Empty, Error)",
+          "id": "27:15865"
+        },
+        {
+          "name": "Chart/Bar (Vertical: Default, Hover; Stacked: Default, Hover, Pattern)",
+          "id": "28:17855"
+        },
+        {
+          "name": "Chart/Donut (Default, Hover)",
+          "id": "28:19543"
+        },
+        {
+          "name": "Chart/Sparkline (Trend Up/Down/Neutral × Size M/S)",
+          "id": "28:19568"
+        },
+        {
+          "name": "Chart/Multiplier Curve (Running, Cashed out, Crashed)",
+          "id": "29:16462"
+        },
+        {
+          "name": "Chart/Heat Strip (Layout Strip/Grid × State Default/Hover)",
+          "id": "29:17011"
+        },
+        {
+          "name": "Chart/Histogram (Default, Hover)",
+          "id": "30:17260"
+        },
+        {
+          "name": "Chart/Gauge (Operational, Degraded, Outage)",
+          "id": "30:17353"
+        },
+        {
+          "name": "Chart/Progress Ring (Type VIP/KYC × Value 25/50/75/100)",
+          "id": "30:23014"
+        },
+        {
+          "name": "Chart/Timeline (Open, Drawing, Settled, Cancelled)",
+          "id": "30:23292"
+        },
+        {
+          "name": "CMP-11 — Title block",
+          "id": "25:17229"
+        },
+        {
+          "name": "DS-08 section",
+          "id": "32:22899"
+        },
+        {
+          "name": "DS-08 / 1 Principles & palette",
+          "id": "32:22900"
+        },
+        {
+          "name": "DS-08 / 2 Anatomy, marks & do / don't",
+          "id": "32:31415"
+        },
+        {
+          "name": "DS-08 / 3 Formatting, accessibility, DEMO & states",
+          "id": "32:37271"
+        },
+        {
+          "name": "DS-08 / 4 Examples in context",
+          "id": "32:52164"
+        },
+        {
+          "name": "Variable chart/series-1 → brand/primary",
+          "id": "VariableID:25:15162"
+        },
+        {
+          "name": "Variable chart/series-2 → status/info",
+          "id": "VariableID:25:15163"
+        },
+        {
+          "name": "Variable chart/series-3 → accent/gold",
+          "id": "VariableID:25:15164"
+        },
+        {
+          "name": "Variable chart/series-4 → brand/secondary",
+          "id": "VariableID:25:15165"
+        },
+        {
+          "name": "Variable chart/series-5 → status/success",
+          "id": "VariableID:25:15166"
+        },
+        {
+          "name": "Variable chart/other → ink/400",
+          "id": "VariableID:25:15167"
+        },
+        {
+          "name": "Variable chart/prize-1 → gold/200",
+          "id": "VariableID:25:15168"
+        },
+        {
+          "name": "Variable chart/prize-2 → accent/gold",
+          "id": "VariableID:25:15169"
+        },
+        {
+          "name": "Variable chart/prize-3 → accent/gold-strong",
+          "id": "VariableID:25:15170"
+        },
+        {
+          "name": "Variable chart/prize-4 → gold/600",
+          "id": "VariableID:25:15171"
+        },
+        {
+          "name": "Variable chart/grid → border/subtle",
+          "id": "VariableID:25:15172"
+        },
+        {
+          "name": "Variable chart/baseline → border/default",
+          "id": "VariableID:25:15173"
+        },
+        {
+          "name": "Variable chart/crosshair → border/strong",
+          "id": "VariableID:25:15174"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-11",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "DS-08",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Palette: the assigned series set (brand/primary, accent/gold, status/info, brand/secondary, status/success) FAILS the dataviz palette validator as five free categories on surface/default #2B2F30. brand/primary vs brand/secondary is ΔE 6.0 even with full colour vision; brand/primary vs accent/gold is ΔE 2.1 under protanopia. I kept all five tokens but made the order mint → sky → gold (slots 1–3 PASS: worst CVD ΔE 19.6, normal vision 21.3). Slot 4 (brand/secondary) is restricted to a tonal companion of slot 1; slot 5 (status/success) only when the data means success; the tail folds into chart/other. This is documented in DS-08 and logged as decision #25.",
+        "Brand hues sit above the dark lightness band (L 0.72–0.86 vs 0.48–0.70). DS-08 records this as an ACCEPTED brand decision, mitigated by ≥ 3:1 contrast, 2px surface gaps, labels and opt-in patterns.",
+        "Foundations: I added 13 Color variables (chart/series-1…5, chart/other, chart/prize-1…4, chart/grid, chart/baseline, chart/crosshair). All are aliases with scopes FRAME_FILL/SHAPE_FILL/STROKE_COLOR and WEB code syntax var(--color-chart-…). Light mode aliases the same targets because Light screens are out of scope.",
+        "Prize distribution uses the ordinal ramp chart/prize-1…4 instead of the categorical palette, because ranked prizes are ordered categories (ramp validated PASS). gold/200 and gold/600 are primitives, wrapped by the chart/prize aliases.",
+        "Overlap with CMP-15: Game/Crash Curve (25:17535) and Game/Roulette Cell (25:16416) already existed. Chart/Multiplier Curve is the analytic version (axes, cash-out markers, round detail) and uses the same growth function m(t)=e^(0.1117t). Heat Strip cells reuse the same wheel tokens rather than the 56×64 felt cell. Neither component was edited.",
+        "Data consistency: the 14-day line chart assumes one round per day (#1,235 on 14 Nov … #1,248 on 27 Nov, 08:00–20:00 UTC), which matches demo-data.md for #1,244–#1,248. Platform fees per round are derived as pool × 0.5% (#1,248 = 932.00). This differs from the admin 30-day KPI of 60,700.00 fees from 1,214,000 entries, which implies about 2 rounds per day. That conflict is in demo-data.md itself; the orchestrator should pick a round cadence.",
+        "Demo values I invented and that are not in demo-data.md: rounds #1,235–#1,243 pool values; #1,245 pool of 46,850.00 with 412 players and 4,685 entries; daily deposits by network; Orbit Rush round #88,214 with cash-outs by @orbit_77 (2.40×) and @mira.sol (3.00×); 50 roulette spins #88,141–#88,190 (23 red / 23 black / 4 zero); dice histogram counts; Degraded 99.62% and Outage 98.40% gauge states; KYC Level 3 'enhanced (optional)' at 2 of 4 steps in the DS-08 examples. All are DEMO-badged; add them to demo-data.md if other screens should reuse them.",
+        "I appended decision #25 to decisions.md. I did not edit ledger.json or any other agent's sections or components.",
+        "Chart/Bar is a sparse variant matrix: State=Pattern exists only for Type=Stacked.",
+        "Chart/Progress Ring variants are snapshots at 25/50/75/100. The demo user's real VIP progress (12,840 / 20,000 = 64%) cannot be shown exactly, so in code the arc must be driven by the real value. The examples board shows VIP Gold at 100% (tier reached) with the 64% figure as text."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Build"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "build:cover",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a0bd62b0d29e5a844",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795812981258,
+      "queuedAt": 1795812981249,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Page \"00 — Cover & Overview\" sections: Cover 13:71 · Overvi…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795814443157,
+      "tokens": 360972,
+      "toolCalls": 40,
+      "durationMs": 1461898,
+      "resultPreview": "{\"section\":\"Page \\\"00 — Cover & Overview\\\" sections: Cover 13:71 · Overview 14:2063 · Screen Ledger 14:2064 · Decisions log 14:2065 · Resume here 14:2066\",\"created\":[{\"name\":\"Section/Cover\",\"id\":\"13:71\"},{\"name\":\"Frame/Cover (1920x1080: Brand/Logo, title, subtitle, v1.0 · 27 Nov 2026, Hero Radial + Gold Radial glows, orbit rings, chain/USDT satellites, DEMO jackpot card, Notice/Demo Data bar, DEMO…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "build:ds",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a08135c4e5ea52109",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795812981259,
+      "queuedAt": 1795812981249,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Page '01 — Design System' (1:2). Sections: DS-01 Brand & lo…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795815573939,
+      "tokens": 511478,
+      "toolCalls": 65,
+      "durationMs": 2592676,
+      "resultPreview": "{\"section\":\"Page '01 — Design System' (1:2). Sections: DS-01 Brand & logo 13:2 (X0), DS-02 Colour 15:1216 (X2200), DS-03 Gradients & effects 20:4226 (X5200), DS-04 Typography 22:467 (X7400), DS-05 Spacing, radius, elevation & grids 22:5906 (X9600), DS-06 Iconography 23:10036 (X14000), DS-07 Motion 23:15575 (X16400), DS-09 DEMO & compliance notices 23:21106 (X19000); all at Y=0 with no overlaps. DS…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "build:admin",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a9169c76c36f9cd1f",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814443163,
+      "queuedAt": 1795812981249,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "23:5438 — 'CMP-16/17 User & admin components' on page '02 —…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795816278249,
+      "tokens": 398422,
+      "toolCalls": 55,
+      "durationMs": 1835086,
+      "resultPreview": "{\"section\":\"23:5438 — 'CMP-16/17 User & admin components' on page '02 — Components' at X=55000, Y=0 (2496 × 12067, no overlap with other sections). Inside: section title 23:5439, group headers 23:5442 (CMP-16) and 23:15198 (CMP-17, with a 'Controlled operations only' compliance callout), and a Doc/ header (usage line) above every set. Registry written to /home/user/Claude/design/figma-build/regist…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "build:charts",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a0ea5c5c16ac3dc39",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795815573951,
+      "queuedAt": 1795812981249,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "CMP-11 Charts: section 25:17228 on page '02 — Components' a…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795817684261,
+      "tokens": 445718,
+      "toolCalls": 67,
+      "durationMs": 2110310,
+      "resultPreview": "{\"section\":\"CMP-11 Charts: section 25:17228 on page '02 — Components' at X=60000, Y=0 (5016 × 4093, 3 columns, ends before CASINO-01 at 66000). DS-08 Data visualisation: section 32:22899 on page '01 — Design System' at X=0, Y=6000 (1864 × 11582, clear of DS-02 at X=2200). Registry: /home/user/Claude/design/figma-build/registry-charts.json. Decision #25 appended to /home/user/Claude/design/figma-bu…"
+    }
+  ],
+  "totalTokens": 1716590,
+  "totalToolCalls": 227
+}
