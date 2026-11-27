@@ -66,3 +66,6 @@ After each component set / screen: take a screenshot (`await node.screenshot()` 
 
 ## 9. Your final answer (return value)
 Return a concise JSON-like report: `{ section: id, created: {"Name": "id", ...}, ledger: {"ID": "VERIFIED|BUILT|PARTIAL|NOT STARTED"}, issues: [...], notes: [...] }`. Also write your component IDs to `/home/user/Claude/design/figma-build/registry-<your-agent-key>.json` (same shape as registry.json: `{"Name": {"id": "..", "variants": {...}, "props": {...}}}`) so later agents can use them.
+
+## 10. Figma MCP limits (IMPORTANT — measured 27 Nov 2026)
+The file owner's seat (Pro, Full) is rate-limited: "You've reached the Figma MCP tool call limit…" errors appear when the whole team of agents calls too fast or after a high daily volume. Rules: (1) never call get_screenshot or get_metadata — verify with `await node.screenshot({scale:0.5})` at the END of the same use_figma build script and read structure inside use_figma; (2) batch more work per use_figma call (a whole screen or 2–3 related states per call, script < 50k chars); (3) on a limit error do NOT retry immediately — prepare the next script first, then retry once; if it fails 3 times in a row, stop and report PARTIAL with exactly which frames remain.

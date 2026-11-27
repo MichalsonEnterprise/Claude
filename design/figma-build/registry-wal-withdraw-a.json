@@ -1,0 +1,6 @@
+{
+ "_note": "Agent wal-withdraw-a — screens only (no new components). Page '06 — Wallet & Transactions', section 'WAL-10..14 Withdraw steps 1–5' (36:516030) at X=34000, Y=0. Mobile: page '10 — Mobile Experience', section 'WAL — Mobile C (Withdraw 1–5)' at X=147000, Y=0.",
+ "Section/WAL-10..14 Withdraw steps 1–5": { "id": "36:516030" },
+ "WAL-10 Withdraw — Step 1 Select Asset / 1440 / Default": { "id": "36:527247" },
+ "WAL-11 Withdraw — Step 2 Select Network / 1440 / Default": { "id": "36:538883" }
+}

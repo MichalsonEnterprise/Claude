@@ -1,0 +1,9 @@
+{
+ "_note": "Agent adm-core (ADM-00/01/02/X1 + MOB-11). No new library components were created; these are screen frame IDs on page '09 — Admin Panel', section 'ADM-00/01/02/X1 Shell, login, overview, approvals' (36:522944) at X=0, Y=0. Reusable patterns: ADM-00 Approvals inbox (36:522948) is the approver-side backdrop for four-eyes modals; admin shell = Notice/Demo Data + Body[Nav/Admin Sidebar (FILL height) | Main(min-height 988)[Nav/Admin Topbar | Content p 24/28/48/28 gap 20]]. Sidebar overrides: set nested 'Group — X' State (Default/Active/No access), hide 'Item — *' children when Finance is collapsed, override texts 'Initials', 'A. Marin', 'Finance Lead', '8 of 10 modules', '2FA session · until …'.",
+ "frames": {
+  "[ADM-00] Admin shell — Approvals inbox / 1440 / Default": "36:522948",
+  "[ADM-00] Admin shell — Command palette / 1440 / Results": "36:537070",
+  "[ADM-00] Admin shell — Command palette / 1440 / No results": "36:540097",
+  "[ADM-00] Admin shell — No permission / 1440 / Support role opens Finance link": "39:50316"
+ }
+}

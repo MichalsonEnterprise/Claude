@@ -1,0 +1,54 @@
+{
+ "_note": "PUB-07 Provably Fair, PUB-21 Geo-block interstitial, PUB-22 Age gate (agent key: pub-07-21-22). No reusable components were created: every screen is composed from library instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Shell/Footer Mega, Footer Tablet, Game/Provably Fair Verifier, Tile/Game Generic, Select/Field, Control/Radio, Control/Checkbox, Notice/Licence, Badge/*, Button/*, Tx/Hash, Strip/Trust, Card/FAQ Item, Game/Die, Game/Playing Card, Nav/Region Banner, Nav/Mobile Tab Bar, Card/Draw Countdown, Section/Home/H1+H2). IDs below are sections and screen frames for navigation / ledger updates. Modals and bottom sheets for the age gate are built inline with Modal/Base anatomy (Modal/Base has a placeholder slot that cannot take content without detaching).",
+ "Section/PUB-07/21/22 Provably Fair & gating (page 03)": {
+  "id": "34:353932"
+ },
+ "[PUB-07] Provably Fair / 1440 / Empty (default — no values entered)": {
+  "id": "34:353933"
+ },
+ "[PUB-07] Provably Fair / 1440 / Verified": {
+  "id": "34:406015"
+ },
+ "[PUB-07] Provably Fair / 1440 / Failed — hash mismatch": {
+  "id": "34:415038"
+ },
+ "[PUB-07] Provably Fair / 768 / Empty (default — no values entered)": {
+  "id": "34:494365"
+ },
+ "[PUB-07] Provably Fair / 768 / Verified": {
+  "id": "34:500470"
+ },
+ "[PUB-07] Provably Fair / 768 / Failed — hash mismatch": {
+  "id": "34:501111"
+ },
+ "[PUB-21] Geo-block interstitial / 1440 / United States (restricted)": {
+  "id": "34:428847"
+ },
+ "[PUB-22] Age gate + licence notice / 1440 / Default — nothing selected": {
+  "id": "34:453500"
+ },
+ "[PUB-22] Age gate + licence notice / 1440 / Failure — You must be 18+": {
+  "id": "34:474089"
+ },
+ "Section/PUB-07/21/22 — Mobile (page 10)": {
+  "id": "36:518991"
+ },
+ "[PUB-07] Provably Fair / 390 / Empty (default — no values entered)": {
+  "id": "36:518992"
+ },
+ "[PUB-07] Provably Fair / 390 / Verified": {
+  "id": "36:525940"
+ },
+ "[PUB-07] Provably Fair / 390 / Failed — hash mismatch": {
+  "id": "36:526470"
+ },
+ "[PUB-21] Geo-block interstitial / 390 / United States (restricted)": {
+  "id": "36:539703"
+ },
+ "[PUB-22] Age gate + licence notice / 390 / Default — nothing selected (bottom sheet)": {
+  "id": "51:146357"
+ },
+ "[PUB-22] Age gate + licence notice / 390 / Failure — You must be 18+": {
+  "id": "51:146780"
+ }
+}

@@ -1,0 +1,20 @@
+{
+ "_note": "Agent adm-games — ADM-G1..G7 Game management screens on page '09 — Admin Panel', section 'ADM-G1..G7 Game management' (33:165240) at X=42000, Y=0. No new components were created (screens composed from library instances: Nav/Admin Sidebar 22:5501 with Game Management expanded via nested-instance overrides, Nav/Admin Topbar 22:6483, Nav/Breadcrumb, Tabs/Underline, Admin/KPI Tile, Table/Header Cell, Badge/Status, Badge/DEMO, Notice/Demo Data, Alert/Banner Regulatory notice, Input/*, Select/*, Menu/Filter Chip, Select/Chip, Table/Filter Button, Table/Density Toggle, Pagination, Nav/Step Item, Chart/Histogram, Chart/Multiplier Curve, Chart/Sparkline, Game/Result Banner, Game/Provably Fair Verifier, Tile/Game Art/*). Signed-in admin on these screens = S. Iyer (Super Admin). Desktop row y=120, laptop row y=4021 (section-local). Frame IDs below are for page-index links and prototypes.",
+ "Section/ADM-G1..G7 Game management": { "id": "33:165240" },
+ "[ADM-G1] Games List / 1440 / Default": { "id": "33:165241" },
+ "[ADM-G1] Games List / 1280 / Default": { "id": "33:166714" },
+ "[ADM-G2] Game Configuration / 1440 / Pending second approval": { "id": "33:215197" },
+ "[ADM-G2] Game Configuration / 1280 / Pending second approval": { "id": "33:215941" },
+ "[ADM-G2] Game Configuration / 1440 / Draft — out of bounds": { "id": "34:421433" },
+ "[ADM-G2] Game Configuration / 1280 / Draft — out of bounds": { "id": "34:421954" },
+ "[ADM-G3] Game Status / 1440 / Default": { "id": "33:250900" },
+ "[ADM-G3] Game Status / 1280 / Default": { "id": "33:252086" },
+ "[ADM-G4] Game Statistics / 1440 / Default": { "id": "33:286269" },
+ "[ADM-G4] Game Statistics / 1280 / Default": { "id": "33:287480" },
+ "[ADM-G5] Round Management / 1440 / Default": { "id": "34:328793" },
+ "[ADM-G5] Round Management / 1280 / Default": { "id": "34:329977" },
+ "[ADM-G6] Game History / 1440 / Filtered": { "id": "34:360672" },
+ "[ADM-G6] Game History / 1280 / Filtered": { "id": "34:361789" },
+ "[ADM-G7] Provably Fair Logs / 1440 / Default": { "id": "34:399536" },
+ "[ADM-G7] Provably Fair Logs / 1280 / Default": { "id": "34:400728" }
+}
