@@ -1,0 +1,866 @@
+{
+  "summary": "Build GLOBAL POOL component families / DS docs / cover in Figma, one agent per family (args = list of family keys)",
+  "agentCount": 5,
+  "logs": [],
+  "result": [
+    {
+      "key": "forms",
+      "section": "13:569",
+      "created": [
+        {
+          "name": "Section — CMP-02 Inputs & form controls (page '02 — Components', x 8000 y 0, 2960x6717)",
+          "id": "13:569"
+        },
+        {
+          "name": "Input/Text (State x Size, 14 variants)",
+          "id": "13:762"
+        },
+        {
+          "name": "Input/Password (State x Strength, 12 variants)",
+          "id": "14:1735"
+        },
+        {
+          "name": "Input/Amount (State, 4 variants)",
+          "id": "15:3387"
+        },
+        {
+          "name": "Input/Address (State, 6 variants)",
+          "id": "15:3617"
+        },
+        {
+          "name": "Input/OTP (State, 5 variants)",
+          "id": "16:3761"
+        },
+        {
+          "name": "Note — OTP error shake (motion annotation frame)",
+          "id": "16:3763"
+        },
+        {
+          "name": "Input/Search (Size x State, 6 variants)",
+          "id": "16:3820"
+        },
+        {
+          "name": "Input/Textarea (State, 4 variants)",
+          "id": "16:3858"
+        },
+        {
+          "name": "Control/Checkbox (Value x State, 15 variants, default Unchecked)",
+          "id": "20:3205"
+        },
+        {
+          "name": "Control/Radio (Selected x State, 8 variants)",
+          "id": "20:3259"
+        },
+        {
+          "name": "Control/Toggle (On x State, 8 variants, default Off)",
+          "id": "20:3309"
+        },
+        {
+          "name": "Control/Slider (Type x State, 6 variants)",
+          "id": "20:6624"
+        },
+        {
+          "name": "Input/Date Range (State, 2 variants, Nov 2026 popover)",
+          "id": "20:6794"
+        },
+        {
+          "name": "Input/File Upload (State, 5 variants, KYC)",
+          "id": "20:9454"
+        },
+        {
+          "name": "Form/Field Group — Login example (documentation frame)",
+          "id": "20:9456"
+        },
+        {
+          "name": "Form/Field Group — Login card (instances only)",
+          "id": "20:9457"
+        },
+        {
+          "name": "Registry file",
+          "id": "/home/user/Claude/design/figma-build/registry-forms.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-02 Input/Text",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/Password",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/Amount",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/Address",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/OTP",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/Search",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/Textarea",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Control/Checkbox",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Control/Radio",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Control/Toggle",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Control/Slider",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/Date Range",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Input/File Upload",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02 Form/Field Group",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-02",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "None blocking. All 13 component sets and the Form/Field Group frame were screenshotted after building, and again after each fix. Fixes made: Input/Text row wrapping, Search M placeholder truncation (widened to 400 px), a scroll indicator on the overflowing Error textarea, readable disabled-reason text (text/tertiary), visible disabled control outlines (border/default), a one-word wrap in the dropzone requirements line, and the login divider contrast.",
+        "OTP digits use Geist Mono 24/32. They have no text style; font family, size and line height are bound to the variables font/family/mono, font/size/number-m and font/line-height/number-m. This is because no Mono style exists at 24 px. A 'Mono/L' text style could be added later in DS-04.",
+        "Checkbox and radio outlines use the icon/muted token, not border/*. border/strong (#3A3A52) is below the 3:1 non-text contrast needed for UI controls. This is noted in the component descriptions; it could go in the decisions log.",
+        "Password strength has 3 variant levels (Weak, Fair, Strong). The 4th tone, status/info for 'Good' (3 segments), is documented in the description for runtime only, so the set stays at 12 variants.",
+        "Input/Address 'New address' uses status/warning as its border colour because there is no border/warning token. A border/warning semantic variable could be added.",
+        "Input/Address 'New address' shows the example address 0x3f9a…c47E. It is not in demo-data.md but does not conflict with it, and it carries a DEMO XS badge. All other values come from demo-data.md (9,215.30 USDT available, 0x7c4e…a21D whitelisted 14 Oct 2026, WD-20931, 25,000.00 daily limit, n•••@example.com, 200.00 USDT/day RG limit).",
+        "Value and placeholder text differ per variant, so they are not TEXT properties (following the conventions). Consumers override the 'Value text' layer on an instance. The login example does this."
+      ]
+    },
+    {
+      "key": "menus",
+      "section": "13:473",
+      "created": [
+        {
+          "name": "Section — CMP-03/07 Selects, menus, tabs & tooltips",
+          "id": "13:473"
+        },
+        {
+          "name": "Section title",
+          "id": "13:474"
+        },
+        {
+          "name": "Select/Field (State=Default|Hover|Open|Focus|Disabled|Error)",
+          "id": "13:565"
+        },
+        {
+          "name": "Menu/Item (Type=Default|Icon|Checkbox|Destructive × State=Default|Hover|Selected|Disabled, 16)",
+          "id": "14:502"
+        },
+        {
+          "name": "Menu/Section Label",
+          "id": "14:508"
+        },
+        {
+          "name": "Menu/Divider",
+          "id": "14:511"
+        },
+        {
+          "name": "Menu/Panel",
+          "id": "14:581"
+        },
+        {
+          "name": "Select/Network Option (State=Default|Hover|Selected|Disabled)",
+          "id": "15:890"
+        },
+        {
+          "name": "Select/Network (State=Closed|Open)",
+          "id": "15:1041"
+        },
+        {
+          "name": "Select/Token (State=Closed|Open)",
+          "id": "16:3543"
+        },
+        {
+          "name": "Select/Chip",
+          "id": "16:3551"
+        },
+        {
+          "name": "Select/Multi (State=Closed|Open)",
+          "id": "16:3651"
+        },
+        {
+          "name": "Menu/Filter Chip (State=Default|Hover|Selected|Disabled)",
+          "id": "17:2766"
+        },
+        {
+          "name": "Menu/Filter",
+          "id": "17:2982"
+        },
+        {
+          "name": "Menu/User",
+          "id": "20:3846"
+        },
+        {
+          "name": "Menu/Language & Region",
+          "id": "20:3919"
+        },
+        {
+          "name": "Tabs/Underline (State=Default|Hover|Active|Disabled, Show count)",
+          "id": "20:6831"
+        },
+        {
+          "name": "Tabs/Underline Bar",
+          "id": "20:6859"
+        },
+        {
+          "name": "Tabs/Pill (State=Default|Hover|Active|Disabled)",
+          "id": "20:6895"
+        },
+        {
+          "name": "Tabs/Pill Bar",
+          "id": "20:6937"
+        },
+        {
+          "name": "Tabs/Segment (State=Default|Hover|Active|Disabled)",
+          "id": "20:6953"
+        },
+        {
+          "name": "Tabs/Segmented (Segments=2|3|4)",
+          "id": "20:6978"
+        },
+        {
+          "name": "Tooltip (Type=Info|Definition × Placement=Top|Bottom)",
+          "id": "20:10849"
+        },
+        {
+          "name": "Tooltip/Balance Glossary",
+          "id": "20:10929"
+        },
+        {
+          "name": "Registry file /home/user/Claude/design/figma-build/registry-menus.json",
+          "id": "file"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-03 Select/Field",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Menu/Item",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Menu/Panel (+ Section Label, Divider)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Select/Network (+ Network Option)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Select/Token",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Select/Multi (+ Select/Chip)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Menu/Filter (+ Filter Chip)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Menu/User",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-03 Menu/Language & Region",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-07 Tabs/Underline (item + bar)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-07 Tabs/Pill (item + bar)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-07 Tabs/Segmented (+ Segment)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-07 Tooltip",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-07 Tooltip/Balance Glossary",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Fixed during build: (1) Select/Network Option rows were too narrow at 388px, so the standard/confirmations text ran into the fee/status column. Rows are now 468px (field 480px), the Standard text fills and truncates, and the Ethereum status reads 'Degraded' to match Wallet/Network Pill. (2) An empty spacer frame made the Select/Network panel header 100px tall; it now has 1px height. Later scripts use SPACE_BETWEEN instead of spacers. (3) Badge/Count is red by default, which reads as an alert. It is recoloured to brand/primary-strong in Menu/Filter, and to brand or surface/selected in Tabs/Underline, as instance overrides. (4) Reusable menus had a Hover row baked in (Wallet, Deutsch, Oldest first, Failed). These are reset to Default so instances don't ship with a highlight. (5) In Menu/Language & Region, 'Portugal' + DEMO collided with the 'Permitted' pill. The pill now sits under the country name.",
+        "Not checked: Inter has no Japanese glyphs, so 日本語 renders through Figma's fallback font. It displayed correctly in the screenshot. The component description tells devs to use the system font fallback.",
+        "Not checked: the USDT contract address in Select/Token (0xFd08…Cbb9) is not in demo-data.md. It is truncated and carries a DEMO badge. The orchestrator may want to add per-network contract placeholders to demo-data.md.",
+        "Gap: no Checkbox component existed in the registry yet (CMP-02 may be in progress), so the 18px checkbox mark is built inside Menu/Item Type=Checkbox with tokens. It can be swapped for the CMP-02 checkbox once that exists.",
+        "Design choice: screens with real overlays should place Select Open panels as absolute overlays. The Open variants show the panel in-flow for documentation, and each description says so.",
+        "Section bounds are 1836 × ~6656 at X=12500, so the right edge is at X≈14336. Nothing outside the section was touched."
+      ]
+    },
+    {
+      "key": "cards",
+      "section": "22:7454",
+      "created": [
+        {
+          "name": "Section — CMP-04 Cards (page 02 — Components, X=17000 Y=0, 2192×9092)",
+          "id": "22:7454"
+        },
+        {
+          "name": "Card/Stat (Trend=Up|Down|Neutral × Size=M|L, 6 variants)",
+          "id": "22:7589"
+        },
+        {
+          "name": "Card/Balance (Type=Total|Available|Locked|Pending|Owed, 5 variants)",
+          "id": "22:7720"
+        },
+        {
+          "name": "Card/Jackpot (Size=Hero|Compact, 2 variants)",
+          "id": "22:9401"
+        },
+        {
+          "name": "Card/Game (Game=Global Jackpot|Roulette|Crash|Dice|Coinflip|Blackjack × State=Default|Restricted, 12 variants)",
+          "id": "23:8247"
+        },
+        {
+          "name": "Card/Winner (Source=Global Pool|Game, 2 variants)",
+          "id": "23:9389"
+        },
+        {
+          "name": "Card/Round (Status=Open|Drawing|Settled|Cancelled, 4 variants)",
+          "id": "23:9602"
+        },
+        {
+          "name": "Card/VIP Tier (Tier=Bronze..Diamond × Current=No|Yes, 10 variants)",
+          "id": "23:12669"
+        },
+        {
+          "name": "Card/Network (Chain=BNB Chain|Polygon|Arbitrum|Ethereum|Solana, 5 variants)",
+          "id": "23:12849"
+        },
+        {
+          "name": "Card/FAQ Item (State=Collapsed|Hover|Focus|Expanded; TEXT props Question, Answer)",
+          "id": "23:16819"
+        },
+        {
+          "name": "Card/Feature (State=Default|Hover|Focus; props Title, Body, Link, Show link, Icon swap)",
+          "id": "23:16859"
+        },
+        {
+          "name": "Card/Notification (Type=Info|Success|Warning|Security × Read=No|Yes, 8 variants)",
+          "id": "23:17017"
+        },
+        {
+          "name": "Card/Security Score (Status=Needs review|All clear)",
+          "id": "23:17143"
+        },
+        {
+          "name": "Registry file /home/user/Claude/design/figma-build/registry-cards.json",
+          "id": "registry-cards.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-04",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Stat",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Balance",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Jackpot",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Game",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Winner",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Round",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/VIP Tier",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Network",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/FAQ Item",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Feature",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Notification",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-04 Card/Security Score",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "The file was re-themed while this run was in progress (decisions.md #18–20, 27 Nov 2026 user decision: charcoal + mint BC.GAME-style palette, casino layout). All CMP-04 fills, strokes, spacing and radii are bound to variables, so the cards follow the new palette automatically. I changed two things to match it: (1) brand-tinted areas use brand/tint and alpha/white-* instead of the raw alpha/violet-* tokens, which still resolve to violet #8B5CF6 and would look off-brand; (2) the Neutral sparkline is grey (text/tertiary), because brand/secondary is now mint and would read as 'up'. The alpha/violet-* primitives are still violet. That should be reviewed file-wide.",
+        "Deliberate deviation: component-set backgrounds use bg/base (page background) plus a border/subtle stroke, not the surface/default that conventions §5 specifies. Cards are surface/default, so a set filled with surface/default would make them disappear into the background.",
+        "Card/Game was adapted to the new tile direction. Each game has its own original illustration made from shapes (pool orb with orbit rings, single-zero wheel with a mint zero pocket, rising multiplier curve, two dice, coin edge-on with flip arcs, face-down hole card plus a fanned ace) on a Gradient/Tile backdrop, with a players chip and DEMO badge. It is a 296 px card with content below the art, not a 3:4 portrait tile with the title over the art. If screens need pure portrait lobby tiles, those belong in CMP-15 Game components.",
+        "Illustrative values not in demo-data.md (all DEMO-badged, none conflict with the sheet): round #1,247 participants 3,198 and entries 17,295 (= 172,950 / 10); round #1,245 cancelled at 412 participants, 2,964 entries, 29,640.00 pool; round #1,247 1st prize 86,475.00 (= 50% of 172,950.00); Crash win 248.00 USDT (12.40× on a 20.00 stake), round #C-88214; game player counts; Blackjack min bet 1.00; VIP thresholds 0 / 2,500 / 8,000 / 20,000 / 50,000 pts and weekly reward rates; Stat-card deltas (−2.4% active users, 0.00 pp health); new-device sign-in time 09:14 UTC.",
+        "The Badge/Status label text is overridden inside Card/Round instances: Processing shows 'Drawing', Confirmed shows 'Settled', Expired shows 'Cancelled'. The badge set has no Drawing, Settled or Cancelled status. CMP-07 could add them.",
+        "Paint styles Gradient/Brand Glow, Brand Solid and Hero Radial are now mint. CMP-04 uses only Gold Jackpot, Gold Radial, Surface Sheen and the Tile gradients.",
+        "Not a problem: the memory note about the LegalTechAnalyses Figma file belongs to a different project and was not used."
+      ]
+    },
+    {
+      "key": "tables",
+      "section": "22:8274",
+      "created": [
+        {
+          "name": "Section 'CMP-05 Tables & pagination' (page 02 — Components, x 22500, y 0)",
+          "id": "22:8274"
+        },
+        {
+          "name": "Section title (H2 + subtitle + DEMO M)",
+          "id": "22:8275"
+        },
+        {
+          "name": "Table/Header Cell (Align Left|Right × Sort None|Asc|Desc; props Label, Show sort icon)",
+          "id": "22:8309"
+        },
+        {
+          "name": "Table/Cell (Type Text|Number|Status|Address|Amount|Date|Actions|User|Network|Checkbox × Density Comfortable 56|Compact 40; props Show secondary, Show DEMO, Show expand, Chain swap)",
+          "id": "22:9559"
+        },
+        {
+          "name": "Table/Amount Value (Sign Positive|Negative|Neutral) — nested in Amount cells",
+          "id": "22:9421"
+        },
+        {
+          "name": "Table/Risk Cell (Level Low|Medium|High × Density)",
+          "id": "23:5378"
+        },
+        {
+          "name": "Table/Row (State Default|Hover|Selected|Expanded; prop Show checkbox) — Expanded detail panel: details, fee breakdown + DEMO, Tx/Hash, Tx/Status Timeline",
+          "id": "23:8970"
+        },
+        {
+          "name": "Table/Toolbar (State Default|Filtered): search, filter w/ count, date range, saved views, density toggle, Export CSV",
+          "id": "23:11446"
+        },
+        {
+          "name": "Table/Filter Button (State Default|Hover|Focus|Active w/ count)",
+          "id": "23:5397"
+        },
+        {
+          "name": "Table/Density Toggle (Value Comfortable|Compact)",
+          "id": "23:5426"
+        },
+        {
+          "name": "Table/Glyph/Density Comfortable (24px glyph)",
+          "id": "23:7430"
+        },
+        {
+          "name": "Table/Glyph/Density Compact (24px glyph)",
+          "id": "23:7432"
+        },
+        {
+          "name": "Table/Bulk Action Bar (State Default|Loading): 3 selected + Approve/Export/Clear, admin style",
+          "id": "23:11539"
+        },
+        {
+          "name": "Table/Skeleton Row (Density Comfortable|Compact, Gradient/Skeleton bars)",
+          "id": "23:14920"
+        },
+        {
+          "name": "Table/Empty State (Type No data|No results|Error; 'No transactions yet' + 'Make a deposit')",
+          "id": "23:15005"
+        },
+        {
+          "name": "Pagination (Type Numbered|Load more|Cursor; Rows per page + '1–20 of 1,284')",
+          "id": "23:16756"
+        },
+        {
+          "name": "Pagination/Page Item (State Default|Hover|Selected|Focus|Disabled; prop Page)",
+          "id": "23:5437"
+        },
+        {
+          "name": "Table/Row Admin Withdrawal (State Default|Hover|Selected|Not selectable; Compact)",
+          "id": "23:19194"
+        },
+        {
+          "name": "Table/Example Transactions (component; Comfortable, sticky header, 6 demo rows, numbered pagination)",
+          "id": "23:20002"
+        },
+        {
+          "name": "Table/Example Admin Withdrawals (component; Compact, checkboxes, risk column, bulk bar, 10 rows)",
+          "id": "23:22259"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-05 Table/Header Cell",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Cell (10 types × 2 densities)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Amount Value",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Risk Cell",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Row (Default/Hover/Selected/Expanded)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Toolbar",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Filter Button",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Density Toggle",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Bulk Action Bar",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Skeleton Row",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Empty State",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Pagination (Numbered/Load more/Cursor)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Pagination/Page Item",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Row Admin Withdrawal",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Example Transactions",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 Table/Example Admin Withdrawals",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-05 registry-tables.json",
+          "status": "BUILT"
+        }
+      ],
+      "issues": [
+        "THEME DRIFT (orchestrator should check DS-02): while this run was in progress, the Color variables began resolving to a mint/graphite palette. Examples: brand/tint is #2CD97D at 16%, surface/default is #2B2F30, and Gradient/Skeleton stops run #2B2F30 → #3A4142. My first screenshot of Tx/Status Timeline showed violet; a later one showed mint. This differs from the master palette (#8B5CF6 / #191927). All CMP-05 nodes are bound to tokens, so they will follow whichever palette is final. Screenshots were judged against the current mint/graphite values.",
+        "Gradient/Skeleton's end stops are exactly surface/default, so skeleton bars disappeared on table surfaces. I added a 1px border/default hairline to every skeleton bar (the paint style is kept). If the paint style is retuned, the hairline can be removed.",
+        "The Badge/Count default fill is status/danger-strong (red). In Table/Filter Button (Active), the nested count is overridden to brand/primary-strong with text/on-primary, matching what CMP-03 did in Menu/Filter. A brand variant of Badge/Count would remove the need for this override.",
+        "The icon set has no density glyphs ('menu' and 'list' look almost the same at 16px). I added two table-specific 24px glyph components that follow the icon family style (1.5px stroke, round caps). They are used only in Table/Density Toggle.",
+        "Tx/Fee Breakdown has no Deposit type, so the Expanded row (DP-77412 deposit) has an inline token-bound deposit fee list. Tx/Status Timeline (State=Confirming, DP-77412) is reused, with its own hash block hidden; a separate Tx/Hash instance is shown in the panel instead.",
+        "Invented values that do not conflict with demo-data: the WD-20850 amount (250.00, Polygon, 18 Nov 2026); the times for DP-77380, WD-20877 and the entry purchase; and nine fictional admin queue requests WD-20944 to WD-20968 (addresses, amounts and risk scores). The 3 selected admin rows sum to 4,620.00, which matches the bulk-bar total. Admin pagination shows 1–10 of 37, matching the 37 pending-withdrawals KPI.",
+        "Possible overlap: Pagination is built here, as assigned. CMP-09 (Navigation, section 14:1015) also lists pagination in the master prompt. The orchestrator should make sure only one Pagination set gets registered.",
+        "node.screenshot() inside use_figma sometimes rendered newly bound variables wrongly (black strokes, or light mode). All verification was therefore done with get_screenshot, which rendered correctly."
+      ]
+    },
+    {
+      "key": "overlays",
+      "section": "24:15958",
+      "created": [
+        {
+          "name": "Section/CMP-06/08 Overlays & feedback",
+          "id": "24:15958"
+        },
+        {
+          "name": "Frame/Section title",
+          "id": "24:15959"
+        },
+        {
+          "name": "Modal/Base",
+          "id": "24:16058"
+        },
+        {
+          "name": "Modal/Base Size=S",
+          "id": "24:15962"
+        },
+        {
+          "name": "Modal/Base Size=M",
+          "id": "24:15993"
+        },
+        {
+          "name": "Modal/Base Size=L",
+          "id": "24:16024"
+        },
+        {
+          "name": "Doc/Modal over scrim — Desktop",
+          "id": "24:16059"
+        },
+        {
+          "name": "Modal/Confirmation",
+          "id": "25:15557"
+        },
+        {
+          "name": "Modal/Danger",
+          "id": "25:15811"
+        },
+        {
+          "name": "Modal/2FA",
+          "id": "25:16745"
+        },
+        {
+          "name": "Modal/RG Limit",
+          "id": "25:17005"
+        },
+        {
+          "name": "Wallet/Provider Mark",
+          "id": "27:15887"
+        },
+        {
+          "name": "Wallet/Provider Row",
+          "id": "27:15928"
+        },
+        {
+          "name": "Modal/Connect Wallet",
+          "id": "27:16569"
+        },
+        {
+          "name": "Modal/Participation Preview",
+          "id": "28:19099"
+        },
+        {
+          "name": "Doc/Platform fee tooltip",
+          "id": "28:19100"
+        },
+        {
+          "name": "Drawer/Detail",
+          "id": "28:20511"
+        },
+        {
+          "name": "Drawer/Filter",
+          "id": "29:17462"
+        },
+        {
+          "name": "Sheet/Bottom",
+          "id": "29:17720"
+        },
+        {
+          "name": "Toast",
+          "id": "30:16872"
+        },
+        {
+          "name": "Alert/Banner",
+          "id": "30:17116"
+        },
+        {
+          "name": "Doc/Drawer over scrim — Desktop",
+          "id": "30:21135"
+        },
+        {
+          "name": "Doc/Sheet on mobile — 390",
+          "id": "30:21335"
+        },
+        {
+          "name": "Doc/Toast stack — Desktop",
+          "id": "30:21462"
+        },
+        {
+          "name": "Registry file",
+          "id": "/home/user/Claude/design/figma-build/registry-overlays.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-06",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-08",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Set backgrounds: overlay sets (Modal/*, Drawer/*, Sheet/Bottom, Wallet/Provider*) use a scrim/strong fill instead of surface/default, because surface/overlay equals surface/default (#2B2F30) and the modals would blend into the set. Toast and Alert/Banner sets use bg/base.",
+        "Data conflict: the participation limit is 500.00 USDT as the assignment says, but the existing RG/Limit Setter (23:21988) shows 200.00 and demo-data.md defines none. Recommend adding 'Daily participation limit 500.00 USDT' to demo-data.md and aligning the RG/Limit Setter.",
+        "Participation Preview 'Insufficient funds' uses an example Available balance of 342.10 USDT (DEMO, noted in the description) because the demo user's 9,215.30 cannot run short below the 500.00 limit. The state offers 'Reduce to 34 entries' and 'Deposit USDT'.",
+        "Added a 'Ready' state to Participation Preview (the user has ticked consent, Gold CTA enabled). Default keeps consent unchecked and Button/Gold disabled; consent is never pre-checked.",
+        "Participation 'Wrong network' needs a product decision: entries are paid from the platform balance with no on-chain transaction, so it is framed as the wallet session needing a supported network (Switch to Arbitrum).",
+        "Drawer/Detail and Drawer/Filter hug their content height (742–1226 px) rather than a fixed 100vh; the descriptions specify 100vh with sticky header and footer in product.",
+        "Assumed current time 27 Nov 2026, 21:42 UTC for the 2FA lock ('until 21:57 UTC') and the RG increase cool-down ('effective 28 Nov 2026, 21:42 UTC'); entry purchase time 14:06 UTC is DEMO.",
+        "The get_screenshot tool once returned a stale render after a fix on Modal/RG Limit; the fix was confirmed with an in-plugin node.screenshot(). All 14 sets plus the doc frames were screenshot-verified after fixes, and the final overlap audit of the section reports 0 overlaps and 0 overflowing text nodes.",
+        "New reusable parts other agents can use: Wallet/Provider Mark (27:15887, neutral monograms BW/WC/CB/TW/PH/LG) and Wallet/Provider Row (27:15928, props Name/Meta/Tag/Show tag/Mark), e.g. for a mobile connect-wallet sheet.",
+        "No user memory notes were used; the only note in the memory index concerns an unrelated project and was not opened."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Build"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "build:forms",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a46af931e92f18080",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795812977372,
+      "queuedAt": 1795812977355,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "13:569",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795814156366,
+      "tokens": 296199,
+      "toolCalls": 30,
+      "durationMs": 1178993,
+      "resultPreview": "{\"section\":\"13:569\",\"created\":[{\"name\":\"Section — CMP-02 Inputs & form controls (page '02 — Components', x 8000 y 0, 2960x6717)\",\"id\":\"13:569\"},{\"name\":\"Input/Text (State x Size, 14 variants)\",\"id\":\"13:762\"},{\"name\":\"Input/Password (State x Strength, 12 variants)\",\"id\":\"14:1735\"},{\"name\":\"Input/Amount (State, 4 variants)\",\"id\":\"15:3387\"},{\"name\":\"Input/Address (State, 6 variants)\",\"id\":\"15:3617\"},…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "build:menus",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a13e2353dd3f40d32",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795812977372,
+      "queuedAt": 1795812977356,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "13:473",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795814182648,
+      "tokens": 298585,
+      "toolCalls": 35,
+      "durationMs": 1203368,
+      "resultPreview": "{\"section\":\"13:473\",\"created\":[{\"name\":\"Section — CMP-03/07 Selects, menus, tabs & tooltips\",\"id\":\"13:473\"},{\"name\":\"Section title\",\"id\":\"13:474\"},{\"name\":\"Select/Field (State=Default|Hover|Open|Focus|Disabled|Error)\",\"id\":\"13:565\"},{\"name\":\"Menu/Item (Type=Default|Icon|Checkbox|Destructive × State=Default|Hover|Selected|Disabled, 16)\",\"id\":\"14:502\"},{\"name\":\"Menu/Section Label\",\"id\":\"14:508\"},{\"n…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "build:cards",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "ab57b9f14eadcc2ed",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814156414,
+      "queuedAt": 1795812977356,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "22:7454",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795815440664,
+      "tokens": 326133,
+      "toolCalls": 35,
+      "durationMs": 1284249,
+      "resultPreview": "{\"section\":\"22:7454\",\"created\":[{\"name\":\"Section — CMP-04 Cards (page 02 — Components, X=17000 Y=0, 2192×9092)\",\"id\":\"22:7454\"},{\"name\":\"Card/Stat (Trend=Up|Down|Neutral × Size=M|L, 6 variants)\",\"id\":\"22:7589\"},{\"name\":\"Card/Balance (Type=Total|Available|Locked|Pending|Owed, 5 variants)\",\"id\":\"22:7720\"},{\"name\":\"Card/Jackpot (Size=Hero|Compact, 2 variants)\",\"id\":\"22:9401\"},{\"name\":\"Card/Game (Game…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "build:tables",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a0906cd8acc70bde3",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814182656,
+      "queuedAt": 1795812977356,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "22:8274",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795815657109,
+      "tokens": 334994,
+      "toolCalls": 58,
+      "durationMs": 1474453,
+      "resultPreview": "{\"section\":\"22:8274\",\"created\":[{\"name\":\"Section 'CMP-05 Tables & pagination' (page 02 — Components, x 22500, y 0)\",\"id\":\"22:8274\"},{\"name\":\"Section title (H2 + subtitle + DEMO M)\",\"id\":\"22:8275\"},{\"name\":\"Table/Header Cell (Align Left|Right × Sort None|Asc|Desc; props Label, Show sort icon)\",\"id\":\"22:8309\"},{\"name\":\"Table/Cell (Type Text|Number|Status|Address|Amount|Date|Actions|User|Network|Chec…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "build:overlays",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a19aa0c1055e8f8f0",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795815440672,
+      "queuedAt": 1795812977356,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "24:15958",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795817257863,
+      "tokens": 407034,
+      "toolCalls": 51,
+      "durationMs": 1817190,
+      "resultPreview": "{\"section\":\"24:15958\",\"created\":[{\"name\":\"Section/CMP-06/08 Overlays & feedback\",\"id\":\"24:15958\"},{\"name\":\"Frame/Section title\",\"id\":\"24:15959\"},{\"name\":\"Modal/Base\",\"id\":\"24:16058\"},{\"name\":\"Modal/Base Size=S\",\"id\":\"24:15962\"},{\"name\":\"Modal/Base Size=M\",\"id\":\"24:15993\"},{\"name\":\"Modal/Base Size=L\",\"id\":\"24:16024\"},{\"name\":\"Doc/Modal over scrim — Desktop\",\"id\":\"24:16059\"},{\"name\":\"Modal/Confirmat…"
+    }
+  ],
+  "totalTokens": 1662945,
+  "totalToolCalls": 209
+}

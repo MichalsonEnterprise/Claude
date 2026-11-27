@@ -1,0 +1,214 @@
+{
+ "_note": "CMP-06 Modals, drawers & bottom sheets + CMP-08 Toasts & alerts. Page '02 — Components', section 'CMP-06/08 Overlays & feedback' (24:15958) at X=28000, Y=0 (4440 x 9973). Use I(id, {variant}, {props}) from helpers.js. Only Modal/Base and Wallet/Provider Row expose TEXT props; all other overlay copy is per-variant — override TEXT layers by name on the instance (Title, Description, Body, Value, Label, Step title, Step caption...). Variant sets for overlays sit on a scrim/strong backdrop (deliberate: floating surfaces read correctly); Toast + Alert/Banner sets sit on bg/base.",
+ "Modal/Base": {
+  "id": "24:16058",
+  "variants": {
+   "Size": [
+    "S",
+    "M",
+    "L"
+   ]
+  },
+  "props": {
+   "Title": "TEXT",
+   "Description": "TEXT",
+   "Show description": "BOOLEAN",
+   "Show close": "BOOLEAN",
+   "Show footer": "BOOLEAN"
+  },
+  "note": "S 400 / M 560 / L 720. Header (H4 title, Body/S description, Ghost close) + dashed 'Slot' body + footer (Secondary Cancel + Primary Continue). surface/overlay, border/subtle, radius 20, Elevation/4. Variants: S 24:15962, M 24:15993, L 24:16024."
+ },
+ "Modal/Confirmation": {
+  "id": "25:15557",
+  "variants": {
+   "State": [
+    "Default",
+    "Loading",
+    "Success"
+   ]
+  },
+  "note": "S 400. Cancel withdrawal WD-20931 example (summary card: 1,500.00 USDT, 0x7c4e…a21D, Arbitrum, Under review). Success: Available 10,715.30 / Locked 350.00 (DEMO)."
+ },
+ "Modal/Danger": {
+  "id": "25:15811",
+  "variants": {
+   "State": [
+    "Default",
+    "Ready",
+    "Error",
+    "Loading"
+   ]
+  },
+  "note": "S 400. Turn off 2FA example: danger icon tile, consequences list on status/danger-tint, Input/Text 'Type CONFIRM to continue' (case-sensitive), Button/Danger disabled until Ready."
+ },
+ "Modal/2FA": {
+  "id": "25:16745",
+  "variants": {
+   "State": [
+    "Default",
+    "Error",
+    "Locked"
+   ]
+  },
+  "note": "S 400. Anti-phishing code AURORA-27 (Mono/M + DEMO), Input/OTP (Filling/Error/Disabled), 'Use backup code' + 'Lost your device?' links. Locked = 15 min lock callout (until 21:57 UTC) + Contact support."
+ },
+ "Modal/RG Limit": {
+  "id": "25:17005",
+  "variants": {
+   "State": [
+    "Increase",
+    "Decrease",
+    "Pending increase"
+   ]
+  },
+  "note": "M 560. Daily participation limit 500.00 USDT; spent today 351.75. Increase to 750.00 → 24 h cool-down (effective 28 Nov 2026, 21:42 UTC, cancellable); Decrease to 300.00 → immediate. Tabs/Segmented Daily|Weekly|Monthly (Daily active). Cooling-off & self-exclusion link always visible."
+ },
+ "Wallet/Provider Mark": {
+  "id": "27:15887",
+  "variants": {
+   "Provider": [
+    "Browser wallet",
+    "WalletConnect",
+    "Coinbase Wallet",
+    "Trust Wallet",
+    "Phantom",
+    "Ledger"
+   ]
+  },
+  "note": "40x40 neutral monogram tiles (BW, WC, CB, TW, PH, LG) — original, no brand logos (decision #9). Variant ids: Browser wallet 27:15872, WalletConnect 27:15874, Coinbase Wallet 27:15876, Trust Wallet 27:15878, Phantom 27:15880, Ledger 27:15882. Pass these ids to Wallet/Provider Row 'Mark'."
+ },
+ "Wallet/Provider Row": {
+  "id": "27:15928",
+  "variants": {
+   "State": [
+    "Default",
+    "Hover",
+    "Focus",
+    "Disabled"
+   ]
+  },
+  "props": {
+   "Name": "TEXT",
+   "Meta": "TEXT",
+   "Tag": "TEXT",
+   "Show tag": "BOOLEAN",
+   "Mark": "INSTANCE_SWAP"
+  },
+  "note": "512 wide (Modal M body). Set FILL inside 358-wide mobile sheets."
+ },
+ "Modal/Connect Wallet": {
+  "id": "27:16569",
+  "variants": {
+   "State": [
+    "List",
+    "WalletConnect QR",
+    "Connecting",
+    "Rejected",
+    "Wrong network",
+    "Success"
+   ]
+  },
+  "note": "M 560. Providers: Browser wallet (EVM) Detected, WalletConnect, Coinbase Wallet, Trust Wallet, Phantom (Solana), Ledger via WalletConnect. 'We never ask for your seed phrase' in every state. QR is illustrative (DEMO), expiry 04:52. Wrong network: chain ID 10 → Switch to Arbitrum. Success: 0x12ab…9f3C on BNB Chain, ownership Pending → Verify ownership (free signed message)."
+ },
+ "Modal/Participation Preview": {
+  "id": "28:19099",
+  "variants": {
+   "State": [
+    "Default",
+    "Ready",
+    "Insufficient funds",
+    "Limit reached",
+    "Wrong network"
+   ]
+  },
+  "note": "M 560, GP-02 core. 35 × 10.00 = 350.00; platform fee 35 × 0.05 = 1.75 (own line + info icon); network fee 0.00 (platform balance, no on-chain tx); Total 351.75; Available after 8,863.55. Odds ≈0.19% 1st / ≈2.44% any. RG check 351.75 of 500.00. Notice/Licence Card, 'You can lose your stake. Outcomes are decided by Chainlink VRF.', UNCHECKED consent; Button/Gold L 'Confirm 35 entries · 351.75 USDT' disabled until consent ticked (Ready = enabled). Insufficient funds uses an example Available of 342.10 (→ Reduce to 34 entries); Limit reached = 210.00 spent + 351.75 = 561.75 of 500.00 (→ Reduce to 28 entries)."
+ },
+ "Drawer/Detail": {
+  "id": "28:20511",
+  "variants": {
+   "Content": [
+    "Withdrawal",
+    "Deposit",
+    "Entry",
+    "Loading"
+   ]
+  },
+  "note": "Right drawer 480 wide, left corners radius 20, Elevation/4. Withdrawal WD-20931 (inline timeline + Tx/Fee Breakdown Withdrawal), Deposit DP-77412 (Tx/Status Timeline Confirming 7/12 + fee card + congestion callout), Entry 35 entries round #1,248 (timeline to VRF + Tx/Fee Breakdown Entry), Loading (Gradient/Skeleton). Height hugs content; in product 100vh with sticky header/footer."
+ },
+ "Drawer/Filter": {
+  "id": "29:17462",
+  "variants": {
+   "State": [
+    "Default",
+    "Applied"
+   ]
+  },
+  "note": "Right drawer 480. Type checkboxes (7), Status + Network Menu/Filter Chips, Input/Date Range, Control/Slider Range. Applied: Badge/Count 3 (recoloured brand), removable Select/Chip row, Clear links, 'Show 24 results' (DEMO count)."
+ },
+ "Sheet/Bottom": {
+  "id": "29:17720",
+  "variants": {
+   "Variant": [
+    "Default",
+    "Participation"
+   ]
+  },
+  "note": "390 mobile, top radius 28, grabber, H5 title + Ghost close M, sticky footer with L button + home indicator. Default = Choose network (5 Select/Network Option rows, Arbitrum selected, Ethereum congested). Participation = mobile Participation Preview (same math/odds/RG/licence/risk/unchecked consent, Button/Gold L disabled)."
+ },
+ "Toast": {
+  "id": "30:16872",
+  "variants": {
+   "Type": [
+    "Success",
+    "Error",
+    "Warning",
+    "Info",
+    "Tx pending"
+   ]
+  },
+  "note": "400 wide, surface/overlay, radius 14, Elevation/3, 4 px status accent bar. Tx pending: progress bar 7/12, '7 / 12 confirmations · est. 2 min', View on explorer. Variant ids: Success 30:16748, Error 30:16771, Warning 30:16794, Info 30:16819, Tx pending 30:16843."
+ },
+ "Alert/Banner": {
+  "id": "30:17116",
+  "variants": {
+   "Type": [
+    "Info",
+    "Warning",
+    "Security",
+    "Regional restriction",
+    "Maintenance",
+    "Regulatory notice"
+   ],
+   "Layout": [
+    "Inline",
+    "Full width"
+   ]
+  },
+  "note": "Inline 720 (radius 14) / Full width 1440 (set FILL in screens, pin under top bar). Regional restriction copy: 'GLOBAL POOL games are not available in your region (United States). You can still view your account and withdraw funds.' + Withdraw funds / Restricted countries (not dismissible, no VPN hint). Security / Regional / Regulatory not dismissible."
+ },
+ "Doc/Modal over scrim": {
+  "id": "24:16059",
+  "type": "FRAME (documentation)",
+  "note": "1200x760 mock desktop page + scrim/overlay + Modal/Base M instance"
+ },
+ "Doc/Platform fee tooltip": {
+  "id": "28:19100",
+  "type": "FRAME (documentation)",
+  "note": "Tooltip (Info, Top) for the platform-fee info icon + fee line context"
+ },
+ "Doc/Drawer over scrim — Desktop": {
+  "id": "30:21135",
+  "type": "FRAME (documentation)",
+  "note": "1280 mock history page + scrim + Drawer/Detail Withdrawal instance at the right edge"
+ },
+ "Doc/Sheet on mobile — 390": {
+  "id": "30:21335",
+  "type": "FRAME (documentation)",
+  "note": "390x844 phone + scrim + Sheet/Bottom Default anchored to the bottom"
+ },
+ "Doc/Toast stack — Desktop": {
+  "id": "30:21462",
+  "type": "FRAME (documentation)",
+  "note": "Top-right stack: Tx pending, Success, Info (24 px inset, 12 px gap)"
+ }
+}
