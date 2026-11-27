@@ -1,0 +1,70 @@
+/** Code-styled previews of each package, shown in the "Deliverables" viewer. */
+
+export type Tok = "k" | "f" | "s" | "p" | "c" | "n" | "t";
+export type Line = [Tok, string][];
+
+export const deliverables: { id: string; tab: string; lines: Line[] }[] = [
+  {
+    id: "analysis",
+    tab: "Analysis · €500",
+    lines: [
+      [["k", "const "], ["t", "analysis = "], ["k", "await "], ["t", "lta."], ["f", "analyse"], ["t", "({"]],
+      [["p", "  project"], ["t", ": "], ["s", '"Nordvault Protocol"'], ["t", ","]],
+      [["p", "  jurisdictions"], ["t", ": ["], ["s", '"EU"'], ["t", ", "], ["s", '"PL"'], ["t", ", "], ["s", '"LT"'], ["t", "],"]],
+      [["p", "  frameworks"], ["t", ": ["], ["s", '"MiCA"'], ["t", ", "], ["s", '"AMLR"'], ["t", ", "], ["s", '"TFR"'], ["t", ", "], ["s", '"DORA"'], ["t", ", "], ["s", '"GDPR"'], ["t", "],"]],
+      [["t", "});"]],
+      [],
+      [["c", "// Regulatory mapping"]],
+      [["t", "analysis."], ["p", "caspLicence"], ["t", "        "], ["c", "// → required · custody & exchange (Art. 59)"]],
+      [["t", "analysis."], ["p", "travelRule"], ["t", "         "], ["c", "// → applies · Regulation (EU) 2023/1113"]],
+      [["t", "analysis."], ["p", "tokenType"], ["t", "          "], ["c", '// → "utility token" (preliminary)']],
+      [],
+      [["c", "// Result"]],
+      [["k", "const "], ["t", "score = analysis."], ["f", "riskScore"], ["t", "();  "], ["c", "// → "], ["n", "23"], ["c", " / 100 · LOW"]],
+      [["t", "analysis."], ["f", "deliver"], ["t", "({ "], ["p", "to"], ["t", ": "], ["s", '"you@company.com"'], ["t", ", "], ["p", "within"], ["t", ": "], ["s", '"72h"'], ["t", " });"]],
+    ],
+  },
+  {
+    id: "opinion",
+    tab: "Legal Opinion · €1,000",
+    lines: [
+      [["k", "const "], ["t", "opinion = "], ["k", "await "], ["t", "lta."], ["f", "opinion"], ["t", "({"]],
+      [["p", "  project"], ["t", ": "], ["s", '"Nordvault Protocol"'], ["t", ","]],
+      [["p", "  token"], ["t", ": "], ["s", '"NVT"'], ["t", ","]],
+      [["p", "  framework"], ["t", ": "], ["s", '"MiCA · Regulation (EU) 2023/1114"'], ["t", ","]],
+      [["t", "});"]],
+      [],
+      [["c", "// § 1. Classification"]],
+      [["t", "opinion."], ["p", "classification"], ["t", "          "], ["c", '// → "Utility token" · Art. 3(1)(9) MiCA']],
+      [["t", "opinion."], ["p", "isART"], ["t", " / "], ["p", "isEMT"], ["t", "           "], ["c", "// → "], ["n", "false"], ["c", " / "], ["n", "false"]],
+      [["t", "opinion."], ["p", "isFinancialInstrument"], ["t", "   "], ["c", "// → "], ["n", "false"], ["c", " · MiFID II test passed"]],
+      [],
+      [["c", "// § 2. Obligations"]],
+      [["t", "opinion."], ["p", "whitePaper"], ["t", "              "], ["c", "// → required · notify the NCA before the offer"]],
+      [["t", "opinion."], ["p", "caspLicence"], ["t", "             "], ["c", "// → custody & exchange services · Art. 59"]],
+      [],
+      [["k", "await "], ["t", "opinion."], ["f", "sign"], ["t", "({ "], ["p", "by"], ["t", ": "], ["s", '"LegalTechAnalyses"'], ["t", " });"]],
+      [["t", "opinion."], ["f", "deliver"], ["t", "({ "], ["p", "to"], ["t", ": "], ["s", '"you@company.com"'], ["t", ", "], ["p", "within"], ["t", ": "], ["s", '"72h"'], ["t", " });"]],
+    ],
+  },
+  {
+    id: "full",
+    tab: "Full · €1,500",
+    lines: [
+      [["k", "const "], ["t", "pkg = "], ["k", "await "], ["t", "lta."], ["f", "full"], ["t", "({ "], ["p", "project"], ["t", ": "], ["s", '"Nordvault Protocol"'], ["t", " });"]],
+      [],
+      [["t", "pkg."], ["p", "analysis"], ["t", "                 "], ["c", "// → regulatory mapping + RiskScore"]],
+      [["t", "pkg."], ["p", "opinion"], ["t", "                  "], ["c", "// → signed legal opinion"]],
+      [],
+      [["c", "// Rejected by an exchange, bank or regulator? Revision included."]],
+      [["k", "if "], ["t", "(reviewer."], ["f", "rejects"], ["t", "(pkg.opinion)) {"]],
+      [["k", "  await "], ["t", "pkg."], ["f", "revise"], ["t", "({"]],
+      [["p", "    comments"], ["t", ": reviewer.comments,"]],
+      [["p", "    included"], ["t", ": "], ["n", "true"], ["t", ",           "], ["c", "// no extra fee"]],
+      [["t", "  });"]],
+      [["t", "}"]],
+      [],
+      [["t", "pkg."], ["f", "deliver"], ["t", "({ "], ["p", "to"], ["t", ": "], ["s", '"you@company.com"'], ["t", ", "], ["p", "within"], ["t", ": "], ["s", '"72h"'], ["t", " });"]],
+    ],
+  },
+];
