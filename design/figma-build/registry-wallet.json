@@ -1,0 +1,75 @@
+{
+ "_note": "CMP-12 Wallet + CMP-13 Transaction components. Page '02 — Components', section 'CMP-12/13 Wallet & transactions' (14:1737) at X=40000, Y=0. Use I(id, {variant}, {prop: value}). Every set has a 'Show DEMO' BOOLEAN (default true) except Connected Wallet Row, whose DEMO lives in the nested Address Chip.",
+ "Wallet/Balance Breakdown": {
+  "id": "14:1974",
+  "variants": { "Layout": ["Card", "Compact"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "Total 12,480.50 = Available 9,215.30 + Locked 1,850.00 + Pending 1,000.00 + Owed 415.20. Card 480 (wallet overview), Compact 360 (dashboard rail / chip popover)."
+ },
+ "Wallet/Balance Chip": {
+  "id": "14:2062",
+  "variants": { "Type": ["Available", "Total"], "State": ["Default", "Hover", "Focus"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "Topbar chip, opens Balance Breakdown Compact popover."
+ },
+ "Wallet/Connected Wallet Row": {
+  "id": "15:4172",
+  "variants": { "State": ["Primary", "Secondary", "Unverified", "Error"] },
+  "props": {},
+  "note": "840 wide. Nests Wallet/Address Chip (chain mark swapped per wallet), Badge/Status (relabelled Verified / Whitelisted / Unverified / Verification failed), Buttons S."
+ },
+ "Wallet/Token Amount Row": {
+  "id": "15:4217",
+  "variants": { "Size": ["M", "S"] },
+  "props": { "Show DEMO": "BOOLEAN", "Amount": "TEXT", "Fiat": "TEXT", "Network": "INSTANCE_SWAP" },
+  "note": "Network = chain mark component id (CHAINS map); default Ethereum 4:772."
+ },
+ "Wallet/Deposit Address Block": {
+  "id": "16:4429",
+  "variants": { "State": ["Active", "Expired"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "600 wide. Original QR-style code (illustrative), full Mono address, Copy, network + USDT ERC-20, 4 warnings, session timer 29:41."
+ },
+ "Wallet/Fee Estimator": {
+  "id": "20:3002",
+  "variants": { "State": ["Normal", "Congested"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "Normal = Arbitrum 0.08 → you receive 1,499.92; Congested = Ethereum 2.40 → 1,497.60 + Switch to Arbitrum."
+ },
+ "Wallet/Confirmations Progress": {
+  "id": "20:3076",
+  "variants": { "State": ["Confirming", "Delayed", "Confirmed"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "Ring + n/N + 12 segments; DP-77412 7 / 12."
+ },
+ "Tx/Hash": {
+  "id": "20:5893",
+  "variants": { "State": ["Default", "Hover", "Focus", "Copied"] },
+  "props": { "Show DEMO": "BOOLEAN", "Hash": "TEXT", "Show explorer link": "BOOLEAN" },
+  "note": "Mono hash + copy (Button/Icon) + View on explorer link."
+ },
+ "Tx/Row": {
+  "id": "20:6222",
+  "variants": { "Type": ["Deposit", "Withdrawal", "Entry", "Prize", "Refund", "Fee", "Reward"], "State": ["Default", "Hover"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "1000 wide list row. Entry −350.00 + Fee −1.75 = 351.75 entry purchase."
+ },
+ "Tx/Status Timeline": {
+  "id": "20:8473",
+  "variants": { "State": ["Submitted", "Confirming", "Confirmed", "Failed"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "420 wide vertical stepper for DP-77412; nests Tx/Hash."
+ },
+ "Tx/Fee Breakdown": {
+  "id": "20:8583",
+  "variants": { "Type": ["Withdrawal", "Entry"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "Withdrawal WD-20931 → You receive 1,499.92; Entry 35 × 10.00 + 35 × 0.05 → You pay 351.75 (+ 'You can lose your stake')."
+ },
+ "Tx/Receipt Card": {
+  "id": "22:5202",
+  "variants": { "Type": ["Deposit", "Withdrawal"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "480 wide. Deposit DP-77380 2,500.00; Withdrawal WD-20877 800.00 − 0.12 → 799.88. Nests Tx/Hash, Address Chip, Badge, Buttons."
+ }
+}

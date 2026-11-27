@@ -1,0 +1,85 @@
+{
+ "_note": "CMP-02 Inputs & form controls — page '02 — Components', section 'CMP-02 Inputs & form controls' (id 13:569, x 8000, y 0). Use I(id, {variant}, {props}) from helpers.js. Value/placeholder text is per-variant (not a TEXT prop): override the 'Value text' layer on the instance when needed. Instance-swap icon props take ICONS[...] ids.",
+ "Input/Text": {
+  "id": "13:762",
+  "variants": { "State": ["Default", "Hover", "Focus", "Filled", "Disabled", "Error", "Success"], "Size": ["M", "L"] },
+  "props": { "Label": "TEXT", "Show label": "BOOLEAN", "Show leading icon": "BOOLEAN", "Leading icon": "INSTANCE_SWAP", "Show trailing icon": "BOOLEAN", "Trailing icon": "INSTANCE_SWAP", "Show helper": "BOOLEAN" },
+  "note": "M = 40 px, L = 48 px (use L on mobile). Default leading icon = mail (email example). Override 'Value text' / 'Helper text' layers per use."
+ },
+ "Input/Password": {
+  "id": "14:1735",
+  "variants": { "State": ["Default", "Focus", "Error"], "Strength": ["Empty", "Weak", "Fair", "Strong"] },
+  "props": { "Label": "TEXT", "Show strength": "BOOLEAN", "Show requirements": "BOOLEAN" },
+  "note": "Login: Show strength=false, Show requirements=false. Eye toggle is a nested Button/Icon (Ghost S)."
+ },
+ "Input/Amount": {
+  "id": "15:3387",
+  "variants": { "State": ["Default", "Focus", "Error", "Disabled"] },
+  "props": { "Label": "TEXT", "Show limits": "BOOLEAN" },
+  "note": "Header 'Available 9,215.30 USDT' + DEMO XS, Number/M value, Token/USDT suffix, MAX chip, fiat hint, limits 'Min 20.00 · Max 25,000.00 per day'. Error = 'Exceeds your available balance (9,215.30 USDT)'."
+ },
+ "Input/Address": {
+  "id": "15:3617",
+  "variants": { "State": ["Default", "Focus", "Valid", "Invalid", "Whitelisted", "New address"] },
+  "props": { "Label": "TEXT", "Show network": "BOOLEAN" },
+  "note": "Arbitrum example; header holds a Wallet/Network Pill instance; Paste + Scan QR are Button/Icon Ghost S; New address shows the 24 h cooldown callout."
+ },
+ "Input/OTP": {
+  "id": "16:3761",
+  "variants": { "State": ["Empty", "Filling", "Complete", "Error", "Disabled"] },
+  "props": { "Label": "TEXT", "Description": "TEXT" },
+  "note": "6 boxes 48x56, Geist Mono digits bound to font/family/mono + font/size/number-m. Motion note frame 'Note — OTP error shake' = 16:3763."
+ },
+ "Input/Search": {
+  "id": "16:3820",
+  "variants": { "Size": ["S", "M"], "State": ["Default", "Focus", "Filled"] },
+  "props": { "Show shortcut": "BOOLEAN" },
+  "note": "S 32 px x 280, M 40 px x 400. Shortcut chip shows ⌘K (Default) / Esc (Focus); Filled shows Clear button."
+ },
+ "Input/Textarea": {
+  "id": "16:3858",
+  "variants": { "State": ["Default", "Focus", "Error", "Disabled"] },
+  "props": { "Label": "TEXT", "Show counter": "BOOLEAN" },
+  "note": "Counter 'n / 500'; Error shows 512 / 500 with scroll indicator."
+ },
+ "Control/Checkbox": {
+  "id": "20:3205",
+  "variants": { "Value": ["Unchecked", "Checked", "Indeterminate"], "State": ["Default", "Hover", "Focus", "Disabled", "Error"] },
+  "props": { "Label": "TEXT", "Show description": "BOOLEAN" },
+  "note": "Default variant = Unchecked (never pre-check consent). Default label: 'I confirm I am 18+ and located in a permitted jurisdiction'."
+ },
+ "Control/Radio": {
+  "id": "20:3259",
+  "variants": { "Selected": ["No", "Yes"], "State": ["Default", "Hover", "Focus", "Disabled"] },
+  "props": { "Label": "TEXT", "Description": "TEXT", "Show description": "BOOLEAN" }
+ },
+ "Control/Toggle": {
+  "id": "20:3309",
+  "variants": { "On": ["No", "Yes"], "State": ["Default", "Hover", "Focus", "Disabled"] },
+  "props": { "Label": "TEXT", "Description": "TEXT", "Show description": "BOOLEAN" },
+  "note": "Default On=No. Never default ON for spend/risk-increasing settings."
+ },
+ "Control/Slider": {
+  "id": "20:6624",
+  "variants": { "Type": ["Single", "Range"], "State": ["Default", "Focus", "Disabled"] },
+  "props": { "Show helper": "BOOLEAN" },
+  "note": "Single = daily loss limit 0–1,000 USDT at 200; Range = amount filter 500–2,500 of 0–5,000. Track area is a fixed 360 px frame (absolute thumbs/tooltips)."
+ },
+ "Input/Date Range": {
+  "id": "20:6794",
+  "variants": { "State": ["Default", "Open"] },
+  "props": { "Label": "TEXT" },
+  "note": "Open = calendar popover, Nov 2026, range 20–27 (Custom preset), presets Today / 7 days / 30 days / Custom, Clear + Apply."
+ },
+ "Input/File Upload": {
+  "id": "20:9454",
+  "variants": { "State": ["Empty", "Dragover", "Uploading", "Uploaded", "Error"] },
+  "props": { "Label": "TEXT", "Description": "TEXT", "Show privacy note": "BOOLEAN" },
+  "note": "KYC dropzone; Uploading at 63%; Error 'File is blurry — retake in good light'."
+ },
+ "Form/Field Group — Login example": {
+  "id": "20:9456",
+  "type": "FRAME (documentation, not a component)",
+  "note": "Composed login card 20:9457 built from Input/Text (Filled, L), Input/Password (Focus, Fair, strength+requirements hidden), Control/Checkbox (Unchecked), Button/Primary L, Button/Secondary L, Badge/18+; plus 8 field-group rules."
+ }
+}
