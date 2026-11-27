@@ -14,3 +14,5 @@
 13. TEXT component properties are only used where all variants share a label (Figma shares one default across variants).
 14. Gold (accent/gold, Button/Gold) is reserved for jackpot/prize moments; never for generic CTAs.
 15. Demo data is centralised in one sheet (round #1,248, @nova.k balances) so all screens reconcile.
+16. States × breakpoints interpretation: every listed STATE is its own frame at Desktop 1440 (master). Laptop 1280 / Tablet 768 / Mobile 390 frames show the default state plus any state whose layout changes materially (restricted, empty, error flows). Mobile frames live on page 10 in per-module sections and are cross-referenced by ledger ID in their frame names.
+17. Screens are composed from library instances; each module slice was built by a dedicated agent with the shared helper library, then reviewed by the orchestrator.
