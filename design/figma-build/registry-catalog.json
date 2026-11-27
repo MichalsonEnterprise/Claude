@@ -1,0 +1,442 @@
+{
+ "_note": "CASINO-03 Catalogue & promotions (agent key: catalog). Page '02 — Components', section 'CASINO-03 Catalogue & promotions' (23:15009) at X=82000, Y=0; catalogue column x=120, promotions column x=1720 (section-local). Use I(id, {variant}, {prop: value}) from helpers.js. Genre icons: use the '_icons' map below like ICONS (createInstance + tint). Tile/Game Generic: I('28:16529', {State:'Default'}, {Art: '<Tile/Game Art id>', Players: '1,062', 'Show tag': true, Tag: 'HOT', 'House edge': 'House edge 1.00%'}). Art components are art-only (title + category baked in) — always place them through Tile/Game Generic. Tournament end date used: Sun 29 Nov 2026, 23:59 UTC (30 Nov 2026 is a Monday — demo-data says 'Sun 30 Nov', flagged to orchestrator).",
+ "_icons": {
+  "mines": "23:15023",
+  "plinko": "23:15035",
+  "limbo": "23:15043",
+  "wheel": "23:15051",
+  "keno": "23:15060",
+  "hilo": "23:15067",
+  "tower": "23:15075",
+  "slots": "23:15084",
+  "live": "23:15092",
+  "baccarat": "23:15100",
+  "sicbo": "23:15113",
+  "duel": "23:15120",
+  "lottery": "23:15128",
+  "bingo": "23:15135",
+  "crash-duel": "23:15144",
+  "tournament": "23:15151",
+  "mission": "23:15159",
+  "rakeback": "23:15167",
+  "cashback": "23:15176",
+  "daily-reward": "23:15183",
+  "flame": "23:15189",
+  "bonus": "23:15195"
+ },
+ "Icon/mines": {
+  "id": "23:15023",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/plinko": {
+  "id": "23:15035",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/limbo": {
+  "id": "23:15043",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/wheel": {
+  "id": "23:15051",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/keno": {
+  "id": "23:15060",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/hilo": {
+  "id": "23:15067",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/tower": {
+  "id": "23:15075",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/slots": {
+  "id": "23:15084",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/live": {
+  "id": "23:15092",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/baccarat": {
+  "id": "23:15100",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/sicbo": {
+  "id": "23:15113",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/duel": {
+  "id": "23:15120",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/lottery": {
+  "id": "23:15128",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/bingo": {
+  "id": "23:15135",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/crash-duel": {
+  "id": "23:15144",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/tournament": {
+  "id": "23:15151",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/mission": {
+  "id": "23:15159",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/rakeback": {
+  "id": "23:15167",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/cashback": {
+  "id": "23:15176",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/daily-reward": {
+  "id": "23:15183",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/flame": {
+  "id": "23:15189",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "Icon/bonus": {
+  "id": "23:15195",
+  "note": "24px, 1.5px stroke bound to icon/default, constraints SCALE"
+ },
+ "_art": {
+  "Global Pool": "24:13141",
+  "Orbit Rush": "24:13176",
+  "Orbit Rush Duel": "24:13206",
+  "Vault Sweeper": "24:13239",
+  "Skyline": "24:13297",
+  "Pinfall": "24:13333",
+  "Fortune Ring": "24:13399",
+  "Pool Dice": "24:13443",
+  "Double Side": "24:13473",
+  "High Card": "24:13496",
+  "Ascend": "24:13528",
+  "Pool Keno": "24:13564",
+  "Pool Roulette": "25:14777",
+  "Twenty-One": "25:14841",
+  "Baccarat Lounge": "25:14875",
+  "Sic Bo Triad": "25:14922",
+  "Dragon & Phoenix": "25:14961",
+  "Neon Koi": "25:14992",
+  "Atlas Vault": "25:15031",
+  "Midnight Orchard": "25:17006",
+  "Comet Cascade": "25:17058",
+  "Desert Relics": "25:17086",
+  "Frost Wolves": "25:17110",
+  "Lucky Lanterns": "25:17144",
+  "Robo Heist": "25:17191",
+  "Live Pool Roulette": "27:15060",
+  "Speed Twenty-One": "27:15096",
+  "Baccarat Lounge Live": "27:15136",
+  "Mega Ring Show": "27:15179",
+  "Keno Express 20/80": "27:15267",
+  "Daily Draw 6/45": "27:15370",
+  "Bingo 75 Night": "27:15422",
+  "Bingo 90 Classic": "27:15495"
+ },
+ "Tile/Game Art/Global Pool": {
+  "id": "24:13141",
+  "note": "Jackpot · backdrop Gradient/Tile Gold + linear top light · caption 'JACKPOT ROUNDS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Orbit Rush": {
+  "id": "24:13176",
+  "note": "Originals · backdrop Gradient/Tile Violet + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Orbit Rush Duel": {
+  "id": "24:13206",
+  "note": "Originals · backdrop Gradient/Tile Red + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Vault Sweeper": {
+  "id": "24:13239",
+  "note": "Originals · backdrop Gradient/Tile Sky + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Skyline": {
+  "id": "24:13297",
+  "note": "Originals · backdrop Gradient/Tile Mint + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Pinfall": {
+  "id": "24:13333",
+  "note": "Originals · backdrop Gradient/Tile Amber + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Fortune Ring": {
+  "id": "24:13399",
+  "note": "Originals · backdrop Gradient/Tile Violet + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Pool Dice": {
+  "id": "24:13443",
+  "note": "Originals · backdrop Gradient/Tile Mint + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Double Side": {
+  "id": "24:13473",
+  "note": "Originals · backdrop Gradient/Tile Gold + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/High Card": {
+  "id": "24:13496",
+  "note": "Originals · backdrop Gradient/Tile Red + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Ascend": {
+  "id": "24:13528",
+  "note": "Originals · backdrop Gradient/Tile Sky + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Pool Keno": {
+  "id": "24:13564",
+  "note": "Originals · backdrop Gradient/Tile Amber + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Pool Roulette": {
+  "id": "25:14777",
+  "note": "Table · backdrop Gradient/Tile Red + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Twenty-One": {
+  "id": "25:14841",
+  "note": "Table · backdrop Gradient/Tile Mint + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Baccarat Lounge": {
+  "id": "25:14875",
+  "note": "Table · backdrop Gradient/Tile Violet + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Sic Bo Triad": {
+  "id": "25:14922",
+  "note": "Table · backdrop Gradient/Tile Amber + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Dragon & Phoenix": {
+  "id": "25:14961",
+  "note": "Table · backdrop Gradient/Tile Red + linear top light · caption 'GLOBAL POOL ORIGINAL' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Neon Koi": {
+  "id": "25:14992",
+  "note": "Slots · backdrop Gradient/Tile Sky + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Atlas Vault": {
+  "id": "25:15031",
+  "note": "Slots · backdrop Gradient/Tile Amber + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Midnight Orchard": {
+  "id": "25:17006",
+  "note": "Slots · backdrop Gradient/Tile Violet + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Comet Cascade": {
+  "id": "25:17058",
+  "note": "Slots · backdrop Gradient/Tile Violet + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Desert Relics": {
+  "id": "25:17086",
+  "note": "Slots · backdrop Gradient/Tile Red + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Frost Wolves": {
+  "id": "25:17110",
+  "note": "Slots · backdrop Gradient/Tile Sky + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Lucky Lanterns": {
+  "id": "25:17144",
+  "note": "Slots · backdrop Gradient/Tile Red + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Robo Heist": {
+  "id": "25:17191",
+  "note": "Slots · backdrop Gradient/Tile Mint + linear top light · caption 'GP STUDIOS' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Live Pool Roulette": {
+  "id": "27:15060",
+  "note": "Live · backdrop Gradient/Tile Mint + linear top light · caption 'LIVE · ILLUSTRATED' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Speed Twenty-One": {
+  "id": "27:15096",
+  "note": "Live · backdrop Gradient/Tile Sky + linear top light · caption 'LIVE · ILLUSTRATED' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Baccarat Lounge Live": {
+  "id": "27:15136",
+  "note": "Live · backdrop Gradient/Tile Violet + linear top light · caption 'LIVE · ILLUSTRATED' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Mega Ring Show": {
+  "id": "27:15179",
+  "note": "Live · backdrop Gradient/Tile Red + linear top light · caption 'LIVE · ILLUSTRATED' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Keno Express 20/80": {
+  "id": "27:15267",
+  "note": "Draws · backdrop Gradient/Tile Sky + linear top light · caption 'DRAW' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Daily Draw 6/45": {
+  "id": "27:15370",
+  "note": "Draws · backdrop Gradient/Tile Gold + linear top light · caption 'DRAW' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Bingo 75 Night": {
+  "id": "27:15422",
+  "note": "Bingo · backdrop Gradient/Tile Violet + linear top light · caption 'BINGO' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Art/Bingo 90 Classic": {
+  "id": "27:15495",
+  "note": "Bingo · backdrop Gradient/Tile Amber + linear top light · caption 'BINGO' · 160×213 r14 clipped, art-only"
+ },
+ "Tile/Game Generic": {
+  "id": "28:16529",
+  "variants": {
+   "State": [
+    "Default",
+    "Hover",
+    "Focus",
+    "Restricted"
+   ]
+  },
+  "props": {
+   "Art": "INSTANCE_SWAP",
+   "Players": "TEXT",
+   "Show tag": "BOOLEAN",
+   "Tag": "TEXT",
+   "House edge": "TEXT"
+  },
+  "variantIds": {
+   "Default": "28:16338",
+   "Hover": "28:16381",
+   "Focus": "28:16436",
+   "Restricted": "28:16479"
+  },
+  "note": "160×213. Art preferred values = all 33 Tile/Game Art components. Players badge has DEMO XS. Hover = Play (Button/Primary S) + house-edge chip; Focus = 2px border/focus outside; Restricted = scrim/strong + lock + 'Not available in your region' + 'Why is this restricted?' (players hidden). Examples frame 28:16530 (Global Pool 3,412 HOT, Orbit Rush 1,062 HOT, Vault Sweeper 146, Skyline 206 NEW, Pinfall 100, Fortune Ring 34, Pool Dice 66 hover, Live Pool Roulette restricted)."
+ },
+ "Banner/Promo": {
+  "id": "29:18042",
+  "variants": {
+   "Type": [
+    "Welcome offer",
+    "Daily rewards",
+    "Missions",
+    "Rakeback",
+    "Cashback",
+    "Tournament",
+    "VIP level-up"
+   ]
+  },
+  "variantIds": {
+   "Welcome offer": "29:17727",
+   "Daily rewards": "29:17763",
+   "Missions": "29:17813",
+   "Rakeback": "29:17856",
+   "Cashback": "29:17934",
+   "Tournament": "29:17975",
+   "VIP level-up": "29:18005"
+  },
+  "note": "580×200 r20, surface/raised + angled colour block with concrete objects. Per-variant text layers: Overline, Headline, Key terms (override in instances). Actions: Button/Primary M + 'Terms apply' + Badge/18+; DEMO S top-right."
+ },
+ "Card/Daily Reward Day": {
+  "id": "30:17380",
+  "variants": {
+   "State": [
+    "Claimed",
+    "Claimable",
+    "Locked"
+   ]
+  },
+  "variantIds": {
+   "Claimed": "30:17357",
+   "Claimable": "30:17364",
+   "Locked": "30:17373"
+  },
+  "props": {
+   "Day": "TEXT",
+   "Amount": "TEXT"
+  },
+  "note": "72×100 day cell"
+ },
+ "Card/Daily Reward Calendar": {
+  "id": "30:17381",
+  "note": "616 wide; days 1–3 Claimed (0.50/0.75/1.00), 4 Claimable 1.50, 5–7 Locked (2.00/3.00/5.00); 'Resets 00:00 UTC'; 7-day total 13.75; CTA Claim 1.50 USDT; DEMO S"
+ },
+ "Card/Mission": {
+  "id": "30:21643",
+  "variants": {
+   "Progress": [
+    "0",
+    "50",
+    "100"
+   ]
+  },
+  "variantIds": {
+   "0": "30:21542",
+   "50": "30:21577",
+   "100": "30:21612"
+  },
+  "props": {
+   "Title": "TEXT",
+   "Meta": "TEXT",
+   "Reward": "TEXT"
+  },
+  "note": "380 wide; 0/50 rounds, 25/50, 50/50 Completed; CTA Play Orbit Rush / Continue / Claim 2.00 USDT"
+ },
+ "Widget/Rakeback": {
+  "id": "30:21644",
+  "note": "320; claimable 3.42 USDT (DEMO S), Claim 3.42 USDT, history link, last claim 24 Nov 2026"
+ },
+ "Widget/Cashback": {
+  "id": "30:21673",
+  "note": "320; rate 10%, period Mon 23 – Sun 29 Nov 2026, next payout Mon 30 Nov, 10:00 UTC, last 12.80 USDT · 23 Nov 2026"
+ },
+ "Card/Tournament": {
+  "id": "31:22554",
+  "note": "400; Orbit Rush Sprint, prize pool 2,500.00 USDT, ends Sun 29 Nov 2026 23:59 UTC, top-3 1,000/500/250, my rank #14 @nova.k 1,284 pts 22.50 USDT"
+ },
+ "Table/Leaderboard Row": {
+  "id": "31:22665",
+  "variants": {
+   "State": [
+    "Gold",
+    "Silver",
+    "Bronze",
+    "Default",
+    "You"
+   ]
+  },
+  "variantIds": {
+   "Gold": "31:22632",
+   "Silver": "31:22639",
+   "Bronze": "31:22646",
+   "Default": "31:22653",
+   "You": "31:22659"
+  },
+  "props": {
+   "Rank": "TEXT",
+   "Player": "TEXT",
+   "Points": "TEXT",
+   "Prize": "TEXT"
+  },
+  "note": "640×44"
+ },
+ "Table/Tournament Leaderboard": {
+  "id": "31:22666",
+  "note": "640; 20 DEMO rows, #14 = You; prizes sum 2,500.00; DEMO M"
+ },
+ "Widget/Bonus Balance": {
+  "id": "32:23192",
+  "note": "360; real 9,215.30 vs bonus 50.00; wagering 30× → 642.00 / 1,500.00 (42.8%); expires Fri 11 Dec 2026 23:59 UTC; Bonus terms + Forfeit bonus"
+ },
+ "Modal/Bonus Terms": {
+  "id": "32:23248",
+  "note": "520; 8 key terms (match, min deposit, wagering example, time limit, game contribution, max bet, withdrawals, RG); DEMO + 18+; opt-in unchecked by default; Full T&C link + Got it"
+ },
+ "_docs": {
+  "section": "23:15009",
+  "Section header": "23:15010",
+  "Doc/Genre icons": "23:15013",
+  "Genre icon grid": "23:15016",
+  "Doc/Tile Game Art": "23:23402",
+  "Tile/Game Art library": "23:23405",
+  "Doc/Tile Game Generic": "28:16335",
+  "Examples/Tile Game Generic": "28:16530",
+  "Promotions header": "29:17721",
+  "Doc/Banner Promo": "29:17724",
+  "Doc/Daily Reward": "30:17354",
+  "Doc/Missions & cashback widgets": "30:21539",
+  "Doc/Tournament": "31:22551",
+  "Doc/Bonus": "32:23189"
+ }
+}

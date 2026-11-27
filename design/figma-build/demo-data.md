@@ -97,8 +97,8 @@ Player counts for tiles (DEMO): Orbit Rush 1,062 · Vault Sweeper 146 · Skyline
 - Daily rewards: 7-day streak calendar (day 1 0.50 USDT … day 7 5.00 USDT in bonus funds), resets at 00:00 UTC (real reset time)
 - Missions: e.g. "Play 50 rounds of Orbit Rush this week → 2.00 USDT", progress bars
 - Rakeback: 5% of house edge returned, claimable anytime (claimable now 3.42 USDT)
-- Cashback: weekly 10% of net losses, paid Mondays 10:00 UTC (last: 12.80 USDT)
-- Weekly tournament: Orbit Rush Sprint — prize pool 2,500.00 USDT, ends Sun 30 Nov 2026 23:59 UTC, leaderboard top 20
+- Cashback: weekly 10% of net losses, paid Mondays 10:00 UTC — next Mon 30 Nov 2026 (last: 12.80 USDT)
+- Weekly tournament: Orbit Rush Sprint — prize pool 2,500.00 USDT, ends Sun 29 Nov 2026 23:59 UTC (27 Nov 2026 is a Friday), leaderboard top 20
 - VIP Club: 29 levels across 5 tiers, level-up rewards
 
 ## Responsible-gaming limits (DEMO, @nova.k)
@@ -112,3 +112,10 @@ Player counts for tiles (DEMO): Orbit Rush 1,062 · Vault Sweeper 146 · Skyline
 - Prize example: runner-up in round #1,244 for @nova.k, +3,620.60 USDT (2% of 181,030.00) — settled
 - USDT contract placeholder (truncated, DEMO): 0xFd08…Cbb9 — illustrative only, never present it as a real contract address
 - New (non-whitelisted) withdrawal address example: 0x3f9a…c47E
+
+## Catalogue / promotions extras (added by the catalogue kit — reuse, all DEMO)
+- Tournament "Orbit Rush Sprint": Mon 23 – Sun 29 Nov 2026 23:59 UTC; prizes 1st 1,000.00 · 2nd 500.00 · 3rd 250.00 · 4th–10th 75.00 each · 11th–20th 22.50 each (= 2,500.00); 1 point per 1.00 USDT wagered
+- Extra fictional handles: @quasar_9, @velvet.io, @ember_ray, @northwind, @cobalt.k, @zephyr21, @halcyon, @rook.eth, @lyra_v, @drift.sol
+- Daily streak amounts (bonus funds): day 1 0.50 · 2 0.75 · 3 1.00 · 4 1.50 · 5 2.00 · 6 3.00 · 7 5.00 (total 13.75)
+- Bonus balance: 50.00 USDT bonus funds, wagering 642.00 / 1,500.00 (30×), expires Fri 11 Dec 2026; max bet with bonus 5.00; contribution Originals/slots 100%, table games 10%, Global Pool 0%
+- Live Pool Roulette example players: 412

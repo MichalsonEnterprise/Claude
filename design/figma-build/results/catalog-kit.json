@@ -1,0 +1,393 @@
+{
+  "summary": "Build GLOBAL POOL game-catalogue art, genre icons, generic game tile and promotion components in Figma",
+  "agentCount": 1,
+  "logs": [],
+  "result": [
+    {
+      "key": "catalog",
+      "section": "23:15009",
+      "created": [
+        {
+          "name": "Section/CASINO-03 Catalogue & promotions (page 02 — Components, X=82000 Y=0)",
+          "id": "23:15009"
+        },
+        {
+          "name": "Genre icon grid (22 cells)",
+          "id": "23:15016"
+        },
+        {
+          "name": "Icon/mines",
+          "id": "23:15023"
+        },
+        {
+          "name": "Icon/plinko",
+          "id": "23:15035"
+        },
+        {
+          "name": "Icon/limbo",
+          "id": "23:15043"
+        },
+        {
+          "name": "Icon/wheel",
+          "id": "23:15051"
+        },
+        {
+          "name": "Icon/keno",
+          "id": "23:15060"
+        },
+        {
+          "name": "Icon/hilo",
+          "id": "23:15067"
+        },
+        {
+          "name": "Icon/tower",
+          "id": "23:15075"
+        },
+        {
+          "name": "Icon/slots",
+          "id": "23:15084"
+        },
+        {
+          "name": "Icon/live",
+          "id": "23:15092"
+        },
+        {
+          "name": "Icon/baccarat",
+          "id": "23:15100"
+        },
+        {
+          "name": "Icon/sicbo",
+          "id": "23:15113"
+        },
+        {
+          "name": "Icon/duel",
+          "id": "23:15120"
+        },
+        {
+          "name": "Icon/lottery",
+          "id": "23:15128"
+        },
+        {
+          "name": "Icon/bingo",
+          "id": "23:15135"
+        },
+        {
+          "name": "Icon/crash-duel",
+          "id": "23:15144"
+        },
+        {
+          "name": "Icon/tournament",
+          "id": "23:15151"
+        },
+        {
+          "name": "Icon/mission",
+          "id": "23:15159"
+        },
+        {
+          "name": "Icon/rakeback",
+          "id": "23:15167"
+        },
+        {
+          "name": "Icon/cashback",
+          "id": "23:15176"
+        },
+        {
+          "name": "Icon/daily-reward",
+          "id": "23:15183"
+        },
+        {
+          "name": "Icon/flame",
+          "id": "23:15189"
+        },
+        {
+          "name": "Icon/bonus",
+          "id": "23:15195"
+        },
+        {
+          "name": "Tile/Game Art library (frame, 5 groups)",
+          "id": "23:23405"
+        },
+        {
+          "name": "Tile/Game Art/Global Pool",
+          "id": "24:13141"
+        },
+        {
+          "name": "Tile/Game Art/Orbit Rush",
+          "id": "24:13176"
+        },
+        {
+          "name": "Tile/Game Art/Orbit Rush Duel",
+          "id": "24:13206"
+        },
+        {
+          "name": "Tile/Game Art/Vault Sweeper",
+          "id": "24:13239"
+        },
+        {
+          "name": "Tile/Game Art/Skyline",
+          "id": "24:13297"
+        },
+        {
+          "name": "Tile/Game Art/Pinfall",
+          "id": "24:13333"
+        },
+        {
+          "name": "Tile/Game Art/Fortune Ring",
+          "id": "24:13399"
+        },
+        {
+          "name": "Tile/Game Art/Pool Dice",
+          "id": "24:13443"
+        },
+        {
+          "name": "Tile/Game Art/Double Side",
+          "id": "24:13473"
+        },
+        {
+          "name": "Tile/Game Art/High Card",
+          "id": "24:13496"
+        },
+        {
+          "name": "Tile/Game Art/Ascend",
+          "id": "24:13528"
+        },
+        {
+          "name": "Tile/Game Art/Pool Keno",
+          "id": "24:13564"
+        },
+        {
+          "name": "Tile/Game Art/Pool Roulette",
+          "id": "25:14777"
+        },
+        {
+          "name": "Tile/Game Art/Twenty-One",
+          "id": "25:14841"
+        },
+        {
+          "name": "Tile/Game Art/Baccarat Lounge",
+          "id": "25:14875"
+        },
+        {
+          "name": "Tile/Game Art/Sic Bo Triad",
+          "id": "25:14922"
+        },
+        {
+          "name": "Tile/Game Art/Dragon & Phoenix",
+          "id": "25:14961"
+        },
+        {
+          "name": "Tile/Game Art/Neon Koi",
+          "id": "25:14992"
+        },
+        {
+          "name": "Tile/Game Art/Atlas Vault",
+          "id": "25:15031"
+        },
+        {
+          "name": "Tile/Game Art/Midnight Orchard",
+          "id": "25:17006"
+        },
+        {
+          "name": "Tile/Game Art/Comet Cascade",
+          "id": "25:17058"
+        },
+        {
+          "name": "Tile/Game Art/Desert Relics",
+          "id": "25:17086"
+        },
+        {
+          "name": "Tile/Game Art/Frost Wolves",
+          "id": "25:17110"
+        },
+        {
+          "name": "Tile/Game Art/Lucky Lanterns",
+          "id": "25:17144"
+        },
+        {
+          "name": "Tile/Game Art/Robo Heist",
+          "id": "25:17191"
+        },
+        {
+          "name": "Tile/Game Art/Live Pool Roulette",
+          "id": "27:15060"
+        },
+        {
+          "name": "Tile/Game Art/Speed Twenty-One",
+          "id": "27:15096"
+        },
+        {
+          "name": "Tile/Game Art/Baccarat Lounge Live",
+          "id": "27:15136"
+        },
+        {
+          "name": "Tile/Game Art/Mega Ring Show",
+          "id": "27:15179"
+        },
+        {
+          "name": "Tile/Game Art/Keno Express 20/80",
+          "id": "27:15267"
+        },
+        {
+          "name": "Tile/Game Art/Daily Draw 6/45",
+          "id": "27:15370"
+        },
+        {
+          "name": "Tile/Game Art/Bingo 75 Night",
+          "id": "27:15422"
+        },
+        {
+          "name": "Tile/Game Art/Bingo 90 Classic",
+          "id": "27:15495"
+        },
+        {
+          "name": "Tile/Game Generic (set: State=Default|Hover|Focus|Restricted; props Art INSTANCE_SWAP [33 preferred], Players TEXT, Show tag BOOLEAN, Tag TEXT, House edge TEXT)",
+          "id": "28:16529"
+        },
+        {
+          "name": "Examples/Tile Game Generic (8 instances)",
+          "id": "28:16530"
+        },
+        {
+          "name": "Banner/Promo (set: Type=Welcome offer|Daily rewards|Missions|Rakeback|Cashback|Tournament|VIP level-up)",
+          "id": "29:18042"
+        },
+        {
+          "name": "Card/Daily Reward Day (set: State=Claimed|Claimable|Locked; props Day, Amount)",
+          "id": "30:17380"
+        },
+        {
+          "name": "Card/Daily Reward Calendar",
+          "id": "30:17381"
+        },
+        {
+          "name": "Card/Mission (set: Progress=0|50|100; props Title, Meta, Reward)",
+          "id": "30:21643"
+        },
+        {
+          "name": "Widget/Rakeback",
+          "id": "30:21644"
+        },
+        {
+          "name": "Widget/Cashback",
+          "id": "30:21673"
+        },
+        {
+          "name": "Card/Tournament",
+          "id": "31:22554"
+        },
+        {
+          "name": "Table/Leaderboard Row (set: State=Gold|Silver|Bronze|Default|You; props Rank, Player, Points, Prize)",
+          "id": "31:22665"
+        },
+        {
+          "name": "Table/Tournament Leaderboard (20 DEMO rows)",
+          "id": "31:22666"
+        },
+        {
+          "name": "Widget/Bonus Balance",
+          "id": "32:23192"
+        },
+        {
+          "name": "Modal/Bonus Terms",
+          "id": "32:23248"
+        },
+        {
+          "name": "Registry file /home/user/Claude/design/figma-build/registry-catalog.json (71 entries incl. _icons and _art maps)",
+          "id": "file"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CASINO-03/A Genre icons (22 Icon/*)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/B Tile/Game Art (33 games)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/C Tile/Game Generic",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Banner/Promo (7 types)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Card/Daily Reward Calendar + Day",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Card/Mission",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Widget/Rakeback",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Widget/Cashback",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Card/Tournament + Table/Tournament Leaderboard + Row",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Widget/Bonus Balance",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-03/D Modal/Bonus Terms",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "GM-02 / PROMO-01..05 (screens)",
+          "status": "NOT STARTED"
+        }
+      ],
+      "issues": [
+        "Date conflict, please confirm: demo-data.md and the task say the tournament ends 'Sun 30 Nov 2026 23:59 UTC', but 30 Nov 2026 is a Monday. All my components use Sun 29 Nov 2026, 23:59 UTC, which fits a weekly Mon–Sun period and cashback paid Mon 30 Nov 10:00 UTC. The doc note in the section says this. demo-data.md should be updated, or tell me to switch to 'Mon 30 Nov'.",
+        "Shared styles bug (I did not edit them): the Gradient/Tile * paint styles render as a flat dark colour. Their gradientTransform [[0,1,1],[-1,0,0]] puts the whole layer past the last stop. A top-to-bottom fix would be [[0,1,0],[-1,0,1]]. In my art I keep the style as the backdrop and add a 'Backdrop light' layer (a linear top-light gradient bound to primitives) so the tiles still look vivid.",
+        "conventions.md got the new 'banned AI look' rule while I was working. After the first art batches I ran a cleanup pass on all 33 art components, keeping their IDs: removed sparkles, scattered dots, decorative concentric rings and background ray bursts, replaced the radial glow with a linear top light plus an angled colour block, and redrew Global Pool (coin basin and entry tickets) and Neon Koi (pond and lily pads). Banners, the tournament header and widgets use concrete objects on angled colour blocks with no glows or confetti.",
+        "Captions: Global Pool uses 'JACKPOT ROUNDS' instead of the 'GLOBAL POOL ORIGINAL' caption, which would repeat its title. Table games use 'GLOBAL POOL ORIGINAL'.",
+        "Added a 4th State=Focus to Tile/Game Generic (2px border/focus outside) on top of the requested Default/Hover/Restricted, for keyboard access.",
+        "Text-property defaults apply to every variant, as the conventions say. So in the component-set previews, Card/Daily Reward Day shows 'Day 1 / 0.50' and Table/Leaderboard Row shows rank '4' in every variant, including inside the medal pills. Real instances set their own values.",
+        "Not in demo-data, so I added these DEMO values (all badged DEMO): tournament prize split 1,000 / 500 / 250 / 75.00 (4th–10th) / 22.50 (11th–20th) = 2,500.00; points rule 1 pt per 1.00 USDT wagered; 10 extra fictional handles (@quasar_9, @velvet.io, @ember_ray, @northwind, @cobalt.k, @zephyr21, @halcyon, @rook.eth, @lyra_v, @drift.sol); daily streak amounts 0.75/1.00/1.50/2.00/3.00 (total 13.75); bonus balance 50.00 USDT with wagering 642.00 / 1,500.00, expiring Fri 11 Dec 2026; bonus terms max bet 5.00 and game contribution 100/10/0%; Live Pool Roulette example players 412. Please add them to demo-data.md if screens will reuse them.",
+        "Compliance: every illustrative value has a DEMO badge. Promos show key terms, a 'Terms apply' link and 18+. The only times shown are real absolute UTC times (no countdowns). The bonus opt-in is unchecked by default. The restricted tile says 'Not available in your region' with a 'Why is this restricted?' link to licence info and no workaround. No VPN or geo-bypass hint appears anywhere. Live tables are illustrated with no people. All titles and art are original, with no reference-casino names, characters or thumbnails.",
+        "registry-casino-lobby.json did not exist, so Tile/Game Art follows the task's tile spec (160×213, radius 14, clipped, UPPERCASE title in Heading/H4 or H5, Overline caption). The casino-lobby agent's Tile/Game can take these arts directly, or use Tile/Game Generic."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Build"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "catalog:kit",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a3569d8374661fbf6",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814713614,
+      "queuedAt": 1795814713603,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "23:15009",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (crypto casino + global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md (BC.GAME-style charcoal + mint palette, casino layout, promotions policy, game catalogue policy…",
+      "promptFramed": true,
+      "lastProgressAt": 1795817371217,
+      "tokens": 511287,
+      "toolCalls": 58,
+      "durationMs": 2657602,
+      "resultPreview": "{\"section\":\"23:15009\",\"created\":[{\"name\":\"Section/CASINO-03 Catalogue & promotions (page 02 — Components, X=82000 Y=0)\",\"id\":\"23:15009\"},{\"name\":\"Genre icon grid (22 cells)\",\"id\":\"23:15016\"},{\"name\":\"Icon/mines\",\"id\":\"23:15023\"},{\"name\":\"Icon/plinko\",\"id\":\"23:15035\"},{\"name\":\"Icon/limbo\",\"id\":\"23:15043\"},{\"name\":\"Icon/wheel\",\"id\":\"23:15051\"},{\"name\":\"Icon/keno\",\"id\":\"23:15060\"},{\"name\":\"Icon/hilo\"…"
+    }
+  ],
+  "totalTokens": 511287,
+  "totalToolCalls": 58
+}
