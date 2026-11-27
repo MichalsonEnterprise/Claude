@@ -7,7 +7,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-02",
@@ -17,7 +18,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-03",
@@ -27,7 +29,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-04",
@@ -37,7 +40,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-05",
@@ -47,7 +51,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-06",
@@ -57,7 +62,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-07",
@@ -67,7 +73,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "DS-08",
@@ -77,7 +84,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "charts"
  },
  {
   "id": "DS-09",
@@ -87,7 +95,8 @@
   "sizes": "",
   "page": "01",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "ds"
  },
  {
   "id": "CMP-01",
@@ -97,7 +106,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "by": "cover"
  },
  {
   "id": "CMP-02",
@@ -107,7 +117,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "forms"
  },
  {
   "id": "CMP-03",
@@ -117,7 +128,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "menus"
  },
  {
   "id": "CMP-04",
@@ -127,7 +139,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "cards"
  },
  {
   "id": "CMP-05",
@@ -137,7 +150,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "tables"
  },
  {
   "id": "CMP-06",
@@ -147,7 +161,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "overlays"
  },
  {
   "id": "CMP-07",
@@ -157,7 +172,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "menus"
  },
  {
   "id": "CMP-08",
@@ -167,7 +183,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "overlays"
  },
  {
   "id": "CMP-09",
@@ -177,7 +194,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "nav"
  },
  {
   "id": "CMP-10",
@@ -187,7 +205,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "nav"
  },
  {
   "id": "CMP-11",
@@ -197,7 +216,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "charts"
  },
  {
   "id": "CMP-12",
@@ -207,7 +227,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "wallet"
  },
  {
   "id": "CMP-13",
@@ -217,7 +238,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "wallet"
  },
  {
   "id": "CMP-14",
@@ -227,7 +249,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "jackpot"
  },
  {
   "id": "CMP-15",
@@ -237,7 +260,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "games"
  },
  {
   "id": "CMP-16",
@@ -247,7 +271,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "admin"
  },
  {
   "id": "CMP-17",
@@ -257,7 +282,8 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "admin"
  },
  {
   "id": "CMP-18",
@@ -267,44 +293,51 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "by": "jackpot"
  },
  {
   "id": "PUB-01",
   "name": "HomePage",
-  "states": "sections H1\u2013H12 as modular frames + states: logged-out, logged-in, wallet-disconnected, wallet-connected, insufficient funds, active round, no active round, restricted region",
+  "states": "sections H1–H12 as modular frames + states: logged-out, logged-in, wallet-disconnected, wallet-connected, insufficient funds, active round, no active round, restricted region",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "States and breakpoints part only. All 7 desktop 1440 states are built, plus Laptop 1280 default, Tablet 768 default, Mobile 390 default and Mobile 390 Restricted. Every frame passed a screenshot check after targeted fixes. The H1–H12 section components and the separate 'Logged out' master frame belong to the home-sections agent (section 'PUB-01 Home — sections & master'). Its Section/Home/* components were not in any registry when I built, so these frames use library components directly. Layout: row 1 = default, logged in, wallet disconnected, wallet connected; row 2 = insufficient funds, no active round, restricted; row 3 = 1280 and 768.",
+  "by": "home-states"
  },
  {
   "id": "PUB-02",
   "name": "Global Pool (public)",
   "states": "live, no round, restricted",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All 12 frames exist: live, no round and restricted at 1440, 1280, 768 and 390. 9 passed a screenshot check: all desktop frames, all mobile frames, 1280 live, 768 live and 768 no round. Three frames were made with the same clone-and-resize steps as checked frames but were not screenshotted because the Figma MCP tool-call limit was reached: 1280 no round (34:391801), 1280 restricted (34:392475) and 768 restricted (34:427559). Hero uses no orbs, glows or particles: a charcoal banner with angled gold and mint blocks and the Jackpot/Pool Visual cropped by the banner edge (coin stacks, entry tickets, number display). Hero CTA 'Sign in to participate' (participation needs login). Also on the page: Jackpot/Round Header, Prize Distribution, Threshold Bar, odds per entry, a 4-step VRF explainer, recent rounds (table on desktop, stacked cards on mobile), licence and RG. No round state swaps in VRF Stepper Settled, the 1st-prize winner card (@lumen.eth) and a Remind me action that is off by default. Restricted state uses the Restricted topbar banner plus Alert/Banner Regional restriction, with no VPN hint and withdrawals still available. Mobile adds a sticky participate bar and the tab bar (Pool).",
+  "by": "pub-pool-lobby"
  },
  {
   "id": "PUB-03",
   "name": "Games Lobby",
   "states": "filters, search, restricted games, empty",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All 15 frames exist: 1440 default, filters, search, restricted games and empty; 1280 and 768 default, restricted and empty; 390 default, filters bottom sheet, restricted and empty. 14 passed a screenshot check. 1280 empty (34:442219) was not screenshotted because the Figma MCP tool-call limit was reached. Layout: lobby banner with real tile art cropped by the edge, category tabs (All 33 · Jackpot · Instant · Table · Slots · Live · Draws & bingo), search, filter chips, sort, Global Pool jackpot spotlight with a Gold Participate button and fee line, Banner/Promo Tournament with key terms, and category grids of Tile/Game Generic using catalogue art for all 33 original titles. Also included: provably-fair and licence chips, Strip/Trust and Notice/Licence. Restricted state: every tile is in the Restricted variant ('Not available in your region · Why is this restricted?'), Participate is disabled, promo is hidden and a 'You can still' list is shown. Empty state: Instant + 'baccarat' shows 'No games match “baccarat”' with recovery actions and the 2 matches from other categories.",
+  "by": "pub-pool-lobby"
  },
  {
   "id": "PUB-04",
-  "name": "Game Details (instances \u00d76)",
+  "name": "Game Details (instances ×6)",
   "states": "per game",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -314,7 +347,7 @@
   "name": "Winners Hall",
   "states": "filters, empty",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -324,7 +357,7 @@
   "name": "Leaderboard",
   "states": "daily/weekly/monthly",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -334,17 +367,19 @@
   "name": "Provably Fair (explainer + verifier)",
   "states": "verified, failed, empty",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All 9 required frames exist (Empty / Verified / Failed at 1440, 768 and 390). I checked each one with screenshots and fixed what they showed. Page layout: casino shell (Shell/Sidebar with Provably Fair active, Topbar, Footer Mega; tablet uses Topbar + Footer Tablet; mobile uses Topbar Mobile + Mobile Tab Bar on Games). Content: hero with concrete dice, a playing card and product-UI previews (a VRF receipt card and a seed-check card) on angled solid blocks. There are two explainer diagrams: Chainlink VRF (round closes at 20:00:00 → request 0x9f2c…e71a → proof at 20:00:41 → settled 20:02:10) and seed commit–reveal (8f3c1e…e813 → nova-k-7f2a91 · 417 → c71d0a…5c27b14 → Roll 73.21), plus the code algorithm. Verifier: the Game/Provably Fair Verifier instance switches variant per state. Per-state panels: Empty = where to find values + recent draws #1,247/#1,246/#1,245 cancelled/#1,244; Verified = 3-check report + bet details + offline code; Failed = expected vs computed hash, 63/64 characters, likely causes, report/support. Also a FAQ (including 'you can lose your stake'), licence notice, 18+ and an RG link. Not VERIFIED for 2 reasons: (1) one copy fix on 768 Failed (34:501111) is not applied because of the Figma rate limit; (2) the 'Global Pool draw · VRF' segment is shown only as an inactive tab — there is no screen with a VRF-request-ID input.",
+  "by": "pub-gates-pf"
  },
  {
   "id": "PUB-08",
   "name": "How It Works",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -354,7 +389,7 @@
   "name": "Supported Networks",
   "states": "per-chain details",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -364,7 +399,7 @@
   "name": "VIP Program",
   "states": "tiers",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -374,7 +409,7 @@
   "name": "Affiliate Program",
   "states": "calculator",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -382,9 +417,9 @@
  {
   "id": "PUB-12",
   "name": "About Us",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -392,9 +427,9 @@
  {
   "id": "PUB-13",
   "name": "Security Center",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -404,7 +439,7 @@
   "name": "FAQ",
   "states": "search, categories",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -414,7 +449,7 @@
   "name": "Contact",
   "states": "form states",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -424,7 +459,7 @@
   "name": "Terms & Conditions",
   "states": "long-form",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -434,7 +469,7 @@
   "name": "Privacy Policy",
   "states": "long-form",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -444,7 +479,7 @@
   "name": "Responsible Gaming",
   "states": "resources",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -454,7 +489,7 @@
   "name": "AML/KYC Policy",
   "states": "long-form",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -464,7 +499,7 @@
   "name": "Restricted Countries",
   "states": "search, list",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -472,29 +507,33 @@
  {
   "id": "PUB-21",
   "name": "Geo-block interstitial",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440 (34:428847) and Mobile 390 (36:539703) both checked with screenshots. Full-screen interstitial 'GLOBAL POOL isn't available in your region' with: Topbar in Restricted region state (Sign up disabled) + region banner; detected region United States (DEMO) with time and a 'Wrong location? Tell support' path; licensing explanation. What you can still do: log in to withdraw, contact support, Restricted countries. A travel note says not to use a VPN or proxy (no bypass hint). Preview of locked game tiles (Tile/Game Generic in Restricted state) on angled mint/charcoal blocks; licence bar with 18+. Mobile adds a sticky 'Log in to withdraw' CTA; there is no tab bar because navigation is blocked.",
+  "by": "pub-gates-pf"
  },
  {
   "id": "PUB-22",
   "name": "Age gate + licence notice modal",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop: default (34:453500) and failure (34:474089). Mobile: default (51:146357) and failure (51:146780). All checked with screenshots. A modal (desktop) or bottom sheet (mobile) sits over the blurred casino home, using scrim/strong + Blur/Glass. Content: 'Are you 18 or older?' with Yes/No radios, neither selected; country select Portugal with a detected-and-permitted status (DEMO); unchecked jurisdiction checkbox; licence notice; links to Terms, Privacy, RG and Restricted Countries. Buttons: Leave, and Enter (disabled until both are answered). Failure state 'You must be 18+': help organisations, a note for parents and carers, and 'Leave GLOBAL POOL'.",
+  "by": "pub-gates-pf"
  },
  {
   "id": "PUB-23",
   "name": "Cookie consent (banner + preferences)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -502,9 +541,9 @@
  {
   "id": "PUB-24",
   "name": "404",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -512,9 +551,9 @@
  {
   "id": "PUB-25",
   "name": "500",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -522,9 +561,9 @@
  {
   "id": "PUB-26",
   "name": "Maintenance",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "",
   "status": "NOT STARTED"
@@ -534,17 +573,17 @@
   "name": "Register (email + password)",
   "states": "validation, loading, error, success",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "AUTH-02",
-  "name": "Register \u2014 wallet-first",
-  "states": "\u2014",
+  "name": "Register — wallet-first",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -554,7 +593,7 @@
   "name": "Login",
   "states": "error, locked, loading",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -564,7 +603,7 @@
   "name": "Email Verification",
   "states": "sent, code entry, resend cooldown, expired, success",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -574,7 +613,7 @@
   "name": "Forgot Password",
   "states": "sent, error",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -584,7 +623,7 @@
   "name": "Reset Password",
   "states": "strength, expired link, success",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -592,9 +631,9 @@
  {
   "id": "AUTH-07",
   "name": "2FA Enrollment",
-  "states": "scan \u2192 confirm \u2192 backup codes",
+  "states": "scan → confirm → backup codes",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -604,7 +643,7 @@
   "name": "2FA Challenge (login / withdrawal)",
   "states": "wrong code, locked",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -614,7 +653,7 @@
   "name": "Connect Wallet modal",
   "states": "list, WalletConnect QR, connecting, rejected, wrong network, success",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -624,7 +663,7 @@
   "name": "Wallet Verification (sign message)",
   "states": "request, success, rejected, expired",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -632,9 +671,9 @@
  {
   "id": "AUTH-11",
   "name": "KYC Intro & levels",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -644,7 +683,7 @@
   "name": "KYC Personal Details",
   "states": "validation",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -654,7 +693,7 @@
   "name": "KYC Document Upload",
   "states": "requirements, preview, error",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -664,7 +703,7 @@
   "name": "KYC Liveness / Selfie",
   "states": "permission denied, retake",
   "pri": "P1",
-  "sizes": "M\u00b7D",
+  "sizes": "M·D",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -672,9 +711,9 @@
  {
   "id": "AUTH-15",
   "name": "KYC Pending",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -682,9 +721,9 @@
  {
   "id": "AUTH-16",
   "name": "KYC Approved",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -694,7 +733,7 @@
   "name": "KYC Rejected",
   "states": "reasons, resubmit",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -704,7 +743,7 @@
   "name": "Restricted Account",
   "states": "suspended, under review, self-excluded, geo-restricted",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -714,7 +753,7 @@
   "name": "Account Recovery",
   "states": "start, verify identity, wallet recovery, cooling-off notice, success",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -722,9 +761,9 @@
  {
   "id": "AUTH-20",
   "name": "Session expired / re-auth modal",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -732,9 +771,9 @@
  {
   "id": "AUTH-21",
   "name": "New-device login alert",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "04",
   "group": "",
   "status": "NOT STARTED"
@@ -742,9 +781,9 @@
  {
   "id": "USR-00",
   "name": "Dashboard shell (sidebar expanded/collapsed, topbar)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "05",
   "group": "",
   "status": "NOT STARTED"
@@ -754,7 +793,7 @@
   "name": "Dashboard Overview",
   "states": "new user empty, active, restricted",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "05",
   "group": "",
   "status": "NOT STARTED"
@@ -764,7 +803,7 @@
   "name": "Notification Center",
   "states": "empty, unread",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "",
   "status": "NOT STARTED"
@@ -772,9 +811,9 @@
  {
   "id": "USR-G1",
   "name": "My Games",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -784,7 +823,7 @@
   "name": "My Entries",
   "states": "empty, filters",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -794,7 +833,7 @@
   "name": "My Active Rounds",
   "states": "live, empty",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -802,9 +841,9 @@
  {
   "id": "USR-G4",
   "name": "My Results",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -814,7 +853,7 @@
   "name": "My Winnings (claim/settlement)",
   "states": "owed, settled",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -824,7 +863,7 @@
   "name": "Game History",
   "states": "filters, export",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -834,7 +873,7 @@
   "name": "Favorites",
   "states": "empty",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
   "status": "NOT STARTED"
@@ -844,7 +883,7 @@
   "name": "Personal Information",
   "states": "edit, saved",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -852,9 +891,9 @@
  {
   "id": "USR-A2",
   "name": "Security Settings (security score)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -864,7 +903,7 @@
   "name": "Two-Factor Authentication mgmt",
   "states": "enable/disable/reset",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -874,7 +913,7 @@
   "name": "KYC Status",
   "states": "all statuses",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -882,9 +921,9 @@
  {
   "id": "USR-A5",
   "name": "Verification Documents",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -894,7 +933,7 @@
   "name": "Login History",
   "states": "suspicious flag",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -904,7 +943,7 @@
   "name": "Connected Devices",
   "states": "revoke",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -914,7 +953,7 @@
   "name": "Session Management",
   "states": "end all",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -922,9 +961,9 @@
  {
   "id": "USR-A9",
   "name": "Notification Preferences",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -932,9 +971,9 @@
  {
   "id": "USR-A10",
   "name": "Anti-Phishing Code",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Account",
   "status": "NOT STARTED"
@@ -944,7 +983,7 @@
   "name": "Deposits",
   "states": "empty, filters",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
   "status": "NOT STARTED"
@@ -952,9 +991,9 @@
  {
   "id": "USR-F2",
   "name": "Withdrawals",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
   "status": "NOT STARTED"
@@ -962,9 +1001,9 @@
  {
   "id": "USR-F3",
   "name": "Fees",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
   "status": "NOT STARTED"
@@ -972,9 +1011,9 @@
  {
   "id": "USR-F4",
   "name": "Rewards",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
   "status": "NOT STARTED"
@@ -982,9 +1021,9 @@
  {
   "id": "USR-F5",
   "name": "Refunds",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
   "status": "NOT STARTED"
@@ -992,9 +1031,9 @@
  {
   "id": "USR-F6",
   "name": "Complete Transaction History + export",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "05",
   "group": "Financial History",
   "status": "NOT STARTED"
@@ -1002,9 +1041,9 @@
  {
   "id": "USR-V1",
   "name": "Current Level & Progress",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "VIP",
   "status": "NOT STARTED"
@@ -1012,9 +1051,9 @@
  {
   "id": "USR-V2",
   "name": "Points & points history",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "VIP",
   "status": "NOT STARTED"
@@ -1022,9 +1061,9 @@
  {
   "id": "USR-V3",
   "name": "Rewards (claim states)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "VIP",
   "status": "NOT STARTED"
@@ -1032,9 +1071,9 @@
  {
   "id": "USR-V4",
   "name": "Benefits / tier comparison",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "VIP",
   "status": "NOT STARTED"
@@ -1042,9 +1081,9 @@
  {
   "id": "USR-R1",
   "name": "Referral Link & overview",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
   "status": "NOT STARTED"
@@ -1052,9 +1091,9 @@
  {
   "id": "USR-R2",
   "name": "Referral Statistics",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
   "status": "NOT STARTED"
@@ -1062,9 +1101,9 @@
  {
   "id": "USR-R3",
   "name": "Invited Users",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
   "status": "NOT STARTED"
@@ -1072,9 +1111,9 @@
  {
   "id": "USR-R4",
   "name": "Affiliate Earnings",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
   "status": "NOT STARTED"
@@ -1082,9 +1121,9 @@
  {
   "id": "USR-R5",
   "name": "Payout History (+ request payout)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
   "status": "NOT STARTED"
@@ -1092,9 +1131,9 @@
  {
   "id": "USR-RG1",
   "name": "RG Hub / overview",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1104,7 +1143,7 @@
   "name": "Deposit Limits",
   "states": "pending increase cool-down",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1112,9 +1151,9 @@
  {
   "id": "USR-RG3",
   "name": "Participation Limits",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1122,9 +1161,9 @@
  {
   "id": "USR-RG4",
   "name": "Time Limits",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1132,9 +1171,9 @@
  {
   "id": "USR-RG5",
   "name": "Reality Checks (settings + popup)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1144,7 +1183,7 @@
   "name": "Cooling-Off Period",
   "states": "confirm, active",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1154,7 +1193,7 @@
   "name": "Self-Exclusion",
   "states": "multi-step, active",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
   "status": "NOT STARTED"
@@ -1164,7 +1203,7 @@
   "name": "Wallet Overview (balance breakdown: available/locked/pending/owed)",
   "states": "empty, loading",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1174,177 +1213,177 @@
   "name": "Connected Wallets",
   "states": "add, remove, primary, error",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-03",
-  "name": "Deposit \u2014 Step 1 Select Network",
-  "states": "\u2014",
+  "name": "Deposit — Step 1 Select Network",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-04",
-  "name": "Deposit \u2014 Step 2 Select Token",
-  "states": "\u2014",
+  "name": "Deposit — Step 2 Select Token",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-05",
-  "name": "Deposit \u2014 Step 3 Deposit Address",
+  "name": "Deposit — Step 3 Deposit Address",
   "states": "wrong-network warning, min deposit",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-06",
-  "name": "Deposit \u2014 Step 4 QR Code",
-  "states": "\u2014",
+  "name": "Deposit — Step 4 QR Code",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-07",
-  "name": "Deposit \u2014 Step 5 Transaction Pending (confirmations n/N)",
+  "name": "Deposit — Step 5 Transaction Pending (confirmations n/N)",
   "states": "delayed",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-08",
-  "name": "Deposit \u2014 Step 6 Confirmation",
-  "states": "\u2014",
+  "name": "Deposit — Step 6 Confirmation",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-09",
-  "name": "Deposit \u2014 Step 7 Successful (receipt)",
+  "name": "Deposit — Step 7 Successful (receipt)",
   "states": "failed/unrecognised",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-10",
-  "name": "Withdraw \u2014 Step 1 Select Asset",
-  "states": "\u2014",
+  "name": "Withdraw — Step 1 Select Asset",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-11",
-  "name": "Withdraw \u2014 Step 2 Select Network",
-  "states": "\u2014",
+  "name": "Withdraw — Step 2 Select Network",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-12",
-  "name": "Withdraw \u2014 Step 3 Enter Address",
+  "name": "Withdraw — Step 3 Enter Address",
   "states": "invalid, whitelisted, new-address cooldown",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-13",
-  "name": "Withdraw \u2014 Step 4 Enter Amount",
+  "name": "Withdraw — Step 4 Enter Amount",
   "states": "min/max, over balance, limit reached",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-14",
-  "name": "Withdraw \u2014 Step 5 Fees & Summary",
-  "states": "\u2014",
+  "name": "Withdraw — Step 5 Fees & Summary",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-15",
-  "name": "Withdraw \u2014 Step 6 Risk Validation",
+  "name": "Withdraw — Step 6 Risk Validation",
   "states": "pass, KYC required, flagged",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-16",
-  "name": "Withdraw \u2014 Step 7 Two-Factor Confirmation",
+  "name": "Withdraw — Step 7 Two-Factor Confirmation",
   "states": "wrong code, locked",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-17",
-  "name": "Withdraw \u2014 Step 8 Pending",
+  "name": "Withdraw — Step 8 Pending",
   "states": "processing, queued, manual review",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-18",
-  "name": "Withdraw \u2014 Step 9 Successful",
-  "states": "\u2014",
+  "name": "Withdraw — Step 9 Successful",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "WAL-19",
-  "name": "Withdraw \u2014 Step 9 Failed",
+  "name": "Withdraw — Step 9 Failed",
   "states": "reasons + actions",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1354,7 +1393,7 @@
   "name": "Transaction History",
   "states": "filters, empty, loading",
   "pri": "P0",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1364,7 +1403,7 @@
   "name": "Transaction Detail drawer",
   "states": "pending / failed / successful",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1372,9 +1411,9 @@
  {
   "id": "WAL-22",
   "name": "Withdrawal Status tracker",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1384,7 +1423,7 @@
   "name": "Whitelisted Addresses",
   "states": "add (cooldown), remove",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1392,9 +1431,9 @@
  {
   "id": "WAL-24",
   "name": "Insufficient-funds / limit / maintenance banners & modals",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "06",
   "group": "",
   "status": "NOT STARTED"
@@ -1404,7 +1443,7 @@
   "name": "Global Pool Hub (pool balance, current round, participants, real countdown, threshold)",
   "states": "active, no round, restricted, wallet disconnected",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1414,7 +1453,7 @@
   "name": "Participation Preview modal (amount, entries, 0.05 USDT fee, network fee, odds disclosure, limit check, licence notice)",
   "states": "insufficient funds, limit reached, wrong network",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1422,9 +1461,9 @@
  {
   "id": "GP-03",
   "name": "Participation Pending",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1432,39 +1471,39 @@
  {
   "id": "GP-04",
   "name": "Participation Success (entry receipt)",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "GP-05",
-  "name": "Round Drawing (VRF stepper: requested \u2192 fulfilled \u2192 settled)",
+  "name": "Round Drawing (VRF stepper: requested → fulfilled → settled)",
   "states": "delayed",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "GP-06",
-  "name": "Round Result \u2014 winner view",
+  "name": "Round Result — winner view",
   "states": "win / not selected",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
  },
  {
   "id": "GP-07",
-  "name": "Round Result \u2014 public view (winner info, prize distribution, PF result)",
-  "states": "\u2014",
+  "name": "Round Result — public view (winner info, prize distribution, PF result)",
+  "states": "—",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1474,7 +1513,7 @@
   "name": "Round History",
   "states": "filters",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1482,9 +1521,9 @@
  {
   "id": "GP-09",
   "name": "Round Detail",
-  "states": "cancelled \u2192 refunds",
+  "states": "cancelled → refunds",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1492,9 +1531,9 @@
  {
   "id": "GP-10",
   "name": "Entry History",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1502,9 +1541,9 @@
  {
   "id": "GP-11",
   "name": "Prize Distribution breakdown",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1514,7 +1553,7 @@
   "name": "Provably Fair Result verification",
   "states": "verified/failed",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1522,9 +1561,9 @@
  {
   "id": "GP-13",
   "name": "Edge states: round closed, round cancelled (refund owed), VRF delayed",
-  "states": "\u2014",
+  "states": "—",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "07",
   "group": "",
   "status": "NOT STARTED"
@@ -1534,7 +1573,7 @@
   "name": "Table (felt + chips + bet slip)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1544,17 +1583,17 @@
   "name": "Number selection (inside bets)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
  },
  {
   "id": "RL-03",
-  "name": "Outside bets (Red/Black, Odd/Even, dozens, columns, 1\u201318/19\u201336)",
+  "name": "Outside bets (Red/Black, Odd/Even, dozens, columns, 1–18/19–36)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1564,7 +1603,7 @@
   "name": "Spinning state",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1574,7 +1613,7 @@
   "name": "Result Screen (win/lose)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1584,7 +1623,7 @@
   "name": "Bet History",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1594,7 +1633,7 @@
   "name": "Rules & payouts",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1604,7 +1643,7 @@
   "name": "Provably-fair verification",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1614,7 +1653,7 @@
   "name": "Error/limit/region states",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
   "status": "NOT STARTED"
@@ -1624,7 +1663,7 @@
   "name": "Pre-round betting",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1634,7 +1673,7 @@
   "name": "Active run (multiplier curve, cash-out)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1644,7 +1683,7 @@
   "name": "Cashed-out state",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1654,7 +1693,7 @@
   "name": "Crashed / Result screen",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1664,7 +1703,7 @@
   "name": "Round History + Game Statistics",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1674,7 +1713,7 @@
   "name": "Auto cash-out settings",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1684,7 +1723,7 @@
   "name": "Provably-fair verification",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1694,7 +1733,7 @@
   "name": "Error/connection-lost/limit/region states",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Crash",
   "status": "NOT STARTED"
@@ -1704,7 +1743,7 @@
   "name": "Dice interface (slider, over/under, bet panel)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1714,7 +1753,7 @@
   "name": "Number selection + live probability/payout display",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1724,7 +1763,7 @@
   "name": "Rolling state",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1734,7 +1773,7 @@
   "name": "Result Screen (win/lose)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1744,7 +1783,7 @@
   "name": "History",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1754,7 +1793,7 @@
   "name": "Provably-fair verification",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1764,7 +1803,7 @@
   "name": "Error/limit/region states",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Dice",
   "status": "NOT STARTED"
@@ -1774,7 +1813,7 @@
   "name": "Bet interface (Heads/Tails)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "08",
   "group": "Coinflip",
   "status": "NOT STARTED"
@@ -1784,7 +1823,7 @@
   "name": "Flipping state",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
   "status": "NOT STARTED"
@@ -1794,7 +1833,7 @@
   "name": "Result Screen (win/lose)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
   "status": "NOT STARTED"
@@ -1804,7 +1843,7 @@
   "name": "History",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
   "status": "NOT STARTED"
@@ -1814,7 +1853,7 @@
   "name": "Provably-fair verification",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
   "status": "NOT STARTED"
@@ -1824,7 +1863,7 @@
   "name": "Error/limit/region states",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
   "status": "NOT STARTED"
@@ -1834,7 +1873,7 @@
   "name": "Table + betting interface",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7T\u00b7M",
+  "sizes": "D·T·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1844,7 +1883,7 @@
   "name": "Dealing state",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1854,7 +1893,7 @@
   "name": "Player decision (Hit/Stand/Double/Split/Insurance)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1864,7 +1903,7 @@
   "name": "Dealer turn",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1874,7 +1913,7 @@
   "name": "Result Screen variants (win/lose/push/blackjack/bust)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1884,7 +1923,7 @@
   "name": "History",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1894,7 +1933,7 @@
   "name": "Rules",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1904,7 +1943,7 @@
   "name": "Provably-fair verification",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1914,7 +1953,7 @@
   "name": "Reconnect/recovery, error/limit/region states",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
   "status": "NOT STARTED"
@@ -1924,7 +1963,7 @@
   "name": "Game session RG bar + reality-check popup (as designed within games)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Shared",
   "status": "NOT STARTED"
@@ -1934,7 +1973,7 @@
   "name": "Admin shell (sidebar, topbar, command palette, role-based \"no permission\" state)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "",
   "status": "NOT STARTED"
@@ -1944,7 +1983,7 @@
   "name": "Admin Login + 2FA + session timeout",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "",
   "status": "NOT STARTED"
@@ -1954,7 +1993,7 @@
   "name": "Overview (all KPIs + system health) (M)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "09",
   "group": "",
   "status": "NOT STARTED"
@@ -1964,7 +2003,7 @@
   "name": "Users List",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -1974,7 +2013,7 @@
   "name": "User Profile (summary)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -1984,7 +2023,7 @@
   "name": "Account Details",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -1994,7 +2033,7 @@
   "name": "Wallet Addresses",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2004,7 +2043,7 @@
   "name": "KYC Status",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2014,7 +2053,7 @@
   "name": "AML Risk",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2024,7 +2063,7 @@
   "name": "Transaction History",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2034,7 +2073,7 @@
   "name": "Account Restrictions (apply/lift with reason + 2FA)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2044,7 +2083,7 @@
   "name": "Responsible Gaming Status",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2054,7 +2093,7 @@
   "name": "Audit History",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "User Management",
   "status": "NOT STARTED"
@@ -2064,7 +2103,7 @@
   "name": "Deposits",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2074,7 +2113,7 @@
   "name": "Withdrawals queue + detail (controlled approve/reject, four-eyes) (M)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2084,7 +2123,7 @@
   "name": "Platform Fees",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2094,7 +2133,7 @@
   "name": "Pool Accounting",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2104,7 +2143,7 @@
   "name": "Financial Ledger (append-only)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2114,7 +2153,7 @@
   "name": "Reconciliation (match/mismatch)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2124,7 +2163,7 @@
   "name": "Refunds",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2134,7 +2173,7 @@
   "name": "Revenue Reports",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2144,7 +2183,7 @@
   "name": "Export CSV (modal + states)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Finance",
   "status": "NOT STARTED"
@@ -2154,7 +2193,7 @@
   "name": "Games List",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2164,7 +2203,7 @@
   "name": "Game Configuration (versioned, dual-approved)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2174,7 +2213,7 @@
   "name": "Game Status",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2184,7 +2223,7 @@
   "name": "Game Statistics",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2194,7 +2233,7 @@
   "name": "Round Management (monitor + permitted controls)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2204,7 +2243,7 @@
   "name": "Game History",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2214,7 +2253,7 @@
   "name": "Provably Fair Logs",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
   "status": "NOT STARTED"
@@ -2224,7 +2263,7 @@
   "name": "Pool Overview",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2234,7 +2273,7 @@
   "name": "Pool Balance",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2244,7 +2283,7 @@
   "name": "Active Round (monitoring) (M)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2254,7 +2293,7 @@
   "name": "Historical Rounds",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2264,7 +2303,7 @@
   "name": "Participant List",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2274,7 +2313,7 @@
   "name": "Prize Distribution",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2284,7 +2323,7 @@
   "name": "VRF Status",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2294,7 +2333,7 @@
   "name": "Settlement Status",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2304,7 +2343,7 @@
   "name": "Refund Status",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2314,7 +2353,7 @@
   "name": "\"Immutable by design\" policy panel / circuit-breaker (dual approval)",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
   "status": "NOT STARTED"
@@ -2324,7 +2363,7 @@
   "name": "Supported Networks",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2334,7 +2373,7 @@
   "name": "Smart Contracts",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2344,7 +2383,7 @@
   "name": "Contract Addresses",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2354,7 +2393,7 @@
   "name": "Transaction Monitoring",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2364,7 +2403,7 @@
   "name": "Blockchain Events",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2374,7 +2413,7 @@
   "name": "Network Health",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2384,7 +2423,7 @@
   "name": "Failed Transactions",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2394,7 +2433,7 @@
   "name": "Gas Statistics",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
   "status": "NOT STARTED"
@@ -2404,7 +2443,7 @@
   "name": "KYC Queue + review detail (M)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2414,7 +2453,7 @@
   "name": "AML Alerts (M)",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T\u00b7M",
+  "sizes": "D·L·T·M",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2424,7 +2463,7 @@
   "name": "Suspicious Transactions",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2434,7 +2473,7 @@
   "name": "Sanctions Screening",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2444,7 +2483,7 @@
   "name": "Restricted Countries",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2454,7 +2493,7 @@
   "name": "Self-Exclusion",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2464,7 +2503,7 @@
   "name": "Responsible Gaming Reports",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
   "status": "NOT STARTED"
@@ -2474,7 +2513,7 @@
   "name": "Affiliates",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
   "status": "NOT STARTED"
@@ -2484,7 +2523,7 @@
   "name": "Referral Statistics",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
   "status": "NOT STARTED"
@@ -2494,7 +2533,7 @@
   "name": "Commissions",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
   "status": "NOT STARTED"
@@ -2504,7 +2543,7 @@
   "name": "Payouts",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
   "status": "NOT STARTED"
@@ -2514,7 +2553,7 @@
   "name": "Fraud Detection",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
   "status": "NOT STARTED"
@@ -2524,7 +2563,7 @@
   "name": "Banners",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
   "status": "NOT STARTED"
@@ -2534,7 +2573,7 @@
   "name": "Promotions",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
   "status": "NOT STARTED"
@@ -2544,7 +2583,7 @@
   "name": "Announcements",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
   "status": "NOT STARTED"
@@ -2554,7 +2593,7 @@
   "name": "Notifications",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
   "status": "NOT STARTED"
@@ -2564,7 +2603,7 @@
   "name": "Referral Campaigns",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
   "status": "NOT STARTED"
@@ -2574,7 +2613,7 @@
   "name": "CMS (with compliance review step)",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
   "status": "NOT STARTED"
@@ -2584,7 +2623,7 @@
   "name": "Admin Roles",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2594,7 +2633,7 @@
   "name": "Permissions matrix",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2604,7 +2643,7 @@
   "name": "Audit Logs",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2614,7 +2653,7 @@
   "name": "API Settings",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2624,7 +2663,7 @@
   "name": "Security",
   "states": "",
   "pri": "P1",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2634,7 +2673,7 @@
   "name": "System Configuration",
   "states": "",
   "pri": "P2",
-  "sizes": "D\u00b7L",
+  "sizes": "D·L",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2644,7 +2683,7 @@
   "name": "Four-eyes approval modal + confirm-with-reason + re-auth pattern",
   "states": "",
   "pri": "P0",
-  "sizes": "D\u00b7L\u00b7T",
+  "sizes": "D·L·T",
   "page": "09",
   "group": "System",
   "status": "NOT STARTED"
@@ -2671,13 +2710,15 @@
  },
  {
   "id": "MOB-03",
-  "name": "Mobile Home \u2014 all sections stacked",
+  "name": "Mobile Home — all sections stacked",
   "states": "",
   "pri": "P0",
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Mobile Home with every section stacked: Topbar Mobile, hero with the rebuilt Jackpot/Pool Visual, promotions carousel, draw countdown and entries feed, two game-tile carousels, winner cards, 5 steps, networks, provably fair, security list, VIP, affiliates, FAQ, Footer Mega Mobile and Nav/Mobile Tab Bar (Home). There is also a Mobile Restricted region frame (33:243178) with the region banner, gated hero, restricted tiles and RG help.",
+  "by": "home-states"
  },
  {
   "id": "MOB-04",
@@ -2741,7 +2782,7 @@
  },
  {
   "id": "MOB-10",
-  "name": "Mobile tables\u2192cards patterns (transactions, entries)",
+  "name": "Mobile tables→cards patterns (transactions, entries)",
   "states": "",
   "pri": "P0",
   "sizes": "",
@@ -2771,7 +2812,7 @@
  },
  {
   "id": "PRO-01",
-  "name": "Homepage \u2192 Register \u2192 Verification \u2192 Dashboard",
+  "name": "Homepage → Register → Verification → Dashboard",
   "states": "",
   "pri": "P0",
   "sizes": "",
@@ -2781,7 +2822,7 @@
  },
  {
   "id": "PRO-02",
-  "name": "Dashboard \u2192 Connect Wallet",
+  "name": "Dashboard → Connect Wallet",
   "states": "",
   "pri": "P0",
   "sizes": "",
@@ -2791,7 +2832,7 @@
  },
  {
   "id": "PRO-03",
-  "name": "Wallet \u2192 Deposit \u2192 Confirmation",
+  "name": "Wallet → Deposit → Confirmation",
   "states": "",
   "pri": "P0",
   "sizes": "",
@@ -2801,7 +2842,7 @@
  },
  {
   "id": "PRO-04",
-  "name": "Wallet \u2192 Withdrawal \u2192 Confirmation",
+  "name": "Wallet → Withdrawal → Confirmation",
   "states": "",
   "pri": "P0",
   "sizes": "",
@@ -2811,7 +2852,7 @@
  },
  {
   "id": "PRO-05",
-  "name": "Global Pool \u2192 Participation Preview \u2192 Result",
+  "name": "Global Pool → Participation Preview → Result",
   "states": "",
   "pri": "P0",
   "sizes": "",
@@ -2821,7 +2862,7 @@
  },
  {
   "id": "PRO-06",
-  "name": "Games Lobby \u2192 Game \u2192 Result",
+  "name": "Games Lobby → Game → Result",
   "states": "",
   "pri": "P1",
   "sizes": "",
@@ -2831,7 +2872,7 @@
  },
  {
   "id": "PRO-07",
-  "name": "Profile \u2192 KYC",
+  "name": "Profile → KYC",
   "states": "",
   "pri": "P1",
   "sizes": "",
@@ -2841,7 +2882,7 @@
  },
  {
   "id": "PRO-08",
-  "name": "Admin \u2192 User Management",
+  "name": "Admin → User Management",
   "states": "",
   "pri": "P1",
   "sizes": "",
@@ -2851,7 +2892,7 @@
  },
  {
   "id": "PRO-09",
-  "name": "Admin \u2192 Finance",
+  "name": "Admin → Finance",
   "states": "",
   "pri": "P1",
   "sizes": "",
@@ -2861,7 +2902,7 @@
  },
  {
   "id": "PRO-10",
-  "name": "Admin \u2192 Pool Monitoring",
+  "name": "Admin → Pool Monitoring",
   "states": "",
   "pri": "P1",
   "sizes": "",
@@ -2941,70 +2982,70 @@
  },
  {
   "id": "GM-02",
-  "name": "Game catalogue \u2014 tiles for all games (Originals, Table, Slots, Live, Draws, Bingo)",
+  "name": "Game catalogue — tiles for all games (Originals, Table, Slots, Live, Draws, Bingo)",
   "states": "default, hover, restricted",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
  },
  {
   "id": "GM-03",
-  "name": "Vault Sweeper (mines) \u2014 game screen + result",
+  "name": "Vault Sweeper (mines) — game screen + result",
   "states": "playing, cashed out, hit",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
  },
  {
   "id": "GM-04",
-  "name": "Pinfall (plinko) \u2014 game screen + result",
+  "name": "Pinfall (plinko) — game screen + result",
   "states": "dropping, result",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
  },
  {
   "id": "GM-05",
-  "name": "Skyline (limbo) \u2014 game screen + result",
+  "name": "Skyline (limbo) — game screen + result",
   "states": "win, lose",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
  },
  {
   "id": "GM-06",
-  "name": "Fortune Ring (wheel) \u2014 game screen + result",
+  "name": "Fortune Ring (wheel) — game screen + result",
   "states": "spinning, result",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
  },
  {
   "id": "GM-07",
-  "name": "Pool Keno \u2014 game screen + draw",
+  "name": "Pool Keno — game screen + draw",
   "states": "picking, drawn",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
  },
  {
   "id": "GM-08",
-  "name": "High Card (hi-lo) \u2014 game screen",
+  "name": "High Card (hi-lo) — game screen",
   "states": "playing, result",
   "pri": "P2",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
   "status": "NOT STARTED"
@@ -3014,7 +3055,7 @@
   "name": "Promotions hub",
   "states": "guest, member",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "Promotions",
   "status": "NOT STARTED"
@@ -3024,7 +3065,7 @@
   "name": "Daily rewards & missions",
   "states": "claimable, claimed, locked",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Promotions",
   "status": "NOT STARTED"
@@ -3034,7 +3075,7 @@
   "name": "Rakeback & cashback",
   "states": "claimable, empty",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Promotions",
   "status": "NOT STARTED"
@@ -3044,7 +3085,7 @@
   "name": "Weekly tournament + leaderboard",
   "states": "live, ended",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "03",
   "group": "Promotions",
   "status": "NOT STARTED"
@@ -3054,7 +3095,7 @@
   "name": "Welcome offer + bonus terms + bonus balance/wagering progress",
   "states": "offer, active, completed",
   "pri": "P1",
-  "sizes": "D\u00b7M",
+  "sizes": "D·M",
   "page": "05",
   "group": "Promotions",
   "status": "NOT STARTED"

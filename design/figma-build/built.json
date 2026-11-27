@@ -1,0 +1,1700 @@
+{
+ "forms": {
+  "section": "13:569",
+  "created": [
+   {
+    "name": "Section — CMP-02 Inputs & form controls (page '02 — Components', x 8000 y 0, 2960x6717)",
+    "id": "13:569"
+   },
+   {
+    "name": "Input/Text (State x Size, 14 variants)",
+    "id": "13:762"
+   },
+   {
+    "name": "Input/Password (State x Strength, 12 variants)",
+    "id": "14:1735"
+   },
+   {
+    "name": "Input/Amount (State, 4 variants)",
+    "id": "15:3387"
+   },
+   {
+    "name": "Input/Address (State, 6 variants)",
+    "id": "15:3617"
+   },
+   {
+    "name": "Input/OTP (State, 5 variants)",
+    "id": "16:3761"
+   },
+   {
+    "name": "Note — OTP error shake (motion annotation frame)",
+    "id": "16:3763"
+   },
+   {
+    "name": "Input/Search (Size x State, 6 variants)",
+    "id": "16:3820"
+   },
+   {
+    "name": "Input/Textarea (State, 4 variants)",
+    "id": "16:3858"
+   },
+   {
+    "name": "Control/Checkbox (Value x State, 15 variants, default Unchecked)",
+    "id": "20:3205"
+   },
+   {
+    "name": "Control/Radio (Selected x State, 8 variants)",
+    "id": "20:3259"
+   },
+   {
+    "name": "Control/Toggle (On x State, 8 variants, default Off)",
+    "id": "20:3309"
+   },
+   {
+    "name": "Control/Slider (Type x State, 6 variants)",
+    "id": "20:6624"
+   },
+   {
+    "name": "Input/Date Range (State, 2 variants, Nov 2026 popover)",
+    "id": "20:6794"
+   },
+   {
+    "name": "Input/File Upload (State, 5 variants, KYC)",
+    "id": "20:9454"
+   },
+   {
+    "name": "Form/Field Group — Login example (documentation frame)",
+    "id": "20:9456"
+   },
+   {
+    "name": "Form/Field Group — Login card (instances only)",
+    "id": "20:9457"
+   },
+   {
+    "name": "Registry file",
+    "id": "/home/user/Claude/design/figma-build/registry-forms.json"
+   }
+  ],
+  "issues": [
+   "None blocking. All 13 component sets and the Form/Field Group frame were screenshotted after building, and again after each fix. Fixes made: Input/Text row wrapping, Search M placeholder truncation (widened to 400 px), a scroll indicator on the overflowing Error textarea, readable disabled-reason text (text/tertiary), visible disabled control outlines (border/default), a one-word wrap in the dropzone requirements line, and the login divider contrast.",
+   "OTP digits use Geist Mono 24/32. They have no text style; font family, size and line height are bound to the variables font/family/mono, font/size/number-m and font/line-height/number-m. This is because no Mono style exists at 24 px. A 'Mono/L' text style could be added later in DS-04.",
+   "Checkbox and radio outlines use the icon/muted token, not border/*. border/strong (#3A3A52) is below the 3:1 non-text contrast needed for UI controls. This is noted in the component descriptions; it could go in the decisions log.",
+   "Password strength has 3 variant levels (Weak, Fair, Strong). The 4th tone, status/info for 'Good' (3 segments), is documented in the description for runtime only, so the set stays at 12 variants.",
+   "Input/Address 'New address' uses status/warning as its border colour because there is no border/warning token. A border/warning semantic variable could be added.",
+   "Input/Address 'New address' shows the example address 0x3f9a…c47E. It is not in demo-data.md but does not conflict with it, and it carries a DEMO XS badge. All other values come from demo-data.md (9,215.30 USDT available, 0x7c4e…a21D whitelisted 14 Oct 2026, WD-20931, 25,000.00 daily limit, n•••@example.com, 200.00 USDT/day RG limit).",
+   "Value and placeholder text differ per variant, so they are not TEXT properties (following the conventions). Consumers override the 'Value text' layer on an instance. The login example does this."
+  ]
+ },
+ "menus": {
+  "section": "13:473",
+  "created": [
+   {
+    "name": "Section — CMP-03/07 Selects, menus, tabs & tooltips",
+    "id": "13:473"
+   },
+   {
+    "name": "Section title",
+    "id": "13:474"
+   },
+   {
+    "name": "Select/Field (State=Default|Hover|Open|Focus|Disabled|Error)",
+    "id": "13:565"
+   },
+   {
+    "name": "Menu/Item (Type=Default|Icon|Checkbox|Destructive × State=Default|Hover|Selected|Disabled, 16)",
+    "id": "14:502"
+   },
+   {
+    "name": "Menu/Section Label",
+    "id": "14:508"
+   },
+   {
+    "name": "Menu/Divider",
+    "id": "14:511"
+   },
+   {
+    "name": "Menu/Panel",
+    "id": "14:581"
+   },
+   {
+    "name": "Select/Network Option (State=Default|Hover|Selected|Disabled)",
+    "id": "15:890"
+   },
+   {
+    "name": "Select/Network (State=Closed|Open)",
+    "id": "15:1041"
+   },
+   {
+    "name": "Select/Token (State=Closed|Open)",
+    "id": "16:3543"
+   },
+   {
+    "name": "Select/Chip",
+    "id": "16:3551"
+   },
+   {
+    "name": "Select/Multi (State=Closed|Open)",
+    "id": "16:3651"
+   },
+   {
+    "name": "Menu/Filter Chip (State=Default|Hover|Selected|Disabled)",
+    "id": "17:2766"
+   },
+   {
+    "name": "Menu/Filter",
+    "id": "17:2982"
+   },
+   {
+    "name": "Menu/User",
+    "id": "20:3846"
+   },
+   {
+    "name": "Menu/Language & Region",
+    "id": "20:3919"
+   },
+   {
+    "name": "Tabs/Underline (State=Default|Hover|Active|Disabled, Show count)",
+    "id": "20:6831"
+   },
+   {
+    "name": "Tabs/Underline Bar",
+    "id": "20:6859"
+   },
+   {
+    "name": "Tabs/Pill (State=Default|Hover|Active|Disabled)",
+    "id": "20:6895"
+   },
+   {
+    "name": "Tabs/Pill Bar",
+    "id": "20:6937"
+   },
+   {
+    "name": "Tabs/Segment (State=Default|Hover|Active|Disabled)",
+    "id": "20:6953"
+   },
+   {
+    "name": "Tabs/Segmented (Segments=2|3|4)",
+    "id": "20:6978"
+   },
+   {
+    "name": "Tooltip (Type=Info|Definition × Placement=Top|Bottom)",
+    "id": "20:10849"
+   },
+   {
+    "name": "Tooltip/Balance Glossary",
+    "id": "20:10929"
+   },
+   {
+    "name": "Registry file /home/user/Claude/design/figma-build/registry-menus.json",
+    "id": "file"
+   }
+  ],
+  "issues": [
+   "Fixed during build: (1) Select/Network Option rows were too narrow at 388px, so the standard/confirmations text ran into the fee/status column. Rows are now 468px (field 480px), the Standard text fills and truncates, and the Ethereum status reads 'Degraded' to match Wallet/Network Pill. (2) An empty spacer frame made the Select/Network panel header 100px tall; it now has 1px height. Later scripts use SPACE_BETWEEN instead of spacers. (3) Badge/Count is red by default, which reads as an alert. It is recoloured to brand/primary-strong in Menu/Filter, and to brand or surface/selected in Tabs/Underline, as instance overrides. (4) Reusable menus had a Hover row baked in (Wallet, Deutsch, Oldest first, Failed). These are reset to Default so instances don't ship with a highlight. (5) In Menu/Language & Region, 'Portugal' + DEMO collided with the 'Permitted' pill. The pill now sits under the country name.",
+   "Not checked: Inter has no Japanese glyphs, so 日本語 renders through Figma's fallback font. It displayed correctly in the screenshot. The component description tells devs to use the system font fallback.",
+   "Not checked: the USDT contract address in Select/Token (0xFd08…Cbb9) is not in demo-data.md. It is truncated and carries a DEMO badge. The orchestrator may want to add per-network contract placeholders to demo-data.md.",
+   "Gap: no Checkbox component existed in the registry yet (CMP-02 may be in progress), so the 18px checkbox mark is built inside Menu/Item Type=Checkbox with tokens. It can be swapped for the CMP-02 checkbox once that exists.",
+   "Design choice: screens with real overlays should place Select Open panels as absolute overlays. The Open variants show the panel in-flow for documentation, and each description says so.",
+   "Section bounds are 1836 × ~6656 at X=12500, so the right edge is at X≈14336. Nothing outside the section was touched."
+  ]
+ },
+ "cards": {
+  "section": "22:7454",
+  "created": [
+   {
+    "name": "Section — CMP-04 Cards (page 02 — Components, X=17000 Y=0, 2192×9092)",
+    "id": "22:7454"
+   },
+   {
+    "name": "Card/Stat (Trend=Up|Down|Neutral × Size=M|L, 6 variants)",
+    "id": "22:7589"
+   },
+   {
+    "name": "Card/Balance (Type=Total|Available|Locked|Pending|Owed, 5 variants)",
+    "id": "22:7720"
+   },
+   {
+    "name": "Card/Jackpot (Size=Hero|Compact, 2 variants)",
+    "id": "22:9401"
+   },
+   {
+    "name": "Card/Game (Game=Global Jackpot|Roulette|Crash|Dice|Coinflip|Blackjack × State=Default|Restricted, 12 variants)",
+    "id": "23:8247"
+   },
+   {
+    "name": "Card/Winner (Source=Global Pool|Game, 2 variants)",
+    "id": "23:9389"
+   },
+   {
+    "name": "Card/Round (Status=Open|Drawing|Settled|Cancelled, 4 variants)",
+    "id": "23:9602"
+   },
+   {
+    "name": "Card/VIP Tier (Tier=Bronze..Diamond × Current=No|Yes, 10 variants)",
+    "id": "23:12669"
+   },
+   {
+    "name": "Card/Network (Chain=BNB Chain|Polygon|Arbitrum|Ethereum|Solana, 5 variants)",
+    "id": "23:12849"
+   },
+   {
+    "name": "Card/FAQ Item (State=Collapsed|Hover|Focus|Expanded; TEXT props Question, Answer)",
+    "id": "23:16819"
+   },
+   {
+    "name": "Card/Feature (State=Default|Hover|Focus; props Title, Body, Link, Show link, Icon swap)",
+    "id": "23:16859"
+   },
+   {
+    "name": "Card/Notification (Type=Info|Success|Warning|Security × Read=No|Yes, 8 variants)",
+    "id": "23:17017"
+   },
+   {
+    "name": "Card/Security Score (Status=Needs review|All clear)",
+    "id": "23:17143"
+   },
+   {
+    "name": "Registry file /home/user/Claude/design/figma-build/registry-cards.json",
+    "id": "registry-cards.json"
+   }
+  ],
+  "issues": [
+   "The file was re-themed while this run was in progress (decisions.md #18–20, 27 Nov 2026 user decision: charcoal + mint BC.GAME-style palette, casino layout). All CMP-04 fills, strokes, spacing and radii are bound to variables, so the cards follow the new palette automatically. I changed two things to match it: (1) brand-tinted areas use brand/tint and alpha/white-* instead of the raw alpha/violet-* tokens, which still resolve to violet #8B5CF6 and would look off-brand; (2) the Neutral sparkline is grey (text/tertiary), because brand/secondary is now mint and would read as 'up'. The alpha/violet-* primitives are still violet. That should be reviewed file-wide.",
+   "Deliberate deviation: component-set backgrounds use bg/base (page background) plus a border/subtle stroke, not the surface/default that conventions §5 specifies. Cards are surface/default, so a set filled with surface/default would make them disappear into the background.",
+   "Card/Game was adapted to the new tile direction. Each game has its own original illustration made from shapes (pool orb with orbit rings, single-zero wheel with a mint zero pocket, rising multiplier curve, two dice, coin edge-on with flip arcs, face-down hole card plus a fanned ace) on a Gradient/Tile backdrop, with a players chip and DEMO badge. It is a 296 px card with content below the art, not a 3:4 portrait tile with the title over the art. If screens need pure portrait lobby tiles, those belong in CMP-15 Game components.",
+   "Illustrative values not in demo-data.md (all DEMO-badged, none conflict with the sheet): round #1,247 participants 3,198 and entries 17,295 (= 172,950 / 10); round #1,245 cancelled at 412 participants, 2,964 entries, 29,640.00 pool; round #1,247 1st prize 86,475.00 (= 50% of 172,950.00); Crash win 248.00 USDT (12.40× on a 20.00 stake), round #C-88214; game player counts; Blackjack min bet 1.00; VIP thresholds 0 / 2,500 / 8,000 / 20,000 / 50,000 pts and weekly reward rates; Stat-card deltas (−2.4% active users, 0.00 pp health); new-device sign-in time 09:14 UTC.",
+   "The Badge/Status label text is overridden inside Card/Round instances: Processing shows 'Drawing', Confirmed shows 'Settled', Expired shows 'Cancelled'. The badge set has no Drawing, Settled or Cancelled status. CMP-07 could add them.",
+   "Paint styles Gradient/Brand Glow, Brand Solid and Hero Radial are now mint. CMP-04 uses only Gold Jackpot, Gold Radial, Surface Sheen and the Tile gradients.",
+   "Not a problem: the memory note about the LegalTechAnalyses Figma file belongs to a different project and was not used."
+  ]
+ },
+ "tables": {
+  "section": "22:8274",
+  "created": [
+   {
+    "name": "Section 'CMP-05 Tables & pagination' (page 02 — Components, x 22500, y 0)",
+    "id": "22:8274"
+   },
+   {
+    "name": "Section title (H2 + subtitle + DEMO M)",
+    "id": "22:8275"
+   },
+   {
+    "name": "Table/Header Cell (Align Left|Right × Sort None|Asc|Desc; props Label, Show sort icon)",
+    "id": "22:8309"
+   },
+   {
+    "name": "Table/Cell (Type Text|Number|Status|Address|Amount|Date|Actions|User|Network|Checkbox × Density Comfortable 56|Compact 40; props Show secondary, Show DEMO, Show expand, Chain swap)",
+    "id": "22:9559"
+   },
+   {
+    "name": "Table/Amount Value (Sign Positive|Negative|Neutral) — nested in Amount cells",
+    "id": "22:9421"
+   },
+   {
+    "name": "Table/Risk Cell (Level Low|Medium|High × Density)",
+    "id": "23:5378"
+   },
+   {
+    "name": "Table/Row (State Default|Hover|Selected|Expanded; prop Show checkbox) — Expanded detail panel: details, fee breakdown + DEMO, Tx/Hash, Tx/Status Timeline",
+    "id": "23:8970"
+   },
+   {
+    "name": "Table/Toolbar (State Default|Filtered): search, filter w/ count, date range, saved views, density toggle, Export CSV",
+    "id": "23:11446"
+   },
+   {
+    "name": "Table/Filter Button (State Default|Hover|Focus|Active w/ count)",
+    "id": "23:5397"
+   },
+   {
+    "name": "Table/Density Toggle (Value Comfortable|Compact)",
+    "id": "23:5426"
+   },
+   {
+    "name": "Table/Glyph/Density Comfortable (24px glyph)",
+    "id": "23:7430"
+   },
+   {
+    "name": "Table/Glyph/Density Compact (24px glyph)",
+    "id": "23:7432"
+   },
+   {
+    "name": "Table/Bulk Action Bar (State Default|Loading): 3 selected + Approve/Export/Clear, admin style",
+    "id": "23:11539"
+   },
+   {
+    "name": "Table/Skeleton Row (Density Comfortable|Compact, Gradient/Skeleton bars)",
+    "id": "23:14920"
+   },
+   {
+    "name": "Table/Empty State (Type No data|No results|Error; 'No transactions yet' + 'Make a deposit')",
+    "id": "23:15005"
+   },
+   {
+    "name": "Pagination (Type Numbered|Load more|Cursor; Rows per page + '1–20 of 1,284')",
+    "id": "23:16756"
+   },
+   {
+    "name": "Pagination/Page Item (State Default|Hover|Selected|Focus|Disabled; prop Page)",
+    "id": "23:5437"
+   },
+   {
+    "name": "Table/Row Admin Withdrawal (State Default|Hover|Selected|Not selectable; Compact)",
+    "id": "23:19194"
+   },
+   {
+    "name": "Table/Example Transactions (component; Comfortable, sticky header, 6 demo rows, numbered pagination)",
+    "id": "23:20002"
+   },
+   {
+    "name": "Table/Example Admin Withdrawals (component; Compact, checkboxes, risk column, bulk bar, 10 rows)",
+    "id": "23:22259"
+   }
+  ],
+  "issues": [
+   "THEME DRIFT (orchestrator should check DS-02): while this run was in progress, the Color variables began resolving to a mint/graphite palette. Examples: brand/tint is #2CD97D at 16%, surface/default is #2B2F30, and Gradient/Skeleton stops run #2B2F30 → #3A4142. My first screenshot of Tx/Status Timeline showed violet; a later one showed mint. This differs from the master palette (#8B5CF6 / #191927). All CMP-05 nodes are bound to tokens, so they will follow whichever palette is final. Screenshots were judged against the current mint/graphite values.",
+   "Gradient/Skeleton's end stops are exactly surface/default, so skeleton bars disappeared on table surfaces. I added a 1px border/default hairline to every skeleton bar (the paint style is kept). If the paint style is retuned, the hairline can be removed.",
+   "The Badge/Count default fill is status/danger-strong (red). In Table/Filter Button (Active), the nested count is overridden to brand/primary-strong with text/on-primary, matching what CMP-03 did in Menu/Filter. A brand variant of Badge/Count would remove the need for this override.",
+   "The icon set has no density glyphs ('menu' and 'list' look almost the same at 16px). I added two table-specific 24px glyph components that follow the icon family style (1.5px stroke, round caps). They are used only in Table/Density Toggle.",
+   "Tx/Fee Breakdown has no Deposit type, so the Expanded row (DP-77412 deposit) has an inline token-bound deposit fee list. Tx/Status Timeline (State=Confirming, DP-77412) is reused, with its own hash block hidden; a separate Tx/Hash instance is shown in the panel instead.",
+   "Invented values that do not conflict with demo-data: the WD-20850 amount (250.00, Polygon, 18 Nov 2026); the times for DP-77380, WD-20877 and the entry purchase; and nine fictional admin queue requests WD-20944 to WD-20968 (addresses, amounts and risk scores). The 3 selected admin rows sum to 4,620.00, which matches the bulk-bar total. Admin pagination shows 1–10 of 37, matching the 37 pending-withdrawals KPI.",
+   "Possible overlap: Pagination is built here, as assigned. CMP-09 (Navigation, section 14:1015) also lists pagination in the master prompt. The orchestrator should make sure only one Pagination set gets registered.",
+   "node.screenshot() inside use_figma sometimes rendered newly bound variables wrongly (black strokes, or light mode). All verification was therefore done with get_screenshot, which rendered correctly."
+  ]
+ },
+ "overlays": {
+  "section": "24:15958",
+  "created": [
+   {
+    "name": "Section/CMP-06/08 Overlays & feedback",
+    "id": "24:15958"
+   },
+   {
+    "name": "Frame/Section title",
+    "id": "24:15959"
+   },
+   {
+    "name": "Modal/Base",
+    "id": "24:16058"
+   },
+   {
+    "name": "Modal/Base Size=S",
+    "id": "24:15962"
+   },
+   {
+    "name": "Modal/Base Size=M",
+    "id": "24:15993"
+   },
+   {
+    "name": "Modal/Base Size=L",
+    "id": "24:16024"
+   },
+   {
+    "name": "Doc/Modal over scrim — Desktop",
+    "id": "24:16059"
+   },
+   {
+    "name": "Modal/Confirmation",
+    "id": "25:15557"
+   },
+   {
+    "name": "Modal/Danger",
+    "id": "25:15811"
+   },
+   {
+    "name": "Modal/2FA",
+    "id": "25:16745"
+   },
+   {
+    "name": "Modal/RG Limit",
+    "id": "25:17005"
+   },
+   {
+    "name": "Wallet/Provider Mark",
+    "id": "27:15887"
+   },
+   {
+    "name": "Wallet/Provider Row",
+    "id": "27:15928"
+   },
+   {
+    "name": "Modal/Connect Wallet",
+    "id": "27:16569"
+   },
+   {
+    "name": "Modal/Participation Preview",
+    "id": "28:19099"
+   },
+   {
+    "name": "Doc/Platform fee tooltip",
+    "id": "28:19100"
+   },
+   {
+    "name": "Drawer/Detail",
+    "id": "28:20511"
+   },
+   {
+    "name": "Drawer/Filter",
+    "id": "29:17462"
+   },
+   {
+    "name": "Sheet/Bottom",
+    "id": "29:17720"
+   },
+   {
+    "name": "Toast",
+    "id": "30:16872"
+   },
+   {
+    "name": "Alert/Banner",
+    "id": "30:17116"
+   },
+   {
+    "name": "Doc/Drawer over scrim — Desktop",
+    "id": "30:21135"
+   },
+   {
+    "name": "Doc/Sheet on mobile — 390",
+    "id": "30:21335"
+   },
+   {
+    "name": "Doc/Toast stack — Desktop",
+    "id": "30:21462"
+   },
+   {
+    "name": "Registry file",
+    "id": "/home/user/Claude/design/figma-build/registry-overlays.json"
+   }
+  ],
+  "issues": [
+   "Set backgrounds: overlay sets (Modal/*, Drawer/*, Sheet/Bottom, Wallet/Provider*) use a scrim/strong fill instead of surface/default, because surface/overlay equals surface/default (#2B2F30) and the modals would blend into the set. Toast and Alert/Banner sets use bg/base.",
+   "Data conflict: the participation limit is 500.00 USDT as the assignment says, but the existing RG/Limit Setter (23:21988) shows 200.00 and demo-data.md defines none. Recommend adding 'Daily participation limit 500.00 USDT' to demo-data.md and aligning the RG/Limit Setter.",
+   "Participation Preview 'Insufficient funds' uses an example Available balance of 342.10 USDT (DEMO, noted in the description) because the demo user's 9,215.30 cannot run short below the 500.00 limit. The state offers 'Reduce to 34 entries' and 'Deposit USDT'.",
+   "Added a 'Ready' state to Participation Preview (the user has ticked consent, Gold CTA enabled). Default keeps consent unchecked and Button/Gold disabled; consent is never pre-checked.",
+   "Participation 'Wrong network' needs a product decision: entries are paid from the platform balance with no on-chain transaction, so it is framed as the wallet session needing a supported network (Switch to Arbitrum).",
+   "Drawer/Detail and Drawer/Filter hug their content height (742–1226 px) rather than a fixed 100vh; the descriptions specify 100vh with sticky header and footer in product.",
+   "Assumed current time 27 Nov 2026, 21:42 UTC for the 2FA lock ('until 21:57 UTC') and the RG increase cool-down ('effective 28 Nov 2026, 21:42 UTC'); entry purchase time 14:06 UTC is DEMO.",
+   "The get_screenshot tool once returned a stale render after a fix on Modal/RG Limit; the fix was confirmed with an in-plugin node.screenshot(). All 14 sets plus the doc frames were screenshot-verified after fixes, and the final overlap audit of the section reports 0 overlaps and 0 overflowing text nodes.",
+   "New reusable parts other agents can use: Wallet/Provider Mark (27:15887, neutral monograms BW/WC/CB/TW/PH/LG) and Wallet/Provider Row (27:15928, props Name/Meta/Tag/Show tag/Mark), e.g. for a mobile connect-wallet sheet.",
+   "No user memory notes were used; the only note in the memory index concerns an unrelated project and was not opened."
+  ]
+ },
+ "nav": {
+  "section": "14:1015",
+  "created": [
+   {
+    "name": "Nav/Sidebar Item",
+    "id": "14:1115"
+   },
+   {
+    "name": "Nav/Sidebar",
+    "id": "20:9165"
+   },
+   {
+    "name": "Nav/Topbar",
+    "id": "20:9304"
+   },
+   {
+    "name": "Nav/App Topbar",
+    "id": "22:8586"
+   },
+   {
+    "name": "Nav/Breadcrumb",
+    "id": "14:1145"
+   },
+   {
+    "name": "Nav/Step Item",
+    "id": "14:1193"
+   },
+   {
+    "name": "Nav/Stepper",
+    "id": "15:3122"
+   },
+   {
+    "name": "Example — Withdraw risk check failed (frame)",
+    "id": "15:3126"
+   },
+   {
+    "name": "Nav/Stepper Mobile",
+    "id": "15:3270"
+   },
+   {
+    "name": "Nav/Header Link",
+    "id": "16:3228"
+   },
+   {
+    "name": "Nav/Balance Chip",
+    "id": "16:3304"
+   },
+   {
+    "name": "Nav/Notifications Trigger",
+    "id": "16:3356"
+   },
+   {
+    "name": "Nav/Avatar Trigger",
+    "id": "16:3384"
+   },
+   {
+    "name": "Nav/Language Trigger",
+    "id": "16:3412"
+   },
+   {
+    "name": "Nav/Region Banner",
+    "id": "16:3449"
+   },
+   {
+    "name": "Header/Public Desktop",
+    "id": "20:3727"
+   },
+   {
+    "name": "Header/Public Tablet",
+    "id": "20:6398"
+   },
+   {
+    "name": "Header/Public Mobile",
+    "id": "20:6509"
+   },
+   {
+    "name": "Menu/Mobile Fullscreen",
+    "id": "20:8863"
+   },
+   {
+    "name": "Nav/Mobile Tab Bar",
+    "id": "22:5413"
+   },
+   {
+    "name": "Nav/Admin Item",
+    "id": "22:5497"
+   },
+   {
+    "name": "Nav/Admin Sidebar",
+    "id": "22:5501"
+   },
+   {
+    "name": "Nav/Admin Topbar",
+    "id": "22:6483"
+   },
+   {
+    "name": "Nav/Command Palette",
+    "id": "22:6663"
+   },
+   {
+    "name": "Footer",
+    "id": "22:7450"
+   }
+  ],
+  "issues": [
+   "Everything assigned is built and was checked by screenshot after the last fix. All 24 component IDs are in /home/user/Claude/design/figma-build/registry-nav.json (registry key: nav).",
+   "Conventions changed while I was working. conventions.md §4 and decisions #18–19 (BC.GAME-style charcoal + mint palette, casino layout) were updated after this task started. Colours pick up the new palette through the tokens. I also followed the new shell widths: Nav/Sidebar is 240/72 instead of the assigned 264/80, and Nav/Topbar defaults to 1200 wide (still at least 1176). This deviation is written into the component descriptions and labels.",
+   "I added Nav/App Topbar (22:8586), which was not in my list. It is the casino-shell top bar from the updated conventions: search, then either auth buttons or balance, Deposit, bell and avatar. It has a Restricted region state.",
+   "Header/Public Desktop cannot fit all 8 links plus the full logged-in actions at 1440, so the logged-in states show 6 links and a 'More' menu holding How It Works and Affiliates. Logged out and Restricted region show all 8. In the Wallet connected state, Button/Wallet Connected is also the account menu, so there is no separate avatar. The tightest state has 19 px to spare, and no state overflows.",
+   "Possible duplicate: the wallet agent built Wallet/Balance Chip (14:2062) at the same time as my Nav/Balance Chip. Nav/Topbar and Nav/App Topbar now use the shared 14:2062. Nav/Balance Chip is kept as a compact (232/219 px) chip for the public headers only, because 14:2062 (304 px) does not fit there. The orchestrator may want to merge them.",
+   "Not built: pagination. The master prompt lists it under CMP-09, but my assignment did not include it. Check whether the tables agent (CMP-05) covers it.",
+   "I added small sub-components the headers and menus needed: Nav/Header Link, Nav/Notifications Trigger, Nav/Avatar Trigger, Nav/Language Trigger, Nav/Stepper Mobile and Nav/Admin Item. Nav/Region Banner is my own build because the registry had no CMP-08 alert yet. The orchestrator may want to align it with CMP-08 later.",
+   "The footer's operator, regulator and licence number are placeholders marked DEMO. The help organisations (GamCare, Gamblers Anonymous, National Council on Problem Gambling) are text links only, with no logos. Their URLs need a legal check per jurisdiction.",
+   "Menu/Mobile Fullscreen grows to fit its content (927 px logged out, 1137 px logged in) and scrolls in the product. It is not a fixed 844 px frame.",
+   "Admin components offer no way to edit results, pick winners or pay out arbitrary amounts. The command palette lists only allowed actions that need a reason, 2FA and an audit entry, and modules outside a role show a 'No access' lock.",
+   "Usage notes: icons swapped through INSTANCE_SWAP may need re-tinting. Nested Badge/Count values are set on the nested instance. Per-variant text such as 'Page title' and breadcrumb crumbs is changed by layer name. Set Nav/Sidebar, Nav/Topbar, Nav/App Topbar and Nav/Admin Topbar to FILL in screens.",
+   "No memory notes applied to this task. The palette and layout decisions came from decisions.md, not from memory."
+  ]
+ },
+ "wallet": {
+  "section": "14:1737",
+  "created": [
+   {
+    "name": "Section title (frame)",
+    "id": "14:1738"
+   },
+   {
+    "name": "Group/CMP-12 Wallet (header frame)",
+    "id": "14:1741"
+   },
+   {
+    "name": "Wallet/Balance Breakdown",
+    "id": "14:1974"
+   },
+   {
+    "name": "Wallet/Balance Chip",
+    "id": "14:2062"
+   },
+   {
+    "name": "Wallet/Connected Wallet Row",
+    "id": "15:4172"
+   },
+   {
+    "name": "Wallet/Token Amount Row",
+    "id": "15:4217"
+   },
+   {
+    "name": "Wallet/Deposit Address Block",
+    "id": "16:4429"
+   },
+   {
+    "name": "Wallet/Fee Estimator",
+    "id": "20:3002"
+   },
+   {
+    "name": "Wallet/Confirmations Progress",
+    "id": "20:3076"
+   },
+   {
+    "name": "Group/CMP-13 Transactions (header frame)",
+    "id": "20:5820"
+   },
+   {
+    "name": "Tx/Hash",
+    "id": "20:5893"
+   },
+   {
+    "name": "Tx/Row",
+    "id": "20:6222"
+   },
+   {
+    "name": "Tx/Status Timeline",
+    "id": "20:8473"
+   },
+   {
+    "name": "Tx/Fee Breakdown",
+    "id": "20:8583"
+   },
+   {
+    "name": "Tx/Receipt Card",
+    "id": "22:5202"
+   }
+  ],
+  "issues": [
+   "Registry written to /home/user/Claude/design/figma-build/registry-wallet.json (12 sets with ids, variant options and props). All 12 sets were screenshot-checked after build and again after targeted fixes, the whole section 14:1737 (2312x6565) included. No clipped or overlapping text, no empty frames, no default fills. All fills, strokes, gaps, padding and radii are bound to tokens.",
+   "Fixes applied after review: the balance meta line no longer wraps; the chip set width is now 1040; the deposit address is set at a fixed 178px width so it splits into two 21-character lines; the Delayed and Confirmed confirmation captions were shortened; the WD-20931 row sub-caption now fits on one line; the receipt reference captions were shortened. Each fix was re-checked with a screenshot.",
+   "Invented demo value (not in demo-data.md): the Tx/Row Prize example is a runner-up prize for @nova.k in round #1,244, +3,620.60 USDT (2% of the 181,030.00 pool). The orchestrator may want to add it to demo-data.md or swap in another value.",
+   "Other values not in demo-data.md, all marked DEMO: a full illustrative Ethereum deposit address 0xDE3001A7c4E9b2F6d18053cA9e7B41f2D6a0c9F3; block numbers 21,384,896 / 21,384,899; second-level timestamps for DP-77412 (18:40:12 to 18:43:09 UTC); WD-20877 completion time 20 Nov 2026, 11:32 UTC and a 0.12 network fee (the BNB fee from the chains table), giving 799.88 received; receipt refs RC-77380 / RC-20877; the 'Week 48' label on the VIP reward.",
+   "Ledger split: Tx/Row shows the entry purchase as two lines (Entry −350.00 and Fee −1.75 = 351.75 from demo-data) so the platform fee is its own line. Screen agents should follow this split.",
+   "Badge/Status has no Verified / Whitelisted / Unverified / Completed options, so instances of Confirmed / Approved / Pending / Failed were relabelled through text overrides (not detached). A future Badge/Status update could add these as proper variants.",
+   "Wallet/Address Chip has the BNB Chain mark built in. In the Connected Wallet Row, the nested chain instance was swapped to Arbitrum or Solana as an instance override. The receipts use BNB, so no swap was needed there.",
+   "Connected Wallet Row has no 'Show DEMO' property, because its DEMO badge lives inside the nested Address Chip, which has its own 'Show DEMO'. Every other set has 'Show DEMO' (BOOLEAN, default true) wired to its own DEMO badges. Tx/Hash also has 'Hash' (TEXT) and 'Show explorer link' (BOOLEAN). Token Amount Row also has 'Amount' and 'Fiat' (TEXT) and 'Network' (INSTANCE_SWAP of a chain mark).",
+   "The QR is an original illustrative pattern and cannot be scanned: a 25x25 grid filled by a fixed-seed random generator, 3 finder squares, timing and alignment patterns, a centre USDT mark, flattened into one vector 'QR/Modules'. The component description tells developers to render a real EIP-681 QR in code.",
+   "Extra states beyond the brief: Balance Chip Hover and Focus, Tx/Hash Hover, Focus and Copied, Tx/Row Hover, Confirmations Progress Delayed and Confirmed, and Tx/Fee Breakdown Type=Entry (with 'You can lose your stake'). The Fee Breakdown Entry variant can serve as the pool participation-preview fee block.",
+   "Did not touch other sections. No memory notes were relevant to this task; nothing new to save."
+  ]
+ },
+ "jackpot": {
+  "section": "22:8310",
+  "created": [
+   {
+    "name": "Section — CMP-14/18 Jackpot & responsible gaming",
+    "id": "22:8310"
+   },
+   {
+    "name": "Section title",
+    "id": "22:8311"
+   },
+   {
+    "name": "Group/CMP-14 Jackpot (header)",
+    "id": "22:8314"
+   },
+   {
+    "name": "Group/CMP-18 Responsible gaming (header)",
+    "id": "22:8317"
+   },
+   {
+    "name": "Jackpot/Counter (Size=XL|L|M)",
+    "id": "22:8356"
+   },
+   {
+    "name": "Note — Pool tick-up motion (doc frame)",
+    "id": "22:8357"
+   },
+   {
+    "name": "Jackpot/Participants Counter",
+    "id": "22:8376"
+   },
+   {
+    "name": "Jackpot/Round Header (Status=Open|Closing soon|Drawing|Settled|Cancelled)",
+    "id": "22:9830"
+   },
+   {
+    "name": "Jackpot/Entry Ticket (State=Active|Won|Not selected|Refunded)",
+    "id": "23:8534"
+   },
+   {
+    "name": "Jackpot/Threshold Bar (State=Met|Not met)",
+    "id": "23:8618"
+   },
+   {
+    "name": "Jackpot/VRF Stepper (Step=Requested|Pending|Fulfilled|Settled|Delayed)",
+    "id": "23:11967"
+   },
+   {
+    "name": "Jackpot/Prize Distribution",
+    "id": "23:16123"
+   },
+   {
+    "name": "Jackpot/Winner Reveal Card (State=You won|Public winner|Not selected)",
+    "id": "23:16334"
+   },
+   {
+    "name": "Jackpot/Pool Visual (Frame=1|2|3)",
+    "id": "23:18928"
+   },
+   {
+    "name": "RG/Limit Setter (Type=Deposit|Participation|Time × State=Default|Pending increase|Saved)",
+    "id": "23:21988"
+   },
+   {
+    "name": "RG/Session Bar (State=Normal|Approaching limit|Limit reached)",
+    "id": "23:24937"
+   },
+   {
+    "name": "RG/Reality Check",
+    "id": "23:24938"
+   },
+   {
+    "name": "RG/Cooling-Off Card (State=Default|Selected|Active)",
+    "id": "24:14742"
+   },
+   {
+    "name": "RG/Help Resources",
+    "id": "24:14743"
+   },
+   {
+    "name": "RG/Self-Exclusion Step (Step=Choose period|Consequences|Confirm|Active)",
+    "id": "25:14013"
+   },
+   {
+    "name": "Registry file",
+    "id": "/home/user/Claude/design/figma-build/registry-jackpot.json"
+   }
+  ],
+  "issues": [
+   "Token mismatch: in this file brand/primary resolves to green #2cd97d, text/brand and icon/brand to #5be89c, and surface/default to neutral grey #2b2f30. decisions.md still says violet #8B5CF6. The paint styles Gradient/Hero Radial and Brand Glow still use raw violet. Brand green looks almost the same as status/success, so the 'current' VRF step indicators use status/info (sky) instead of brand. The orchestrator should reconcile decisions.md or the palette.",
+   "Render bug, fixed: some variable-bound paints kept a stale cached colour of (0,0,0) and rendered black (the Cooling-Off 'Active' card fill and 2 vector strokes), even though the binding was correct. Fixed by re-resolving each paint with variable.resolveForConsumer(); bindings are kept. Other agents may hit the same thing when they call fill() twice on one node.",
+   "New demo values not in demo-data.md (please add them): round #1,245 cancelled with 412 participants, 4,120 entries and a 41,200.00 USDT pool, open 25 Nov 2026 20:00 to 26 Nov 2026 08:00 UTC, assuming 12 h rounds; refunded entry E-1245-00412; #1,248 1st-prize winner @lumen.eth with entry E-1248-07734; 'now' = 27 Nov 2026 16:42:18 UTC, derived from countdown 03:17:42; RG demo limits of deposit 2,500.00/day (used 1,000.00), participation 200.00/day (used 124.60) and time 2 h/day (used 42 min).",
+   "Deviation from the brief: the spec said round #1,248 for every Round Header variant, but the Cancelled header, the Refunded ticket and the Not met threshold use round #1,245 (the cancelled round in demo-data.md). This avoids showing #1,248 as both threshold-met and cancelled.",
+   "Policy assumptions in the copy that need product/compliance sign-off: (a) on cancellation only the entry amount (10.00 USDT) is refunded, which matches demo data (300.00 = 30 × 10.00), and copy never promises a fee refund; (b) during a cooling-off or self-exclusion, entries already placed stay in the draw; (c) a self-exclusion is shared with a national register 'where your licence region requires it'; (d) reopening after exclusion needs a support request plus a 24 h cooling period.",
+   "Help Resources names real organisations as plain text with no logos (Gambling Therapy gamblingtherapy.org, Gamblers Anonymous gamblersanonymous.org, GamCare gamcare.org.uk). Legal/compliance should confirm the list per region; the Portugal-specific helpline is not listed.",
+   "Pool Visual prototype: Frame=1 → 2 → 3 is wired with Smart Animate (600 ms each, After delay). These reactions only work after the variants are combined, so setting them earlier fails.",
+   "Layout notes, no defects: on the Counter set the M variant wraps to a second row so the motion-note frame (22:8357) stays left of column B at x 2200. Wrap sets needed about 48 px of extra width over the exact variant sum to avoid early wrapping.",
+   "Component API: no TEXT props, because text differs per variant; override text layers by name. Every set has a 'Show DEMO' BOOLEAN bound to its own Badge/DEMO instances. RG/Help Resources has no DEMO because it holds no demo values. VRF Stepper nests Tx/Hash, which has its own Show DEMO.",
+   "Final audit: 15 components/sets, every one with a description; no overlapping top-level nodes and no text overflowing its parent. Every family was screenshotted after fixes. Memory: the only stored note (LegalTechAnalyses Figma) is unrelated and was not used."
+  ]
+ },
+ "games": {
+  "section": "23:11968",
+  "created": [
+   {
+    "name": "Section — CMP-15 Game components (page 02 — Components, X=50000 Y=0, 2792x5554)",
+    "id": "23:11968"
+   },
+   {
+    "name": "Header — CMP-15",
+    "id": "23:11969"
+   },
+   {
+    "name": "Game/Chip (Value 0.10|1|5|10|25|100|500 x State Default|Hover|Selected|Disabled, 28 variants)",
+    "id": "23:12227"
+   },
+   {
+    "name": "Game/Bet Slip (State Empty|Filled|Over limit)",
+    "id": "23:16674"
+   },
+   {
+    "name": "Game/Odds Display (State Default|Updating|Out of range)",
+    "id": "23:19312"
+   },
+   {
+    "name": "Game/Result Banner (Result Win|Lose|Push|Blackjack|Bust)",
+    "id": "23:19422"
+   },
+   {
+    "name": "Game/History Strip (Game Roulette|Crash|Dice|Coinflip)",
+    "id": "23:23256"
+   },
+   {
+    "name": "Game/Seed Display (State Active|Rotated)",
+    "id": "23:23401"
+   },
+   {
+    "name": "Game/Provably Fair Verifier (State Empty|Verified|Failed)",
+    "id": "23:24790"
+   },
+   {
+    "name": "Game/Playing Card (Suit Spades|Hearts|Diamonds|Clubs|Back + Rank TEXT prop Rank#24:16)",
+    "id": "24:14880"
+   },
+   {
+    "name": "Game/Die (Face 1-6)",
+    "id": "24:14917"
+   },
+   {
+    "name": "Game/Coin (Side Heads|Tails|Flipping)",
+    "id": "24:14951"
+   },
+   {
+    "name": "Game/Roulette Wheel (State Idle|Spinning|Result)",
+    "id": "25:15363"
+   },
+   {
+    "name": "Game/Roulette Cell (Color Red|Black|Green x State Default|Hover|Bet placed|Winning, 12 variants)",
+    "id": "25:16416"
+   },
+   {
+    "name": "Example — Roulette Cell grid (instances, documentation frame)",
+    "id": "25:16417"
+   },
+   {
+    "name": "Game/Multiplier Readout (State Rising|Cashed out|Crashed)",
+    "id": "25:16521"
+   },
+   {
+    "name": "Game/Crash Curve (State Betting|Running|Crashed)",
+    "id": "25:17535"
+   },
+   {
+    "name": "Registry file",
+    "id": "/home/user/Claude/design/figma-build/registry-games.json"
+   }
+  ],
+  "issues": [
+   "All 14 families are built and were checked on screenshots after their fixes. Things I fixed along the way: Bet Slip text overflowing (header caption, limits value, the hint on the over-limit row); Result Banner detail text running into the net caption; one Dice pill too many in History Strip (cut to 6 rolls); an extra-tall actions row in the Verifier (spacer); the Heads logo mark turning into a flat black disc when tinted (now a dark medallion); low tick contrast on the green Winning roulette cell; the Multiplier Readout caption overflowing; the Crash Curve 'Crashed' label covering the DEMO badge.",
+   "Additions not in the brief: Game/Chip has an extra Hover state (28 variants, still under 30). Game/Odds Display has three states (Default / Updating / Out of range), Game/Seed Display has two (Active / Rotated), and Game/Crash Curve has three (Betting / Running / Crashed). Keyboard focus for chips is written up in the description (2 px border/focus outside ring) rather than built as a variant, to stay under the 30-variant cap.",
+   "Token choices: the black roulette pockets and cells, the black 100 chip and the Tails coin use Primitives ink/* (ink/900, ink/950, ink/200, ink/400). These primitives are hidden from Figma's pickers (empty scopes), but binding them through the API works. The brief named 'ink' for black. Other primitives used: alpha/white-* and alpha/black-40 for inserts, grooves and hover overlays, plus ink/100–800 for chip and coin details.",
+   "Gold appears in exactly one place: the Blackjack result banner (a prize moment). Coin and chips are mint, silver and denomination colours only.",
+   "Game/Roulette Cell and Game/Result Banner use per-variant text instead of TEXT properties, per conventions §5 (the text differs across variants). Override the 'Number', 'Headline', 'Detail' or 'Net amount' layers on instances.",
+   "Demo values follow demo-data.md: house edges, payouts and limits, Pool Dice 49.50% · 2.0000× · 20.00 on 10.00, roulette limits, coinflip 1.96×, blackjack 3:2. Values I made up because the sheet has none are all DEMO-badged: round IDs D-88213 / BJ-40517 / CR-55102, roll 73.21, seeds and hashes, client seed nova-k-7f2a91, nonce 417/418, crash points 2.47× / 2.10× / 3.82×. Screen agents should reuse these so the game screens agree.",
+   "Section layout: two columns. A (x=120): Chip, Bet Slip, Odds Display, Result Banner, History Strip, Seed Display. B (x=1480): Playing Card, Die, Coin, Roulette Wheel, Roulette Cell plus example grid, Multiplier Readout, Crash Curve, Provably Fair Verifier. Every set has a description covering usage, anatomy, states, do/don't and dev notes.",
+   "Nothing outside the CMP-15 section was changed. ledger.json and the merged registry.json were not touched; the orchestrator should merge registry-games.json."
+  ]
+ },
+ "cover": {
+  "section": "Page \"00 — Cover & Overview\" sections: Cover 13:71 · Overview 14:2063 · Screen Ledger 14:2064 · Decisions log 14:2065 · Resume here 14:2066",
+  "created": [
+   {
+    "name": "Section/Cover",
+    "id": "13:71"
+   },
+   {
+    "name": "Frame/Cover (1920x1080: Brand/Logo, title, subtitle, v1.0 · 27 Nov 2026, Hero Radial + Gold Radial glows, orbit rings, chain/USDT satellites, DEMO jackpot card, Notice/Demo Data bar, DEMO statement, licence + 18+ footer)",
+    "id": "13:72"
+   },
+   {
+    "name": "Section/Overview",
+    "id": "14:2063"
+   },
+   {
+    "name": "Frame/Overview (product summary, page index with 13 NODE hyperlinks to pages, naming conventions, 10 compliance rules, demo data sheet, handoff notes, v1.0 changelog, jump links)",
+    "id": "15:3619"
+   },
+   {
+    "name": "Section/Screen Ledger",
+    "id": "14:2064"
+   },
+   {
+    "name": "Frame/Ledger header",
+    "id": "17:3897"
+   },
+   {
+    "name": "Frame/Ledger summary (counts by status, priority, page + progress bar)",
+    "id": "17:3926"
+   },
+   {
+    "name": "Frame/Ledger legend",
+    "id": "17:4148"
+   },
+   {
+    "name": "Frame/Ledger — 01 — Design System (9 rows)",
+    "id": "17:4196"
+   },
+   {
+    "name": "Frame/Ledger — 02 — Components (18 rows)",
+    "id": "17:4362"
+   },
+   {
+    "name": "Frame/Ledger — 03 — Public Website (26 rows)",
+    "id": "17:4672"
+   },
+   {
+    "name": "Frame/Ledger — 04 — Authentication (21 rows)",
+    "id": "17:5112"
+   },
+   {
+    "name": "Frame/Ledger — 05 — User Dashboard (42 rows)",
+    "id": "20:4470"
+   },
+   {
+    "name": "Frame/Ledger — 06 — Wallet & Transactions (24 rows)",
+    "id": "20:5184"
+   },
+   {
+    "name": "Frame/Ledger — 07 — Global Pool (13 rows)",
+    "id": "20:5590"
+   },
+   {
+    "name": "Frame/Ledger — 08 — Games (40 rows)",
+    "id": "20:7513"
+   },
+   {
+    "name": "Frame/Ledger — 09 — Admin Panel (72 rows)",
+    "id": "20:9607"
+   },
+   {
+    "name": "Frame/Ledger — 10 — Mobile Experience (12 rows)",
+    "id": "20:6982"
+   },
+   {
+    "name": "Frame/Ledger — 11 — Prototypes (10 rows)",
+    "id": "20:7197"
+   },
+   {
+    "name": "Frame/Ledger — 12 — Empty & Error States (7 rows)",
+    "id": "20:7379"
+   },
+   {
+    "name": "Section/Decisions log",
+    "id": "14:2065"
+   },
+   {
+    "name": "Frame/Decisions log (Decision/01..17, mirrors decisions.md)",
+    "id": "22:5712"
+   },
+   {
+    "name": "Section/Resume here",
+    "id": "14:2066"
+   },
+   {
+    "name": "Frame/Resume here",
+    "id": "22:6171"
+   },
+   {
+    "name": "File/registry-cover.json",
+    "id": "/home/user/Claude/design/figma-build/registry-cover.json"
+   }
+  ],
+  "issues": [
+   "NEEDS ATTENTION: the Color variables changed during this session, and not by this agent. Dark mode now resolves brand/primary to #2CD97D (spec #8B5CF6), text/brand to #5BE89C and bg/base to #232626 (spec #09090F); Light mode brand/primary is #17A35A. Screenshots taken early (Cover, first Overview, ledger header) render violet on #09090F; later ones render green on grey. decisions.md has no entry explaining it. Page 00 nodes are 100% token-bound, so they will follow whatever palette is final. I did not touch the variables (design-system scope); the orchestrator or DS agent should confirm this is intended or revert it.",
+   "The file thumbnail was not set: figma.setFileThumbnailNodeAsync returns 'not a supported API' in the MCP runtime. Set the Cover frame 13:72 as the thumbnail manually in Figma. This is also documented in the Resume card's Known limitations.",
+   "ledger.json data artifact: the 'group' field carries over from the previous section. Pages 06 and 07 rows are tagged 'Responsible Gaming', pages 10, 11 and 12 are tagged 'System', and ADM-00..02 are tagged 'Shared'; none of these is a group header in the master prompt. On canvas these rows are shown ungrouped (ADM-X1 stays under System, as the prompt lists it). ledger.json was NOT edited; the orchestrator should clear those group values.",
+   "The Ledger summary counts (status tiles, priority tiles, by-page table, progress bar) are a static snapshot: 284 NOT STARTED / 9 IN PROGRESS / 1 BUILT / 0 VERIFIED / 0 BLOCKED, total 294; P0 126, P1 129, P2 39. Whoever updates statuses must also refresh these. Node names: 'Count/Status/<S> value', 'Count/Status/<S> pct', 'Count/Priority/<P> value', 'Sum/<page>/<COLUMN>', 'PageStatus/<page>', 'Bar/<S>' (StatusDot/<ID> recolours as described in the Resume card).",
+   "Verification: Cover, Overview (after the fix), Decisions log, Resume here, the Ledger header, and ledger groups 01, 05, 08 and 12 were each checked with a passing close-up screenshot. Groups 02, 03, 04, 06, 07, 09, 10 and 11 were checked only through a low-resolution screenshot of the whole section plus structural counts: 294 Ledger/<ID> rows, 294 Status/<ID> texts, 294 StatusDot/<ID> ellipses, all 12 frames present, no overlapping sections.",
+   "Defect found and fixed: the first Overview (1,328 px tall) would have run into the Screen Ledger at Y=1300. It was rebuilt at 1,079 px; the section now ends at Y=1159. An equal-height pass then clipped the last card in two columns (Handoff notes, Changelog); fixed by restoring HUG, measuring and applying fixed equal column heights, with a check that every card fits its content.",
+   "Not appended to decisions.md, to avoid clashing with concurrent edits; for the orchestrator to add: (a) the ledger group carry-over is corrected at render time on page 00; (b) the file thumbnail must be set manually because the API is unsupported.",
+   "The 'Next ledger IDs' on the Resume card is a snapshot as of 27 Nov 2026: DS-01..09 verify, CMP-01 QA, then CMP-02, 03, 07, 04, 05, 06, 08, 09, 10, 12, then the P0 slice. Other agents working in parallel may already have moved past it.",
+   "The task brief says 'one frame per page group (00/01..12)', but ledger.json has no page-00 rows, so 12 group frames (01–12) were built. Page 00 itself is covered by the Overview page index.",
+   "Memory: nothing in the user's memory notes bore on this task (the only indexed note is about an unrelated LegalTechAnalyses Figma file); no memory content was used."
+  ]
+ },
+ "ds": {
+  "section": "Page '01 — Design System' (1:2). Sections: DS-01 Brand & logo 13:2 (X0), DS-02 Colour 15:1216 (X2200), DS-03 Gradients & effects 20:4226 (X5200), DS-04 Typography 22:467 (X7400), DS-05 Spacing, radius, elevation & grids 22:5906 (X9600), DS-06 Iconography 23:10036 (X14000), DS-07 Motion 23:15575 (X16400), DS-09 DEMO & compliance notices 23:21106 (X19000); all at Y=0 with no overlaps. DS-01 ends at Y=4888, so X 0–2000 at Y=6000 is free for the charts agent. Registry written to /home/user/Claude/design/figma-build/registry-ds.json. Mid-run, the user's re-theme (decision #18: charcoal plus mint, gold for jackpots) changed the variables. I rebuilt DS-02.1, DS-02.2, DS-02.4 and DS-03, and edited DS-01 copy, so all printed hex values, aliases, gradient stops and contrast ratios are read live from the re-themed file. The task's quoted ratios (18.9, 6.5, 4.05:1 and so on) belong to the superseded violet palette. Current values include text/primary on bg/base 14.09:1, text/on-primary (dark) on mint 9.71:1, and text/on-gold on gold 11.50:1.",
+  "created": [
+   {
+    "name": "DS-01 Brand & logo / Cover hero",
+    "id": "13:3"
+   },
+   {
+    "name": "DS-01 Brand & logo / Usage",
+    "id": "14:606"
+   },
+   {
+    "name": "DS-02 Colour / 1 Primitives (94 bound swatches)",
+    "id": "22:7753"
+   },
+   {
+    "name": "DS-02 Colour / 2 Semantic tokens (81 rows, live alias/value)",
+    "id": "22:8713"
+   },
+   {
+    "name": "DS-02 Colour / 3 Balance semantics",
+    "id": "17:3173"
+   },
+   {
+    "name": "DS-02 Colour / 4 Contrast (28 WCAG pairs computed in-script)",
+    "id": "22:9831"
+   },
+   {
+    "name": "DS-03 Gradients & effects / Styles (14 gradients incl. 6 tile, 9 effects, glass, recipes)",
+    "id": "23:7065"
+   },
+   {
+    "name": "DS-04 Typography / Type system (24 styles, tabular-nums dev note, formatting)",
+    "id": "22:468"
+   },
+   {
+    "name": "DS-05 / 1 Spacing, radius & elevation (bars width-bound to space/*, size/* squares bound)",
+    "id": "22:5907"
+   },
+   {
+    "name": "DS-05 / 2 Layout grids (Breakpoint table + 1440/1280/768/390 frames with Grid styles + modes)",
+    "id": "22:6667"
+   },
+   {
+    "name": "Grid sample Desktop 1440",
+    "id": "22:6743"
+   },
+   {
+    "name": "Grid sample Laptop 1280",
+    "id": "22:6804"
+   },
+   {
+    "name": "Grid sample Tablet 768",
+    "id": "22:6865"
+   },
+   {
+    "name": "Grid sample Mobile 390",
+    "id": "22:6914"
+   },
+   {
+    "name": "DS-06 Iconography / Icons & marks (121-icon catalogue, grid/stroke rule, sizes, colours, do/don't, chain/token marks, game glyphs)",
+    "id": "23:10037"
+   },
+   {
+    "name": "DS-07 Motion / Tokens & storyboards (13 durations, 6 plotted easings, 8 storyboards x4 keyframes, reduced-motion table)",
+    "id": "23:15576"
+   },
+   {
+    "name": "DS-09 DEMO & compliance notices / Spec (DEMO XS/S/M spec, placement rules, examples on number/address/hash/user/table/chart, Demo Data bar, Licence Inline/Compact/Card, 18+, risk line, 10 §1.2 rules)",
+    "id": "23:21107"
+   }
+  ],
+  "issues": [
+   "ACCESSIBILITY (foundations owner): text/on-danger (#F5F6F6 after re-theme) on status/danger-strong #DC2626 is 4.46:1, which fails AA for 14 px danger-button labels. Fix: alias text/on-danger to paper/0 #FFFFFF (4.83:1) or use red/700 as the fill. Documented as an action card in DS-02.4; I did not change the token because foundations are outside this section.",
+   "ACCESSIBILITY: text/danger on surface/raised is 4.37:1 (fails small text). Documented as: keep validation/error text on surface/default or bg (4.89:1), not inside raised tiles or inputs.",
+   "ACCESSIBILITY (documented, decorative): border/default on bg/base is 1.46:1. Inputs rely on surface/raised fill + visible label; focus uses border/focus at 9.78:1.",
+   "HELPERS: paint() in helpers.js binds variables with a black {0,0,0} fallback colour. Headless renders and screenshots intermittently show that fallback, so icons appear black. In all DS sections I rewrote the fallback of every bound icon stroke/fill to its resolved Dark value (bindings kept). Recommend paint() use the resolved value as fallback for every agent.",
+   "FOUNDATIONS: the Gradient/Brand Solid paint style's gradientTransform puts the whole node past the end stop, so it renders as flat #1FBF69 rather than a gradient. Gradient/Brand Glow similarly renders near its end colour. Documented as-is; fix belongs to the foundations owner.",
+   "SCOPE NOTE: DS-08 (data-viz) is not in my assignment and was not built.",
+   "Copy changed in DS-01 for decisions #18–19: personality 'Composed' replaced by 'Energetic'; 'We are not' list reworded (no copying other casinos; no bonus pressure, VPN hints or wagering hype); misuse recolour example now uses sky/red so it can't be mistaken for brand mint."
+  ]
+ },
+ "admin": {
+  "section": "23:5438 — 'CMP-16/17 User & admin components' on page '02 — Components' at X=55000, Y=0 (2496 × 12067, no overlap with other sections). Inside: section title 23:5439, group headers 23:5442 (CMP-16) and 23:15198 (CMP-17, with a 'Controlled operations only' compliance callout), and a Doc/ header (usage line) above every set. Registry written to /home/user/Claude/design/figma-build/registry-admin.json (key: admin, 20 entries). Every set has a full description (usage, anatomy, do/don't, dev notes). Every set except KYC chip, Role chip and Permission cell has a 'Show DEMO' BOOLEAN bound to a nested Badge/DEMO XS. Existing components are reused as nested instances: Badge/Status, Badge/DEMO, Buttons, Button/Icon, User/Avatar, Wallet/Address Chip, Wallet/Network Pill, Input/Search, Menu/Filter Chip, Select/Field, Input/Textarea, Input/OTP and the icon set. All colours and spacing use tokens.",
+  "created": [
+   {
+    "name": "User/KYC Status Chip (Status×Level, 15)",
+    "id": "23:5565"
+   },
+   {
+    "name": "User/2FA Status (On|Off|Backup codes low)",
+    "id": "23:5644"
+   },
+   {
+    "name": "User/Device Row (State Current|Trusted|New × Interaction Default|Hover, 6)",
+    "id": "23:9199"
+   },
+   {
+    "name": "User/Session Row (Status Active|Expired × Interaction, 4)",
+    "id": "23:9317"
+   },
+   {
+    "name": "User/Notification Item (Type×Read, 8)",
+    "id": "23:11317"
+   },
+   {
+    "name": "Admin/KPI Tile (Trend Up|Down|Flat, sparkline+delta+DEMO)",
+    "id": "23:15270"
+   },
+   {
+    "name": "Admin/Queue Card (Queue KYC 214|Withdrawals 37 × SLA On track|At risk|Breached, 6)",
+    "id": "23:15571"
+   },
+   {
+    "name": "Admin/Risk Score Meter (Level Low|Medium|High|Critical)",
+    "id": "23:18374"
+   },
+   {
+    "name": "Admin/Role Chip (Role×Size S|M, 10)",
+    "id": "23:18440"
+   },
+   {
+    "name": "Admin/Permission Cell (Value×State Default|Hover|Focus, 12)",
+    "id": "23:18516"
+   },
+   {
+    "name": "Admin/Audit Log Header",
+    "id": "23:22005"
+   },
+   {
+    "name": "Admin/Audit Log Row (Default|Hover|Chain alert)",
+    "id": "23:22145"
+   },
+   {
+    "name": "Admin/Reconciliation Header",
+    "id": "23:22164"
+   },
+   {
+    "name": "Admin/Reconciliation Row (Match|Mismatch|Pending)",
+    "id": "23:22254"
+   },
+   {
+    "name": "Admin/Approval Request Card (four-eyes; Pending|Approved|Rejected|Expired)",
+    "id": "23:24500"
+   },
+   {
+    "name": "Admin/Contract Card (Active|Paused|Deprecated)",
+    "id": "24:14297"
+   },
+   {
+    "name": "Admin/Event Stream Header",
+    "id": "24:14325"
+   },
+   {
+    "name": "Admin/Event Stream Row (7 events)",
+    "id": "24:14528"
+   },
+   {
+    "name": "Admin/Filter Bar (Default|Filtered)",
+    "id": "24:16268"
+   },
+   {
+    "name": "Admin/Confirm With Reason Dialog (Default|Ready|Error|Submitted)",
+    "id": "25:16172"
+   },
+   {
+    "name": "Section",
+    "id": "23:5438"
+   },
+   {
+    "name": "Section title",
+    "id": "23:5439"
+   },
+   {
+    "name": "Group/CMP-16 header",
+    "id": "23:5442"
+   },
+   {
+    "name": "Group/CMP-17 header + compliance callout",
+    "id": "23:15198"
+   }
+  ],
+  "issues": [
+   "Verification: every set was screenshotted after it was built. Clipping and overlap were fixed and re-screenshotted: risk-meter band labels and outcome text; audit-log, reconciliation and event-stream column widths; reconciliation sub-row wrapping; filter-bar overflow, fixed by splitting it into a controls row and a filters row and collapsing the spacers; OTP resend and status rows in the dialog; placeholder colours. The final screenshot of each set passes.",
+   "Gotcha for other agents: the text fill override on the nested Select/Field Error variant's 'Value' layer rendered black, although it was bound to text/tertiary through paint(). Re-binding it with setBoundVariableForPaint on a paint that already carries the resolved colour fixed it. When a token override on text inside a nested instance looks black, re-bind it the same way.",
+   "An empty figma.createAutoLayout() frame used as a FILL spacer defaults to about 100 px tall, which inflates rows. Set layoutSizingVertical='FIXED' and resize the height to 1.",
+   "Width assumption: admin table rows and their headers (Audit Log, Reconciliation, Event Stream, Filter Bar) are 1136 wide, which assumes the admin content area at 1440 with a sidebar. Use FILL inside tables.",
+   "Extras beyond the brief: three column-header components (Admin/Audit Log Header, Admin/Reconciliation Header, Admin/Event Stream Header). Some sets have extra state axes: Interaction=Hover on the device and session rows, SLA axis on the queue card, Focus/Hover on the permission cell, Chain alert on the audit row.",
+   "Example values not on the demo sheet: all are DEMO-badged and don't conflict with it. They are: AR-1039/1042/1043, INV-0192, AML-3317/AML-3342, SCR-5521, audit entries #88213/#88241/#88244, block numbers and tx hashes for VRF/settlement/refund events, WD-20950, deprecated GlobalPool v1.2.4 0x61e0…b3a8, masked device IPs, 2FA enabled 3 Mar 2026, queue SLA metrics.",
+   "Compliance by design: no component offers result editing, winner selection, arbitrary payouts, ledger edits or balance adjustments. Sensitive actions route through the confirm-with-reason dialog and the four-eyes approval card. The circuit-breaker pause affects new entries only and needs dual approval. Reconciliation mismatches open an investigation and never edit the ledger. Audit rows have no edit or delete affordances.",
+   "Memory: the only indexed note (a LegalTechAnalyses Figma file) is unrelated to this task and was not used. Nothing new to save from this run."
+  ]
+ },
+ "charts": {
+  "section": "CMP-11 Charts: section 25:17228 on page '02 — Components' at X=60000, Y=0 (5016 × 4093, 3 columns, ends before CASINO-01 at 66000). DS-08 Data visualisation: section 32:22899 on page '01 — Design System' at X=0, Y=6000 (1864 × 11582, clear of DS-02 at X=2200). Registry: /home/user/Claude/design/figma-build/registry-charts.json. Decision #25 appended to /home/user/Claude/design/figma-build/decisions.md.",
+  "created": [
+   {
+    "name": "Chart/Legend Item (Key × State, 12 variants; props Label, Value, Show value)",
+    "id": "25:17311"
+   },
+   {
+    "name": "Chart/Legend (Horizontal, Vertical)",
+    "id": "25:17362"
+   },
+   {
+    "name": "Chart/Tooltip (Single, Delta, Multi, Bin)",
+    "id": "25:17433"
+   },
+   {
+    "name": "Chart/Line-Area (Default, Hover, Loading, Empty, Error)",
+    "id": "27:15865"
+   },
+   {
+    "name": "Chart/Bar (Vertical: Default, Hover; Stacked: Default, Hover, Pattern)",
+    "id": "28:17855"
+   },
+   {
+    "name": "Chart/Donut (Default, Hover)",
+    "id": "28:19543"
+   },
+   {
+    "name": "Chart/Sparkline (Trend Up/Down/Neutral × Size M/S)",
+    "id": "28:19568"
+   },
+   {
+    "name": "Chart/Multiplier Curve (Running, Cashed out, Crashed)",
+    "id": "29:16462"
+   },
+   {
+    "name": "Chart/Heat Strip (Layout Strip/Grid × State Default/Hover)",
+    "id": "29:17011"
+   },
+   {
+    "name": "Chart/Histogram (Default, Hover)",
+    "id": "30:17260"
+   },
+   {
+    "name": "Chart/Gauge (Operational, Degraded, Outage)",
+    "id": "30:17353"
+   },
+   {
+    "name": "Chart/Progress Ring (Type VIP/KYC × Value 25/50/75/100)",
+    "id": "30:23014"
+   },
+   {
+    "name": "Chart/Timeline (Open, Drawing, Settled, Cancelled)",
+    "id": "30:23292"
+   },
+   {
+    "name": "CMP-11 — Title block",
+    "id": "25:17229"
+   },
+   {
+    "name": "DS-08 section",
+    "id": "32:22899"
+   },
+   {
+    "name": "DS-08 / 1 Principles & palette",
+    "id": "32:22900"
+   },
+   {
+    "name": "DS-08 / 2 Anatomy, marks & do / don't",
+    "id": "32:31415"
+   },
+   {
+    "name": "DS-08 / 3 Formatting, accessibility, DEMO & states",
+    "id": "32:37271"
+   },
+   {
+    "name": "DS-08 / 4 Examples in context",
+    "id": "32:52164"
+   },
+   {
+    "name": "Variable chart/series-1 → brand/primary",
+    "id": "VariableID:25:15162"
+   },
+   {
+    "name": "Variable chart/series-2 → status/info",
+    "id": "VariableID:25:15163"
+   },
+   {
+    "name": "Variable chart/series-3 → accent/gold",
+    "id": "VariableID:25:15164"
+   },
+   {
+    "name": "Variable chart/series-4 → brand/secondary",
+    "id": "VariableID:25:15165"
+   },
+   {
+    "name": "Variable chart/series-5 → status/success",
+    "id": "VariableID:25:15166"
+   },
+   {
+    "name": "Variable chart/other → ink/400",
+    "id": "VariableID:25:15167"
+   },
+   {
+    "name": "Variable chart/prize-1 → gold/200",
+    "id": "VariableID:25:15168"
+   },
+   {
+    "name": "Variable chart/prize-2 → accent/gold",
+    "id": "VariableID:25:15169"
+   },
+   {
+    "name": "Variable chart/prize-3 → accent/gold-strong",
+    "id": "VariableID:25:15170"
+   },
+   {
+    "name": "Variable chart/prize-4 → gold/600",
+    "id": "VariableID:25:15171"
+   },
+   {
+    "name": "Variable chart/grid → border/subtle",
+    "id": "VariableID:25:15172"
+   },
+   {
+    "name": "Variable chart/baseline → border/default",
+    "id": "VariableID:25:15173"
+   },
+   {
+    "name": "Variable chart/crosshair → border/strong",
+    "id": "VariableID:25:15174"
+   }
+  ],
+  "issues": [
+   "Palette: the assigned series set (brand/primary, accent/gold, status/info, brand/secondary, status/success) FAILS the dataviz palette validator as five free categories on surface/default #2B2F30. brand/primary vs brand/secondary is ΔE 6.0 even with full colour vision; brand/primary vs accent/gold is ΔE 2.1 under protanopia. I kept all five tokens but made the order mint → sky → gold (slots 1–3 PASS: worst CVD ΔE 19.6, normal vision 21.3). Slot 4 (brand/secondary) is restricted to a tonal companion of slot 1; slot 5 (status/success) only when the data means success; the tail folds into chart/other. This is documented in DS-08 and logged as decision #25.",
+   "Brand hues sit above the dark lightness band (L 0.72–0.86 vs 0.48–0.70). DS-08 records this as an ACCEPTED brand decision, mitigated by ≥ 3:1 contrast, 2px surface gaps, labels and opt-in patterns.",
+   "Foundations: I added 13 Color variables (chart/series-1…5, chart/other, chart/prize-1…4, chart/grid, chart/baseline, chart/crosshair). All are aliases with scopes FRAME_FILL/SHAPE_FILL/STROKE_COLOR and WEB code syntax var(--color-chart-…). Light mode aliases the same targets because Light screens are out of scope.",
+   "Prize distribution uses the ordinal ramp chart/prize-1…4 instead of the categorical palette, because ranked prizes are ordered categories (ramp validated PASS). gold/200 and gold/600 are primitives, wrapped by the chart/prize aliases.",
+   "Overlap with CMP-15: Game/Crash Curve (25:17535) and Game/Roulette Cell (25:16416) already existed. Chart/Multiplier Curve is the analytic version (axes, cash-out markers, round detail) and uses the same growth function m(t)=e^(0.1117t). Heat Strip cells reuse the same wheel tokens rather than the 56×64 felt cell. Neither component was edited.",
+   "Data consistency: the 14-day line chart assumes one round per day (#1,235 on 14 Nov … #1,248 on 27 Nov, 08:00–20:00 UTC), which matches demo-data.md for #1,244–#1,248. Platform fees per round are derived as pool × 0.5% (#1,248 = 932.00). This differs from the admin 30-day KPI of 60,700.00 fees from 1,214,000 entries, which implies about 2 rounds per day. That conflict is in demo-data.md itself; the orchestrator should pick a round cadence.",
+   "Demo values I invented and that are not in demo-data.md: rounds #1,235–#1,243 pool values; #1,245 pool of 46,850.00 with 412 players and 4,685 entries; daily deposits by network; Orbit Rush round #88,214 with cash-outs by @orbit_77 (2.40×) and @mira.sol (3.00×); 50 roulette spins #88,141–#88,190 (23 red / 23 black / 4 zero); dice histogram counts; Degraded 99.62% and Outage 98.40% gauge states; KYC Level 3 'enhanced (optional)' at 2 of 4 steps in the DS-08 examples. All are DEMO-badged; add them to demo-data.md if other screens should reuse them.",
+   "I appended decision #25 to decisions.md. I did not edit ledger.json or any other agent's sections or components.",
+   "Chart/Bar is a sparse variant matrix: State=Pattern exists only for Type=Stacked.",
+   "Chart/Progress Ring variants are snapshots at 25/50/75/100. The demo user's real VIP progress (12,840 / 20,000 = 64%) cannot be shown exactly, so in code the arc must be driven by the real value. The examples board shows VIP Gold at 100% (tier reached) with the 64% figure as text."
+  ]
+ },
+ "home-sections": {
+  "section": "32:20473",
+  "created": [
+   {
+    "name": "Section 'PUB-01 Home — sections & master' (page 03 — Public Website, X=0 Y=0)",
+    "id": "32:20473"
+   },
+   {
+    "name": "Doc/PUB-01 header",
+    "id": "32:20474"
+   },
+   {
+    "name": "Section/Home/H1 Hero (component, 1200x568)",
+    "id": "32:20477"
+   },
+   {
+    "name": "Section/Home/H2 Global Pool Live (component, 1200x995)",
+    "id": "32:32022"
+   },
+   {
+    "name": "Section/Home/H3 Available Games (component, 1200x1160)",
+    "id": "32:44403"
+   },
+   {
+    "name": "Section/Home/H4 Recent Winners (component, 1200x1018)",
+    "id": "32:61072"
+   },
+   {
+    "name": "Section/Home/H5 How It Works (component, 1200x576)",
+    "id": "32:61959"
+   },
+   {
+    "name": "Section/Home/H6 Supported Networks (component, 1200x615)",
+    "id": "32:78026"
+   },
+   {
+    "name": "Section/Home/H7 Provably Fair (component, 1200x914)",
+    "id": "32:78248"
+   },
+   {
+    "name": "Section/Home/H8 Security (component, 1200x516)",
+    "id": "32:94303"
+   },
+   {
+    "name": "Section/Home/H9 VIP Program (component, 1200x512)",
+    "id": "32:94426"
+   },
+   {
+    "name": "Section/Home/H10 Affiliate Program (component, 1200x488)",
+    "id": "32:94598"
+   },
+   {
+    "name": "Section/Home/H11 FAQ (component, 1200x1097)",
+    "id": "32:109765"
+   },
+   {
+    "name": "Section/Home/H12 Footer (component, 1200x1126)",
+    "id": "32:109955"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Logged out — active round (screen 1440x9685)",
+    "id": "33:128264"
+   },
+   {
+    "name": "Master: Notice/Demo Data instance (DEMOBAR)",
+    "id": "33:128265"
+   },
+   {
+    "name": "Master: Shell/Sidebar Expanded Guest instance",
+    "id": "33:128273"
+   },
+   {
+    "name": "Master: Shell/Topbar Desktop Guest instance",
+    "id": "33:128508"
+   },
+   {
+    "name": "Registry file /home/user/Claude/design/figma-build/registry-home-sections.json",
+    "id": "registry-home-sections.json"
+   }
+  ],
+  "issues": [
+   "User feedback 'to w tle wyglada jak AI' (the background looks AI-made): no section uses orbs, glow blobs, orbit rings, particles or a logo halo. The H1 hero uses the Banner/Hero Global Pool slide with its Spot/Orb and accent coin hidden. In their place are concrete objects cropped by the banner edge: two Jackpot/Entry Ticket instances, gold coin stacks and angled gold/mint colour blocks. In H3 I also hid the floating 'Satellite' dots on the Global Pool category tile.",
+   "Deviation in H1: Banner/Hero Carousel (1136 wide) does not fit beside Card/Draw Countdown (360) in a 1136 content area. I used the Banner/Hero Global Pool slide (resized to 760x344) with carousel controls (slide 1 of 3 + pause), then a promo row: Banner/Hero Side Provably Fair, Banner/Hero Side VIP Club and an inline Welcome-offer card. Because the instance's layer order is fixed, the gold 186,400.00 USDT sits above the headline 'One global pool. Every entry verifiable.'.",
+   "Deviation in H3: instead of Row/Game Carousel (old Tile/Game with orb/arc art, fixed to 6 tiles) I used Row/Carousel Header + Tile/Game Generic (28:16529) with the original Tile/Game Art swaps from CASINO-03. There are two carousels (GLOBAL POOL Originals, Table games & live) of 8 tiles each in a clipped 1136 track, plus 6 Tile/Category resized to 368x180. Category copy is updated to the expanded catalogue (11 originals, 9 table games, 8 instant games).",
+   "Built inline with tokens, no matching component: Welcome-offer promo card, Level-up rewards promo card, Latest-entries feed, Participate panel with per-entry fee breakdown, five compact network cards (Card/Network is 320 wide and cannot fit 5-up in 1136), How-it-works step tiles with UI diagrams, VIP tier strip, affiliate key facts and commission calculator, FAQ support card and RG card.",
+   "Invented values, all marked DEMO: player counts for Double Side (58) and the table/live tiles (Live Pool Roulette 388, Pool Roulette 212, Twenty-One 147, Mega Ring Show 512, Baccarat Lounge 96, Speed Twenty-One 175, Sic Bo Triad 41, Dragon & Phoenix 38); latest-entry rows (@juno88 5, @atlas_q 2, Hidden 10, @pixelfox 1, @tidewalker 20 entries); VIP weekly reward by tier, 0.1%–0.5%; affiliate 30-day cookie and monthly payout; support reply time under 2 min. The affiliate calculator uses 20% to match the existing Card/Promo Affiliate ('Earn 20% of platform fees'): 40 × 120 × 0.05 = 240.00 USDT fees, giving 48.00 USDT. Commission is on platform fees only, never on player losses.",
+   "Library-level look issues outside my scope: Strip/Recent Wins, Table/Live Bets mini art and Tile/Category (Global Pool) still use the older Art/Spot/Art/Game motifs: glossy orb ball, coin with a thin orbit arc, 'Network' nodes. The CASINO-02 owner should restyle these to match the AI-look ban. The Brand/Logo in Shell/Topbar shows a row of '$' glyphs above the wordmark, which looks odd; the logo owner should check it.",
+   "Section/SEO Text (library 25:16288) still says 'five original games — Roulette, Crash, Dice, Coinflip and Blackjack'. I overrode that paragraph inside H11 for the current catalogue. Its 'Help us improve' heading duplicated the footer heading, so in H11 I renamed it 'Contact & support'. The library component itself should be updated.",
+   "helpers.js bug: screen() calls resize(w, 800), which leaves the primary axis FIXED at 800, so screens do not hug their height. I set primaryAxisSizingMode='AUTO' on the master by hand. Other screen agents will need the same fix, or the helper needs it.",
+   "Tooling: I hit the Figma MCP tool-call limit on this seat, first for get_screenshot and once for use_figma; a later use_figma retry worked. The last verification used inline node.screenshot. A child node screenshotted on its own loses the screen's explicit Color mode, so DEMOBAR rendered light; inside the full frame it renders correctly. The last change, the SEO heading rename to 'Contact & support', is text-only and has no post-change screenshot.",
+   "Memory: the only stored note is about a different project (LegalTechAnalyses Figma file) and was not used. Nothing new from this task needs saving to memory."
+  ]
+ },
+ "home-states": {
+  "section": "32:23347",
+  "created": [
+   {
+    "name": "Section — PUB-01 Home — states & breakpoints (page 03, X=9000 Y=0, 6360x26605)",
+    "id": "32:23347"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Active round (default · logged out)",
+    "id": "32:23348"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Logged in",
+    "id": "32:39810"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Wallet disconnected",
+    "id": "32:48047"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Wallet connected",
+    "id": "32:53744"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Insufficient funds (separate DEMO balance · Available 4.20 USDT)",
+    "id": "32:65496"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / No active round",
+    "id": "32:81796"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1440 / Restricted region",
+    "id": "32:110845"
+   },
+   {
+    "name": "[PUB-01] HomePage / 1280 / Active round (default · logged out)",
+    "id": "33:152559"
+   },
+   {
+    "name": "[PUB-01] HomePage / 768 / Active round (default · logged out)",
+    "id": "33:182019"
+   },
+   {
+    "name": "Section — PUB-01 Home — Mobile (page 10, X=0 Y=0)",
+    "id": "33:225447"
+   },
+   {
+    "name": "[MOB-03] Mobile Home — all sections stacked / 390 / Logged out · active round",
+    "id": "33:225448"
+   },
+   {
+    "name": "[MOB-03] Mobile Home / 390 / Restricted region",
+    "id": "33:243178"
+   }
+  ],
+  "issues": [
+   "The user's complaint (relayed in Polish) was that the background looks AI-generated. None of these frames use orbit rings, radial glow backgrounds, particles or a logo in a halo. I did not use Banner/Hero (Global Pool slide, 23:23896): it still has a glossy orb with small floating dots. The hero is built inline instead: charcoal banner, angled gold and mint blocks behind the art, and the rebuilt Jackpot/Pool Visual (coins, entry tickets, jackpot meter; its 'Keyframe label' layer is hidden).",
+   "Older art still in library components I placed on the page. Strip/Recent Wins, Tile/Category (Global Pool tile), Table/Live Bets thumbnails and Card/Draw Countdown's icon still use the old Art/Spot glossy orb. The orchestrator should rebuild these with the Tile/Game Art style, or the AI look comes back through them.",
+   "Built inline because no library component exists (candidates for componentising): hero banner, promo mini-cards with key terms, 'Terms apply' and DEMO; latest-entries feed; step cards with mini diagrams; wallet prompt banner; wallet-connected strip; insufficient-funds inline warning; last-round result card; region-gate cards; responsive networks card; mobile lists. There is no Alert/Banner component in any registry, so the regional restriction uses Nav/Region Banner (inside the topbar's Restricted variant) plus inline gating cards.",
+   "Library components that do not reflow below 1136 px: Strip/Networks overflows, so it is replaced by an inline responsive card at 1280 and 768. Table/Live Bets cells overlap, so the table sits in a horizontal-scroll container at 1136 with a hint line. Chart/Line-Area's plot is fixed at about 690 px and clips at 600, so it is 720 fixed at 1280 with a vertical feed beside it. Strip/Trust does not wrap, so it is removed at 768 (the footer keeps the trust row). Shell/Topbar Desktop at 768 overlaps logo and search, so search is hidden at tablet.",
+   "Stale catalogue copy fixed as instance overrides only; the source components still need updating: Tile/Category ('5 in-house games'/'2 games' became 11/9 games), Section/SEO Text (old 5 game names, and its column title duplicated the footer's 'Help us improve', now 'Contact & support'), Footer Tablet 22:7450 (Roulette/Crash/Dice/Coinflip/Blackjack became the catalogue names), Card/Winner Game variant ('Crash' became 'Orbit Rush'). Restricted frames: 'English · Portugal' became 'English · United States' and RG help now says '(United States)'.",
+   "Notice/Demo Data truncates its default message at 390 px, so mobile frames use a shorter Message override.",
+   "Compliance choices. The insufficient-funds frame uses a separate DEMO balance and says so in the frame name and the hero legal line. The restricted state removes promotions, recent wins, live bets, deposit strip and VIP/affiliate marketing. It sets every game tile to Restricted with tags removed and disables Sign up. 'Log in to withdraw' and 'Close account / self-exclude' stay available. No VPN or bypass hints. The no-active-round state uses the countdown's Next round variant (opens 28 Nov 2026 08:00 UTC), 'Notify me', the last-round result card, the Public winner card, and relabels 'Awaiting draw' to 'Settled'.",
+   "Known limitations: in long frames the expanded sidebar stretches the full page height (meant as sticky). In the restricted state the sidebar still lists game navigation, because the component has no gated variant. On mobile the tab bar is the frame's last child and is fixed to the viewport in prototypes.",
+   "Figma MCP rate limit: this account allows 10 calls a minute and 200 a day (from Figma's docs), shared by all parallel agents. My calls were rejected twice, so later agents should pace calls and screenshot several nodes inside one use_figma call. Possible memory item for the main session (source: Figma rate-limit docs page, plan type from the whoami tool).",
+   "No new components were created, so no registry-<agent>.json was written. I did not write to decisions.md or ledger.json; the orchestrator should merge the statuses from this report."
+  ]
+ },
+ "pub-pool-lobby": {
+  "section": "33:269480 (page '03 — Public Website', 'PUB-02/03 Global Pool & Games Lobby', X=20000,Y=0) + 34:502361 (page '10 — Mobile Experience', 'PUB-02/03 — Mobile', X=7000,Y=0)",
+  "created": [
+   {
+    "name": "Section/PUB-02/03 Global Pool & Games Lobby",
+    "id": "33:269480"
+   },
+   {
+    "name": "Section/PUB-02/03 — Mobile",
+    "id": "34:502361"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1440 / Live — round open",
+    "id": "33:269481"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1440 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "33:306879"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1440 / Restricted region (United States)",
+    "id": "33:320290"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1280 / Live — round open",
+    "id": "34:391142"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1280 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "34:391801"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1280 / Restricted region (United States)",
+    "id": "34:392475"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 768 / Live — round open",
+    "id": "34:425123"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 768 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "34:426263"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 768 / Restricted region (United States)",
+    "id": "34:427559"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 390 / Live — round open",
+    "id": "34:502362"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 390 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "36:520009"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 390 / Restricted region (United States)",
+    "id": "36:520860"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / All games (default)",
+    "id": "34:347033"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Filters — Instant · provably fair · house edge ≤ 1%",
+    "id": "34:366258"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Search — “orbit”",
+    "id": "34:367751"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Restricted games — United States",
+    "id": "34:373416"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Empty — no Instant games match “baccarat”",
+    "id": "34:378370"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1280 / All games (default)",
+    "id": "34:436379"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1280 / Restricted games — United States",
+    "id": "34:439296"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1280 / Empty — no Instant games match “baccarat”",
+    "id": "34:442219"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 768 / All games (default)",
+    "id": "34:454533"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 768 / Restricted games — United States",
+    "id": "34:457441"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 768 / Empty — no Instant games match “baccarat”",
+    "id": "34:460367"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / All games (default)",
+    "id": "36:531732"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / Filters — bottom sheet open",
+    "id": "36:542037"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / Restricted games — United States",
+    "id": "36:542276"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / Empty — no Instant games match “baccarat”",
+    "id": "36:545533"
+   }
+  ],
+  "issues": [
+   "Figma MCP tool-call limit for the Professional Full seat was reached at the end. Four frames were not screenshot-checked: 34:391801, 34:392475, 34:427559 and 34:442219. Each was built with the same clone-and-resize steps as sibling frames that did pass. Re-check them once the limit resets; then PUB-02 and PUB-03 can move to VERIFIED.",
+   "The assigned section X=20000 overlaps the existing 'PUB-01 Home — states & breakpoints' section (x 9000, width 11040, ends at 20040) by 40 px. Only the section backgrounds overlap; frames start at local x 120. Suggest moving my section to X≈20200.",
+   "I did not use Card/Game, although the brief asked for 'grid of Card/Game (6)'. Its Global Jackpot variant draws a glowing orb with orbit rings and floating dots, which is the banned 'AI look' (conventions §4, decision 23). It also uses the old names (Roulette/Crash/Dice/Coinflip/Blackjack). The lobby uses Tile/Game Generic with Tile/Game Art (catalogue names) instead. Card/Game art should be rebuilt.",
+   "'No games match baccarat' conflicts with the catalogue, which has Baccarat Lounge and Baccarat Lounge Live. The empty state is therefore scoped to the Instant category, where there really are no matches, and offers 'Search all categories', 'Clear search' and the 2 matches in other categories.",
+   "Jackpot/Threshold Bar and Jackpot/Prize Distribution use fixed 472 px bars and meters. The meter is not auto-layout, and changing position, constraints or size inside an instance is blocked or ignored. Both need a card at least 520 px wide. Workarounds: PUB-02 at 1280 uses the collapsed 72 px Shell/Sidebar; at 768 both stay 520 px in a centred column; at 390 I built prizes and threshold inline with tokens. Recommend making these bars auto-layout with SCALE constraints.",
+   "Data conflicts in components: the Jackpot/Round Header Cancelled variant puts round #1,245 at 25 Nov 20:00 → 26 Nov 08:00, but Chart/Line-Area shows one round per day (#1,245 = 24 Nov). Chart/Timeline gives #1,245 a pool of 46,850.00; Round Header gives 41,200.00. I used the daily schedule (closes 24 Nov 2026, 20:00 UTC) and 41,200.00 with 412 players. Derived values: #1,247 1st prize 86,475.00 (17,295 entries); #1,246 84,210.00 (16,842); #1,244 90,515.00 (18,103).",
+   "Player counts not in demo-data.md were added as DEMO and every tile badge shows DEMO: Orbit Rush Duel 88, Double Side 214, High Card 57, Ascend 41, Pool Keno 29, Pool Roulette 284, Twenty-One 347, Baccarat Lounge 96, Sic Bo Triad 38, Dragon & Phoenix 52, Neon Koi 173, Atlas Vault 121, Midnight Orchard 64, Comet Cascade 88, Desert Relics 45, Frost Wolves 77, Lucky Lanterns 131, Robo Heist 59, Speed Twenty-One 158, Baccarat Lounge Live 97, Mega Ring Show 236, Keno Express 182, Daily Draw 6/45 640, Bingo 75 Night 73, Bingo 90 Classic 51. Slot RTPs were set per title inside 96.0–96.7%. Daily Draw shows 'Next draw 21:00 UTC' as an illustrative schedule. These should go into demo-data.md.",
+   "Built inline because no component fits: hero art band, odds-per-entry card, 4-step VRF explainer, recent-rounds table and mobile round cards, mobile 2×2 round stats, mobile prize and threshold cards, mobile filter & sort bottom sheet (uses Menu/Filter Chip, Control/Radio and Button instances), lobby jackpot panel, empty-state card, 'You can still' card.",
+   "768 frames use Shell/Footer Mega Mobile stretched to full width. Shell/Footer Mega has no tablet variant, and the Nav 'Footer' Tablet variant lists the old game names.",
+   "Changes to instances: I hid the 'Keyframe label' and duplicate header inside Jackpot/Pool Visual (its registry note about orbit rings is out of date; the component now shows coins and tickets). I hid the LIVE badge on the sidebar Global Pool item in No round and Restricted. In the Restricted lobby I hid promo tags (HOT/NEW) and the Tournament promo, so nothing is marketed to a restricted region."
+  ]
+ },
+ "pub-gates-pf": {
+  "section": "34:353932 (page 03 'PUB-07/21/22 Provably Fair & gating' at 31000,0) + 36:518991 (page 10 'PUB-07/21/22 — Mobile' at 14000,0)",
+  "created": [
+   {
+    "name": "Section/PUB-07/21/22 Provably Fair & gating (page 03)",
+    "id": "34:353932"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Empty (default — no values entered)",
+    "id": "34:353933"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Verified",
+    "id": "34:406015"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Failed — hash mismatch",
+    "id": "34:415038"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 768 / Empty (default — no values entered)",
+    "id": "34:494365"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 768 / Verified",
+    "id": "34:500470"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 768 / Failed — hash mismatch",
+    "id": "34:501111"
+   },
+   {
+    "name": "[PUB-21] Geo-block interstitial / 1440 / United States (restricted)",
+    "id": "34:428847"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 1440 / Default — nothing selected",
+    "id": "34:453500"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 1440 / Failure — You must be 18+",
+    "id": "34:474089"
+   },
+   {
+    "name": "Section/PUB-07/21/22 — Mobile (page 10)",
+    "id": "36:518991"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Empty (default — no values entered)",
+    "id": "36:518992"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Verified",
+    "id": "36:525940"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Failed — hash mismatch",
+    "id": "36:526470"
+   },
+   {
+    "name": "[PUB-21] Geo-block interstitial / 390 / United States (restricted)",
+    "id": "36:539703"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 390 / Default — nothing selected (bottom sheet)",
+    "id": "51:146357"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 390 / Failure — You must be 18+",
+    "id": "51:146780"
+   }
+  ],
+  "issues": [
+   "Figma MCP rate limit: the seat's tool-call limit was hit repeatedly, with waits of up to 10 minutes between calls. One fix was never applied: on [PUB-07] 768 Failed (34:501111) the text 'Report the round with the button on the left' should read 'Use Report this round in the verifier above…', because the verifier sits above the panel on tablet. The same fix is already applied on mobile. A ready-to-run script is in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/pub07/tablet-copy-fix.js. The 34:353932 section size may also need fitSection after that edit.",
+   "Missing component state: Game/Provably Fair Verifier only covers seed commit–reveal. There is no variant with a Global Pool VRF-request-ID input. VRF verification is shown through the 'Originals bet · seeds | Global Pool draw · VRF' segmented control (seeds active), the VRF diagram, the Tx/Hash request ID and the recent-draws list. A VRF-mode variant should be added to the component, or a frame built for that tab.",
+   "Component defects I worked around with per-instance overrides; they should be fixed at source: (a) the Card/FAQ Item question text is auto-width and clips at 358 px. On mobile I overrode it to FILL plus wrap. (b) The Card/FAQ Item Expanded variant has a hard-coded fee 'Example' row. I rewrote it to a fairness example. (c) In Game/Provably Fair Verifier, the Empty variant shows 'Recorded for D-88213' even with no round entered. I overrode it to 'Recorded result'. Its header subtitle also does not wrap at 358 px; on mobile I overrode it to FILL plus wrap.",
+   "Modal/Base's body is a placeholder slot that cannot take content without detaching. So the age-gate modal and the mobile bottom sheets are built inline with the same anatomy: surface/overlay, border/subtle, radius 20 (modal) or 28 at the top (sheet), Elevation/4. Sheet/Bottom variants were not usable either, because their content is fixed.",
+   "Tablet 768 has no casino tablet topbar. Following the PUB-01 tablet pattern, I used Shell/Topbar Desktop Guest stretched to the frame width, plus Footer Variant=Tablet from registry-nav. Strip/Trust was left off the tablet layout.",
+   "Wrote /home/user/Claude/design/figma-build/registry-pub-07-21-22.json. I built no reusable components, so it lists only the section and frame IDs. I also added decision #26 to /home/user/Claude/design/figma-build/decisions.md: the Empty default for PUB-07, the geo-block rules (no VPN hint, no tab bar on mobile), and the age-gate consent pattern.",
+   "On the user's 'looks like AI' complaint: none of the banned patterns are used — no orbit rings, radial glow backgrounds, particles or logo halos. Heroes and art use concrete objects (Game/Die, Game/Playing Card, locked Tile/Game Generic art), product-UI preview cards and solid angled colour blocks cropped by the banner edges."
+  ]
+ }
+}

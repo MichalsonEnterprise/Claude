@@ -7,7 +7,7 @@ const builtPath = path.join(dir, 'built.json'); const built = fs.existsSync(buil
 const rank = { 'NOT STARTED': 0, 'BLOCKED': 0, 'IN PROGRESS': 1, 'PARTIAL': 1, 'BUILT': 2, 'VERIFIED': 3 };
 const norm = s => { s = String(s || '').toUpperCase(); if (s.startsWith('VERIF')) return 'VERIFIED'; if (s.startsWith('BUILT')) return 'BUILT'; if (s.startsWith('PART') || s.startsWith('IN PROG')) return 'IN PROGRESS'; if (s.startsWith('BLOCK')) return 'BLOCKED'; return 'NOT STARTED'; };
 for (const f of process.argv.slice(2)) {
-  let res = JSON.parse(fs.readFileSync(f, 'utf8')); if (!Array.isArray(res)) res = res.results || [res];
+  let res = JSON.parse(fs.readFileSync(f, 'utf8')); if (!Array.isArray(res)) res = res.result || res.results || [res];
   for (const r of res) {
     if (!r) continue; built[r.key] = { section: r.section, created: r.created, issues: r.issues };
     for (const e of r.ledger || []) {
