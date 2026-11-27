@@ -100,3 +100,15 @@ Player counts for tiles (DEMO): Orbit Rush 1,062 · Vault Sweeper 146 · Skyline
 - Cashback: weekly 10% of net losses, paid Mondays 10:00 UTC (last: 12.80 USDT)
 - Weekly tournament: Orbit Rush Sprint — prize pool 2,500.00 USDT, ends Sun 30 Nov 2026 23:59 UTC, leaderboard top 20
 - VIP Club: 29 levels across 5 tiers, level-up rewards
+
+## Responsible-gaming limits (DEMO, @nova.k)
+- Daily participation limit (Global Pool entries + game stakes): **500.00 USDT** — today used 351.75
+- Daily loss limit: **200.00 USDT** — today net −24.60 (shown in RG/Session Bar)
+- Deposit limit: **5,000.00 USDT / week** — pending increase to 7,500.00 takes effect after 24 h cool-down
+- Session reminder (reality check): every 60 min
+- Insufficient-funds examples use a separate DEMO account balance (e.g. Available 342.10 or 4.20 USDT) and must say so in the frame state name.
+
+## Extra illustrative values already used in components (keep consistent)
+- Prize example: runner-up in round #1,244 for @nova.k, +3,620.60 USDT (2% of 181,030.00) — settled
+- USDT contract placeholder (truncated, DEMO): 0xFd08…Cbb9 — illustrative only, never present it as a real contract address
+- New (non-whitelisted) withdrawal address example: 0x3f9a…c47E
