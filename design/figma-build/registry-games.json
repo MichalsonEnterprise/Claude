@@ -1,0 +1,74 @@
+{
+ "_note": "CMP-15 Game components. Page '02 — Components', section 'CMP-15 Game components' (23:11968) at X=50000, Y=0. Use I(id, {variant}, {prop: value}). Per-variant text is unbound unless listed under props — override TEXT layers by name (e.g. 'Number' in Game/Roulette Cell, 'Multiplier' in Game/Multiplier Readout, 'Net amount' / 'Headline' / 'Detail' in Game/Result Banner). Every illustrative value already carries a Badge/DEMO instance.",
+ "Game/Chip": {
+  "id": "23:12227",
+  "variants": { "Value": ["0.10", "1", "5", "10", "25", "100", "500"], "State": ["Default", "Hover", "Selected", "Disabled"] },
+  "note": "64x64 frame (56 chip + selection ring). Colours: 0.10 ink/400, 1 ink/100, 5 status/danger-strong, 10 status/info, 25 status/success, 100 ink/950 + mint inserts, 500 status/pending. Children use SCALE constraints: inst.rescale(28/64) for table stacks."
+ },
+ "Game/Bet Slip": {
+  "id": "23:16674",
+  "variants": { "State": ["Empty", "Filled", "Over limit"] },
+  "note": "360 wide, Pool Roulette demo: Straight 19 (5.00) + Red (10.00) + Dozen 13–24 (5.00) = 20.00, max payout 215.00, house edge 2.70%, limits 0.10–1,000.00 per spot / 5,000.00 table. Nests Button/Group (Items=3), Button/Icon (remove), Button/Primary L, Badge/DEMO. Over limit = Straight 19 at 1,200.00."
+ },
+ "Game/Odds Display": {
+  "id": "23:19312",
+  "variants": { "State": ["Default", "Updating", "Out of range"] },
+  "note": "520 wide Pool Dice triple: Default 49.50% · 2.0000× · 20.00 (roll over 50.50, bet 10.00); Updating 66.00% · 1.5000× · 15.00; Out of range 98.50% (max 98.00%)."
+ },
+ "Game/Result Banner": {
+  "id": "23:19422",
+  "variants": { "Result": ["Win", "Lose", "Push", "Blackjack", "Bust"] },
+  "note": "520 wide. TEXT layers: Headline, Detail, Net amount. Win +10.00 (Pool Dice 73.21), Lose −10.00, Push 0.00, Blackjack +15.00 (gold, 3:2), Bust −10.00. Meta row: DEMO XS + round/hand ID + 'Verify result' link."
+ },
+ "Game/History Strip": {
+  "id": "23:23256",
+  "variants": { "Game": ["Roulette", "Crash", "Dice", "Coinflip"] },
+  "note": "520 wide; newest result outlined (border/focus); independence footnote (RG). Roulette 12 discs (19 first), Crash 7 pills, Dice 6 pills, Coinflip 12 H/T discs."
+ },
+ "Game/Seed Display": {
+  "id": "23:23401",
+  "variants": { "State": ["Active", "Rotated"] },
+  "note": "520 wide. Server seed hash (Mono/S, 2×32 chars, Copy), client seed (Edit), nonce, Button/Secondary S 'Rotate seed', link to verifier. Rotated reveals previous server seed c71d0a58…5c27b14 (matches hash 8f3c1e…e813)."
+ },
+ "Game/Provably Fair Verifier": {
+  "id": "23:24790",
+  "variants": { "State": ["Empty", "Verified", "Failed"] },
+  "note": "520 wide. Game + Round ID, revealed seed, committed hash (read-only), client seed + nonce 417, computed hash match tag, computed vs recorded result (Roll 73.21), callout, Verify (Button/Primary M), 'Report this round' on Failed."
+ },
+ "Game/Playing Card": {
+  "id": "24:14880",
+  "variants": { "Suit": ["Spades", "Hearts", "Diamonds", "Clubs", "Back"] },
+  "props": { "Rank": "TEXT" },
+  "note": "80x112. Rank default 'A' (key Rank#24:16) drives both corner indices. Back = brand lattice + Brand/Logo Mark (dealer hole card). rescale(0.75) for mobile."
+ },
+ "Game/Die": {
+  "id": "24:14917",
+  "variants": { "Face": ["1", "2", "3", "4", "5", "6"] },
+  "note": "64x64 dark die, light pips, face 1 mint pip. SCALE constraints."
+ },
+ "Game/Coin": {
+  "id": "24:14951",
+  "variants": { "Side": ["Heads", "Tails", "Flipping"] },
+  "note": "96x96. Heads mint + logo medallion, Tails silver + pool glyph, Flipping edge-on with motion arcs. Never gold."
+ },
+ "Game/Roulette Wheel": {
+  "id": "25:15363",
+  "variants": { "State": ["Idle", "Spinning", "Result"] },
+  "note": "360x360 European single-zero wheel, 37 trig-computed wedges (3 vector layers by colour), rim numbers, ball, turret. Result = 19 Red rotated to 12 o'clock with centre result disc. SCALE constraints: rescale for mobile."
+ },
+ "Game/Roulette Cell": {
+  "id": "25:16416",
+  "variants": { "Color": ["Red", "Black", "Green"], "State": ["Default", "Hover", "Bet placed", "Winning"] },
+  "note": "56x64 auto-layout cell; override TEXT 'Number'. Bet placed / Winning nest Game/Chip (Value=5) at 28 px (absolute). Example grid frame (instances, 0 + 1–12): 25:16417."
+ },
+ "Game/Multiplier Readout": {
+  "id": "25:16521",
+  "variants": { "State": ["Rising", "Cashed out", "Crashed"] },
+  "note": "360 wide Orbit Rush readout: Rising 2.47× (cash-out value 24.70, auto 3.00×), Cashed out 2.10× (21.00, +11.00 net), Crashed 3.82× (round CR-55102). TEXT layer 'Multiplier'."
+ },
+ "Game/Crash Curve": {
+  "id": "25:17535",
+  "variants": { "State": ["Betting", "Running", "Crashed"] },
+  "note": "560x320 chart: 1.00–4.00× dashed grid, 0–12 s axis, curve m(t)=e^(0.1117t), head + multiplier label, auto cash-out line (Running), cash-out marker 2.10× + flag (Crashed), betting-window overlay (Betting)."
+ }
+}

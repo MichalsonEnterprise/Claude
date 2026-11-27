@@ -1,0 +1,117 @@
+{
+ "_note": "CMP-16 User + CMP-17 Admin components (agent key: admin). Page '02 — Components', section 'CMP-16/17 User & admin components' (23:5438) at X=55000, Y=0. Use I(id, {variant}, {prop: value}) from helpers.js. 'Show DEMO' BOOLEAN (default true) toggles the nested Badge/DEMO XS. Example text is per-variant (no TEXT props); override TEXT layers by name on instances when needed. Admin rows are 1136 wide (admin content width at 1440 with sidebar) — set layoutSizingHorizontal=FILL inside tables and pair each row set with its Header component. Compliance: no component offers result editing, winner selection, arbitrary payouts, ledger edits or silent balance adjustments.",
+ "User/KYC Status Chip": {
+  "id": "23:5565",
+  "variants": { "Status": ["Not started", "Pending", "Approved", "Rejected", "Expired"], "Level": ["L1", "L2", "L3"] },
+  "props": {},
+  "note": "24 px pill: status icon + 'KYC Lx' + divider + status label. Demo user @nova.k = Status=Approved, Level=L2. TEXT layers: Level, Status."
+ },
+ "User/2FA Status": {
+  "id": "23:5644",
+  "variants": { "State": ["On", "Off", "Backup codes low"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "600 wide block (FILL in cards): icon tile + 'Two-factor authentication' + Badge/Status + description + action Button S (Manage / Turn on 2FA / Generate codes). TEXT layer: Description."
+ },
+ "User/Device Row": {
+  "id": "23:9199",
+  "variants": { "State": ["Current", "Trusted", "New"], "Interaction": ["Default", "Hover"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "800 wide list row. Current = MacBook Pro Lisbon ('Sign out'); Trusted = iPhone 15 ('Revoke'); New = Windows · Edge Madrid flagged 25 Nov 2026 (amber left rule, 'It was me' + Danger 'Not you? Revoke'). TEXT layers: Device, Location, IP, Last active."
+ },
+ "User/Session Row": {
+  "id": "23:9317",
+  "variants": { "Status": ["Active", "Expired"], "Interaction": ["Default", "Hover"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "800 wide list row; Active has Secondary S 'Revoke', Expired has disabled Revoke. TEXT layer: Session."
+ },
+ "User/Notification Item": {
+  "id": "23:11317",
+  "variants": { "Type": ["Security", "Transaction", "Round", "Promotion"], "Read": ["No", "Yes"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "400 wide (notifications panel), FILL on mobile. Read=No = surface/raised + bold title + mint unread dot. TEXT layers: Title, Time, Body, Link."
+ },
+ "Admin/KPI Tile": {
+  "id": "23:15270",
+  "variants": { "Trend": ["Up", "Down", "Flat"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "280 wide. Up = Total deposits 12,846,500.00 +8.4%; Down = Active users 41,206 −2.1%; Flat = Platform fees 60,700.00 0.0%. Sparkline frame 248x40 (Area + Line vectors + End dot). TEXT layers: Label, Value, Unit, Delta value, Definition."
+ },
+ "Admin/Queue Card": {
+  "id": "23:15571",
+  "variants": { "Queue": ["KYC", "Withdrawals"], "SLA": ["On track", "At risk", "Breached"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "360 wide. KYC 214 pending (SLA 48 h), Withdrawals 37 pending (SLA 4 h); oldest item age, % within SLA, Assigned to me / Needs 2nd approver, SLA bar, 'Open queue'. TEXT layer: Count."
+ },
+ "Admin/Risk Score Meter": {
+  "id": "23:18374",
+  "variants": { "Level": ["Low", "Medium", "High", "Critical"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "320 wide. Scores 18 / 46 / 72 / 91; 4-band scale (0–29, 30–59, 60–84, 85+) with marker; top factors; policy outcome line. Read-only model output. TEXT layers: Score, Factors text, Outcome."
+ },
+ "Admin/Role Chip": {
+  "id": "23:18440",
+  "variants": { "Role": ["Super Admin", "Finance", "Compliance", "Support", "Read-only"], "Size": ["S", "M"] },
+  "props": {},
+  "note": "Neutral raised pill, coloured role icon. S 20 px (tables), M 26 px (headers/cards). Demo admins: S. Iyer Super Admin, A. Marin Finance, K. Osei Compliance, R. Duarte Support."
+ },
+ "Admin/Permission Cell": {
+  "id": "23:18516",
+  "variants": { "Value": ["Allowed", "Denied", "Requires approval", "N/A"], "State": ["Default", "Hover", "Focus"] },
+  "props": {},
+  "note": "152x40 matrix cell, right+bottom border/subtle so cells tile. Requires approval = 'Needs approval' (four-eyes). Read-only; changes go through Admin/Approval Request Card."
+ },
+ "Admin/Audit Log Header": {
+  "id": "23:22005",
+  "note": "Column header (TIME, ACTOR · ROLE, ACTION, TARGET, REASON, IP, INTEGRITY) matching Admin/Audit Log Row widths."
+ },
+ "Admin/Audit Log Row": {
+  "id": "23:22145",
+  "variants": { "State": ["Default", "Hover", "Chain alert"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "1136 wide. A. Marin (Role Chip Finance) · Rejected withdrawal · WD-20850 @nova.k · reason (2 lines) · IP · hash-chain ✓ + 'Immutable · entry #88213'. Chain alert = red tint + 'Chain break'. No edit/delete affordances. TEXT layers: Time, Date, Actor name, Action, Action code, Target, Reason, IP, Chain status, Hash, Integrity note."
+ },
+ "Admin/Reconciliation Header": {
+  "id": "23:22164",
+  "note": "Column header (SCOPE, SNAPSHOT, ON-CHAIN, LEDGER, DIFFERENCE, STATUS) matching Admin/Reconciliation Row widths."
+ },
+ "Admin/Reconciliation Row": {
+  "id": "23:22254",
+  "variants": { "Status": ["Match", "Mismatch", "Pending"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "1136 wide. Match = Round #1,248 pool 186,400.00 / 186,400.00; Mismatch = Treasury BNB 48,212.60 vs 48,225.00 (−12.40, investigation INV-0192, no ledger edits); Pending = DP-77412 7/12. TEXT layers: Scope, On-chain, Ledger, Difference, Note."
+ },
+ "Admin/Approval Request Card": {
+  "id": "23:24500",
+  "variants": { "State": ["Pending", "Approved", "Rejected", "Expired"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "460 wide four-eyes card: AR-1042 release AML-flagged withdrawal WD-20931 (1,500.00 USDT → 0x7c4e…a21D Arbitrum), requested by A. Marin (Finance), second approver K. Osei (Compliance), mandatory reason, 2FA required, expiry 4 h, audit entry reference. Nests Address Chip, Avatar, Role Chip, Badge/Status, Buttons."
+ },
+ "Admin/Contract Card": {
+  "id": "24:14297",
+  "variants": { "State": ["Active", "Paused", "Deprecated"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "440 wide. GlobalPool v1.3.0 0x4b1d…77ce (Arbitrum), audit 'Audited — DEMO placeholder', 48 h timelock · 3-of-5 multisig, last event. Paused = circuit breaker paused NEW entries only (AR-1039, S. Iyer + K. Osei). Deprecated = v1.2.4 0x61e0…b3a8 read-only. Actions: Request pause/resume (4-eyes). TEXT layers: Contract name, Version, Note."
+ },
+ "Admin/Event Stream Header": {
+  "id": "24:14325",
+  "note": "Column header (TIME, EVENT, CONTRACT, DETAILS, NETWORK, BLOCK, TX HASH) matching Admin/Event Stream Row widths."
+ },
+ "Admin/Event Stream Row": {
+  "id": "24:14528",
+  "variants": { "Event": ["EntryPurchased", "VRFRequested", "VRFFulfilled", "RoundSettled", "WithdrawalExecuted", "WithdrawalFailed", "RefundClaimed"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "1136 wide, read-only on-chain events. Round #1,248 VRF requestId 0x9f2c…e71a: requested 20:00:04, fulfilled 20:00:41, settled 20:02:10. WithdrawalFailed row has danger tint. TEXT layers: Time, Event name, Contract, Contract version, Details, Block, Tx hash."
+ },
+ "Admin/Filter Bar": {
+  "id": "24:16268",
+  "variants": { "State": ["Default", "Filtered"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "1136 wide toolbar: row 1 Input/Search S (FILL) + saved view + Export CSV; row 2 Menu/Filter Chips + More filters; summary row (result count + DEMO, sort, export audit note / Clear all + Save view). TEXT layer: Result count."
+ },
+ "Admin/Confirm With Reason Dialog": {
+  "id": "25:16172",
+  "variants": { "State": ["Default", "Ready", "Error", "Submitted"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "520 wide modal (surface/overlay, radius 20, Elevation/4): reason category Select/Field, required Input/Textarea reason, Input/OTP 2FA code, four-eyes notice 'A second admin must approve', audit notice 'This action is recorded in the immutable audit log', Cancel + Danger 'Submit for approval' (disabled in Default). Submitted shows AR-1043 + audit entry. Example: Reject flagged withdrawal WD-20931."
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "_note": "CMP-05 Tables & pagination — page '02 — Components', section 'CMP-05 Tables & pagination' (id 22:8274, x 22500, y 0). Use I(id, {variant}, {props}) from helpers.js. Cell content is per-variant text (not TEXT props): override TEXT layers by name (Primary, Secondary, Value, Handle, Network name, Score, Range). Nested instances are exposed (Status badge, Address chip, Amount value, Avatar, Checkbox, Expand/More buttons) so setP() works on them via inst.findOne(n => n.name === '...').",
+ "Table/Header Cell": {
+  "id": "22:8309",
+  "variants": { "Align": ["Left", "Right"], "Sort": ["None", "Asc", "Desc"] },
+  "props": { "Label": "TEXT", "Show sort icon": "BOOLEAN" },
+  "note": "160x40 default, resize width per column. Overline label (auto-uppercase). Align=Right for Number/Amount columns. Hide sort icon on non-sortable columns; for an Actions column also hide the 'Label' layer. Compact tables: pad(h, 0, 12, 0, 12) on the instance."
+ },
+ "Table/Cell": {
+  "id": "22:9559",
+  "variants": { "Type": ["Text", "Number", "Status", "Address", "Amount", "Date", "Actions", "User", "Network", "Checkbox"], "Density": ["Comfortable", "Compact"] },
+  "props": { "Show secondary": "BOOLEAN", "Show DEMO": "BOOLEAN", "Show expand": "BOOLEAN", "Chain": "INSTANCE_SWAP" },
+  "note": "Comfortable 56 px (pad 16) / Compact 40 px (pad 12). Default widths: Text 240, Number 120, Status 148, Address 232, Amount 208, Date 184, Actions 96, User 200, Network 156 (use 188 with secondary line), Checkbox 48/40. Layers: Text → Primary/Secondary; Date → Primary/Secondary (compact: Primary '27 Nov 2026, 18:40'); Network → Chain prop (CHAINS[...] or USDT_ID) + 'Network name' + Secondary; Status → 'Status badge' (Badge/Status S); Address → 'Address chip' (Wallet/Address Chip S; swap nested 'Chain/…' mark per network); Amount → 'Amount value' (Table/Amount Value: Sign + 'Value') + DEMO XS; User → 'Avatar' (Initials) + 'Handle' (+ Secondary user ID) + DEMO XS; Actions → 'Expand button' (Show expand) + 'More button'; Checkbox → 'Checkbox' (Control/Checkbox, label hidden; set Value/State)."
+ },
+ "Table/Amount Value": {
+  "id": "22:9421",
+  "variants": { "Sign": ["Positive", "Negative", "Neutral"] },
+  "note": "Number/S value + Caption 'USDT'. Positive '+1,000.00' text/success (money in), Negative '−1,500.00' text/danger with U+2212 (money out), Neutral '1,500.00' text/primary (admin queues/totals). Override TEXT layer 'Value'."
+ },
+ "Table/Risk Cell": {
+  "id": "23:5378",
+  "variants": { "Level": ["Low", "Medium", "High"], "Density": ["Comfortable", "Compact"] },
+  "note": "152 wide (144 in admin example). 5-segment meter + level word + score. Comfortable: 'Low risk' / 'Score 12 / 100'; Compact: 'Low' / '· 12' (override TEXT 'Score'). Low 0–33 success, Medium 34–66 warning, High 67–100 danger. High-risk rows are not bulk-selectable."
+ },
+ "Table/Row": {
+  "id": "23:8970",
+  "variants": { "State": ["Default", "Hover", "Selected", "Expanded"] },
+  "props": { "Show checkbox": "BOOLEAN" },
+  "note": "Transactions template, 1120 wide, Comfortable. Columns: Cell/Checkbox 48 · Cell/Text FILL · Cell/Date 184 · Cell/Network 188 · Cell/Status 148 · Cell/Amount 208 · Cell/Actions 96 (expand + more). Expanded adds 'Detail panel' (details KV list, fee breakdown + DEMO, Tx/Hash, actions, Tx/Status Timeline Confirming for DP-77412). Override per row via r.findOne(x => x.name === 'Cell/Text') etc."
+ },
+ "Table/Row Admin Withdrawal": {
+  "id": "23:19194",
+  "variants": { "State": ["Default", "Hover", "Selected", "Not selectable"] },
+  "note": "Admin queue row, 1240 wide, Compact 40 px. Cells: Cell/Checkbox 40 · Cell/Request (Text, FILL) · Cell/User 168 (DEMO hidden) · Cell/Amount 184 (Neutral) · Cell/Destination 224 (Address chip) · Cell/Risk 144 (Table/Risk Cell) · Cell/Status 132 · Cell/Requested 164 (Date compact) · Cell/Actions 56. 'Not selectable' = High risk, checkbox Disabled."
+ },
+ "Table/Toolbar": {
+  "id": "23:11446",
+  "variants": { "State": ["Default", "Filtered"] },
+  "note": "1120 wide, 40 px controls: Input/Search M (240, 'Search ID or hash') · Table/Filter Button · date-range Button/Secondary '20–27 Nov 2026' · spacer · saved view Button/Secondary ('All activity' / 'Withdrawals in review') · Table/Density Toggle · Export CSV. Filtered adds removable Select/Chip row + Clear all + '12 results' DEMO."
+ },
+ "Table/Filter Button": {
+  "id": "23:5397",
+  "variants": { "State": ["Default", "Hover", "Focus", "Active"] },
+  "props": { "Label": "TEXT" },
+  "note": "40 px secondary-style trigger; Active shows Badge/Count (brand, exposed as 'Count')."
+ },
+ "Table/Density Toggle": {
+  "id": "23:5426",
+  "variants": { "Value": ["Comfortable", "Compact"] },
+  "note": "Two Button/Icon Ghost S with density glyphs (Table/Glyph/Density Comfortable 23:7430, Compact 23:7432); selected = surface/selected + icon/brand."
+ },
+ "Table/Bulk Action Bar": {
+  "id": "23:11539",
+  "variants": { "State": ["Default", "Loading"] },
+  "note": "1120 x 56, replaces toolbar when rows are selected. Select-all (Indeterminate) · '3 selected' · '4,620.00 USDT total' DEMO · policy note (reason + 2FA, audit) · Approve (3) Primary S · Export Secondary S · Clear Ghost S. Loading: 'Approving 3 withdrawals…', Approve Loading, others Disabled."
+ },
+ "Table/Skeleton Row": {
+  "id": "23:14920",
+  "variants": { "Density": ["Comfortable", "Compact"] },
+  "note": "1120 wide, mirrors Table/Row columns; bars use Gradient/Skeleton paint style + border/default hairline."
+ },
+ "Table/Empty State": {
+  "id": "23:15005",
+  "variants": { "Type": ["No data", "No results", "Error"] },
+  "note": "1120 wide. No data: 'No transactions yet' + Make a deposit (Primary) + How deposits work. No results: Clear all filters + Edit filters. Error: Try again + System status + error ref."
+ },
+ "Pagination": {
+  "id": "23:16756",
+  "variants": { "Type": ["Numbered", "Load more", "Cursor"] },
+  "note": "1120 wide footer (top hairline). Layers: 'Button/Secondary — 20' (rows-per-page select, set Label), 'Range' TEXT ('1–20 of 1,284'), page items 'Page 1'…'Page 5', 'Gap', 'Page 65' (hide/override as needed), 'Previous'/'Next'. Load more: 'Showing 1–20 of 1,284 transactions' + progress + 'Load 20 more'. Cursor: 'Newest first' + Previous (Disabled) / Next."
+ },
+ "Pagination/Page Item": {
+  "id": "23:5437",
+  "variants": { "State": ["Default", "Hover", "Selected", "Focus", "Disabled"] },
+  "props": { "Page": "TEXT" },
+  "note": "32 px, min-width 32; Selected = brand/tint + border/brand + text/brand."
+ },
+ "Table/Example Transactions": {
+  "id": "23:20002",
+  "type": "COMPONENT",
+  "note": "1120 card: title + DEMO DATA, Table/Toolbar, sticky header (Date sorted Desc), 6 Table/Row instances (DP-77412, WD-20931, 35 entries Round #1,248, DP-77380, WD-20877, WD-20850), scrollbar thumb, Pagination Numbered 1–20 of 1,284."
+ },
+ "Table/Example Admin Withdrawals": {
+  "id": "23:22259",
+  "type": "COMPONENT",
+  "note": "1240 card: 'Withdrawal queue' + Live + DEMO DATA, Bulk Action Bar (3 selected, 4,620.00), sticky header with select-all Indeterminate (Requested Asc), 10 admin rows (3 Selected, 1 Hover, 1 Not selectable High risk), Pagination Numbered 10 per page, 1–10 of 37."
+ }
+}

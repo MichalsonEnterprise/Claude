@@ -1,0 +1,49 @@
+{
+ "_note": "CASINO-01 App shell — page '02 — Components', section 'CASINO-01 App shell' (22:8632) at X=66000, Y=0. Use I(id, {variant}, {props}). After swapping a Shell/Sidebar Item Icon, re-tint the nested 'Icon' layer (icon/muted Default, icon/default Hover, icon/brand Active, text/disabled Disabled) and keep it 20x20. Count text on items: set the nested 'Count' (Badge/Count) instance's Count prop. Footer Desktop inside the sidebar layout: FILL the column and bind paddingLeft/Right to space/6 (24). Mobile tab bar: reuse Nav/Mobile Tab Bar 22:5413 (Active=Home|Pool|Games|Wallet|Account).",
+ "Shell/Sidebar Item": {
+  "id": "22:8712",
+  "variants": { "State": ["Default", "Hover", "Active", "Disabled"], "Collapsed": ["No", "Yes"] },
+  "props": { "Label": "TEXT", "Icon": "INSTANCE_SWAP", "Show badge": "BOOLEAN", "Show count": "BOOLEAN", "Show chevron": "BOOLEAN" },
+  "note": "Expanded 216x36 (resize instance height to 44 in the mobile drawer), Collapsed 48x40 icon-only (label hidden, kept for tooltip/aria). Active = brand/tint fill + text/brand + icon/brand + 3px mint left indicator. Badge = Badge/Status Live S; Chevron nested icon can be swapped to chevron-up for an open group."
+ },
+ "Shell/Sidebar": {
+  "id": "23:6697",
+  "variants": { "State": ["Expanded", "Collapsed"], "Auth": ["Guest", "Member"] },
+  "props": {},
+  "note": "Expanded 240x1024 / Collapsed 72x1024, bg/secondary + right hairline. Promo tiles (Global Pool gold tile 186,400.00 USDT + DEMO, VIP Club tile), Lobby (active), Global Pool LIVE, Originals open (Orbit Rush, Pool Dice, Double Side, Pool Roulette, Twenty-One), Casino games group, Favourites, Recently played, Winners, Provably Fair, VIP Club, Affiliates, Promotions | Wallet, [Member: My entries 35, Transactions], Responsible gaming, Support. Pinned footer: language & region (English · Portugal), 18+, Notice/Licence Compact. Nav area 'Nav (scrolls)' clips/scrolls. Variant ids: Expanded/Guest 23:5648, Expanded/Member 23:6001, Collapsed/Guest 23:6381, Collapsed/Member 23:6531."
+ },
+ "Shell/Topbar Desktop": {
+  "id": "23:9832",
+  "variants": { "State": ["Guest", "Member", "Member wrong network", "Restricted region"] },
+  "props": {},
+  "note": "1200 wide (set FILL in the column), 64 high (Restricted 129 = Nav/Region Banner + bar). Burger + Brand/Logo | Input/Search M (FILL, min 240 / max 400, 'Search games, rounds…') | Guest: Sign in + Sign up + language; Member: balance pill (USDT 9,215.30 DEMO) joined to Deposit S, Wallet/Network Pill Arbitrum, Nav/Notifications Trigger (Button/Icon + Badge/Count 3), User/Avatar L 'NK'; Wrong network: Button/Wallet Wrong network; Restricted: Sign up Disabled. Variant ids: Guest 23:9606, Member 23:9653, Wrong network 23:9715, Restricted 23:9775."
+ },
+ "Shell/Topbar Mobile": {
+  "id": "23:12908",
+  "variants": { "State": ["Guest", "Member"] },
+  "props": {},
+  "note": "390x56. Logo mark | Guest: Sign in + Sign up (M) / Member: balance pill + Deposit S | menu icon (opens Shell/Mobile Drawer). Variant ids: Guest 23:12853, Member 23:12878."
+ },
+ "Shell/Mobile Drawer": {
+  "id": "23:13536",
+  "variants": { "Auth": ["Guest", "Member"] },
+  "props": {},
+  "note": "390x844 full-height sheet: header (logo + close), account block (Guest: Sign in/Sign up L; Member: @nova.k + VIP Gold + balance & Deposit), scrolling nav with 44px items + scroll indicator, pinned footer (language & region, 18+, licence). Variant ids: Guest 23:12909, Member 23:13200."
+ },
+ "Shell/Mobile — usage": {
+  "id": "23:13537",
+  "type": "FRAME (documentation, not a component)",
+  "note": "Two 390x844 phones: Topbar Mobile Member + content slots + Nav/Mobile Tab Bar (Active=Home); Mobile Drawer Member open."
+ },
+ "Shell/Footer Mega": {
+  "id": "23:17478",
+  "variants": { "Breakpoint": ["Desktop", "Mobile"] },
+  "props": {},
+  "note": "Desktop 1440 (120 side padding = 1200 content) x 1083; Mobile 390 x 1799 (link columns as accordions). About blurb, Help us improve (feedback@example.com / security@example.com), trust strip (Chainlink VRF, audited contracts + licensed operator as DEMO placeholders), RG strip (18+, GamCare, Gamblers Anonymous, BeGambleAware, National Council on Problem Gambling), link columns, community placeholders (X/Tg/Dc/Yt), supported networks (5 chains + USDT), language & region, licence paragraph + DEMO, copyright + 18+. Variant ids: Desktop 23:17147, Mobile 23:17324."
+ },
+ "Shell/Page Layout": {
+  "id": "23:19423",
+  "type": "COMPONENT (documentation)",
+  "note": "1440x1024: Sidebar Expanded Member + main column 1200 (Topbar Member, content 1152 with 24 gutters: hero 240, recent wins 72, section header with All + ‹ ›, 7-up 3:4 tile row gap 16, more-sections slot) + Footer Mega Desktop (padding 24). Info annotations (status/info) + gutter overlays are documentation layers — hide them when using as a screen starter."
+ }
+}

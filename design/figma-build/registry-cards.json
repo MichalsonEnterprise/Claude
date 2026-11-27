@@ -1,0 +1,65 @@
+{
+ "_note": "CMP-04 Cards — page '02 — Components', section 'CMP-04 Cards' (22:7454) at X=17000, Y=0. Use I(id, {variant}, {props}) from helpers.js. All card text except FAQ/Feature props is per-variant (not TEXT props): override layers by name on the instance (Label, Value, Unit, Amount, Composition, Title, Body, Handle, Prize amount, Round, Countdown, Close time ...). Every card carries a nested Badge/DEMO. Fills/strokes are token-bound, so the cards follow the charcoal + mint re-theme automatically.",
+ "Card/Stat": {
+  "id": "22:7589",
+  "variants": { "Trend": ["Up", "Down", "Neutral"], "Size": ["M", "L"] },
+  "note": "M 288 px (Number/M), L 400 px (Number/L + icon tile). Layers: Label, Value, Unit, Delta chip text, 'Delta context', Sparkline (vectors Line/Area/End dot scale with the frame). Up = Pool balance 186,400.00 (+7.8% vs #1,247); Down = Active users 41,206 (−2.4%); Neutral = System health 99.97% (0.00 pp)."
+ },
+ "Card/Balance": {
+  "id": "22:7720",
+  "variants": { "Type": ["Total", "Available", "Locked", "Pending", "Owed"] },
+  "note": "320 px. Icon tile + label + info-tooltip icon, Amount in balance colour (Number/L), share bar, Composition caption, footer share + 'Updated 18:42 UTC'. Values reconcile: 12,480.50 = 9,215.30 + 1,850.00 + 1,000.00 + 415.20."
+ },
+ "Card/Jackpot": {
+  "id": "22:9401",
+  "variants": { "Size": ["Hero", "Compact"] },
+  "note": "Hero 560 px radius 20 (Display/L gold-gradient pool, hh:mm:ss countdown boxes 03:17:42 to real close 27 Nov 2026 20:00 UTC, participants 3,412, entries 18,640, threshold Met, fee disclosure, Button/Gold L Participate + Secondary Round details, Notice/Licence Compact). Compact 360 px radius 14 (Number/L pool, inline countdown, Button/Gold M). Both have LIVE badge, DEMO and absolute Gradient/Gold Radial glow."
+ },
+ "Card/Game": {
+  "id": "23:8247",
+  "variants": { "Game": ["Global Jackpot", "Roulette", "Crash", "Dice", "Coinflip", "Blackjack"], "State": ["Default", "Restricted"] },
+  "note": "296 px. Art 188 px: Gradient/Tile backdrop (Gold/Red/Violet/Sky/Amber/Mint) + original shape illustration (frame 'Illustration') + players chip with DEMO. Body: Name, Description, chips (house edge 2.70/1.00/1.00/2.00/≈0.50%; jackpot '0.05 USDT fee per entry'), Limits (DEMO), licence note, Button Primary S 'Play' (jackpot Button/Gold S 'Participate'). Restricted: illustration 35% under scrim/overlay + lock + 'Not available in your region', Badge/Status Restricted, details 50%, CTA Disabled."
+ },
+ "Card/Winner": {
+  "id": "23:9389",
+  "variants": { "Source": ["Global Pool", "Game"] },
+  "note": "340 px. User/Avatar L, Handle, Time ago, gold prize block (Prize label overline + Prize amount Number/M gold gradient), Game + round, Proof caption, Verify draw / Verify result link. Global Pool = @orbit_77 86,475.00 (round #1,247 1st prize); Game = @mira.sol 248.00 (Crash 12.40× on 20.00 stake)."
+ },
+ "Card/Round": {
+  "id": "23:9602",
+  "variants": { "Status": ["Open", "Drawing", "Settled", "Cancelled"] },
+  "note": "400 px. Header Round # + Badge/Status (Live / Processing→'Drawing' / Confirmed→'Settled' / Expired→'Cancelled') + DEMO; data grid Pool, Participants, Qualifying entries, close/settle time; status block: Open countdown + elapsed bar + threshold met; Drawing VRF steps + request 0x9f2c…e71a; Settled winner row + Verify draw; Cancelled warning + 'Your refund: 300.00 USDT' + View refund."
+ },
+ "Card/VIP Tier": {
+  "id": "23:12669",
+  "variants": { "Tier": ["Bronze", "Silver", "Gold", "Platinum", "Diamond"], "Current": ["No", "Yes"] },
+  "note": "280 px. Crown emblem (vip/<tier>), Badge/VIP M, 'Your tier' pill + 1.5 px tier border + progress block when Current=Yes, threshold (0 / 2,500 / 8,000 / 20,000 / 50,000 pts), benefits (rakeback-free wording), fair-play note 'VIP status never changes odds or outcomes.' Demo user = Gold, 12,840 / 20,000 pts."
+ },
+ "Card/Network": {
+  "id": "23:12849",
+  "variants": { "Chain": ["BNB Chain", "Polygon", "Arbitrum", "Ethereum", "Solana"] },
+  "note": "320 px. Chain mark 36 + name + token standard, status chip (Operational / Congested for Ethereum), details rows (token standard, confirmations, typical network fee, minimum deposit 10.00 USDT) + DEMO XS, wrong-network note or congestion notice."
+ },
+ "Card/FAQ Item": {
+  "id": "23:16819",
+  "variants": { "State": ["Collapsed", "Hover", "Focus", "Expanded"] },
+  "props": { "Question": "TEXT", "Answer": "TEXT" },
+  "note": "720 px accordion. Default Q: 'What does the 0.05 USDT platform fee cover?'. Expanded adds worked example (DEMO) + two links. Focus = 2 px border/focus outside."
+ },
+ "Card/Feature": {
+  "id": "23:16859",
+  "variants": { "State": ["Default", "Hover", "Focus"] },
+  "props": { "Title": "TEXT", "Body": "TEXT", "Link": "TEXT", "Show link": "BOOLEAN", "Icon": "INSTANCE_SWAP" },
+  "note": "320 px. 48 px brand/tint icon tile (swap takes ICONS[...] ids; re-tint icon/brand after swap), Heading/H5 title, Body/S body, optional link. Default copy 'Verifiable draws'."
+ },
+ "Card/Notification": {
+  "id": "23:17017",
+  "variants": { "Type": ["Info", "Success", "Warning", "Security"], "Read": ["No", "Yes"] },
+  "note": "420 px row card. Icon tile by type, Title, Time, unread dot (Read=No, surface/raised), Body, action link + DEMO XS. Content: round #1,248 closing, DP-77380 credited, WD-20931 under review, new device sign-in Madrid."
+ },
+ "Card/Security Score": {
+  "id": "23:17143",
+  "variants": { "Status": ["Needs review", "All clear"] },
+  "note": "460 px. Score ring (arc, 80/100 warning or 100/100 success), verdict + advice, checklist: 2FA On, anti-phishing code AURORA-27 (Mono), withdrawal whitelist On · 1 address, new device sign-in ⚠ with Button/Secondary S 'Review' (or Recognised devices ✓), 'Open security settings' link."
+ }
+}

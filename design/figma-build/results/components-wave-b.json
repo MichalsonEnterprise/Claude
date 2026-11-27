@@ -1,0 +1,685 @@
+{
+  "summary": "Build GLOBAL POOL component families / DS docs / cover in Figma, one agent per family (args = list of family keys)",
+  "agentCount": 4,
+  "logs": [],
+  "result": [
+    {
+      "key": "nav",
+      "section": "14:1015",
+      "created": [
+        {
+          "name": "Nav/Sidebar Item",
+          "id": "14:1115"
+        },
+        {
+          "name": "Nav/Sidebar",
+          "id": "20:9165"
+        },
+        {
+          "name": "Nav/Topbar",
+          "id": "20:9304"
+        },
+        {
+          "name": "Nav/App Topbar",
+          "id": "22:8586"
+        },
+        {
+          "name": "Nav/Breadcrumb",
+          "id": "14:1145"
+        },
+        {
+          "name": "Nav/Step Item",
+          "id": "14:1193"
+        },
+        {
+          "name": "Nav/Stepper",
+          "id": "15:3122"
+        },
+        {
+          "name": "Example — Withdraw risk check failed (frame)",
+          "id": "15:3126"
+        },
+        {
+          "name": "Nav/Stepper Mobile",
+          "id": "15:3270"
+        },
+        {
+          "name": "Nav/Header Link",
+          "id": "16:3228"
+        },
+        {
+          "name": "Nav/Balance Chip",
+          "id": "16:3304"
+        },
+        {
+          "name": "Nav/Notifications Trigger",
+          "id": "16:3356"
+        },
+        {
+          "name": "Nav/Avatar Trigger",
+          "id": "16:3384"
+        },
+        {
+          "name": "Nav/Language Trigger",
+          "id": "16:3412"
+        },
+        {
+          "name": "Nav/Region Banner",
+          "id": "16:3449"
+        },
+        {
+          "name": "Header/Public Desktop",
+          "id": "20:3727"
+        },
+        {
+          "name": "Header/Public Tablet",
+          "id": "20:6398"
+        },
+        {
+          "name": "Header/Public Mobile",
+          "id": "20:6509"
+        },
+        {
+          "name": "Menu/Mobile Fullscreen",
+          "id": "20:8863"
+        },
+        {
+          "name": "Nav/Mobile Tab Bar",
+          "id": "22:5413"
+        },
+        {
+          "name": "Nav/Admin Item",
+          "id": "22:5497"
+        },
+        {
+          "name": "Nav/Admin Sidebar",
+          "id": "22:5501"
+        },
+        {
+          "name": "Nav/Admin Topbar",
+          "id": "22:6483"
+        },
+        {
+          "name": "Nav/Command Palette",
+          "id": "22:6663"
+        },
+        {
+          "name": "Footer",
+          "id": "22:7450"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-09",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-10",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Everything assigned is built and was checked by screenshot after the last fix. All 24 component IDs are in /home/user/Claude/design/figma-build/registry-nav.json (registry key: nav).",
+        "Conventions changed while I was working. conventions.md §4 and decisions #18–19 (BC.GAME-style charcoal + mint palette, casino layout) were updated after this task started. Colours pick up the new palette through the tokens. I also followed the new shell widths: Nav/Sidebar is 240/72 instead of the assigned 264/80, and Nav/Topbar defaults to 1200 wide (still at least 1176). This deviation is written into the component descriptions and labels.",
+        "I added Nav/App Topbar (22:8586), which was not in my list. It is the casino-shell top bar from the updated conventions: search, then either auth buttons or balance, Deposit, bell and avatar. It has a Restricted region state.",
+        "Header/Public Desktop cannot fit all 8 links plus the full logged-in actions at 1440, so the logged-in states show 6 links and a 'More' menu holding How It Works and Affiliates. Logged out and Restricted region show all 8. In the Wallet connected state, Button/Wallet Connected is also the account menu, so there is no separate avatar. The tightest state has 19 px to spare, and no state overflows.",
+        "Possible duplicate: the wallet agent built Wallet/Balance Chip (14:2062) at the same time as my Nav/Balance Chip. Nav/Topbar and Nav/App Topbar now use the shared 14:2062. Nav/Balance Chip is kept as a compact (232/219 px) chip for the public headers only, because 14:2062 (304 px) does not fit there. The orchestrator may want to merge them.",
+        "Not built: pagination. The master prompt lists it under CMP-09, but my assignment did not include it. Check whether the tables agent (CMP-05) covers it.",
+        "I added small sub-components the headers and menus needed: Nav/Header Link, Nav/Notifications Trigger, Nav/Avatar Trigger, Nav/Language Trigger, Nav/Stepper Mobile and Nav/Admin Item. Nav/Region Banner is my own build because the registry had no CMP-08 alert yet. The orchestrator may want to align it with CMP-08 later.",
+        "The footer's operator, regulator and licence number are placeholders marked DEMO. The help organisations (GamCare, Gamblers Anonymous, National Council on Problem Gambling) are text links only, with no logos. Their URLs need a legal check per jurisdiction.",
+        "Menu/Mobile Fullscreen grows to fit its content (927 px logged out, 1137 px logged in) and scrolls in the product. It is not a fixed 844 px frame.",
+        "Admin components offer no way to edit results, pick winners or pay out arbitrary amounts. The command palette lists only allowed actions that need a reason, 2FA and an audit entry, and modules outside a role show a 'No access' lock.",
+        "Usage notes: icons swapped through INSTANCE_SWAP may need re-tinting. Nested Badge/Count values are set on the nested instance. Per-variant text such as 'Page title' and breadcrumb crumbs is changed by layer name. Set Nav/Sidebar, Nav/Topbar, Nav/App Topbar and Nav/Admin Topbar to FILL in screens.",
+        "No memory notes applied to this task. The palette and layout decisions came from decisions.md, not from memory."
+      ]
+    },
+    {
+      "key": "wallet",
+      "section": "14:1737",
+      "created": [
+        {
+          "name": "Section title (frame)",
+          "id": "14:1738"
+        },
+        {
+          "name": "Group/CMP-12 Wallet (header frame)",
+          "id": "14:1741"
+        },
+        {
+          "name": "Wallet/Balance Breakdown",
+          "id": "14:1974"
+        },
+        {
+          "name": "Wallet/Balance Chip",
+          "id": "14:2062"
+        },
+        {
+          "name": "Wallet/Connected Wallet Row",
+          "id": "15:4172"
+        },
+        {
+          "name": "Wallet/Token Amount Row",
+          "id": "15:4217"
+        },
+        {
+          "name": "Wallet/Deposit Address Block",
+          "id": "16:4429"
+        },
+        {
+          "name": "Wallet/Fee Estimator",
+          "id": "20:3002"
+        },
+        {
+          "name": "Wallet/Confirmations Progress",
+          "id": "20:3076"
+        },
+        {
+          "name": "Group/CMP-13 Transactions (header frame)",
+          "id": "20:5820"
+        },
+        {
+          "name": "Tx/Hash",
+          "id": "20:5893"
+        },
+        {
+          "name": "Tx/Row",
+          "id": "20:6222"
+        },
+        {
+          "name": "Tx/Status Timeline",
+          "id": "20:8473"
+        },
+        {
+          "name": "Tx/Fee Breakdown",
+          "id": "20:8583"
+        },
+        {
+          "name": "Tx/Receipt Card",
+          "id": "22:5202"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-12 Wallet/Balance Breakdown (Layout=Card|Compact)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-12 Wallet/Balance Chip (Type=Available|Total x State=Default|Hover|Focus)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-12 Wallet/Connected Wallet Row (State=Primary|Secondary|Unverified|Error)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-12 Wallet/Deposit Address Block (State=Active|Expired)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-12 Wallet/Token Amount Row (Size=M|S)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-12 Wallet/Fee Estimator (State=Normal|Congested)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-12 Wallet/Confirmations Progress (State=Confirming|Delayed|Confirmed)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-13 Tx/Row (Type=Deposit|Withdrawal|Entry|Prize|Refund|Fee|Reward x State=Default|Hover)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-13 Tx/Status Timeline (State=Submitted|Confirming|Confirmed|Failed)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-13 Tx/Hash (State=Default|Hover|Focus|Copied)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-13 Tx/Fee Breakdown (Type=Withdrawal|Entry)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-13 Tx/Receipt Card (Type=Deposit|Withdrawal)",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Registry written to /home/user/Claude/design/figma-build/registry-wallet.json (12 sets with ids, variant options and props). All 12 sets were screenshot-checked after build and again after targeted fixes, the whole section 14:1737 (2312x6565) included. No clipped or overlapping text, no empty frames, no default fills. All fills, strokes, gaps, padding and radii are bound to tokens.",
+        "Fixes applied after review: the balance meta line no longer wraps; the chip set width is now 1040; the deposit address is set at a fixed 178px width so it splits into two 21-character lines; the Delayed and Confirmed confirmation captions were shortened; the WD-20931 row sub-caption now fits on one line; the receipt reference captions were shortened. Each fix was re-checked with a screenshot.",
+        "Invented demo value (not in demo-data.md): the Tx/Row Prize example is a runner-up prize for @nova.k in round #1,244, +3,620.60 USDT (2% of the 181,030.00 pool). The orchestrator may want to add it to demo-data.md or swap in another value.",
+        "Other values not in demo-data.md, all marked DEMO: a full illustrative Ethereum deposit address 0xDE3001A7c4E9b2F6d18053cA9e7B41f2D6a0c9F3; block numbers 21,384,896 / 21,384,899; second-level timestamps for DP-77412 (18:40:12 to 18:43:09 UTC); WD-20877 completion time 20 Nov 2026, 11:32 UTC and a 0.12 network fee (the BNB fee from the chains table), giving 799.88 received; receipt refs RC-77380 / RC-20877; the 'Week 48' label on the VIP reward.",
+        "Ledger split: Tx/Row shows the entry purchase as two lines (Entry −350.00 and Fee −1.75 = 351.75 from demo-data) so the platform fee is its own line. Screen agents should follow this split.",
+        "Badge/Status has no Verified / Whitelisted / Unverified / Completed options, so instances of Confirmed / Approved / Pending / Failed were relabelled through text overrides (not detached). A future Badge/Status update could add these as proper variants.",
+        "Wallet/Address Chip has the BNB Chain mark built in. In the Connected Wallet Row, the nested chain instance was swapped to Arbitrum or Solana as an instance override. The receipts use BNB, so no swap was needed there.",
+        "Connected Wallet Row has no 'Show DEMO' property, because its DEMO badge lives inside the nested Address Chip, which has its own 'Show DEMO'. Every other set has 'Show DEMO' (BOOLEAN, default true) wired to its own DEMO badges. Tx/Hash also has 'Hash' (TEXT) and 'Show explorer link' (BOOLEAN). Token Amount Row also has 'Amount' and 'Fiat' (TEXT) and 'Network' (INSTANCE_SWAP of a chain mark).",
+        "The QR is an original illustrative pattern and cannot be scanned: a 25x25 grid filled by a fixed-seed random generator, 3 finder squares, timing and alignment patterns, a centre USDT mark, flattened into one vector 'QR/Modules'. The component description tells developers to render a real EIP-681 QR in code.",
+        "Extra states beyond the brief: Balance Chip Hover and Focus, Tx/Hash Hover, Focus and Copied, Tx/Row Hover, Confirmations Progress Delayed and Confirmed, and Tx/Fee Breakdown Type=Entry (with 'You can lose your stake'). The Fee Breakdown Entry variant can serve as the pool participation-preview fee block.",
+        "Did not touch other sections. No memory notes were relevant to this task; nothing new to save."
+      ]
+    },
+    {
+      "key": "jackpot",
+      "section": "22:8310",
+      "created": [
+        {
+          "name": "Section — CMP-14/18 Jackpot & responsible gaming",
+          "id": "22:8310"
+        },
+        {
+          "name": "Section title",
+          "id": "22:8311"
+        },
+        {
+          "name": "Group/CMP-14 Jackpot (header)",
+          "id": "22:8314"
+        },
+        {
+          "name": "Group/CMP-18 Responsible gaming (header)",
+          "id": "22:8317"
+        },
+        {
+          "name": "Jackpot/Counter (Size=XL|L|M)",
+          "id": "22:8356"
+        },
+        {
+          "name": "Note — Pool tick-up motion (doc frame)",
+          "id": "22:8357"
+        },
+        {
+          "name": "Jackpot/Participants Counter",
+          "id": "22:8376"
+        },
+        {
+          "name": "Jackpot/Round Header (Status=Open|Closing soon|Drawing|Settled|Cancelled)",
+          "id": "22:9830"
+        },
+        {
+          "name": "Jackpot/Entry Ticket (State=Active|Won|Not selected|Refunded)",
+          "id": "23:8534"
+        },
+        {
+          "name": "Jackpot/Threshold Bar (State=Met|Not met)",
+          "id": "23:8618"
+        },
+        {
+          "name": "Jackpot/VRF Stepper (Step=Requested|Pending|Fulfilled|Settled|Delayed)",
+          "id": "23:11967"
+        },
+        {
+          "name": "Jackpot/Prize Distribution",
+          "id": "23:16123"
+        },
+        {
+          "name": "Jackpot/Winner Reveal Card (State=You won|Public winner|Not selected)",
+          "id": "23:16334"
+        },
+        {
+          "name": "Jackpot/Pool Visual (Frame=1|2|3)",
+          "id": "23:18928"
+        },
+        {
+          "name": "RG/Limit Setter (Type=Deposit|Participation|Time × State=Default|Pending increase|Saved)",
+          "id": "23:21988"
+        },
+        {
+          "name": "RG/Session Bar (State=Normal|Approaching limit|Limit reached)",
+          "id": "23:24937"
+        },
+        {
+          "name": "RG/Reality Check",
+          "id": "23:24938"
+        },
+        {
+          "name": "RG/Cooling-Off Card (State=Default|Selected|Active)",
+          "id": "24:14742"
+        },
+        {
+          "name": "RG/Help Resources",
+          "id": "24:14743"
+        },
+        {
+          "name": "RG/Self-Exclusion Step (Step=Choose period|Consequences|Confirm|Active)",
+          "id": "25:14013"
+        },
+        {
+          "name": "Registry file",
+          "id": "/home/user/Claude/design/figma-build/registry-jackpot.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-14",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-18",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Counter",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Round Header",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Participants Counter",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Entry Ticket",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Threshold Bar",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/VRF Stepper",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Prize Distribution",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Winner Reveal Card",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "Jackpot/Pool Visual",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "RG/Limit Setter",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "RG/Session Bar",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "RG/Reality Check",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "RG/Cooling-Off Card",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "RG/Self-Exclusion Step",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "RG/Help Resources",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Token mismatch: in this file brand/primary resolves to green #2cd97d, text/brand and icon/brand to #5be89c, and surface/default to neutral grey #2b2f30. decisions.md still says violet #8B5CF6. The paint styles Gradient/Hero Radial and Brand Glow still use raw violet. Brand green looks almost the same as status/success, so the 'current' VRF step indicators use status/info (sky) instead of brand. The orchestrator should reconcile decisions.md or the palette.",
+        "Render bug, fixed: some variable-bound paints kept a stale cached colour of (0,0,0) and rendered black (the Cooling-Off 'Active' card fill and 2 vector strokes), even though the binding was correct. Fixed by re-resolving each paint with variable.resolveForConsumer(); bindings are kept. Other agents may hit the same thing when they call fill() twice on one node.",
+        "New demo values not in demo-data.md (please add them): round #1,245 cancelled with 412 participants, 4,120 entries and a 41,200.00 USDT pool, open 25 Nov 2026 20:00 to 26 Nov 2026 08:00 UTC, assuming 12 h rounds; refunded entry E-1245-00412; #1,248 1st-prize winner @lumen.eth with entry E-1248-07734; 'now' = 27 Nov 2026 16:42:18 UTC, derived from countdown 03:17:42; RG demo limits of deposit 2,500.00/day (used 1,000.00), participation 200.00/day (used 124.60) and time 2 h/day (used 42 min).",
+        "Deviation from the brief: the spec said round #1,248 for every Round Header variant, but the Cancelled header, the Refunded ticket and the Not met threshold use round #1,245 (the cancelled round in demo-data.md). This avoids showing #1,248 as both threshold-met and cancelled.",
+        "Policy assumptions in the copy that need product/compliance sign-off: (a) on cancellation only the entry amount (10.00 USDT) is refunded, which matches demo data (300.00 = 30 × 10.00), and copy never promises a fee refund; (b) during a cooling-off or self-exclusion, entries already placed stay in the draw; (c) a self-exclusion is shared with a national register 'where your licence region requires it'; (d) reopening after exclusion needs a support request plus a 24 h cooling period.",
+        "Help Resources names real organisations as plain text with no logos (Gambling Therapy gamblingtherapy.org, Gamblers Anonymous gamblersanonymous.org, GamCare gamcare.org.uk). Legal/compliance should confirm the list per region; the Portugal-specific helpline is not listed.",
+        "Pool Visual prototype: Frame=1 → 2 → 3 is wired with Smart Animate (600 ms each, After delay). These reactions only work after the variants are combined, so setting them earlier fails.",
+        "Layout notes, no defects: on the Counter set the M variant wraps to a second row so the motion-note frame (22:8357) stays left of column B at x 2200. Wrap sets needed about 48 px of extra width over the exact variant sum to avoid early wrapping.",
+        "Component API: no TEXT props, because text differs per variant; override text layers by name. Every set has a 'Show DEMO' BOOLEAN bound to its own Badge/DEMO instances. RG/Help Resources has no DEMO because it holds no demo values. VRF Stepper nests Tx/Hash, which has its own Show DEMO.",
+        "Final audit: 15 components/sets, every one with a description; no overlapping top-level nodes and no text overflowing its parent. Every family was screenshotted after fixes. Memory: the only stored note (LegalTechAnalyses Figma) is unrelated and was not used."
+      ]
+    },
+    {
+      "key": "games",
+      "section": "23:11968",
+      "created": [
+        {
+          "name": "Section — CMP-15 Game components (page 02 — Components, X=50000 Y=0, 2792x5554)",
+          "id": "23:11968"
+        },
+        {
+          "name": "Header — CMP-15",
+          "id": "23:11969"
+        },
+        {
+          "name": "Game/Chip (Value 0.10|1|5|10|25|100|500 x State Default|Hover|Selected|Disabled, 28 variants)",
+          "id": "23:12227"
+        },
+        {
+          "name": "Game/Bet Slip (State Empty|Filled|Over limit)",
+          "id": "23:16674"
+        },
+        {
+          "name": "Game/Odds Display (State Default|Updating|Out of range)",
+          "id": "23:19312"
+        },
+        {
+          "name": "Game/Result Banner (Result Win|Lose|Push|Blackjack|Bust)",
+          "id": "23:19422"
+        },
+        {
+          "name": "Game/History Strip (Game Roulette|Crash|Dice|Coinflip)",
+          "id": "23:23256"
+        },
+        {
+          "name": "Game/Seed Display (State Active|Rotated)",
+          "id": "23:23401"
+        },
+        {
+          "name": "Game/Provably Fair Verifier (State Empty|Verified|Failed)",
+          "id": "23:24790"
+        },
+        {
+          "name": "Game/Playing Card (Suit Spades|Hearts|Diamonds|Clubs|Back + Rank TEXT prop Rank#24:16)",
+          "id": "24:14880"
+        },
+        {
+          "name": "Game/Die (Face 1-6)",
+          "id": "24:14917"
+        },
+        {
+          "name": "Game/Coin (Side Heads|Tails|Flipping)",
+          "id": "24:14951"
+        },
+        {
+          "name": "Game/Roulette Wheel (State Idle|Spinning|Result)",
+          "id": "25:15363"
+        },
+        {
+          "name": "Game/Roulette Cell (Color Red|Black|Green x State Default|Hover|Bet placed|Winning, 12 variants)",
+          "id": "25:16416"
+        },
+        {
+          "name": "Example — Roulette Cell grid (instances, documentation frame)",
+          "id": "25:16417"
+        },
+        {
+          "name": "Game/Multiplier Readout (State Rising|Cashed out|Crashed)",
+          "id": "25:16521"
+        },
+        {
+          "name": "Game/Crash Curve (State Betting|Running|Crashed)",
+          "id": "25:17535"
+        },
+        {
+          "name": "Registry file",
+          "id": "/home/user/Claude/design/figma-build/registry-games.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CMP-15",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Chip",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Bet Slip",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Odds Display",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Result Banner",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/History Strip",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Provably Fair Verifier",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Seed Display",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Playing Card",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Die",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Coin",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Roulette Wheel",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Roulette Cell",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Multiplier Readout",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CMP-15 Game/Crash Curve",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "All 14 families are built and were checked on screenshots after their fixes. Things I fixed along the way: Bet Slip text overflowing (header caption, limits value, the hint on the over-limit row); Result Banner detail text running into the net caption; one Dice pill too many in History Strip (cut to 6 rolls); an extra-tall actions row in the Verifier (spacer); the Heads logo mark turning into a flat black disc when tinted (now a dark medallion); low tick contrast on the green Winning roulette cell; the Multiplier Readout caption overflowing; the Crash Curve 'Crashed' label covering the DEMO badge.",
+        "Additions not in the brief: Game/Chip has an extra Hover state (28 variants, still under 30). Game/Odds Display has three states (Default / Updating / Out of range), Game/Seed Display has two (Active / Rotated), and Game/Crash Curve has three (Betting / Running / Crashed). Keyboard focus for chips is written up in the description (2 px border/focus outside ring) rather than built as a variant, to stay under the 30-variant cap.",
+        "Token choices: the black roulette pockets and cells, the black 100 chip and the Tails coin use Primitives ink/* (ink/900, ink/950, ink/200, ink/400). These primitives are hidden from Figma's pickers (empty scopes), but binding them through the API works. The brief named 'ink' for black. Other primitives used: alpha/white-* and alpha/black-40 for inserts, grooves and hover overlays, plus ink/100–800 for chip and coin details.",
+        "Gold appears in exactly one place: the Blackjack result banner (a prize moment). Coin and chips are mint, silver and denomination colours only.",
+        "Game/Roulette Cell and Game/Result Banner use per-variant text instead of TEXT properties, per conventions §5 (the text differs across variants). Override the 'Number', 'Headline', 'Detail' or 'Net amount' layers on instances.",
+        "Demo values follow demo-data.md: house edges, payouts and limits, Pool Dice 49.50% · 2.0000× · 20.00 on 10.00, roulette limits, coinflip 1.96×, blackjack 3:2. Values I made up because the sheet has none are all DEMO-badged: round IDs D-88213 / BJ-40517 / CR-55102, roll 73.21, seeds and hashes, client seed nova-k-7f2a91, nonce 417/418, crash points 2.47× / 2.10× / 3.82×. Screen agents should reuse these so the game screens agree.",
+        "Section layout: two columns. A (x=120): Chip, Bet Slip, Odds Display, Result Banner, History Strip, Seed Display. B (x=1480): Playing Card, Die, Coin, Roulette Wheel, Roulette Cell plus example grid, Multiplier Readout, Crash Curve, Provably Fair Verifier. Every set has a description covering usage, anatomy, states, do/don't and dev notes.",
+        "Nothing outside the CMP-15 section was changed. ledger.json and the merged registry.json were not touched; the orchestrator should merge registry-games.json."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Build"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "build:nav",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "aea6c450c102930d3",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795812981142,
+      "queuedAt": 1795812981127,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "14:1015",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795814801414,
+      "tokens": 406237,
+      "toolCalls": 52,
+      "durationMs": 1820271,
+      "resultPreview": "{\"section\":\"14:1015\",\"created\":[{\"name\":\"Nav/Sidebar Item\",\"id\":\"14:1115\"},{\"name\":\"Nav/Sidebar\",\"id\":\"20:9165\"},{\"name\":\"Nav/Topbar\",\"id\":\"20:9304\"},{\"name\":\"Nav/App Topbar\",\"id\":\"22:8586\"},{\"name\":\"Nav/Breadcrumb\",\"id\":\"14:1145\"},{\"name\":\"Nav/Step Item\",\"id\":\"14:1193\"},{\"name\":\"Nav/Stepper\",\"id\":\"15:3122\"},{\"name\":\"Example — Withdraw risk check failed (frame)\",\"id\":\"15:3126\"},{\"name\":\"Nav/Steppe…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "build:wallet",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "ad798030ff1f48fa0",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795812981142,
+      "queuedAt": 1795812981128,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "14:1737",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795814257478,
+      "tokens": 314918,
+      "toolCalls": 40,
+      "durationMs": 1276332,
+      "resultPreview": "{\"section\":\"14:1737\",\"created\":[{\"name\":\"Section title (frame)\",\"id\":\"14:1738\"},{\"name\":\"Group/CMP-12 Wallet (header frame)\",\"id\":\"14:1741\"},{\"name\":\"Wallet/Balance Breakdown\",\"id\":\"14:1974\"},{\"name\":\"Wallet/Balance Chip\",\"id\":\"14:2062\"},{\"name\":\"Wallet/Connected Wallet Row\",\"id\":\"15:4172\"},{\"name\":\"Wallet/Token Amount Row\",\"id\":\"15:4217\"},{\"name\":\"Wallet/Deposit Address Block\",\"id\":\"16:4429\"},{\"n…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "build:jackpot",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a2f264f99fa98f588",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814257486,
+      "queuedAt": 1795812981128,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "22:8310",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795816090983,
+      "tokens": 403517,
+      "toolCalls": 51,
+      "durationMs": 1833496,
+      "resultPreview": "{\"section\":\"22:8310\",\"created\":[{\"name\":\"Section — CMP-14/18 Jackpot & responsible gaming\",\"id\":\"22:8310\"},{\"name\":\"Section title\",\"id\":\"22:8311\"},{\"name\":\"Group/CMP-14 Jackpot (header)\",\"id\":\"22:8314\"},{\"name\":\"Group/CMP-18 Responsible gaming (header)\",\"id\":\"22:8317\"},{\"name\":\"Jackpot/Counter (Size=XL|L|M)\",\"id\":\"22:8356\"},{\"name\":\"Note — Pool tick-up motion (doc frame)\",\"id\":\"22:8357\"},{\"name\":\"…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "build:games",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a597f607fd9d109bf",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814801425,
+      "queuedAt": 1795812981128,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "23:11968",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md and follow it exactly (fileKey, sessionId, skillNames, script skeleton, tokens, naming, verif…",
+      "promptFramed": true,
+      "lastProgressAt": 1795816368982,
+      "tokens": 369933,
+      "toolCalls": 48,
+      "durationMs": 1567556,
+      "resultPreview": "{\"section\":\"23:11968\",\"created\":[{\"name\":\"Section — CMP-15 Game components (page 02 — Components, X=50000 Y=0, 2792x5554)\",\"id\":\"23:11968\"},{\"name\":\"Header — CMP-15\",\"id\":\"23:11969\"},{\"name\":\"Game/Chip (Value 0.10|1|5|10|25|100|500 x State Default|Hover|Selected|Disabled, 28 variants)\",\"id\":\"23:12227\"},{\"name\":\"Game/Bet Slip (State Empty|Filled|Over limit)\",\"id\":\"23:16674\"},{\"name\":\"Game/Odds Disp…"
+    }
+  ],
+  "totalTokens": 1494605,
+  "totalToolCalls": 191
+}

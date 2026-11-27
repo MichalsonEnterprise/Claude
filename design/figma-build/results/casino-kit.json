@@ -1,0 +1,375 @@
+{
+  "summary": "Build the BC.GAME-style casino layout kit for GLOBAL POOL (app shell + lobby content components) in Figma",
+  "agentCount": 2,
+  "logs": [],
+  "result": [
+    {
+      "key": "shell",
+      "section": "22:8632",
+      "created": [
+        {
+          "name": "Section/CASINO-01 App shell",
+          "id": "22:8632"
+        },
+        {
+          "name": "Section header",
+          "id": "22:8633"
+        },
+        {
+          "name": "Shell/Sidebar Item",
+          "id": "22:8712"
+        },
+        {
+          "name": "Shell/Sidebar",
+          "id": "23:6697"
+        },
+        {
+          "name": "Shell/Sidebar — State=Expanded, Auth=Guest",
+          "id": "23:5648"
+        },
+        {
+          "name": "Shell/Sidebar — State=Expanded, Auth=Member",
+          "id": "23:6001"
+        },
+        {
+          "name": "Shell/Sidebar — State=Collapsed, Auth=Guest",
+          "id": "23:6381"
+        },
+        {
+          "name": "Shell/Sidebar — State=Collapsed, Auth=Member",
+          "id": "23:6531"
+        },
+        {
+          "name": "Shell/Topbar Desktop",
+          "id": "23:9832"
+        },
+        {
+          "name": "Shell/Topbar Desktop — Guest",
+          "id": "23:9606"
+        },
+        {
+          "name": "Shell/Topbar Desktop — Member",
+          "id": "23:9653"
+        },
+        {
+          "name": "Shell/Topbar Desktop — Member wrong network",
+          "id": "23:9715"
+        },
+        {
+          "name": "Shell/Topbar Desktop — Restricted region",
+          "id": "23:9775"
+        },
+        {
+          "name": "Shell/Topbar Mobile",
+          "id": "23:12908"
+        },
+        {
+          "name": "Shell/Topbar Mobile — Guest",
+          "id": "23:12853"
+        },
+        {
+          "name": "Shell/Topbar Mobile — Member",
+          "id": "23:12878"
+        },
+        {
+          "name": "Shell/Mobile Drawer",
+          "id": "23:13536"
+        },
+        {
+          "name": "Shell/Mobile Drawer — Guest",
+          "id": "23:12909"
+        },
+        {
+          "name": "Shell/Mobile Drawer — Member",
+          "id": "23:13200"
+        },
+        {
+          "name": "Shell/Mobile — usage (doc frame)",
+          "id": "23:13537"
+        },
+        {
+          "name": "Shell/Footer Mega",
+          "id": "23:17478"
+        },
+        {
+          "name": "Shell/Footer Mega — Desktop",
+          "id": "23:17147"
+        },
+        {
+          "name": "Shell/Footer Mega — Mobile",
+          "id": "23:17324"
+        },
+        {
+          "name": "Shell/Page Layout",
+          "id": "23:19423"
+        },
+        {
+          "name": "Registry file",
+          "id": "/home/user/Claude/design/figma-build/registry-casino-shell.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CASINO-01 Shell/Sidebar Item (8 variants)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-01 Shell/Sidebar (Expanded|Collapsed x Guest|Member)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-01 Shell/Topbar Desktop (Guest|Member|Wrong network|Restricted)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-01 Shell/Topbar Mobile (Guest|Member)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-01 Shell/Mobile Drawer (Guest|Member)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-01 Shell/Mobile Tab Bar",
+          "status": "NOT BUILT: reused existing Nav/Mobile Tab Bar 22:5413"
+        },
+        {
+          "id": "CASINO-01 Shell/Footer Mega (Desktop|Mobile)",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-01 Shell/Page Layout (1440x1024 doc component)",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Departure from the assignment, made to follow the updated conventions §4 and the demo-data Game catalogue: the Originals group lists the 5 platform games under their catalogue names (Orbit Rush = Crash, Pool Dice = Dice, Double Side = Coinflip, Pool Roulette = Roulette, Twenty-One = Blackjack). I also added one collapsed 'Casino games' group (Slots, Table games, Live casino, Draws & bingo). The computed task said '5 original games, no third-party slots', but the updated conventions now include GP Studios original slots. The orchestrator should confirm which list wins. Reverting means renaming 5 sub-item labels and deleting one item in 23:5648, 23:6001, 23:6381 and 23:6531.",
+        "I did not build a Shell/Mobile Tab Bar because Nav/Mobile Tab Bar (22:5413) already exists and I reused it. Its first tab is labelled 'Home', not 'Lobby'; changing that is up to that component's owner.",
+        "Notifications reuse Nav/Notifications Trigger (16:3356), which is itself a Button/Icon plus Badge/Count. The Restricted topbar reuses Nav/Region Banner Desktop (16:3449), whose copy is honest and has no VPN hint. In that state Sign up is Disabled and Sign in stays so existing holders can withdraw.",
+        "The Expanded Member sidebar uses 893 of the 897 px nav height at 1024. Any more items will scroll; the 'Nav (scrolls)' frame clips by design. In the mobile drawer the nav list is cut off mid-row on purpose to show it scrolls, with a scroll indicator. A strict 'no clipped text' check may still flag it.",
+        "The Collapsed sidebar (72) has no LIVE dot on Global Pool and no licence text. It shows a language icon button, a licence icon button (with tooltip) and the 18+ badge.",
+        "In the sidebar and drawer footers, the Notice/Licence Compact instance text is overridden to 'Licence required · Permitted regions only', because the 18+ badge sits beside it. In the 240 sidebar it wraps to 3 lines and its radius is overridden to md.",
+        "Swapping an icon on a Shell/Sidebar Item instance drops the colour override. Consumers must re-tint the nested 'Icon' layer and keep it 20x20; this is noted in the component description and the registry.",
+        "Tooling: createComponent() sets strokesIncludedInLayout=true by default, which made the topbars 65 px tall. I fixed the topbars to exactly 64 (Restricted is 129). The sidebar's 1px right hairline is still counted inside its 240 width.",
+        "Tooling: the inline node.screenshot() rendered icon/default icons black (a render race). get_screenshot rendered them correctly and the variable resolves to light ink/100, so I used get_screenshot for every verification.",
+        "The footer community icons (X / Tg / Dc / Yt) are neutral text placeholders because the library has no social icons. The trust strip uses outlined text badges only: no award seals and no third-party logos.",
+        "The reference sites' VPN or geo-bypass hints and award seals were deliberately not reproduced. No logos, mascots, photos or copy were taken from them; only layout architecture and density."
+      ]
+    },
+    {
+      "key": "lobby",
+      "section": "22:9405",
+      "created": [
+        {
+          "name": "Section/CASINO-02 Lobby content",
+          "id": "22:9405"
+        },
+        {
+          "name": "Section header",
+          "id": "22:9406"
+        },
+        {
+          "name": "Art/Spot (10 motifs: Orb, Wheel, Comet, Dice, Coin, Cards, Shield, Crown, Gauge, Network)",
+          "id": "23:10035"
+        },
+        {
+          "name": "Art/Game (6 games)",
+          "id": "23:14045"
+        },
+        {
+          "name": "Tile/Game (6 games x Default/Hover/Restricted = 18 variants; props Show players, Show DEMO)",
+          "id": "23:14885"
+        },
+        {
+          "name": "Tile/Game Small (6 games; prop Show title)",
+          "id": "23:17671"
+        },
+        {
+          "name": "Row/Carousel Header (props Title, Show live dot, Show All, Show arrows)",
+          "id": "23:17672"
+        },
+        {
+          "name": "Row/Game Carousel (Layout=Overflow|Fits)",
+          "id": "23:18243"
+        },
+        {
+          "name": "Strip/Recent Wins (props Show DEMO, Show live dot)",
+          "id": "23:20415"
+        },
+        {
+          "name": "Tile/Category (6 categories)",
+          "id": "23:21105"
+        },
+        {
+          "name": "Banner/Hero (Slide=Global Pool|Provably Fair|VIP Club; prop Show DEMO)",
+          "id": "23:23896"
+        },
+        {
+          "name": "Banner/Hero Side (3 slides; prop Show DEMO)",
+          "id": "23:23985"
+        },
+        {
+          "name": "Banner/Hero Carousel",
+          "id": "23:23986"
+        },
+        {
+          "name": "Card/Draw Countdown (State=Open|Drawing|Next round)",
+          "id": "24:13861"
+        },
+        {
+          "name": "Card/Promo (Type=VIP weekly reward|Affiliate|Provably fair|Responsible gaming)",
+          "id": "24:14012"
+        },
+        {
+          "name": "Table/Live Bets (State=Loaded|Loading)",
+          "id": "25:14776"
+        },
+        {
+          "name": "Strip/Trust",
+          "id": "25:16197"
+        },
+        {
+          "name": "Strip/Networks",
+          "id": "25:16229"
+        },
+        {
+          "name": "Section/SEO Text",
+          "id": "25:16288"
+        },
+        {
+          "name": "Registry file",
+          "id": "/home/user/Claude/design/figma-build/registry-casino-lobby.json"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "CASINO-02 Tile/Game",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Tile/Game Small",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Row/Carousel Header",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Row/Game Carousel",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Strip/Recent Wins",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Tile/Category",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Banner/Hero",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Banner/Hero Side",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Banner/Hero Carousel",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Card/Draw Countdown",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Card/Promo",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Table/Live Bets",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Strip/Trust",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Strip/Networks",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Section/SEO Text",
+          "status": "VERIFIED"
+        },
+        {
+          "id": "CASINO-02 Art/Spot + Art/Game (supporting art library)",
+          "status": "VERIFIED"
+        }
+      ],
+      "issues": [
+        "Deviation from the brief: Row/Game Carousel holds 6 tiles, not 8. The product has exactly 6 titles (Global Pool plus 5 originals), and padding the row with placeholder or third-party games would break the product facts. The cropped-last-tile pattern is shown in Layout=Overflow (960 wide, Blackjack cropped, scroll indicator). Layout=Fits (1136) shows all 6 tiles with both arrows disabled.",
+        "Hover 'lift' cannot be expressed as a translate inside a component. It is shown as a 2px border/brand stroke + Glow/Brand + overlay. translateY(-4px) and 150 ms ease-out are documented in the Tile/Game description for dev.",
+        "Variable-bound gradient stops take their alpha from the token. True fade-to-transparent gradients therefore use the existing Gradient/Gold Radial and Hero Radial paint styles, or blurred alpha/* shapes (LAYER_BLUR). No raw hex was used.",
+        "Invented values, all marked DEMO: player counts per game (Roulette 1,062, Crash 896, Dice 538, Coinflip 214, Blackjack 347; Global Pool 3,412 = round participants), recent-win and live-bet rows (pool prizes reconcile to round #1,247 at 50/20/10%), and next round #1,249 opening 28 Nov 2026 08:00 UTC (countdown 11:57:50 from settlement at 20:02:10). The Open countdown 03:17:42 to the real 20:00 UTC close comes from demo-data.md.",
+        "Contact emails use the reserved placeholder domain globalpool.example with DEMO badges. Replace them once real addresses exist.",
+        "Notice/Licence (Inline) does not wrap inside a 360px column, so it sits under the SEO paragraphs in the left column instead of in the contact column.",
+        "Two backdrop frames ('Row/Carousel Header — backdrop', 'Banner/Hero Carousel — backdrop') sit behind those two standalone components for documentation contrast only. They are not components.",
+        "Reference screenshots were used for layout and density only. No logos, mascots, photos, third-party game art or copy from BC.GAME or HyperLucky were reproduced. VPN hints, bonus pressure and fake urgency were excluded."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Build"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "casino:shell",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a422e2f4e9cdbe396",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814411268,
+      "queuedAt": 1795814411257,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "22:8632",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (Web3 global jackpot + crypto casino platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md (NOTE §3/§4 were just UPDATED: BC.GAME-style charcoal + mint palette and casino layout arc…",
+      "promptFramed": true,
+      "lastProgressAt": 1795815527524,
+      "tokens": 306101,
+      "toolCalls": 52,
+      "durationMs": 1116255,
+      "resultPreview": "{\"section\":\"22:8632\",\"created\":[{\"name\":\"Section/CASINO-01 App shell\",\"id\":\"22:8632\"},{\"name\":\"Section header\",\"id\":\"22:8633\"},{\"name\":\"Shell/Sidebar Item\",\"id\":\"22:8712\"},{\"name\":\"Shell/Sidebar\",\"id\":\"23:6697\"},{\"name\":\"Shell/Sidebar — State=Expanded, Auth=Guest\",\"id\":\"23:5648\"},{\"name\":\"Shell/Sidebar — State=Expanded, Auth=Member\",\"id\":\"23:6001\"},{\"name\":\"Shell/Sidebar — State=Collapsed, Auth=Gu…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "casino:lobby",
+      "phaseIndex": 1,
+      "phaseTitle": "Build",
+      "agentId": "a6c8e63b9a30bb533",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795814411269,
+      "queuedAt": 1795814411257,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "22:9405",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building part of the real Figma file \"GLOBAL POOL — Product Design\" (Web3 global jackpot + crypto casino platform) via the Figma MCP use_figma tool.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-build/conventions.md (NOTE §3/§4 were just UPDATED: BC.GAME-style charcoal + mint palette and casino layout arc…",
+      "promptFramed": true,
+      "lastProgressAt": 1795816212972,
+      "tokens": 394960,
+      "toolCalls": 57,
+      "durationMs": 1801701,
+      "resultPreview": "{\"section\":\"22:9405\",\"created\":[{\"name\":\"Section/CASINO-02 Lobby content\",\"id\":\"22:9405\"},{\"name\":\"Section header\",\"id\":\"22:9406\"},{\"name\":\"Art/Spot (10 motifs: Orb, Wheel, Comet, Dice, Coin, Cards, Shield, Crown, Gauge, Network)\",\"id\":\"23:10035\"},{\"name\":\"Art/Game (6 games)\",\"id\":\"23:14045\"},{\"name\":\"Tile/Game (6 games x Default/Hover/Restricted = 18 variants; props Show players, Show DEMO)\",\"id\"…"
+    }
+  ],
+  "totalTokens": 701061,
+  "totalToolCalls": 109
+}

@@ -1,0 +1,89 @@
+{
+ "_note": "CASINO-02 Lobby content kit (agent key: casino-lobby). Page '02 — Components', section 'CASINO-02 Lobby content' (22:9405) at X=74000, Y=0. Use I(id, {variant}, {props}) from helpers.js. All art is original token-bound vector art (no raster, no third-party game art). Every illustrative number carries Badge/DEMO. Default width for lobby rows = 1136 (1440 screen with expanded 240 sidebar) — set layoutSizingHorizontal='FILL' in screens.",
+ "Section/CASINO-02 Lobby content": { "id": "22:9405", "note": "header frame 22:9406" },
+ "Art/Spot": {
+  "id": "23:10035",
+  "variants": { "Motif": ["Orb", "Wheel", "Comet", "Dice", "Coin", "Cards", "Shield", "Crown", "Gauge", "Network"] },
+  "note": "160x160 transparent spot illustrations; all children SCALE constraints, so instance.resize(n, n) scales the art. Orb=Global Pool, Wheel=Roulette, Comet=Crash, Dice, Coin=Coinflip, Cards=Blackjack, Shield=Provably fair, Crown=VIP, Gauge=Responsible gaming, Network=Affiliates."
+ },
+ "Art/Game": {
+  "id": "23:14045",
+  "variants": { "Game": ["Global Pool", "Roulette", "Crash", "Dice", "Coinflip", "Blackjack"] },
+  "note": "3:4 key art 160x213 (Gradient/Tile backdrop + rays + rings + Art/Spot + bottom fade). Scales via SCALE constraints: 100x133 (small tile), 30x40 (table mini)."
+ },
+ "Tile/Game": {
+  "id": "23:14885",
+  "variants": { "Game": ["Global Pool", "Roulette", "Crash", "Dice", "Coinflip", "Blackjack"], "State": ["Default", "Hover", "Restricted"] },
+  "props": { "Show players": "BOOLEAN", "Show DEMO": "BOOLEAN" },
+  "note": "160x213 r14. Players DEMO: Global Pool 3,412 (= round participants), Roulette 1,062, Crash 896, Dice 538, Coinflip 214, Blackjack 347. Hover = mint 2px border + Glow/Brand + Play (Button/Primary M) + house-edge chip (Global Pool: 'Fee 0.05 USDT / entry'). Restricted = scrim + lock + 'Not available in your region' (no Play, no players badge). Override 'Players count' text per instance for live counts."
+ },
+ "Tile/Game Small": {
+  "id": "23:17671",
+  "variants": { "Game": ["Global Pool", "Roulette", "Crash", "Dice", "Coinflip", "Blackjack"] },
+  "props": { "Show title": "BOOLEAN" },
+  "note": "100x133 r10, for recent wins / search / mobile rows."
+ },
+ "Row/Carousel Header": {
+  "id": "23:17672",
+  "props": { "Title": "TEXT", "Show live dot": "BOOLEAN", "Show All": "BOOLEAN", "Show arrows": "BOOLEAN" },
+  "note": "1136 wide (FILL in screens). Nested 'Prev' / 'Next' are Button/Icon Secondary S — set their State (Disabled at scroll ends) on the nested instance."
+ },
+ "Row/Game Carousel": {
+  "id": "23:18243",
+  "variants": { "Layout": ["Overflow", "Fits"] },
+  "note": "Header + Track of the 6 Tile/Game (gap 12, clipped) + scroll indicator. Overflow = 960 wide, last tile cropped, indicator shown; Fits = 1136, both arrows disabled, no indicator. Holds 6 tiles because the product has exactly 6 titles (no filler games)."
+ },
+ "Strip/Recent Wins": {
+  "id": "23:20415",
+  "props": { "Show DEMO": "BOOLEAN", "Show live dot": "BOOLEAN" },
+  "note": "1136. Tabs/Segmented (All active · Global Pool · Originals) + DEMO M + arrows; 11 items (Tile/Game Small + handle or 'Hidden' + USDT payout; gold for pool prizes = round #1,247 1st 86,475.00 / 2nd 34,590.00 / 3rd 17,295.00, mint for games)."
+ },
+ "Tile/Category": {
+  "id": "23:21105",
+  "variants": { "Category": ["Global Pool", "Originals", "Table games", "Instant games", "Provably fair", "VIP Club"] },
+  "note": "380x180 r14: gradient + legibility shade + Art/Spot 176 + overline/title/description + count chip."
+ },
+ "Banner/Hero": {
+  "id": "23:23896",
+  "variants": { "Slide": ["Global Pool", "Provably Fair", "VIP Club"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "880x320 r20. Global Pool: '186,400.00 USDT in round #1,248 · Draws 27 Nov 2026, 20:00 UTC · 10.00 USDT + 0.05 USDT fee per entry', Button/Gold L 'Participate' + Ghost 'How it works'. Provably Fair: Button/Primary L 'Verify a draw', request 0x9f2c…e71a. VIP Club: Button/Secondary L 'See VIP tiers'."
+ },
+ "Banner/Hero Side": {
+  "id": "23:23985",
+  "variants": { "Slide": ["Global Pool", "Provably Fair", "VIP Club"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "240x152 r14 secondary promo card beside the main banner (>= 1280 px only)."
+ },
+ "Banner/Hero Carousel": {
+  "id": "23:23986",
+  "note": "1136: main Banner/Hero (Global Pool) + side column (Provably Fair, VIP Club) + dots (active 24x8 mint pill) + pause autoplay Button/Icon Ghost S. Swap nested instance variants to rotate slides."
+ },
+ "Card/Draw Countdown": {
+  "id": "24:13861",
+  "variants": { "State": ["Open", "Drawing", "Next round"] },
+  "note": "360 wide. Open: pool 186,400.00, 'Closes in 03 h : 17 m : 42 s' (to 27 Nov 2026 20:00 UTC), 3,412 participants · 18,640 entries, Button/Primary L 'Enter round', fee line. Drawing: VRF progress (20:00:04 requested, 20:00:41 fulfilled), 'Watch the draw'. Next round: #1,248 settled, next pool 0.00, 'Opens in 11 h : 57 m : 50 s' to 28 Nov 2026 08:00 UTC, 'Remind me'. Countdown values are TEXT layers named 'Value' inside 'Box h|m|s'."
+ },
+ "Card/Promo": {
+  "id": "24:14012",
+  "variants": { "Type": ["VIP weekly reward", "Affiliate", "Provably fair", "Responsible gaming"] },
+  "note": "560 wide (2 per row at 1136, gap 16). 128 art tile + overline (+DEMO XS, hidden on RG) + Heading/H4 + Body/S + Button/Secondary S."
+ },
+ "Table/Live Bets": {
+  "id": "25:14776",
+  "variants": { "State": ["Loaded", "Loading"] },
+  "note": "1136. Tabs/Segmented 'Latest entries | Big wins | Round history' + DEMO M + rows select '10'. Columns Game (Art/Game 30x40) | Player (User/Avatar S or 'Hidden') | Amount | Multiplier / Round | Payout / Result (+DEMO XS per row; Global Pool rows show Badge 'Awaiting draw'). 10 rows, zebra; Loading = Gradient/Skeleton blocks in the same grid."
+ },
+ "Strip/Trust": {
+  "id": "25:16197",
+  "note": "1136. Outlined neutral pills: Chainlink VRF · On-chain settlement · 2FA & whitelisting · 'Audits — DEMO placeholder' (+DEMO XS) + Badge/18+ + Responsible gaming link. No awards."
+ },
+ "Strip/Networks": {
+  "id": "25:16229",
+  "note": "1136. Token/USDT + 'Deposit USDT on 5 networks' + min deposit note + 5 Wallet/Network Pill (Operational, no chevron/label) + Button/Primary 'Deposit'."
+ },
+ "Section/SEO Text": {
+  "id": "25:16288",
+  "note": "1136. Left: 'Verifiable global jackpot' + 3 paragraphs + Notice/Licence (Inline). Right 360: contact column (support@/security@globalpool.example placeholders with DEMO, RG link)."
+ }
+}

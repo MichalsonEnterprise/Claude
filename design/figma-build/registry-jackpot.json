@@ -1,0 +1,88 @@
+{
+ "_note": "CMP-14 Jackpot + CMP-18 Responsible-gaming components. Page '02 — Components', section 'CMP-14/18 Jackpot & responsible gaming' (22:8310) at X=45000, Y=0. Column A (x 120) = Jackpot, column B (x 2200) = RG. Use I(id, {variant}, {'Show DEMO': false}) from helpers.js. Every set/component has a 'Show DEMO' BOOLEAN (default true) bound to its own Badge/DEMO instances (RG/Help Resources has no demo data, so no DEMO). Per-variant text is unbound: override TEXT layers by name on the instance (e.g. 'Digits', 'Countdown value', 'Entry ID', 'Value', 'Timer', 'Net value', 'Limit value').",
+ "Jackpot/Counter": {
+  "id": "22:8356",
+  "variants": { "Size": ["XL", "L", "M"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "186,400.00 USDT in Display XL/L/M with paint style Gradient/Gold Jackpot (XL adds Glow/Gold), LIVE badge + DEMO, caption with entries / fee exclusion / updated time. Motion: tick-up 1200 ms ease standard, never faster than real data. Motion spec frame 'Note — Pool tick-up motion' = 22:8357."
+ },
+ "Jackpot/Participants Counter": {
+  "id": "22:8376",
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "Pill: 5 × User/Avatar M in opaque rings + '+3.4k' overflow, '3,412 participants', '+128 in the last hour' (trending-up, text/success)."
+ },
+ "Jackpot/Round Header": {
+  "id": "22:9830",
+  "variants": { "Status": ["Open", "Closing soon", "Drawing", "Settled", "Cancelled"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "880 wide. Round #1,248, Badge/Status M relabelled, absolute open/close times, countdown 03:17:42 to 27 Nov 2026 20:00:00 UTC, stats strip (participants / entries / pool / threshold), status note. Cancelled uses round #1,245 (412 participants, 41,200.00 USDT) to match the demo data sheet."
+ },
+ "Jackpot/Entry Ticket": {
+  "id": "23:8534",
+  "variants": { "State": ["Active", "Won", "Not selected", "Refunded"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "400 × 176 fixed. Boolean-subtracted perforation notches (true cutouts) + dashed tear line. E-1248-00981, Entry 10.00 + Platform fee 0.05 USDT. Won = runner-up +3,728.00 with gold stub; Refunded = E-1245-00412 (round #1,245 cancelled) → 10.00 USDT to Owed."
+ },
+ "Jackpot/Threshold Bar": {
+  "id": "23:8618",
+  "variants": { "State": ["Met", "Not met"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "520 wide. Pool vs min 50,000.00 and participants vs min 500 with 2 px minimum markers + labels. Met = 186,400.00 / 3,412 (success); Not met = 41,200.00 / 412 (warning, 'to go' deltas, refund rule)."
+ },
+ "Jackpot/VRF Stepper": {
+  "id": "23:11967",
+  "variants": { "Step": ["Requested", "Pending", "Fulfilled", "Settled", "Delayed"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "560 wide. 4 steps (requested 20:00:04 → awaiting response → fulfilled 20:00:41, 3 conf. → settled 20:02:10 UTC). Current step = status/info ring + spinner (brand is green in this file, so info is used to differ from done/success). Nests Tx/Hash (20:5893) with 0x9f2c…e71a. Delayed shows the required copy in an amber callout."
+ },
+ "Jackpot/Prize Distribution": {
+  "id": "23:16123",
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "520 wide. 1st 50% 93,200.00 · 2nd 20% 37,280.00 · 3rd 10% 18,640.00 · Runner-up ×10 2% 3,728.00 each (10 segments); bars = share × 472 px; total 186,400.00; fee + equal-chance footnote."
+ },
+ "Jackpot/Winner Reveal Card": {
+  "id": "23:16334",
+  "variants": { "State": ["You won", "Public winner", "Not selected"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "440 wide, radius 20. Calm copy, no hype. You won = runner-up 3,728.00 (View receipt / Verify draw); Public winner = 1st 93,200.00 @lumen.eth E-1248-07734 (Verify draw / All 13 winners); Not selected = 35 entries, 351.75 spent (Verify draw / Set a limit)."
+ },
+ "Jackpot/Pool Visual": {
+  "id": "23:18928",
+  "variants": { "Frame": ["1", "2", "3"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "480 × 480 original artwork (ellipses, orbit rings, ticket particles, Gold Radial / Gold Jackpot styles). Keyframes 0 / 600 / 1200 ms: value 186,390.00 → 186,395.00 → 186,400.00. Prototype wired: Frame=1 → 2 → 3 with Smart Animate 600 ms each (After delay). Variant ids: 23:18821, 23:18855, 23:18891."
+ },
+ "RG/Limit Setter": {
+  "id": "23:21988",
+  "variants": { "Type": ["Deposit", "Participation", "Time"], "State": ["Default", "Pending increase", "Saved"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "440 wide, 9 variants. Nested Tabs/Segmented (Daily active / Weekly / Monthly), limit input, usage bar, rule 'Increases take effect after 24 h; decreases apply immediately'. Pending increase shows effective time 28 Nov 2026, 16:42 UTC; Saved shows decrease applied now."
+ },
+ "RG/Session Bar": {
+  "id": "23:24937",
+  "variants": { "State": ["Normal", "Approaching limit", "Limit reached"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "1360 wide (FILL in game layouts). Session 00:42:18 · net −24.60 USDT · daily loss limit 24.60 / 200.00 + meter · Badge/18+ · Responsible gaming (Ghost S) · Take a break (Secondary S). Approaching = amber; Limit reached = danger + paused until 00:00 UTC + View limits."
+ },
+ "RG/Reality Check": {
+  "id": "23:24938",
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "448 wide modal content (surface/overlay, radius 20, Elevation/4). 'You have been playing for 60 minutes. Net result this session: −24.60 USDT.' Equal-weight actions Continue / View history / Take a break; no close icon."
+ },
+ "RG/Cooling-Off Card": {
+  "id": "24:14742",
+  "variants": { "State": ["Default", "Selected", "Active"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "440 wide. Options 24 hours / 7 days / 30 days as Control/Radio rows (none pre-selected in Default; Start break disabled). Selected = 7 days; Active = ends 4 Dec 2026, 16:42 UTC, withdrawals stay open."
+ },
+ "RG/Self-Exclusion Step": {
+  "id": "25:14013",
+  "variants": { "Step": ["Choose period", "Consequences", "Confirm", "Active"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "note": "520 wide. 3-segment progress. Choose period (6 months / 1 year / 5 years / Indefinite, none selected) → Consequences (6 items) → Confirm (summary, Control/Checkbox unchecked, Input/OTP Empty, Button/Danger disabled) → Active (until 27 Nov 2027, 16:45 UTC)."
+ },
+ "RG/Help Resources": {
+  "id": "24:14743",
+  "note": "440 wide. Badge/18+, help organisations as plain text (Gambling Therapy, Gamblers Anonymous, GamCare) with URLs, self-assessment row, 'Talk to support' (Primary) + 'Set limits' (Ghost), 18+ / permitted-jurisdictions footnote. No DEMO (real resources, no demo values)."
+ }
+}

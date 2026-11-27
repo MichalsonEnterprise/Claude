@@ -1,0 +1,11 @@
+{
+ "_note": "Agent ds — page '01 — Design System' (1:2). Documentation only: no new components were created; DS frames reuse existing library instances (Brand/Logo, Brand/Logo Mark, Icon/*, Chain/*, Token/USDT, Badge/DEMO, Badge/Status, Badge/18+, Notice/Demo Data, Notice/Licence, Button/*, User/Avatar, Wallet/Network Pill, Wallet/Address Chip). IDs below are Sections and documentation frames, for page-index links. All colour values/ratios printed in DS-02/DS-03 were read live after the 27 Nov 2026 charcoal+mint re-theme (decision #18).",
+ "DS-01 Brand & logo": { "id": "13:2", "type": "SECTION", "frames": { "Cover hero": "13:3", "Usage": "14:606" } },
+ "DS-02 Colour": { "id": "15:1216", "type": "SECTION", "frames": { "1 Primitives": "22:7753", "2 Semantic tokens": "22:8713", "3 Balance semantics": "17:3173", "4 Contrast": "22:9831" } },
+ "DS-03 Gradients & effects": { "id": "20:4226", "type": "SECTION", "frames": { "Styles": "23:7065" } },
+ "DS-04 Typography": { "id": "22:467", "type": "SECTION", "frames": { "Type system": "22:468" } },
+ "DS-05 Spacing, radius, elevation & grids": { "id": "22:5906", "type": "SECTION", "frames": { "1 Spacing, radius & elevation": "22:5907", "2 Layout grids": "22:6667" }, "gridSamples": { "Desktop 1440": "22:6743", "Laptop 1280": "22:6804", "Tablet 768": "22:6865", "Mobile 390": "22:6914" } },
+ "DS-06 Iconography": { "id": "23:10036", "type": "SECTION", "frames": { "Icons & marks": "23:10037" } },
+ "DS-07 Motion": { "id": "23:15575", "type": "SECTION", "frames": { "Tokens & storyboards": "23:15576" } },
+ "DS-09 DEMO & compliance notices": { "id": "23:21106", "type": "SECTION", "frames": { "Spec": "23:21107" } }
+}
