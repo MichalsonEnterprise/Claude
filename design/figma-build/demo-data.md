@@ -64,3 +64,39 @@ Min deposit 10.00 USDT · min withdrawal 20.00 USDT · daily withdrawal limit 25
 - Admins: **A. Marin** (Finance Lead), **K. Osei** (Compliance Officer), **R. Duarte** (Support L2), **S. Iyer** (Super Admin)
 - KPIs (30 d): Total users 184,320 · Active users 41,206 · Total deposits 12,846,500.00 · Total withdrawals 10,932,140.00 · Platform fees 60,700.00 (1,214,000 entries × 0.05) · Pool liabilities 186,400.00 + owed prizes 52,310.40 · Active rounds 1 · Pending withdrawals 37 · KYC pending 214 · System health 99.97%
 - Smart contracts (Arbitrum): GlobalPool v1.3.0 0x4b1d…77ce · VRFConsumer v1.1.2 0x9e07…2a5f · Treasury v1.0.4 0xd3c8…10b9 (all "Audited — DEMO placeholder")
+
+
+## Game catalogue (original names — genres adopted from the reference casinos; DEMO player counts)
+| Category | Game (display name) | Genre / mechanic | House edge / RTP | Icon |
+|---|---|---|---|---|
+| Jackpot | **Global Pool** | progressive pool rounds, Chainlink VRF | 0.05 USDT fee/entry | pool |
+| Originals | **Orbit Rush** | crash multiplier (our Crash game) | 1.00% | crash |
+| Originals | **Orbit Rush Duel** | two-line crash variant | 1.00% | crash-duel |
+| Originals | **Vault Sweeper** | mines grid 5×5 | 1.00% | mines |
+| Originals | **Skyline** | limbo target multiplier | 1.00% | limbo |
+| Originals | **Pinfall** | plinko 8–16 rows | 1.00% | plinko |
+| Originals | **Fortune Ring** | wheel, low/medium/high risk | 1.00% | wheel |
+| Originals | **Pool Dice** | dice roll over/under (our Dice game) | 1.00% | dice |
+| Originals | **Double Side** | coinflip (our Coinflip game) | 2.00% (1.96×) | coin |
+| Originals | **High Card** | hi-lo card | 1.00% | hilo |
+| Originals | **Ascend** | tower climb | 1.00% | tower |
+| Originals | **Pool Keno** | keno 10/40 | 1.00% | keno |
+| Table | **Pool Roulette** | European roulette (our Roulette game) | 2.70% | roulette |
+| Table | **Twenty-One** | blackjack (our Blackjack game) | ≈0.50% | cards |
+| Table | **Baccarat Lounge** | baccarat | 1.06% banker | baccarat |
+| Table | **Sic Bo Triad** | sic bo | 2.78% | sicbo |
+| Table | **Dragon & Phoenix** | two-card duel | 3.73% | duel |
+| Slots (GP Studios) | **Neon Koi**, **Atlas Vault**, **Midnight Orchard**, **Comet Cascade**, **Desert Relics**, **Frost Wolves**, **Lucky Lanterns**, **Robo Heist** | 5×3 / cascade slots, original themes | RTP 96.0–96.7% | slots |
+| Live (illustrated) | **Live Pool Roulette**, **Speed Twenty-One**, **Baccarat Lounge Live**, **Mega Ring Show** | live tables, illustrated (no real people) | as table | live |
+| Draws | **Keno Express 20/80**, **Daily Draw 6/45** | lottery-style draws with real scheduled times | disclosed per draw | lottery |
+| Bingo | **Bingo 75 Night**, **Bingo 90 Classic** | bingo rooms | disclosed | bingo |
+Player counts for tiles (DEMO): Orbit Rush 1,062 · Vault Sweeper 146 · Skyline 206 · Pinfall 100 · Fortune Ring 34 · Pool Dice 66 · Global Pool 3,412.
+
+## Promotions (DEMO terms — always show key terms + "Terms apply")
+- Welcome offer: 100% match on first deposit up to 500 USDT, 30× wagering on bonus funds, 14 days to complete, min deposit 20 USDT
+- Daily rewards: 7-day streak calendar (day 1 0.50 USDT … day 7 5.00 USDT in bonus funds), resets at 00:00 UTC (real reset time)
+- Missions: e.g. "Play 50 rounds of Orbit Rush this week → 2.00 USDT", progress bars
+- Rakeback: 5% of house edge returned, claimable anytime (claimable now 3.42 USDT)
+- Cashback: weekly 10% of net losses, paid Mondays 10:00 UTC (last: 12.80 USDT)
+- Weekly tournament: Orbit Rush Sprint — prize pool 2,500.00 USDT, ends Sun 30 Nov 2026 23:59 UTC, leaderboard top 20
+- VIP Club: 29 levels across 5 tiers, level-up rewards
