@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 06:20 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 05:52 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
@@ -54,7 +54,7 @@ Answered 28 Nov 2026 (details in `global-pool/docs/DEV_CONVENTIONS.md` → Owner
 3. ✅ Player auth = **Privy** (email OTP, social, wallets/embedded). Admins use their own auth with mandatory TOTP. Players have no passwords; step-up TOTP protects withdrawals. ⚠ This changes Figma AUTH-01/03 (email+password) to a code-based flow — the screens need a design update.
 4. ✅ Code in `global-pool/` in this repo.
 
-Asked 28 Nov 06:05 UTC (current behaviour in brackets): (a) self-exclusion/cooling-off with open entries — refund or keep in the round? [kept in the round; Figma says refunded]; (b) cancelled round — refund the 0.05 platform fee? [not refunded; Figma F3/F5 show a fee reversal]; (c) games currency — DEMO credits without cash value vs USDT in Figma [DEMO credits]. Lower priority (agent assumptions to confirm later): AML risk score model (rule-based placeholder), which restrictions need four-eyes (now: frozen withdrawals + suspension), who may send refund reminders (now: Super Admin + Marketing).
+Asked 28 Nov 05:45 UTC (current behaviour in brackets): (a) self-exclusion/cooling-off with open entries — refund or keep in the round? [kept in the round; Figma says refunded]; (b) cancelled round — refund the 0.05 platform fee? [not refunded; Figma F3/F5 show a fee reversal]; (c) games currency — DEMO credits without cash value vs USDT in Figma [DEMO credits]. Lower priority (agent assumptions to confirm later): AML risk score model (rule-based placeholder), which restrictions need four-eyes (now: frozen withdrawals + suspension), who may send refund reminders (now: Super Admin + Marketing).
 
 Still open (not blocking yet): KYC provider, AML/chain-analytics provider, e-mail provider, hosting, licensed jurisdictions/restricted-country list, Privy app credentials (dev runs on a mock until provided).
 
