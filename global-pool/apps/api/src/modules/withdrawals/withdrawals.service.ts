@@ -543,8 +543,9 @@ export class WithdrawalsService {
   }
 
   /**
-   * Broadcast step. This build has no hot-wallet signer wired (testnet signer is a later batch), so queued
-   * withdrawals stay queued; DEMO builds can simulate the on-chain confirmation (POST /dev/withdrawals/:id/simulate-confirm).
+   * Broadcast step WITHOUT a signer (WITHDRAWAL_BROADCASTER_ENABLED=false): queued withdrawals stay queued; DEMO
+   * builds can simulate the on-chain confirmation (POST /dev/withdrawals/:id/simulate-confirm). With the testnet
+   * broadcaster on, WithdrawalBroadcasterService sends and tracks the transfer instead.
    */
   async broadcast(id: string): Promise<WithdrawalStatus> {
     const w = await this.prisma.withdrawal.findUniqueOrThrow({ where: { id } });

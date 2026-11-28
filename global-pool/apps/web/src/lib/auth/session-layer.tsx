@@ -14,6 +14,7 @@ import { setPlayerTokenProvider } from '@/lib/api/client';
 import { publicEnv } from '@/lib/env';
 
 import { AuthContext, useAuthCore } from './context';
+import { onboardingExempt } from './routes';
 import { initialsFrom, type AuthContextValue } from './types';
 import {
   AuthUiContext,
@@ -28,12 +29,7 @@ export const IDLE_TIMEOUT_MINUTES = (() => {
   return Number.isFinite(raw) && raw >= 0 ? raw : 30;
 })();
 
-/** Paths a member who still has to onboard may stay on (everything else redirects to /onboarding). */
-export function onboardingExempt(pathname: string): boolean {
-  return /^\/(onboarding|restricted|legal|sign-in|sign-up|verify|design-system|admin|auth-preview|2fa|responsible-gaming|support)(\/|$)/.test(
-    pathname,
-  );
-}
+export { onboardingExempt };
 
 const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'wheel', 'touchstart'] as const;
 
@@ -235,8 +231,10 @@ export function AuthSessionLayer({ children }: { children: React.ReactNode }) {
         }),
       profile,
       syncing: member && me.isPending,
+      sessionError: member && me.isError ? me.error : null,
+      refreshProfile: () => void me.refetch(),
     };
-  }, [core, profile, ui, signOut, member, me.isPending]);
+  }, [core, profile, ui, signOut, member, me]);
 
   return (
     <AuthContext.Provider value={value}>
@@ -246,7 +244,8 @@ export function AuthSessionLayer({ children }: { children: React.ReactNode }) {
             {children}
             <AuthDialog />
             <SessionExpiredDialog />
-            {member && profile?.onboarded && <NewDeviceAlertHost />}
+            {/* Seeded DEMO accounts (shared by every QA run) never auto-open AUTH-21; see /auth-preview. */}
+            {member && profile?.onboarded && !profile.isDemo && <NewDeviceAlertHost />}
           </WalletFlowProvider>
         </StepUpProvider>
       </AuthUiContext.Provider>

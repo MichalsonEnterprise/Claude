@@ -6,7 +6,10 @@ import {
   ArrowLeft,
   CircleCheck,
   Clock,
+  Gift,
   Info,
+  Lock,
+  LogIn,
   Mail,
   MailCheck,
   Pencil,
@@ -30,6 +33,7 @@ import { cn } from '@/lib/utils';
 
 import {
   AuthModal,
+  BrandArt,
   BrandPanel,
   Callout,
   Divider,
@@ -37,11 +41,12 @@ import {
   NumStep,
   Pane,
   PaneHeader,
+  ResponsibleFooter,
   SplitLayout,
   StepBar,
 } from './auth-ui';
 import { maskEmail, useNow, formatUtcTime, formatCountdown } from './format';
-import { WalletProviderList } from './wallet-providers';
+import { WalletMark, WalletProviderList } from './wallet-providers';
 
 const RESEND_COOLDOWN_MS = 60_000;
 const MAX_CODE_ATTEMPTS = 5;
@@ -77,7 +82,14 @@ export function AuthDialog() {
   const syncUrl = ui.dialog?.syncUrl ?? false;
   React.useEffect(() => {
     if (!open || !syncUrl) return;
-    const path = view === 'code' ? '/verify' : view === 'sign-up' ? '/sign-up' : view === 'sign-in' ? '/sign-in' : null;
+    const path =
+      view === 'code'
+        ? '/verify'
+        : view === 'sign-up'
+          ? '/sign-up'
+          : view === 'sign-in'
+            ? '/sign-in'
+            : null;
     if (path && window.location.pathname !== path) {
       window.history.replaceState(window.history.state, '', `${path}${window.location.search}`);
     }
@@ -131,7 +143,11 @@ function IntentTabs({ intent }: { intent: 'sign-in' | 'sign-up' }) {
   const set = (next: 'sign-in' | 'sign-up') =>
     ui.dialog && ui.openDialog({ ...ui.dialog, view: next, intent: next });
   return (
-    <div role="tablist" aria-label="Sign in or sign up" className="inline-flex rounded-md bg-surface-default p-1">
+    <div
+      role="tablist"
+      aria-label="Sign in or sign up"
+      className="inline-flex rounded-md bg-surface-default p-1"
+    >
       {(['sign-in', 'sign-up'] as const).map((k) => (
         <button
           key={k}
@@ -141,7 +157,9 @@ function IntentTabs({ intent }: { intent: 'sign-in' | 'sign-up' }) {
           onClick={() => set(k)}
           className={cn(
             'h-9 rounded-sm px-4 text-label-m transition-colors focus-visible:shadow-focus-ring focus-visible:outline-none',
-            intent === k ? 'bg-surface-raised text-text-primary shadow-elevation-1' : 'text-text-secondary hover:text-text-primary',
+            intent === k
+              ? 'bg-brand-tint text-text-primary'
+              : 'text-text-secondary hover:text-text-primary',
           )}
         >
           {k === 'sign-in' ? 'Sign in' : 'Sign up'}
@@ -165,8 +183,15 @@ function DevMockNote({ children }: { children: React.ReactNode }) {
 function GoogleMark() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className="size-5">
-      <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 6.6 2.2 2.3 6.6 2.3 12S6.6 21.8 12 21.8c5.8 0 9.6-4.1 9.6-9.8 0-.7-.1-1.2-.2-1.8H12Z" />
-      <path fill="#34A853" d="M3.5 7.4l3.2 2.4C7.6 7.7 9.6 6.2 12 6.2c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 8.3 2.2 5.1 4.3 3.5 7.4Z" opacity=".001" />
+      <path
+        fill="#EA4335"
+        d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 6.6 2.2 2.3 6.6 2.3 12S6.6 21.8 12 21.8c5.8 0 9.6-4.1 9.6-9.8 0-.7-.1-1.2-.2-1.8H12Z"
+      />
+      <path
+        fill="#34A853"
+        d="M3.5 7.4l3.2 2.4C7.6 7.7 9.6 6.2 12 6.2c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 8.3 2.2 5.1 4.3 3.5 7.4Z"
+        opacity=".001"
+      />
     </svg>
   );
 }
@@ -179,17 +204,28 @@ function AppleMark() {
   );
 }
 
-/** Sticky CTA bar on mobile, inline block on tablet+ (Figma: sticky CTA with home indicator below 768). */
+/** Inline CTA block on tablet+; below 768 the same CTA renders in the Pane's sticky `mobileFooter` bar. */
 function Actions({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={cn('flex flex-col gap-3 max-tablet:hidden', className)}>{children}</div>;
+}
+
+/** Mobile / tablet: the brand panel collapses into a compact DEMO welcome-offer card (Figma AUTH-01 390). */
+function CompactOffer() {
   return (
-    <div
-      className={cn(
-        'flex flex-col gap-3',
-        'max-tablet:sticky max-tablet:bottom-0 max-tablet:z-10 max-tablet:-mx-4 max-tablet:-mb-6 max-tablet:border-t max-tablet:border-border-subtle max-tablet:bg-surface-overlay max-tablet:px-4 max-tablet:pt-3 max-tablet:pb-[max(16px,env(safe-area-inset-bottom))]',
-        className,
-      )}
-    >
-      {children}
+    <div className="relative flex min-h-[106px] overflow-hidden rounded-lg border border-border-subtle bg-bg-secondary lg:hidden">
+      <div className="relative z-10 flex max-w-[64%] flex-col gap-1 p-4">
+        <p className="flex items-center gap-1.5 text-overline font-semibold tracking-[0.08em] text-text-brand uppercase">
+          <Gift aria-hidden className="size-3.5" /> Welcome offer <DemoBadge size="xs" />
+        </p>
+        <p className="text-label-l text-text-primary">100% up to 500 USDT</p>
+        <p className="text-caption text-text-tertiary">
+          First deposit · 30× wagering · 14 days ·{' '}
+          <a href="/promotions" className="text-text-brand underline underline-offset-2">
+            Terms apply
+          </a>
+        </p>
+      </div>
+      <BrandArt className="pointer-events-none absolute top-[-70px] right-[-180px] h-[236px] w-[420px] scale-[0.55]" />
     </div>
   );
 }
@@ -207,6 +243,7 @@ function EmailView({
   const ui = useAuthUi();
   const [error, setError] = React.useState<string | null>(null);
   const [social, setSocial] = React.useState<OAuthProvider | null>(null);
+  const formId = React.useId();
   const form = useForm<EmailForm>({
     resolver: zodResolver(emailForm),
     defaultValues: { email: ui.dialog?.email ?? '' },
@@ -218,7 +255,9 @@ function EmailView({
       const { expiresAt } = await core.flow.sendEmailCode(email);
       onSent(email, expiresAt);
     } catch (err) {
-      setError(err instanceof AuthFlowError ? err.message : 'We couldn’t send the code. Try again.');
+      setError(
+        err instanceof AuthFlowError ? err.message : 'We couldn’t send the code. Try again.',
+      );
     }
   });
 
@@ -236,15 +275,32 @@ function EmailView({
   };
 
   const signUp = intent === 'sign-up';
+  const submitButton = (
+    <Button
+      type="submit"
+      form={formId}
+      size="l"
+      block
+      loading={form.formState.isSubmitting}
+      leadingIcon={signUp ? undefined : <LogIn />}
+    >
+      {signUp ? 'Create account' : 'Sign in'}
+    </Button>
+  );
   return (
-    <Pane top={<IntentTabs intent={intent} />} onClose={() => ui.closeDialog('dismiss')}>
+    <Pane
+      top={<IntentTabs intent={intent} />}
+      onClose={() => ui.closeDialog('dismiss')}
+      mobileFooter={submitButton}
+    >
+      {signUp && <CompactOffer />}
       <PaneHeader title={signUp ? 'Create your account' : 'Welcome back'}>
         {signUp
           ? 'Takes about a minute. Next, you’ll verify your email.'
-          : 'Sign in with a one-time code — no password to remember.'}
+          : 'Sign in to play, join rounds and manage your wallet.'}
       </PaneHeader>
 
-      <form onSubmit={submit} noValidate className="flex flex-col gap-5">
+      <form id={formId} onSubmit={submit} noValidate className="flex flex-col gap-5">
         <Field label="Email address" error={form.formState.errors.email?.message}>
           <Input
             size="l"
@@ -257,22 +313,19 @@ function EmailView({
           />
         </Field>
         <Note icon={ShieldCheck} tone="brand">
-          We email you a 6-digit code — players never have a password. 18+ only; you’ll confirm your age, country
-          and the Terms in the next step (nothing is pre-ticked).
+          {signUp
+            ? 'Next: we email you a 6-digit code — players never have a password. 18+ only; you’ll confirm your age, country and the Terms after that (nothing is pre-ticked).'
+            : 'Next: enter the 6-digit code we email you — no password needed.'}
         </Note>
         {error && (
           <Callout tone="danger" title="That didn’t work">
             {error}
           </Callout>
         )}
-        <Actions>
-          <Button type="submit" size="l" block loading={form.formState.isSubmitting}>
-            {signUp ? 'Create account' : 'Send me a code'}
-          </Button>
-        </Actions>
+        <Actions>{submitButton}</Actions>
       </form>
 
-      <Divider label="or" />
+      <Divider label={signUp ? 'or' : 'or continue with'} />
 
       <div className="grid gap-3 tablet:grid-cols-2">
         <Button
@@ -296,15 +349,19 @@ function EmailView({
           Continue with Apple
         </Button>
       </div>
-      <Button
-        variant="secondary"
-        size="l"
-        block
-        leadingIcon={<Wallet />}
-        onClick={() => ui.setView('wallet')}
-      >
-        {signUp ? 'Sign up with a wallet instead' : 'Connect wallet instead'}
-      </Button>
+      {signUp ? (
+        <Button
+          variant="secondary"
+          size="l"
+          block
+          leadingIcon={<Wallet />}
+          onClick={() => ui.setView('wallet')}
+        >
+          Sign up with a wallet instead
+        </Button>
+      ) : (
+        <QuickWallets />
+      )}
 
       <p className="text-center text-body-s text-text-secondary">
         {signUp ? 'Already have an account?' : 'New to GLOBAL POOL?'}{' '}
@@ -313,17 +370,61 @@ function EmailView({
           className="text-label-m text-text-brand hover:underline focus-visible:underline focus-visible:outline-none"
           onClick={() =>
             ui.dialog &&
-            ui.openDialog({ ...ui.dialog, view: signUp ? 'sign-in' : 'sign-up', intent: signUp ? 'sign-in' : 'sign-up' })
+            ui.openDialog({
+              ...ui.dialog,
+              view: signUp ? 'sign-in' : 'sign-up',
+              intent: signUp ? 'sign-in' : 'sign-up',
+            })
           }
         >
           {signUp ? 'Sign in' : 'Create an account'}
         </button>
       </p>
+      {!signUp && (
+        <Note icon={Lock}>
+          Check the address bar shows this site’s address. We never ask for your seed phrase or 2FA
+          codes by email or chat.
+        </Note>
+      )}
+      <ResponsibleFooter className="border-t border-border-subtle pt-4 lg:hidden" />
       <DevMockNote>
-        Privy isn’t configured, so this offline mock signs you in. <b>nova.k@example.com</b>, Google, Apple and
-        wallets open the DEMO player @nova.k; any other email creates a new player who must onboard.
+        Privy isn’t configured, so this offline mock signs you in. <b>nova.k@example.com</b>,
+        Google, Apple and wallets open the DEMO player @nova.k; any other email creates a new player
+        who must onboard.
       </DevMockNote>
     </Pane>
+  );
+}
+
+/** AUTH-03 "or connect a wallet instead": quick-connect tiles (neutral letter marks, no third-party logos). */
+function QuickWallets() {
+  const ui = useAuthUi();
+  const ids: WalletProviderId[] = ['browser', 'walletconnect', 'coinbase', 'phantom'];
+  const label: Record<string, string> = {
+    browser: 'Browser',
+    walletconnect: 'WalletConnect',
+    coinbase: 'Coinbase',
+    phantom: 'Phantom',
+  };
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-center text-caption text-text-tertiary">or connect a wallet instead</p>
+      <div className="grid grid-cols-4 gap-2">
+        {ids.map((id) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() =>
+              ui.dialog && ui.openDialog({ ...ui.dialog, view: 'wallet', walletChoice: id })
+            }
+            className="flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-md border border-border-subtle bg-surface-default px-1 text-caption text-text-secondary transition-colors hover:border-border-default hover:bg-surface-hover focus-visible:shadow-focus-ring focus-visible:outline-none"
+          >
+            <WalletMark id={id} className="size-8" />
+            <span className="truncate">{label[id]}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -345,6 +446,7 @@ function CodeView({
   const [busy, setBusy] = React.useState(false);
   const [resending, setResending] = React.useState(false);
   const [error, setError] = React.useState<AuthFlowError | null>(null);
+  const formId = React.useId();
   const masked = maskEmail(state.email);
   const expired = now >= state.expiresAt || error?.kind === 'expired_code';
   const exhausted = state.failures >= MAX_CODE_ATTEMPTS || error?.kind === 'too_many_attempts';
@@ -359,7 +461,10 @@ function CodeView({
       await core.flow.loginWithEmailCode(code);
       ui.setView('success');
     } catch (err) {
-      const e = err instanceof AuthFlowError ? err : new AuthFlowError('unknown', 'Something went wrong. Try again.');
+      const e =
+        err instanceof AuthFlowError
+          ? err
+          : new AuthFlowError('unknown', 'Something went wrong. Try again.');
       setError(e);
       if (e.kind === 'invalid_code') setState((s) => (s ? { ...s, failures: s.failures + 1 } : s));
       setValue('');
@@ -373,18 +478,52 @@ function CodeView({
     setError(null);
     try {
       const { expiresAt } = await core.flow.sendEmailCode(state.email);
-      setState({ email: state.email, sentAt: Date.now(), expiresAt: Date.parse(expiresAt), failures: 0 });
+      setState({
+        email: state.email,
+        sentAt: Date.now(),
+        expiresAt: Date.parse(expiresAt),
+        failures: 0,
+      });
       setValue('');
     } catch (err) {
-      setError(err instanceof AuthFlowError ? err : new AuthFlowError('unknown', 'We couldn’t send a new code.'));
+      setError(
+        err instanceof AuthFlowError
+          ? err
+          : new AuthFlowError('unknown', 'We couldn’t send a new code.'),
+      );
     } finally {
       setResending(false);
     }
   };
 
   const attemptsLeft = MAX_CODE_ATTEMPTS - state.failures;
+  const codeCta =
+    expired || exhausted ? (
+      <Button
+        type="button"
+        size="l"
+        block
+        leadingIcon={<RefreshCw />}
+        loading={resending}
+        onClick={() => void resend()}
+      >
+        Send a new code
+      </Button>
+    ) : (
+      <Button
+        type="submit"
+        form={formId}
+        size="l"
+        block
+        disabled={value.length !== 6}
+        loading={busy}
+      >
+        {intent === 'sign-up' ? 'Verify email' : 'Verify and sign in'}
+      </Button>
+    );
   return (
     <Pane
+      mobileFooter={codeCta}
       top={
         intent === 'sign-up' ? (
           <StepBar total={3} current={1} label="Step 2 of 3 · Verify email" />
@@ -400,22 +539,34 @@ function CodeView({
       }
       onClose={() => ui.closeDialog('dismiss')}
     >
-      <PaneHeader icon={expired || exhausted ? Clock : Mail} tone={expired || exhausted ? 'warning' : 'brand'} title={expired ? 'This code has expired' : exhausted ? 'Too many incorrect codes' : 'Check your email'}>
+      <PaneHeader
+        icon={expired || exhausted ? Clock : Mail}
+        tone={expired || exhausted ? 'warning' : 'brand'}
+        title={
+          expired
+            ? 'This code has expired'
+            : exhausted
+              ? 'Too many incorrect codes'
+              : 'Check your email'
+        }
+      >
         {expired ? (
           <>
-            Codes work for 10 minutes. The one we sent to {masked} expired at {formatUtcTime(state.expiresAt)}.
-            Send a new one — it only takes a moment.
+            Codes work for 10 minutes. The one we sent to {masked} expired at{' '}
+            {formatUtcTime(state.expiresAt)}. Send a new one — it only takes a moment.
           </>
         ) : exhausted ? (
           <>For your safety this code no longer works. Send a new code to {masked} and try again.</>
         ) : (
           <>
-            We sent a 6-digit code to {masked}. Enter it below to {intent === 'sign-up' ? 'verify your address' : 'sign in'}.
+            We sent a 6-digit code to {masked}. Enter it below to{' '}
+            {intent === 'sign-up' ? 'verify your address' : 'sign in'}.
           </>
         )}
       </PaneHeader>
 
       <form
+        id={formId}
         className="flex flex-col gap-5"
         onSubmit={(e) => {
           e.preventDefault();
@@ -429,9 +580,7 @@ function CodeView({
               ? `${error.message} ${attemptsLeft} ${attemptsLeft === 1 ? 'attempt' : 'attempts'} left.`
               : undefined
           }
-          helper={
-            !error ? `Enter the 6 digits from the email we sent to ${masked}.` : undefined
-          }
+          helper={!error ? `Enter the 6 digits from the email we sent to ${masked}.` : undefined}
           disabled={expired || exhausted}
         >
           <OtpInput
@@ -477,17 +626,7 @@ function CodeView({
           </Callout>
         )}
 
-        <Actions>
-          {expired || exhausted ? (
-            <Button type="button" size="l" block leadingIcon={<RefreshCw />} loading={resending} onClick={() => void resend()} disabled={cooldownLeft > 0 && !expired && !exhausted}>
-              Send a new code
-            </Button>
-          ) : (
-            <Button type="submit" size="l" block disabled={value.length !== 6} loading={busy}>
-              {intent === 'sign-up' ? 'Verify email' : 'Verify and sign in'}
-            </Button>
-          )}
-        </Actions>
+        <Actions>{codeCta}</Actions>
         {!expired && !exhausted && remaining > 0 && (
           <Note icon={Info}>
             {remaining === 6
@@ -506,7 +645,9 @@ function CodeView({
       >
         Change email address
       </Button>
-      <DevMockNote>No email is sent in DEV MOCK: any 6 digits work (000000 simulates a wrong code).</DevMockNote>
+      <DevMockNote>
+        No email is sent in DEV MOCK: any 6 digits work (000000 simulates a wrong code).
+      </DevMockNote>
     </Pane>
   );
 }
@@ -518,6 +659,8 @@ function WalletView({ intent }: { intent: 'sign-in' | 'sign-up' }) {
   const ui = useAuthUi();
   const [pending, setPending] = React.useState<WalletProviderId | null>(null);
   const [error, setError] = React.useState<AuthFlowError | null>(null);
+  const auto = ui.dialog?.walletChoice;
+  const started = React.useRef(false);
 
   const choose = async (provider: WalletProviderId) => {
     setError(null);
@@ -527,11 +670,21 @@ function WalletView({ intent }: { intent: 'sign-in' | 'sign-up' }) {
       await core.flow.loginWithWallet(provider);
       if (core.mode === 'mock' || provider === 'browser') ui.setView('success');
     } catch (err) {
-      setError(err instanceof AuthFlowError ? err : new AuthFlowError('unknown', 'Something went wrong.'));
+      setError(
+        err instanceof AuthFlowError ? err : new AuthFlowError('unknown', 'Something went wrong.'),
+      );
     } finally {
       setPending(null);
     }
   };
+
+  React.useEffect(() => {
+    if (auto && !started.current) {
+      started.current = true;
+      void choose(auto);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto]);
 
   return (
     <Pane
@@ -541,26 +694,35 @@ function WalletView({ intent }: { intent: 'sign-in' | 'sign-up' }) {
           onClick={() => ui.setView(intent)}
           className="inline-flex min-h-11 items-center gap-2 text-label-m text-text-secondary hover:text-text-primary"
         >
-          <ArrowLeft aria-hidden className="size-4" /> {intent === 'sign-up' ? 'Sign up with email instead' : 'Use email instead'}
+          <ArrowLeft aria-hidden className="size-4" />{' '}
+          {intent === 'sign-up' ? 'Sign up with email instead' : 'Use email instead'}
         </button>
       }
       onClose={() => ui.closeDialog('dismiss')}
     >
       <PaneHeader title={intent === 'sign-up' ? 'Sign up with a wallet' : 'Sign in with a wallet'}>
-        Choose your wallet. You’ll sign a short message to prove it’s yours — signing is not a transaction and
-        costs no gas.
+        Choose your wallet. You’ll sign a short message to prove it’s yours — signing is not a
+        transaction and costs no gas.
       </PaneHeader>
       {pending ? (
-        <div role="status" className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface-raised px-4 py-3.5">
+        <div
+          role="status"
+          className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface-raised px-4 py-3.5"
+        >
           <RefreshCw aria-hidden className="size-5 animate-spin text-icon-brand" />
           <div className="flex flex-col gap-0.5">
             <p className="text-body-s-strong text-text-primary">Waiting for your wallet…</p>
-            <p className="text-caption text-text-tertiary">Approve the connection, then sign the message. No funds move.</p>
+            <p className="text-caption text-text-tertiary">
+              Approve the connection, then sign the message. No funds move.
+            </p>
           </div>
         </div>
       ) : null}
       {error && (
-        <Callout tone={error.kind === 'rejected' ? 'info' : 'danger'} title={error.kind === 'rejected' ? 'You declined the request' : 'Couldn’t connect'}>
+        <Callout
+          tone={error.kind === 'rejected' ? 'info' : 'danger'}
+          title={error.kind === 'rejected' ? 'You declined the request' : 'Couldn’t connect'}
+        >
           {error.message} {error.kind === 'rejected' && 'Nothing was signed or sent.'}
         </Callout>
       )}
@@ -569,10 +731,13 @@ function WalletView({ intent }: { intent: 'sign-in' | 'sign-up' }) {
         Connecting a wallet never moves funds. Entries are always paid from your platform balance.
       </Callout>
       <p className="text-caption text-text-tertiary">
-        By connecting you confirm you are 18+ and located in a permitted jurisdiction. Terms and Privacy Policy
-        apply.
+        By connecting you confirm you are 18+ and located in a permitted jurisdiction. Terms and
+        Privacy Policy apply.
       </p>
-      <DevMockNote>Any wallet signs you in as the DEMO player @nova.k (simulated connection, no extension needed).</DevMockNote>
+      <DevMockNote>
+        Any wallet signs you in as the DEMO player @nova.k (simulated connection, no extension
+        needed).
+      </DevMockNote>
     </Pane>
   );
 }
@@ -600,18 +765,43 @@ function SuccessView({ email, intent }: { email: string | null; intent: 'sign-in
   };
 
   const who = profile?.displayHandle ?? profile?.emailMasked ?? (email ? maskEmail(email) : null);
+  const successCta = (
+    <Button
+      size="l"
+      block
+      onClick={proceed}
+      disabled={!ready}
+      loading={!ready && !auth.sessionError}
+      leadingIcon={ready ? <CircleCheck /> : undefined}
+    >
+      {needsOnboarding ? 'Continue to account setup' : 'Continue'}
+    </Button>
+  );
   return (
     <Pane
-      top={intent === 'sign-up' || needsOnboarding ? <StepBar total={3} current={2} label="Step 3 of 3 · Set up your account" /> : undefined}
+      mobileFooter={successCta}
+      top={
+        intent === 'sign-up' || needsOnboarding ? (
+          <StepBar total={3} current={2} label="Step 3 of 3 · Set up your account" />
+        ) : undefined
+      }
       onClose={proceed}
       closeLabel="Close and continue"
     >
-      <PaneHeader icon={MailCheck} tone="success" title={needsOnboarding ? 'Email verified' : who ? `Welcome back, ${who}` : 'You’re signed in'}>
-        {!ready
-          ? 'Setting up your session…'
-          : needsOnboarding
-            ? `You’re signed in${who ? ` as ${who}` : ''}. One more minute to finish your account.`
-            : 'Your balance, entries and history are exactly as you left them.'}
+      <PaneHeader
+        icon={MailCheck}
+        tone="success"
+        title={
+          needsOnboarding ? 'Email verified' : who ? `Welcome back, ${who}` : 'You’re signed in'
+        }
+      >
+        {!ready && auth.sessionError
+          ? 'Your sign-in worked, but we couldn’t load your account yet.'
+          : !ready
+            ? 'Setting up your session…'
+            : needsOnboarding
+              ? `You’re signed in${who ? ` as ${who}` : ''}. One more minute to finish your account.`
+              : 'Your balance, entries and history are exactly as you left them.'}
       </PaneHeader>
       {needsOnboarding && (
         <ol className="flex flex-col gap-4">
@@ -629,11 +819,19 @@ function SuccessView({ email, intent }: { email: string | null; intent: 'sign-in
           </NumStep>
         </ol>
       )}
-      <Actions>
-        <Button size="l" block onClick={proceed} disabled={!ready} loading={!ready} leadingIcon={ready ? <CircleCheck /> : undefined}>
-          {needsOnboarding ? 'Continue to account setup' : 'Continue'}
-        </Button>
-      </Actions>
+      {auth.sessionError && (
+        <Callout tone="danger" title="We couldn’t finish signing you in">
+          {auth.sessionError.message}{' '}
+          <button
+            type="button"
+            className="text-label-s text-text-brand hover:underline"
+            onClick={() => auth.refreshProfile?.()}
+          >
+            Try again
+          </button>
+        </Callout>
+      )}
+      <Actions>{successCta}</Actions>
     </Pane>
   );
 }

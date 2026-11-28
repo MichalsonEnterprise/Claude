@@ -35,7 +35,19 @@ const MODULE_OF: Record<string, string> = {
   withdrawal: 'Finance',
   user: 'Users',
   admin_role: 'System',
+  feature_flag: 'Global Pool',
 };
+
+/**
+ * Requests owned by other modules (e.g. admin-b's NEW-entries circuit breaker, `pool.entries.pause|resume`) are
+ * listed in the inbox but decided only at their own endpoint (`payload.decideAt`); this service never executes or
+ * expires them.
+ */
+const EXTERNAL_ACTION_LABEL: Record<string, string> = {
+  'pool.entries.pause': 'Pause new pool entries (circuit breaker)',
+  'pool.entries.resume': 'Resume new pool entries (circuit breaker)',
+};
+const isOwnAction = (action: string) => action in FOUR_EYES_ACTION_PERMISSION;
 
 /** Human reference for an approval request (AR-XXXXXX, derived from the UUID — display only). */
 export const approvalRef = (id: string) => `AR-${id.replace(/-/g, '').slice(0, 6).toUpperCase()}`;
@@ -204,10 +216,14 @@ export class FourEyesService {
         take: 100,
       }),
     ]);
+    const pendingViews = pending.map((a) => this.view(a, admin));
     const views = {
-      open: pending.map((a) => this.view(a, admin)),
+      open: pendingViews.filter((a) => a.status === 'pending'),
       decided_today: decidedToday.map((a) => this.view(a, admin)),
-      expired: expired.map((a) => this.view(a, admin)),
+      expired: [
+        ...pendingViews.filter((a) => a.status === 'expired'),
+        ...expired.map((a) => this.view(a, admin)),
+      ],
     };
     const waiting = views.open.filter((a) => a.yourRole === 'can_decide');
     const mine = views.open.filter((a) => a.yourRole === 'requester');
@@ -434,6 +450,7 @@ export class FourEyesService {
   async expireStale(tx: Tx, now = new Date()) {
     const pending = await tx.adminApproval.findMany({ where: { status: 'pending' } });
     for (const a of pending) {
+      if (!isOwnAction(a.action)) continue; // other modules expire their own requests
       const exp = expiresAtOf(a);
       if (!exp || exp > now) continue;
       const res = await tx.adminApproval.updateMany({
@@ -500,7 +517,16 @@ export class FourEyesService {
       );
     }
     const permission = this.permissionFor(a.action);
-    if (!permission) throw new AppError('BAD_REQUEST', `Unknown request action ${a.action}`);
+    if (!permission) {
+      const decideAt = payloadOf(a).decideAt;
+      throw new AppError(
+        'BAD_REQUEST',
+        typeof decideAt === 'string'
+          ? `This request is decided in its own module (${decideAt})`
+          : `Unknown request action ${a.action}`,
+        typeof decideAt === 'string' ? { decideAt } : undefined,
+      );
+    }
     if (!admin.permissions.includes(permission)) {
       throw new AppError('FORBIDDEN', 'Your role does not allow this action', {
         missingPermissions: [permission],
@@ -668,18 +694,23 @@ export class FourEyesService {
     const expiresAt = expiresAtOf(a);
     const isRequester = a.requestedByAdminId === admin.id;
     const canDecide = !isRequester && permission !== null && admin.permissions.includes(permission);
+    const decideAt = !isOwnAction(a.action) && typeof p.decideAt === 'string' ? p.decideAt : null;
+    // A foreign request past its expiry is shown as expired (its module records the real transition).
+    const lapsed = a.status === 'pending' && expiresAt !== null && expiresAt <= new Date();
     return {
       id: a.id,
       ref: approvalRef(a.id),
       action: a.action,
       actionLabel:
         (FOUR_EYES_ACTION_LABEL as Record<string, string>)[a.action] ??
+        EXTERNAL_ACTION_LABEL[a.action] ??
         a.action.replace(/[._]/g, ' '),
+      decideAt,
       module: MODULE_OF[a.targetType] ?? 'System',
       targetType: a.targetType,
       targetId: a.targetId,
       summary: this.summary(a, p),
-      status: a.status,
+      status: lapsed ? ('expired' as const) : a.status,
       requiredPermission: permission,
       requestedBy: {
         id: a.requestedBy.id,
@@ -698,13 +729,15 @@ export class FourEyesService {
       expiresAt: expiresAt?.toISOString() ?? null,
       decidedAt: a.decidedAt?.toISOString() ?? null,
       yourRole:
-        a.status !== 'pending'
+        a.status !== 'pending' || lapsed
           ? ('decided' as const)
-          : isRequester
-            ? ('requester' as const)
-            : canDecide
-              ? ('can_decide' as const)
-              : ('not_eligible' as const),
+          : decideAt
+            ? ('external' as const)
+            : isRequester
+              ? ('requester' as const)
+              : canDecide
+                ? ('can_decide' as const)
+                : ('not_eligible' as const),
     };
   }
 
@@ -728,8 +761,10 @@ export class FourEyesService {
         const r = Array.isArray(p.revoke) ? p.revoke.length : 0;
         return `Role ${String(p.roleLabel ?? p.roleKey)} · +${g} / −${r} permissions`;
       }
-      default:
-        return a.action;
+      default: {
+        const label = EXTERNAL_ACTION_LABEL[a.action];
+        return label ? `${label} · ${a.targetId}` : a.action;
+      }
     }
   }
 }

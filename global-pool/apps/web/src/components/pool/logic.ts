@@ -6,7 +6,12 @@
  * explain in advance what the server will enforce (balance, round window, responsible-gaming limits).
  */
 import { deriveWinners, splitPool } from '@gp/contracts/verify';
-import { ENTRY_TOTAL_PER_ENTRY, MAX_ENTRIES_PER_PURCHASE, entryQuote, type EntryQuote } from '@gp/shared/fees';
+import {
+  ENTRY_TOTAL_PER_ENTRY,
+  MAX_ENTRIES_PER_PURCHASE,
+  entryQuote,
+  type EntryQuote,
+} from '@gp/shared/fees';
 import { formatTimeUTC } from '@gp/shared/format';
 import {
   fromBaseUnits,
@@ -108,18 +113,27 @@ export function checkParticipation(input: {
 }
 
 /** Odds after buying `adding` more entries (the pool grows by the same entries). */
-export function oddsAfter(round: Pick<PoolRoundView, 'entries'>, mine: number, adding: number): OddsDisclosure {
-  const total = round.entries + adding;
-  const my = mine + adding;
-  return oddsDisclosure(my, total, Math.min(PRIZES_PER_ROUND, total));
+export function oddsAfter(
+  round: Pick<PoolRoundView, 'entries'>,
+  mine: number,
+  adding: number,
+): OddsDisclosure {
+  return oddsFor(mine + adding, round.entries + adding);
 }
 
-/** "≈2.44%" — percent strings from oddsDisclosure, trimmed to `dp` decimals (never rounded up to look better). */
-export function approxPercent(percent: string, dp = 2): string {
+/**
+ * "≈2.41%" — odds percent strings (from oddsDisclosure) with precision that fits the size: 2 dp from 1%, 3 dp from
+ * 0.1%, else 4 dp. Always rounded DOWN, so a disclosed chance is never overstated.
+ */
+export function approxPercent(percent: string): string {
   const d = money(percent);
-  const shown = d.lt('0.01') && dp < 3 ? d.toDecimalPlaces(3, 1) : d.toDecimalPlaces(dp, 1);
-  return `≈${shown.toFixed()}%`;
+  const places = d.gte(1) ? 2 : d.gte('0.1') ? 3 : 4;
+  return `≈${d.toDecimalPlaces(places, 1).toFixed(places)}%`;
 }
+
+/** Odds disclosure with enough decimals for display (approxPercent picks the shown precision). */
+export const oddsFor = (mine: number, total: number) =>
+  oddsDisclosure(mine, total, Math.min(PRIZES_PER_ROUND, total), 6);
 
 // ── round phase ───────────────────────────────────────────────────────────────────────────────
 
@@ -172,9 +186,9 @@ export const acceptsEntries = (phase: RoundPhase) => phase === 'open';
 
 /** "12 s ago" / "4 min ago" — falls back to the absolute UTC time for future or older (> 1 h) timestamps. */
 export function relativeTime(iso: string, nowMs: number | null): string {
-  if (nowMs === null) return formatTimeUTC(iso) + ' UTC';
+  if (nowMs === null) return formatTimeUTC(iso);
   const s = Math.round((nowMs - Date.parse(iso)) / 1000);
-  if (s < 0 || s >= 3600) return `${formatTimeUTC(iso)} UTC`;
+  if (s < 0 || s >= 3600) return `${formatTimeUTC(iso)}`;
   if (s < 60) return `${s} s ago`;
   return `${Math.floor(s / 60)} min ago`;
 }
@@ -188,6 +202,13 @@ export interface Hms {
 
 export function hmsUntil(targetIso: string, nowMs: number): Hms {
   const totalMs = Math.max(0, Date.parse(targetIso) - nowMs);
+  const t = Math.floor(totalMs / 1000);
+  return { totalMs, h: Math.floor(t / 3600), m: Math.floor((t % 3600) / 60), s: t % 60 };
+}
+
+/** Elapsed / remaining milliseconds as h:m:s parts. */
+export function hmsOf(ms: number): Hms {
+  const totalMs = Math.max(0, ms);
   const t = Math.floor(totalMs / 1000);
   return { totalMs, h: Math.floor(t / 3600), m: Math.floor((t % 3600) / 60), s: t % 60 };
 }
@@ -234,7 +255,8 @@ export interface VerifyReport {
 const HEX_WORD = /^0x[0-9a-fA-F]{1,64}$/;
 
 /** Mock VRF word as the API's MockVrfProvider derives it (DEV only — always labelled mock). */
-export const mockVrfWord = (requestId: string) => keccak256(stringToHex(`GP_MOCK_VRF:${requestId}`));
+export const mockVrfWord = (requestId: string) =>
+  keccak256(stringToHex(`GP_MOCK_VRF:${requestId}`));
 
 /**
  * Re-derive a settled round's winners from its random word with @gp/contracts/verify (the same code the
@@ -243,7 +265,7 @@ export const mockVrfWord = (requestId: string) => keccak256(stringToHex(`GP_MOCK
  */
 export function verifyDraw(
   bundle: PoolVerification,
-  round: Pick<PoolRoundView, 'closesAt'> | null,
+  round: (Pick<PoolRoundView, 'closesAt'> & { closedAt?: string | null }) | null,
   randomWordOverride?: string,
 ): VerifyReport {
   const r = bundle.randomness;
@@ -257,7 +279,9 @@ export function verifyDraw(
     randomWordUsed: null,
   });
   if (bundle.round.status === 'cancelled')
-    return unavailable('This round was cancelled before a draw, so there is no randomness to check.');
+    return unavailable(
+      'This round was cancelled before a draw, so there is no randomness to check.',
+    );
   if (!r?.randomWord)
     return unavailable(
       bundle.round.status === 'settled'
@@ -270,11 +294,13 @@ export function verifyDraw(
   const checks: VerifyCheck[] = [];
 
   // 1 — the request belongs to this round and was made after entries closed
-  const after = round ? Date.parse(r.requestedAt) >= Date.parse(round.closesAt) : true;
+  // entries freeze when the round is closed (the lifecycle closes it at — or just after — closesAt)
+  const closedAt = round ? (round.closedAt ?? round.closesAt) : null;
+  const after = closedAt ? Date.parse(r.requestedAt) >= Date.parse(closedAt) : true;
   checks.push({
     id: 'request',
     title: `Request belongs to round #${bundle.round.number}`,
-    detail: `Request ${shortHash(r.requestId)} sent ${formatTimeUTC(r.requestedAt, { seconds: true })} UTC${round ? (after ? ', after entries closed.' : ', BEFORE entries closed.') : '.'}`,
+    detail: `Request ${shortHash(r.requestId)} sent ${formatTimeUTC(r.requestedAt, { seconds: true })}${round ? (after ? ', after entries closed.' : ', BEFORE entries closed.') : '.'}`,
     status: after ? 'passed' : 'failed',
   });
 
@@ -295,9 +321,11 @@ export function verifyDraw(
     const ok = wellFormed && BigInt(word) === BigInt(r.randomWord);
     checks.push({
       id: 'randomness',
-      title: ok ? 'Randomness came from Chainlink VRF' : 'Random word does not match the VRF fulfilment',
+      title: ok
+        ? 'Randomness came from Chainlink VRF'
+        : 'Random word does not match the VRF fulfilment',
       detail: ok
-        ? `Fulfilled ${r.fulfilledAt ? formatTimeUTC(r.fulfilledAt, { seconds: true }) + ' UTC' : ''}${r.fulfillTxHash ? ` in tx ${shortHash(r.fulfillTxHash)}` : ''}. The VRF proof itself is checked on-chain by the coordinator.`
+        ? `Fulfilled ${r.fulfilledAt ? formatTimeUTC(r.fulfilledAt, { seconds: true }) : ''}${r.fulfillTxHash ? ` in tx ${shortHash(r.fulfillTxHash)}` : ''}. The VRF proof itself is checked on-chain by the coordinator.`
         : `You entered …${word.slice(-8)}; the fulfilment emitted …${r.randomWord.slice(-8)}.`,
       status: ok ? 'passed' : 'failed',
     });
@@ -317,7 +345,12 @@ export function verifyDraw(
   const stored = [...bundle.winners].sort((a, b) => a.place - b.place);
   let indices: bigint[] = [];
   if (wellFormed) {
-    indices = deriveWinners(BigInt(bundle.algorithm.roundIdUsed), BigInt(word), BigInt(n), BigInt(count));
+    indices = deriveWinners(
+      BigInt(bundle.algorithm.roundIdUsed),
+      BigInt(word),
+      BigInt(n),
+      BigInt(count),
+    );
   }
   const drawn = bps.slice(0, count);
   const missing = bps.slice(count).reduce((a, b) => a + b, 0);
@@ -327,8 +360,7 @@ export function verifyDraw(
     const s = stored[i];
     const seq = Number(idx) + 1;
     const amount = toUSDTString(fromBaseUnits(amounts[i] ?? 0n));
-    const matches =
-      Boolean(s) && s!.entrySeq === seq && money(s!.amount).eq(money(amount));
+    const matches = Boolean(s) && s!.entrySeq === seq && money(s!.amount).eq(money(amount));
     return {
       place: i + 1,
       entrySeq: seq,

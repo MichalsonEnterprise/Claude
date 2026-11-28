@@ -38,7 +38,9 @@ export class RoundChainController {
   }
 
   @Get('payouts')
-  @ApiOperation({ summary: 'Payout leaves + Merkle proofs (check each with verifyPayout on-chain)' })
+  @ApiOperation({
+    summary: 'Payout leaves + Merkle proofs (check each with verifyPayout on-chain)',
+  })
   payouts(@Param('number', ParseIntPipe) number: number) {
     return this.mirror.payouts(number);
   }

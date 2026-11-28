@@ -14,7 +14,6 @@ import type {
 import type {
   AdminRole,
   ApprovalStatus,
-  FourEyesAction,
   KycLevel,
   Permission,
   PermissionPolicy,
@@ -200,7 +199,8 @@ export const getAdminRounds = (pageSize = 10) =>
 export interface ApprovalItem {
   id: string;
   ref: string;
-  action: FourEyesAction | string;
+  /** FourEyesAction ('withdrawal.approve' | 'user.restriction.apply' | 'admin.role.permissions.change'). */
+  action: string;
   actionLabel: string;
   module: string;
   targetType: string;
@@ -217,7 +217,9 @@ export interface ApprovalItem {
   createdAt: string;
   expiresAt: string | null;
   decidedAt: string | null;
-  yourRole: 'can_decide' | 'requester' | 'not_eligible' | 'decided';
+  /** 'external' = owned by another module, decided at `decideAt` (e.g. the pool circuit breaker). */
+  yourRole: 'can_decide' | 'requester' | 'not_eligible' | 'decided' | 'external';
+  decideAt: string | null;
 }
 
 export interface ApprovalDetail extends ApprovalItem {
@@ -536,8 +538,10 @@ export const getUserKyc = (id: string) =>
   apiRequest<UserKyc>(`/admin/users/${id}/kyc`, { auth: 'admin' });
 export const getUserAml = (id: string) =>
   apiRequest<UserAml>(`/admin/users/${id}/aml`, { auth: 'admin' });
-export const getUserTransactions = (id: string, query: { page?: number; pageSize?: number; type?: TxType }) =>
-  apiRequest<UserTransactions>(`/admin/users/${id}/transactions`, { auth: 'admin', query });
+export const getUserTransactions = (
+  id: string,
+  query: { page?: number; pageSize?: number; type?: TxType },
+) => apiRequest<UserTransactions>(`/admin/users/${id}/transactions`, { auth: 'admin', query });
 export const getUserRg = (id: string) =>
   apiRequest<UserRg>(`/admin/users/${id}/responsible-gaming`, { auth: 'admin' });
 

@@ -8,12 +8,7 @@ import { PrismaService } from '../../infra/prisma/prisma.service';
 
 /** What happened to a purchase's entries (per round — a player may buy several times in one round). */
 export type EntryResultKind =
-  | 'in_draw'
-  | 'drawing'
-  | 'won'
-  | 'not_selected'
-  | 'refund_owed'
-  | 'refunded';
+  'in_draw' | 'drawing' | 'won' | 'not_selected' | 'refund_owed' | 'refunded';
 
 export interface EntryHistoryItem {
   reference: string;
@@ -71,7 +66,9 @@ export class EntryHistoryService {
         skip: (query.page - 1) * query.pageSize,
         take: query.pageSize,
         include: {
-          round: { select: { id: true, number: true, status: true, closesAt: true, entryPrice: true } },
+          round: {
+            select: { id: true, number: true, status: true, closesAt: true, entryPrice: true },
+          },
         },
       }),
       this.prisma.transaction.count({ where }),

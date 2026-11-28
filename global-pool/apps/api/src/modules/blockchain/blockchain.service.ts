@@ -28,6 +28,8 @@ export class BlockchainService {
       chain: this.chain(),
       transport: http(rpc, { timeout: 15_000, retryCount: 2 }),
       pollingInterval: this.config.env.EVM_CHAIN_ID === 31_337 ? 250 : 4_000,
+      // A cached head can only under-count confirmations; the local devnet mines on demand, so never cache there.
+      ...(this.config.env.EVM_CHAIN_ID === 31_337 ? { cacheTime: 0 } : {}),
     }) as PublicClient;
     this.clients.set(network, client);
     return client;

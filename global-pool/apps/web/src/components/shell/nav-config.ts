@@ -41,6 +41,8 @@ export interface NavItem {
   countKey?: 'entries' | 'notifications';
   children?: NavItem[];
   defaultOpen?: boolean;
+  /** Extra path prefixes that also mark this item active (e.g. the Account tab on /account/* and /notifications). */
+  match?: string[];
 }
 
 export const ROUTES = {
@@ -62,6 +64,8 @@ export const ROUTES = {
   responsibleGaming: '/responsible-gaming',
   support: '/support',
   account: '/account',
+  dashboard: '/dashboard',
+  notifications: '/notifications',
   game: (slug: string) => `/games/${slug}`,
 } as const;
 
@@ -135,7 +139,14 @@ export const TAB_NAV: NavItem[] = [
   { id: 'pool', label: 'Pool', href: ROUTES.pool, icon: CircleDollarSign },
   { id: 'games', label: 'Games', href: ROUTES.originals, icon: Gamepad2 },
   { id: 'wallet', label: 'Wallet', href: ROUTES.wallet, icon: Wallet },
-  { id: 'account', label: 'Account', href: ROUTES.account, icon: User, countKey: 'notifications' },
+  {
+    id: 'account',
+    label: 'Account',
+    href: ROUTES.dashboard,
+    icon: User,
+    countKey: 'notifications',
+    match: [ROUTES.account, ROUTES.notifications],
+  },
 ];
 
 /** True when `href` is the current page or a parent section of it. */

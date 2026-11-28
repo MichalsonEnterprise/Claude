@@ -267,7 +267,11 @@ export class ChainSignerService {
   }
 
   /** Poll track() until the transaction resolves or `timeoutMs` passes (then it stays pending for the next tick). */
-  async waitFor(row: ChainTransaction, confirmations: number, timeoutMs: number): Promise<TrackResult> {
+  async waitFor(
+    row: ChainTransaction,
+    confirmations: number,
+    timeoutMs: number,
+  ): Promise<TrackResult> {
     const deadline = Date.now() + timeoutMs;
     const interval = this.blockchain.chainId === 31_337 ? 150 : 2_000;
     let result = await this.track(row, confirmations);

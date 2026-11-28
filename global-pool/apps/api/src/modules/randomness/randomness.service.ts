@@ -84,9 +84,13 @@ export class RandomnessService {
       });
       await this.prisma.randomnessRequest.update({
         where: { id: request.id },
-        data: { status: 'failed', failureReason: `superseded: request ${f.requestId} was fulfilled first` },
+        data: {
+          status: 'failed',
+          failureReason: `superseded: request ${f.requestId} was fulfilled first`,
+        },
       });
-      if (!earlier) throw new Error(`Fulfilled VRF request ${f.requestId} is unknown to the database`);
+      if (!earlier)
+        throw new Error(`Fulfilled VRF request ${f.requestId} is unknown to the database`);
       request = earlier;
     }
     return this.prisma.randomnessRequest.update({

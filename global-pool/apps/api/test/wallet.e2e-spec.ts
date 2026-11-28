@@ -50,8 +50,18 @@ describe('wallet status + progressive DEMO deposits', () => {
 
   it('progressive deposit: detected 0 / 20 → Pending, advanced by simulated blocks → credited to Available', async () => {
     const key = `dep-${uid()}`;
-    const body = { network: 'arbitrum', amount: '250.00', idempotencyKey: key, mode: 'progressive' };
-    const res = await t.http().post('/dev/deposits/simulate').set(bearer(p.token)).send(body).expect(200);
+    const body = {
+      network: 'arbitrum',
+      amount: '250.00',
+      idempotencyKey: key,
+      mode: 'progressive',
+    };
+    const res = await t
+      .http()
+      .post('/dev/deposits/simulate')
+      .set(bearer(p.token))
+      .send(body)
+      .expect(200);
     expect(res.body).toMatchObject({
       status: 'confirming',
       amount: '250.00',
@@ -61,7 +71,12 @@ describe('wallet status + progressive DEMO deposits', () => {
     });
     const ref = res.body.reference as string;
 
-    const replay = await t.http().post('/dev/deposits/simulate').set(bearer(p.token)).send(body).expect(200);
+    const replay = await t
+      .http()
+      .post('/dev/deposits/simulate')
+      .set(bearer(p.token))
+      .send(body)
+      .expect(200);
     expect(replay.body).toMatchObject({ reference: ref, replayed: true });
 
     let bal = (await t.http().get('/wallet/balances').set(bearer(p.token)).expect(200)).body;
@@ -73,10 +88,17 @@ describe('wallet status + progressive DEMO deposits', () => {
       .set(bearer(p.token))
       .send({ confirmations: 7 })
       .expect(200);
-    expect(one.body).toMatchObject({ status: 'confirming', confirmations: { current: 7, required: 20 } });
+    expect(one.body).toMatchObject({
+      status: 'confirming',
+      confirmations: { current: 7, required: 20 },
+    });
 
     const got = await t.http().get(`/deposits/ref/${ref}`).set(bearer(p.token)).expect(200);
-    expect(got.body).toMatchObject({ reference: ref, confirmations: { current: 7 }, requiredConfirmations: 20 });
+    expect(got.body).toMatchObject({
+      reference: ref,
+      confirmations: { current: 7 },
+      requiredConfirmations: 20,
+    });
 
     const tx = await t.http().get(`/transactions/${ref}`).set(bearer(p.token)).expect(200);
     expect(tx.body).toMatchObject({ status: 'confirming', statusDetail: '7 / 20 confirmations' });
@@ -87,15 +109,28 @@ describe('wallet status + progressive DEMO deposits', () => {
       .set(bearer(p.token))
       .send({ confirmations: 50 })
       .expect(200);
-    expect(done.body).toMatchObject({ status: 'credited', confirmations: { current: 20, required: 20 } });
+    expect(done.body).toMatchObject({
+      status: 'credited',
+      confirmations: { current: 20, required: 20 },
+    });
     bal = (await t.http().get('/wallet/balances').set(bearer(p.token)).expect(200)).body;
     expect(bal).toMatchObject({ pending: '0.00', available: '250.00' });
 
     // Credited deposits cannot be advanced again; other players cannot see or advance it.
-    await t.http().post(`/dev/deposits/${ref}/confirmations`).set(bearer(p.token)).send({}).expect(409);
+    await t
+      .http()
+      .post(`/dev/deposits/${ref}/confirmations`)
+      .set(bearer(p.token))
+      .send({})
+      .expect(409);
     const other = await newPlayer(t);
     await t.http().get(`/deposits/ref/${ref}`).set(bearer(other.token)).expect(404);
-    await t.http().post(`/dev/deposits/${ref}/confirmations`).set(bearer(other.token)).send({}).expect(404);
+    await t
+      .http()
+      .post(`/dev/deposits/${ref}/confirmations`)
+      .set(bearer(other.token))
+      .send({})
+      .expect(404);
     await t.http().get('/deposits/ref/not-a-ref').set(bearer(p.token)).expect(404);
   });
 });
@@ -113,7 +148,9 @@ describe('withdrawal pre-check (read-only risk validation before 2FA)', () => {
   });
 
   it('stops at identity verification while KYC is missing (other checks not run)', async () => {
-    const res = await precheck({ network: 'arbitrum', address: fresh, amount: '100.00' }).expect(200);
+    const res = await precheck({ network: 'arbitrum', address: fresh, amount: '100.00' }).expect(
+      200,
+    );
     expect(res.body).toMatchObject({ outcome: 'kyc_required', code: 'KYC_REQUIRED' });
     expect(res.body.checks.map((c: { status: string }) => c.status)).toEqual([
       'fail',
@@ -126,18 +163,41 @@ describe('withdrawal pre-check (read-only risk validation before 2FA)', () => {
   });
 
   it('reports blocked outcomes: no 2FA, over balance, invalid address, below minimum', async () => {
-    await t.http().post('/dev/kyc/approve').set(bearer(p.token)).send({ level: 'level_2' }).expect(200);
-    const no2fa = await precheck({ network: 'arbitrum', address: fresh, amount: '100.00' }).expect(200);
-    expect(no2fa.body).toMatchObject({ outcome: 'blocked', code: 'TWO_FACTOR_REQUIRED', twoFactorEnabled: false });
+    await t
+      .http()
+      .post('/dev/kyc/approve')
+      .set(bearer(p.token))
+      .send({ level: 'level_2' })
+      .expect(200);
+    const no2fa = await precheck({ network: 'arbitrum', address: fresh, amount: '100.00' }).expect(
+      200,
+    );
+    expect(no2fa.body).toMatchObject({
+      outcome: 'blocked',
+      code: 'TWO_FACTOR_REQUIRED',
+      twoFactorEnabled: false,
+    });
 
     secret = await enrol2fa(t, p);
-    const over = await precheck({ network: 'arbitrum', address: fresh, amount: '5000.00' }).expect(200);
+    const over = await precheck({ network: 'arbitrum', address: fresh, amount: '5000.00' }).expect(
+      200,
+    );
     expect(over.body).toMatchObject({ outcome: 'blocked', code: 'INSUFFICIENT_FUNDS' });
 
-    const invalid = await precheck({ network: 'arbitrum', address: '7Hq3abc', amount: '100.00' }).expect(200);
-    expect(invalid.body).toMatchObject({ outcome: 'blocked', code: 'INVALID_ADDRESS', address: { valid: false } });
+    const invalid = await precheck({
+      network: 'arbitrum',
+      address: '7Hq3abc',
+      amount: '100.00',
+    }).expect(200);
+    expect(invalid.body).toMatchObject({
+      outcome: 'blocked',
+      code: 'INVALID_ADDRESS',
+      address: { valid: false },
+    });
 
-    const tiny = await precheck({ network: 'arbitrum', address: fresh, amount: '12.00' }).expect(200);
+    const tiny = await precheck({ network: 'arbitrum', address: fresh, amount: '12.00' }).expect(
+      200,
+    );
     expect(tiny.body).toMatchObject({ outcome: 'blocked', code: 'BELOW_MINIMUM' });
 
     await precheck({ network: 'bnb', address: fresh, amount: '100.00' }).expect(400);
@@ -145,7 +205,9 @@ describe('withdrawal pre-check (read-only risk validation before 2FA)', () => {
 
   it('new destination → review with the plain reason; sanctioned → blocked; never writes an AML alert', async () => {
     const before = await t.prisma.amlAlert.count({ where: { userId: p.userId } });
-    const res = await precheck({ network: 'arbitrum', address: fresh, amount: '100.00' }).expect(200);
+    const res = await precheck({ network: 'arbitrum', address: fresh, amount: '100.00' }).expect(
+      200,
+    );
     expect(res.body).toMatchObject({
       outcome: 'review',
       reason: 'Routine AML screening for new destinations — usually under 4 h',
@@ -154,7 +216,9 @@ describe('withdrawal pre-check (read-only risk validation before 2FA)', () => {
       twoFactorEnabled: true,
     });
     expect(res.body.checks).toHaveLength(6);
-    expect(new Date(res.body.validUntil).getTime() - new Date(res.body.checkedAt).getTime()).toBe(900_000);
+    expect(new Date(res.body.validUntil).getTime() - new Date(res.body.checkedAt).getTime()).toBe(
+      900_000,
+    );
 
     const sanctioned = await precheck({
       network: 'arbitrum',
@@ -171,9 +235,16 @@ describe('withdrawal pre-check (read-only risk validation before 2FA)', () => {
       .http()
       .post('/me/wallets/whitelist')
       .set(bearer(p.token))
-      .send({ network: 'arbitrum', address: addr, label: 'Cold wallet', totpCode: await totp(secret, 1) })
+      .send({
+        network: 'arbitrum',
+        address: addr,
+        label: 'Cold wallet',
+        totpCode: await totp(secret, 1),
+      })
       .expect(201);
-    const res = await precheck({ network: 'arbitrum', address: addr, amount: '100.00' }).expect(200);
+    const res = await precheck({ network: 'arbitrum', address: addr, amount: '100.00' }).expect(
+      200,
+    );
     expect(res.body).toMatchObject({
       outcome: 'blocked',
       code: 'ADDRESS_COOLDOWN',
@@ -216,5 +287,8 @@ describe('withdrawal pre-check (read-only risk validation before 2FA)', () => {
       usedToday: '100.00',
       remainingToday: '24900.00',
     });
+
+    // Leave no open review behind in the shared test database (the admin queue lists open withdrawals oldest first).
+    await t.http().post(`/withdrawals/${created.body.id as string}/cancel`).set(bearer(p.token)).expect(200);
   });
 });

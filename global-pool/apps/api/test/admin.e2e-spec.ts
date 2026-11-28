@@ -228,13 +228,25 @@ describe('admin RBAC, MFA re-auth and the hash-chained audit log', () => {
       .expect(403);
     expect(same.body.error.message).toMatch(/different admin/);
 
+    // The shared test DB accumulates withdrawals (oldest first): read the first and the last page.
     const queue = await t
       .http()
-      .get('/admin/withdrawals?status=under_review')
+      .get('/admin/withdrawals?status=under_review&pageSize=100')
       .set(bearer(ta))
       .expect(200);
+    const lastPage =
+      queue.body.totalPages > 1
+        ? await t
+            .http()
+            .get(
+              `/admin/withdrawals?status=under_review&pageSize=100&page=${queue.body.totalPages}`,
+            )
+            .set(bearer(ta))
+            .expect(200)
+        : queue;
     expect(
-      queue.body.items.find((w: { id: string }) => w.id === wd.body.id).pendingApproval,
+      [...queue.body.items, ...lastPage.body.items].find((w: { id: string }) => w.id === wd.body.id)
+        .pendingApproval,
     ).toMatchObject({ approvals: 1, of: 2 });
 
     const tb = await adminLogin(t, b, 0);

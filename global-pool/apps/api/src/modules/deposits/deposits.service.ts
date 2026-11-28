@@ -1,9 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { Deposit } from '@prisma/client';
 import { CHAINS, type ChainKey } from '@gp/shared/chains';
-import { fromBaseUnits, toUSDTString } from '@gp/shared/money';
+import { toUSDTString } from '@gp/shared/money';
 import { paginate, type PaginationQuery } from '@gp/shared/schemas';
-import { parseAbiItem, type Address } from 'viem';
 import { randomBytes } from 'node:crypto';
 
 import { usdt } from '../../common/money';
@@ -15,13 +14,7 @@ import { IdempotencyService } from '../idempotency/idempotency.service';
 import { LedgerService } from '../ledger/ledger.service';
 import { depositCreditedLines, depositDetectedLines } from '../ledger/posting';
 import { NotificationsService } from '../notifications/notifications.service';
-import { AppConfig } from '../../config/app-config';
 import { DepositAddressService } from './deposit-address.service';
-
-const TRANSFER_EVENT = parseAbiItem(
-  'event Transfer(address indexed from, address indexed to, uint256 value)',
-);
-const ADDRESS_CHUNK = 200;
 
 export interface DetectedTransfer {
   network: ChainKey;
@@ -29,6 +22,8 @@ export interface DetectedTransfer {
   txHash: string;
   logIndex: number;
   blockNumber: bigint | null;
+  /** Block hash of the log (re-org detection by the chain watcher). */
+  blockHash?: string | null;
   from: string | null;
   to: string;
   tokenAddress: string | null;
@@ -37,24 +32,14 @@ export interface DetectedTransfer {
   isDemo?: boolean;
 }
 
-export interface WatchResult {
-  status: 'ok' | 'skipped';
-  reason?: string;
-  fromBlock?: string;
-  toBlock?: string;
-  detected?: number;
-  credited?: number;
-}
-
 /**
  * Hybrid custody deposits: per-user addresses (HD), on-chain detection (test-USDT Transfer logs), confirmation
  * tracking, then ledger CHAIN_CLEARING → PENDING (detected) → AVAILABLE (after N confirmations).
- * The chain is the authority; the ledger mirrors it and is reconciled against it.
+ * The chain is the authority; the ledger mirrors it and is reconciled against it. The re-org-safe chain scan lives
+ * in DepositChainWatcherService; this service owns the posting rules shared with the DEMO simulations.
  */
 @Injectable()
 export class DepositsService {
-  private readonly logger = new Logger(DepositsService.name);
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly ledger: LedgerService,
@@ -63,7 +48,6 @@ export class DepositsService {
     private readonly addresses: DepositAddressService,
     private readonly rg: ResponsibleGamingService,
     private readonly idempotency: IdempotencyService,
-    private readonly config: AppConfig,
     private readonly flags: FeatureFlagsService,
   ) {}
 
@@ -112,6 +96,7 @@ export class DepositsService {
           txHash: t.txHash,
           logIndex: t.logIndex,
           blockNumber: t.blockNumber,
+          blockHash: t.blockHash ?? null,
           fromAddress: t.from,
           toAddress: t.to,
           amount: t.amount,
@@ -245,120 +230,4 @@ export class DepositsService {
       },
     );
   }
-
-  /** One watcher pass: scan new Transfer logs to assigned addresses, then update confirmations / credit. */
-  async watch(network: ChainKey = 'arbitrum'): Promise<WatchResult> {
-    const client = this.blockchain.client(network);
-    const token = this.blockchain.tokenAddress(network);
-    if (!client) return { status: 'skipped', reason: 'RPC not configured' };
-    if (!token) return { status: 'skipped', reason: 'test-USDT address not configured' };
-    let head: bigint;
-    try {
-      head = await client.getBlockNumber();
-    } catch (err) {
-      return { status: 'skipped', reason: `RPC unavailable: ${String(err)}` };
-    }
-    const cursorKey = `deposits:${network}:${token.toLowerCase()}`;
-    const cursor = await this.prisma.chainCursor.findUnique({ where: { key: cursorKey } });
-    const start =
-      cursor !== null
-        ? cursor.lastBlock + 1n
-        : (this.config.env.DEPOSIT_WATCHER_START_BLOCK ?? (head > 1000n ? head - 1000n : 0n));
-    const end = minBig(head, start + BigInt(this.config.env.DEPOSIT_WATCHER_MAX_BLOCK_RANGE) - 1n);
-    let detected = 0;
-    if (start <= end) {
-      const assigned = await this.prisma.depositAddress.findMany({
-        where: { network },
-        select: { address: true, userId: true },
-      });
-      const owner = new Map(assigned.map((a) => [a.address.toLowerCase(), a.userId]));
-      const addresses = [...owner.keys()] as Address[];
-      for (let i = 0; i < addresses.length; i += ADDRESS_CHUNK) {
-        let logs;
-        try {
-          logs = await client.getLogs({
-            address: token,
-            event: TRANSFER_EVENT,
-            args: { to: addresses.slice(i, i + ADDRESS_CHUNK) },
-            fromBlock: start,
-            toBlock: end,
-          });
-        } catch (err) {
-          this.logger.warn(`getLogs ${start}-${end} failed: ${String(err)}`);
-          return {
-            status: 'skipped',
-            reason: 'RPC getLogs failed (will retry from the same block)',
-          };
-        }
-        for (const log of logs) {
-          const to = log.args.to?.toLowerCase();
-          const userId = to ? owner.get(to) : undefined;
-          if (!to || !userId || log.args.value === undefined || !log.transactionHash) continue;
-          const amount = toUSDTString(fromBaseUnits(log.args.value, CHAINS[network].usdtDecimals));
-          if (amount === '0.00') continue;
-          const created = await this.prisma.tx((tx) =>
-            this.recordDetected(tx, {
-              network,
-              userId,
-              txHash: log.transactionHash,
-              logIndex: log.logIndex ?? 0,
-              blockNumber: log.blockNumber ?? null,
-              from: log.args.from?.toLowerCase() ?? null,
-              to,
-              tokenAddress: token.toLowerCase(),
-              amount,
-            }),
-          );
-          if (created) detected++;
-        }
-      }
-      await this.prisma.chainCursor.upsert({
-        where: { key: cursorKey },
-        create: { key: cursorKey, lastBlock: end },
-        update: { lastBlock: end },
-      });
-    }
-    const credited = await this.updateConfirmations(network, head);
-    return {
-      status: 'ok',
-      fromBlock: start.toString(),
-      toBlock: end.toString(),
-      detected,
-      credited,
-    };
-  }
-
-  async updateConfirmations(network: ChainKey, head: bigint): Promise<number> {
-    const open = await this.prisma.deposit.findMany({
-      where: {
-        network,
-        status: { in: ['detected', 'confirming'] },
-        blockNumber: { not: null },
-        isDemo: false,
-      },
-    });
-    let credited = 0;
-    for (const d of open) {
-      const conf = Number(head - d.blockNumber! + 1n);
-      if (conf >= d.requiredConfirmations) {
-        if (await this.prisma.tx((tx) => this.credit(tx, d, conf))) credited++;
-      } else if (conf !== d.confirmations) {
-        await this.prisma.deposit.update({
-          where: { id: d.id },
-          data: { confirmations: Math.max(conf, 0) },
-        });
-        await this.prisma.transaction.updateMany({
-          where: { depositId: d.id },
-          data: {
-            metadata: {
-              statusDetail: `${Math.max(conf, 0)} / ${d.requiredConfirmations} confirmations`,
-            },
-          },
-        });
-      }
-    }
-    return credited;
-  }
 }
-
-const minBig = (a: bigint, b: bigint) => (a < b ? a : b);

@@ -5,7 +5,8 @@ import { MemberGate } from '@/components/wallet/wallet-ui';
 
 export const metadata: Metadata = {
   title: 'Wallet',
-  description: 'Available, Locked, Pending and Owed balances, deposits, withdrawals and history (DEMO / testnet).',
+  description:
+    'Available, Locked, Pending and Owed balances, deposits, withdrawals and history (DEMO / testnet).',
 };
 
 /** WAL-01 Wallet overview · MOB-05 (mobile). */

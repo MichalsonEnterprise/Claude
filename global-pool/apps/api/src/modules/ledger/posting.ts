@@ -154,6 +154,22 @@ export function depositDetectedLines(
   ];
 }
 
+/**
+ * A detected deposit left the canonical chain (re-org) or reverted before it was credited: PENDING −amount →
+ * CHAIN_CLEARING +amount — the exact inverse of `depositDetectedLines` (the ledger mirrors the chain).
+ */
+export function depositReversedLines(
+  userId: string,
+  network: ChainKey,
+  amount: MoneyInput,
+): PostingLineInput[] {
+  const a = parseUSDT(amount);
+  return [
+    { account: { type: 'user_pending', userId }, amount: a.negated() },
+    { account: { type: 'chain_clearing', network }, amount: a, userId },
+  ];
+}
+
 /** Deposit reached the required confirmations: PENDING −amount → AVAILABLE +amount. */
 export function depositCreditedLines(userId: string, amount: MoneyInput): PostingLineInput[] {
   const a = parseUSDT(amount);

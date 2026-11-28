@@ -155,12 +155,7 @@ export interface MyRoundEntries {
 }
 
 export type EntryResultKind =
-  | 'in_draw'
-  | 'drawing'
-  | 'won'
-  | 'not_selected'
-  | 'refund_owed'
-  | 'refunded';
+  'in_draw' | 'drawing' | 'won' | 'not_selected' | 'refund_owed' | 'refunded';
 
 export interface EntryHistoryItem {
   reference: string;
@@ -313,7 +308,15 @@ export async function getRound(number: number): Promise<PoolRoundView> {
 }
 
 function mockNotFound(path: string): never {
-  throw new ApiRequestError(404, path, 'Round not found', 'NOT_FOUND', undefined, undefined, undefined);
+  throw new ApiRequestError(
+    404,
+    path,
+    'Round not found',
+    'NOT_FOUND',
+    undefined,
+    undefined,
+    undefined,
+  );
 }
 
 export interface RoundListQuery {

@@ -75,7 +75,9 @@ export function HomePage({
     countryName: region.data?.countryName ?? null,
     scenario,
     snapshot,
-    demoNow: snapshot.isDemo ? snapshot.serverNow : undefined,
+    // Real clock in both data sources: the API serves (shifted) real close times and the mock is shifted to the
+    // next 20:00 UTC (lib/data/demo-clock.ts), so countdowns never anchor to a fixed DEMO moment.
+    demoNow: undefined,
     now,
     myEntries: myEntries.data,
     balance: balance.data,

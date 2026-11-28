@@ -19,6 +19,8 @@ Object.assign(process.env, {
   DEV_COUNTRY_OVERRIDE: 'PT',
   TRUST_PROXY: 'false',
   RANDOMNESS_PROVIDER: 'mock',
+  // No email jobs pile up in the test Redis; test/infra.e2e-spec.ts turns the console / SMTP transports on.
+  MAIL_TRANSPORT: process.env.MAIL_TRANSPORT ?? 'disabled',
 });
 loadEnvFiles();
 const testUrl =

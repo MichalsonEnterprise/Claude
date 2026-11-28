@@ -64,7 +64,11 @@ export function IconTile({
       aria-hidden
       className={cn(
         'inline-flex shrink-0 items-center justify-center',
-        size === 48 ? 'size-12 rounded-lg [&_svg]:size-6' : size === 40 ? 'size-10 rounded-md [&_svg]:size-5' : 'size-8 rounded-md [&_svg]:size-4',
+        size === 48
+          ? 'size-12 rounded-lg [&_svg]:size-6'
+          : size === 40
+            ? 'size-10 rounded-md [&_svg]:size-5'
+            : 'size-8 rounded-md [&_svg]:size-4',
         TILE_TONE[tone],
         className,
       )}
@@ -81,7 +85,11 @@ export function Overline({
 }: React.ComponentProps<'p'> & { tone?: Tone }) {
   return (
     <p
-      className={cn('text-overline font-semibold tracking-[0.08em] uppercase', TEXT_TONE[tone], className)}
+      className={cn(
+        'text-overline font-semibold tracking-[0.08em] uppercase',
+        TEXT_TONE[tone],
+        className,
+      )}
       {...props}
     />
   );
@@ -90,9 +98,18 @@ export function Overline({
 // ── callouts / notes ──────────────────────────────────────────────────────────────────────────
 
 const CALLOUT: Record<Exclude<Tone, 'neutral' | 'brand'>, { cls: string; icon: LucideIcon }> = {
-  success: { cls: 'border-status-success/60 bg-status-success-tint [&>svg]:text-text-success', icon: CircleCheck },
-  warning: { cls: 'border-status-warning/60 bg-status-warning-tint [&>svg]:text-text-warning', icon: TriangleAlert },
-  danger: { cls: 'border-status-danger/60 bg-status-danger-tint [&>svg]:text-text-danger', icon: CircleAlert },
+  success: {
+    cls: 'border-status-success/60 bg-status-success-tint [&>svg]:text-text-success',
+    icon: CircleCheck,
+  },
+  warning: {
+    cls: 'border-status-warning/60 bg-status-warning-tint [&>svg]:text-text-warning',
+    icon: TriangleAlert,
+  },
+  danger: {
+    cls: 'border-status-danger/60 bg-status-danger-tint [&>svg]:text-text-danger',
+    icon: CircleAlert,
+  },
   info: { cls: 'border-status-info/50 bg-status-info-tint [&>svg]:text-text-info', icon: Info },
 };
 
@@ -142,7 +159,13 @@ export function Note({
 }) {
   return (
     <p className={cn('flex gap-2 text-caption text-text-tertiary', className)}>
-      <Icon aria-hidden className={cn('mt-px size-4 shrink-0', tone === 'neutral' ? 'text-icon-muted' : TEXT_TONE[tone])} />
+      <Icon
+        aria-hidden
+        className={cn(
+          'mt-px size-4 shrink-0',
+          tone === 'neutral' ? 'text-icon-muted' : TEXT_TONE[tone],
+        )}
+      />
       <span className="min-w-0">{children}</span>
     </p>
   );
@@ -204,7 +227,12 @@ export function NumStep({
         {state === 'done' ? <CircleCheck aria-label="Done" className="size-4" /> : n}
       </span>
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className={cn('text-body-s-strong', state === 'next' ? 'text-text-secondary' : 'text-text-primary')}>
+        <p
+          className={cn(
+            'text-body-s-strong',
+            state === 'next' ? 'text-text-secondary' : 'text-text-primary',
+          )}
+        >
           {title}
         </p>
         {children && <p className="text-caption text-text-tertiary">{children}</p>}
@@ -214,10 +242,29 @@ export function NumStep({
 }
 
 /** Segmented progress (Figma SEG): done = success, current = mint, next = border. */
-export function StepBar({ total, current, label }: { total: number; current: number; label: string }) {
+export function StepBar({
+  total,
+  current,
+  label,
+  variant = 'caption',
+}: {
+  total: number;
+  current: number;
+  label: string;
+  /** caption (AUTH-04 "Step 2 of 3 · Verify email") · overline (AUTH-07 "STEP 1 OF 3 · SCAN") */
+  variant?: 'caption' | 'overline';
+}) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-caption text-text-secondary">{label}</p>
+      <p
+        className={
+          variant === 'overline'
+            ? 'text-overline font-semibold tracking-[0.08em] text-text-brand uppercase'
+            : 'text-caption text-text-secondary'
+        }
+      >
+        {label}
+      </p>
       <div
         role="progressbar"
         aria-label={label}
@@ -257,7 +304,12 @@ export function KeyValue({
   return (
     <div className={cn('flex items-center gap-3 py-2.5', !last && 'border-b border-border-subtle')}>
       <dt className="min-w-0 flex-1 text-body-s text-text-secondary">{label}</dt>
-      <dd className={cn('text-right text-text-primary', mono ? 'font-mono text-mono-s' : 'text-body-s-strong')}>
+      <dd
+        className={cn(
+          'text-right text-text-primary',
+          mono ? 'font-mono text-mono-s' : 'text-body-s-strong',
+        )}
+      >
         {value}
       </dd>
       {demo && <DemoBadge size="xs" />}
@@ -275,7 +327,9 @@ export function KeyValueBox({
   className?: string;
 }) {
   return (
-    <section className={cn('rounded-lg border border-border-subtle bg-bg-secondary px-4 py-1', className)}>
+    <section
+      className={cn('rounded-lg border border-border-subtle bg-bg-secondary px-4 py-1', className)}
+    >
       {title && <p className="pt-3 pb-1 text-label-m text-text-primary">{title}</p>}
       <dl>{children}</dl>
     </section>
@@ -306,6 +360,28 @@ export function LicenceChip({ className }: { className?: string }) {
   );
 }
 
+/** True inside <AuthModal>: the visible pane heading doubles as the dialog's accessible title. */
+const InModalContext = React.createContext(false);
+
+/** Visible heading that is also the Radix dialog title when rendered inside <AuthModal>. */
+export function ModalHeading({
+  className,
+  children,
+  id,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  id?: string;
+}) {
+  const inModal = React.useContext(InModalContext);
+  const h = (
+    <h2 id={id} className={className}>
+      {children}
+    </h2>
+  );
+  return inModal ? <DialogPrimitive.Title asChild>{h}</DialogPrimitive.Title> : h;
+}
+
 // ── modal shell: split dialog (≥ 1024) / single dialog (768–1023) / bottom sheet (< 768) ────────
 
 export function AuthModal({
@@ -323,8 +399,8 @@ export function AuthModal({
   /** Accessible title (also shown visually by the panes). */
   title: string;
   description?: string;
-  /** split = 960 two-pane · m = 560 · s = 480 */
-  size?: 'split' | 'm' | 's';
+  /** split = 960 two-pane · l = 820 · m = 560 · s = 480 · xs = 400 (Modal/2FA) */
+  size?: 'split' | 'l' | 'm' | 's' | 'xs';
   /** false: Esc / outside click do nothing (explicit choice required). */
   dismissible?: boolean;
   children: React.ReactNode;
@@ -336,7 +412,16 @@ export function AuthModal({
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-scrim-overlay data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
         <DialogPrimitive.Content
           data-slot="auth-modal"
-          aria-describedby={description ? undefined : undefined}
+          aria-label={title}
+          {...(description ? {} : { 'aria-describedby': undefined })}
+          // Focus the dialog itself (not the first control) so screen readers start at the top and no control
+          // shows a focus ring on open; Tab then moves through the dialog in order.
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            const el = e.currentTarget as HTMLElement;
+            // Keep focus if a dedicated code-entry field already took it (OtpInput focusOnMount).
+            if (!el.contains(document.activeElement)) el.focus();
+          }}
           onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
           onPointerDownOutside={(e) => !dismissible && e.preventDefault()}
           onInteractOutside={(e) => !dismissible && e.preventDefault()}
@@ -348,18 +433,22 @@ export function AuthModal({
             'tablet:inset-x-auto tablet:bottom-auto tablet:top-1/2 tablet:left-1/2 tablet:max-h-[calc(100dvh-48px)] tablet:w-[calc(100%-48px)] tablet:-translate-x-1/2 tablet:-translate-y-1/2 tablet:rounded-xl tablet:border tablet:data-[state=open]:slide-in-from-bottom-0 tablet:data-[state=open]:zoom-in-95',
             size === 'split' && 'tablet:max-w-[560px] lg:max-w-[960px]',
             size === 'm' && 'tablet:max-w-[560px]',
+            size === 'l' && 'tablet:max-w-[560px] lg:max-w-[880px]',
             size === 's' && 'tablet:max-w-[480px]',
+            size === 'xs' && 'tablet:max-w-[400px]',
             className,
           )}
         >
-          <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
-          {description ? (
-            <DialogPrimitive.Description className="sr-only">{description}</DialogPrimitive.Description>
-          ) : (
-            <DialogPrimitive.Description className="sr-only">{title}</DialogPrimitive.Description>
+          {description && (
+            <DialogPrimitive.Description className="sr-only">
+              {description}
+            </DialogPrimitive.Description>
           )}
-          <div aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-border-strong tablet:hidden" />
-          {children}
+          <div
+            aria-hidden
+            className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-border-strong tablet:hidden"
+          />
+          <InModalContext.Provider value={true}>{children}</InModalContext.Provider>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
@@ -367,7 +456,13 @@ export function AuthModal({
 }
 
 /** Two panes: side panel (≥ 1024 only) + main column. */
-export function SplitLayout({ panel, children }: { panel: React.ReactNode; children: React.ReactNode }) {
+export function SplitLayout({
+  panel,
+  children,
+}: {
+  panel: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-0 flex-1">
       <aside className="hidden w-[480px] shrink-0 flex-col overflow-y-auto border-r border-border-subtle bg-bg-secondary lg:flex">
@@ -385,6 +480,7 @@ export function Pane({
   closeLabel = 'Close',
   children,
   footer,
+  mobileFooter,
   className,
 }: {
   top?: React.ReactNode;
@@ -392,12 +488,19 @@ export function Pane({
   closeLabel?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  /** Sticky CTA bar shown only below 768 (Figma mobile sheets); tablet+ keeps the CTA inline. */
+  mobileFooter?: React.ReactNode;
   className?: string;
 }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className={cn('flex flex-col gap-6 px-4 pt-3 pb-6 tablet:px-10 tablet:pt-8 tablet:pb-9', className)}>
+        <div
+          className={cn(
+            'flex flex-col gap-6 px-4 pt-3 pb-6 tablet:px-10 tablet:pt-8 tablet:pb-9',
+            className,
+          )}
+        >
           {(top || onClose) && (
             <div className="flex min-h-11 items-start gap-2">
               <div className="min-w-0 flex-1">{top}</div>
@@ -410,6 +513,11 @@ export function Pane({
       {footer && (
         <div className="shrink-0 border-t border-border-subtle bg-surface-overlay px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] tablet:px-10 tablet:pb-8">
           {footer}
+        </div>
+      )}
+      {mobileFooter && (
+        <div className="flex shrink-0 flex-col gap-2 border-t border-border-subtle bg-surface-overlay px-4 pt-3 pb-[max(16px,env(safe-area-inset-bottom))] tablet:hidden">
+          {mobileFooter}
         </div>
       )}
     </div>
@@ -436,6 +544,7 @@ export function PaneHeader({
   title,
   children,
   titleId,
+  layout = 'stack',
 }: {
   icon?: LucideIcon;
   tone?: Tone;
@@ -443,14 +552,30 @@ export function PaneHeader({
   title: React.ReactNode;
   children?: React.ReactNode;
   titleId?: string;
+  /** inline = icon tile beside the title (Modal/* headers); stack = tile above (dialog panes). */
+  layout?: 'stack' | 'inline';
 }) {
+  if (layout === 'inline') {
+    return (
+      <div className="flex items-start gap-4">
+        {icon && <IconTile icon={icon} tone={tone} />}
+        <div className="flex min-w-0 flex-col gap-1.5">
+          {overline && <Overline tone={tone === 'neutral' ? 'neutral' : tone}>{overline}</Overline>}
+          <ModalHeading id={titleId} className="text-h4 text-text-primary">
+            {title}
+          </ModalHeading>
+          {children && <div className="text-body-s text-text-secondary">{children}</div>}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-2.5">
       {icon && <IconTile icon={icon} tone={tone} className="mb-1" />}
       {overline && <Overline tone={tone === 'neutral' ? 'neutral' : tone}>{overline}</Overline>}
-      <h2 id={titleId} className="text-h4 text-text-primary tablet:text-h3">
+      <ModalHeading id={titleId} className="text-h4 text-text-primary tablet:text-h3">
         {title}
-      </h2>
+      </ModalHeading>
       {children && <div className="text-body-m text-text-secondary">{children}</div>}
     </div>
   );
@@ -491,7 +616,11 @@ function MiniTicket({ className }: { className?: string }) {
 }
 
 const TRUST_POINTS: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: ShieldCheck, title: 'Every draw is verifiable', body: 'Chainlink VRF on Arbitrum — check any round yourself.' },
+  {
+    icon: ShieldCheck,
+    title: 'Every draw is verifiable',
+    body: 'Chainlink VRF on Arbitrum — check any round yourself.',
+  },
   {
     icon: Upload,
     title: 'Withdraw your available balance anytime',
@@ -575,7 +704,12 @@ export function SecurityPanel({
       <div className="flex flex-col gap-3 px-9 pt-8">
         <Logo height={30} title="GLOBAL POOL" />
         <div className="flex flex-col gap-2 pt-3">
-          <p className={cn('flex items-center gap-2 text-overline font-semibold tracking-[0.08em] uppercase', TEXT_TONE[tone])}>
+          <p
+            className={cn(
+              'flex items-center gap-2 text-overline font-semibold tracking-[0.08em] uppercase',
+              TEXT_TONE[tone],
+            )}
+          >
             <OIcon aria-hidden className="size-4" /> {overline}
           </p>
           <p className="text-h3 text-text-primary">{title}</p>
@@ -586,8 +720,8 @@ export function SecurityPanel({
       {children && <div className="flex flex-col gap-4 px-9 pt-5 pb-2">{children}</div>}
       <div className="mt-auto flex flex-col gap-2.5 border-t border-border-subtle px-9 pt-4 pb-7">
         <Note icon={Lock}>
-          GLOBAL POOL staff will never ask for your 2FA codes, backup codes or wallet seed phrase — not by email,
-          chat or phone.
+          GLOBAL POOL staff will never ask for your 2FA codes, backup codes or wallet seed phrase —
+          not by email, chat or phone.
         </Note>
         <div className="flex flex-wrap items-center gap-2">
           <AgeBadge />
@@ -611,7 +745,9 @@ export function SecurityArt({
   return (
     <div aria-hidden className={cn('relative mt-4 h-[236px] shrink-0 overflow-hidden', className)}>
       <div className="absolute -left-20 top-[150px] h-[132px] w-[640px] rotate-[10deg] bg-surface-raised" />
-      <div className={cn('absolute -left-20 top-[196px] h-[56px] w-[640px] rotate-[10deg]', accent)} />
+      <div
+        className={cn('absolute -left-20 top-[196px] h-[56px] w-[640px] rotate-[10deg]', accent)}
+      />
       {children}
     </div>
   );

@@ -51,7 +51,10 @@ export function NewDeviceAlertHost() {
   const [secured, setSecured] = React.useState<{ count: number } | null>(null);
 
   const done = () => void qc.invalidateQueries({ queryKey: authKeys.newDeviceAlerts });
-  const confirm = useMutation({ mutationFn: (id: string) => authApi.confirmNewDevice(id), onSuccess: done });
+  const confirm = useMutation({
+    mutationFn: (id: string) => authApi.confirmNewDevice(id),
+    onSuccess: done,
+  });
   const secure = useMutation({
     mutationFn: (id: string) => authApi.secureAccount(id),
     onSuccess: (r) => {
@@ -131,10 +134,14 @@ export function NewDeviceDialog({
                     <Mail aria-hidden className="size-4 text-icon-brand" /> New sign-in alert
                   </p>
                   <p className="mt-2 text-caption text-text-tertiary">
-                    {alert ? `${alert.device} · ${formatUtcDateTime(alert.signedInAt)}` : 'Signed out everywhere else'}
+                    {alert
+                      ? `${alert.device} · ${formatUtcDateTime(alert.signedInAt)}`
+                      : 'Signed out everywhere else'}
                   </p>
                   {code && (
-                    <span className="mt-3 inline-flex rounded-sm bg-brand-tint px-2 py-0.5 font-mono text-mono-s text-text-brand">{code}</span>
+                    <span className="mt-3 inline-flex rounded-sm bg-brand-tint px-2 py-0.5 font-mono text-mono-s text-text-brand">
+                      {code}
+                    </span>
                   )}
                 </div>
               </SecurityArt>
@@ -142,7 +149,9 @@ export function NewDeviceDialog({
           >
             {email && (
               <Point icon={Mail} title={`We also email ${email} about new sign-ins`}>
-                {code ? `Real emails show your anti-phishing code ${code}. No code — it isn’t from us.` : 'Set an anti-phishing code in Security settings to spot fake emails.'}
+                {code
+                  ? `Real emails show your anti-phishing code ${code}. No code — it isn’t from us.`
+                  : 'Set an anti-phishing code in Security settings to spot fake emails.'}
               </Point>
             )}
             <Point icon={ShieldCheck} title="Answering is safe">
@@ -153,16 +162,26 @@ export function NewDeviceDialog({
       >
         {secured ? (
           <Pane onClose={onCloseSecured}>
-            <PaneHeader icon={CircleCheck} tone="success" overline="Account secured" title="We signed out every other session">
-              {secured.count === 1 ? '1 session was' : `${secured.count} sessions were`} signed out. This device stays
-              signed in.
+            <PaneHeader
+              icon={CircleCheck}
+              tone="success"
+              overline="Account secured"
+              title="We signed out every other session"
+            >
+              {secured.count === 1 ? '1 session was' : `${secured.count} sessions were`} signed out.
+              This device stays signed in.
             </PaneHeader>
             <ol className="flex flex-col gap-4">
-              <NumStep n={1} state="done" title="Other devices signed out">They need your email code or wallet again.</NumStep>
-              <NumStep n={2} state="now" title="Secure your sign-in email or wallet">
-                Change your email password, or move funds out of a wallet you no longer trust. Your 2FA stays on.
+              <NumStep n={1} state="done" title="Other devices signed out">
+                They need your email code or wallet again.
               </NumStep>
-              <NumStep n={3} state="next" title="Check your whitelisted addresses">Remove any you don’t recognise.</NumStep>
+              <NumStep n={2} state="now" title="Secure your sign-in email or wallet">
+                Change your email password, or move funds out of a wallet you no longer trust. Your
+                2FA stays on.
+              </NumStep>
+              <NumStep n={3} state="next" title="Check your whitelisted addresses">
+                Remove any you don’t recognise.
+              </NumStep>
             </ol>
             <div className="flex flex-col-reverse gap-3 border-t border-border-subtle pt-5 tablet:flex-row">
               <Button variant="ghost" size="l" block onClick={onCloseSecured}>
@@ -175,7 +194,12 @@ export function NewDeviceDialog({
           </Pane>
         ) : alert ? (
           <Pane onClose={onLater} closeLabel="Decide later">
-            <PaneHeader icon={ShieldAlert} tone="warning" overline="New device · needs your answer" title="Was this you?">
+            <PaneHeader
+              icon={ShieldAlert}
+              tone="warning"
+              overline="New device · needs your answer"
+              title="Was this you?"
+            >
               Someone signed in to your account from a device we haven’t seen before.
             </PaneHeader>
             <KeyValueBox title="Sign-in details">
@@ -185,8 +209,8 @@ export function NewDeviceDialog({
               <KeyValue label="When" value={formatUtcDateTime(alert.signedInAt)} last />
             </KeyValueBox>
             <Note icon={Info}>
-              Location is estimated from the IP address and can be off by tens of kilometres — mobile and office
-              networks often show another city.
+              Location is estimated from the IP address and can be off by tens of kilometres —
+              mobile and office networks often show another city.
             </Note>
             <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface-raised p-4">
               <p className="text-label-m text-text-primary">“Secure my account” will:</p>
@@ -231,7 +255,9 @@ export function NewDeviceDialog({
                 No, secure my account
               </Button>
             </div>
-            <Note icon={Info}>Not sure? Choose “No” — you can always sign in again on that device.</Note>
+            <Note icon={Info}>
+              Not sure? Choose “No” — you can always sign in again on that device.
+            </Note>
           </Pane>
         ) : null}
       </SplitLayout>

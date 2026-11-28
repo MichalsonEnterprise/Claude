@@ -167,9 +167,12 @@ export const envSchema = z.object({
   /** Confirmations a DrawFulfilled event needs before settlement (Arbitrum Sepolia: 20 per the demo table). */
   VRF_FULFILLMENT_CONFIRMATIONS: z.coerce.number().int().min(1).default(20),
 
-  /** Outbound email: console (dev, logs a redacted preview), smtp (SMTP_* below) or disabled. */
-  EMAIL_TRANSPORT: z.enum(['console', 'smtp', 'disabled']).default('console'),
-  EMAIL_FROM: z.string().default('GLOBAL POOL (DEMO) <no-reply@globalpool.test>'),
+  /** Outbound email: log (dev: logs a redacted preview; `console` is an alias), smtp (SMTP_* below) or disabled. */
+  MAIL_TRANSPORT: z
+    .enum(['log', 'console', 'smtp', 'disabled'])
+    .transform((v) => (v === 'console' ? 'log' : v))
+    .default('log'),
+  MAIL_FROM: z.string().default('GLOBAL POOL (DEMO) <no-reply@globalpool.example>'),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
   /** true = implicit TLS (port 465); false = STARTTLS when the server offers it. */
@@ -235,10 +238,12 @@ export function crossFieldProblems(env: Env): string[] {
     if (!env.TEST_USDT_ADDRESS_ARBITRUM_SEPOLIA)
       out.push('WITHDRAWAL_BROADCASTER_ENABLED=true requires TEST_USDT_ADDRESS_ARBITRUM_SEPOLIA');
     if (!env.WITHDRAWAL_SIGNER_PRIVATE_KEY)
-      out.push('WITHDRAWAL_BROADCASTER_ENABLED=true requires WITHDRAWAL_SIGNER_PRIVATE_KEY (testnet key)');
+      out.push(
+        'WITHDRAWAL_BROADCASTER_ENABLED=true requires WITHDRAWAL_SIGNER_PRIVATE_KEY (testnet key)',
+      );
   }
-  if (env.EMAIL_TRANSPORT === 'smtp' && !env.SMTP_HOST) {
-    out.push('EMAIL_TRANSPORT=smtp requires SMTP_HOST');
+  if (env.MAIL_TRANSPORT === 'smtp' && !env.SMTP_HOST) {
+    out.push('MAIL_TRANSPORT=smtp requires SMTP_HOST');
   }
   return out;
 }

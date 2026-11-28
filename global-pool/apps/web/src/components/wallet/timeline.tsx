@@ -33,7 +33,13 @@ const STATE_LABEL: Record<TimelineState, string> = {
 };
 
 /** Tx/Status Timeline: vertical steps with done / current / to-do / review / error states (icon + text, not colour only). */
-export function StatusTimeline({ items, className }: { items: TimelineItem[]; className?: string }) {
+export function StatusTimeline({
+  items,
+  className,
+}: {
+  items: TimelineItem[];
+  className?: string;
+}) {
   return (
     <ol className={cn('flex flex-col', className)}>
       {items.map((it, i) => {
@@ -72,7 +78,9 @@ export function StatusTimeline({ items, className }: { items: TimelineItem[]; cl
                   {it.title}
                 </p>
                 {it.time && (
-                  <span className="shrink-0 text-caption tabular-nums text-text-tertiary">{it.time}</span>
+                  <span className="shrink-0 text-caption tabular-nums text-text-tertiary">
+                    {it.time}
+                  </span>
                 )}
               </div>
               {it.detail && <p className="text-caption text-text-tertiary">{it.detail}</p>}

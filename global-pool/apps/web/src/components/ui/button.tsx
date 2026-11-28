@@ -101,6 +101,16 @@ export function Button({
     className,
   );
   if (asChild) {
+    // Icons are rendered inside the child element (e.g. <Link>) via Slottable; without icons this is unchanged.
+    if (leadingIcon || trailingIcon) {
+      return (
+        <Slot.Root data-slot="button" className={classes} {...props}>
+          {leadingIcon}
+          <Slot.Slottable>{children}</Slot.Slottable>
+          {trailingIcon}
+        </Slot.Root>
+      );
+    }
     return (
       <Slot.Root data-slot="button" className={classes} {...props}>
         {children}

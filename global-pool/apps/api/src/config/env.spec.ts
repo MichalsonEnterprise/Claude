@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { AppConfig } from './app-config';
 import { parseEnv } from './env';
 
 const base = {
@@ -47,9 +48,9 @@ describe('on-chain configuration (testnet only)', () => {
     expect(parseEnv({ ...base, EVM_CHAIN_ID: '31337' }).EVM_CHAIN_ID).toBe(31_337);
     expect(() => parseEnv({ ...base, EVM_CHAIN_ID: '42161' })).toThrow(/EVM_CHAIN_ID/); // Arbitrum One mainnet
     expect(() => parseEnv({ ...base, EVM_CHAIN_ID: '1' })).toThrow(/EVM_CHAIN_ID/);
-    expect(() =>
-      parseEnv({ ...base, NODE_ENV: 'production', EVM_CHAIN_ID: '31337' }),
-    ).toThrow(/not allowed in production/);
+    expect(() => parseEnv({ ...base, NODE_ENV: 'production', EVM_CHAIN_ID: '31337' })).toThrow(
+      /not allowed in production/,
+    );
   });
 
   it('validates signer keys and the requirements of round mirroring / withdrawal broadcasting', () => {
@@ -70,6 +71,23 @@ describe('on-chain configuration (testnet only)', () => {
     expect(() => parseEnv({ ...base, ...chain, WITHDRAWAL_BROADCASTER_ENABLED: 'true' })).toThrow(
       /WITHDRAWAL_SIGNER_PRIVATE_KEY/,
     );
-    expect(() => parseEnv({ ...base, EMAIL_TRANSPORT: 'smtp' })).toThrow(/SMTP_HOST/);
+    expect(() => parseEnv({ ...base, MAIL_TRANSPORT: 'smtp' })).toThrow(/SMTP_HOST/);
+  });
+});
+
+describe('player auth mode (DEV MOCK)', () => {
+  it('allows the DEV MOCK in development (docker compose dev profile) and refuses it in production', () => {
+    const dev = new AppConfig(parseEnv({ ...base, NODE_ENV: 'development', PRIVY_MOCK: 'true' }));
+    expect(dev.playerAuthMode).toBe('mock');
+    const devWithApp = new AppConfig(
+      parseEnv({ ...base, NODE_ENV: 'development', PRIVY_MOCK: 'true', PRIVY_APP_ID: 'app' }),
+    );
+    expect(devWithApp.playerAuthMode).toBe('mock');
+    const prod = new AppConfig(parseEnv({ ...base, NODE_ENV: 'production', PRIVY_MOCK: 'true' }));
+    expect(prod.playerAuthMode).toBe('disabled');
+    const prodPrivy = new AppConfig(
+      parseEnv({ ...base, NODE_ENV: 'production', PRIVY_APP_ID: 'app' }),
+    );
+    expect(prodPrivy.playerAuthMode).toBe('privy');
   });
 });

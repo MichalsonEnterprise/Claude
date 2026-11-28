@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FOUR_EYES_EXPIRY_HOURS, ROUND_STATUS_LABEL } from '@gp/shared/enums';
+import { ROUND_STATUS_LABEL } from '@gp/shared/enums';
 import { money, toUSDTString } from '@gp/shared/money';
 import { PRIZES_PER_ROUND, prizeBreakdown } from '@gp/shared/pool';
 import {
@@ -13,7 +13,7 @@ import {
 import { AppError, notFound } from '../../common/errors';
 import { usdt } from '../../common/money';
 import type { AuthAdmin, RequestMeta } from '../../common/request';
-import { addHours } from '../../common/time';
+import { addHours, addMinutes } from '../../common/time';
 import { AppConfig } from '../../config/app-config';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -24,18 +24,24 @@ import { TotpService } from '../security/totp.service';
 import { atHandle } from './admin-finance.service';
 
 export const ENTRIES_FLAG = 'pool.entries.enabled';
-/** A circuit-breaker request expires if no second admin approves it within this many hours. */
-export const BREAKER_REQUEST_TTL_HOURS = FOUR_EYES_EXPIRY_HOURS;
-/** Who may request a breaker change (Super Admin). */
-export const BREAKER_REQUEST_PERMISSION = 'system.feature_flags.manage';
+/** A circuit-breaker request expires (and changes nothing) if no second admin approves it in time. */
+export const BREAKER_REQUEST_TTL_MINUTES = 30;
 /**
- * Who may give the second approval: a different admin holding a four-eyes control permission — Super Admin
- * (feature flags) or Compliance (geo rules). Business decision, documented in docs/API.md (admin-ops).
+ * Circuit-breaker dual control (ADM-P10): a Super Admin, Finance or Compliance admin may request; the second approver
+ * must be a DIFFERENT person holding a DIFFERENT one of these roles (e.g. Super Admin requests, Compliance
+ * approves). Both re-authenticate with 2FA and give a reason. Role-based on purpose: it is a dual-control policy.
  */
-export const BREAKER_APPROVER_PERMISSIONS = [
-  'system.feature_flags.manage',
-  'compliance.geo_rules.manage',
-] as const;
+export const BREAKER_ROLES = ['super_admin', 'finance', 'compliance'] as const;
+export const BREAKER_ROLE_LABEL: Record<(typeof BREAKER_ROLES)[number], string> = {
+  super_admin: 'Super Admin',
+  finance: 'Finance',
+  compliance: 'Compliance',
+};
+const breakerRolesOf = (roles: readonly string[]) =>
+  roles.filter((r): r is (typeof BREAKER_ROLES)[number] =>
+    (BREAKER_ROLES as readonly string[]).includes(r),
+  );
+const expiryOf = (created: Date) => addMinutes(created, BREAKER_REQUEST_TTL_MINUTES);
 
 const ACTIVE = ['open', 'closed', 'drawing'] as const;
 const m = (v: unknown) => money((v ?? '0') as string);
@@ -610,7 +616,7 @@ export class AdminPoolService {
         orderBy: { seq: 'desc' },
       }),
     ]);
-    const expiresAt = pending ? addHours(pending.createdAt, BREAKER_REQUEST_TTL_HOURS) : null;
+    const expiresAt = pending ? expiryOf(pending.createdAt) : null;
     const expired = Boolean(expiresAt && expiresAt <= now);
     return {
       flag: ENTRIES_FLAG,
@@ -654,9 +660,11 @@ export class AdminPoolService {
         decidedAt: h.decidedAt?.toISOString() ?? null,
       })),
       rules: {
-        requestPermission: BREAKER_REQUEST_PERMISSION,
-        approverPermissions: [...BREAKER_APPROVER_PERMISSIONS],
-        ttlHours: BREAKER_REQUEST_TTL_HOURS,
+        roles: BREAKER_ROLES.map((r) => BREAKER_ROLE_LABEL[r]),
+        secondApprover: 'Different person and different role',
+        reauth: '2FA for requester and approver',
+        ttlMinutes: BREAKER_REQUEST_TTL_MINUTES,
+        resume: 'Same dual-approval flow',
       },
       policy: IMMUTABLE_POLICY,
     };
@@ -667,10 +675,14 @@ export class AdminPoolService {
   }
 
   async requestBreaker(admin: AuthAdmin, input: CircuitBreakerRequest, meta: RequestMeta) {
-    if (!admin.permissions.includes(BREAKER_REQUEST_PERMISSION)) {
-      throw new AppError('FORBIDDEN', 'Your role does not allow this action', {
-        missingPermissions: [BREAKER_REQUEST_PERMISSION],
-      });
+    if (breakerRolesOf(admin.roles).length === 0) {
+      throw new AppError(
+        'FORBIDDEN',
+        'Only Super Admin, Finance or Compliance can request a breaker change',
+        {
+          allowedRoles: [...BREAKER_ROLES],
+        },
+      );
     }
     const enabled = await this.flags.isEnabled(ENTRIES_FLAG);
     if (input.action === 'pause_new_entries' && !enabled)
@@ -680,7 +692,7 @@ export class AdminPoolService {
     const existing = await this.prisma.adminApproval.findFirst({
       where: { targetType: 'feature_flag', targetId: ENTRIES_FLAG, status: 'pending' },
     });
-    if (existing && addHours(existing.createdAt, BREAKER_REQUEST_TTL_HOURS) > new Date()) {
+    if (existing && expiryOf(existing.createdAt) > new Date()) {
       throw new AppError(
         'CONFLICT',
         'A circuit-breaker request is already waiting for a second approver',
@@ -703,7 +715,8 @@ export class AdminPoolService {
             reasonCategory: input.reasonCategory ?? null,
             flag: ENTRIES_FLAG,
             // Same shape as the four-eyes inbox (admin approvals): decided at POST /admin/pool/circuit-breaker/:id/decision.
-            expiresAt: addHours(new Date(), BREAKER_REQUEST_TTL_HOURS).toISOString(),
+            expiresAt: expiryOf(new Date()).toISOString(),
+            requesterRoles: breakerRolesOf(admin.roles),
             decideAt: '/admin/pool/policy',
           },
         },
@@ -731,7 +744,7 @@ export class AdminPoolService {
         status: 'pending_approval' as const,
         approvals: 1,
         of: 2,
-        expiresAt: addHours(approval.createdAt, BREAKER_REQUEST_TTL_HOURS).toISOString(),
+        expiresAt: expiryOf(approval.createdAt).toISOString(),
         auditSeq: audit.seq,
       };
     });
@@ -743,10 +756,15 @@ export class AdminPoolService {
     input: CircuitBreakerDecision,
     meta: RequestMeta,
   ) {
-    if (!BREAKER_APPROVER_PERMISSIONS.some((p) => admin.permissions.includes(p))) {
-      throw new AppError('FORBIDDEN', 'Your role does not allow this action', {
-        missingPermissions: [BREAKER_APPROVER_PERMISSIONS[0]],
-      });
+    const myRoles = breakerRolesOf(admin.roles);
+    if (myRoles.length === 0) {
+      throw new AppError(
+        'FORBIDDEN',
+        'Only Super Admin, Finance or Compliance can approve a breaker change',
+        {
+          allowedRoles: [...BREAKER_ROLES],
+        },
+      );
     }
     const approval = await this.prisma.adminApproval.findUnique({ where: { id: approvalId } });
     if (!approval || approval.targetType !== 'feature_flag' || approval.targetId !== ENTRIES_FLAG)
@@ -759,7 +777,19 @@ export class AdminPoolService {
         'Four-eyes rule: a different admin must give the second approval',
       );
     }
-    if (addHours(approval.createdAt, BREAKER_REQUEST_TTL_HOURS) <= new Date()) {
+    const requesterRoles = await this.prisma.adminUserRole.findMany({
+      where: { adminUserId: approval.requestedByAdminId },
+      select: { role: { select: { key: true } } },
+    });
+    const shared = myRoles.filter((r) => requesterRoles.some((x) => x.role.key === r));
+    if (shared.length === myRoles.length) {
+      throw new AppError(
+        'FORBIDDEN',
+        'Dual control: the second approver must hold a different role than the requester',
+        { requesterRoles: requesterRoles.map((x) => x.role.key) },
+      );
+    }
+    if (expiryOf(approval.createdAt) <= new Date()) {
       await this.prisma.adminApproval.update({
         where: { id: approval.id },
         data: { status: 'expired' },

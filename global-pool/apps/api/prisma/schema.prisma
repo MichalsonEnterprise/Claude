@@ -1057,7 +1057,7 @@ model RandomnessRequest {
 
   round Round @relation(fields: [roundId], references: [id])
 
-  @@unique([provider, requestId])
+  @@unique([roundId, provider, requestId])
   @@index([roundId, status])
   @@map("randomness_requests")
 }

@@ -18,8 +18,8 @@ export function demoShiftDays(nowMs: number = Date.now()): number {
 
 /** Shift a DEMO ISO timestamp by `days` whole days (null passes through). */
 export function shiftIso<T extends string | null | undefined>(iso: T, days: number): T {
-  if (!iso) return iso;
-  return new Date(Date.parse(iso) + days * DAY_MS).toISOString() as T;
+  if (!iso || days === 0) return iso;
+  return new Date(Date.parse(iso) + days * DAY_MS).toISOString().replace('.000Z', 'Z') as T;
 }
 
 /**

@@ -16,19 +16,22 @@
  ┌──────────────────────────── @gp/api (NestJS 11) ─────────┴───────────────────────────┐
  │ HTTP pipeline · modules · ledger · audit · BullMQ workers · WebSocket gateway        │
  └───────┬─────────────────────────┬─────────────────────────────┬──────────────────────┘
-         │ Prisma 6                │ ioredis / BullMQ             │ viem (read-only)
+         │ Prisma 6                │ ioredis / BullMQ             │ viem (reads + testnet signer)
          ▼                         ▼                              ▼
-   PostgreSQL 16             Redis 7                     Arbitrum Sepolia RPC
-   ledger · users ·          queues (deposits,           test-USDT Transfer logs (deposits)
-   rounds · audit …          withdrawals, rounds),       GlobalPoolRounds events
-                             step-up token replay        (DrawRequested / DrawFulfilled, Chainlink VRF v2.5)
+   PostgreSQL 16             Redis 7                     Arbitrum Sepolia RPC (or local Anvil 31337 in dev/e2e)
+   ledger · users ·          queues (deposits,           test-USDT Transfer logs + receipts (deposits, re-org safe)
+   rounds · audit ·          withdrawals, rounds,        test-USDT transfers from the hot wallet (withdrawals)
+   signed-tx outbox …        emails), step-up replay,    GlobalPoolRounds: openRound · commitEntries · cancelRound ·
+                             socket.io Redis adapter     requestDraw · DrawFulfilled (Chainlink VRF v2.5) · recordSettlement
 ```
 
 **Systems of record.** The API ledger owns player balances (Available / Locked / Pending / Owed), entries, fees,
 refunds and prize credits. The chain owns custody balances and, through `GlobalPoolRounds`, the round rules, the
 committed entry list, the VRF word and the settlement attestation. The API never treats itself as the authority for
 on-chain balances: deposits are credited only from observed logs after N confirmations, and `chain_clearing:<network>`
-is the ledger's mirror of custody, to be reconciled against the chain.
+is the ledger's mirror of custody, to be reconciled against the chain. With `POOL_ONCHAIN_MIRROR=true` every round is
+mirrored on `GlobalPoolRounds`, and settlement refuses to credit any prize unless the database winners equal the
+contract's `computeWinners()` for the VRF word.
 
 ### Source layout
 
@@ -40,9 +43,11 @@ apps/api/
   src/main.ts, app.module.ts, app.setup.ts
   src/config/                    zod env schema, AppConfig, .env loader (no override)
   src/common/                    errors (AppError → envelope), exception filter, crypto, money, request types, DTO helpers
-  src/infra/                     prisma, redis, BullMQ queues, pino logging, socket.io adapter
+  src/infra/                     prisma, redis, BullMQ queues, pino logging, socket.io adapter (+ Redis adapter),
+                                 openapi/response-schemas.ts (zod → OpenAPI response components)
   src/modules/<feature>/         module · controller · service · DTOs · *.spec.ts
-  test/                          e2e (supertest + socket.io-client) against globalpool_test
+  test/                          e2e (supertest + socket.io-client) against globalpool_test; anvil.ts deploys the
+                                 contracts on a throwaway Anvil devnet for chain.e2e-spec.ts (and `pnpm devnet`)
 ```
 
 Cross-cutting services (ledger, audit, idempotency, compliance, security, auth guards, notifications, transactions,
@@ -87,8 +92,22 @@ helmet (CSP, no x-powered-by) → CORS (CORS_ORIGINS) → JSON body ≤ 256 kB �
   runs `selectWinners()`, a bit-for-bit mirror of `DrawMath.sol`. Unit tests check it against the contract's
   Solidity-proven vectors.
 - `RandomnessProvider` interface: `MockVrfProvider` (dev; deterministic from the request id, always labelled `mock`)
-  and `ChainlinkVrfProvider` (read-only adapter for `GlobalPoolRounds` events on Arbitrum Sepolia; mock is refused in
-  production).
+  and `ChainlinkVrfProvider` (VRF fulfilment watcher for `GlobalPoolRounds` events; `DrawFulfilled` must have
+  `VRF_FULFILLMENT_CONFIRMATIONS`; mock is refused in production).
+- **On-chain mirroring** (`onchain-rounds`): open → `openRound` with a `rulesHash` of the canonical rules JSON; close →
+  random 32-byte salt per entry (encrypted at rest), salted user commitments, OpenZeppelin `SimpleMerkleTree` over
+  `keccak256(abi.encode(index, entryId, commitment))` (the `@gp/contracts/verify` encodings, proven equal to
+  `DrawMath.sol` — a unit test rebuilds the contract fixture's 18,640-entry root) → `commitEntries`; the contract's
+  threshold check decides `requestDraw` or `cancelRound`; after fulfilment the DB winners are compared with
+  `computeWinners()` / `prizeAmounts()` before any credit; settlement → payouts tree → `recordSettlement`. Steps are
+  idempotent (the chain state decides), frozen data is append-only, and a requested draw is never cancelled: after
+  24 h it is re-requested (first fulfilment wins, audited).
+- **Transactions the API signs** go through `ChainSignerService`: eth_chainId check (421614 / 31337 only), simulation
+  with decoded custom errors, DB nonce manager (`chain_signer_nonces`, row lock, `max(stored, pending)`), signed-tx
+  outbox (`chain_transactions`, stored before broadcast), re-broadcast of the same bytes, `mined` / `reverted` /
+  `dropped` tracking with confirmations. Roles: OPERATOR (open, commit), KEEPER (requestDraw, cancel — permissionless
+  calls), SETTLER (recordSettlement), hot wallet (withdrawals); testnet keys from env, production keys belong in a
+  KMS/HSM.
 - There is no code path for an admin to set results, pick winners, settle by hand, adjust balances or edit ledger rows.
   Public `GET /pool/rounds/:n/verify` recomputes the winners from the stored inputs.
 
@@ -123,11 +142,12 @@ reason + MFA + audit. No VPN or geo-bypass hints anywhere.
 
 ### Background jobs (BullMQ)
 
-| Queue         | Jobs                                                                                        | Schedule                                                         |
-| ------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `deposits`    | `deposit.watch` — scan test-USDT `Transfer` logs, update confirmations, credit              | every `DEPOSIT_WATCHER_POLL_SECONDS` (skips without RPC / token) |
-| `withdrawals` | `withdrawal.risk-check` (retry path), `withdrawal.broadcast` (no signer yet → stays queued) | on demand                                                        |
-| `rounds`      | `round.tick` (open / close / draw / settle / cancel / auto-schedule), `round.settle`        | every 30 s                                                       |
+| Queue         | Jobs                                                                                                                                                      | Schedule                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `deposits`    | `deposit.watch` — reconcile unconfirmed deposits via receipts (re-org), scan `Transfer` logs (re-org window), credit                                      | every `DEPOSIT_WATCHER_POLL_SECONDS` (skips without RPC / token) |
+| `withdrawals` | `withdrawal.risk-check` (retry path), `withdrawal.broadcast` (testnet broadcaster, else stays queued), `withdrawal.track` (confirm / fail / retry queued) | on demand; track every `WITHDRAWAL_TRACK_POLL_SECONDS`           |
+| `rounds`      | `round.tick` (mirror housekeeping, open / close / commit / draw / settle / cancel / auto-schedule), `round.settle`                                        | every 30 s                                                       |
+| `emails`      | `email.notification` — render + send the email of a notification (log / SMTP)                                                                             | on demand (delayed 2 s, retried)                                 |
 
 Workers start only with `JOBS_ENABLED=true` (tests and one-off scripts disable them). Jobs are idempotent: state is
 guarded by compare-and-set status updates and unique posting event keys.
@@ -137,19 +157,28 @@ guarded by compare-and-set status updates and unique posting event keys.
 - **Docker contract:** `build` (`prisma generate` + `nest build`), `start:prod` (`node dist/src/main.js`),
   `db:migrate:deploy`. The API listens on `:4000`; `/health` checks PostgreSQL and Redis (503 when degraded) and is
   what the container health check uses.
-- **Scaling notes:** the HTTP layer is stateless apart from the in-memory throttler and the in-process socket.io
-  server. Running several API replicas needs a Redis throttler store and the socket.io Redis adapter (next batch).
-  BullMQ workers can run in a separate process with the same image (`JOBS_ENABLED=true` there, `false` on the web
-  replicas).
-- **Tests:** unit tests for posting rules, fee math, selection determinism (vs the contract vectors), RG limits,
-  audit chain, crypto, HD derivation, AML and env validation; e2e tests (supertest) on `globalpool_test` for auth,
-  onboarding, deposits, entries, idempotency, RG, withdrawals, four eyes, admin auth / RBAC / audit, settlement,
-  cancellation, WebSocket and the absence of result-altering endpoints.
+- **Scaling notes:** the HTTP layer is stateless apart from the in-memory throttler. `SOCKET_IO_REDIS_ADAPTER=true`
+  shares socket.io broadcasts across replicas (an event raised by the worker that settles a round reaches clients on
+  every replica; e2e-tested with two app instances). A Redis throttler store is still missing. BullMQ workers can run
+  in a separate process with the same image (`JOBS_ENABLED=true` there, `false` on the web replicas); the DB nonce
+  manager keeps signing safe across processes.
+- **Docker:** the image installs OpenSSL (Prisma engine). `docker compose --profile dev` runs `api-dev`
+  (`NODE_ENV=development` → DEV MOCK player login, migrations + DEMO seed on start, jobs on, log mail transport) and
+  `web-dev`; `--profile prod` runs production mode (DEV MOCK refused; Privy app id needed). Secrets come from
+  `.env.example` (dev placeholders) overridden by `.env`.
+- **Tests:** unit tests for posting rules, fee math, selection determinism (vs the contract vectors), commitments and
+  payout trees (vs the contract fixture roots), RG limits, audit chain, crypto, HD derivation, AML and env validation;
+  e2e tests (supertest) on `globalpool_test` for auth, onboarding, deposits, entries, idempotency, RG, withdrawals,
+  four eyes, admin auth / RBAC / audit, settlement, cancellation, WebSocket and the absence of result-altering
+  endpoints; chain e2e on a throwaway Anvil (round mirroring, broadcaster, re-org-safe watcher); infra e2e (email via
+  log + a fake SMTP server, socket.io Redis adapter across two replicas); OpenAPI contract test (live responses parse
+  with the documented schemas).
 
 ### Not yet built (next batches)
 
-On-chain mirroring writes (`openRound` / `commitEntries` with entry Merkle trees and per-entry salts /
-`recordSettlement`) through a keeper with a testnet operator key; a testnet withdrawal signer and confirmation
-tracking; a deposit-sweep / treasury process; reorg handling in the deposit watcher; real KYC / AML providers; email
-delivery (anti-phishing code in templates); referral commission accrual; game sessions (commit–reveal simulation);
-a Redis-backed throttler and socket.io adapter for multiple replicas.
+A deposit-sweep / treasury process (deposit addresses are xpub-derived; sweeping needs the offline key); a deployed
+`GlobalPoolRounds` + funded VRF subscription on Arbitrum Sepolia (the mirror is proven on Anvil only); KMS/HSM signers
+instead of env keys; replacement (speed-up / cancel) transactions for stuck withdrawals (today: same-bytes
+re-broadcast, `dropped` only when the nonce is used elsewhere); real KYC / AML providers; referral commission accrual;
+game sessions (commit–reveal simulation); a Redis-backed throttler. RG session-time enforcement and reality checks
+are owned by the RG module (rg-history batch).

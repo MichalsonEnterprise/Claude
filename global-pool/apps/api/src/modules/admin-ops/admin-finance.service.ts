@@ -47,6 +47,19 @@ const OPEN_WITHDRAWAL: WithdrawalStatus[] = [
   'broadcast',
 ];
 
+/** Read-only risk score (0–100) for a risk level — the same bands as the Admin/Risk Score Meter. */
+export function riskScoreOf(level: string | null | undefined): number {
+  return level === 'critical'
+    ? 91
+    : level === 'high'
+      ? 72
+      : level === 'medium'
+        ? 46
+        : level === 'low'
+          ? 18
+          : 0;
+}
+
 /** "@nova.k" from a stored handle ("nova.k"). */
 export const atHandle = (h: string | null | undefined) => (h ? `@${h.replace(/^@/, '')}` : null);
 
@@ -116,7 +129,28 @@ export class AdminFinanceService {
         _sum: { amount: true },
       }),
     ]);
-    const cursors = await this.prisma.chainCursor.findMany();
+    const [cursors, creditedToday, unsupported24h, heldRows] = await Promise.all([
+      this.prisma.chainCursor.findMany(),
+      this.prisma.deposit.groupBy({
+        by: ['network'],
+        where: { status: 'credited', creditedAt: { gte: startOfUtcDay(now) } },
+        _count: true,
+      }),
+      this.prisma.deposit.aggregate({
+        where: { status: 'rejected', detectedAt: { gte: since24h } },
+        _count: true,
+        _sum: { amount: true },
+      }),
+      this.prisma.deposit.findMany({
+        where: { amlAlerts: { some: { status: { in: ['open', 'under_review', 'escalated'] } } } },
+        orderBy: { detectedAt: 'desc' },
+        take: 5,
+        include: {
+          user: { select: { handle: true } },
+          amlAlerts: { select: { id: true, rule: true, riskLevel: true }, take: 1 },
+        },
+      }),
+    ]);
     const stat = (s: DepositStatus) => {
       const r = byStatus.find((b) => b.status === s);
       return { count: r?._count ?? 0, amount: usdt(r?._sum.amount) };
@@ -142,6 +176,7 @@ export class AdminFinanceService {
         confirming: confirming?._count ?? 0,
         confirmingAmount: usdt(confirming?._sum.amount),
         deposits: rowsFor.reduce((n, r) => n + r._count, 0),
+        creditedToday: creditedToday.find((c) => c.network === key)?._count ?? 0,
       };
     });
     return {
@@ -152,8 +187,25 @@ export class AdminFinanceService {
         credited: stat('credited'),
         rejected: stat('rejected'),
         heldForCompliance: held,
+        unsupported24h: { count: unsupported24h._count, amount: usdt(unsupported24h._sum.amount) },
       },
       networks,
+      held: heldRows.map((d) => ({
+        id: d.id,
+        reference: `DP-${d.number}`,
+        handle: atHandle(d.user.handle),
+        network: d.network,
+        networkName: CHAINS[d.network].name,
+        amount: usdt(d.amount),
+        alert: d.amlAlerts[0]
+          ? {
+              id: d.amlAlerts[0].id,
+              rule: d.amlAlerts[0].rule,
+              riskLevel: d.amlAlerts[0].riskLevel,
+            }
+          : null,
+        isDemo: d.isDemo,
+      })),
       ...paginate(
         rows.map((d) => ({
           id: d.id,
@@ -224,7 +276,7 @@ export class AdminFinanceService {
             }
         : {}),
     };
-    const [rows, total, counts, held, oldestOpen] = await Promise.all([
+    const [rows, total, counts, held, oldestOpen, paid24h, openRows] = await Promise.all([
       this.prisma.withdrawal.findMany({
         where,
         orderBy: { createdAt: view === 'queue' ? 'asc' : 'desc' },
@@ -247,7 +299,30 @@ export class AdminFinanceService {
         orderBy: { createdAt: 'asc' },
         select: { createdAt: true },
       }),
+      this.prisma.withdrawal.aggregate({
+        where: { status: 'confirmed', confirmedAt: { gte: addHours(now, -24) } },
+        _sum: { amount: true },
+        _count: true,
+      }),
+      this.prisma.withdrawal.findMany({
+        where: { status: { in: ['requested', 'risk_check', 'under_review', 'queued'] } },
+        orderBy: { createdAt: 'asc' },
+        take: 200,
+        select: {
+          id: true,
+          number: true,
+          createdAt: true,
+          amount: true,
+          status: true,
+          riskLevel: true,
+          requiresFourEyes: true,
+          user: { select: { handle: true } },
+        },
+      }),
     ]);
+    const slaLeft = (created: Date) =>
+      Math.floor((addHours(created, WITHDRAWAL_SLA_HOURS).getTime() - now.getTime()) / 60_000);
+    const withinSla = openRows.filter((r) => slaLeft(r.createdAt) >= 0).length;
     const count = (...s: WithdrawalStatus[]) =>
       counts.filter((c) => s.includes(c.status)).reduce((n, c) => n + c._count, 0);
     return {
@@ -268,7 +343,21 @@ export class AdminFinanceService {
         broadcasting: count('broadcast'),
         completed: count('confirmed'),
         rejected: count('rejected', 'failed', 'cancelled'),
+        withinSlaPercent:
+          openRows.length === 0 ? 100 : Math.round((withinSla / openRows.length) * 100),
+        paid24h: { count: paid24h._count, amount: usdt(paid24h._sum.amount) },
       },
+      slaWatch: openRows.slice(0, 3).map((r) => ({
+        id: r.id,
+        reference: `WD-${r.number}`,
+        handle: atHandle(r.user.handle),
+        amount: usdt(r.amount),
+        status: r.status,
+        statusLabel: WITHDRAWAL_STATUS_LABEL[r.status],
+        riskLevel: r.riskLevel,
+        requiresFourEyes: r.requiresFourEyes,
+        slaMinutesLeft: slaLeft(r.createdAt),
+      })),
       view,
       ...paginate(
         rows.map((w) => {
@@ -287,6 +376,7 @@ export class AdminFinanceService {
             networkFee: usdt(w.networkFee),
             youReceive: usdt(w.netAmount),
             riskLevel: w.riskLevel,
+            riskScore: riskScoreOf(w.riskLevel),
             riskFlags: w.riskFlags,
             flagged: w.flagged,
             requiresFourEyes: w.requiresFourEyes,
@@ -320,7 +410,7 @@ export class AdminFinanceService {
       where: { id },
       include: {
         events: { orderBy: { createdAt: 'asc' } },
-        user: { include: { profile: true } },
+        user: { include: { profile: true, totpSecret: { select: { status: true } } } },
         amlAlerts: { orderBy: { createdAt: 'desc' } },
       },
     });
@@ -382,6 +472,7 @@ export class AdminFinanceService {
         country: w.user.profile?.country ?? null,
         kycLevel: w.user.profile?.kycLevel ?? 'none',
         vipTier: w.user.profile?.vipTier ?? 'bronze',
+        twoFactorEnabled: w.user.totpSecret?.status === 'active',
         memberSince: w.user.createdAt.toISOString(),
         confirmedWithdrawals: previousCount,
         isDemo: w.user.isDemo,
@@ -404,6 +495,14 @@ export class AdminFinanceService {
           : null,
       },
       fourEyes,
+      risk: {
+        score: riskScoreOf(w.riskLevel),
+        level: w.riskLevel ?? 'low',
+        factors: [
+          ...(Array.isArray(w.riskFlags) ? (w.riskFlags as string[]) : []),
+          `KYC ${(w.user.profile?.kycLevel ?? 'none').replace('level_', 'L')}`,
+        ],
+      },
       canDecide: w.status === 'under_review',
       canApprove: w.status === 'under_review' && !fourEyes.firstApprovedByMe,
       amlAlerts: w.amlAlerts.map((a) => ({
@@ -436,7 +535,9 @@ export class AdminFinanceService {
         hash: r.hash,
         createdAt: r.createdAt.toISOString(),
       })),
-      postings: postings.map((p) => this.postingView(p)),
+      postings: postings.map((p) =>
+        this.postingView(p, new Map([[w.userId, atHandle(w.user.handle)]])),
+      ),
       fees: {
         networkFee: usdt(w.networkFee),
         platformFee: usdt(w.platformFee),
@@ -716,14 +817,22 @@ export class AdminFinanceService {
     const roundOf = new Map(rounds.map((r) => [r.id, r.number]));
     let debits = money(0);
     let credits = money(0);
+    const chain = await this.journalDigest(new Set(rows.map((p) => p.id)));
     const items = rows.map((p) => {
       const v = this.postingView(p, handleOf, roundOf);
       debits = debits.plus(m(v.debits));
       credits = credits.plus(m(v.credits));
-      return v;
+      const link = chain.links.get(p.id);
+      return {
+        ...v,
+        journalSeq: link?.seq ?? null,
+        prevHash: link?.prevHash ?? null,
+        chainHash: link?.hash ?? null,
+      };
     });
     return {
       ...paginate(items, total, query),
+      journal: { postings: chain.postings, headHash: chain.headHash },
       pageTotals: {
         debits: toUSDTString(debits),
         credits: toUSDTString(credits),
@@ -752,7 +861,11 @@ export class AdminFinanceService {
         ledgerTotal: reconcile.ledgerTotal,
         unbalancedPostings: reconcile.unbalancedPostings,
       },
-      journal: digest,
+      journal: {
+        postings: digest.postings,
+        headHash: digest.headHash,
+        algorithm: digest.algorithm,
+      },
       auditChain: {
         ok: auditChain.ok,
         checked: auditChain.checked,
@@ -768,7 +881,8 @@ export class AdminFinanceService {
    * Running SHA-256 over every posting in commit order (id, kind, reference, createdAt, sorted lines). Any edit or
    * deletion of history would change it; DB triggers already make both impossible.
    */
-  async journalDigest() {
+  async journalDigest(withLinks?: ReadonlySet<string>) {
+    const links = new Map<string, { seq: number; prevHash: string; hash: string }>();
     const rows = await this.prisma.$queryRaw<
       { id: string; kind: string; reference: string | null; created_at: Date; lines: string }[]
     >`
@@ -777,14 +891,17 @@ export class AdminFinanceService {
       FROM ledger_postings p JOIN ledger_entries e ON e.posting_id = p.id JOIN ledger_accounts a ON a.id = e.account_id
       GROUP BY p.id ORDER BY p.created_at, p.id`;
     let head = createHash('sha256').update('GLOBAL_POOL_LEDGER_V1').digest('hex');
-    for (const r of rows) {
+    rows.forEach((r, i) => {
+      const prev = head;
       head = createHash('sha256')
         .update(
           `${head}|${r.id}|${r.kind}|${r.reference ?? ''}|${r.created_at.toISOString()}|${r.lines}`,
         )
         .digest('hex');
-    }
+      if (withLinks?.has(r.id)) links.set(r.id, { seq: i + 1, prevHash: prev, hash: head });
+    });
     return {
+      links,
       postings: rows.length,
       headHash: head,
       algorithm: 'sha256(prev | id | kind | reference | createdAt | lines)',

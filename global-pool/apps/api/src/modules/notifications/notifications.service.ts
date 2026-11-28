@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { paginate, type PaginationQuery } from '@gp/shared/schemas';
 
 import { notFound } from '../../common/errors';
 import { PrismaService, type Db } from '../../infra/prisma/prisma.service';
+import { EmailService } from '../email/email.service';
 
 export type NotificationType =
   | 'deposit.detected'
   | 'deposit.credited'
+  | 'deposit.reversed'
   | 'withdrawal.requested'
   | 'withdrawal.under_review'
   | 'withdrawal.queued'
@@ -58,9 +60,13 @@ function categoryWhere(category: NotificationCategoryFilter): Prisma.Notificatio
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly email?: EmailService,
+  ) {}
 
-  notify(
+  /** In-app notification (inside the caller's DB transaction) + queued email for email-worthy types. */
+  async notify(
     db: Db,
     input: {
       userId: string;
@@ -71,7 +77,7 @@ export class NotificationsService {
       isDemo?: boolean;
     },
   ) {
-    return db.notification.create({
+    const row = await db.notification.create({
       data: {
         userId: input.userId,
         type: input.type,
@@ -81,6 +87,9 @@ export class NotificationsService {
         isDemo: input.isDemo ?? false,
       },
     });
+    // Never blocks or fails the business transaction; the worker retries until the row is committed.
+    void this.email?.enqueueForNotification(row.id, row.type);
+    return row;
   }
 
   async list(

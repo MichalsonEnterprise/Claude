@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fromBaseUnits, toUSDTString } from '@gp/shared/money';
 import { keccak256, stringToHex, type Hex } from 'viem';
 import { describe, expect, it } from 'vitest';
 
@@ -60,13 +61,13 @@ describe('round commitments (mirror of GlobalPoolRounds encodings)', () => {
         entryIndex: p.entryIndex,
         entryIdBytes32: p.entryId,
         userCommitment: p.userCommitment,
-        amount: (Number(p.amount) / 1e6).toFixed(2),
+        amount: toUSDTString(fromBaseUnits(p.amount)),
       })),
     );
     expect(payouts.root).toBe(fixture.settlement.payoutsRoot);
     expect(payouts.totalUnits).toBe(186_400_000_000n);
     for (const p of payouts.rows) expect(verifyProof(payouts.root, p.leaf, p.proof)).toBe(true);
-  });
+  }, 60_000); // 18,640 keccak leaves + tree: ~3 s alone, slower when the suite runs in parallel
 
   it('uses fresh random salts, rejects a non-canonical order and commits zero entries as the zero root', () => {
     const entries = [1, 2, 3].map((seq) => ({

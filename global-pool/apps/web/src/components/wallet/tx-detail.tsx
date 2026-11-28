@@ -3,7 +3,7 @@
 import { explorerTxUrl, type ChainKey } from '@gp/shared/chains';
 import { TX_TYPE_LABEL } from '@gp/shared/enums';
 import { formatTimeUTC } from '@gp/shared/format';
-import { formatUSDT } from '@gp/shared/money';
+import { formatUSDT, gt } from '@gp/shared/money';
 import { ArrowRight, ExternalLink, Hash } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -66,6 +66,11 @@ export function TxHash({
   );
 }
 
+/** End a server sentence with a full stop before more text follows. */
+function sentence(s: string): string {
+  return /[.!?]$/.test(s.trim()) ? s : `${s.trim()}.`;
+}
+
 function timelineFor(tx: TxDetail): TimelineItem[] {
   if (tx.type === 'withdrawal') {
     const items: TimelineItem[] = tx.timeline.map((s, i) => ({
@@ -82,8 +87,17 @@ function timelineFor(tx: TxDetail): TimelineItem[] {
     const st = tx.withdrawalStatus;
     if (st && ['requested', 'risk_check', 'under_review', 'queued', 'broadcast'].includes(st)) {
       if (st !== 'broadcast')
-        items.push({ id: 'sent', title: 'Sent to the network', detail: 'The transaction hash appears here', state: 'todo' });
-      items.push({ id: 'confirmed', title: 'Confirmed on-chain', state: st === 'broadcast' ? 'current' : 'todo' });
+        items.push({
+          id: 'sent',
+          title: 'Sent to the network',
+          detail: 'The transaction hash appears here',
+          state: 'todo',
+        });
+      items.push({
+        id: 'confirmed',
+        title: 'Confirmed on-chain',
+        state: st === 'broadcast' ? 'current' : 'todo',
+      });
     }
     return items;
   }
@@ -91,18 +105,33 @@ function timelineFor(tx: TxDetail): TimelineItem[] {
     const c = tx.confirmations;
     const credited = tx.status === 'completed';
     return [
-      { id: 'detected', title: 'Detected', detail: `On ${chainName(tx.network)}`, time: formatTimeUTC(tx.createdAt), state: 'done' },
+      {
+        id: 'detected',
+        title: 'Detected',
+        detail: `On ${chainName(tx.network)}`,
+        time: formatTimeUTC(tx.createdAt),
+        state: 'done',
+      },
       {
         id: 'confirming',
         title: 'Confirming',
         detail: c ? `${c.current} / ${c.required} confirmations` : undefined,
-        state: credited ? 'done' : tx.status === 'failed' || tx.status === 'rejected' ? 'error' : 'current',
-        extra: c && !credited ? <ConfirmationBar current={c.current} required={c.required} /> : undefined,
+        state: credited
+          ? 'done'
+          : tx.status === 'failed' || tx.status === 'rejected'
+            ? 'error'
+            : 'current',
+        extra:
+          c && !credited ? (
+            <ConfirmationBar current={c.current} required={c.required} />
+          ) : undefined,
       },
       {
         id: 'credited',
         title: credited ? 'Credited to Available' : 'Credited',
-        detail: credited ? undefined : `Shown as Pending until ${c?.required ?? 'all'} confirmations`,
+        detail: credited
+          ? undefined
+          : `Shown as Pending until ${c?.required ?? 'all'} confirmations`,
         time: tx.completedAt ? formatTimeUTC(tx.completedAt) : undefined,
         state: credited ? 'done' : 'todo',
       },
@@ -112,7 +141,12 @@ function timelineFor(tx: TxDetail): TimelineItem[] {
     id: `${i}`,
     title: s.label,
     time: formatTimeUTC(s.at),
-    state: tx.status === 'failed' || tx.status === 'rejected' ? 'error' : tx.status === 'pending' ? 'current' : 'done',
+    state:
+      tx.status === 'failed' || tx.status === 'rejected'
+        ? 'error'
+        : tx.status === 'pending'
+          ? 'current'
+          : 'done',
   }));
 }
 
@@ -141,7 +175,7 @@ export function TxDetailDrawer({
           'Transaction'
         )
       }
-      description={tx ? `${tx.id} · ${when(tx.createdAt)}` : reference ?? undefined}
+      description={tx ? `${tx.id} · ${when(tx.createdAt)}` : (reference ?? undefined)}
       footer={
         tx?.type === 'withdrawal' ? (
           <Button asChild block variant="secondary" trailingIcon={<ArrowRight />}>
@@ -192,15 +226,20 @@ function TxDetailBody({ tx }: { tx: TxDetail }) {
       )}
 
       {failed && (
-        <Alert type="security" title={tx.type === 'withdrawal' ? 'Withdrawal not sent — funds returned' : 'Not completed'}>
-          {tx.statusDetail ?? 'This transaction did not complete.'}
+        <Alert
+          type="security"
+          title={
+            tx.type === 'withdrawal' ? 'Withdrawal not sent — funds returned' : 'Not completed'
+          }
+        >
+          {sentence(tx.statusDetail ?? 'This transaction did not complete.')}
           {tx.type === 'withdrawal' && ' Nothing left GLOBAL POOL, so no network fee was charged.'}
         </Alert>
       )}
       {tx.type === 'withdrawal' && tx.withdrawalStatus === 'under_review' && (
         <Alert type="warning" title="Under review">
-          {tx.statusDetail ?? 'A compliance analyst checks this withdrawal before it is sent.'} You can cancel it
-          from the withdrawal tracker until it is sent.
+          {tx.statusDetail ?? 'A compliance analyst checks this withdrawal before it is sent.'} You
+          can cancel it from the withdrawal tracker until it is sent.
         </Alert>
       )}
 
@@ -209,18 +248,40 @@ function TxDetailBody({ tx }: { tx: TxDetail }) {
           { label: 'Type', value: TX_TYPE_LABEL[tx.type] },
           { label: 'Amount', value: formatUSDT(tx.amount) },
           ...(tx.networkFee !== null
-            ? [{ label: 'Network fee', value: tx.type === 'withdrawal' ? `−${formatUSDT(tx.networkFee)}` : formatUSDT(tx.networkFee) }]
+            ? [
+                {
+                  label: 'Network fee',
+                  value:
+                    tx.type === 'withdrawal' && gt(tx.networkFee, 0)
+                      ? `−${formatUSDT(tx.networkFee)}`
+                      : formatUSDT(tx.networkFee),
+                },
+              ]
             : []),
           { label: 'Platform fee', value: formatUSDT(tx.platformFee) },
           {
-            label: tx.direction === 'in' ? 'Credited' : tx.type === 'withdrawal' ? 'You receive' : 'Total paid',
+            label:
+              tx.direction === 'in'
+                ? 'Credited'
+                : tx.type === 'withdrawal'
+                  ? 'You receive'
+                  : 'Total paid',
             value: <span className="text-body-s-strong">{formatUSDT(tx.netAmount)}</span>,
           },
           ...(tx.network ? [{ label: 'Network', value: chainName(tx.network) }] : []),
-          ...(tx.addressDisplay ? [{ label: tx.direction === 'out' ? 'To' : 'Address', value: <span className="font-mono text-mono-s">{tx.addressDisplay}</span> }] : []),
+          ...(tx.addressDisplay
+            ? [
+                {
+                  label: tx.direction === 'out' ? 'To' : 'Address',
+                  value: <span className="font-mono text-mono-s">{tx.addressDisplay}</span>,
+                },
+              ]
+            : []),
           { label: 'Reference', value: <span className="font-mono text-mono-s">{tx.id}</span> },
           { label: 'Created', value: when(tx.createdAt) },
-          ...(tx.completedAt ? [{ label: failed ? 'Closed' : 'Completed', value: when(tx.completedAt) }] : []),
+          ...(tx.completedAt
+            ? [{ label: failed ? 'Closed' : 'Completed', value: when(tx.completedAt) }]
+            : []),
         ]}
       />
 

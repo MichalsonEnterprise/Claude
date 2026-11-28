@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-import type { AuthView } from './types';
+import type { AuthView, WalletProviderId } from './types';
 
 export interface AuthDialogState {
   view: AuthView;
@@ -16,6 +16,8 @@ export interface AuthDialogState {
   email?: string;
   /** Keep the browser URL in sync with the view (/sign-in, /sign-up, /verify) — route pages only. */
   syncUrl?: boolean;
+  /** Wallet quick-connect tile chosen on the sign-in view (starts that wallet right away). */
+  walletChoice?: WalletProviderId;
 }
 
 export interface SessionExpiredState {

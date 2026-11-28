@@ -247,5 +247,8 @@ describe('RBAC & state machine', () => {
     expect(canTransitionWithdrawal('broadcast', 'confirmed')).toBe(true);
     expect(canTransitionWithdrawal('confirmed', 'requested')).toBe(false);
     expect(canTransitionWithdrawal('requested', 'broadcast')).toBe(false);
+    // a transfer that cannot be sent (simulation revert) fails from queued; funds go back to Available
+    expect(canTransitionWithdrawal('queued', 'failed')).toBe(true);
+    expect(canTransitionWithdrawal('failed', 'queued')).toBe(false);
   });
 });

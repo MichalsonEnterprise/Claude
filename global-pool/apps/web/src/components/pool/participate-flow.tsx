@@ -156,7 +156,7 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
     phase.kind === 'success'
       ? `Global Pool · Round ${formatRoundNumber(round.number)} · reference ${phase.result.reference}`
       : phase.kind === 'closed'
-        ? `Entries closed at ${formatTimeUTC(round.closesAt, { seconds: true })} UTC. Nothing was charged.`
+        ? `Entries closed at ${formatTimeUTC(round.closesAt, { seconds: true })}. Nothing was charged.`
         : `Global Pool · Round ${formatRoundNumber(round.number)} · closes ${formatDateTimeUTC(round.closesAt)}`;
 
   const body = (
@@ -172,7 +172,12 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
         />
       )}
       {phase.kind === 'pending' && (
-        <PendingStep round={round} entries={phase.entries} onClose={() => onOpenChange(false)} desktop={desktop} />
+        <PendingStep
+          round={round}
+          entries={phase.entries}
+          onClose={() => onOpenChange(false)}
+          desktop={desktop}
+        />
       )}
       {phase.kind === 'success' && (
         <SuccessStep
@@ -205,7 +210,10 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
       <Ticket aria-hidden className="size-5 text-text-gold" />
     );
 
-  const header = (TitleC: typeof DialogTitle | typeof SheetTitle, DescC: typeof DialogDescription | typeof SheetDescription) => (
+  const header = (
+    TitleC: typeof DialogTitle | typeof SheetTitle,
+    DescC: typeof DialogDescription | typeof SheetDescription,
+  ) => (
     <div className="flex items-start gap-4 border-b border-border-subtle px-4 pt-2 pb-5 tablet:px-6 tablet:pt-6">
       <span
         className={cn(
@@ -297,19 +305,27 @@ function PreviewStep({
     >
       <Body className="flex flex-col gap-4">
         {wrongNetwork && (
-          <Callout tone="warning" icon={<TriangleAlert />} title="Your wallet is on the wrong network">
+          <Callout
+            tone="warning"
+            icon={<TriangleAlert />}
+            title="Your wallet is on the wrong network"
+          >
             Switch your wallet to Arbitrum Sepolia (testnet) to confirm. Entries are still paid from
             your platform balance — there is no on-chain payment from your wallet.
           </Callout>
         )}
-        {error !== null && serverCode !== 'INSUFFICIENT_FUNDS' && serverCode !== 'RG_LIMIT_EXCEEDED' && (
-          <Callout tone="danger" icon={<TriangleAlert />} title="Your entries were not placed">
-            {errorMessage(error)} Nothing was charged.
-            {error instanceof ApiRequestError && error.requestId ? (
-              <span className="block font-mono text-mono-s text-text-tertiary">Ref {error.requestId}</span>
-            ) : null}
-          </Callout>
-        )}
+        {error !== null &&
+          serverCode !== 'INSUFFICIENT_FUNDS' &&
+          serverCode !== 'RG_LIMIT_EXCEEDED' && (
+            <Callout tone="danger" icon={<TriangleAlert />} title="Your entries were not placed">
+              {errorMessage(error)} Nothing was charged.
+              {error instanceof ApiRequestError && error.requestId ? (
+                <span className="block font-mono text-mono-s text-text-tertiary">
+                  Ref {error.requestId}
+                </span>
+              ) : null}
+            </Callout>
+          )}
 
         {/* entries stepper */}
         <div className="flex items-center justify-between gap-4 rounded-lg bg-surface-raised p-4">
@@ -318,7 +334,8 @@ function PreviewStep({
               Entries
             </label>
             <p id="pool-entries-hint" className="text-caption text-text-tertiary">
-              {ENTRY_PRICE} USDT per entry · max {formatCount(MAX_ENTRIES_PER_PURCHASE)} per purchase
+              {ENTRY_PRICE} USDT per entry · max {formatCount(MAX_ENTRIES_PER_PURCHASE)} per
+              purchase
             </p>
           </div>
           <Controller
@@ -373,7 +390,10 @@ function PreviewStep({
         )}
 
         {/* line items (platform fee is its own line, separate from the network fee) */}
-        <dl className="flex flex-col gap-3 rounded-lg bg-surface-raised p-4" aria-label="Cost breakdown">
+        <dl
+          className="flex flex-col gap-3 rounded-lg bg-surface-raised p-4"
+          aria-label="Cost breakdown"
+        >
           <KV
             label="Entries"
             hint={`${formatCount(entries)} × ${ENTRY_PRICE} USDT`}
@@ -442,7 +462,11 @@ function PreviewStep({
                   size="s"
                   variant="ghost"
                   type="button"
-                  onClick={() => form.setValue('entries', Math.min(check.maxEntries, check.maxAffordable!), { shouldValidate: true })}
+                  onClick={() =>
+                    form.setValue('entries', Math.min(check.maxEntries, check.maxAffordable!), {
+                      shouldValidate: true,
+                    })
+                  }
                 >
                   Reduce to {formatCount(Math.min(check.maxEntries, check.maxAffordable))}
                 </Button>
@@ -462,17 +486,21 @@ function PreviewStep({
             </p>
             <p className="text-body-m text-text-primary">
               Your {formatCount(odds.myEntries)} {odds.myEntries === 1 ? 'entry' : 'entries'} of{' '}
-              {formatCount(odds.totalEntries)} → {approxPercent(odds.firstPrizePercent, 3)} chance of
+              {formatCount(odds.totalEntries)} → {approxPercent(odds.firstPrizePercent)} chance of
               1st prize, {approxPercent(odds.anyPrizePercent)} chance of any prize
             </p>
             <p className="text-caption text-text-tertiary">
-              {odds.prizes} prizes per round. Odds change as entries are added until the round closes
-              at {formatTimeUTC(round.closesAt)} UTC.
+              {odds.prizes} prizes per round. Odds change as entries are added until the round
+              closes at {formatTimeUTC(round.closesAt)}.
             </p>
           </div>
         </div>
 
-        <LimitCheck check={check} serverError={serverCode === 'RG_LIMIT_EXCEEDED' ? error : null} onReduce={(n) => form.setValue('entries', n, { shouldValidate: true })} />
+        <LimitCheck
+          check={check}
+          serverError={serverCode === 'RG_LIMIT_EXCEEDED' ? error : null}
+          onReduce={(n) => form.setValue('entries', n, { shouldValidate: true })}
+        />
 
         <LicenceCard />
 
@@ -480,7 +508,10 @@ function PreviewStep({
           <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-text-warning" />
           <span>
             You can lose your stake. Outcomes are decided by Chainlink VRF.{' '}
-            <Link href={POOL_ROUTES.fairness} className="inline-flex items-center gap-1 text-text-brand hover:underline">
+            <Link
+              href={POOL_ROUTES.fairness}
+              className="inline-flex items-center gap-1 text-text-brand hover:underline"
+            >
               How draws are verified <ExternalLink aria-hidden className="size-3.5" />
             </Link>
           </span>
@@ -498,8 +529,14 @@ function PreviewStep({
           )}
         />
       </Body>
-      <Footer className={cn(desktop && 'tablet:justify-stretch')}>
-        <Button type="button" variant="secondary" size="l" onClick={onCancel} className={cn(desktop && 'tablet:w-auto')}>
+      <Footer className={cn(desktop ? 'tablet:justify-stretch' : 'flex-col-reverse')}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="l"
+          onClick={onCancel}
+          className={cn(desktop && 'tablet:w-auto')}
+        >
           Cancel
         </Button>
         <Button
@@ -573,7 +610,10 @@ function LimitCheck({
               : `Within your ${period} ${kind} limit: ${formatUSDT(after, { symbol: false })} of ${formatUSDT(limit)}`}
           </span>
         </p>
-        <Link href={POOL_ROUTES.rg} className="shrink-0 text-label-m text-text-brand hover:underline">
+        <Link
+          href={POOL_ROUTES.rg}
+          className="shrink-0 text-label-m text-text-brand hover:underline"
+        >
           Manage
         </Link>
       </div>
@@ -585,15 +625,18 @@ function LimitCheck({
       {exceeded && (
         <div className="flex flex-wrap items-center gap-3 text-caption text-text-secondary">
           {l && l.maxEntries > 0 ? (
-            <Button size="s" variant="secondary" type="button" onClick={() => onReduce(l.maxEntries)}>
+            <Button
+              size="s"
+              variant="secondary"
+              type="button"
+              onClick={() => onReduce(l.maxEntries)}
+            >
               Reduce to {formatCount(l.maxEntries)} {l.maxEntries === 1 ? 'entry' : 'entries'}
             </Button>
           ) : (
             <span>No entries fit under your limit until it resets.</span>
           )}
-          <span>
-            Limits reset at 00:00 UTC. Increases take effect after a 24 h cool-down.
-          </span>
+          <span>Limits reset at 00:00 UTC. Increases take effect after a 24 h cool-down.</span>
         </div>
       )}
     </div>
@@ -622,14 +665,17 @@ function PendingStep({
         <div className="flex flex-col gap-2 rounded-lg bg-surface-raised p-4 tablet:flex-row tablet:items-center tablet:justify-between">
           <div>
             <p className="text-overline text-text-tertiary uppercase">You pay</p>
-            <p className="text-number-l text-text-primary tabular-nums">{formatUSDT(check.quote.total)}</p>
+            <p className="text-number-l text-text-primary tabular-nums">
+              {formatUSDT(check.quote.total)}
+            </p>
           </div>
           <div className="flex flex-col text-caption text-text-secondary tablet:items-end">
             <span>
               {formatCount(entries)} × {ENTRY_PRICE} = {formatUSDT(check.quote.entryAmount)}
             </span>
             <span>
-              Platform fee {formatCount(entries)} × {PLATFORM_FEE_PER_ENTRY} = {formatUSDT(check.quote.platformFee)}
+              Platform fee {formatCount(entries)} × {PLATFORM_FEE_PER_ENTRY} ={' '}
+              {formatUSDT(check.quote.platformFee)}
             </span>
             <span>Network fee {formatUSDT(check.quote.networkFee)}</span>
           </div>
@@ -646,19 +692,22 @@ function PendingStep({
               id: 'record',
               state: 'current',
               title: `Recording ${formatCount(entries)} ${entries === 1 ? 'entry' : 'entries'} in round ${formatRoundNumber(round.number)}`,
-              description: 'Entry IDs are allocated in sequence. The round’s entry list is committed for the draw at close.',
+              description:
+                'Entry IDs are allocated in sequence. The round’s entry list is committed for the draw at close.',
             },
             {
               id: 'receipt',
               state: 'next',
               title: 'Entry receipt',
-              description: 'Your entry IDs appear here as soon as the purchase is recorded — usually in a second or two.',
+              description:
+                'Your entry IDs appear here as soon as the purchase is recorded — usually in a second or two.',
             },
           ]}
         />
         <Callout tone="info">
-          Round {formatRoundNumber(round.number)} closes at {formatTimeUTC(round.closesAt, { seconds: true })} UTC.
-          Entries recorded before close are in the draw. If recording fails, nothing is charged.
+          Round {formatRoundNumber(round.number)} closes at{' '}
+          {formatTimeUTC(round.closesAt, { seconds: true })}. Entries recorded before close are in
+          the draw. If recording fails, nothing is charged.
         </Callout>
       </Body>
       <Footer>
@@ -732,7 +781,9 @@ function SuccessStep({
           />
           {desktop && (
             <div className="flex flex-col">
-              <span className="text-number-l text-text-primary">×{formatCount(result.entries)}</span>
+              <span className="text-number-l text-text-primary">
+                ×{formatCount(result.entries)}
+              </span>
               <span className="text-caption text-text-tertiary">entries in this purchase</span>
             </div>
           )}
@@ -741,18 +792,35 @@ function SuccessStep({
           <KV label="Round" value={`${formatRoundNumber(result.roundNumber)} · Global Pool`} />
           <KV
             label="Entry IDs"
-            value={<span className="font-mono text-mono-s">{result.firstEntryId} … {result.lastEntryId.split('-').at(-1)}</span>}
+            value={
+              <span className="font-mono text-mono-s">
+                {result.firstEntryId} … {result.lastEntryId.split('-').at(-1)}
+              </span>
+            }
           />
-          <KV label="Reference" value={<span className="font-mono text-mono-s">{result.reference}</span>} />
+          <KV
+            label="Reference"
+            value={<span className="font-mono text-mono-s">{result.reference}</span>}
+          />
           <KV label="Draw" value={formatDateTimeUTC(round.closesAt)} />
           <KV label="Randomness" value="Chainlink VRF · Arbitrum" />
         </dl>
         <dl className="flex flex-col gap-2 rounded-lg border border-border-subtle p-4">
-          <KV label={`Entries ${formatCount(result.entries)} × ${result.entryPrice}`} value={formatUSDT(result.entryAmount)} />
-          <KV label={`Platform fee ${formatCount(result.entries)} × ${PLATFORM_FEE_PER_ENTRY}`} value={formatUSDT(result.platformFee)} />
+          <KV
+            label={`Entries ${formatCount(result.entries)} × ${result.entryPrice}`}
+            value={formatUSDT(result.entryAmount)}
+          />
+          <KV
+            label={`Platform fee ${formatCount(result.entries)} × ${PLATFORM_FEE_PER_ENTRY}`}
+            value={formatUSDT(result.platformFee)}
+          />
           <KV label="Network fee" value={formatUSDT(result.networkFee)} />
           <div className="border-t border-border-subtle pt-2">
-            <KV label={<span className="text-label-l text-text-primary">You paid</span>} value={formatUSDT(result.total)} valueClassName="text-h5" />
+            <KV
+              label={<span className="text-label-l text-text-primary">You paid</span>}
+              value={formatUSDT(result.total)}
+              valueClassName="text-h5"
+            />
           </div>
           <p className="text-caption text-text-tertiary">You can lose your stake.</p>
         </dl>
@@ -766,9 +834,9 @@ function SuccessStep({
         />
         <Callout tone="info" icon={<Percent />}>
           {approxPercent(odds.anyPrizePercent)} chance of any of the {odds.prizes} prizes ·{' '}
-          {approxPercent(odds.firstPrizePercent, 3)} chance of 1st with your {formatCount(odds.myEntries)}{' '}
-          entries. Results are published with the randomness proof after{' '}
-          {formatTimeUTC(round.closesAt)} UTC.
+          {approxPercent(odds.firstPrizePercent)} chance of 1st with your{' '}
+          {formatCount(odds.myEntries)} entries. Results are published with the randomness proof
+          after {formatTimeUTC(round.closesAt)}.
         </Callout>
         {limit && (
           <div className="flex flex-col gap-1.5">
@@ -778,7 +846,10 @@ function SuccessStep({
                 {formatUSDT(limit.after, { symbol: false })} / {formatUSDT(limit.limit)}
               </span>
             </p>
-            <Meter value={money(limit.after).div(limit.limit).toNumber()} label="Participation limit used" />
+            <Meter
+              value={money(limit.after).div(limit.limit).toNumber()}
+              label="Participation limit used"
+            />
           </div>
         )}
         {result.replayed && (
@@ -790,7 +861,13 @@ function SuccessStep({
       <Footer>
         <div className={cn('flex w-full gap-3', desktop ? 'flex-row' : 'flex-col')}>
           {desktop && (
-            <Button type="button" variant="ghost" size="l" leadingIcon={<Download aria-hidden />} onClick={() => downloadReceipt(round, result)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="l"
+              leadingIcon={<Download aria-hidden />}
+              onClick={() => downloadReceipt(round, result)}
+            >
               Download receipt
             </Button>
           )}
@@ -803,7 +880,13 @@ function SuccessStep({
             </Link>
           </Button>
           {!desktop && (
-            <Button type="button" variant="ghost" size="l" leadingIcon={<Download aria-hidden />} onClick={() => downloadReceipt(round, result)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="l"
+              leadingIcon={<Download aria-hidden />}
+              onClick={() => downloadReceipt(round, result)}
+            >
               Download receipt
             </Button>
           )}
@@ -835,10 +918,18 @@ function ClosedStep({
     <>
       <Body className="flex flex-col gap-4">
         <dl className="flex flex-col gap-2.5 rounded-lg bg-surface-raised p-4">
-          <KV label="Not placed" value={`${formatCount(entries)} ${entries === 1 ? 'entry' : 'entries'} in round ${formatRoundNumber(round.number)}`} />
-          <KV label="Would have cost" value={`${q.entryAmount} + ${q.platformFee} fee = ${formatUSDT(q.total)}`} />
+          <KV
+            label="Not placed"
+            value={`${formatCount(entries)} ${entries === 1 ? 'entry' : 'entries'} in round ${formatRoundNumber(round.number)}`}
+          />
+          <KV
+            label="Would have cost"
+            value={`${q.entryAmount} + ${q.platformFee} fee = ${formatUSDT(q.total)}`}
+          />
           <KV label="Charged" value={formatUSDT('0')} valueClassName="text-text-success" />
-          {available !== null && <KV label="Available balance" value={`${formatUSDT(available)} · unchanged`} />}
+          {available !== null && (
+            <KV label="Available balance" value={`${formatUSDT(available)} · unchanged`} />
+          )}
         </dl>
         <Callout tone="info">
           The draw for round {formatRoundNumber(round.number)} is running on Chainlink VRF. Results

@@ -3,7 +3,6 @@
 import { ChevronRight } from 'lucide-react';
 import * as React from 'react';
 
-import { Tag } from '@/components/ui/badge';
 import type { WalletProviderId } from '@/lib/auth/types';
 import { cn } from '@/lib/utils';
 
@@ -16,15 +15,36 @@ export const WALLET_PROVIDERS: {
   name: string;
   meta: string;
   mark: string;
-  markClass: string;
   tag?: string;
 }[] = [
-  { id: 'browser', name: 'Browser wallet', meta: 'Extension in this browser (EVM)', mark: 'B', markClass: 'bg-surface-hover text-text-primary' },
-  { id: 'walletconnect', name: 'WalletConnect', meta: 'Scan a QR code with any mobile wallet', mark: 'W', markClass: 'bg-sky-500 text-ink-950', tag: 'Recommended' },
-  { id: 'coinbase', name: 'Coinbase Wallet', meta: 'Mobile app or extension', mark: 'C', markClass: 'bg-sky-400 text-ink-950' },
-  { id: 'trust', name: 'Trust Wallet', meta: 'Mobile app', mark: 'T', markClass: 'bg-mint-600 text-ink-950' },
-  { id: 'phantom', name: 'Phantom (Solana)', meta: 'Connects on Solana only', mark: 'P', markClass: 'bg-violet-400 text-ink-950', tag: 'Solana' },
-  { id: 'ledger', name: 'Ledger via WalletConnect', meta: 'Hardware wallet through the Ledger Live app', mark: 'L', markClass: 'bg-ink-100 text-ink-950', tag: 'Hardware' },
+  {
+    id: 'browser',
+    name: 'Browser wallet (EVM)',
+    meta: 'Extension in this browser · Arbitrum',
+    mark: 'BW',
+  },
+  {
+    id: 'walletconnect',
+    name: 'WalletConnect',
+    meta: 'Scan a QR code with any compatible mobile wallet',
+    mark: 'WC',
+  },
+  { id: 'coinbase', name: 'Coinbase Wallet', meta: 'Browser extension or mobile app', mark: 'CB' },
+  { id: 'trust', name: 'Trust Wallet', meta: 'Browser extension or mobile app', mark: 'TW' },
+  {
+    id: 'phantom',
+    name: 'Phantom (Solana)',
+    meta: 'Connects on Solana only',
+    mark: 'PH',
+    tag: 'Solana',
+  },
+  {
+    id: 'ledger',
+    name: 'Ledger via WalletConnect',
+    meta: 'Hardware wallet through the Ledger Live app',
+    mark: 'LG',
+    tag: 'Hardware',
+  },
 ];
 
 export function useInjectedWallet(): boolean {
@@ -40,7 +60,10 @@ export function WalletMark({ id, className }: { id: WalletProviderId; className?
   return (
     <span
       aria-hidden
-      className={cn('flex size-10 shrink-0 items-center justify-center rounded-md text-label-l font-bold', p.markClass, className)}
+      className={cn(
+        'flex size-10 shrink-0 items-center justify-center rounded-md border border-border-subtle bg-surface-raised text-label-m font-bold text-text-primary',
+        className,
+      )}
     >
       {p.mark}
     </span>
@@ -74,11 +97,13 @@ export function WalletProviderList({
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2 text-label-m text-text-primary">
                   {p.name}
-                  {p.id === 'browser' && injected && <Tag tone="brand">Detected</Tag>}
-                  {p.tag && <Tag>{p.tag}</Tag>}
+                  {p.id === 'browser' && injected && <ProviderTag>Detected</ProviderTag>}
+                  {p.tag && <ProviderTag>{p.tag}</ProviderTag>}
                 </span>
                 <span className="text-caption text-text-tertiary">
-                  {unavailable ? 'Not detected — open this page in your wallet’s in-app browser' : p.meta}
+                  {unavailable
+                    ? 'Not detected — open this page in your wallet’s in-app browser'
+                    : p.meta}
                 </span>
               </span>
               <ChevronRight aria-hidden className="size-5 shrink-0 text-icon-muted" />
@@ -87,5 +112,13 @@ export function WalletProviderList({
         );
       })}
     </ul>
+  );
+}
+
+function ProviderTag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="ml-auto inline-flex h-6 shrink-0 items-center rounded-full bg-status-success-tint px-2.5 text-label-s text-text-success">
+      {children}
+    </span>
   );
 }

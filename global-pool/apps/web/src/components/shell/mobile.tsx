@@ -109,7 +109,7 @@ export function MobileTabBar({
     >
       <ul className="grid h-14 grid-cols-5">
         {TAB_NAV.map((tab) => {
-          const active = isActive(tab.href, pathname);
+          const active = [tab.href, ...(tab.match ?? [])].some((h) => isActive(h, pathname));
           const Icon = tab.icon;
           const count = tab.countKey === 'notifications' ? notifications : 0;
           return (

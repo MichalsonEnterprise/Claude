@@ -22,12 +22,7 @@ export interface AuthUser {
 export type OAuthProvider = 'google' | 'apple';
 /** Wallet options in AUTH-02 / AUTH-09 (WalletConnect covers mobile wallets and Ledger Live). */
 export type WalletProviderId =
-  | 'browser'
-  | 'walletconnect'
-  | 'coinbase'
-  | 'trust'
-  | 'phantom'
-  | 'ledger';
+  'browser' | 'walletconnect' | 'coinbase' | 'trust' | 'phantom' | 'ledger';
 
 /** Views of the custom auth dialog (desktop split dialog / mobile bottom sheet). */
 export type AuthView = 'sign-in' | 'sign-up' | 'code' | 'wallet' | 'success';
@@ -97,7 +92,11 @@ export interface WalletFlowApi {
   /** Ask the wallet for the signature (mock: resolved by the DEMO wallet pop-up). */
   sign: (conn: WalletConnection, request: WalletSignatureRequest) => Promise<string>;
   /** Link the proven wallet to the account; the caller then re-syncs the API session. */
-  link: (conn: WalletConnection, request: WalletSignatureRequest, signature: string) => Promise<void>;
+  link: (
+    conn: WalletConnection,
+    request: WalletSignatureRequest,
+    signature: string,
+  ) => Promise<void>;
 }
 
 /** Internal value each provider (Privy / mock) supplies; the session layer turns it into AuthContextValue. */
@@ -131,6 +130,10 @@ export interface AuthContextValue {
   profile?: MeProfile | null;
   /** True while the first API session sync (`POST /auth/session`) runs after a login. */
   syncing?: boolean;
+  /** The API session sync / profile load failed (network, rate limit…) — the UI offers a retry. */
+  sessionError?: Error | null;
+  /** Retry the API session sync / profile load. */
+  refreshProfile?: () => void;
 }
 
 export function initialsFrom(name: string): string {

@@ -58,7 +58,10 @@ export function WalletTabs({ className }: { className?: string }) {
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
   return (
-    <nav aria-label="Wallet" className={cn('-mx-4 overflow-x-auto px-4 tablet:mx-0 tablet:px-0', className)}>
+    <nav
+      aria-label="Wallet"
+      className={cn('-mx-4 overflow-x-auto px-4 tablet:mx-0 tablet:px-0', className)}
+    >
       <ul className="flex min-w-max items-end gap-6 border-b border-border-subtle">
         {TABS.map((t) => {
           const on = active(t.href);
@@ -75,7 +78,10 @@ export function WalletTabs({ className }: { className?: string }) {
               >
                 {t.label}
                 {on && (
-                  <span aria-hidden className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-brand" />
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-brand"
+                  />
                 )}
               </Link>
             </li>
@@ -321,7 +327,13 @@ export function ConfirmationRing({
       aria-label={`${current} of ${required} confirmations`}
     >
       <svg width={size} height={size} aria-hidden className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={3} className="fill-none stroke-surface-pressed" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          strokeWidth={3}
+          className="fill-none stroke-surface-pressed"
+        />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -357,7 +369,10 @@ export function ConfirmationBar({
       {Array.from({ length: segments }, (_, i) => (
         <span
           key={i}
-          className={cn('h-1 flex-1 rounded-full', i < filled ? 'bg-balance-pending' : 'bg-surface-pressed')}
+          className={cn(
+            'h-1 flex-1 rounded-full',
+            i < filled ? 'bg-balance-pending' : 'bg-surface-pressed',
+          )}
         />
       ))}
     </div>

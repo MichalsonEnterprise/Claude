@@ -90,8 +90,8 @@ export function WhitelistPage() {
           }
         >
           {justAdded.address.slice(0, 6)}…{justAdded.address.slice(-4)} unlocks{' '}
-          {formatDateTimeUTC(justAdded.usableForWithdrawalsFrom)}. We’ll notify you when it’s ready. Didn’t add
-          it? Remove it now and secure your account.
+          {formatDateTimeUTC(justAdded.usableForWithdrawalsFrom)}. We’ll notify you when it’s ready.
+          Didn’t add it? Remove it now and secure your account.
         </Alert>
       )}
 
@@ -127,7 +127,10 @@ export function WhitelistPage() {
                     <p className="flex flex-wrap items-center gap-2 text-body-s-strong text-text-primary">
                       {w.label ?? CHAINS[w.network].name}
                       {w.inCooldown ? (
-                        <StatusBadge status="pending" label={`Cooling down · ${remaining(w.usableForWithdrawalsFrom!, now)}`} />
+                        <StatusBadge
+                          status="pending"
+                          label={`Cooling down · ${remaining(w.usableForWithdrawalsFrom!, now)}`}
+                        />
                       ) : (
                         <StatusBadge status="approved" label="Ready" />
                       )}
@@ -137,7 +140,9 @@ export function WhitelistPage() {
                       <span>
                         {CHAINS[w.network].name}
                         {w.whitelistedAt && ` · added ${formatDateUTC(w.whitelistedAt)}`}
-                        {w.inCooldown && w.usableForWithdrawalsFrom && ` · unlocks ${formatDateTimeUTC(w.usableForWithdrawalsFrom)}`}
+                        {w.inCooldown &&
+                          w.usableForWithdrawalsFrom &&
+                          ` · unlocks ${formatDateTimeUTC(w.usableForWithdrawalsFrom)}`}
                       </span>
                     </p>
                   </div>
@@ -157,8 +162,8 @@ export function WhitelistPage() {
         )}
         <p className="flex gap-2 text-caption text-text-tertiary">
           <ShieldCheck aria-hidden className="size-4 shrink-0" />
-          Every change needs your authenticator code and is recorded in your security log. The 24 h cool-down
-          applies to all players and support can’t skip it.
+          Every change needs your authenticator code and is recorded in your security log. The 24 h
+          cool-down applies to all players and support can’t skip it.
         </p>
       </Card>
 
@@ -193,12 +198,22 @@ export function AddAddressModal({
   const [code, setCode] = React.useState('');
   const form = useForm<AddForm>({
     resolver: zodResolver(addFormSchema),
-    defaultValues: { network: defaultNetwork, address: defaultAddress, label: '', owner: undefined as unknown as true },
+    defaultValues: {
+      network: defaultNetwork,
+      address: defaultAddress,
+      label: '',
+      owner: undefined as unknown as true,
+    },
     mode: 'onChange',
   });
   React.useEffect(() => {
     if (open) {
-      form.reset({ network: defaultNetwork, address: defaultAddress, label: '', owner: undefined as unknown as true });
+      form.reset({
+        network: defaultNetwork,
+        address: defaultAddress,
+        label: '',
+        owner: undefined as unknown as true,
+      });
       setCode('');
     }
   }, [open, defaultNetwork, defaultAddress, form]);
@@ -215,7 +230,9 @@ export function AddAddressModal({
       toast({
         type: 'success',
         title: 'Address saved — cooling down',
-        description: w.usableForWithdrawalsFrom ? `Usable from ${formatDateTimeUTC(w.usableForWithdrawalsFrom)}.` : undefined,
+        description: w.usableForWithdrawalsFrom
+          ? `Usable from ${formatDateTimeUTC(w.usableForWithdrawalsFrom)}.`
+          : undefined,
       });
       onAdded?.(w);
       onOpenChange(false);
@@ -224,7 +241,11 @@ export function AddAddressModal({
   });
   const network = form.watch('network') as ChainKey;
   const submit = form.handleSubmit((v) => {
-    const parsed = whitelistAddressSchema.safeParse({ network: v.network, address: v.address, label: v.label || undefined });
+    const parsed = whitelistAddressSchema.safeParse({
+      network: v.network,
+      address: v.address,
+      label: v.label || undefined,
+    });
     if (!parsed.success) {
       form.setError('address', { message: parsed.error.issues[0]?.message ?? 'Check the address' });
       return;
@@ -260,7 +281,11 @@ export function AddAddressModal({
           control={form.control}
           name="network"
           render={({ field }) => (
-            <NetworkSelect value={field.value as ChainKey} onValueChange={field.onChange} showFee={false} />
+            <NetworkSelect
+              value={field.value as ChainKey}
+              onValueChange={field.onChange}
+              showFee={false}
+            />
           )}
         />
         <Controller
@@ -277,8 +302,17 @@ export function AddAddressModal({
             />
           )}
         />
-        <Field label="Label (optional)" helper="Only you see it, e.g. “Cold wallet”." error={form.formState.errors.label?.message}>
-          <Input {...form.register('label')} placeholder="Cold wallet" maxLength={40} autoComplete="off" />
+        <Field
+          label="Label (optional)"
+          helper="Only you see it, e.g. “Cold wallet”."
+          error={form.formState.errors.label?.message}
+        >
+          <Input
+            {...form.register('label')}
+            placeholder="Cold wallet"
+            maxLength={40}
+            autoComplete="off"
+          />
         </Field>
         <Controller
           control={form.control}
@@ -291,7 +325,9 @@ export function AddAddressModal({
                 label="I own this address and I checked it character by character"
                 description="Crypto sent to the wrong address can’t be recovered."
               />
-              {fieldState.error && <p className="text-caption text-text-danger">{fieldState.error.message}</p>}
+              {fieldState.error && (
+                <p className="text-caption text-text-danger">{fieldState.error.message}</p>
+              )}
             </div>
           )}
         />
@@ -312,7 +348,8 @@ function RemoveAddressModal({
   const [code, setCode] = React.useState('');
   React.useEffect(() => setCode(''), [wallet]);
   const remove = useMutation({
-    mutationFn: (v: { id: string; totpCode: string }) => walletApi.removeWhitelist(v.id, { totpCode: v.totpCode }),
+    mutationFn: (v: { id: string; totpCode: string }) =>
+      walletApi.removeWhitelist(v.id, { totpCode: v.totpCode }),
     onSuccess: () => {
       void invalidate();
       toast({ type: 'success', title: 'Address removed from your whitelist' });
@@ -349,7 +386,8 @@ function RemoveAddressModal({
     >
       <div className="flex flex-col gap-4">
         <p className="text-body-s text-text-secondary">
-          Withdrawals already sent are not affected. Pending withdrawals to this address keep their place.
+          Withdrawals already sent are not affected. Pending withdrawals to this address keep their
+          place.
         </p>
         <TwoFactorField value={code} onChange={setCode} error={remove.error} />
         {remove.error && !stepUpError(remove.error) && (
@@ -444,7 +482,9 @@ export function ConnectedWalletsPage() {
                         <StatusBadge status="neutral" label="Not whitelisted" />
                       )}
                       {!CHAINS[w.network].enabled && (
-                        <span className="text-caption text-text-tertiary">· withdrawals on this network coming soon</span>
+                        <span className="text-caption text-text-tertiary">
+                          · withdrawals on this network coming soon
+                        </span>
                       )}
                     </p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2 text-caption text-text-tertiary">
@@ -456,7 +496,12 @@ export function ConnectedWalletsPage() {
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                   {!w.whitelisted && CHAINS[w.network].enabled && (
-                    <Button variant="secondary" size="s" leadingIcon={<ShieldCheck />} onClick={() => setWhitelistFor(w)}>
+                    <Button
+                      variant="secondary"
+                      size="s"
+                      leadingIcon={<ShieldCheck />}
+                      onClick={() => setWhitelistFor(w)}
+                    >
                       Whitelist for withdrawals
                     </Button>
                   )}
@@ -473,15 +518,21 @@ export function ConnectedWalletsPage() {
         {!canConnect && (
           <p className="flex gap-2 text-caption text-text-tertiary">
             <Clock aria-hidden className="size-4 shrink-0" />
-            Connecting another wallet uses the sign-in wallet flow, which isn’t available in this build yet.
+            Connecting another wallet uses the sign-in wallet flow, which isn’t available in this
+            build yet.
           </p>
         )}
       </Card>
-      <Card radius="xl" padding="l" className="gap-2 tablet:flex-row tablet:items-center tablet:justify-between">
+      <Card
+        radius="xl"
+        padding="l"
+        className="gap-2 tablet:flex-row tablet:items-center tablet:justify-between"
+      >
         <div>
           <p className="text-body-m-strong text-text-primary">Withdrawal addresses</p>
           <p className="text-body-s text-text-secondary">
-            Withdrawals use your whitelist. Supported now: {ENABLED_CHAINS.map((c) => c.testnet.name).join(', ')}.
+            Withdrawals use your whitelist. Supported now:{' '}
+            {ENABLED_CHAINS.map((c) => c.testnet.name).join(', ')}.
           </p>
         </div>
         <Button asChild variant="secondary">

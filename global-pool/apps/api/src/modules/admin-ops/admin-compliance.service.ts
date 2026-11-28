@@ -105,6 +105,38 @@ export class AdminComplianceService {
         },
       }),
     ]);
+    const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const [decidedToday, decided7d, recentAudit] = await Promise.all([
+      this.prisma.kycRecord.groupBy({
+        by: ['status'],
+        where: {
+          reviewedAt: { gte: dayStart },
+          status: { in: ['verified', 'rejected', 'resubmission_required'] },
+        },
+        _count: true,
+      }),
+      this.prisma.kycRecord.findMany({
+        where: { reviewedAt: { gte: addHours(now, -24 * 7) }, submittedAt: { not: null } },
+        select: { submittedAt: true, reviewedAt: true },
+        take: 2000,
+      }),
+      this.prisma.auditLog.findMany({
+        where: { action: { startsWith: 'kyc.' }, targetType: 'kyc_record' },
+        orderBy: { seq: 'desc' },
+        take: 5,
+      }),
+    ]);
+    const durations = decided7d
+      .map((r) => (r.reviewedAt!.getTime() - r.submittedAt!.getTime()) / 60_000)
+      .filter((d) => d >= 0)
+      .sort((a, b) => a - b);
+    const median = durations.length
+      ? Math.round(durations[Math.floor(durations.length / 2)]!)
+      : null;
+    const recentRecords = await this.prisma.kycRecord.findMany({
+      where: { id: { in: recentAudit.map((a) => a.targetId!).filter(Boolean) } },
+      select: { id: true, level: true, user: { select: { handle: true } } },
+    });
     const c = (s: KycStatus) => byStatus.find((b) => b.status === s)?._count ?? 0;
     const breached = await this.prisma.kycRecord.count({
       where: { status: { in: OPEN_KYC }, submittedAt: { lt: addHours(now, -KYC_SLA_HOURS) } },
@@ -126,7 +158,27 @@ export class AdminComplianceService {
               (now.getTime() - (oldest.submittedAt ?? oldest.createdAt).getTime()) / 3_600_000,
             )
           : null,
+        decidedToday: {
+          approved: decidedToday.find((d) => d.status === 'verified')?._count ?? 0,
+          rejected: decidedToday.find((d) => d.status === 'rejected')?._count ?? 0,
+          infoRequested:
+            decidedToday.find((d) => d.status === 'resubmission_required')?._count ?? 0,
+        },
+        medianDecisionMinutes7d: median,
       },
+      recentDecisions: recentAudit.map((a) => {
+        const rec = recentRecords.find((r) => r.id === a.targetId);
+        return {
+          seq: a.seq.toString(),
+          action: a.action,
+          reference: a.targetId ? kycRef(a.targetId) : null,
+          recordId: a.targetId,
+          handle: rec ? atHandle(rec.user.handle) : null,
+          level: rec?.level ?? null,
+          by: a.actorLabel,
+          at: a.createdAt.toISOString(),
+        };
+      }),
       ...paginate(
         rows.map((r) => {
           const submitted = r.submittedAt ?? r.createdAt;
@@ -439,6 +491,20 @@ export class AdminComplianceService {
         where: { resolvedAt: { gte: addHours(now, -24 * 7) } },
       }),
     ]);
+    const [closed30, noIssue30] = await Promise.all([
+      this.prisma.amlAlert.count({
+        where: {
+          resolvedAt: { gte: addHours(now, -24 * 30) },
+          status: { in: ['resolved', 'dismissed', 'escalated'] },
+        },
+      }),
+      this.prisma.amlAlert.count({
+        where: {
+          resolvedAt: { gte: addHours(now, -24 * 30) },
+          status: { in: ['resolved', 'dismissed'] },
+        },
+      }),
+    ]);
     const s = (k: string) => byStatus.find((b) => b.status === k)?._count ?? 0;
     const r = (k: string) => byRisk.find((b) => b.riskLevel === k)?._count ?? 0;
     return {
@@ -448,6 +514,8 @@ export class AdminComplianceService {
         highOrCritical: r('high') + r('critical'),
         byRisk: { low: r('low'), medium: r('medium'), high: r('high'), critical: r('critical') },
         resolved7d,
+        closed30d: closed30,
+        noIssueRate30d: closed30 === 0 ? null : Math.round((noIssue30 / closed30) * 100),
       },
       ...paginate(
         rows.map((a) => {

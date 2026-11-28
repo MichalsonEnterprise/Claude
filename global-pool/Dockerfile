@@ -11,6 +11,10 @@ ENV PNPM_HOME=/pnpm \
     PATH=/pnpm:$PATH \
     CI=true \
     NEXT_TELEMETRY_DISABLED=1
+# Prisma's query engine (debian-openssl-3.0.x) needs OpenSSL; the slim image does not ship it.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends openssl ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 WORKDIR /repo
 
@@ -49,6 +53,8 @@ FROM api-build AS api
 ENV NODE_ENV=production \
     API_PORT=4000 \
     REAL_MONEY_ENABLED=false
+# DEV / DEMO credential files (DEMO seed, dev xpub) are written here — owned by the runtime user (compose volume).
+RUN mkdir -p apps/api/.dev && chown node:node apps/api/.dev
 EXPOSE 4000
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=10 \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.API_PORT||4000)+'/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"

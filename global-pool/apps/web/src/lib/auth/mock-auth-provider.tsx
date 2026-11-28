@@ -40,6 +40,34 @@ export async function mockDidForEmail(email: string): Promise<string> {
   return `did:privy:mock-${hex.slice(0, 24)}`;
 }
 
+const TOKEN_KEY = 'gp.devMockToken';
+
+interface CachedToken {
+  did: string;
+  wallet: string | null;
+  token: string;
+  expiresAt: number;
+}
+
+/** DEV MOCK tokens are reused across reloads so one browser = one API session (device), like Privy. */
+function readToken(): CachedToken | null {
+  try {
+    const raw = window.localStorage.getItem(TOKEN_KEY);
+    return raw ? (JSON.parse(raw) as CachedToken) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeToken(t: CachedToken | null) {
+  try {
+    if (t) window.localStorage.setItem(TOKEN_KEY, JSON.stringify(t));
+    else window.localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 function readSession(): MockSession | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -103,13 +131,14 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<MockSession | null>(null);
   const [status, setStatus] = React.useState<AuthStatus>('loading');
   const pending = React.useRef<{ email: string; sentAt: number } | null>(null);
-  const token = React.useRef<{ did: string; token: string; expiresAt: number } | null>(null);
+  const token = React.useRef<CachedToken | null>(null);
   const inflight = React.useRef<Promise<string | null> | null>(null);
   const sessionRef = React.useRef<MockSession | null>(null);
 
   React.useEffect(() => {
     const s = readSession();
     sessionRef.current = s;
+    token.current = s ? readToken() : null;
     setSession(s);
     setStatus(s ? 'member' : 'guest');
   }, []);
@@ -118,6 +147,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
     writeSession(s);
     sessionRef.current = s;
     token.current = null;
+    writeToken(null);
     setSession(s);
     setStatus('member');
   }, []);
@@ -126,7 +156,14 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
     const s = sessionRef.current;
     if (!s) return null;
     const cached = token.current;
-    if (cached && cached.did === s.did && cached.expiresAt - Date.now() > 60_000) return cached.token;
+    if (
+      cached &&
+      cached.did === s.did &&
+      cached.wallet === s.wallet &&
+      cached.expiresAt - Date.now() > 60_000
+    ) {
+      return cached.token;
+    }
     if (inflight.current) return inflight.current;
     inflight.current = (async () => {
       try {
@@ -136,12 +173,22 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
           ...(s.wallet ? { wallet: s.wallet } : {}),
           ttlSeconds: 3600,
         });
-        token.current = { did: s.did, token: res.token, expiresAt: Date.parse(res.expiresAt) };
+        token.current = {
+          did: s.did,
+          wallet: s.wallet,
+          token: res.token,
+          expiresAt: Date.parse(res.expiresAt),
+        };
+        writeToken(token.current);
         return res.token;
       } catch (err) {
-        // API down or not in mock mode: no token (calls fail with 401 and the UI shows its error state).
-        if (err instanceof ApiRequestError) return null;
-        return null;
+        // API down / rate-limited / not in mock mode: fail the request instead of sending it unauthenticated
+        // (a 401 would look like a revoked session and sign the player out).
+        const status = err instanceof ApiRequestError ? ` (${err.status})` : '';
+        throw new AuthFlowError(
+          'network',
+          `Couldn’t reach the sign-in service${status}. Try again.`,
+        );
       } finally {
         inflight.current = null;
       }
@@ -157,6 +204,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
       getAccessToken,
       signOut: () => {
         writeSession(null);
+        writeToken(null);
         sessionRef.current = null;
         token.current = null;
         setSession(null);
@@ -173,6 +221,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
           return { ...conn, chainId: 421614 };
         },
         prepareSignature: async (conn) => {
+          await wait(200);
           const issued = new Date();
           const nonce = randomHex(8);
           return {
@@ -188,6 +237,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
           return `0x${randomHex(65)}`;
         },
         link: async (conn) => {
+          await wait(150);
           const s = sessionRef.current;
           if (!s) throw new AuthFlowError('unknown', 'Sign in first.');
           start({ ...s, wallet: conn.address });
@@ -208,7 +258,10 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
             throw new AuthFlowError('expired_code', 'This code has expired. Send a new one.');
           }
           if (!/^\d{6}$/.test(code) || code === MOCK_WRONG_CODE) {
-            throw new AuthFlowError('invalid_code', 'That code isn’t right. Check the email and try again.');
+            throw new AuthFlowError(
+              'invalid_code',
+              'That code isn’t right. Check the email and try again.',
+            );
           }
           pending.current = null;
           start({ did: await mockDidForEmail(p.email), email: p.email, wallet: null });

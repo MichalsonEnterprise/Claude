@@ -294,6 +294,13 @@ export class KycFlowService {
       }
       throw conflict('Another verification is already in progress', { status: open.status });
     }
+    // Carry the personal details over from the last verified level, so the player confirms instead of retyping.
+    const previous = await this.prisma.kycRecord.findFirst({
+      where: { userId, status: 'verified' },
+      orderBy: { createdAt: 'desc' },
+    });
+    const personal = previous ? asFlow(previous).personal : undefined;
+    const draft: FlowData = { version: 1, level, documents: [], ...(personal ? { personal } : {}) };
     await this.prisma.kycRecord.create({
       data: {
         userId,
@@ -301,7 +308,7 @@ export class KycFlowService {
         status: 'not_started',
         provider: 'mock',
         providerRef: `mock-kyc-${randomUUID()}`,
-        details: { version: 1, level, documents: [] },
+        details: draft as unknown as Prisma.InputJsonValue,
       },
     });
     return this.view(userId);

@@ -14,7 +14,9 @@ export const localAnvil = defineChain({
 export function evmChain(chainId: number): Chain {
   if (chainId === arbitrumSepolia.id) return arbitrumSepolia;
   if (chainId === localAnvil.id) return localAnvil;
-  throw new Error(`Unsupported EVM chain ${chainId}: only Arbitrum Sepolia (421614) or Anvil (31337)`);
+  throw new Error(
+    `Unsupported EVM chain ${chainId}: only Arbitrum Sepolia (421614) or Anvil (31337)`,
+  );
 }
 
 /** Block-explorer link for a transaction (null on the local devnet). */
@@ -23,7 +25,10 @@ export function explorerTxUrl(chainId: number, txHash: string | null | undefined
   return chainId === arbitrumSepolia.id ? `https://sepolia.arbiscan.io/tx/${txHash}` : null;
 }
 
-export function explorerAddressUrl(chainId: number, address: string | null | undefined): string | null {
+export function explorerAddressUrl(
+  chainId: number,
+  address: string | null | undefined,
+): string | null {
   if (!address) return null;
   return chainId === arbitrumSepolia.id ? `https://sepolia.arbiscan.io/address/${address}` : null;
 }

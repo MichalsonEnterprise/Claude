@@ -1,6 +1,6 @@
 'use client';
 
-import { formatCount, formatRoundNumber, formatTimeUTC } from '@gp/shared/format';
+import { formatCount, formatDateUTC, formatRoundNumber, formatTimeUTC } from '@gp/shared/format';
 import { formatUSDT, money } from '@gp/shared/money';
 import { PRIZE_DISTRIBUTION, ROUND_THRESHOLDS, prizeBreakdown } from '@gp/shared/pool';
 import { ArrowRight, Info, TrendingUp, TriangleAlert } from 'lucide-react';
@@ -51,7 +51,11 @@ function PoolBalanceCard() {
         <div>
           <h3 className="text-label-l text-text-primary">Pool balance</h3>
           <p className="text-caption text-text-tertiary">
-            Closing pool per daily round · 14 – 27 Nov 2026 · USDT
+            Closing pool per daily round
+            {points[0] && last
+              ? ` · ${formatDateUTC(points[0].closesAt).replace(/ \d{4}$/, '')} – ${formatDateUTC(last.closesAt)}`
+              : ''}{' '}
+            · USDT
           </p>
         </div>
         {history.data?.isDemo && <DemoBadge size="s" />}
@@ -104,14 +108,23 @@ function PoolBalanceCard() {
 
 function ago(iso: string, now: number | null): string {
   if (now === null) return '';
-  const s = Math.max(0, Math.round((now - new Date(iso).getTime()) / 1000));
+  const s = Math.round((now - new Date(iso).getTime()) / 1000);
+  // future (DEMO rows dated later today) or older than an hour → absolute time, never a made-up "0 s ago"
+  if (s < 0 || s >= 3600) return formatTimeUTC(iso);
   if (s < 60) return `${s} s ago`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m} min ago`;
-  return `${Math.floor(m / 60)} h ago`;
+  return `${Math.floor(s / 60)} min ago`;
 }
 
-function FeedRow({ entry, now }: { entry: FeedEntryView; now: number | null }) {
+function FeedRow({
+  entry,
+  now,
+  roundNumber,
+}: {
+  entry: FeedEntryView;
+  now: number | null;
+  /** The API feed is per round and omits roundNumber on rows. */
+  roundNumber: number;
+}) {
   return (
     <li className="flex items-center gap-3 border-b border-border-subtle py-2.5 last:border-0">
       {entry.handle ? (
@@ -144,7 +157,7 @@ function FeedRow({ entry, now }: { entry: FeedEntryView; now: number | null }) {
         </p>
         <p className="truncate text-caption text-text-tertiary">
           {formatCount(entry.entries)} {entry.entries === 1 ? 'entry' : 'entries'} · round{' '}
-          {formatRoundNumber(entry.roundNumber)}
+          {formatRoundNumber(entry.roundNumber ?? roundNumber)}
         </p>
       </div>
       <div className="flex flex-col items-end">
@@ -173,7 +186,9 @@ function LatestEntriesCard() {
       {round ? (
         <ul className="mt-2 flex flex-col">
           {feed.data
-            ? feed.data.slice(0, 5).map((e) => <FeedRow key={e.id} entry={e} now={now} />)
+            ? feed.data
+                .slice(0, 5)
+                .map((e) => <FeedRow key={e.id} entry={e} now={now} roundNumber={round.number} />)
             : Array.from({ length: 5 }, (_, i) => (
                 <li key={i} className="py-3">
                   <Skeleton className="h-9 w-full" />

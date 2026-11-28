@@ -78,7 +78,9 @@ export class DemoDepositsService {
         await tx.deposit.update({ where: { id: d.id }, data: { confirmations: next } });
         await tx.transaction.updateMany({
           where: { depositId: d.id },
-          data: { metadata: { statusDetail: `${next} / ${d.requiredConfirmations} confirmations` } },
+          data: {
+            metadata: { statusDetail: `${next} / ${d.requiredConfirmations} confirmations` },
+          },
         });
       }
       return tx.deposit.findUniqueOrThrow({ where: { id: d.id } });

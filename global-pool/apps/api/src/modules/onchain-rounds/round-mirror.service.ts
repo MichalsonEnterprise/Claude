@@ -3,7 +3,7 @@ import type { Prisma, Round, RoundChainOp, RoundChainStep } from '@prisma/client
 import { CancelReason, RoundStatus as OnchainStatus, globalPoolRoundsAbi } from '@gp/contracts/abi';
 import { buildTree } from '@gp/contracts/verify';
 import { formatRoundNumber } from '@gp/shared/format';
-import { toBaseUnits } from '@gp/shared/money';
+import { toBaseUnits, toUSDTString } from '@gp/shared/money';
 import { encodeFunctionData, hexToBigInt, type Address, type Hex } from 'viem';
 import { hkdfSync } from 'node:crypto';
 
@@ -84,7 +84,7 @@ export class RoundMirrorService {
   private contract(): Address {
     const address = this.config.env.POOL_CONTRACT_ADDRESS;
     if (!address) throw new ChainUnavailableError('POOL_CONTRACT_ADDRESS is not configured');
-    return address as Address;
+    return address;
   }
 
   private onchainId(round: Round): bigint {
@@ -96,7 +96,9 @@ export class RoundMirrorService {
     const explicit = this.config.env.ENTRY_SALT_ENCRYPTION_KEY;
     this.saltKeyCache = explicit
       ? Buffer.from(explicit, 'base64')
-      : Buffer.from(hkdfSync('sha256', this.config.totpKey, Buffer.alloc(0), 'gp:entry-salt:v1', 32));
+      : Buffer.from(
+          hkdfSync('sha256', this.config.totpKey, Buffer.alloc(0), 'gp:entry-salt:v1', 32),
+        );
     return this.saltKeyCache;
   }
 
@@ -309,7 +311,10 @@ export class RoundMirrorService {
   /** Adopt the round for mirroring (once) and publish its rules with openRound. */
   async ensureOpened(round: Round): Promise<StepResult> {
     if (!round.chainMirror) {
-      if (round.closesAt.getTime() <= Date.now() + 60_000 || !['scheduled', 'open'].includes(round.status)) {
+      if (
+        round.closesAt.getTime() <= Date.now() + 60_000 ||
+        !['scheduled', 'open'].includes(round.status)
+      ) {
         throw new AppError(
           'CONFLICT',
           `Round ${formatRoundNumber(round.number)} cannot be mirrored any more (closes too soon or not open)`,
@@ -389,7 +394,12 @@ export class RoundMirrorService {
           throw new AppError('CONFLICT', 'Entry list does not match the round counters');
         }
         const built = buildEntryCommitments(
-          entries.map((e) => ({ id: e.id, seq: e.seq, code: e.code, userPublicId: e.user.publicId })),
+          entries.map((e) => ({
+            id: e.id,
+            seq: e.seq,
+            code: e.code,
+            userPublicId: e.user.publicId,
+          })),
         );
         const key = this.saltKey();
         for (let i = 0; i < built.rows.length; i += COMMIT_CHUNK) {
@@ -423,8 +433,14 @@ export class RoundMirrorService {
       role: 'operator',
       done: (s) => s.status !== OnchainStatus.None && s.status !== OnchainStatus.Open,
       check: (s) => {
-        if (s.status === OnchainStatus.Cancelled && s.entriesRoot === ZERO_ROOT && round.entriesCount > 0) {
-          throw new MirrorMismatchError(`On-chain round was cancelled before its entries were committed`);
+        if (
+          s.status === OnchainStatus.Cancelled &&
+          s.entriesRoot === ZERO_ROOT &&
+          round.entriesCount > 0
+        ) {
+          throw new MirrorMismatchError(
+            `On-chain round was cancelled before its entries were committed`,
+          );
         }
         if (
           s.entriesRoot.toLowerCase() !== root.toLowerCase() ||
@@ -441,13 +457,7 @@ export class RoundMirrorService {
         encodeFunctionData({
           abi: globalPoolRoundsAbi,
           functionName: 'commitEntries',
-          args: [
-            this.onchainId(round),
-            root,
-            totalEntries,
-            BigInt(round.participantsCount),
-            pool,
-          ],
+          args: [this.onchainId(round), root, totalEntries, BigInt(round.participantsCount), pool],
         }),
     });
     if (!res.done) return { ...res, thresholdsMet: null };
@@ -542,8 +552,7 @@ export class RoundMirrorService {
       local.length === onchainWinners.length &&
       local.every(
         (w, i) =>
-          BigInt(w.entryIndex) === onchainWinners[i] &&
-          toBaseUnits(w.amount) === onchainAmounts[i],
+          BigInt(w.entryIndex) === onchainWinners[i] && toBaseUnits(w.amount) === onchainAmounts[i],
       );
     if (!same) {
       this.logger.error(
@@ -575,7 +584,8 @@ export class RoundMirrorService {
           args: [this.onchainId(round), root, pool],
         }),
     });
-    if (res.changed) await this.auditStep(round, 'round.settlement_recorded_onchain', res, { payoutsRoot: root });
+    if (res.changed)
+      await this.auditStep(round, 'round.settlement_recorded_onchain', res, { payoutsRoot: root });
     return res;
   }
 
@@ -632,11 +642,18 @@ export class RoundMirrorService {
    */
   async sync(round: Round): Promise<void> {
     if (!this.shouldMirror(round)) return;
-    if ((round.status === 'open' || round.status === 'scheduled') && (round.chainMirror || round.closesAt.getTime() > Date.now() + 60_000)) {
+    if (
+      (round.status === 'open' || round.status === 'scheduled') &&
+      (round.chainMirror || round.closesAt.getTime() > Date.now() + 60_000)
+    ) {
       await this.ensureOpened(round);
     } else if (round.chainMirror && round.status === 'settled') {
       await this.recordSettlement(round);
-    } else if (round.chainMirror && round.status === 'cancelled' && round.cancelReason === 'threshold_not_met') {
+    } else if (
+      round.chainMirror &&
+      round.status === 'cancelled' &&
+      round.cancelReason === 'threshold_not_met'
+    ) {
       const state = await this.read(round);
       if (state.status === OnchainStatus.Committed) await this.cancelForThresholds(round);
     }
@@ -650,9 +667,22 @@ export class RoundMirrorService {
       where: {
         OR: [
           { status: { in: ['scheduled', 'open'] }, chainMirror: false, closesAt: { gt: cutoff } },
-          { status: { in: ['scheduled', 'open'] }, chainMirror: true, chainOps: { none: { step: 'open', status: 'confirmed' } } },
-          { status: 'settled', chainMirror: true, chainOps: { none: { step: 'settle', status: 'confirmed' } } },
-          { status: 'cancelled', chainMirror: true, cancelReason: 'threshold_not_met', chainOps: { none: { step: 'cancel', status: 'confirmed' } } },
+          {
+            status: { in: ['scheduled', 'open'] },
+            chainMirror: true,
+            chainOps: { none: { step: 'open', status: 'confirmed' } },
+          },
+          {
+            status: 'settled',
+            chainMirror: true,
+            chainOps: { none: { step: 'settle', status: 'confirmed' } },
+          },
+          {
+            status: 'cancelled',
+            chainMirror: true,
+            cancelReason: 'threshold_not_met',
+            chainOps: { none: { step: 'cancel', status: 'confirmed' } },
+          },
         ],
       },
       orderBy: { number: 'asc' },
@@ -780,7 +810,7 @@ export class RoundMirrorService {
         entryIndex: p.entryIndex,
         entryIdBytes32: p.entryIdBytes32,
         userCommitment: p.userCommitment,
-        amount: p.amount.toFixed(2),
+        amount: toUSDTString(p.amount.toFixed()),
         amountUnits: p.amountUnits,
         leaf: p.leaf,
         proof: p.proof as Prisma.JsonArray,
@@ -815,7 +845,8 @@ export class RoundMirrorService {
     try {
       return await fn();
     } catch (err) {
-      const level = err instanceof ChainUnavailableError || err instanceof ChainRevertError ? 'warn' : 'error';
+      const level =
+        err instanceof ChainUnavailableError || err instanceof ChainRevertError ? 'warn' : 'error';
       this.logger[level](`${label}: ${errorSummary(err)}`);
       return null;
     }

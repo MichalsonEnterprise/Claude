@@ -31,7 +31,14 @@ class RoundHistoryDto extends createZodDto(
     status: z
       .string()
       .optional()
-      .transform((v) => (v ? v.split(',').map((s) => s.trim()).filter(Boolean) : []))
+      .transform((v) =>
+        v
+          ? v
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+      )
       .pipe(z.array(z.enum(HISTORY_STATUSES))),
     number: z.coerce.number().int().min(1).optional(),
   }),

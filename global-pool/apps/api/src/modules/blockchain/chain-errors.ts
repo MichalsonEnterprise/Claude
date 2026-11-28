@@ -35,7 +35,7 @@ export function decodeRevert(err: unknown, abi: Abi): ChainRevertError | null {
   }
   try {
     const decoded = decodeErrorResult({ abi, data });
-    const args = (decoded.args ?? []) as readonly unknown[];
+    const args = decoded.args ?? [];
     return new ChainRevertError(
       decoded.errorName,
       args,
@@ -43,7 +43,12 @@ export function decodeRevert(err: unknown, abi: Abi): ChainRevertError | null {
       `${decoded.errorName}(${args.map(stringifyArg).join(', ')})`,
     );
   } catch {
-    return new ChainRevertError('UnknownRevert', [], data, `reverted with data ${data.slice(0, 10)}`);
+    return new ChainRevertError(
+      'UnknownRevert',
+      [],
+      data,
+      `reverted with data ${data.slice(0, 10)}`,
+    );
   }
 }
 

@@ -93,7 +93,8 @@ export interface StepUpToken {
   expiresAt: string;
 }
 
-export type AccountGate = 'ok' | 'onboarding' | 'suspended' | 'self_excluded' | 'region' | 'under_review';
+export type AccountGate =
+  'ok' | 'onboarding' | 'suspended' | 'self_excluded' | 'region' | 'under_review';
 
 export interface AccountStatus {
   gate: AccountGate;

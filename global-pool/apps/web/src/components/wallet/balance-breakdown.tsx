@@ -1,7 +1,7 @@
 'use client';
 
 import { formatTimeUTC } from '@gp/shared/format';
-import { money } from '@gp/shared/money';
+import { formatUSDT, money } from '@gp/shared/money';
 import { CircleHelp, Wallet } from 'lucide-react';
 import * as React from 'react';
 
@@ -49,7 +49,14 @@ export function composition(b: WalletBalances, bucket: Exclude<BalanceType, 'tot
           : [];
   if (bucket === 'available') return ROW_HELP.available;
   if (items.length === 0) return `Nothing ${bucket} right now`;
-  return items.map((i) => `${money(i.amount).toFixed(2)} · ${i.label}`).join(' + ');
+  return items
+    .map((i) => {
+      const label = i.label
+        .replace(/^Active entries — /, 'in active entries · ')
+        .replace(/^Pending /, 'pending ');
+      return `${formatUSDT(i.amount, { symbol: false })} ${label.charAt(0).toLowerCase()}${label.slice(1)}`;
+    })
+    .join(' + ');
 }
 
 /**
@@ -78,11 +85,13 @@ export function BalanceBreakdown({
           <div className="flex items-center gap-2 text-body-s-strong text-text-secondary">
             <Wallet aria-hidden className="size-4 text-icon-muted" />
             Total balance
-            <InfoTooltip label="What is the total balance?">{BALANCE_SPEC.total.definition}</InfoTooltip>
+            <InfoTooltip label="What is the total balance?">
+              {BALANCE_SPEC.total.definition}
+            </InfoTooltip>
           </div>
           <Amount
             value={b.total}
-            className={cn('text-text-primary', compact ? 'text-number-m' : 'text-number-xl')}
+            className={cn('text-text-primary', compact ? 'text-number-m' : 'text-number-l')}
           />
           {updatedAt !== undefined && updatedAt > 0 && (
             <p className="text-caption text-text-tertiary">
@@ -101,7 +110,13 @@ export function BalanceBreakdown({
         {BUCKETS.map((k) => {
           const pct = share(b[k], b.total);
           if (!pct || pct === '0.0') return null;
-          return <span key={k} className={cn('h-full', BALANCE_SPEC[k].bar)} style={{ width: `${pct}%` }} />;
+          return (
+            <span
+              key={k}
+              className={cn('h-full', BALANCE_SPEC[k].bar)}
+              style={{ width: `${pct}%` }}
+            />
+          );
         })}
       </div>
 
@@ -127,11 +142,11 @@ export function BalanceBreakdown({
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <div className="flex items-center gap-1.5">
                   <span className="text-body-s-strong text-text-primary">{spec.label}</span>
-                  <InfoTooltip label={`What is ${spec.label.toLowerCase()}?`}>{spec.definition}</InfoTooltip>
+                  <InfoTooltip label={`What is ${spec.label.toLowerCase()}?`}>
+                    {spec.definition}
+                  </InfoTooltip>
                 </div>
-                {!compact && (
-                  <p className="text-caption text-text-tertiary">{composition(b, k)}</p>
-                )}
+                {!compact && <p className="text-caption text-text-tertiary">{composition(b, k)}</p>}
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Amount value={b[k]} className={cn('text-number-s', spec.text)} />
@@ -202,9 +217,9 @@ export function BalanceGlossary({
             })}
           </dl>
           <p className="mt-4 text-caption text-text-tertiary">
-            Only Available can be withdrawn. Pending becomes Available after the network confirmations;
-            Locked is released when the round settles or the withdrawal completes; Owed moves to
-            Available when you claim it or when it settles automatically.
+            Only Available can be withdrawn. Pending becomes Available after the network
+            confirmations; Locked is released when the round settles or the withdrawal completes;
+            Owed moves to Available when you claim it or when it settles automatically.
           </p>
         </DialogBody>
       </DialogContent>

@@ -1,0 +1,26 @@
+/** Dev / QA preview states for /auth-preview (server- and client-safe). */
+export const PREVIEW_STATES = [
+  'sign-in',
+  'sign-up',
+  'wallet',
+  'stepup',
+  'stepup-wrong',
+  'stepup-locked',
+  'connect-list',
+  'connect-qr',
+  'connect-connecting',
+  'connect-rejected',
+  'connect-wrong-network',
+  'connect-success',
+  'verify-request',
+  'verify-success',
+  'verify-rejected',
+  'verify-expired',
+  'session-expired',
+  'new-device',
+  'restricted-suspended',
+  'restricted-under-review',
+  'restricted-self-excluded',
+  'restricted-region',
+] as const;
+export type PreviewState = (typeof PREVIEW_STATES)[number];

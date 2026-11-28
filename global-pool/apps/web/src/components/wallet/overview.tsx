@@ -36,6 +36,7 @@ import {
   useTransactions,
   useWalletStatus,
   useWithdrawals,
+  type TxView,
   type WalletBalances,
 } from '@/lib/api/wallet';
 import { cn } from '@/lib/utils';
@@ -63,10 +64,7 @@ export function WalletOverview() {
   const tx = useTransactions({ page: 1, pageSize: 5 });
 
   const empty =
-    balances.data &&
-    isZero(balances.data.total) &&
-    tx.data !== undefined &&
-    tx.data.total === 0;
+    balances.data && isZero(balances.data.total) && tx.data !== undefined && tx.data.total === 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -84,7 +82,7 @@ export function WalletOverview() {
           </div>
         }
       />
-      <WalletTabs />
+      <WalletTabs className="hidden tablet:block" />
       <WalletStatusBanners status={status.data} rg={rg.data} context="overview" />
 
       {balances.isError ? (
@@ -99,8 +97,8 @@ export function WalletOverview() {
         <EmptyWallet />
       ) : (
         <>
-          <div className="grid gap-6 laptop:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)]">
-            <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 gap-6 laptop:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)]">
+            <div className="flex min-w-0 flex-col gap-6">
               {balances.data ? (
                 <BalanceBreakdown balances={balances.data} updatedAt={balances.dataUpdatedAt} />
               ) : (
@@ -108,7 +106,8 @@ export function WalletOverview() {
               )}
               <LifetimeCard className="hidden laptop:flex" />
             </div>
-            <div className="flex flex-col gap-6">
+            <div className="flex min-w-0 flex-col gap-6">
+              <MobileActions balances={balances.data} />
               <WithdrawableCard balances={balances.data} />
               <InProgressCard balances={balances.data} />
             </div>
@@ -121,9 +120,9 @@ export function WalletOverview() {
       <NetworksStrip />
       <p className="flex gap-2 text-caption text-text-tertiary">
         <ShieldCheck aria-hidden className="size-4 shrink-0" />
-        Balances live on your GLOBAL POOL platform account and are computed from an append-only ledger.
-        On-chain transfers happen only when you deposit or withdraw; pool entries are paid from Available
-        with no network fee. DEMO / testnet — no real money.
+        Balances live on your GLOBAL POOL platform account and are computed from an append-only
+        ledger. On-chain transfers happen only when you deposit or withdraw; pool entries are paid
+        from Available with no network fee. DEMO / testnet — no real money.
       </p>
     </div>
   );
@@ -133,24 +132,29 @@ function WithdrawableCard({ balances }: { balances: WalletBalances | undefined }
   const status = useWalletStatus();
   const s = status.data?.withdrawal;
   return (
-    <Card radius="xl" padding="l" className="gap-5">
+    <Card radius="xl" padding="l" className="hidden gap-5 tablet:flex">
       <div className="flex flex-col gap-1">
         <p className="text-overline text-text-tertiary uppercase">Withdrawable now</p>
         {balances ? (
           <div className="flex items-center gap-2">
-            <Amount value={balances.available} className="text-number-xl text-balance-available" />
+            <Amount value={balances.available} className="text-number-l text-balance-available" />
             <DemoBadge size="s" />
           </div>
         ) : (
           <Skeleton className="h-10 w-48" />
         )}
         <p className="text-body-s text-text-secondary">
-          Equals your Available balance. Locked, pending and owed funds become withdrawable as soon as they
-          settle.
+          Equals your Available balance. Locked, pending and owed funds become withdrawable as soon
+          as they settle.
         </p>
       </div>
       <div className="grid grid-cols-3 gap-2 tablet:gap-3">
-        <QuickAction href={WALLET_ROUTES.deposit} icon={<ArrowDownToLine />} label="Deposit" primary />
+        <QuickAction
+          href={WALLET_ROUTES.deposit}
+          icon={<ArrowDownToLine />}
+          label="Deposit"
+          primary
+        />
         <QuickAction href={WALLET_ROUTES.withdraw} icon={<ArrowUpFromLine />} label="Withdraw" />
         <QuickAction href={WALLET_ROUTES.history} icon={<History />} label="History" />
       </div>
@@ -177,7 +181,9 @@ function WithdrawableCard({ balances }: { balances: WalletBalances | undefined }
             aria-label="Daily withdrawal limit used"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={isZero(s.dailyLimit) ? 0 : money(s.usedToday).div(s.dailyLimit).times(100).toNumber()}
+            aria-valuenow={
+              isZero(s.dailyLimit) ? 0 : money(s.usedToday).div(s.dailyLimit).times(100).toNumber()
+            }
           >
             <div
               className="h-full rounded-full bg-status-info"
@@ -189,12 +195,56 @@ function WithdrawableCard({ balances }: { balances: WalletBalances | undefined }
         )}
         {s && (
           <p className="text-caption text-text-tertiary">
-            Resets {formatDateTimeUTC(s.resetsAt)} · platform withdrawal fee {formatUSDT(s.platformFee)} · the
-            network fee is shown before you confirm
+            Resets {formatDateTimeUTC(s.resetsAt)} · platform withdrawal fee{' '}
+            {formatUSDT(s.platformFee)} · the network fee is shown before you confirm
           </p>
         )}
       </div>
     </Card>
+  );
+}
+
+/** MOB-05: action tiles + a compact "Withdrawable now" strip (< 768 px). */
+function MobileActions({ balances }: { balances: WalletBalances | undefined }) {
+  const status = useWalletStatus();
+  const s = status.data?.withdrawal;
+  return (
+    <div className="flex flex-col gap-3 tablet:hidden">
+      <div className="grid grid-cols-3 gap-2">
+        <QuickAction
+          href={WALLET_ROUTES.deposit}
+          icon={<ArrowDownToLine />}
+          label="Deposit"
+          primary
+        />
+        <QuickAction href={WALLET_ROUTES.withdraw} icon={<ArrowUpFromLine />} label="Withdraw" />
+        <QuickAction href={WALLET_ROUTES.history} icon={<History />} label="History" />
+      </div>
+      <div className="flex flex-col gap-1 rounded-lg border border-border-subtle bg-surface-default p-4">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-body-s text-text-secondary">Withdrawable now</span>
+          {balances ? (
+            <span className="flex items-center gap-1.5">
+              <Amount
+                value={balances.available}
+                className="text-body-m-strong text-balance-available"
+              />
+              <DemoBadge size="xs" />
+            </span>
+          ) : (
+            <Skeleton className="h-5 w-28" />
+          )}
+        </div>
+        {s && (
+          <p className="text-caption text-text-tertiary">
+            Daily limit {formatUSDT(s.usedToday, { symbol: false })} / {formatUSDT(s.dailyLimit)}{' '}
+            used
+            {status.data ? ` (KYC ${status.data.kycLevel.replace('level_', 'L')})` : ''} · resets
+            00:00 UTC · platform fee {formatUSDT(s.platformFee, { symbol: false })}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -213,7 +263,7 @@ function QuickAction({
     <Link
       href={href}
       className={cn(
-        'flex min-h-12 flex-col items-center justify-center gap-1 rounded-md px-2 py-2 text-label-m transition-colors tablet:flex-row tablet:gap-2 [&_svg]:size-[18px]',
+        'flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-3 text-label-m transition-colors tablet:min-h-12 tablet:flex-row tablet:gap-2 tablet:rounded-md tablet:py-2 [&_svg]:size-[18px]',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus',
         primary
           ? 'bg-brand text-text-on-primary hover:bg-brand-hover'
@@ -254,7 +304,11 @@ function InProgressCard({ balances }: { balances: WalletBalances | undefined }) 
     claim.mutate(claimKey.current, {
       onSuccess: (r) => {
         claimKey.current = null;
-        toast({ type: 'success', title: 'Moved to Available', description: `${formatUSDT(r.claimed)} is now Available.` });
+        toast({
+          type: 'success',
+          title: 'Moved to Available',
+          description: `${formatUSDT(r.claimed)} is now Available.`,
+        });
       },
       onError: (e) => toast({ type: 'error', title: 'Couldn’t claim', description: e.message }),
     });
@@ -282,15 +336,22 @@ function InProgressCard({ balances }: { balances: WalletBalances | undefined }) 
         </div>
       ) : nothing ? (
         <p className="rounded-md border border-dashed border-border-default p-4 text-body-s text-text-secondary">
-          Nothing in progress. Deposits waiting for confirmations, pending withdrawals, active entries and
-          refunds show up here.
+          Nothing in progress. Deposits waiting for confirmations, pending withdrawals, active
+          entries and refunds show up here.
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
           {pendingDeposits.map((d) => (
-            <li key={d.id} className="flex flex-col gap-2 rounded-md border border-border-subtle bg-bg-secondary p-3">
+            <li
+              key={d.id}
+              className="flex flex-col gap-2 rounded-md border border-border-subtle bg-bg-secondary p-3"
+            >
               <div className="flex items-center gap-3">
-                <ConfirmationRing current={d.confirmations.current} required={d.confirmations.required} size={44} />
+                <ConfirmationRing
+                  current={d.confirmations.current}
+                  required={d.confirmations.required}
+                  size={44}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-body-s-strong text-text-primary">
                     {d.confirmations.current} / {d.confirmations.required} confirmations
@@ -301,7 +362,10 @@ function InProgressCard({ balances }: { balances: WalletBalances | undefined }) 
                 </div>
                 {d.isDemo && <DemoBadge size="xs" />}
               </div>
-              <ConfirmationBar current={d.confirmations.current} required={d.confirmations.required} />
+              <ConfirmationBar
+                current={d.confirmations.current}
+                required={d.confirmations.required}
+              />
             </li>
           ))}
           {openWithdrawals.map((w) => (
@@ -344,8 +408,10 @@ function InProgressCard({ balances }: { balances: WalletBalances | undefined }) 
           {owed.length > 0 && (
             <InProgressRow
               icon={<Coins />}
-              title={`${formatUSDT(balances!.owed)} owed to you`}
-              detail={owed.map((o) => `${o.label} ${formatUSDT(o.amount, { symbol: false })}`).join(' · ')}
+              title={`${formatUSDT(balances?.owed ?? '0')} owed to you`}
+              detail={owed
+                .map((o) => `${o.label} ${formatUSDT(o.amount, { symbol: false })}`)
+                .join(' · ')}
               action={
                 <Button variant="secondary" size="s" loading={claim.isPending} onClick={onClaim}>
                   Claim to Available
@@ -401,7 +467,7 @@ function RecentActivity({
 }: {
   loading: boolean;
   error: Error | null;
-  items: import('@/lib/api/wallet').TxView[];
+  items: TxView[];
 }) {
   const router = useRouter();
   return (
@@ -477,8 +543,8 @@ function NetworksStrip() {
         <div className="min-w-0">
           <p className="text-h5 text-text-primary">Deposit test USDT on Arbitrum Sepolia</p>
           <p className="text-caption text-text-tertiary">
-            Min. deposit {formatUSDT(CHAINS.arbitrum.minDeposit)} · network fees go to the chain, not to us ·
-            more networks coming soon
+            Min. deposit {formatUSDT(CHAINS.arbitrum.minDeposit)} · network fees go to the chain,
+            not to us · more networks coming soon
           </p>
         </div>
       </div>
@@ -526,4 +592,3 @@ function EmptyWallet() {
     </>
   );
 }
-

@@ -109,7 +109,9 @@ function TxRow({
             )}
           />
         </div>
-        <p className="line-clamp-2 text-caption text-text-tertiary tablet:truncate">{txSubtitle(tx)}</p>
+        <p className="line-clamp-2 text-caption text-text-tertiary tablet:truncate">
+          {txSubtitle(tx)}
+        </p>
         <div className="mt-1 flex flex-wrap items-center gap-2 tablet:hidden">
           <TxStatusBadge status={tx.status} type={tx.type} />
           <span className="text-caption text-text-tertiary">{when(tx.createdAt)}</span>
@@ -137,7 +139,9 @@ function TxRow({
       <span className="hidden w-12 justify-center tablet:flex">
         {tx.isDemo && <DemoBadge size="xs" />}
       </span>
-      {onSelect && <ChevronRight aria-hidden className="hidden size-4 shrink-0 text-icon-muted tablet:block" />}
+      {onSelect && (
+        <ChevronRight aria-hidden className="hidden size-4 shrink-0 text-icon-muted tablet:block" />
+      )}
     </>
   );
   const cls = cn(

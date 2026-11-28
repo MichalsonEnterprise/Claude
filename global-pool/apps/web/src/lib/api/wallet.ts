@@ -216,12 +216,26 @@ export interface MeView {
 }
 
 export interface RgLimitView {
-  type: 'deposit' | 'participation' | 'loss' | string;
+  /** 'deposit' | 'participation' | 'loss' | … */
+  type: string;
   period: string;
   limit: string;
   used: string;
   remaining: string;
   pendingIncrease: { amount: string; effectiveAt: string } | null;
+}
+
+export interface CurrentRoundView {
+  id: string;
+  number: number;
+  numberLabel: string;
+  status: string;
+  statusLabel: string;
+  closesAt: string;
+  entryPrice: string;
+  platformFeePerEntry: string;
+  poolBalance: string | null;
+  isDemo?: boolean;
 }
 
 export interface RgView {
@@ -299,6 +313,8 @@ export const walletApi = {
     }),
   me: (signal?: AbortSignal) => apiRequest<MeView>('/me', { signal }),
   rg: (signal?: AbortSignal) => apiRequest<RgView>('/responsible-gaming', { signal }),
+  currentRound: (signal?: AbortSignal) =>
+    apiRequest<CurrentRoundView>('/pool/rounds/current', { auth: 'none', signal }),
 };
 
 // ── query keys + hooks ─────────────────────────────────────────────────────────────────────────
@@ -318,6 +334,7 @@ export const walletKeys = {
   wallets: () => ['wallet', 'linked'] as const,
   me: () => ['wallet', 'me'] as const,
   rg: () => ['wallet', 'rg'] as const,
+  currentRound: () => ['wallet', 'current-round'] as const,
 };
 
 type Opts<T> = Omit<UseQueryOptions<T, Error, T, readonly unknown[]>, 'queryKey' | 'queryFn'>;
@@ -465,6 +482,15 @@ export function useRg() {
     queryKey: walletKeys.rg(),
     queryFn: ({ signal }) => walletApi.rg(signal),
     enabled: member,
+  });
+}
+
+export function useCurrentRound(enabled = true) {
+  return useQuery({
+    queryKey: walletKeys.currentRound(),
+    queryFn: ({ signal }) => walletApi.currentRound(signal),
+    enabled,
+    staleTime: 60_000,
   });
 }
 

@@ -249,7 +249,7 @@ export class AdminPoolController {
 
   @Post('circuit-breaker')
   @HttpCode(201)
-  @RequirePermissions('system.feature_flags.manage')
+  @RequirePermissions('rounds.read')
   @ApiOperation({
     summary:
       'Request to pause / resume NEW entries (reason + MFA; needs a second, different approver)',

@@ -51,7 +51,8 @@ export function rulesDocument(r: RoundRulesInput) {
     currency: 'USDT (test token, 6 decimals)',
     entryPriceUnits: toBaseUnits(r.entryPrice).toString(),
     platformFeePerEntryUnits: toBaseUnits(r.feePerEntry).toString(),
-    platformFeeNote: 'The platform fee is charged per entry, is never part of the pool and is not refunded.',
+    platformFeeNote:
+      'The platform fee is charged per entry, is never part of the pool and is not refunded.',
     minParticipants: r.minParticipants,
     minPoolUnits: toBaseUnits(r.minPool).toString(),
     prizeSplitBps: [...r.prizeSplitBps],
@@ -110,7 +111,9 @@ export function buildEntryCommitments(
 ): { rows: EntryCommitmentRow[]; root: Hex } {
   const rows = entries.map((e, index) => {
     if (e.seq !== index + 1) {
-      throw new Error(`entry list must be in canonical seq order (index ${index} has seq ${e.seq})`);
+      throw new Error(
+        `entry list must be in canonical seq order (index ${index} has seq ${e.seq})`,
+      );
     }
     const salt = saltFor(index);
     const entryIdBytes32 = encodeEntryId(e.code);
@@ -121,7 +124,11 @@ export function buildEntryCommitments(
       entryIdBytes32,
       salt,
       userCommitment: commitment,
-      leaf: entryLeaf({ index: BigInt(index), entryId: entryIdBytes32, userCommitment: commitment }),
+      leaf: entryLeaf({
+        index: BigInt(index),
+        entryId: entryIdBytes32,
+        userCommitment: commitment,
+      }),
     };
   });
   const root = rows.length === 0 ? ZERO_ROOT : (buildTree(rows.map((r) => r.leaf)).root as Hex);

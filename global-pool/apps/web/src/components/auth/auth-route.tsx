@@ -6,11 +6,9 @@ import * as React from 'react';
 import { useAuth } from '@/lib/auth/context';
 import { useAuthUi } from '@/lib/auth/ui-context';
 
-/** Only same-origin relative paths are accepted as `next` (no open redirects). */
-export function safeNext(raw: string | null | undefined): string | undefined {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return undefined;
-  return raw;
-}
+import { safeNext } from './safe-next';
+
+export { safeNext };
 
 /**
  * /sign-in, /sign-up and /verify: the lobby renders behind (dimmed) and this opens the GLOBAL POOL auth dialog at

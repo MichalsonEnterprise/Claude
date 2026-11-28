@@ -20,6 +20,8 @@ export const ignores = [
   '**/build/**',
   '**/out/**',
   '**/.next/**',
+  // per-agent / per-job Next dist dirs (NEXT_DIST_DIR=.next-<key>)
+  '**/.next-*/**',
   '**/coverage/**',
   '**/.turbo/**',
   '**/.dev/**',

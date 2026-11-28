@@ -165,10 +165,14 @@ export function CardHeading({
   );
 }
 
-export function Overline({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <p className={cn('text-overline text-text-tertiary uppercase', className)}>{children}</p>
-  );
+export function Overline({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <p className={cn('text-overline text-text-tertiary uppercase', className)}>{children}</p>;
 }
 
 /** Horizontal meter (0–1). */
@@ -259,7 +263,13 @@ export function RiskLine({
 export const FEE_LINE =
   '10.00 USDT + 0.05 USDT platform fee per entry · Network fee 0.00 USDT — entries are paid from your platform balance';
 
-export function LicenceCard({ compact = false, className }: { compact?: boolean; className?: string }) {
+export function LicenceCard({
+  compact = false,
+  className,
+}: {
+  compact?: boolean;
+  className?: string;
+}) {
   return (
     <section
       aria-label="Licence and jurisdiction"
@@ -295,10 +305,7 @@ export function LicenceCard({ compact = false, className }: { compact?: boolean;
 export function LicenceStrip({ className }: { className?: string }) {
   return (
     <p
-      className={cn(
-        'flex flex-wrap items-center gap-2 text-caption text-text-tertiary',
-        className,
-      )}
+      className={cn('flex flex-wrap items-center gap-2 text-caption text-text-tertiary', className)}
     >
       <AgeBadge />
       Real-money games require an applicable licence and are available only in permitted
@@ -510,11 +517,21 @@ export function ThresholdCard({
   const partMet = round.participants >= minParticipants;
   const both = poolMet && partMet;
   const open = round.status === 'open' || round.status === 'scheduled';
-  const bar = (label: string, value: string, ratio: string, frac: number, met: boolean, min: string, missing: string) => (
+  const bar = (
+    label: string,
+    value: string,
+    ratio: string,
+    frac: number,
+    met: boolean,
+    min: string,
+    missing: string,
+  ) => (
     <div className="flex flex-col gap-1.5">
       <p className="flex items-center justify-between gap-2 text-caption text-text-secondary">
         {label}
-        <span className={met ? 'text-text-success' : 'text-text-warning'}>{met ? ratio : missing}</span>
+        <span className={met ? 'text-text-success' : 'text-text-warning'}>
+          {met ? ratio : missing}
+        </span>
       </p>
       <p className="text-body-l text-text-primary tabular-nums">{value}</p>
       <Meter value={frac} tone={met ? 'brand' : 'warning'} label={`${label} ${value}, ${min}`} />
@@ -528,7 +545,7 @@ export function ThresholdCard({
       <CardHeading
         title="Draw threshold"
         demo={demo}
-        sub={`Round ${formatRoundNumber(round.number)} · ${open ? 'closes' : 'closed'} ${formatTimeUTC(round.closesAt, { seconds: true })} UTC`}
+        sub={`Round ${formatRoundNumber(round.number)} · ${open ? 'closes' : 'closed'} ${formatTimeUTC(round.closesAt, { seconds: true })}`}
         action={
           <StatusBadge
             status={both ? 'confirmed' : 'under_review'}
@@ -558,7 +575,7 @@ export function ThresholdCard({
         <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-icon-muted" />
         {open
           ? both
-            ? `Both minimums are met, so this round will draw at ${formatTimeUTC(round.closesAt, { seconds: true })} UTC.`
+            ? `Both minimums are met, so this round will draw at ${formatTimeUTC(round.closesAt, { seconds: true })}.`
             : 'If either minimum is not met at close, the round is cancelled and every stake is refunded to Owed.'
           : round.status === 'cancelled'
             ? 'The minimums were not met at close, so the round was cancelled and stakes went to Owed.'
@@ -584,7 +601,7 @@ export function VrfExplainerCard({
   const close = formatTimeUTC(closesAt, { seconds: true });
   const steps: [string, string][] = [
     [
-      `Entries freeze at ${close} UTC`,
+      `Entries freeze at ${close}`,
       'The round closes at its fixed time. Nothing is added or removed after close.',
     ],
     [
@@ -625,8 +642,8 @@ export function VrfExplainerCard({
         ))}
       </ol>
       <p className="text-caption text-text-tertiary">
-        Each round publishes its VRF request ID, random word and settlement, and anyone can re-derive
-        the winners in the browser.
+        Each round publishes its VRF request ID, random word and settlement, and anyone can
+        re-derive the winners in the browser.
       </p>
     </article>
   );

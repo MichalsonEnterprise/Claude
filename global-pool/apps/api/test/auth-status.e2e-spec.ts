@@ -66,7 +66,7 @@ describe('GET /auth/account-status (web route guards, AUTH-18)', () => {
       .http()
       .post('/responsible-gaming/self-exclusion')
       .set(bearer(p.token))
-      .send({ duration: '6m', confirm: true })
+      .send({ duration: '24h', confirm: true })
       .expect(200);
     const res = await t.http().get('/auth/account-status').set(bearer(p.token)).expect(200);
     expect(res.body.gate).toBe('self_excluded');

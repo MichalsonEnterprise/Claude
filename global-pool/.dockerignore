@@ -5,7 +5,8 @@
 **/coverage
 **/test-results
 **/playwright-report
-.dev
+**/.dev
+**/.next-*
 .env
 .env.*
 !.env.example

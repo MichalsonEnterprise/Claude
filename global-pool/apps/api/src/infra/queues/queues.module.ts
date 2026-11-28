@@ -29,6 +29,7 @@ import { QUEUES } from './queues';
       { name: QUEUES.DEPOSITS },
       { name: QUEUES.WITHDRAWALS },
       { name: QUEUES.ROUNDS },
+      { name: QUEUES.EMAILS },
     ),
   ],
   exports: [BullModule],

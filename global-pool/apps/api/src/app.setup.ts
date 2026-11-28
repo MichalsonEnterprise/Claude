@@ -6,6 +6,7 @@ import { Logger } from 'nestjs-pino';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 
 import { AppConfig } from './config/app-config';
+import { applyResponseSchemas } from './infra/openapi/response-schemas';
 import { GpIoAdapter } from './infra/socket-io.adapter';
 
 export function buildOpenApi(app: INestApplication): OpenAPIObject {
@@ -37,7 +38,7 @@ export function buildOpenApi(app: INestApplication): OpenAPIObject {
       'admin',
     )
     .build();
-  return cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
+  return applyResponseSchemas(cleanupOpenApiDoc(SwaggerModule.createDocument(app, config)));
 }
 
 /** HTTP hardening + docs shared by main.ts and the e2e tests. */
@@ -76,7 +77,12 @@ export function configureApp(app: NestExpressApplication): void {
     maxAge: 600,
   });
   app.useBodyParser('json', { limit: '256kb' });
-  app.useWebSocketAdapter(new GpIoAdapter(app, config.env.CORS_ORIGINS));
+  app.useWebSocketAdapter(
+    new GpIoAdapter(app, config.env.CORS_ORIGINS, {
+      redisUrl: config.env.SOCKET_IO_REDIS_ADAPTER ? config.env.REDIS_URL : null,
+      keyPrefix: config.env.BULLMQ_PREFIX,
+    }),
+  );
   SwaggerModule.setup('docs', app, () => buildOpenApi(app), {
     jsonDocumentUrl: 'docs-json',
     customSiteTitle: 'GLOBAL POOL API (DEMO)',

@@ -1,8 +1,90 @@
 # GLOBAL POOL — local stack (DEMO / testnet only).
-#   docker compose up -d postgres redis        # services only (alternative to scripts/dev-services.sh)
-#   docker compose up --build                  # full stack: postgres, redis, api (:4000), web (:3000)
+#   docker compose up -d postgres redis              # services only (alternative to scripts/dev-services.sh)
+#   docker compose --profile dev up --build          # DEMO stack: api-dev (:4000, NODE_ENV=development, DEV MOCK
+#                                                    #   player login, migrations + DEMO seed on start) + web-dev (:3000)
+#   docker compose --profile prod up --build         # production mode: api (:4000) + web (:3000); the DEV MOCK is
+#                                                    #   refused, so player sign-in needs a Privy app id in .env
+# Secrets come from .env.example (dev placeholders) overridden by .env — set real values before any shared use.
+# DEV credentials written by the seed: docker compose exec api-dev cat apps/api/.dev/demo-admins.json
 # Do not run alongside scripts/dev-services.sh on the same ports (override POSTGRES_PORT / REDIS_PORT).
 name: global-pool
+
+x-api: &api
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: api
+  env_file:
+    - path: .env.example
+      required: true
+    - path: .env
+      required: false
+  ports:
+    - '${API_PORT:-4000}:4000'
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  healthcheck:
+    test:
+      [
+        'CMD',
+        'node',
+        '-e',
+        "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+      ]
+    interval: 10s
+    timeout: 3s
+    start_period: 60s
+    retries: 10
+  restart: unless-stopped
+
+x-api-env: &api-env
+  API_PORT: '4000'
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/globalpool?schema=public
+  DATABASE_URL_TEST: postgresql://postgres:postgres@postgres:5432/globalpool_test?schema=public
+  REDIS_URL: redis://redis:6379
+  APP_URL: http://localhost:3000
+  API_URL: http://localhost:4000
+  CORS_ORIGINS: http://localhost:3000
+  REAL_MONEY_ENABLED: 'false'
+  DEMO_MODE: 'true'
+
+x-web: &web
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: web
+    args:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_WS_URL: ws://localhost:4000
+      NEXT_PUBLIC_DEMO_MODE: 'true'
+      NEXT_PUBLIC_PRIVY_APP_ID: ${NEXT_PUBLIC_PRIVY_APP_ID:-}
+      NEXT_PUBLIC_PRIVY_MOCK: ${NEXT_PUBLIC_PRIVY_MOCK:-true}
+      NEXT_PUBLIC_CHAIN_ID: '421614'
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    NODE_ENV: production
+    PORT: '3000'
+  ports:
+    - '${WEB_PORT:-3000}:3000'
+  healthcheck:
+    test:
+      [
+        'CMD',
+        'node',
+        '-e',
+        "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status<500?0:1),()=>process.exit(1))",
+      ]
+    interval: 10s
+    timeout: 3s
+    start_period: 30s
+    retries: 10
+  restart: unless-stopped
 
 services:
   postgres:
@@ -37,85 +119,53 @@ services:
       retries: 20
     restart: unless-stopped
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: api
-    env_file:
-      - path: .env
-        required: false
+  # ── dev profile: DEMO stack with the offline DEV MOCK player auth (NODE_ENV=development) ──────────────
+  api-dev:
+    <<: *api
+    profiles: ['dev']
     environment:
-      NODE_ENV: production
-      API_PORT: '4000'
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/globalpool?schema=public
-      DATABASE_URL_TEST: postgresql://postgres:postgres@postgres:5432/globalpool_test?schema=public
-      REDIS_URL: redis://redis:6379
-      APP_URL: http://localhost:3000
-      API_URL: http://localhost:4000
-      CORS_ORIGINS: http://localhost:3000
-      REAL_MONEY_ENABLED: 'false'
-      DEMO_MODE: 'true'
-      PRIVY_MOCK: ${PRIVY_MOCK:-true}
-    ports:
-      - '${API_PORT:-4000}:4000'
+      <<: *api-env
+      NODE_ENV: development
+      # The DEV MOCK (locally signed player tokens) is honoured only outside production.
+      PRIVY_MOCK: 'true'
+      JOBS_ENABLED: 'true'
+      SOCKET_IO_REDIS_ADAPTER: 'true'
+      MAIL_TRANSPORT: log
+    # Migrations, then the DEMO seed (skipped with a message when the database already has non-DEMO data).
+    command:
+      [
+        'sh',
+        '-c',
+        "pnpm --filter @gp/api db:migrate:deploy && (pnpm --filter @gp/api db:seed:prod || echo 'DEMO seed skipped') && pnpm --filter @gp/api start:prod",
+      ]
+    volumes:
+      - apidev:/repo/apps/api/.dev
+
+  web-dev:
+    <<: *web
+    profiles: ['dev']
     depends_on:
-      postgres:
+      api-dev:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
-        ]
-      interval: 10s
-      timeout: 3s
-      start_period: 30s
-      retries: 10
-    restart: unless-stopped
+
+  # ── prod profile: production mode (DEV MOCK refused; set PRIVY_APP_ID / secrets in .env) ───────────────
+  api:
+    <<: *api
+    profiles: ['prod']
+    environment:
+      <<: *api-env
+      NODE_ENV: production
+      PRIVY_MOCK: 'false'
+      SOCKET_IO_REDIS_ADAPTER: 'true'
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: web
-      args:
-        NEXT_PUBLIC_API_URL: http://localhost:4000
-        NEXT_PUBLIC_APP_URL: http://localhost:3000
-        NEXT_PUBLIC_WS_URL: ws://localhost:4000
-        NEXT_PUBLIC_DEMO_MODE: 'true'
-        NEXT_PUBLIC_PRIVY_APP_ID: ${NEXT_PUBLIC_PRIVY_APP_ID:-}
-        NEXT_PUBLIC_PRIVY_MOCK: ${NEXT_PUBLIC_PRIVY_MOCK:-true}
-        NEXT_PUBLIC_CHAIN_ID: '421614'
-    env_file:
-      - path: .env
-        required: false
-    environment:
-      NODE_ENV: production
-      PORT: '3000'
-    ports:
-      - '${WEB_PORT:-3000}:3000'
+    <<: *web
+    profiles: ['prod']
     depends_on:
       api:
         condition: service_healthy
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status<500?0:1),()=>process.exit(1))",
-        ]
-      interval: 10s
-      timeout: 3s
-      start_period: 30s
-      retries: 10
-    restart: unless-stopped
 
 volumes:
   pgdata:
   redisdata:
+  apidev:

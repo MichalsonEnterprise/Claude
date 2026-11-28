@@ -2,7 +2,9 @@
 
 > **DEMO / testnet only.** MVP chain Arbitrum Sepolia (421614). `REAL_MONEY_ENABLED=true` is rejected at boot.
 > NestJS 11 · Prisma 6 · PostgreSQL 16 · Redis 7 / BullMQ · socket.io · zod (shared schemas from `@gp/shared`).
-> Live OpenAPI: **`GET /docs`** (Swagger UI) and **`GET /docs-json`** (83 operations).
+> Live OpenAPI: **`GET /docs`** (Swagger UI) and **`GET /docs-json`**. The main endpoints carry response schemas
+> (`src/infra/openapi/response-schemas.ts`, contract-tested against live responses) and every operation documents
+> the shared error envelope as its `default` response.
 
 ## Quick start
 
@@ -23,16 +25,25 @@ pnpm --filter @gp/api start:dev                     # http://localhost:4000 · /
   The @nova.k TOTP secret (for step-up) is in `apps/api/.dev/demo-player.json`.
 - **Fresh DEMO database:** `pnpm --filter @gp/api db:reset` drops all data, re-applies the migrations and seeds. The
   seed refuses to run on a non-empty ledger, because ledger rows can never be deleted.
+- **Docker:** `docker compose --profile dev up --build` runs the DEMO stack with `NODE_ENV=development`, so the DEV
+  MOCK player login works (migrations + DEMO seed on start; credentials via
+  `docker compose exec api-dev cat apps/api/.dev/demo-admins.json`). `--profile prod` runs production mode, where the
+  DEV MOCK is refused and player sign-in needs a Privy app id. `docker compose up -d postgres redis` = services only.
+- **Local chain:** `pnpm --filter @gp/api devnet` starts Anvil (31337) with `GlobalPoolRounds`, the VRF v2.5 mock and
+  a mock test-USDT deployed from throwaway runtime keys, and writes the env lines to `apps/api/.dev/devnet.env`. Run
+  the API with them plus `POOL_ONCHAIN_MIRROR=true RANDOMNESS_PROVIDER=chainlink` (and
+  `WITHDRAWAL_BROADCASTER_ENABLED=true`). See [On-chain operations](#on-chain-operations-testnet-only).
 
-| Script                             | What it does                                                                               |
-| ---------------------------------- | ------------------------------------------------------------------------------------------ |
-| `typecheck` / `lint` / `build`     | `prisma generate` + `tsc --noEmit` / type-aware ESLint / `nest build` → `dist/src/main.js` |
-| `test`                             | unit tests (vitest + SWC) **and** e2e tests (supertest) against `globalpool_test`          |
-| `test:unit` / `test:e2e`           | one suite only                                                                             |
-| `start:dev` / `start:prod`         | watch mode / `node dist/src/main.js`                                                       |
-| `db:migrate` / `db:migrate:deploy` | create and apply (dev) / apply only (CI, Docker)                                           |
-| `db:seed` / `db:seed:prod`         | DEMO seed with tsx / compiled seed (`dist/prisma/seed.js`)                                 |
-| `db:migrate:test`                  | reset the test database (destructive; e2e itself only runs `migrate deploy`)               |
+| Script                             | What it does                                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| `typecheck` / `lint` / `build`     | `prisma generate` + `tsc --noEmit` / type-aware ESLint / `nest build` → `dist/src/main.js`  |
+| `test`                             | unit tests (vitest + SWC) **and** e2e tests (supertest) against `globalpool_test`           |
+| `test:unit` / `test:e2e`           | one suite only                                                                              |
+| `start:dev` / `start:prod`         | watch mode / `node dist/src/main.js`                                                        |
+| `db:migrate` / `db:migrate:deploy` | create and apply (dev) / apply only (CI, Docker)                                            |
+| `db:seed` / `db:seed:prod`         | DEMO seed with tsx / compiled seed (`dist/prisma/seed.js`)                                  |
+| `db:migrate:test`                  | reset the test database (destructive; e2e itself only runs `migrate deploy`)                |
+| `devnet`                           | local Anvil devnet with the contracts deployed (DEV ONLY; env written to `.dev/devnet.env`) |
 
 ## Conventions
 
@@ -50,35 +61,39 @@ pnpm --filter @gp/api start:dev                     # http://localhost:4000 · /
 - **Auth headers:** player `Authorization: Bearer <Privy access token>` (or the `privy-token` cookie); admin
   `Authorization: Bearer <admin access token>`; step-up `X-Step-Up-Token: <token>`, or `totpCode` in the body.
 - Every DEMO record carries `isDemo: true` so the UI can render the DEMO badge.
+- **Response schemas** (OpenAPI components `RoundView`, `WalletBalances`, `WithdrawalView`, `EntryPurchase`, …) are
+  `looseObject`s: listed fields are guaranteed; new fields may be added without notice, never removed silently.
 
 ## Modules
 
-| Module          | Responsibility                                                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `config`        | zod-validated env (`src/config/env.ts`); refuses `REAL_MONEY_ENABLED=true`, weak secrets and a wrong-size TOTP key                                                                         |
-| `health`        | `/health` with PostgreSQL and Redis checks (503 when degraded)                                                                                                                             |
-| `ledger`        | append-only double-entry ledger: posting templates, balance computation, reconciliation                                                                                                    |
-| `audit`         | hash-chained `audit_logs`: service, `@Audit()` interceptor, chain verification                                                                                                             |
-| `idempotency`   | stored responses for financial writes (`idempotency_keys`)                                                                                                                                 |
-| `auth`          | Privy verification (`@privy-io/server-auth`) or DEV MOCK tokens, user upsert by `privy_user_id`, linked email and wallet sync, onboarding consents, `PlayerAuth` guards and route policies |
-| `security`      | TOTP (otplib; AES-256-GCM at rest; replay protection; lockout), backup codes, anti-phishing code, step-up tokens                                                                           |
-| `users`         | `/me`, profile, sessions/devices and revoke, linked wallets, withdrawal whitelist (24 h cool-down)                                                                                         |
-| `wallet`        | balances from the ledger (Available / Locked / Pending / Owed / Total with breakdown), lifetime stats, claim owed                                                                          |
-| `deposits`      | per-user HD deposit addresses (xpub only), BullMQ deposit watcher (test-USDT `Transfer` logs via viem), confirmations, DEMO simulation                                                     |
-| `withdrawals`   | request (step-up, KYC limit, AML), state machine, four-eyes approvals, DEMO confirmation, BullMQ processing                                                                                |
-| `transactions`  | user-facing activity history (paginated, filtered); never used for balances                                                                                                                |
-| `pool`          | rounds, entries, live projections, lifecycle (close → draw → settle / cancel), WebSocket gateway `/pool`                                                                                   |
-| `randomness`    | provider interface, `MockVrfProvider` (dev), `ChainlinkVrfProvider` (reads `GlobalPoolRounds` events), winner selection                                                                    |
-| `games`         | catalogue from the DB (house edge disclosed; simulation mode only)                                                                                                                         |
-| `notifications` | in-app notifications                                                                                                                                                                       |
-| `compliance`    | geo rules + `RESTRICTED_COUNTRIES`, 18+, responsible gaming (limits, cool-down, self-exclusion, reality checks), admin restrictions                                                        |
-| `kyc` / `aml`   | provider interfaces + mock providers (KYC level → withdrawal limit; withdrawal screening → alerts)                                                                                         |
-| `affiliates`    | referral / affiliate **stub** (read-only)                                                                                                                                                  |
-| `admin`         | separate admin auth (argon2id + mandatory TOTP, refresh-token families), RBAC, back-office endpoints                                                                                       |
-| `reporting`     | dashboard KPIs computed from the ledger                                                                                                                                                    |
-| `blockchain`    | chain config and read-only viem clients (testnets only)                                                                                                                                    |
-| `feature-flags` | operational kill switches (`pool.entries.enabled`, `deposits.enabled`, `withdrawals.enabled`, …)                                                                                           |
-| `platform`      | public config (`/config`): fees, limits, chains, round rules, auth mode                                                                                                                    |
+| Module           | Responsibility                                                                                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `config`         | zod-validated env (`src/config/env.ts`); refuses `REAL_MONEY_ENABLED=true`, weak secrets and a wrong-size TOTP key                                                                         |
+| `health`         | `/health` with PostgreSQL and Redis checks (503 when degraded)                                                                                                                             |
+| `ledger`         | append-only double-entry ledger: posting templates, balance computation, reconciliation                                                                                                    |
+| `audit`          | hash-chained `audit_logs`: service, `@Audit()` interceptor, chain verification                                                                                                             |
+| `idempotency`    | stored responses for financial writes (`idempotency_keys`)                                                                                                                                 |
+| `auth`           | Privy verification (`@privy-io/server-auth`) or DEV MOCK tokens, user upsert by `privy_user_id`, linked email and wallet sync, onboarding consents, `PlayerAuth` guards and route policies |
+| `security`       | TOTP (otplib; AES-256-GCM at rest; replay protection; lockout), backup codes, anti-phishing code, step-up tokens                                                                           |
+| `users`          | `/me`, profile, sessions/devices and revoke, linked wallets, withdrawal whitelist (24 h cool-down)                                                                                         |
+| `wallet`         | balances from the ledger (Available / Locked / Pending / Owed / Total with breakdown), lifetime stats, claim owed                                                                          |
+| `deposits`       | per-user HD deposit addresses (xpub only), re-org-safe chain watcher (test-USDT `Transfer` logs via viem, receipts re-checked until credited), confirmations, DEMO simulation              |
+| `withdrawals`    | request (step-up, KYC limit, AML), state machine, four-eyes approvals, testnet broadcaster (signer outbox, nonce manager, confirmation tracker), DEMO confirmation, BullMQ processing      |
+| `transactions`   | user-facing activity history (paginated, filtered); never used for balances                                                                                                                |
+| `pool`           | rounds, entries, live projections, lifecycle (close → draw → settle / cancel), WebSocket gateway `/pool`                                                                                   |
+| `randomness`     | provider interface, `MockVrfProvider` (dev), `ChainlinkVrfProvider` (VRF fulfilment watcher: `DrawRequested` / `DrawFulfilled` of `GlobalPoolRounds` with confirmations), winner selection |
+| `onchain-rounds` | round mirroring on `GlobalPoolRounds` (openRound → commitEntries with salted entry commitments → requestDraw → recordSettlement / cancelRound), public proofs and manifest                 |
+| `games`          | catalogue from the DB (house edge disclosed; simulation mode only)                                                                                                                         |
+| `notifications`  | in-app notifications (email-worthy types are also queued for email)                                                                                                                        |
+| `email`          | email adapter: `log` (dev console) / `smtp` (nodemailer) / `disabled`; BullMQ `emails` worker; anti-phishing code + DEMO notice in every email; honours A9 preferences                     |
+| `compliance`     | geo rules + `RESTRICTED_COUNTRIES`, 18+, responsible gaming (limits, cool-down, self-exclusion, reality checks), admin restrictions                                                        |
+| `kyc` / `aml`    | provider interfaces + mock providers (KYC level → withdrawal limit; withdrawal screening → alerts)                                                                                         |
+| `affiliates`     | referral / affiliate **stub** (read-only)                                                                                                                                                  |
+| `admin`          | separate admin auth (argon2id + mandatory TOTP, refresh-token families), RBAC, back-office endpoints                                                                                       |
+| `reporting`      | dashboard KPIs computed from the ledger                                                                                                                                                    |
+| `blockchain`     | chain config, viem clients (Arbitrum Sepolia or local Anvil only) and `ChainSignerService` (testnet keys, eth_chainId check, DB nonce manager, signed-tx outbox, re-broadcast, tracking)   |
+| `feature-flags`  | operational kill switches (`pool.entries.enabled`, `deposits.enabled`, `withdrawals.enabled`, …)                                                                                           |
+| `platform`       | public config (`/config`): fees, limits, chains, round rules, auth mode                                                                                                                    |
 
 ## Endpoints
 
@@ -102,13 +117,17 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 
 ### auth
 
-| Method | Path               | Auth   | Description                                                                                                |
-| ------ | ------------------ | ------ | ---------------------------------------------------------------------------------------------------------- |
-| GET    | `/auth/config`     | public | Player auth mode: privy / mock (DEV MOCK, offline) / disabled                                              |
-| POST   | `/auth/dev/token`  | public | DEV MOCK only (never in production): issue a locally signed player token. DEMO user: did:privy:demo-nova-k |
-| POST   | `/auth/logout`     | player | Revoke the current session for this API (call Privy logout on the client too)                              |
-| POST   | `/auth/onboarding` | player | First-login onboarding: consents (never pre-checked) + country + handle                                    |
-| POST   | `/auth/session`    | player | Call after Privy login: verifies the token, upserts the user (privy_user_id), syncs linked email/wallets   |
+| Method | Path                                          | Auth   | Description                                                                                                                                                                                                                |
+| ------ | --------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/auth/config`                                | public | Player auth mode: privy / mock (DEV MOCK, offline) / disabled                                                                                                                                                              |
+| POST   | `/auth/dev/token`                             | public | DEV MOCK only (never in production): issue a locally signed player token. DEMO user: did:privy:demo-nova-k                                                                                                                 |
+| POST   | `/auth/logout`                                | player | Revoke the current session for this API (call Privy logout on the client too)                                                                                                                                              |
+| POST   | `/auth/onboarding`                            | player | First-login onboarding: consents (never pre-checked) + country + handle                                                                                                                                                    |
+| POST   | `/auth/session`                               | player | Call after Privy login: verifies the token, upserts the user (privy_user_id), syncs linked email/wallets                                                                                                                   |
+| GET    | `/auth/account-status`                        | player | Account gate for the web (AUTH-18): `ok · onboarding · suspended · self_excluded · region · under_review`, restrictions (type, since, case reference — never the internal reason), paused features, self-exclusion, region |
+| GET    | `/auth/new-device-alerts`                     | player | AUTH-21: sign-ins from a device label this player never used, shown on their OTHER sessions (14 days)                                                                                                                      |
+| POST   | `/auth/new-device-alerts/{sessionId}/confirm` | player | “Yes, it was me” — clears the flag (audited)                                                                                                                                                                               |
+| POST   | `/auth/new-device-alerts/{sessionId}/secure`  | player | “No, secure my account” — revokes every other session (audited)                                                                                                                                                            |
 
 ### auth · 2FA
 
@@ -134,6 +153,21 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | POST   | `/me/wallets/whitelist`      | player | Whitelist a withdrawal address (step-up: whitelist_change; 24 h cool-down) |
 | DELETE | `/me/wallets/{id}/whitelist` | player | Remove an address from the whitelist (step-up: whitelist_change)           |
 
+### users · account (account module — USR-A1…A10)
+
+| Method | Path                            | Auth   | Description                                                                                       |
+| ------ | ------------------------------- | ------ | ------------------------------------------------------------------------------------------------- |
+| GET    | `/me/preferences`               | player | Language, time zone, notification channels per category (locked categories resolved), idle timeout |
+| PATCH  | `/me/profile`                   | player | A1: display name, language, time zone (verified identity is never editable here; audited)        |
+| PUT    | `/me/notification-preferences`  | player | A9: channels per category — security + RG stay on; promotions are opt-in and mirror marketingOptIn |
+| GET    | `/me/devices`                   | player | A7/A8: sessions as devices (masked IP, method, status); `?include=all` adds ended (90 days)        |
+| POST   | `/me/sessions/revoke-others`    | player | A8: end every other session — protective, no 2FA code (audited)                                   |
+| GET    | `/me/login-history`             | player | A6: sign-ins (one per Privy session), `?filter=all\|success\|flagged\|ended&days=30`, counts       |
+| GET    | `/me/security`                  | player | A2: security score 0–100 from live protections + your own recent security events (audit log)     |
+
+"Yes, it was me" / "Secure my account" for a flagged device use the auth module's
+`POST /auth/new-device-alerts/{sessionId}/confirm|secure`.
+
 ### wallet
 
 | Method | Path                 | Auth   | Description                                                                                     |
@@ -141,6 +175,7 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | GET    | `/wallet/balances`   | player | Available / Locked / Pending / Owed / Total — computed from the append-only double-entry ledger |
 | GET    | `/wallet/lifetime`   | player | Lifetime deposits, withdrawals, entries, platform fees paid, rewards                            |
 | POST   | `/wallet/owed/claim` | player | Claim everything owed (refunds, prizes, rewards) to Available (idempotent)                      |
+| GET    | `/wallet/status` | player | Deposits / withdrawals operational status + daily withdrawal limit usage (KYC level, used today, resets at) |
 
 ### deposits
 
@@ -148,6 +183,7 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | ------ | ------------------- | ------ | ---------------------------------------------------------------------- |
 | GET    | `/deposits`         | player | Your deposits with confirmation progress                               |
 | GET    | `/deposits/address` | player | Your per-user deposit address (HD-derived, Arbitrum Sepolia test-USDT) |
+| GET    | `/deposits/ref/{reference}` | player | One deposit by reference (DP-…) with confirmation progress (polled by the pending step) |
 
 ### withdrawals
 
@@ -158,6 +194,8 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | GET    | `/withdrawals/quote`       | player | Fee breakdown: network fee (deducted), platform fee 0.00, you receive                                   |
 | GET    | `/withdrawals/{id}`        | player |                                                                                                         |
 | POST   | `/withdrawals/{id}/cancel` | player | Cancel before sending — funds return to Available                                                       |
+| GET    | `/withdrawals/precheck` | player | Read-only risk validation before 2FA (KYC, limits + balance, 2FA, AML preview, address risk / cool-down, network) → pass / review / kyc_required / blocked; writes nothing |
+| GET    | `/withdrawals/ref/{reference}` | player | One withdrawal by reference (WD-…) with its stored AML screening (status tracker) |
 
 ### transactions
 
@@ -168,17 +206,22 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 
 ### pool
 
-| Method | Path                                | Auth   | Description                                                                                       |
-| ------ | ----------------------------------- | ------ | ------------------------------------------------------------------------------------------------- |
-| GET    | `/pool/quote`                       | public | Entry quote: n × 10.00 + platform fee n × 0.05 (separate line) + network fee 0.00                 |
-| GET    | `/pool/rounds`                      | public | Round history (closed, drawing, settled, cancelled)                                               |
-| GET    | `/pool/rounds/current`              | public | Current round (open → next scheduled → latest) with pool, thresholds and prize table              |
-| GET    | `/pool/rounds/{number}`             | public | Round by public number (e.g. 1248)                                                                |
-| GET    | `/pool/rounds/{number}/feed`        | public | Latest entry purchases in a round                                                                 |
-| GET    | `/pool/rounds/{number}/verify`      | public | Verification bundle: VRF word, algorithm, recomputed winners vs stored winners                    |
-| POST   | `/pool/rounds/{roundId}/entries`    | player | Buy entries (idempotent): RG limits, balance check, AVAILABLE → POOL + FEES in one DB transaction |
-| GET    | `/pool/rounds/{roundId}/my-entries` | player | Your entries in a round + odds disclosure                                                         |
-| GET    | `/pool/winners`                     | public | Recent winners                                                                                    |
+| Method | Path                                | Auth   | Description                                                                                           |
+| ------ | ----------------------------------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| GET    | `/pool/quote`                       | public | Entry quote: n × 10.00 + platform fee n × 0.05 (separate line) + network fee 0.00                     |
+| GET    | `/pool/rounds`                      | public | Round history (closed, drawing, settled, cancelled); `?status=settled,cancelled&number=1245`                                   |
+| GET    | `/pool/rounds/current`              | public | Current round (open → next scheduled → latest) with pool, thresholds and prize table                  |
+| GET    | `/pool/rounds/{number}`             | public | Round by public number (e.g. 1248)                                                                    |
+| GET    | `/pool/rounds/{number}/feed`        | public | Latest entry purchases in a round                                                                     |
+| GET    | `/pool/rounds/{number}/verify`      | public | Verification bundle: VRF word, algorithm, recomputed winners vs stored winners                        |
+| GET    | `/pool/rounds/{number}/chain`       | public | On-chain mirror status: contract, steps (open / commit / draw / settle) + tx links, rules hash, roots |
+| GET    | `/pool/rounds/{number}/manifest`    | public | Committed entry leaves in index order (`?page&pageSize≤5000`) — rebuild the on-chain entries root     |
+| GET    | `/pool/rounds/{number}/payouts`     | public | Payout leaves + Merkle proofs (check each with `verifyPayout` on-chain)                               |
+| GET    | `/pool/rounds/{number}/my-proofs`   | player | Your entry receipts: index, entry id, secret salt, commitment and proof (`verifyEntry` on-chain)      |
+| POST   | `/pool/rounds/{roundId}/entries`    | player | Buy entries (idempotent): RG limits, balance check, AVAILABLE → POOL + FEES in one DB transaction     |
+| GET    | `/pool/rounds/{roundId}/my-entries` | player | Your entries in a round + odds disclosure                                                             |
+| GET    | `/pool/winners`                     | public | Recent winners                                                                                        |
+| GET    | `/pool/me/entries`                  | player | Your entry history: one row per purchase (entries + separate platform fee) with its result + lifetime summary |
 
 ### games
 
@@ -189,13 +232,51 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 
 ### responsible-gaming
 
-| Method | Path                                    | Auth   | Description                                                                   |
-| ------ | --------------------------------------- | ------ | ----------------------------------------------------------------------------- |
-| GET    | `/responsible-gaming`                   | player | Limits (effective + pending increases + usage), self-exclusion, reality check |
-| PUT    | `/responsible-gaming/limits`            | player | Set a limit — decreases apply now, increases after a 24 h cool-down           |
-| PUT    | `/responsible-gaming/reality-check`     | player | Reality-check reminder interval (minutes)                                     |
-| POST   | `/responsible-gaming/reality-check/ack` | player | Acknowledge a reality-check reminder                                          |
-| POST   | `/responsible-gaming/self-exclusion`    | player | Self-exclude immediately (withdrawals remain available)                       |
+All limits and breaks are enforced server-side (entries, game stakes and deposits); nothing here can block a withdrawal.
+Every change is written to the hash-chained audit log, which also feeds the player's limit history.
+
+| Method | Path                                         | Auth   | Description                                                                                                                         |
+| ------ | -------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/responsible-gaming`                        | player | Limits (effective, usage, `resetsAt`, pending increase / removal), `exclusion` (break or self-exclusion), settings, session, 2FA on? |
+| PUT    | `/responsible-gaming/limits`                 | player | Set a limit — new or lower limits apply now, increases after a 24 h cool-down                                                       |
+| POST   | `/responsible-gaming/limits/remove`          | player | Remove a limit — waits for the 24 h cool-down (cancellable)                                                                         |
+| POST   | `/responsible-gaming/limits/cancel-pending`  | player | Cancel a pending increase or removal — the current limit stays                                                                      |
+| PUT    | `/responsible-gaming/session-limit`          | player | Session length limit (minutes, `null` = remove) — increases / removal wait 24 h                                                     |
+| PUT    | `/responsible-gaming/quiet-hours`            | player | Quiet hours (UTC) — on applies now, off waits 24 h                                                                                  |
+| POST   | `/responsible-gaming/settings/cancel-pending`| player | Cancel a pending session-limit change or quiet-hours switch-off                                                                     |
+| PUT    | `/responsible-gaming/reality-check`          | player | Reality-check interval (15–240 min) + `pauseGame` / `pushNotification` toggles                                                      |
+| POST   | `/responsible-gaming/reality-check/ack`      | player | Answer a reminder: `continue` / `history` / `break` (restarts the interval; logged)                                                 |
+| GET    | `/responsible-gaming/session`                | player | Session: started, played today, sessions today, net session / today, next reality check (`due`), `blockedReason`                   |
+| POST   | `/responsible-gaming/session/heartbeat`      | player | Activity heartbeat (web: every 60 s while playing) — drives time limits; a session ends after 15 min idle                          |
+| GET    | `/responsible-gaming/history`                | player | `?kind=limits\|reality_checks\|all` — your RG changes and reminder answers (from the audit log)                                     |
+| POST   | `/responsible-gaming/cooling-off`            | player | Break of 24 h / 7 d / 30 d, immediate; cannot be shortened (409 when an equal or longer exclusion is active)                        |
+| POST   | `/responsible-gaming/self-exclusion`         | player | Self-exclude immediately. 6m / 1y / 5y / permanent need `phrase: "SELF-EXCLUDE"` + `acknowledged: true` (+ TOTP when 2FA is on)    |
+
+Time rules (`assertCanParticipate`): the daily `session_time` limit, the session-length limit and quiet hours block **new**
+entries / bets with `422 RG_LIMIT_EXCEEDED` (`details.type` = `daily_time_limit` / `session_limit` / `quiet_hours`).
+Breaks and self-exclusion answer `403 SELF_EXCLUDED` (`details.kind` = `cooling_off` / `self_exclusion`) on entries and
+deposits; withdrawals and history stay available.
+
+### history (player financial + gaming history)
+
+| Method | Path                              | Auth   | Description                                                                                                  |
+| ------ | --------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| GET    | `/history/summary`                | player | Deposits / withdrawals / platform + network fees / rewards / refunds KPIs                                    |
+| GET    | `/history/transactions`           | player | Paginated history: `types=deposit,withdrawal,…`, `status`, `network`, `from`, `to`, `q` (reference / hash)   |
+| GET    | `/history/transactions/export`    | player | CSV (`format=csv\|csv_semicolon`, `includeHashes`) of the same filters — every export is audited            |
+| GET    | `/history/fees`                   | player | Fee lines: 0.05 USDT platform fee per entry purchase and network fees per withdrawal (separate lines)       |
+| GET    | `/history/entries`                | player | My Global Pool entries grouped by round (`status`, `roundFrom`, `roundTo`, `sort`) + odds share + result     |
+| GET    | `/history/rounds/active`          | player | Open / drawing rounds where I hold entries                                                                   |
+| GET    | `/history/rounds/results`         | player | Settled / cancelled rounds I took part in                                                                    |
+| GET    | `/history/winnings`               | player | Prizes, refunds and rewards split into owed vs settled                                                       |
+| GET    | `/history/games`                  | player | My games: active rounds, recently played games, 30-day totals (Global Pool and simulation reported apart)   |
+| GET    | `/history/game-rounds` (+`/export`) | player | Game results with commit–reveal seeds (server seed only after the session ended); CSV export audited       |
+| GET    | `/history/favourites`             | player | Favourite games                                                                                              |
+| PUT    | `/history/favourites/{slug}`      | player | Add a favourite (idempotent)                                                                                 |
+| DELETE | `/history/favourites/{slug}`      | player | Remove a favourite                                                                                           |
+
+DEMO simulation game history for @nova.k (idempotent, never touches the ledger):
+`DEMO_MODE=true pnpm --filter @gp/api exec tsx prisma/seed-history-demo.ts`.
 
 ### compliance
 
@@ -210,11 +291,25 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | GET    | `/kyc`       | player | KYC level, status and the resulting daily withdrawal limit       |
 | POST   | `/kyc/start` | player | Start verification for a level (provider interface; mock in dev) |
 
+KYC flow (AUTH-11…17, account module). Documents go to the KYC provider (mock in dev): the API stores metadata,
+SHA-256 and check results in `kyc_records.details` — never the files.
+
+| Method | Path                           | Auth   | Description                                                                                         |
+| ------ | ------------------------------ | ------ | --------------------------------------------------------------------------------------------------- |
+| GET    | `/kyc/application`             | player | Open (or latest) application: status, next step, requirements, documents, liveness, check results   |
+| POST   | `/kyc/application`             | player | Start / resume a level above the current one (L3 needs L2); personal details carry over             |
+| PUT    | `/kyc/application/details`     | player | AUTH-12: legal name, 18+ DOB, nationality, address + postal format, occupation, PEP, accuracy (true) |
+| POST   | `/kyc/application/documents`   | player | AUTH-13: one document side (type/side/file name/mime/size/sha256); mock quality check (< 40 KB = blurry) |
+| POST   | `/kyc/application/liveness`    | player | AUTH-14: mock liveness (≥ 3 s passes); 3 attempts, then manual review                                  |
+| POST   | `/kyc/application/submit`      | player | AUTH-15: submit (L1 approved instantly; L2/L3 → in_review + notification; audited)                    |
+| GET    | `/kyc/documents`               | player | A5: documents on file (metadata only) + counts                                                        |
+| POST   | `/dev/kyc/reject`              | player | DEMO only: mock rejection with failed checks → resubmission_required (only those items are redone)    |
+
 ### notifications
 
 | Method | Path                       | Auth   | Description                             |
 | ------ | -------------------------- | ------ | --------------------------------------- |
-| GET    | `/notifications`           | player | Notifications (paginated, ?unread=true) |
+| GET    | `/notifications`           | player | Notifications (paginated, ?unread=true, ?category=security\|transactions\|rounds\|promotions\|account) + per-category `counts` |
 | POST   | `/notifications/read-all`  | player |                                         |
 | POST   | `/notifications/{id}/read` | player |                                         |
 
@@ -229,6 +324,7 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | Method | Path                                     | Auth   | Description                                                                                        |
 | ------ | ---------------------------------------- | ------ | -------------------------------------------------------------------------------------------------- |
 | POST   | `/dev/deposits/simulate`                 | player | DEMO only: simulate a confirmed test-USDT deposit (same ledger postings as a real one; idempotent) |
+| POST   | `/dev/deposits/{reference}/confirmations` | player | DEMO only: add simulated confirmations to a `mode: "progressive"` DEMO deposit; credited by the regular posting at N |
 | POST   | `/dev/kyc/approve`                       | player | DEMO only: mock-provider approval of your KYC level                                                |
 | POST   | `/dev/withdrawals/{id}/simulate-confirm` | player | DEMO only: simulate broadcast + on-chain confirmation of a QUEUED withdrawal                       |
 
@@ -273,13 +369,46 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | `pool:update`           | after every entry purchase: `{ type, roundId, roundNumber, status, entries, participants, poolBalance, platformFees, closesAt, lastPurchase, isDemo }` |
 | `round:status`          | lifecycle change: `{ type, roundId, roundNumber, status, at }`                                                                                         |
 
-The socket is read-only: clients cannot change state over it. CORS follows `CORS_ORIGINS`.
+The socket is read-only: clients cannot change state over it. CORS follows `CORS_ORIGINS`. With
+`SOCKET_IO_REDIS_ADAPTER=true` broadcasts go through the socket.io Redis adapter (`@socket.io/redis-adapter`,
+channel prefix `BULLMQ_PREFIX`), so an event raised on any API replica (e.g. the worker that settles a round) reaches
+clients connected to every replica.
 
 ### Capabilities that deliberately do not exist
 
 No endpoint, admin or otherwise, sets results, chooses winners, settles a round by hand, credits or debits a balance,
 or edits or deletes ledger rows. `POST /admin/rounds/:id/winner`, `PATCH /admin/ledger/entries/:id` and similar paths
 return `404` (covered by e2e tests). Settlement runs only inside the round lifecycle, from a fulfilled random word.
+
+### admin · console (admin-a)
+
+| Method | Path                                    | Auth  | Description                                                                                                       |
+| ------ | --------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------- |
+| GET    | `/admin/approvals/inbox`                | admin | Four-eyes inbox (`?view=open\|waiting_for_me\|created_by_me\|decided_today\|expired`) with counts and your role per request |
+| GET    | `/admin/approvals/{id}`                 | admin | One request: eligible approvers + its audit trail                                                                 |
+| POST   | `/admin/approvals/{id}/approve`         | admin | Second approver (different admin, own reason + fresh MFA); the requested action runs in the same transaction       |
+| POST   | `/admin/approvals/{id}/reject`          | admin | Reject (reason + MFA): nothing changes (a flagged withdrawal is rejected → funds back to Available)                |
+| POST   | `/admin/approvals/{id}/withdraw`        | admin | Requester withdraws their own pending request (reason; audited)                                                   |
+| GET    | `/admin/user-stats`                     | admin | Users KPIs (total, active 30 d, KYC verified, restricted)                                                         |
+| GET    | `/admin/users/{id}/account`             | admin | Masked PII, consents, security, sessions                                                                          |
+| POST   | `/admin/users/{id}/pii/reveal`          | admin | Reveal ONE field (`email` · `date_of_birth` · `last_ip`) with a reason (`users.pii.read`; audited, value not logged) |
+| GET    | `/admin/users/{id}/wallets`             | admin | Linked wallets / whitelist / deposit addresses (read-only)                                                        |
+| GET    | `/admin/users/{id}/kyc` · `/aml`        | admin | KYC records + limits by level · AML alerts + rule-based read-only risk score (`kyc.read` / `aml.read`)            |
+| GET    | `/admin/users/{id}/transactions`        | admin | Paginated history + lifetime flows + ledger balances                                                              |
+| GET    | `/admin/users/{id}/responsible-gaming`  | admin | RG limits / usage / self-exclusion history (`rg.read`; admins cannot loosen limits)                                |
+| GET    | `/admin/roles` · `/admin/permissions`   | admin | Live RBAC matrix + permission policy (`system.read`)                                                              |
+| POST   | `/admin/roles/{key}/change-requests`    | admin | REQUEST a role-permission change (`admins.manage`, reason + MFA) → four-eyes; Super Admin role is fixed            |
+| GET    | `/admin/system/health`                  | admin | DB, Redis, queues, randomness, chains, kill switches, ledger invariants                                           |
+| GET    | `/admin/alerts` · POST `/admin/alerts/{key}/ack` | admin | Live alerts computed from real state (role-filtered) · acknowledge (audited, changes nothing else)       |
+
+`GET /admin/users` also accepts `status`, `kycLevel`, `restricted=yes|no` and returns `totalBalance` (ledger) and the
+open-AML `amlRiskLevel` per row. **Restrictions:** `withdrawals_frozen` and `account_suspended` need four eyes
+(`RESTRICTION_REQUIRES_FOUR_EYES` in `@gp/shared/enums`): `POST /admin/users/{id}/restrictions` then answers
+`{ status: 'pending_approval', approval: { id, ref, expiresAt } }` and nothing changes until a different admin with
+`users.restrict` approves. `gaming_blocked` / `deposits_blocked` still apply immediately (`status: 'active'`). Requests
+expire after `FOUR_EYES_EXPIRY_HOURS` (4) and then change nothing.
+Requests created by other modules (e.g. the NEW-entries circuit breaker `pool.entries.pause|resume`) appear in the inbox
+with `yourRole: 'external'` and their `decideAt` page; `/admin/approvals/{id}/approve|reject` refuses them (`400`, `details.decideAt`).
 
 ## Ledger model
 
@@ -350,10 +479,26 @@ session and purpose). Each TOTP time step is accepted once; 5 wrong codes pause 
 ### Deposit (hybrid custody, Arbitrum Sepolia)
 
 `GET /deposits/address?network=arbitrum` assigns the next HD index of `DEPOSIT_XPUB` (public key only; a throwaway dev
-xpub is generated when unset). The watcher job (every `DEPOSIT_WATCHER_POLL_SECONDS`) reads test-USDT `Transfer` logs
-to assigned addresses (block cursor in `chain_cursors`, chunked ranges), records `confirming` deposits (posting
-`deposit_detected`) and credits them after `DEPOSIT_CONFIRMATIONS_ARBITRUM` (20) confirmations. Without an RPC URL or
-token address it skips. DEMO: `POST /dev/deposits/simulate` posts the same two postings at once.
+xpub is generated when unset). The watcher job (every `DEPOSIT_WATCHER_POLL_SECONDS`, `DepositChainWatcherService`)
+reads test-USDT `Transfer` logs to assigned addresses (block cursor in `chain_cursors`, chunked ranges), records
+`confirming` deposits (posting `deposit_detected`, CHAIN_CLEARING → PENDING) and credits them after
+`DEPOSIT_CONFIRMATIONS_ARBITRUM` (20) confirmations (`deposit_credited`, PENDING → AVAILABLE). Without an RPC URL or
+token address it skips. DEMO: `POST /dev/deposits/simulate` posts the same two postings at once; with
+`mode: "progressive"` it records the deposit as detected (0 / 20) and `POST /dev/deposits/:reference/confirmations`
+adds simulated blocks until it is credited (wallet deposit-flow QA).
+
+**Re-org safety.** Idempotent by `(network, txHash, logIndex)` (unique index + posting event keys). Each pass first
+re-checks every unconfirmed deposit against the canonical chain through its receipt, then scans; the scan always
+re-reads the last N blocks (N = required confirmations).
+
+| Observation                                  | Effect                                                                                                    |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| receipt in another block / new log index     | block number, hash and log index updated; confirmations restart; credited once it is N deep               |
+| receipt missing (block re-orged out)         | `reorg_seen_at_block` set, confirmations 0, "Network re-organisation detected — waiting for re-inclusion" |
+| still missing N blocks after that            | `deposit_reversed` posting (PENDING → CHAIN_CLEARING), status `rejected`, transaction `failed`, notified  |
+| receipt reverted / matching Transfer missing | reversed the same way                                                                                     |
+
+Credit happens only from a fresh receipt with ≥ N confirmations. Credited deposits are final (that is what N is for).
 
 ### Enter a round
 
@@ -377,8 +522,17 @@ requested → risk_check → queued ──────────────�
 
 AML screening (mock, 6 checks): a sanctioned destination is rejected; a new destination, a large amount or high
 velocity goes to `under_review` with **four eyes** (two different admins, each with reason and MFA); otherwise the
-withdrawal is `queued`. No testnet signer is wired yet, so queued withdrawals wait. DEMO:
-`POST /dev/withdrawals/:id/simulate-confirm` posts the confirmation.
+withdrawal is `queued`.
+
+**Broadcaster (testnet, `WITHDRAWAL_BROADCASTER_ENABLED=true`, `WithdrawalBroadcasterService`).** For a queued
+withdrawal: hot-wallet test-USDT and gas check (missing liquidity keeps it queued and logs an `ALERT`) →
+`eth_call` simulation of `transfer(to, net)` → sign + store in the outbox (the same DB transaction moves it to
+`broadcast` with its tx hash and nonce) → broadcast. The tracker job (`withdrawal.track`, every
+`WITHDRAWAL_TRACK_POLL_SECONDS`) settles it after `WITHDRAWAL_CONFIRMATIONS` (`withdrawal_settle`: LOCKED →
+CHAIN_CLEARING + network fee). A reverted or dropped transaction → `failed` and the full amount back to Available; a
+transfer whose simulation reverts never gets a nonce and fails from `queued` (new edge `queued → failed` in
+`WITHDRAWAL_TRANSITIONS`), funds back. An unreachable RPC keeps it queued and retried. Without the broadcaster queued
+withdrawals wait; DEMO: `POST /dev/withdrawals/:id/simulate-confirm` posts the confirmation.
 
 ### Round lifecycle and settlement
 
@@ -397,7 +551,67 @@ takes the remainder, so prizes always sum to the pool. Unit tests check this aga
 `packages/contracts`. `GET /pool/rounds/:number/verify` returns the word, the request id, the algorithm and whether a
 recomputation matches the stored winners. Providers: `RANDOMNESS_PROVIDER=mock` (dev; word =
 `keccak256("GP_MOCK_VRF:" + requestId)`) or `chainlink` (reads `DrawRequested` / `DrawFulfilled` of `GlobalPoolRounds`
-at `POOL_CONTRACT_ADDRESS`).
+at `POOL_CONTRACT_ADDRESS`, waiting `VRF_FULFILLMENT_CONFIRMATIONS`).
+
+### On-chain operations (testnet only)
+
+`POOL_ONCHAIN_MIRROR=true` (requires `RANDOMNESS_PROVIDER=chainlink`, the RPC, `POOL_CONTRACT_ADDRESS` and
+`POOL_OPERATOR_PRIVATE_KEY`) mirrors every non-DEMO round on `GlobalPoolRounds` (`RoundMirrorService`, driven by the
+round tick; each step is a row in `round_chain_ops`):
+
+| Round event                | On-chain call (signer)                                                              | Database                                                                                                                      |
+| -------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| open (closes > 60 s ahead) | `openRound(rules…, rulesHash)` (OPERATOR)                                           | `chain_mirror`, `chain_id`, `contract_address`, `rules_hash` (keccak of the canonical rules JSON)                             |
+| close → draw               | `commitEntries(root, entries, participants, pool)` (OPERATOR), after `closesAt`     | per entry: random 32-byte salt (AES-256-GCM at rest), `userCommitment`, leaf → `entry_commitments` + root, one DB transaction |
+| thresholds missed (chain)  | `cancelRound(id, THRESHOLDS_NOT_MET)` (KEEPER, permissionless) → then the DB refund | stakes to Owed (fees not refunded)                                                                                            |
+| thresholds met             | `requestDraw(id)` (KEEPER) → Chainlink VRF v2.5                                     | `randomness_requests` from the `DrawRequested` event                                                                          |
+| `DrawFulfilled` (N conf.)  | —                                                                                   | **DB winners must equal `computeWinners()` and `prizeAmounts()`** (else settlement is blocked + `ALERT`), then settle         |
+| settled                    | `recordSettlement(payoutsRoot, pool)` (SETTLER)                                     | `round_payouts` (leaves + proofs) + `payouts_merkle_root`; audited                                                            |
+| unfulfilled for 24 h       | `requestDraw(id)` again (same committed entries; first fulfilment wins; audited)    | old request `timed_out`, new request tracked                                                                                  |
+
+Every step is idempotent: the contract state decides whether a step is already done (then nothing is sent), and
+frozen data (salts, commitments, payout leaves) is written once — `entry_commitments` and `round_payouts` are
+append-only (database triggers). The canonical entry order is `seq` (index = seq − 1); the salted commitment is
+`keccak256(abi.encode(keccak256(utf8(publicId)), salt))`, so the public manifest does not reveal who holds an entry.
+
+**Signer (`ChainSignerService`).** Keys come from env (`POOL_OPERATOR_PRIVATE_KEY`, optional
+`POOL_SETTLER_PRIVATE_KEY` / `POOL_KEEPER_PRIVATE_KEY`, `WITHDRAWAL_SIGNER_PRIVATE_KEY`; throwaway testnet keys only —
+production keys belong in a KMS/HSM). Before the first signature it checks `eth_chainId == EVM_CHAIN_ID` (421614 or
+31337 only; 31337 refused in production). `send()` simulates (decoded custom-error revert → nothing stored), estimates
+gas (+20 %) and fees, then in one DB transaction locks the signer's `chain_signer_nonces` row, takes
+`max(stored next nonce, pending nonce)`, signs, stores the raw tx in `chain_transactions` (unique per chain + signer +
+nonce) and bumps the nonce; it broadcasts after commit. `track()` resolves `mined` / `reverted` with the required
+confirmations, `dropped` when the nonce was consumed by another transaction, and re-broadcasts the same raw bytes after
+`CHAIN_REBROADCAST_SECONDS`. A crash can therefore neither lose a transaction nor send a different one.
+
+| Variable                                                      | Default                       | Purpose                                                |
+| ------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------ |
+| `EVM_CHAIN_ID`                                                | 421614                        | 421614 Arbitrum Sepolia · 31337 Anvil (dev / e2e only) |
+| `POOL_ONCHAIN_MIRROR` / `POOL_CONTRACT_START_BLOCK`           | false / —                     | round mirroring · first block for event scans          |
+| `CHAIN_WRITE_CONFIRMATIONS` / `CHAIN_TX_WAIT_SECONDS`         | 2 / 60                        | confirmations before the next step · wait per call     |
+| `CHAIN_REBROADCAST_SECONDS`                                   | 120                           | re-send an unmined transaction (same hash)             |
+| `VRF_FULFILLMENT_CONFIRMATIONS`                               | 20                            | confirmations of `DrawFulfilled` before settlement     |
+| `ENTRY_SALT_ENCRYPTION_KEY`                                   | HKDF of `TOTP_ENCRYPTION_KEY` | salt encryption key (base64, 32 bytes)                 |
+| `WITHDRAWAL_BROADCASTER_ENABLED` / `WITHDRAWAL_CONFIRMATIONS` | false / 20                    | broadcaster on · confirmations before settlement       |
+| `WITHDRAWAL_TRACK_POLL_SECONDS`                               | 15                            | tracker job interval                                   |
+
+**Tests** (`test/chain.e2e-spec.ts`, skipped when `anvil` is missing): a fresh Anvil per run, VRF mock +
+`GlobalPoolRounds` + `MockUSDT` deployed from `@gp/contracts/artifacts/local-devnet.json` with keys generated at
+runtime. They prove the full lifecycle (DB winners == contract winners, prizes == `prizeAmounts`, every payout passes
+`verifyPayout`, the owner's receipts pass `verifyEntry`), the on-chain cancel for missed thresholds, the withdrawal
+broadcaster (confirmation, consecutive nonces under concurrency, simulation revert, on-chain revert → funds back) and
+the deposit watcher (credit once, re-org out → reversed, re-inclusion in another block → credited once).
+
+### Email
+
+Notifications of email-worthy types (`EMAIL_NOTIFICATION_CATEGORY` in `src/modules/email/email.service.ts`: deposits
+credited / reversed, withdrawal updates, prizes, cancelled rounds, security, KYC, restrictions) are queued on the
+BullMQ `emails` queue (job id = notification id, delayed so the business transaction has committed) and sent by the
+worker. `MAIL_TRANSPORT=log` (dev: redacted log line + in-memory outbox), `smtp` (`SMTP_HOST`, `SMTP_PORT`,
+`SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`; STARTTLS required on 587) or `disabled`. Every email shows the DEMO
+notice and the player's anti-phishing code (or how to set one), never contains codes or keys, and links to the
+notification preferences. Preferences come from `user_profiles.preferences.notifications` (A9); locked security
+categories always send.
 
 ### Admin
 
@@ -422,7 +636,10 @@ Tables: `users`, `user_profiles`, `user_wallets`, `deposit_addresses`, `sessions
 `pool_ledger`, `fee_ledger`, `rounds`, `entries`, `winners`, `prize_claims`, `randomness_requests`, `games`,
 `game_sessions`, `game_results`, `referrals`, `affiliates`, `vip_levels`, `notifications`, `admin_users`,
 `admin_roles`, `admin_permissions`, `admin_role_permissions`, `admin_user_roles`, `admin_approvals`, `audit_logs`,
-`idempotency_keys`, `feature_flags`, `chain_cursors`.
+`idempotency_keys`, `feature_flags`, `chain_cursors`, and for on-chain operations `chain_signer_nonces`,
+`chain_transactions` (signed-tx outbox), `round_chain_ops`, `entry_commitments` (append-only) and `round_payouts`
+(append-only). `deposits` carry `block_hash` / `reorg_seen_at_block`; `rounds` carry `chain_mirror`, `chain_id`,
+`contract_address`, `rules_hash`, `payouts_merkle_root`, `onchain_status`.
 
 ## DEMO seed
 
@@ -441,3 +658,40 @@ Tables: `users`, `user_profiles`, `user_wallets`, `deposit_addresses`, `sessions
 
 DEMO dates are shifted by whole days so round #1,248 closes at the next 20:00 UTC (`DEMO_SEED_SHIFT_DAYS=0` keeps the
 exact snapshot). The seed checks the 12,480.50 total and the ledger reconciliation before it finishes.
+
+## Admin back-office: Finance · Global Pool · Compliance (`admin-ops`, admin-b)
+
+Module `src/modules/admin-ops` (controllers `admin/finance`, `admin/pool`, `admin/compliance`; contracts in
+`@gp/shared/schemas` → `admin-ops.ts`). Read endpoints are aggregates of the append-only ledger and its sub-ledgers;
+writes are reviewed, audited workflow actions only. There is still no endpoint that sets results, picks winners, moves
+funds, edits ledger rows or adjusts balances (`PATCH /admin/finance/ledger/:id`, `POST /admin/pool/rounds/:n/winners`,
+`POST /admin/finance/refunds/:n/manual` → 404, covered by `test/admin-ops.e2e-spec.ts`).
+
+| Method | Path | Permission | Description |
+| ------ | ---- | ---------- | ----------- |
+| GET | `/admin/finance/deposits` | deposits.read | Deposits (status/network/search), KPIs, network watchers, held deposits |
+| GET | `/admin/finance/withdrawals` | withdrawals.read | Queue views (queue / awaiting 2nd / broadcasting / completed / rejected), SLA 4 h, four-eyes progress, SLA watch |
+| GET | `/admin/finance/withdrawals/{id}` | withdrawals.read | Review detail: player, ledger balances, destination history, AML, approvals, postings, audit. Decisions stay on `POST /admin/withdrawals/{id}/approve|reject` |
+| GET | `/admin/finance/fees` | ledger.read | Platform fees (0.05 × qualifying entries) from `fee_ledger`: 30-day series, by round, sub-ledger = fees account |
+| GET | `/admin/finance/pool-accounting` | ledger.read | Liabilities = open-round escrow + owed prizes + refunds outstanding; account balances; round waterfall |
+| GET | `/admin/finance/ledger` | ledger.read | Journals with balanced lines + per-journal chain hash (`prev → hash`, recomputed on read) |
+| GET | `/admin/finance/ledger/integrity` | ledger.read | Append-only triggers present, Σ ledger = 0, unbalanced postings, journal digest, audit hash-chain verification |
+| GET | `/admin/finance/reconciliation` | reconciliation.read | Scopes match / mismatch / pending (ledger total, fee/pool sub-ledgers, owed, locked, round pools, custody, in-flight deposits) |
+| GET | `/admin/finance/refunds` | ledger.read | Cancelled rounds: refunded to Owed, claimed, outstanding (+ withdrawal releases, which are not refunds) |
+| POST | `/admin/finance/refunds/{number}/remind` | notifications.send | In-app reminder to players with an unclaimed refund (reason; audited; max 1 per round per 24 h; never moves money) |
+| GET | `/admin/finance/reports?days=` | ledger.read | Revenue: platform fees − rewards funded = net; network fees recovered shown but excluded |
+| POST | `/admin/finance/exports` | reports.export (+ users.pii.read for personal data) | CSV export (reason required; personal data masked by default; 500,000-row limit; SHA-256; watermark line; audit `report.exported`) |
+| GET | `/admin/pool/overview` · `/balance` · `/active-round` · `/rounds` · `/vrf` | rounds.read | Monitoring (current round, KPIs, pipeline health, ledger vs projection, feed, concentration, history, VRF requests) |
+| GET | `/admin/pool/rounds/{number}/participants` · `/prizes` | rounds.read | Participants grouped by player; prize split, winners, settlement + claim status |
+| GET | `/admin/pool/circuit-breaker` | rounds.read | NEW-entries breaker state, pending request, history, rules |
+| POST | `/admin/pool/circuit-breaker` | role Super Admin / Finance / Compliance | Request pause / resume of NEW entries (reason + fresh 2FA) — nothing changes yet |
+| POST | `/admin/pool/circuit-breaker/{id}/decision` | role Super Admin / Finance / Compliance | Second approval or decline: a different person with a different role, reason + 2FA, within 30 min; flips `pool.entries.enabled`; audited |
+| GET | `/admin/compliance/kyc` · `/kyc/{id}` | kyc.read | KYC queue (SLA 48 h, decisions today, median time to decision, recent decisions) and review detail (PII masked) |
+| POST | `/admin/compliance/kyc/{id}/decision` | kyc.review | approve / reject / request_info with reason + fresh 2FA (stricter than the REASON policy); approve raises the KYC level (limits only); player notified; audited |
+| GET | `/admin/compliance/aml` | aml.read | AML alerts with risk summary and the linked withdrawal / deposit. Resolution: `POST /admin/aml/alerts/{id}/resolve` |
+
+Business decisions (admin-b): the circuit breaker is the only pool control and is role-based dual control (requester
+and approver must be different people holding different roles among Super Admin / Finance / Compliance, 30-minute
+expiry); platform fees of cancelled rounds stay in the fees account (stakes are refunded in full) — the Figma copy
+"fee released" was not implemented because the ledger posting rules do not refund fees. DEMO compliance cases for QA:
+`pnpm --filter @gp/api exec tsx prisma/seed-admin-ops.ts` (idempotent, non-ledger rows only).

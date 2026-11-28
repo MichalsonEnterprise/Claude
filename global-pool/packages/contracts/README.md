@@ -70,6 +70,7 @@ pnpm --filter @gp/contracts snapshot     # forge snapshot → .gas-snapshot (sna
 pnpm --filter @gp/contracts gas-report   # per-function gas table
 pnpm --filter @gp/contracts fixture      # regenerate test/fixtures/round-1248.json (DEMO round #1,248)
 pnpm --filter @gp/contracts build:ts     # tsup only (no forge needed; abi/*.ts is committed)
+pnpm --filter @gp/contracts artifacts    # artifacts/local-devnet.json: ABI + bytecode for local Anvil tests (after forge build)
 ```
 
 Fuzz runs: 1,024 per property (`FOUNDRY_PROFILE=ci` → 10,000), fixed seed for a reproducible snapshot.
@@ -81,6 +82,8 @@ fulfil, duplicate callbacks, settle, cancel, pause and time warps.
 ```
 src/GlobalPoolRounds.sol         the registry (AccessControl + Pausable + VRFConsumerBaseV2Plus)
 src/libraries/DrawMath.sol       pure: leaf encodings, winner derivation, prize split
+test/mocks/MockUSDT.sol          TEST ONLY 6-decimal mintable ERC-20 (API e2e: deposit watcher, withdrawal broadcaster)
+artifacts/local-devnet.json      generated ABI + bytecode (GlobalPoolRounds, VRFCoordinatorV2_5Mock, MockUSDT) for Anvil
 test/GlobalPoolRounds.t.sol      lifecycle, thresholds, commit/draw/settle rules, roles, pause, coordinator lock
 test/DrawMath.t.sol              fuzz/property tests for winners & split, gas reference points
 test/MerkleFixture.t.sol         cross-checks against the TypeScript implementation (fixture)

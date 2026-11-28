@@ -27,7 +27,12 @@ const COUNTS_TOWARDS_LIMIT = [
   'broadcast',
   'confirmed',
 ] as const;
-const KYC_LABEL = { none: 'Not verified', level_1: 'Level 1', level_2: 'Level 2', level_3: 'Level 3' };
+const KYC_LABEL = {
+  none: 'Not verified',
+  level_1: 'Level 1',
+  level_2: 'Level 2',
+  level_3: 'Level 3',
+};
 const fmt = (v: string) => formatUSDT(v);
 
 interface AddressFacts {
@@ -180,8 +185,12 @@ export class WithdrawalPrecheckService {
     });
     if (belowMin) block('BELOW_MINIMUM', `Minimum withdrawal is ${fmt(quote.minWithdrawal)}`);
     if (overBalance)
-      block('INSUFFICIENT_FUNDS', `Only your Available balance (${fmt(balances.available)}) can be withdrawn`);
-    if (overLimit) block('LIMIT_EXCEEDED', `This exceeds your daily withdrawal limit of ${fmt(limit)}`);
+      block(
+        'INSUFFICIENT_FUNDS',
+        `Only your Available balance (${fmt(balances.available)}) can be withdrawn`,
+      );
+    if (overLimit)
+      block('LIMIT_EXCEEDED', `This exceeds your daily withdrawal limit of ${fmt(limit)}`);
 
     // 3 · account security
     checks.push({
@@ -212,7 +221,9 @@ export class WithdrawalPrecheckService {
       amlDecision = screening.decision;
       amlReason = screening.reason;
       const sanctioned = screening.flags.includes('sanctions_screening');
-      const patternFlags = screening.flags.filter((f) => f === 'velocity' || f === 'amount_threshold');
+      const patternFlags = screening.flags.filter(
+        (f) => f === 'velocity' || f === 'amount_threshold',
+      );
       checks.push({
         key: 'aml',
         label: 'AML transaction screening',
@@ -228,15 +239,26 @@ export class WithdrawalPrecheckService {
       checks.push({
         key: 'address_risk',
         label: 'Destination address risk',
-        status: sanctioned ? 'fail' : inCooldown ? 'fail' : !whitelisted || priorConfirmed === 0 ? 'review' : 'pass',
+        status: sanctioned
+          ? 'fail'
+          : inCooldown
+            ? 'fail'
+            : !whitelisted || priorConfirmed === 0
+              ? 'review'
+              : 'pass',
         detail: inCooldown
           ? `New address — usable from ${usableFrom!.toISOString().slice(0, 16).replace('T', ' ')} UTC (24 h cool-down)`
           : whitelisted
             ? `Whitelisted${wallet?.label ? ` (${wallet.label})` : ''} · ${priorConfirmed > 0 ? 'used before' : 'first withdrawal to this address'}`
             : 'Not on your whitelist — first withdrawal to this address',
       });
-      if (sanctioned) block('SANCTIONED_DESTINATION', screening.reason ?? 'Destination flagged by sanctions screening');
-      if (inCooldown) block('ADDRESS_COOLDOWN', 'This address is in its 24 h new-address cool-down');
+      if (sanctioned)
+        block(
+          'SANCTIONED_DESTINATION',
+          screening.reason ?? 'Destination flagged by sanctions screening',
+        );
+      if (inCooldown)
+        block('ADDRESS_COOLDOWN', 'This address is in its 24 h new-address cool-down');
     } else {
       checks.push(
         {
@@ -265,9 +287,17 @@ export class WithdrawalPrecheckService {
         : `${chain.name} withdrawals are coming soon`,
     });
 
-    const outcome = blockedCode ? 'blocked' : checks.some((c) => c.status === 'review') ? 'review' : 'pass';
+    const outcome = blockedCode
+      ? 'blocked'
+      : checks.some((c) => c.status === 'review')
+        ? 'review'
+        : 'pass';
     const reason =
-      outcome === 'blocked' ? blockedReason : outcome === 'review' ? (amlReason ?? 'Manual review required') : null;
+      outcome === 'blocked'
+        ? blockedReason
+        : outcome === 'review'
+          ? (amlReason ?? 'Manual review required')
+          : null;
     return this.result(outcome, reason, blockedCode, checks, now, quote, {
       valid: validAddress,
       whitelisted,
@@ -346,4 +376,3 @@ export class WithdrawalPrecheckService {
     };
   }
 }
-

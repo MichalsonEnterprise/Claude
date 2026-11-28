@@ -8,7 +8,6 @@
  */
 import { CHAIN_DISPLAY_ORDER, CHAINS } from '@gp/shared/chains';
 import {
-  DEMO_AS_OF,
   DEMO_CURRENT_ROUND,
   DEMO_ENTRIES_FEED,
   DEMO_MY_ENTRIES,
@@ -21,6 +20,9 @@ import {
 } from '@gp/shared/demo';
 import { formatCount, formatRoundNumber } from '@gp/shared/format';
 import { ROUND_THRESHOLDS } from '@gp/shared/pool';
+import type { Round } from '@gp/shared/types';
+
+import { demoBetweenRoundsShiftDays, demoShiftDays, shiftIso } from './demo-clock';
 
 import type {
   DrawRandomnessView,
@@ -37,7 +39,10 @@ import type {
   VipTierView,
 } from './types';
 
-/** DEMO "now" between rounds (no-round scenario): round #1,248 settled at 20:02:10, #1,249 opens at 08:00. */
+/**
+ * Legacy DEMO "now" between rounds (unshifted snapshot): round #1,248 settled at 20:02:10, #1,249 opens at 08:00.
+ * Countdowns no longer anchor to it — mock data is shifted to the real clock (see ../data/demo-clock.ts).
+ */
 export const DEMO_BETWEEN_ROUNDS_NOW = '2026-11-27T21:12:40Z';
 
 const prev = (n: number) => {
@@ -46,16 +51,48 @@ const prev = (n: number) => {
   return r;
 };
 
+/** Whole-day shift for a scenario: the open round closes at the next 20:00 UTC, or (between rounds) the next
+ *  round opens at the next 08:00 UTC — the same rule the API seed uses, so mock and API dates agree. */
+export function mockShiftDays(scenario: HomeScenario, nowMs: number = Date.now()): number {
+  return scenario.round === 'active' ? demoShiftDays(nowMs) : demoBetweenRoundsShiftDays(nowMs);
+}
+
+function shiftRound<T extends Round>(r: T, days: number): T {
+  return {
+    ...r,
+    openedAt: shiftIso(r.openedAt, days),
+    closesAt: shiftIso(r.closesAt, days),
+    draw: r.draw
+      ? {
+          ...r.draw,
+          requestedAt: shiftIso(r.draw.requestedAt, days),
+          fulfilledAt: shiftIso(r.draw.fulfilledAt, days),
+          settledAt: shiftIso(r.draw.settledAt, days),
+        }
+      : null,
+  };
+}
+
 // ── pool snapshot ───────────────────────────────────────────────────────────────────────────────
 
-export function mockPoolSnapshot(scenario: HomeScenario): PoolSnapshot {
+/**
+ * DEMO pool snapshot on the REAL clock: `serverNow` is now and every DEMO date is shifted by whole days, so the
+ * countdown runs to the next real 20:00 UTC close (or the next 08:00 UTC opening between rounds) — never a timer
+ * anchored to a fixed DEMO moment.
+ */
+export function mockPoolSnapshot(scenario: HomeScenario, nowMs: number = Date.now()): PoolSnapshot {
   const active = scenario.round === 'active';
+  const days = mockShiftDays(scenario, nowMs);
   return {
-    serverNow: active ? DEMO_AS_OF : DEMO_BETWEEN_ROUNDS_NOW,
-    current: active ? DEMO_CURRENT_ROUND : null,
-    last: active ? prev(1247) : DEMO_ROUND_1248_SETTLED,
-    // Daily schedule 08:00–20:00 UTC: #1,249 runs on 28 Nov 2026.
-    next: { number: 1249, opensAt: '2026-11-28T08:00:00Z', closesAt: '2026-11-28T20:00:00Z' },
+    serverNow: new Date(nowMs).toISOString(),
+    current: active ? shiftRound(DEMO_CURRENT_ROUND, days) : null,
+    last: shiftRound(active ? prev(1247) : DEMO_ROUND_1248_SETTLED, days),
+    // Daily schedule 08:00–20:00 UTC: #1,249 runs the day after #1,248.
+    next: {
+      number: 1249,
+      opensAt: shiftIso('2026-11-28T08:00:00Z', days),
+      closesAt: shiftIso('2026-11-28T20:00:00Z', days),
+    },
     participantsLastHour: active ? 128 : null,
     recentHandles: ['orbit_77', 'mira.sol', 'kestrel', 'lumen.eth', 'atlas_q'],
     isDemo: true,
@@ -84,7 +121,8 @@ const closeOf = (roundNumber: number) => {
   return d.toISOString().replace('.000Z', 'Z');
 };
 
-export function mockPoolHistory(scenario: HomeScenario): PoolHistory {
+export function mockPoolHistory(scenario: HomeScenario, nowMs: number = Date.now()): PoolHistory {
+  const days = mockShiftDays(scenario, nowMs);
   const shared = [prev(1244), prev(1245), prev(1246), prev(1247)].map((r) => ({
     roundNumber: r.number,
     closesAt: r.closesAt,
@@ -92,24 +130,25 @@ export function mockPoolHistory(scenario: HomeScenario): PoolHistory {
     status: r.status === 'cancelled' ? ('cancelled' as const) : ('settled' as const),
     isDemo: true,
   }));
+  const points = [
+    ...CHART_ONLY.map(([n, pool]) => ({
+      roundNumber: n,
+      closesAt: closeOf(n),
+      pool,
+      status: 'settled' as const,
+      isDemo: true,
+    })),
+    ...shared,
+    {
+      roundNumber: 1248,
+      closesAt: DEMO_CURRENT_ROUND.closesAt,
+      pool: DEMO_CURRENT_ROUND.poolBalance ?? '0.00',
+      status: scenario.round === 'active' ? ('open' as const) : ('settled' as const),
+      isDemo: true,
+    },
+  ];
   return {
-    points: [
-      ...CHART_ONLY.map(([n, pool]) => ({
-        roundNumber: n,
-        closesAt: closeOf(n),
-        pool,
-        status: 'settled' as const,
-        isDemo: true,
-      })),
-      ...shared,
-      {
-        roundNumber: 1248,
-        closesAt: DEMO_CURRENT_ROUND.closesAt,
-        pool: DEMO_CURRENT_ROUND.poolBalance ?? '0.00',
-        status: scenario.round === 'active' ? ('open' as const) : ('settled' as const),
-        isDemo: true,
-      },
-    ],
+    points: points.map((p) => ({ ...p, closesAt: shiftIso(p.closesAt, days) })),
     minPool: ROUND_THRESHOLDS.minPool,
     isDemo: true,
   };
@@ -117,10 +156,12 @@ export function mockPoolHistory(scenario: HomeScenario): PoolHistory {
 
 // ── feeds ───────────────────────────────────────────────────────────────────────────────────────
 
-export const mockEntriesFeed = () => DEMO_ENTRIES_FEED;
+export const mockEntriesFeed = (nowMs: number = Date.now()) =>
+  DEMO_ENTRIES_FEED.map((e) => ({ ...e, at: shiftIso(e.at, demoShiftDays(nowMs)) }));
 
-export const mockMyEntries = (): MyEntriesView => ({
+export const mockMyEntries = (nowMs: number = Date.now()): MyEntriesView => ({
   ...DEMO_MY_ENTRIES,
+  purchasedAt: shiftIso(DEMO_MY_ENTRIES.purchasedAt, demoShiftDays(nowMs)),
   odds: {
     anyPrizeApproxPercent: DEMO_ODDS_EXAMPLE.anyPrizeApproxPercent,
     firstPrizePercent: DEMO_ODDS_EXAMPLE.firstPrizePercent,

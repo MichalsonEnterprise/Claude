@@ -306,6 +306,48 @@ describe('four-eyes restrictions (withdrawal hold needs a second admin)', () => 
   });
 });
 
+describe('requests owned by other modules (e.g. the pool circuit breaker)', () => {
+  it('are listed with their decideAt link and can never be decided here', async () => {
+    const requester = await createAdmin(t, 'super_admin');
+    const viewer = await createAdmin(t, 'super_admin');
+    const row = await t.prisma.adminApproval.create({
+      data: {
+        action: 'pool.entries.pause',
+        targetType: 'feature_flag',
+        targetId: 'pool.entries.enabled',
+        requestedByAdminId: requester.id,
+        requestReason: 'Oracle incident drill',
+        payload: {
+          decideAt: '/admin/pool/policy',
+          expiresAt: new Date(Date.now() + 30 * 60_000).toISOString(),
+        },
+      },
+    });
+    const token = await adminLogin(t, viewer, -1);
+    const inbox = await t
+      .http()
+      .get('/admin/approvals/inbox?view=open')
+      .set(bearer(token))
+      .expect(200);
+    expect(inbox.body.items.find((i: { id: string }) => i.id === row.id)).toMatchObject({
+      yourRole: 'external',
+      decideAt: '/admin/pool/policy',
+      module: 'Global Pool',
+    });
+    const res = await t
+      .http()
+      .post(`/admin/approvals/${row.id}/approve`)
+      .set(bearer(token))
+      .send({ reason: 'Trying from the inbox', mfaCode: await totp(viewer.secret, 0) })
+      .expect(400);
+    expect(res.body.error.details).toMatchObject({ decideAt: '/admin/pool/policy' });
+    expect((await t.prisma.adminApproval.findUniqueOrThrow({ where: { id: row.id } })).status).toBe(
+      'pending',
+    );
+    await t.prisma.adminApproval.update({ where: { id: row.id }, data: { status: 'cancelled' } });
+  });
+});
+
 describe('user tabs, PII reveal and RBAC on the console reads', () => {
   it('reveals ONE PII field with a logged reason; support cannot', async () => {
     const compliance = await createAdmin(t, 'compliance');

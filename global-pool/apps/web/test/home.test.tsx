@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { HeroSection } from '@/components/home/hero';
 import { HomeViewProvider, type HomeView } from '@/components/home/home-context';
@@ -21,6 +21,15 @@ import { prefetchHome, queryKeys } from '@/lib/data/queries';
 import { DEFAULT_SCENARIO, type HomeScenario } from '@/lib/data/types';
 import { rollFromDigest, verifyDiceRoll } from '@/lib/fairness/dice';
 import { parseHomePreview } from '@/lib/home-preview';
+
+// The mock data follows the real clock (shifted to the next 20:00 UTC close). Pin "now" to the unshifted DEMO
+// snapshot moment so the absolute dates below stay deterministic (shift = 0 days).
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-11-27T18:44:30Z') });
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe('dev state preview (?state=)', () => {
   it('parses comma-separated flags', () => {

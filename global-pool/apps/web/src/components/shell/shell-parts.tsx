@@ -105,7 +105,7 @@ export function BalancePill({
 export function NotificationsButton({ count, className }: { count: number; className?: string }) {
   return (
     <Link
-      href={`${ROUTES.account}/notifications`}
+      href={ROUTES.notifications}
       aria-label={count > 0 ? `Notifications, ${count} unread` : 'Notifications'}
       className={cn(
         'relative inline-flex size-10 items-center justify-center rounded-md text-icon-default transition-colors hover:bg-surface-hover',
@@ -171,7 +171,7 @@ export function UserMenu({ member, onSignOut }: { member: ShellMember; onSignOut
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={ROUTES.account}>
+          <Link href={ROUTES.dashboard}>
             <LayoutDashboard aria-hidden /> Dashboard
           </Link>
         </DropdownMenuItem>
@@ -191,7 +191,7 @@ export function UserMenu({ member, onSignOut }: { member: ShellMember; onSignOut
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`${ROUTES.account}/settings`}>
+          <Link href={ROUTES.account}>
             <Settings aria-hidden /> Settings
           </Link>
         </DropdownMenuItem>

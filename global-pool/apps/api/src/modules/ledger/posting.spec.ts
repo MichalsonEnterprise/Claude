@@ -6,6 +6,7 @@ import {
   accountCode,
   depositCreditedLines,
   depositDetectedLines,
+  depositReversedLines,
   entryPurchaseLines,
   normalizePosting,
   owedClaimLines,
@@ -131,5 +132,18 @@ describe('double-entry posting rules', () => {
       '-50.00',
     ]);
     balanced(owedClaimLines(U, '415.20'));
+  });
+
+  it('a re-orged deposit reverses exactly what detection posted (PENDING → CHAIN_CLEARING)', () => {
+    const detected = balanced(depositDetectedLines(U, 'arbitrum', '250.5'));
+    const reversed = balanced(depositReversedLines(U, 'arbitrum', '250.5'));
+    const net = new Map<string, number>();
+    for (const l of [...detected, ...reversed])
+      net.set(l.code, (net.get(l.code) ?? 0) + Number(l.amount));
+    expect([...net.values()].every((v) => v === 0)).toBe(true);
+    expect(reversed.map((l) => [l.code, l.amount])).toEqual([
+      [`user:${U}:pending`, '-250.50'],
+      ['chain_clearing:arbitrum', '250.50'],
+    ]);
   });
 });

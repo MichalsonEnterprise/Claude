@@ -35,13 +35,73 @@ pnpm --filter @gp/web visual             # Playwright screenshots → apps/web/t
 | `src/app/design-system/…`            | kitchen sink + shell preview (noindex)                                                |
 | `src/components/shell/nav-config.ts` | `ROUTES`, `PRIMARY_NAV`, `ACCOUNT_NAV`, `TAB_NAV` (planned URL map)                   |
 
-## Auth — `@/lib/auth`
+## Auth — `@/lib/auth` + `@/components/auth/*`
 
-`useAuth()` → `{ mode: 'privy'|'mock', status: 'loading'|'guest'|'member', user, signIn(), signUp(), signOut(), getAccessToken() }`.
-Privy (`@privy-io/react-auth`, email OTP + Google/Apple + wallets, Arbitrum Sepolia) when `NEXT_PUBLIC_PRIVY_APP_ID` is
-set and `NEXT_PUBLIC_PRIVY_MOCK` ≠ `true`; otherwise the **DEV MOCK** dialog (email → any 6-digit code, or "Continue with
-a wallet") signs in as DEMO `@nova.k` (localStorage `gp.devMockSession`). Mock `getAccessToken()` returns an UNSIGNED
-`dev-mock.<base64url>` placeholder — the API defines the real dev-token exchange.
+`useAuth()` → `{ mode: 'privy'|'mock', status: 'loading'|'guest'|'member', user, profile, syncing, signIn(), signUp(),
+signOut(), openAuth(view?, { next }), getAccessToken() }`. `profile` is the API `GET /me` view (`MeProfile` in
+`@/lib/api/auth`: handle, emailMasked, `onboardingRequired`, `security.antiPhishingCode`, `isDemo`, …).
+
+- **One GLOBAL POOL flow for sign-in and sign-up** (owner decision #3): `<AuthDialog>` (split dialog over the dimmed
+  lobby ≥ 1024, single pane 768–1023, full-height bottom sheet with sticky CTA < 768) drives Privy **headlessly**
+  (`useLoginWithEmail` email → 6-digit code, `useLoginWithOAuth` Google / Apple, `useLoginWithSiwe` browser wallet;
+  WalletConnect-style wallets open Privy's themed modal). Routes: `/sign-in`, `/sign-up`, `/verify` (lobby behind,
+  `?next=` honoured, URL follows the step). Open it from anywhere with `useAuth().signIn()` / `openAuth('sign-up', { next })`.
+- **DEV MOCK** (no `NEXT_PUBLIC_PRIVY_APP_ID` or `NEXT_PUBLIC_PRIVY_MOCK=true`): the same dialog; no email is sent — any
+  6 digits work (`000000` simulates a wrong code). `nova.k@example.com`, Google, Apple and wallets sign in as the seeded
+  DEMO player **@nova.k** (`did:privy:demo-nova-k`); any other email is a NEW player (deterministic DID) who must
+  onboard. `getAccessToken()` exchanges the mock session for a real DEV token via `POST /auth/dev/token` (cached in
+  localStorage `gp.devMockToken`, so one browser = one API session). Session: localStorage `gp.devMockSession`.
+- **Session layer** (mounted by `AuthProvider`, nothing to add in pages): registers the player token provider for
+  `apiRequest()`, runs `POST /auth/session` once per login then `GET /me`, redirects members with
+  `onboardingRequired` to `/onboarding?next=…` (exempt: `/onboarding`, `/restricted/*`, `/legal/*`, `/sign-*`, `/verify`,
+  `/2fa/*`, `/responsible-gaming`, `/support`, `/admin`, `/design-system`), signs out after
+  `NEXT_PUBLIC_IDLE_TIMEOUT_MINUTES` (default 30, `0` = off) or when any player query/mutation fails with 401
+  `UNAUTHENTICATED`, then shows **AUTH-20** `<SessionExpiredDialog>` ("Sign in again" returns to the same page), and
+  shows **AUTH-21** `<NewDeviceDialog>` for `GET /auth/new-device-alerts` (never auto-opens for seeded DEMO accounts).
+- **Onboarding** `/onboarding` (`<OnboardingScreen>`): handle, country (prefilled from `GET /compliance/region`), date of
+  birth (18+), consents never pre-checked (Terms + Privacy · 18+ + jurisdiction · optional marketing) →
+  `POST /auth/onboarding`. Errors: taken handle, `GEO_RESTRICTED` (no bypass hints).
+
+### Step-up 2FA — `useStepUp()` / `<StepUpDialog>` (`@/components/auth/step-up`)
+
+```tsx
+const { requestStepUp } = useStepUp();
+const step = await requestStepUp({
+  purpose: 'withdrawal',                       // 'withdrawal' | 'whitelist_change' | 'security_settings'
+  title: 'Confirm withdrawal WD-20931',        // optional
+  description: 'Enter the code to send 1,500.00 USDT.', // optional
+  summary: <KeyValueBox>…</KeyValueBox>,       // optional — what is being confirmed (amount, address, fees)
+  confirmLabel: 'Confirm withdrawal',          // optional
+});
+if (!step) return;                             // cancelled
+await apiRequest('/withdrawals', { method: 'POST', body, stepUpToken: step.stepUpToken });
+```
+
+AUTH-08 states: anti-phishing code (from `/me`), authenticator code or backup code, wrong code (attempts left from the
+API), 15-minute lock with a countdown to the real `lockedUntil`, "Set up two-step sign-in first" (links to
+`/2fa/setup?next=<this page>`) when 2FA is off. The token is single-use, 5 min, bound to session + purpose.
+Pages: **`/2fa/setup`** (AUTH-07: QR + setup key → TOTP confirm → 10 backup codes, Finish disabled until "I've saved my
+backup codes" is ticked; `?next=` returns to the caller) and **`/2fa/challenge?purpose=…&next=…`** (page version;
+the next page reads the token once with `consumeStoredStepUp(purpose)`).
+
+### Wallet connect & verification — `useWalletConnect()` (`@/components/auth/wallet-dialogs`)
+
+`const { openConnect, openVerify } = useWalletConnect()` — **AUTH-09** `<ConnectWalletDialog>` (list · WalletConnect
+QR · connecting · rejected · wrong network → "Switch to Arbitrum" · success) then **AUTH-10** `<VerifyWalletDialog>`
+(human-readable message, "No transaction / No gas · 0.00 / Can't move funds", 10-minute nonce with live countdown,
+success record · rejected · expired nonce). Privy: browser wallets via EIP-1193 + `useLinkWithSiwe`; other wallets
+via Privy's link-wallet modal. After a successful link the session is re-synced (`POST /auth/session`) and `auth`,
+`me`, `wallet`, `wallets` queries are invalidated. DEV MOCK uses a DEMO wallet and a neutral "Mock wallet" pop-up.
+
+### Account gate & restricted pages (AUTH-18)
+
+`GET /auth/account-status` (`authApi.accountStatus()`) → `{ gate: ok|onboarding|suspended|self_excluded|region|
+under_review, restrictions[{type, since, reference}], paused{gaming,deposits,withdrawals}, selfExclusion, region }`.
+`routeForGate(gate)` and `restrictedRouteFor(apiError)` map to **`/restricted/suspended · under-review ·
+self-excluded · region`** (`/restricted` picks the right one). Withdrawals stay available unless an AML freeze applies.
+
+QA: `/auth-preview?show=<state>` (dev / `NEXT_PUBLIC_STATE_PREVIEW=true` only) renders every dialog state with DEMO
+fixtures; `node scripts/auth-qa.mjs` screenshots them at 1440 / 390; e2e: `e2e/auth.spec.ts`.
 
 ## UI primitives — `@/components/ui/*`
 
@@ -155,3 +215,121 @@ preview viewer with `<ShellOverride restricted previewMember previewGuest />` (`
 QA: `NEXT_PUBLIC_STATE_PREVIEW=true pnpm --filter @gp/web build && pnpm --filter @gp/web start`, then
 `pnpm --filter @gp/web visual:home` → `test-results/visual/home-<state>_<1440|390>.png` (fails on horizontal overflow
 or console errors).
+
+## Admin console (admin-a) — `src/components/admin-a/*`, routes `src/app/admin/*`
+
+Separate product shell (owner decision #3: admins never use Privy). Routes: `/admin/login` (ADM-01, no shell) and the
+`app/admin/(console)/` group (session guard + shell): `/admin` overview (ADM-02), `/admin/approvals` (ADM-00 inbox,
+ADM-X1), `/admin/alerts` (MOB-11), `/admin/users` (U1), `/admin/users/[id]` + `/account` `/wallets` `/kyc` `/aml`
+`/transactions` `/restrictions` `/responsible-gaming` `/audit` (U2–U10), `/admin/audit` (S3), `/admin/roles` (S1),
+`/admin/permissions` (S2), `/admin/no-access` (ADM-00 no-permission). Unknown `/admin/*` paths render an honest
+"not in this build" state via `[...slug]`; static module routes (e.g. admin-b's `/admin/finance/*`) take precedence.
+
+| Export (`@/components/admin-a/…`)                                    | Notes                                                                                                                                                    |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `session`: `AdminSessionProvider`, `useAdminSession()`               | `{status, admin, can(p), canAny(ps), login(), logout(), staySignedIn(), idleDeadline, expired}`; registers `setAdminTokenProvider`; access JWT in memory, rotating refresh token in sessionStorage; 15-min idle timeout with a 2-min warning (only "Stay signed in" extends it) |
+| `shell`: `AdminShell`, `AdminSidebar`, `AdminTopbar`, `SessionTimeoutDialog` | sidebar 248 (≥ 1280) / drawer (< 1280) / mobile top bar + Admin Tab Bar (< 768); env badge, ⌘K, approvals + alerts counts                       |
+| `nav-config`: `ADMIN_NAV`, `resolveAdminNav()`                       | the 10 groups; access = any of the group's permissions (lock state otherwise). Other modules add children additively                                   |
+| `command-palette`: `CommandPalette`                                  | pages (permission-aware) + player search (`/admin/users?q=`)                                                                                             |
+| `four-eyes`: `ConfirmWithReasonDialog`, `ApprovalReviewDialog`, `actionErrorMessage()` | ADM-X1: reason category + reason + fresh 2FA (+ four-eyes notice → AR reference); second-approver review / self-approval blocked / decision trail |
+| `primitives`: `AdminPageHeader`, `Panel`, `KeyValue`, `KpiTile`, `RoleChip`, `KycChip`, `RiskChip`, `Meter`, `NoPermission`, `QueryErrorPanel`, `Pagination` | admin density building blocks                                                       |
+| `hooks`: `useAdminQuery()` + per-endpoint hooks, `adminKeys`         | queries run only while signed in; all keys start with `'admin'`                                                                                          |
+
+API wrappers: `src/lib/api/admin-a.ts` (all `auth: 'admin'`). QA: `BASE_URL=http://localhost:3106 API_URL=http://localhost:4106
+node scripts/admin-a-qa.mjs` (env `ADMIN`, `WIDTHS`, `PAGES`) → `test-results/visual/admin-a/*.png`; e2e: `e2e/admin-a.spec.ts`.
+Dev-only login states: `/admin/login?state=error|locked|blocked|expired|2fa` (dev or `NEXT_PUBLIC_STATE_PREVIEW=true`).
+
+## Account module (USR-00/01/02, USR-A1…A10, AUTH-11…17) — `src/components/account/*`
+
+Routes (all inside the casino shell, member-only — guests get a sign-in prompt): `/dashboard` (USR-01 overview:
+Active · New user checklist · Restricted from `GET /auth/account-status`; dev preview `/dashboard?state=restricted`),
+`/notifications` (USR-02), `/account` (A1), `/account/security` (A2), `/account/2fa` (A3), `/account/kyc` (A4),
+`/account/kyc/verify` (AUTH-11…17 dialog over A4; full screen on mobile), `/account/documents` (A5),
+`/account/login-history` (A6), `/account/devices` (A7), `/account/sessions` (A8), `/account/notifications` (A9),
+`/account/anti-phishing` (A10). Data: `src/lib/api/account.ts` (`accountApi`, `accountKeys`, `use*` hooks; member
+queries only run when signed in).
+
+| Component (file)                                | Notes                                                                                                         |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `DashboardPage` (`page-shell.tsx`)              | USR-00 frame: breadcrumb, title + chips + actions, dashboard sub-nav (underline tabs), Account & security pills (`accountTab`), mobile "Dashboard sections" bottom sheet, sign-in gate |
+| `DASHBOARD_TABS`, `ACCOUNT_TABS`, `ACCOUNT_ROUTES`, `HISTORY_ROUTES` (`nav.ts`) | in-page navigation config                                                         |
+| `Demo`, `IconTile`, `ToneChip`, `CheckLine`, `SettingRow`, `KeyValue`, `Meter`, `ScoreRing`, `NoteBox`, `QueryState`, `CardSkeleton` (`primitives.tsx`) | account building blocks (tone = success·warning·danger·info·pending·brand·neutral·gold) |
+| `ConfirmSurface` (`confirm.tsx`)                | confirmation as a modal ≥ 768 and a bottom sheet on mobile (MOB-09)                                            |
+| `dashboard/*`                                   | `BalancesSection` (+ mobile compact breakdown), `ActivePoolSection`, `VipStrip`, `SetupChecklist`, `WelcomeOfferCard` (info only), `GamesPreview`, `NotificationsPreview`, `RecentActivity`, `RgModule` |
+| `kyc-flow/*`                                    | `KycFlowDialog` (stepper, context panel, DEMO decision controls on the pending screen), `DetailsStep` (RHF + `kycDetailsSchema`), `DocumentStep` (SHA-256 in the browser, metadata only), `LivenessStep` (camera or DEMO capture), `KycArt` |
+
+Step-up 2FA uses the auth module's `useStepUp().requestStepUp({ purpose: 'security_settings' })` (A3 disable /
+reset / backup codes, A10). Enabling 2FA links to the auth module's `/2fa/setup?next=/account/2fa`.
+
+## Responsible gaming + history (rg-history) — `src/components/rg-history/*`
+
+Routes: `/responsible-gaming` (USR-RG1 hub) · `/deposit-limits` (RG2) · `/participation-limits` (RG3) · `/time-limits`
+(RG4) · `/reality-checks` (RG5) · `/cooling-off` (RG6) · `/self-exclusion` (RG7, 4 steps); `/history/transactions`
+(F6, filters + CSV export) · `/deposits` · `/withdrawals` · `/fees` · `/rewards` · `/refunds` (F1–F5);
+`/history/games` (G1) · `/entries` · `/active` · `/results` · `/winnings` · `/rounds` · `/favourites` (G2–G7).
+API wrappers + TanStack hooks: `src/lib/api/rg-history.ts` (`rgApi`, `historyApi`, `useRgState`, `useHistoryTransactions`, …).
+
+| File                    | Exports                                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `reality-check.tsx`     | `RealityCheckHost` (mounted in `app/(app)/layout.tsx`: play heartbeat + reminder when due), `RealityCheckCard`, RG5 page |
+| `limit-setter.tsx`      | `LimitSetter` (RG/Limit Setter: period, input, usage meter, pending increase / removal, cancel)                            |
+| `session-bar.tsx`       | `SessionBar` (RG/Session Bar), `useElapsed(startedAt)` — real clock from an absolute time                                  |
+| `help-resources.tsx`    | `HelpResources` (RG/Help Resources — real help organisations, self-check, support)                                         |
+| `self-check.tsx`        | `SelfCheckDialog` (9 PGSI questions, answers never leave the dialog)                                                       |
+| `page-shell.tsx`        | `PageShell` (breadcrumb, title, desktop tabs / mobile pills), `MemberOnly`, `PageSkeleton`, `QueryError`                   |
+| `history-common.tsx`    | `FinancePage`, `GamingPage`, `Kpi`, `TxTable` (≥1024), `TxCards` (<1024), `txStatus/txTitle/txAmount`, `Pager`            |
+| `export-dialog.tsx`     | `ExportDialog` (period, types, separator, hashes → `GET /history/transactions/export`; dialog ≥768, bottom sheet <768)     |
+| `ui.tsx`                | `IconTile`, `Meter`, `Chip`, `KV`, `Bullet`, `NoteBox`, `Columns`, `CardHead`, `SectionHead`                                |
+
+The reality-check host only runs with `NEXT_PUBLIC_DATA_SOURCE=api`; play time counts on `/pool`, `/games`, `/casino`,
+`/originals` with real input in the last 90 s (idle tabs and browsing do not count). QA: `node scripts/rg-history-qa.mjs`;
+e2e: `pnpm --filter @gp/web test:e2e -- e2e/rg-history.spec.ts`.
+
+## Global Pool (pool) — `src/components/pool/*`
+
+Routes: `/pool` (GP-01 hub · MOB-04 mobile with sticky participate bar · PUB-02 signed-out variant) ·
+`/pool/rounds/[number]` (status-driven: GP-05 drawing / VRF delayed, GP-06 your result, GP-07 public results, GP-09
+round detail, cancelled → refunds, GP-13) · `/pool/rounds/[number]/verify` (GP-12) · `/pool/history` (GP-08) ·
+`/pool/entries` (GP-10) · `/pool/prizes` (GP-11) · `/provably-fair` (PUB-07). API wrappers: `src/lib/api/pool.ts`
+(mock fallback = shifted `@gp/shared/demo`; buying entries always needs the API).
+
+| File                     | Exports                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `use-pool.ts`            | `poolKeys`, `useCurrentRound`, `useRound`, `useRounds`, `useRoundFeed`, `useVerification`, `useMyRoundEntries`, `useEntryHistory`, `useViewerBalances`, `useViewerRg`, `useNow` (real clock), `useLivePool` (socket.io `/pool`: patches round + feed caches) |
+| `logic.ts`               | `checkParticipation` (balance + RG participation/loss limits → insufficient / limit reached / max entries), `oddsAfter`, `roundPhase` (incl. `not_open_yet`, `delayed`), `relativeTime`, `verifyDraw` (re-derives winners + prizes in the browser with `@gp/contracts/verify`) |
+| `parts.tsx`              | `PoolPageHeader`, `PoolTabs`, `CardHeading`, `Meter`, `KV`, `RiskLine`, `LicenceCard`, `RoundStatusBadge`, `Steps`, `PrizeDistributionCard`, `ThresholdCard`, `VrfExplainerCard`, `QueryError`, `Callout`, `POOL_ROUTES` |
+| `participate-flow.tsx`   | `ParticipateFlow` — GP-02 preview (RHF + zod `enterRoundSchema`, unchecked consent, fee lines, odds, RG check, licence) → GP-03 pending → GP-04 receipt, GP-13 "round closed" outcome; dialog ≥ 768 / bottom sheet < 768; one idempotency key per intent |
+| `pool-hub.tsx`           | `PoolHub`, `RoundCard`                                                                                                          |
+| `round-page.tsx` · `verify-page.tsx` · `history-page.tsx` · `entries-page.tsx` · `prizes-page.tsx` · `provably-fair-page.tsx` | one page component each |
+| `preview.ts`             | dev `?state=` flags for `/pool`: `guest`, `restricted`, `no-round`, `wrong-network`, `participate`                              |
+
+Countdowns run on the real clock against the round's real `closesAt` (the API seed and the mock are both shifted by whole
+days to the next 20:00 UTC — `src/lib/data/demo-clock.ts`; the homepage uses the same clock). e2e:
+`E2E_BASE_URL=http://localhost:3105 E2E_API_URL=http://localhost:4105 pnpm --filter @gp/web test:e2e -- e2e/pool.spec.ts`
+(needs a round that is open right now).
+
+## Wallet (wallet) — `src/components/wallet/*`
+
+Routes: `/wallet` (WAL-01 overview · MOB-05 mobile tiles) · `/wallet/deposit` (WAL-03…09, `?step=` + `?ref=DP-…`) ·
+`/wallet/withdraw` (WAL-10…19, `?step=` + `?ref=WD-…`; unsent draft in `sessionStorage gp.withdrawDraft`) ·
+`/wallet/withdraw/[reference]` (WAL-22 tracker) · `/wallet/history` (WAL-20, filters in the URL, `?tx=` opens the WAL-21
+drawer) · `/wallet/connected` (WAL-02) · `/wallet/whitelist` (WAL-23). Below 768 px the deposit / withdraw flows open as a
+bottom sheet over the wallet page (MOB-06 / MOB-07). API wrappers + TanStack hooks: `src/lib/api/wallet.ts`.
+
+| File                       | Exports                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `wallet-ui.tsx`            | `WALLET_ROUTES`, `WalletTabs`, `WalletPageHeader`, `TxStatusBadge`, `TxIcon`, `KeyValueList`, `QueryError`, `MemberGate`, `SectionTitle`, `ConfirmationRing`, `ConfirmationBar` |
+| `balance-breakdown.tsx`    | `BalanceBreakdown` (total + share bar + 4 buckets, `compact`), `BalanceGlossary`, `composition()`                               |
+| `flow-shell.tsx`           | `FlowShell` (page ≥ 768 / bottom sheet < 768), `FlowStepper`, `FlowFooter`, `NextButton`, `FlowHeading`, `OptionRow` (radio row) |
+| `deposit-flow.tsx`         | `DepositFlow` — network → token → address (+ session re-check, wrong-network via EIP-1193 `eth_chainId`) → QR (`qr-code.tsx`, client-side `qrcode`) → pending n / 20 (polled) → confirmation → receipt; DEMO controls "Simulate testnet deposit" + "Add 5 confirmations" |
+| `withdraw-flow.tsx`        | `WithdrawFlow` — asset → network → address (whitelist / new, format checks) → amount (quote every 15 s) → fees + unchecked confirmation → risk check (`GET /withdrawals/precheck`) → 2FA (authenticator `totpCode`, anti-phishing code) → pending / done |
+| `withdrawal-status.tsx`    | `WithdrawalOutcome` (WAL-17/18/19), `WithdrawalTracker` (WAL-22), `phaseOf`, `withdrawalTimeline`                               |
+| `history.tsx` · `tx-list.tsx` · `tx-detail.tsx` | `WalletHistory` (table ≥ 1280, cards below, CSV export of the page), `TxList`, `TxDetailDrawer` (right drawer / bottom sheet), `TxHash` |
+| `addresses.tsx`            | `WhitelistPage`, `AddAddressModal` (24 h cool-down, unchecked ownership box, 2FA), `ConnectedWalletsPage`                       |
+| `banners.tsx`              | WAL-24 `WalletStatusBanners`, `InsufficientFundsModal`, `DepositLimitModal`, `MaintenanceModal`                                  |
+| `two-factor.tsx` · `timeline.tsx` · `responsive-modal.tsx` | `TwoFactorField`, `AntiPhishingCode`, `stepUpError`; `StatusTimeline`; `ResponsiveModal` (dialog / drawer ≥ 768, bottom sheet < 768) |
+
+Dev-only previews (`next dev` or `NEXT_PUBLIC_STATE_PREVIEW=true`): `/wallet/deposit?step=address&preview=wrong-network|expired`,
+`?step=pending&ref=…&preview=delayed`. e2e: `E2E_BASE_URL=http://localhost:3104 E2E_API_URL=http://localhost:4104
+pnpm --filter @gp/web test:e2e -- e2e/wallet.spec.ts`. `Button asChild` now renders `leadingIcon` / `trailingIcon` inside the
+child (Radix `Slottable`); without icons it is unchanged.

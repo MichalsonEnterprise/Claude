@@ -34,7 +34,10 @@ export function stepUpError(err: unknown): StepUpErrorInfo | null {
   }
   if (err.code === 'STEP_UP_REQUIRED') {
     if (d.reason === 'enroll_2fa')
-      return { kind: 'not_enrolled', message: 'Set up two-factor authentication before you continue.' };
+      return {
+        kind: 'not_enrolled',
+        message: 'Set up two-factor authentication before you continue.',
+      };
     if (d.reason === 'invalid_code') {
       const left = typeof d.attemptsRemaining === 'number' ? d.attemptsRemaining : undefined;
       return {
@@ -121,8 +124,8 @@ export function TwoFactorField({
       </Field>
       {locked && (
         <Alert type="security" title="Paused for 15 minutes">
-          {info.message} Lost your authenticator? Use a backup code or recover access — support will never ask
-          for your codes.
+          {info.message} Lost your authenticator? Use a backup code or recover access — support will
+          never ask for your codes.
         </Alert>
       )}
       {info?.kind === 'not_enrolled' && (
@@ -130,7 +133,10 @@ export function TwoFactorField({
           type="security"
           title="Two-factor authentication is off"
           actions={
-            <Link href="/account/security" className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-brand">
+            <Link
+              href="/account/security"
+              className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-brand"
+            >
               <KeyRound aria-hidden className="size-4" /> Set up 2FA
             </Link>
           }

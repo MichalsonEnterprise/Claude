@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "visual": "node scripts/visual-qa.mjs",
     "visual:home": "node scripts/home-qa.mjs"
   },
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.5.29",
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4.3.5",
     "@types/node": "^22.20.7",
     "@types/qrcode": "^1.5.6",

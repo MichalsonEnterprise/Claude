@@ -20,6 +20,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { ComplianceModule } from './modules/compliance/compliance.module';
 import { DepositsModule } from './modules/deposits/deposits.module';
+import { EmailModule } from './modules/email/email.module';
 import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
 import { GamesModule } from './modules/games/games.module';
 import { HealthModule } from './modules/health/health.module';
@@ -65,6 +66,7 @@ import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
     IdempotencyModule,
     FeatureFlagsModule,
     BlockchainModule,
+    EmailModule,
     NotificationsModule,
     TransactionsModule,
     ComplianceModule,

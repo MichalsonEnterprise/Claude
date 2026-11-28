@@ -21,7 +21,13 @@ export function depositLimit(rg: RgView | undefined): RgLimitView | undefined {
 }
 
 function periodLabel(period: string): string {
-  return period === 'day' ? 'daily' : period === 'week' ? 'weekly' : period === 'month' ? 'monthly' : period;
+  return period === 'day'
+    ? 'daily'
+    : period === 'week'
+      ? 'weekly'
+      : period === 'month'
+        ? 'monthly'
+        : period;
 }
 
 /**
@@ -41,8 +47,8 @@ export function WalletStatusBanners({
   if (status && !status.depositsEnabled && context !== 'withdraw') {
     banners.push(
       <Alert key="dep-maint" type="maintenance" title="Deposits are paused for maintenance">
-        New deposit addresses are not issued right now. Transfers already on their way are still detected
-        and credited once deposits resume. Your balance is not affected.
+        New deposit addresses are not issued right now. Transfers already on their way are still
+        detected and credited once deposits resume. Your balance is not affected.
       </Alert>,
     );
   }
@@ -69,17 +75,17 @@ export function WalletStatusBanners({
             </Button>
           }
         >
-          {formatUSDT(dep.remaining)} left this period. Limits are set by you and checked on our side
-          for every deposit.
+          {formatUSDT(dep.remaining)} left this period. Limits are set by you and checked on our
+          side for every deposit.
         </Alert>,
       );
     }
     if (dep.pendingIncrease) {
       banners.push(
         <Alert key="dep-pending" type="info" title="Deposit limit increase pending">
-          Your increase to {formatUSDT(dep.pendingIncrease.amount)} applies after the 24 h cool-down, on{' '}
-          {formatDateTimeUTC(dep.pendingIncrease.effectiveAt)}. You can keep the current limit by
-          cancelling it in Responsible gaming.
+          Your increase to {formatUSDT(dep.pendingIncrease.amount)} applies after the 24 h
+          cool-down, on {formatDateTimeUTC(dep.pendingIncrease.effectiveAt)}. You can keep the
+          current limit by cancelling it in Responsible gaming.
         </Alert>,
       );
     }
@@ -137,13 +143,18 @@ export function InsufficientFundsModal({
           { label: 'Needed', value: <Amount value={required} /> },
           {
             label: 'Short by',
-            value: <Amount value={shortfall.isNegative() ? '0' : shortfall.toFixed(2)} className="text-text-warning" />,
+            value: (
+              <Amount
+                value={shortfall.isNegative() ? '0' : shortfall.toFixed(2)}
+                className="text-text-warning"
+              />
+            ),
           },
         ]}
       />
       <p className="mt-3 text-caption text-text-tertiary">
-        Pending deposits become Available after their confirmations; Locked funds are released when the
-        round settles or a withdrawal completes. Only deposit what you can afford to lose.
+        Pending deposits become Available after their confirmations; Locked funds are released when
+        the round settles or a withdrawal completes. Only deposit what you can afford to lose.
       </p>
     </ResponsiveModal>
   );
@@ -182,14 +193,22 @@ export function DepositLimitModal({
       {limit ? (
         <KeyValueList
           rows={[
-            { label: `${periodLabel(limit.period)} limit`.replace(/^./, (c) => c.toUpperCase()), value: <Amount value={limit.limit} /> },
+            {
+              label: `${periodLabel(limit.period)} limit`.replace(/^./, (c) => c.toUpperCase()),
+              value: <Amount value={limit.limit} />,
+            },
             { label: 'Used this period', value: <Amount value={limit.used} /> },
-            { label: 'Left', value: <Amount value={limit.remaining} className="text-text-warning" /> },
+            {
+              label: 'Left',
+              value: <Amount value={limit.remaining} className="text-text-warning" />,
+            },
             ...(attempted ? [{ label: 'You tried', value: <Amount value={attempted} /> }] : []),
           ]}
         />
       ) : (
-        <p className="text-body-s text-text-secondary">Your deposit limit has been reached for this period.</p>
+        <p className="text-body-s text-text-secondary">
+          Your deposit limit has been reached for this period.
+        </p>
       )}
       <p className="mt-3 text-caption text-text-tertiary">
         Lowering a limit applies immediately. Raising it takes effect only after a 24 h cool-down.
@@ -224,8 +243,8 @@ export function MaintenanceModal({
       }
     >
       <p className="text-body-s text-text-secondary">
-        Nothing was sent and your balance has not changed. Please try again later — we’ll show a notice on
-        your wallet as soon as {what.toLowerCase()} resume.
+        Nothing was sent and your balance has not changed. Please try again later — we’ll show a
+        notice on your wallet as soon as {what.toLowerCase()} resume.
       </p>
     </ResponsiveModal>
   );

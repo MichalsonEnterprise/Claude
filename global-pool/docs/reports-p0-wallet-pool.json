@@ -1,0 +1,309 @@
+[
+  {
+    "key": "wallet",
+    "report": "The wallet module is built and verified against a running API. Of the 27 ledger rows, 21 are IMPLEMENTED and 6 are PARTIAL (WAL-02, WAL-05, WAL-09, WAL-16, WAL-17, WAL-24; reasons in the per-row notes). It covers the overview, deposit, withdraw, history, transaction detail, withdrawal tracker, whitelist, connected wallets and the banners and modals. Mobile uses true bottom-sheet patterns.\n\n**Web**\n- Routes (all under apps/web/src/app/(app)/wallet/):\n  - `/wallet`\n  - `/wallet/deposit` (step and deposit reference kept in the URL)\n  - `/wallet/withdraw` (the unsent draft is kept in sessionStorage `gp.withdrawDraft`)\n  - `/wallet/withdraw/[reference]` (the tracker)\n  - `/wallet/history` (`?tx=` opens the detail drawer)\n  - `/wallet/connected`\n  - `/wallet/whitelist`\n- Components are in /home/user/Claude/global-pool/apps/web/src/components/wallet/ (16 files).\n- API wrappers and TanStack hooks are in /home/user/Claude/global-pool/apps/web/src/lib/api/wallet.ts. They use the shared `apiRequest()`; the client was not forked.\n- Money stays a decimal string throughout (`@gp/shared/money`). Every financial write sends an idempotency key, created once per user intent and reused on retries.\n- The deposit QR is rendered in the browser from the address with the `qrcode` package (`qr-code.tsx`).\n- Below 768 px the deposit and withdraw flows open as a bottom sheet over the wallet page (MOB-06/07). Option pickers, the transaction detail, filters and all modals become bottom sheets too.\n- Clearly labelled DEMO controls exist for \"Simulate testnet deposit\", \"Add 5 confirmations / Auto-advance\" and \"Simulate testnet confirmation\" (the last one is for queued withdrawals).\n- Dev-only previews (`NEXT_PUBLIC_STATE_PREVIEW`): `?preview=wrong-network`, `?preview=expired` and `?preview=delayed` on the deposit flow.\n\n**Shared component change:** `ui/button.tsx` with `asChild` now renders `leadingIcon` / `trailingIcon` inside the child element. Before, these icons were silently dropped. Without icons the behaviour is unchanged.\n\n**API additions** (additive; new files are `withdrawal-precheck.service.ts` and `demo-deposits.service.ts`):\n- `GET /wallet/status`: whether deposits and withdrawals are switched on, plus KYC daily limit, used today, remaining and reset time.\n- `GET /withdrawals/precheck`: read-only risk check before 2FA, with 6 checks. Outcome is pass, review, kyc_required or blocked (with a code). It writes no AML alert.\n- `GET /withdrawals/ref/:reference`: the withdrawal plus its stored screening, for the tracker.\n- `GET /deposits/ref/:reference`: one deposit, polled by the pending step.\n- `POST /dev/deposits/simulate` accepts `mode: 'progressive'`, which records the deposit as detected at 0/20. `POST /dev/deposits/:reference/confirmations` then adds simulated confirmations and credits it through the normal posting path. Both are DEMO only.\n- `AmlService.previewWithdrawal()` was added.\n- In @gp/shared: `demoDepositSimulationSchema.mode`, `demoDepositAdvanceSchema`, `withdrawalPrecheckQuerySchema`, and the types `WalletStatus`, `WithdrawalPrecheck`, `PrecheckCheck`.\n- Tests: apps/api/test/wallet.e2e-spec.ts (7 tests). It cancels the withdrawal it creates so it leaves nothing open in the shared test DB.\n- docs/API.md and docs/WEB_COMPONENTS.md have new wallet sections. I did not run prettier on these shared docs, and `prettier --check` flags both files.\n\n**Verification (exact results)**\n- Web `pnpm --filter @gp/web typecheck`: exit 0.\n- Web `lint`: exit 0.\n- Web `test`: 10 files, 95 tests passed, including test/wallet.test.tsx (8 tests).\n- Production build `flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-wallet[-b] … pnpm --filter @gp/web build`: passed twice (exit 0). After the second build I made one small change in tx-detail.tsx (no minus sign on a 0.00 fee, plus a full stop). Typecheck, lint and test passed after it, but no third build was run.\n- Playwright e2e `apps/web/e2e/wallet.spec.ts`: 1 passed in 15.1 s, against the production build on :3104 and the API on :4104. It covers deposit through credited, withdraw through manual review, cancel, and history with the detail drawer.\n- API `typecheck`: exit 0.\n- API `lint`: 0 errors and 1 warning, in another agent's prisma/seed-admin-ops.ts.\n- API `pnpm test` (final run): unit 14 files / 59 tests passed; e2e 13 files / 100 tests passed.\n- An earlier run had one failure in admin.e2e (\"FOUR EYES\"). The admin queue lists open withdrawals oldest first, 20 per page, and the shared test DB had collected 28 open reviews. That test passed on the final run.\n\n**Screenshots:** 61 PNGs (35 at 1440, 26 at 390) are in /home/user/Claude/global-pool/apps/web/test-results/visual/wallet/ as `WAL-xx_<state>_<width>.png`. All have 0 px horizontal overflow and no page errors. They were compared with the Figma references; fixes from that comparison:\n- history became a table on desktop with 5 lifetime tiles and the filters in the card toolbar;\n- the tracker was rebuilt to the WAL-22 layout;\n- mobile action tiles were added;\n- the grid overflow at 390 px was fixed;\n- button icons now render.\n\nA 768 px check was done on the deposit address step.\n\n**Figma:** 7 key frames saved to /home/user/Claude/design/reference/wallet/ (WAL-01, WAL-05, WAL-07, WAL-13, WAL-20, WAL-22 at 1440; MOB-05 at 390). 4 calls were refused by the rate limit and not hammered. The rest of the copy came from the results JSON and the pending build scripts.\n\n**Remaining differences from Figma:**\n- No ID/hash search on history.\n- No \"notify me\" toggle on the tracker.\n- No bonus-funds row on the asset step.\n- No email-code field on 2FA.\n- The withdraw stepper context uses the network name, not \"Arbitrum One\".\n\n**Cleanup:** every server I started is stopped (web :3104, API :4104). My `.next-wallet*` dist dirs and the private API build dir are removed. Only my own `.next-wallet*` lines were removed from apps/web/tsconfig.json; other agents' lines are untouched.\n\n**Data left behind:** in the shared dev DB, DEMO players `did:privy:wallet-qa-01` and `did:privy:e2e-wallet-*` hold simulated deposits and cancelled withdrawals. @nova.k was only read.\n\n**Memory:** I read project_global_pool_figma.md (file key, BC.GAME casino direction) for context. Nothing new needs saving.",
+    "implemented": [
+      {
+        "id": "WAL-01",
+        "status": "IMPLEMENTED",
+        "note": "Overview from GET /wallet/balances: Available/Locked/Pending/Owed with share bar, composition lines and glossary dialog. Withdrawable-now card with daily limit meter (GET /wallet/status), quick actions, in-progress list, recent activity, lifetime totals, networks strip, deposit-limit banners. Loading skeletons and error state. Empty state (zero balance and no transactions) is implemented but was not screenshotted with a real empty account. Screenshots at 1440 (default + glossary) and 390."
+      },
+      {
+        "id": "MOB-05",
+        "status": "IMPLEMENTED",
+        "note": "390 layout: breakdown card, Deposit/Withdraw/History tiles, compact withdrawable strip, stacked transaction cards, no sub-tabs; sticky Deposit button on the empty state."
+      },
+      {
+        "id": "WAL-02",
+        "status": "PARTIAL",
+        "note": "Linked wallets list (primary / verified / whitelisted / cooling-down badges), 'Whitelist for withdrawals' (step-up modal), error, loading and empty states. Missing: set-primary and remove/unlink (no API endpoints; unlinking a Privy wallet is the auth module's area). 'Connect a wallet' calls the auth module's openAuth('wallet') when present, otherwise it is disabled with an explanation."
+      },
+      {
+        "id": "WAL-03",
+        "status": "IMPLEMENTED",
+        "note": "Network step: Arbitrum Sepolia live, BNB/Polygon/Ethereum/Solana 'Coming soon' and disabled; maintenance banner; first-deposit deposit-limit prompt."
+      },
+      {
+        "id": "WAL-04",
+        "status": "IMPLEMENTED",
+        "note": "Token step: test USDT only; other tokens disabled with a warning."
+      },
+      {
+        "id": "WAL-05",
+        "status": "PARTIAL",
+        "note": "Address from GET /deposits/address with the client-side QR. Verified: default, wrong-network (real EIP-1193 eth_chainId check plus switch-chain button, and a dev preview), expired session (30-minute client re-check; the HD address itself is permanent). Below-minimum is only a client warning: the API credits any amount, so there is no 'held below minimum' state."
+      },
+      {
+        "id": "WAL-06",
+        "status": "IMPLEMENTED",
+        "note": "Large QR, optional amount reminder with below-minimum error, 'waiting for your transfer' watcher (polls /deposits every 5 s), DEMO simulate control."
+      },
+      {
+        "id": "WAL-07",
+        "status": "IMPLEMENTED",
+        "note": "Pending n/20 polled every 4 s from GET /deposits/ref/:ref: ring, segmented bar, timeline, tx hash, pending/available-after rows, DEMO 'Add 5 confirmations' and auto-advance; 'Delayed' state after 10 minutes (and via preview); advances to confirmation automatically once credited."
+      },
+      {
+        "id": "WAL-08",
+        "status": "IMPLEMENTED",
+        "note": "Credited confirmation with a before/after table (derived from current balances), gold open-round card (real closesAt, separate 0.05 fee line, 'You can lose your stake', 18+)."
+      },
+      {
+        "id": "WAL-09",
+        "status": "PARTIAL",
+        "note": "Success receipt and failed (deposit status rejected) are done. 'Unrecognised token' cannot happen: the watcher only reads test-USDT Transfer logs."
+      },
+      {
+        "id": "MOB-06",
+        "status": "IMPLEMENTED",
+        "note": "All deposit steps run in a bottom sheet over the wallet page: grabber, title + close, compact stepper, scrollable body, sticky CTA."
+      },
+      {
+        "id": "WAL-10",
+        "status": "IMPLEMENTED",
+        "note": "USDT asset with Available balance; empty-balance state. No bonus-funds row (no bonus API)."
+      },
+      {
+        "id": "WAL-11",
+        "status": "IMPLEMENTED",
+        "note": "Network rows with typical fees and ETA; only Arbitrum Sepolia selectable; network-match warning."
+      },
+      {
+        "id": "WAL-12",
+        "status": "IMPLEMENTED",
+        "note": "Whitelisted address rows or a new address with live format checks (0x, 40 hex, EIP-55), Solana-address detection (invalid state), cooldown blocking, and a new-address choice (withdraw now with manual review, or add to whitelist)."
+      },
+      {
+        "id": "WAL-13",
+        "status": "IMPLEMENTED",
+        "note": "AmountInput, quick chips + MAX, limit tiles from /wallet/status, fee estimate from GET /withdrawals/quote refreshed every 15 s; below-minimum, over-balance (+ insufficient-funds modal) and limit-reached states."
+      },
+      {
+        "id": "WAL-14",
+        "status": "IMPLEMENTED",
+        "note": "Review: you-receive hero, network fee separate, platform fee 0.00, irreversibility warning, never-pre-checked confirmation box; the idempotency key is created here."
+      },
+      {
+        "id": "WAL-15",
+        "status": "IMPLEMENTED",
+        "note": "Six checks from the new GET /withdrawals/precheck: pass (valid 15 min), manual review (plain reason + where the funds are), KYC required, blocked (sanctions, cooldown, balance, limit, no 2FA) with fix actions."
+      },
+      {
+        "id": "WAL-16",
+        "status": "PARTIAL",
+        "note": "Authenticator code (OtpInput) sent as totpCode with POST /withdrawals; anti-phishing code shown; wrong-code (attempts left), locked and 2FA-off states mapped from STEP_UP_* errors; explicit Confirm button. Deviation: no email code (the API has none; the owner decision is TOTP + anti-phishing). Inline step as in Figma rather than the auth module's StepUpDialog."
+      },
+      {
+        "id": "WAL-17",
+        "status": "PARTIAL",
+        "note": "Live polled status view. Manual review verified with WD-20931; processing and queued are code paths (queued needs four-eyes admin approval). Cancel before broadcast with confirmation. DEMO 'Simulate testnet confirmation' for queued withdrawals."
+      },
+      {
+        "id": "WAL-18",
+        "status": "IMPLEMENTED",
+        "note": "Completed view (verified with seeded WD-20877): amount received, tx hash, timeline."
+      },
+      {
+        "id": "WAL-19",
+        "status": "IMPLEMENTED",
+        "note": "Rejected/failed views with the reason, funds returned, no fee, timeline (verified with WD-20850). The network-failure path renders from status=failed; not produced live in DEMO."
+      },
+      {
+        "id": "MOB-07",
+        "status": "IMPLEMENTED",
+        "note": "Withdraw steps 1-9 in the bottom sheet; nested sheets for the insufficient-funds, add-address and cancel modals."
+      },
+      {
+        "id": "WAL-20",
+        "status": "IMPLEMENTED",
+        "note": "Table at 1280 and above, day-grouped cards below; 5 lifetime tiles; type chips plus status/network/date filters in the URL (bottom sheet on mobile); empty, no-results, loading and error states; pagination; CSV export of the visible page. No ID/hash search (no API parameter)."
+      },
+      {
+        "id": "WAL-21",
+        "status": "IMPLEMENTED",
+        "note": "Detail as right drawer (desktop) or bottom sheet (mobile): pending deposit with confirmations, failed withdrawal with reason, successful receipt; status timeline; tx hash (no explorer link for DEMO hashes); link to the tracker."
+      },
+      {
+        "id": "WAL-22",
+        "status": "IMPLEMENTED",
+        "note": "Tracker /wallet/withdraw/[ref] in the Figma layout: breadcrumb, status + DEMO, compliance hero, ETA card, 5-step tracker, amount & fees, destination, what happens next, activity log, cancel and contact support. No 'notify me' toggle."
+      },
+      {
+        "id": "WAL-23",
+        "status": "IMPLEMENTED",
+        "note": "Whitelist list with ready/cooling-down countdown and unlock time; add modal (network, address, label, unchecked ownership box, authenticator code) uses POST /me/wallets/whitelist with a 24 h cooldown; remove with code; cooling-down alert with a remove escape."
+      },
+      {
+        "id": "WAL-24",
+        "status": "PARTIAL",
+        "note": "Banners in context (maintenance from feature flags, deposit-limit usage and pending increase) and the insufficient-funds modal are verified at 1440 and 390. The deposit-limit modal (RG_LIMIT_EXCEEDED on deposit) and maintenance modal (SERVICE_UNAVAILABLE) are implemented but not screenshotted (they need the limit hit or a flag switched off)."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/web typecheck: exit 0",
+      "pnpm --filter @gp/web lint: exit 0",
+      "pnpm --filter @gp/web test: 10 files, 95 tests passed (includes test/wallet.test.tsx, 8 tests)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-wallet / .next-wallet-b … pnpm --filter @gp/web build: exit 0 twice; one cosmetic edit to tx-detail.tsx came after the second build (typecheck/lint/test re-run after it)",
+      "E2E_BASE_URL=http://localhost:3104 E2E_API_URL=http://localhost:4104 pnpm --filter @gp/web test:e2e e2e/wallet.spec.ts: 1 passed (15.1s) against the production build",
+      "pnpm --filter @gp/api typecheck: exit 0",
+      "pnpm --filter @gp/api lint: 0 errors, 1 warning in another agent's seed-admin-ops.ts",
+      "pnpm --filter @gp/api test (final run): unit 14 files / 59 tests passed; e2e 13 files / 100 tests passed (includes test/wallet.e2e-spec.ts, 7 tests)",
+      "61 screenshots (35 at 1440, 26 at 390) in apps/web/test-results/visual/wallet/: 0 px horizontal overflow, no page errors; 768 checked on the deposit address step",
+      "Compared with the Figma references saved in /home/user/Claude/design/reference/wallet/ (WAL-01, 05, 07, 13, 20, 22 at 1440; MOB-05 at 390)"
+    ],
+    "failing": [
+      "None in the final runs. An earlier full API e2e run failed once in test/admin.e2e-spec.ts ('flagged withdrawals need FOUR EYES'): the admin queue lists open withdrawals oldest first, 20 per page, and the shared globalpool_test DB had 28 open reviews. It passed on the final run; the test is still sensitive to leftover data. apps/web/test/wallet.e2e-spec.ts now cancels its withdrawal so it adds no open review."
+    ],
+    "decisions": [
+      "Non-whitelisted destinations follow the API's server policy: they are allowed and the first withdrawal goes to a manual AML review. Figma's new-address cooldown state shows Continue disabled; here the user is offered either 'withdraw now (review, usually under 4 h)' or 'add to whitelist (24 h cooldown)'. Whitelisted addresses still in cooldown are blocked. Needs a product/compliance sign-off.",
+      "2FA for withdrawals and whitelist changes uses the authenticator code only, sent as totpCode with the protected request (single use) and showing the anti-phishing code. There is no email code because the API has no email OTP; this matches the owner decision of TOTP + anti-phishing.",
+      "Withdrawals need an explicit 'Confirm withdrawal · amount' press; the code is not auto-submitted on the 6th digit.",
+      "The 30-minute 'address session' on the deposit step is a client-side safety re-check (the address is masked and must be refreshed). The HD deposit address itself never changes, and the copy says so.",
+      "A deposit still confirming after 10 minutes is shown as 'Delayed', with the honest note that no action is needed and support is available after 60 minutes.",
+      "New read-only GET /withdrawals/precheck runs the same deterministic checks as POST /withdrawals but writes no AML alert; POST re-checks everything authoritatively.",
+      "DEMO progressive deposits (mode 'progressive' plus the dev confirmations endpoint) let the pending flow be exercised without a chain. DEMO only, same ledger postings.",
+      "The confirmation step's balance before/after is derived from current balances (Available − amount, Pending + amount).",
+      "Explorer links are hidden for DEMO hashes (they would point to non-existent testnet transactions).",
+      "Shared Button (asChild) now renders leading/trailing icons inside the child through Radix Slottable. Additive change to a shared component.",
+      "Every wallet page shows DEMO badges; there is no VPN hint, no fake urgency, and withdrawals are never blocked by RG limits."
+    ],
+    "next": [
+      "API: hold deposits below the 10.00 minimum (a 'held' status + top-up) and add an unrecognised-token record and recovery flow so the WAL-05 and WAL-09 edge states become real.",
+      "API (users/auth): set-primary and unlink endpoints for linked wallets (WAL-02), plus Privy unlink on the client.",
+      "API: an id/hash search parameter on GET /transactions (WAL-20 search box).",
+      "Email OTP as a second factor, if the owner wants the Figma 'email code + authenticator' pair for withdrawals.",
+      "Once the api-gaps withdrawal broadcaster is live, run the queued → sent → confirmed path and the network-failure path end to end (the UI already handles broadcast/failed).",
+      "admin.e2e four-eyes test: request the admin queue with a larger pageSize or a status filter so leftover test data cannot push the new withdrawal off page 1.",
+      "Optionally run prettier on docs/API.md and docs/WEB_COMPONENTS.md once all agents' sections are merged.",
+      "Screenshot the maintenance and deposit-limit modals by switching the feature flags off / hitting an RG deposit limit."
+    ]
+  },
+  {
+    "key": "pool",
+    "report": "POOL module (GLOBAL POOL, DEMO/testnet) is built and checked against the API. The official production build passes; it was run under the flock. The e2e happy path passes three times. Of the 16 ledger rows, 13 are verified and 3 (GP-06, GP-13, PUB-07) are PARTIAL: one state each is built but not screenshot-checked.\n\nROUTES (apps/web/src/app/(app)/…)\n- /pool: GP-01 hub, MOB-04 mobile, PUB-02 guest variant.\n- /pool/rounds/[number]: one page that follows the round status. Drawing or VRF-delayed shows GP-05 / GP-13; settled shows GP-07 public results plus GP-06 \"your result\"; cancelled shows GP-09 refunds; open or scheduled shows a summary.\n- /pool/rounds/[number]/verify: GP-12.\n- /pool/history: GP-08. /pool/entries: GP-10. /pool/prizes: GP-11. /provably-fair: PUB-07.\n\nCOMPONENTS (apps/web/src/components/pool/)\n- use-pool.ts: TanStack hooks, a real clock, and the live socket.io `/pool` feed. Socket events patch the round and feed caches directly.\n- logic.ts: pure logic. Participation check (balance plus RG participation and loss limits), round phases including `not_open_yet` and `delayed`, odds display rounded DOWN, and verifyDraw, which re-derives the winners and prize split in the browser with @gp/contracts/verify.\n- parts.tsx, participate-flow.tsx (GP-02/03/04 plus the GP-13 \"round closed\" outcome; dialog from 768px, bottom sheet below), pool-hub.tsx, round-page.tsx, verify-page.tsx, history-page.tsx, entries-page.tsx, prizes-page.tsx, provably-fair-page.tsx, preview.ts (dev `?state=` flags: guest, restricted, no-round, wrong-network, participate).\n- API wrappers are in apps/web/src/lib/api/pool.ts and use the shared apiRequest(). In mock mode it serves shifted DEMO data; buying entries is always refused in mock mode.\n\nPARTICIPATION\n- Form uses RHF + zod (shared enterRoundSchema). The consent box is never pre-checked.\n- Line items: entries × 10.00, the 0.05 platform fee as its own line, network fee 0.00, total, and Available after.\n- Shows the shared oddsDisclosure (exact, rounded down) and the RG limit check (within / limit reached, with \"Reduce to N\").\n- Insufficient funds offers Deposit and \"Reduce to N\". The wrong-network state is reachable only through the preview flag.\n- Also shown: licence card, \"You can lose your stake\", and a gold Confirm button.\n- One idempotency key per intent, reused on retry. Server error codes ROUND_NOT_OPEN, INSUFFICIENT_FUNDS and RG_LIMIT_EXCEEDED each map to their UI state.\n\nHOMEPAGE CLOCK FIX\n- New apps/web/src/lib/data/demo-clock.ts uses the same whole-day shift as the API seed (round closes at the next 20:00 UTC; between rounds, the next 08:00).\n- mock-home.ts now shifts every DEMO date and sets serverNow to the real now. home-page.tsx passes demoNow=undefined, so countdowns use the real clock in both api and mock mode.\n- pool-live.tsx: relative times no longer invent \"0 s ago\" for rows dated later today, the chart date range is computed from the data, and API feed rows without roundNumber no longer break.\n- test/home.test.tsx pins Date to the DEMO snapshot moment.\n\nAPI ADDITIONS (additive, pool module)\n- GET /pool/me/entries (player): one row per purchase with entry amount, the separate platform fee, network fee, total and result (in_draw / drawing / won / not_selected / refund_owed / refunded), plus a lifetime summary. New file: apps/api/src/modules/pool/entry-history.service.ts.\n- GET /pool/rounds gains optional `?status=settled,cancelled&number=1245` filters (RoundsService.history takes a second optional argument).\n- New e2e test apps/api/test/pool-history.e2e-spec.ts (3 tests). docs/API.md and docs/WEB_COMPONENTS.md updated.\n\nQA SETUP\n- Private API on :4105 and web on :3105.\n- I used an isolated QA database, globalpool_pool (migrated and seeded), so e2e purchases would not change the shared ledger. The seed's random admin/TOTP credentials file was restored to the shared one immediately after seeding.\n- I drove the real RoundLifecycleService (mock VRF): close → draw → settle of round #1,248, then opened #1,249. Settlement re-derived 13 winners from 18,646 entries, and the browser verifier shows 4 / 4 checks passed.\n\nFIGMA REFERENCES\n12 frames saved to /home/user/Claude/design/reference/pool/: GP-01 at 1440 and 390, GP-02, GP-05, GP-07, GP-08, GP-09, GP-10, GP-11, GP-12, GP-13 delayed, PUB-07. The seat limit refused several other calls.\n\nREMAINING VISUAL DIFFERENCES\n- Hub recent entries: a pool-only table instead of the mixed-game Live Bets table, because mixed-game rows would be invented data.\n- GP-11: a split bar instead of a donut.\n- GP-10: a side receipt panel instead of an expandable row.\n- On-chain record links and the entry snapshot root are shown as not yet published.\n\nMEMORY\nThe stored GLOBAL POOL Figma note (from memory) matched the brief and I followed its casino direction. Nothing new to save.",
+    "implemented": [
+      {
+        "id": "GP-01",
+        "status": "IMPLEMENTED",
+        "note": "Hub with real API data and the live socket. States checked by screenshot: active (1440/768/390, member and guest), new low-pool round (threshold not met), between rounds, restricted, wallet disconnected (= signed out), loading skeleton. Error state is built (QueryError) but not shown in a screenshot. Countdown uses the real closesAt."
+      },
+      {
+        "id": "GP-02",
+        "status": "IMPLEMENTED",
+        "note": "Preview modal (1440) and bottom sheet (390). Default and limit-reached checked by screenshot (@nova.k really is over the seeded loss limit). Insufficient funds is unit-tested (342.10 → short by 9.65, reduce to 34) but not screenshot. Wrong network is UI-only via ?state=wrong-network: the auth layer exposes no wallet chain."
+      },
+      {
+        "id": "GP-03",
+        "status": "IMPLEMENTED",
+        "note": "Pending step while the single DB transaction runs, with honest steps (no fake confirmation counter or tx hash). The e2e passes through it; it is too short-lived to capture in a screenshot."
+      },
+      {
+        "id": "GP-04",
+        "status": "IMPLEMENTED",
+        "note": "Receipt: entry IDs, reference, fee breakdown, locked amount, odds, RG usage, client-side receipt download. Asserted by the e2e (reference, Locked until the draw, 30.15 total) plus API ledger checks."
+      },
+      {
+        "id": "GP-05",
+        "status": "IMPLEMENTED",
+        "note": "Drawing and delayed states at 1440 and 390, screenshot-checked on a real lifecycle round (mock VRF): requested → awaiting/delayed → fulfilled → settled stepper, refund deadline = request + 24 h."
+      },
+      {
+        "id": "GP-06",
+        "status": "PARTIAL",
+        "note": "'Not selected' is checked with the real settlement (nova, 1440/390). The 'won' branch is coded (winning entries ∩ my entries; prize sits in Owed until claimed) but never screenshot because no QA player won."
+      },
+      {
+        "id": "GP-07",
+        "status": "IMPLEMENTED",
+        "note": "Public results: banner, top 3, all 13 winners, prize distribution, round facts, provably-fair card. Checked at 1440/390 for guest and member."
+      },
+      {
+        "id": "GP-08",
+        "status": "IMPLEMENTED",
+        "note": "History: open round first, status chips, round-number search, Rounds I entered, CSV export, pagination, mobile cards. No date-range filter."
+      },
+      {
+        "id": "GP-09",
+        "status": "IMPLEMENTED",
+        "note": "Cancelled → refunds (#1,245): threshold not met, your refund, refund timeline, round facts. The settled-round detail is part of the results page."
+      },
+      {
+        "id": "GP-10",
+        "status": "IMPLEMENTED",
+        "note": "Entry history from the new GET /pool/me/entries: summary, result filter chips, table/cards, receipt panel, RG limit card, guest empty state."
+      },
+      {
+        "id": "GP-11",
+        "status": "IMPLEMENTED",
+        "note": "Pool basis, distribution card, split bar (instead of a donut), tier table with chance per entry, your chances / not part of the pool / if the round doesn't draw, past rounds."
+      },
+      {
+        "id": "GP-12",
+        "status": "IMPLEMENTED",
+        "note": "Fetches /pool/rounds/:n/verify and re-derives winners and prizes in the browser with @gp/contracts/verify. Verified (4/4) and failed (pasted wrong random word) checked at 1440/390. Snapshot-root check is informational only (not published yet). Unit-tested against the Solidity-proven round-1248 fixture."
+      },
+      {
+        "id": "GP-13",
+        "status": "PARTIAL",
+        "note": "VRF delayed and the cancelled-round refund-owed hub banner are checked by screenshot. The 'round closed before your entries were placed' modal (ROUND_NOT_OPEN) is coded but never screenshot."
+      },
+      {
+        "id": "MOB-04",
+        "status": "IMPLEMENTED",
+        "note": "390 hub: compact hero stats, sticky participate bar above the tab bar, bottom-sheet participation."
+      },
+      {
+        "id": "PUB-02",
+        "status": "IMPLEMENTED",
+        "note": "Signed-out /pool: 'Sign in to participate', 'Connect your wallet to add entries' card, odds per entry; restricted and no-round states."
+      },
+      {
+        "id": "PUB-07",
+        "status": "PARTIAL",
+        "note": "Explainers first, then the verifier: seeds tab (default, using the existing dice algorithm and a DEMO sample button) and a real VRF tab (round number → verify bundle → in-browser re-derivation). Only the empty state is screenshot-checked at 1440/390; the verified/failed panels of both tabs are coded but not screenshot."
+      },
+      {
+        "id": "HOMEPAGE-CLOCK",
+        "status": "IMPLEMENTED",
+        "note": "Real clock everywhere. API mode uses the shifted closesAt from the API; mock mode is shifted to the next 20:00 UTC like the seed. Covered by tests."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/web typecheck (tsc): 0 errors, whole app",
+      "pnpm --filter @gp/web lint: exit 0, whole app",
+      "pnpm --filter @gp/web test: 10 files / 95 tests passed (test/pool.test.ts: 17, incl. in-browser draw verification vs packages/contracts/test/fixtures/round-1248.json)",
+      "flock /tmp/gp-web-build.lock production `next build` with type checking (NEXT_DIST_DIR=.next-pool): exit 0, run twice; the second run is after all logic changes",
+      "pnpm --filter @gp/api typecheck: exit 0; lint: exit 0",
+      "pnpm --filter @gp/api test: unit 14 files / 59 passed; e2e 13 files / 100 passed (includes test/pool-history.e2e-spec.ts, 3 tests)",
+      "E2E_BASE_URL=http://localhost:3105 E2E_API_URL=http://localhost:4105 playwright test e2e/pool.spec.ts: passed 3 times (round #1,248 open; round #1,249 twice). Fresh player → hub → preview (3 entries: 30.00 + 0.15 fee + 0.00 = 30.15, Available after 69.85, consent gate) → receipt → entry history; API ledger checked (available 69.85, locked 30.00)",
+      "Playwright screenshots at 1440 + 390 (+768 hub) in /home/user/Claude/global-pool/apps/web/test-results/visual/pool-*.png, compared with the Figma refs in /home/user/Claude/design/reference/pool/; no horizontal overflow on any page",
+      "Real lifecycle in the isolated QA DB: settlement of 18,646 entries; the browser verifier shows Verified 4/4 and fails as expected with a tampered random word"
+    ],
+    "failing": [
+      "None of my checks fail. Remaining console 404s come from other modules: shell nav prefetch of /games/*, /vip, /winners, /promotions, /affiliates, plus /responsible-gaming/session missing from my older API build.",
+      "My last edit (whitespace-nowrap on two entry-history table cells) landed while the final build was running, so it may not be in that build output. Lint passes on it; the separate tsc typecheck was not re-run after this edit."
+    ],
+    "decisions": [
+      "BUSINESS RULE CONFLICT (needs an owner decision): the API does not refund platform fees when a round is cancelled ('platform fees are not refunded', API.md), but Figma GP-09/11/13 say fees go back to Available. The UI shows the API rule: 'Platform fees are not refunded'.",
+      "Prizes: in the API, prizes land in Owed and the player claims them (POST /wallet/owed/claim). Figma shows an automatic move to Available after 20 confirmations. The UI shows the API behaviour.",
+      "Odds use the exact formula from @gp/shared oddsDisclosure (prizes drawn without replacement) and are rounded DOWN so a chance is never overstated: ≈2.41% any prize instead of Figma's 2.44% upper-bound approximation.",
+      "No nudging: the participation modal defaults to 1 entry (Figma shows 35). The limit shown is the API's max 1,000 per purchase (Figma says 'max 500 per round').",
+      "'Wallet disconnected' maps to the signed-out state: with Privy and hybrid custody, entries are paid from the platform balance. The wrong-network state is UI-only (dev preview flag) until auth exposes the wallet chain.",
+      "GP-03 shows honest steps for a single DB transaction, with no fake confirmation counts or tx hash. On-chain record links and the entry snapshot root are shown as 'not published yet' (snapshot check is informational).",
+      "Module tabs are Overview / My entries / Round history / Prize distribution / Fairness (VRF), instead of Figma's Winners / Rules / Refunds.",
+      "Hub recent entries show only real pool purchases from GET /pool/rounds/:n/feed, not the mixed-game Live Bets table, which would need fabricated game rows. Participant avatars come from real feed handles; hard-coded initials removed.",
+      "QA ran against an isolated database (globalpool_pool) instead of the shared dev DB, so e2e purchases do not move shared balances or round totals. QA-only changes there: round #1,248 opens_at set to now−2h; #1,248 closed / drawn / settled through the real lifecycle (mock VRF); requested_at backdated to show the delayed state, then restored to close+4s; round #1,249 opened.",
+      "Shared tsconfig: other agents' dev servers add `.next-<key>/types` includes whose stale files break `next build`. My build script (inside the flock) filtered them out during the build and restored tsconfig byte-for-byte. I removed the `.next-pool` entry my own dev server had added.",
+      "Additive shared edits: @gp/web package.json (+socket.io-client, +@gp/contracts workspace dependency) and pnpm-lock.yaml; homepage files home-page.tsx, pool-live.tsx, mock-home.ts; new lib/data/demo-clock.ts; test/home.test.tsx (Date pinned); docs/API.md and docs/WEB_COMPONENTS.md."
+    ],
+    "next": [
+      "Owner decision: refund platform fees on cancelled rounds (Figma) or keep them (current API)? Then align API and UI.",
+      "Seed fixes (API owner): (a) after the day shift, round #1,248 is 'open' with opensAt in the future between 20:00 and 08:00 UTC, so entries fail with ROUND_NOT_OPEN; the UI shows 'not open yet'. (b) Seeded feed and purchase timestamps land later today, i.e. in the future. (c) @nova.k's seeded daily loss limit is 200.00 while 351.75 is already used, so nova can never buy entries.",
+      "When api-gaps' on-chain mirroring publishes the entry snapshot root and settlement tx in /pool/rounds/:n/verify, turn GP-12's snapshot check from informational into a Merkle check and show explorer links.",
+      "Expose the wallet chainId from lib/auth so the GP-02 wrong-network state is real.",
+      "Add 'Remind me when the round opens / results are ready' once notification preferences exist; add date-range and server-side result filters to history and entries.",
+      "Capture the remaining states visually: GP-06 win, GP-13 round-closed modal, the PUB-07 verified/failed panels, insufficient funds, and the GP-03/GP-04 mobile sheets.",
+      "Rerun e2e/pool.spec.ts against any API that has a round open right now (opensAt ≤ now < closesAt). The isolated QA DB globalpool_pool was kept; my servers are stopped and the compiled API copy (.dev/pool-dist) was removed."
+    ]
+  }
+]

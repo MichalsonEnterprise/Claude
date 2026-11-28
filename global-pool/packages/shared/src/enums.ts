@@ -98,7 +98,8 @@ export const WITHDRAWAL_TRANSITIONS: Readonly<
   requested: ['risk_check', 'cancelled'],
   risk_check: ['queued', 'under_review', 'rejected'],
   under_review: ['queued', 'rejected', 'cancelled'],
-  queued: ['broadcast', 'cancelled'],
+  // queued → failed: the transfer could not be sent (simulation revert); funds return to Available.
+  queued: ['broadcast', 'cancelled', 'failed'],
   broadcast: ['confirmed', 'failed'],
   confirmed: [],
   failed: [],
@@ -222,7 +223,11 @@ export const SelfExclusionDuration = {
 export type SelfExclusionDuration = ValuesOf<typeof SelfExclusionDuration>;
 export const SELF_EXCLUSION_DURATIONS = valuesOf(SelfExclusionDuration);
 /** Short breaks (RG6 cooling-off): honoured at once with a single confirmation. */
-export const COOLING_OFF_DURATIONS = ['24h', '7d', '30d'] as const satisfies readonly SelfExclusionDuration[];
+export const COOLING_OFF_DURATIONS = [
+  '24h',
+  '7d',
+  '30d',
+] as const satisfies readonly SelfExclusionDuration[];
 export type CoolingOffDuration = (typeof COOLING_OFF_DURATIONS)[number];
 /** Long self-exclusion periods (RG7): typed confirmation + acknowledgement (+ step-up TOTP when 2FA is on). */
 export const LONG_SELF_EXCLUSION_DURATIONS = [

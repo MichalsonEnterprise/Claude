@@ -37,7 +37,18 @@ import {
 import { shortAddress } from '@/lib/auth/wallet-message';
 import { cn } from '@/lib/utils';
 
-import { AuthModal, Callout, IconTile, KeyValue, KeyValueBox, Note, NumStep, Pane, PaneHeader, Point } from './auth-ui';
+import {
+  AuthModal,
+  Callout,
+  IconTile,
+  KeyValue,
+  KeyValueBox,
+  Note,
+  NumStep,
+  Pane,
+  PaneHeader,
+  Point,
+} from './auth-ui';
 import { formatCountdown, formatUtcDateTime, formatUtcTime, useNow } from './format';
 import { WALLET_PROVIDERS, WalletMark, WalletProviderList } from './wallet-providers';
 
@@ -55,8 +66,19 @@ export type ConnectState =
   | { step: 'success'; conn: WalletConnection };
 
 export type VerifyState =
-  | { step: 'request'; conn: WalletConnection; request: WalletSignatureRequest | null; signing: boolean }
-  | { step: 'success'; conn: WalletConnection; request: WalletSignatureRequest; signature: string; at: string }
+  | {
+      step: 'request';
+      conn: WalletConnection;
+      request: WalletSignatureRequest | null;
+      signing: boolean;
+    }
+  | {
+      step: 'success';
+      conn: WalletConnection;
+      request: WalletSignatureRequest;
+      signature: string;
+      at: string;
+    }
   | { step: 'rejected'; conn: WalletConnection }
   | { step: 'expired'; conn: WalletConnection; request: WalletSignatureRequest };
 
@@ -130,7 +152,15 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
-function WalletRow({ conn, badge, demo }: { conn: WalletConnection; badge?: React.ReactNode; demo: boolean }) {
+function WalletRow({
+  conn,
+  badge,
+  demo,
+}: {
+  conn: WalletConnection;
+  badge?: React.ReactNode;
+  demo: boolean;
+}) {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface-raised py-3 pr-4 pl-3">
       <WalletMark id={conn.provider} />
@@ -141,7 +171,9 @@ function WalletRow({ conn, badge, demo }: { conn: WalletConnection; badge?: Reac
         </span>
       </div>
       {badge ?? (
-        <span className="text-caption text-text-tertiary">{CHAIN_NAME[conn.chainId] ?? `Chain ID ${conn.chainId}`}</span>
+        <span className="text-caption text-text-tertiary">
+          {CHAIN_NAME[conn.chainId] ?? `Chain ID ${conn.chainId}`}
+        </span>
       )}
     </div>
   );
@@ -160,7 +192,12 @@ export function DemoQr({ value, size = 168 }: { value: string; size?: number }) 
   const [svg, setSvg] = React.useState<string | null>(null);
   React.useEffect(() => {
     let alive = true;
-    void QRCode.toString(value, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#0f1111', light: '#ffffff' } }).then((s) => {
+    void QRCode.toString(value, {
+      type: 'svg',
+      margin: 0,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#0f1111', light: '#ffffff' },
+    }).then((s) => {
       if (alive) setSvg(s);
     });
     return () => {
@@ -203,7 +240,8 @@ export function ConnectWalletDialog({
         onStateChange(null);
         return;
       }
-      if (!SUPPORTED_CHAIN_IDS.includes(res.chainId)) onStateChange({ step: 'wrong-network', conn: res });
+      if (!SUPPORTED_CHAIN_IDS.includes(res.chainId))
+        onStateChange({ step: 'wrong-network', conn: res });
       else onStateChange({ step: 'success', conn: res });
     } catch (err) {
       onStateChange({
@@ -224,50 +262,93 @@ export function ConnectWalletDialog({
 
   const s = state ?? { step: 'list' as const };
   return (
-    <AuthModal open={state !== null} onOpenChange={(o) => !o && close()} title="Connect a wallet" size="m">
-      <Pane onClose={close} top={s.step !== 'list' && s.step !== 'success' ? (
-        <button type="button" onClick={() => onStateChange({ step: 'list' })} className="inline-flex min-h-11 items-center gap-2 text-label-m text-text-secondary hover:text-text-primary">
-          ← All wallets
-        </button>
-      ) : undefined}>
+    <AuthModal
+      open={state !== null}
+      onOpenChange={(o) => !o && close()}
+      title="Connect a wallet"
+      size="m"
+    >
+      <Pane
+        onClose={close}
+        top={
+          s.step !== 'list' && s.step !== 'success' ? (
+            <button
+              type="button"
+              onClick={() => onStateChange({ step: 'list' })}
+              className="inline-flex min-h-11 items-center gap-2 text-label-m text-text-secondary hover:text-text-primary"
+            >
+              ← All wallets
+            </button>
+          ) : undefined
+        }
+      >
         {s.step === 'list' && (
           <>
-            <PaneHeader icon={Wallet} title="Connect a wallet">
-              Use a self-custody wallet to deposit, withdraw and verify ownership. Entries are always paid from your
-              platform balance.
+            <PaneHeader icon={Wallet} title="Connect a wallet" layout="inline">
+              Use a self-custody wallet to deposit, withdraw and verify ownership. Entries are
+              always paid from your platform balance.
             </PaneHeader>
-            <p className="text-overline font-semibold tracking-[0.08em] text-text-tertiary uppercase">Choose a wallet</p>
-            <WalletProviderList onChoose={choose} mockAlwaysAvailable={demo} />
-            <SeedNotice />
-            <p className="text-caption text-text-tertiary">
-              By connecting you confirm you are 18+ and located in a permitted jurisdiction. Terms and Privacy Policy
-              apply.
+            <p className="text-overline font-semibold tracking-[0.08em] text-text-tertiary uppercase">
+              Choose a provider
             </p>
+            <WalletProviderList onChoose={choose} mockAlwaysAvailable={demo} />
+            <Callout tone="success" icon={ShieldCheck} title="We never ask for your seed phrase">
+              GLOBAL POOL will never ask for your recovery phrase or private key, and connecting a
+              wallet never moves funds.
+            </Callout>
+            <p className="text-caption text-text-tertiary">
+              By connecting you confirm you are 18+ and located in a permitted jurisdiction. Terms
+              and Privacy Policy apply.
+            </p>
+            <div className="-mx-4 flex items-center justify-between gap-3 border-t border-border-subtle px-4 pt-4 tablet:-mx-10 tablet:px-10">
+              <span className="text-body-s text-text-secondary">New to self-custody wallets?</span>
+              <Link
+                href="/support"
+                className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-primary hover:underline"
+              >
+                Learn the basics <ExternalLink aria-hidden className="size-4" />
+              </Link>
+            </div>
           </>
         )}
         {s.step === 'qr' && (
           <>
             <PaneHeader title={`Scan with ${providerName(s.provider)}`}>
-              Open your wallet app, tap “Scan” and point the camera at this code. On this phone? Use “Open wallet
-              app” instead.
+              Open your wallet app, tap “Scan” and point the camera at this code. On this phone? Use
+              “Open wallet app” instead.
             </PaneHeader>
             <div className="flex flex-col items-center gap-5 tablet:flex-row tablet:items-start">
-              <DemoQr value={`wc:globalpool-demo@2?relay-protocol=irn&symKey=${s.expiresAt.toString(16)}`} />
+              <DemoQr
+                value={`wc:globalpool-demo@2?relay-protocol=irn&symKey=${s.expiresAt.toString(16)}`}
+              />
               <ol className="flex flex-col gap-3.5">
-                <NumStep n={1} state="now" title="Scan the code">It only shares your public address</NumStep>
-                <NumStep n={2} state="next" title="Approve in your wallet">No funds move, no gas</NumStep>
-                <NumStep n={3} state="next" title="Verify ownership">A free signed message</NumStep>
+                <NumStep n={1} state="now" title="Scan the code">
+                  It only shares your public address
+                </NumStep>
+                <NumStep n={2} state="next" title="Approve in your wallet">
+                  No funds move, no gas
+                </NumStep>
+                <NumStep n={3} state="next" title="Verify ownership">
+                  A free signed message
+                </NumStep>
               </ol>
             </div>
             <p className="flex items-center gap-2 text-caption text-text-secondary">
               <Clock aria-hidden className="size-4 text-icon-muted" />
-              {s.expiresAt > now ? `Connection link expires in ${formatCountdown(s.expiresAt - now)}` : 'This code expired — go back and choose the wallet again.'}
+              {s.expiresAt > now
+                ? `Connection link expires in ${formatCountdown(s.expiresAt - now)}`
+                : 'This code expired — go back and choose the wallet again.'}
               {demo && <DemoBadge size="xs" />}
             </p>
             <SeedNotice />
             {demo && (
-              <Button variant="secondary" size="l" onClick={() => void run(s.provider)} disabled={s.expiresAt <= now}>
-                DEV MOCK: simulate the wallet scanning this code
+              <Button
+                variant="secondary"
+                size="l"
+                onClick={() => void run(s.provider)}
+                disabled={s.expiresAt <= now}
+              >
+                Simulate the scan (DEV MOCK)
               </Button>
             )}
           </>
@@ -275,19 +356,32 @@ export function ConnectWalletDialog({
         {s.step === 'connecting' && (
           <>
             <PaneHeader icon={RefreshCw} title={`Approve in ${providerName(s.provider)}`}>
-              Your wallet is asking you to connect to GLOBAL POOL. It can see your address and ask you to sign
-              messages — it can never move funds without your approval.
+              Your wallet is asking you to connect to GLOBAL POOL. It can see your address and ask
+              you to sign messages — it can never move funds without your approval.
             </PaneHeader>
-            <div role="status" className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface-raised px-4 py-3.5">
+            <div
+              role="status"
+              className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface-raised px-4 py-3.5"
+            >
               <WalletMark id={s.provider} />
               <div className="flex flex-1 flex-col gap-0.5">
-                <p className="text-body-s-strong text-text-primary">Waiting for you to tap Connect…</p>
-                <p className="text-caption text-text-tertiary">Check the wallet extension or app.</p>
+                <p className="text-body-s-strong text-text-primary">
+                  Waiting for you to tap Connect…
+                </p>
+                <p className="text-caption text-text-tertiary">
+                  Check the wallet extension or app.
+                </p>
               </div>
               <RefreshCw aria-hidden className="size-5 animate-spin text-icon-brand" />
             </div>
             <SeedNotice />
-            <ActionsRow right={<Button variant="ghost" size="l" onClick={() => onStateChange({ step: 'list' })}>Cancel</Button>} />
+            <ActionsRow
+              right={
+                <Button variant="ghost" size="l" onClick={() => onStateChange({ step: 'list' })}>
+                  Cancel
+                </Button>
+              }
+            />
           </>
         )}
         {s.step === 'rejected' && (
@@ -299,21 +393,47 @@ export function ConnectWalletDialog({
               Make sure the wallet is unlocked and on Arbitrum, then choose it again.
             </Callout>
             <ActionsRow
-              left={<Button variant="ghost" size="l" onClick={() => onStateChange({ step: 'list' })}>Choose another wallet</Button>}
-              right={<Button size="l" leadingIcon={<RefreshCw />} onClick={() => void run(s.provider)}>Try again</Button>}
+              left={
+                <Button variant="ghost" size="l" onClick={() => onStateChange({ step: 'list' })}>
+                  Choose another wallet
+                </Button>
+              }
+              right={
+                <Button size="l" leadingIcon={<RefreshCw />} onClick={() => void run(s.provider)}>
+                  Try again
+                </Button>
+              }
             />
           </>
         )}
         {s.step === 'wrong-network' && (
           <>
             <PaneHeader icon={TriangleAlert} tone="warning" title="Switch network">
-              Your wallet is on chain ID {s.conn.chainId}. Deposits and withdrawals only work on Arbitrum. Switching is
-              free and no funds move — your wallet will ask you to approve it.
+              Your wallet is on chain ID {s.conn.chainId}. Deposits and withdrawals only work on
+              Arbitrum. Switching is free and no funds move — your wallet will ask you to approve
+              it.
             </PaneHeader>
-            <WalletRow conn={s.conn} demo={demo} badge={<StatusBadge status="restricted" label={`Unsupported · chain ID ${s.conn.chainId}`} size="s" />} />
-            <Note icon={Globe}>Supported now: Arbitrum (Sepolia testnet in this DEMO). BNB Chain, Polygon, Ethereum and Solana are coming soon.</Note>
+            <WalletRow
+              conn={s.conn}
+              demo={demo}
+              badge={
+                <StatusBadge
+                  status="restricted"
+                  label={`Unsupported · chain ID ${s.conn.chainId}`}
+                  size="s"
+                />
+              }
+            />
+            <Note icon={Globe}>
+              Supported now: Arbitrum (Sepolia testnet in this DEMO). BNB Chain, Polygon, Ethereum
+              and Solana are coming soon.
+            </Note>
             <ActionsRow
-              left={<Button variant="ghost" size="l" leadingIcon={<LogOut />} onClick={close}>Disconnect</Button>}
+              left={
+                <Button variant="ghost" size="l" leadingIcon={<LogOut />} onClick={close}>
+                  Disconnect
+                </Button>
+              }
               right={
                 <Button
                   size="l"
@@ -323,7 +443,11 @@ export function ConnectWalletDialog({
                       const conn = await core.wallet.switchToArbitrum(s.conn);
                       onStateChange({ step: 'success', conn });
                     } catch (err) {
-                      onStateChange({ step: 'rejected', provider: s.conn.provider, message: err instanceof Error ? err.message : 'Switch declined.' });
+                      onStateChange({
+                        step: 'rejected',
+                        provider: s.conn.provider,
+                        message: err instanceof Error ? err.message : 'Switch declined.',
+                      });
                     }
                   }}
                 >
@@ -336,16 +460,29 @@ export function ConnectWalletDialog({
         {s.step === 'success' && (
           <>
             <PaneHeader icon={CircleCheck} tone="success" title="Wallet connected">
-              {providerName(s.conn.provider)} {shortAddress(s.conn.address)} on {CHAIN_NAME[s.conn.chainId] ?? 'Arbitrum'}.
-              Verify ownership before your first withdrawal.
+              {providerName(s.conn.provider)} {shortAddress(s.conn.address)} on{' '}
+              {CHAIN_NAME[s.conn.chainId] ?? 'Arbitrum'}. Verify ownership before your first
+              withdrawal.
             </PaneHeader>
-            <WalletRow conn={s.conn} demo={demo} badge={<StatusBadge status="pending" label="Ownership pending" size="s" />} />
+            <WalletRow
+              conn={s.conn}
+              demo={demo}
+              badge={<StatusBadge status="pending" label="Ownership pending" size="s" />}
+            />
             <Point icon={KeyRound} title="Verify ownership — free">
               You sign a short message. It’s not a transaction, costs no gas and can’t move funds.
             </Point>
             <ActionsRow
-              left={<Button variant="ghost" size="l" onClick={close}>Later</Button>}
-              right={<Button size="l" leadingIcon={<ShieldCheck />} onClick={() => onVerify(s.conn)}>Verify ownership</Button>}
+              left={
+                <Button variant="ghost" size="l" onClick={close}>
+                  Later
+                </Button>
+              }
+              right={
+                <Button size="l" leadingIcon={<ShieldCheck />} onClick={() => onVerify(s.conn)}>
+                  Verify ownership
+                </Button>
+              }
             />
           </>
         )}
@@ -356,20 +493,44 @@ export function ConnectWalletDialog({
 
 // ── AUTH-10 verify ownership ──────────────────────────────────────────────────────────────────
 
-function MessageBox({ request, expired = false, demo }: { request: WalletSignatureRequest; expired?: boolean; demo: boolean }) {
+function MessageBox({
+  request,
+  expired = false,
+  demo,
+}: {
+  request: WalletSignatureRequest;
+  expired?: boolean;
+  demo: boolean;
+}) {
   return (
-    <div className={cn('flex flex-col gap-2.5 rounded-md border bg-bg-secondary px-4 pt-3.5 pb-4', expired ? 'border-border-subtle' : 'border-border-default')}>
+    <div
+      className={cn(
+        'flex flex-col gap-2.5 rounded-md border bg-bg-secondary px-4 pt-3.5 pb-4',
+        expired ? 'border-border-subtle' : 'border-border-default',
+      )}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <FileText aria-hidden className="size-4 text-icon-muted" />
-        <span className="flex-1 text-label-s text-text-secondary">{expired ? 'Expired message' : 'Message you’ll sign'}</span>
+        <span className="flex-1 text-label-s text-text-secondary">
+          {expired ? 'Expired message' : 'Message you’ll sign'}
+        </span>
         {expired ? (
-          <StatusBadge status="expired" label={`Expired ${formatUtcTime(request.expiresAt)}`} size="s" />
+          <StatusBadge
+            status="expired"
+            label={`Expired ${formatUtcTime(request.expiresAt)}`}
+            size="s"
+          />
         ) : (
           <span className="text-caption text-text-tertiary">Issued by GLOBAL POOL</span>
         )}
         {demo && <DemoBadge size="xs" />}
       </div>
-      <pre className={cn('font-mono text-mono-s whitespace-pre-wrap break-all', expired ? 'text-text-tertiary' : 'text-text-primary')}>
+      <pre
+        className={cn(
+          'font-mono text-mono-s whitespace-pre-wrap break-all',
+          expired ? 'text-text-tertiary' : 'text-text-primary',
+        )}
+      >
         {request.message}
       </pre>
     </div>
@@ -399,7 +560,9 @@ function DemoWalletPopup({
         <WalletMark id={conn.provider} />
         <div className="flex flex-1 flex-col">
           <span className="text-label-m text-text-primary">{providerName(conn.provider)}</span>
-          <span className="font-mono text-mono-s text-text-tertiary">Account 1 · {shortAddress(conn.address)}</span>
+          <span className="font-mono text-mono-s text-text-tertiary">
+            Account 1 · {shortAddress(conn.address)}
+          </span>
         </div>
         <DemoBadge size="xs" label="Mock wallet" />
       </div>
@@ -407,7 +570,9 @@ function DemoWalletPopup({
       <pre className="max-h-32 overflow-y-auto rounded-md border border-border-subtle bg-bg-secondary p-3 font-mono text-mono-s whitespace-pre-wrap break-all text-text-primary">
         {request.message}
       </pre>
-      <Note icon={ShieldCheck} tone="info">Signing is free. This is not a transaction and can’t move funds.</Note>
+      <Note icon={ShieldCheck} tone="info">
+        Signing is free. This is not a transaction and can’t move funds.
+      </Note>
       <div className="grid grid-cols-2 gap-2">
         <Button variant="secondary" onClick={onReject} disabled={busy}>
           Reject
@@ -447,7 +612,9 @@ export function VerifyWalletDialog({
         // Privy: ask the real wallet straight away.
         if (core.mode === 'privy' && requested.current === key) void sign(state.conn, request);
       })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Couldn’t prepare the message.'));
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : 'Couldn’t prepare the message.'),
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.step, state?.step === 'request' ? state.request : null]);
 
@@ -467,11 +634,13 @@ export function VerifyWalletDialog({
       await core.wallet.link(conn, request, signature);
       await authApi.session(); // sync the linked wallet into the API (user_wallets)
       await qc.invalidateQueries({
-        predicate: (q) => ['auth', 'me', 'wallet', 'wallets', 'users'].includes(String(q.queryKey[0])),
+        predicate: (q) =>
+          ['auth', 'me', 'wallet', 'wallets', 'users'].includes(String(q.queryKey[0])),
       });
       onStateChange({ step: 'success', conn, request, signature, at: new Date().toISOString() });
     } catch (err) {
-      if (err instanceof AuthFlowError && err.kind === 'rejected') onStateChange({ step: 'rejected', conn });
+      if (err instanceof AuthFlowError && err.kind === 'rejected')
+        onStateChange({ step: 'rejected', conn });
       else {
         setError(err instanceof Error ? err.message : 'Verification failed.');
         onStateChange({ step: 'request', conn, request, signing: false });
@@ -488,76 +657,128 @@ export function VerifyWalletDialog({
   } as const;
 
   return (
-    <AuthModal open={s !== null} onOpenChange={(o) => !o && close()} title={s ? titles[s.step] : 'Verify wallet'} size="m">
+    <AuthModal
+      open={s !== null}
+      onOpenChange={(o) => !o && close()}
+      title={s ? titles[s.step] : 'Verify wallet'}
+      size={demo && s?.step === 'request' ? 'l' : 'm'}
+    >
       {s && (
         <Pane onClose={close} top={<span className="sr-only">Verify wallet ownership</span>}>
           {s.step === 'request' && (
-            <>
-              <PaneHeader icon={KeyRound} overline="Verify ownership · Step 2 of 2" title={titles.request}>
-                This proves you control {shortAddress(s.conn.address)}. It’s free — signing a message is not a
-                transaction and can’t move funds.
-              </PaneHeader>
-              <WalletRow conn={s.conn} demo={demo} />
-              {s.request ? <MessageBox request={s.request} demo={demo} /> : <div className="h-36 animate-pulse rounded-md bg-surface-default" aria-busy />}
-              <div className="flex flex-wrap gap-2">
-                <Chip>No transaction</Chip>
-                <Chip>No gas · 0.00</Chip>
-                <Chip>Can’t move funds</Chip>
-              </div>
-              {s.request && (
-                <div role="status" className="flex items-center gap-3 rounded-md border border-border-subtle bg-surface-raised px-4 py-3">
-                  <RefreshCw aria-hidden className={cn('size-5 text-icon-brand', s.signing && 'animate-spin')} />
-                  <div className="flex flex-1 flex-col gap-0.5">
-                    <p className="text-body-s-strong text-text-primary">
-                      Waiting for your signature in {providerName(s.conn.provider)}…
-                    </p>
-                    <p className="text-caption text-text-tertiary">
-                      Expires at {formatUtcTime(s.request.expiresAt)} · {formatCountdown(Date.parse(s.request.expiresAt) - now)} left
-                    </p>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
+              <div className="flex min-w-0 flex-col gap-6">
+                <PaneHeader
+                  icon={KeyRound}
+                  overline="Verify ownership · Step 2 of 2"
+                  title={titles.request}
+                >
+                  This proves you control {shortAddress(s.conn.address)}. It’s free — signing a
+                  message is not a transaction and can’t move funds.
+                </PaneHeader>
+                <WalletRow conn={s.conn} demo={demo} />
+                {s.request ? (
+                  <MessageBox request={s.request} demo={demo} />
+                ) : (
+                  <div className="h-36 animate-pulse rounded-md bg-surface-default" aria-busy />
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Chip>No transaction</Chip>
+                  <Chip>No gas · 0.00</Chip>
+                  <Chip>Can’t move funds</Chip>
+                </div>
+                {s.request && (
+                  <div
+                    role="status"
+                    className="flex items-center gap-3 rounded-md border border-border-subtle bg-surface-raised px-4 py-3"
+                  >
+                    <RefreshCw
+                      aria-hidden
+                      className={cn('size-5 text-icon-brand', s.signing && 'animate-spin')}
+                    />
+                    <div className="flex flex-1 flex-col gap-0.5">
+                      <p className="text-body-s-strong text-text-primary">
+                        Waiting for your signature in {providerName(s.conn.provider)}…
+                      </p>
+                      <p className="text-caption text-text-tertiary">
+                        Expires at {formatUtcTime(s.request.expiresAt)} ·{' '}
+                        {formatCountdown(Date.parse(s.request.expiresAt) - now)} left
+                      </p>
+                    </div>
                   </div>
+                )}
+                {error && (
+                  <Callout tone="danger" title="Verification failed">
+                    {error}
+                  </Callout>
+                )}
+                <Note icon={ShieldCheck} tone="brand">
+                  Only sign if the message starts with “GLOBAL POOL wants you to sign in” and comes
+                  from this site. Never sign anything that asks to approve tokens or send funds.
+                </Note>
+                <ActionsRow
+                  left={
+                    <Button variant="ghost" size="l" onClick={close}>
+                      Cancel
+                    </Button>
+                  }
+                  right={
+                    !demo && s.request ? (
+                      <Button
+                        variant="secondary"
+                        size="l"
+                        leadingIcon={<ExternalLink />}
+                        onClick={() => void sign(s.conn, s.request!)}
+                        disabled={s.signing}
+                      >
+                        Open wallet again
+                      </Button>
+                    ) : null
+                  }
+                />
+              </div>
+              {demo && s.request && (
+                <div className="lg:sticky lg:top-0">
+                  <DemoWalletPopup
+                    conn={s.conn}
+                    request={s.request}
+                    busy={s.signing}
+                    onSign={() => void sign(s.conn, s.request!)}
+                    onReject={() => onStateChange({ step: 'rejected', conn: s.conn })}
+                  />
                 </div>
               )}
-              {error && (
-                <Callout tone="danger" title="Verification failed">
-                  {error}
-                </Callout>
-              )}
-              {demo && s.request && (
-                <DemoWalletPopup
-                  conn={s.conn}
-                  request={s.request}
-                  busy={s.signing}
-                  onSign={() => void sign(s.conn, s.request!)}
-                  onReject={() => onStateChange({ step: 'rejected', conn: s.conn })}
-                />
-              )}
-              <Note icon={ShieldCheck} tone="brand">
-                Only sign if the message starts with “GLOBAL POOL wants you to sign in” and comes from this site.
-                Never sign anything that asks to approve tokens or send funds.
-              </Note>
-              <ActionsRow
-                left={<Button variant="ghost" size="l" onClick={close}>Cancel</Button>}
-                right={
-                  !demo && s.request ? (
-                    <Button variant="secondary" size="l" leadingIcon={<ExternalLink />} onClick={() => void sign(s.conn, s.request!)} disabled={s.signing}>
-                      Open wallet again
-                    </Button>
-                  ) : null
-                }
-              />
-            </>
+            </div>
           )}
           {s.step === 'success' && (
             <>
-              <PaneHeader icon={CircleCheck} tone="success" overline="Wallet verified" title={titles.success}>
-                Your signature matched {shortAddress(s.conn.address)}. You can deposit from it now and add it as a
-                withdrawal address.
+              <PaneHeader
+                icon={CircleCheck}
+                tone="success"
+                overline="Wallet verified"
+                title={titles.success}
+              >
+                Your signature matched {shortAddress(s.conn.address)}. You can deposit from it now
+                and add it as a withdrawal address.
               </PaneHeader>
-              <WalletRow conn={s.conn} demo={demo} badge={<StatusBadge status="approved" label="Verified" size="s" />} />
+              <WalletRow
+                conn={s.conn}
+                demo={demo}
+                badge={<StatusBadge status="approved" label="Verified" size="s" />}
+              />
               <KeyValueBox>
                 <KeyValue label="Verified" value={formatUtcDateTime(s.at)} demo={demo} />
-                <KeyValue label="Signature" value={`${s.signature.slice(0, 6)}…${s.signature.slice(-4)}`} mono demo={demo} />
-                <KeyValue label="Nonce" value={`${s.request.nonce.slice(0, 6)}… · used, can’t be reused`} mono />
+                <KeyValue
+                  label="Signature"
+                  value={`${s.signature.slice(0, 6)}…${s.signature.slice(-4)}`}
+                  mono
+                  demo={demo}
+                />
+                <KeyValue
+                  label="Nonce"
+                  value={`${s.request.nonce.slice(0, 6)}… · used, can’t be reused`}
+                  mono
+                />
                 <KeyValue label="Transaction" value="None — gas spent 0.00" last />
               </KeyValueBox>
               <Point icon={ArrowDownToLine} title="Deposit USDT from this wallet" tile>
@@ -567,7 +788,11 @@ export function VerifyWalletDialog({
                 Add it to your whitelist — new withdrawal addresses have a 24-hour cooldown.
               </Point>
               <ActionsRow
-                left={<Button variant="ghost" size="l" onClick={close}>Done</Button>}
+                left={
+                  <Button variant="ghost" size="l" onClick={close}>
+                    Done
+                  </Button>
+                }
                 right={
                   <>
                     <Button asChild variant="secondary" size="l" onClick={close}>
@@ -583,29 +808,57 @@ export function VerifyWalletDialog({
           )}
           {s.step === 'rejected' && (
             <>
-              <PaneHeader icon={CircleX} tone="danger" overline="Signature declined" title={titles.rejected}>
-                Nothing happened: no transaction was sent and no fees were charged. The wallet stays connected but
-                unverified.
+              <PaneHeader
+                icon={CircleX}
+                tone="danger"
+                overline="Signature declined"
+                title={titles.rejected}
+              >
+                Nothing happened: no transaction was sent and no fees were charged. The wallet stays
+                connected but unverified.
               </PaneHeader>
-              <WalletRow conn={s.conn} demo={demo} badge={<StatusBadge status="pending" label="Unverified" size="s" />} />
+              <WalletRow
+                conn={s.conn}
+                demo={demo}
+                badge={<StatusBadge status="pending" label="Unverified" size="s" />}
+              />
               <Callout tone="info" title="Why we ask for a signature">
-                It’s the only way to prove the wallet is yours without moving any funds. Unverified wallets can’t be
-                used for withdrawals.
+                It’s the only way to prove the wallet is yours without moving any funds. Unverified
+                wallets can’t be used for withdrawals.
               </Callout>
               <div className="flex flex-col gap-3.5">
                 <p className="text-label-m text-text-primary">What you can do</p>
                 <Point icon={RefreshCw} title="Try again">
-                  We’ll send a fresh message with a new nonce — check it starts with “GLOBAL POOL wants you to sign in”.
+                  We’ll send a fresh message with a new nonce — check it starts with “GLOBAL POOL
+                  wants you to sign in”.
                 </Point>
-                <Point icon={Wallet} title="Use a different wallet">Disconnect this one and connect another.</Point>
+                <Point icon={Wallet} title="Use a different wallet">
+                  Disconnect this one and connect another.
+                </Point>
                 <Point icon={Clock} title="Verify later">
-                  You can deposit and play from your balance. Verify any time in Wallet → Connected wallets.
+                  You can deposit and play from your balance. Verify any time in Wallet → Connected
+                  wallets.
                 </Point>
               </div>
               <ActionsRow
-                left={<Button variant="ghost" size="l" onClick={close}>Later</Button>}
+                left={
+                  <Button variant="ghost" size="l" onClick={close}>
+                    Later
+                  </Button>
+                }
                 right={
-                  <Button size="l" leadingIcon={<RefreshCw />} onClick={() => onStateChange({ step: 'request', conn: s.conn, request: null, signing: false })}>
+                  <Button
+                    size="l"
+                    leadingIcon={<RefreshCw />}
+                    onClick={() =>
+                      onStateChange({
+                        step: 'request',
+                        conn: s.conn,
+                        request: null,
+                        signing: false,
+                      })
+                    }
+                  >
                     Try again
                   </Button>
                 }
@@ -614,19 +867,45 @@ export function VerifyWalletDialog({
           )}
           {s.step === 'expired' && (
             <>
-              <PaneHeader icon={Clock} tone="warning" overline="Request expired" title={titles.expired}>
-                Each message works once and expires 10 minutes after it’s issued. This one was issued at{' '}
-                {formatUtcTime(s.request.issuedAt)} and expired at {formatUtcTime(s.request.expiresAt)}.
+              <PaneHeader
+                icon={Clock}
+                tone="warning"
+                overline="Request expired"
+                title={titles.expired}
+              >
+                Each message works once and expires 10 minutes after it’s issued. This one was
+                issued at {formatUtcTime(s.request.issuedAt)} and expired at{' '}
+                {formatUtcTime(s.request.expiresAt)}.
               </PaneHeader>
-              <WalletRow conn={s.conn} demo={demo} badge={<StatusBadge status="pending" label="Unverified" size="s" />} />
+              <WalletRow
+                conn={s.conn}
+                demo={demo}
+                badge={<StatusBadge status="pending" label="Unverified" size="s" />}
+              />
               <MessageBox request={s.request} expired demo={demo} />
               <Callout tone="warning" title="Still see the old request in your wallet?">
-                Reject it there. Signing an expired message does nothing — we only accept the newest nonce, once.
+                Reject it there. Signing an expired message does nothing — we only accept the newest
+                nonce, once.
               </Callout>
               <ActionsRow
-                left={<Button variant="ghost" size="l" onClick={close}>Cancel</Button>}
+                left={
+                  <Button variant="ghost" size="l" onClick={close}>
+                    Cancel
+                  </Button>
+                }
                 right={
-                  <Button size="l" leadingIcon={<RefreshCw />} onClick={() => onStateChange({ step: 'request', conn: s.conn, request: null, signing: false })}>
+                  <Button
+                    size="l"
+                    leadingIcon={<RefreshCw />}
+                    onClick={() =>
+                      onStateChange({
+                        step: 'request',
+                        conn: s.conn,
+                        request: null,
+                        signing: false,
+                      })
+                    }
+                  >
                     Get a new message
                   </Button>
                 }
