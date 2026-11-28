@@ -70,10 +70,16 @@ export function AddressChip({
           aria-label={copied ? 'Copied' : `Copy ${display}`}
           className={cn(
             'inline-flex size-6 items-center justify-center rounded-full transition-colors',
-            copied ? 'text-text-success' : 'text-icon-muted hover:bg-surface-hover hover:text-icon-default',
+            copied
+              ? 'text-text-success'
+              : 'text-icon-muted hover:bg-surface-hover hover:text-icon-default',
           )}
         >
-          {copied ? <Check aria-hidden className="size-3.5" /> : <Copy aria-hidden className="size-3.5" />}
+          {copied ? (
+            <Check aria-hidden className="size-3.5" />
+          ) : (
+            <Copy aria-hidden className="size-3.5" />
+          )}
         </button>
       )}
       <span role="status" aria-live="polite" className="sr-only">

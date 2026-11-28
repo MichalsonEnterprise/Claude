@@ -19,7 +19,13 @@ export interface StatCardProps {
   className?: string;
 }
 
-function Sparkline({ series, trend }: { series: readonly number[]; trend: 'up' | 'down' | 'neutral' }) {
+function Sparkline({
+  series,
+  trend,
+}: {
+  series: readonly number[];
+  trend: 'up' | 'down' | 'neutral';
+}) {
   const w = 120;
   const h = 36;
   const min = Math.min(...series);
@@ -31,11 +37,23 @@ function Sparkline({ series, trend }: { series: readonly number[]; trend: 'up' |
   ]);
   const line = pts.map(([x, y]) => `${x?.toFixed(1)},${y?.toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1] ?? [w, h / 2];
-  const stroke = trend === 'down' ? 'stroke-status-danger' : trend === 'up' ? 'stroke-brand' : 'stroke-text-tertiary';
-  const fill = trend === 'down' ? 'fill-status-danger' : trend === 'up' ? 'fill-brand' : 'fill-text-tertiary';
+  const stroke =
+    trend === 'down'
+      ? 'stroke-status-danger'
+      : trend === 'up'
+        ? 'stroke-brand'
+        : 'stroke-text-tertiary';
+  const fill =
+    trend === 'down' ? 'fill-status-danger' : trend === 'up' ? 'fill-brand' : 'fill-text-tertiary';
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="h-9 w-28 overflow-visible" aria-hidden>
-      <polyline points={line} className={cn('fill-none', stroke)} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      <polyline
+        points={line}
+        className={cn('fill-none', stroke)}
+        strokeWidth={2}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
       <circle cx={last[0]} cy={last[1]} r={3} className={fill} />
     </svg>
   );
@@ -53,7 +71,8 @@ export function StatCard({
   demo = false,
   className,
 }: StatCardProps) {
-  const TrendIcon = delta?.trend === 'up' ? ArrowUpRight : delta?.trend === 'down' ? ArrowDownRight : ArrowRight;
+  const TrendIcon =
+    delta?.trend === 'up' ? ArrowUpRight : delta?.trend === 'down' ? ArrowDownRight : ArrowRight;
   return (
     <Card padding={size === 'l' ? 'l' : 'm'} className={cn('gap-3', className)}>
       <div className="flex items-center justify-between gap-2">
@@ -69,10 +88,14 @@ export function StatCard({
       </div>
       <div className="flex items-end justify-between gap-3">
         <p className="flex min-w-0 items-baseline gap-1.5">
-          <span className={cn('tabular-nums', size === 'l' ? 'text-number-l' : 'text-number-m')}>{value}</span>
+          <span className={cn('tabular-nums', size === 'l' ? 'text-number-l' : 'text-number-m')}>
+            {value}
+          </span>
           {unit && <span className="text-body-s text-text-secondary">{unit}</span>}
         </p>
-        {series && series.length > 1 && <Sparkline series={series} trend={delta?.trend ?? 'neutral'} />}
+        {series && series.length > 1 && (
+          <Sparkline series={series} trend={delta?.trend ?? 'neutral'} />
+        )}
       </div>
       {delta && (
         <p className="flex flex-wrap items-center gap-2 text-caption text-text-tertiary">

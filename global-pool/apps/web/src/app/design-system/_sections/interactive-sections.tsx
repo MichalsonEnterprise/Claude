@@ -40,7 +40,13 @@ import { OtpInput } from '@/components/ui/otp-input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SearchInput } from '@/components/ui/search-input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Sheet,
   SheetBody,
@@ -54,7 +60,13 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToastCard, toast } from '@/components/ui/sonner';
 import { SwitchField } from '@/components/ui/switch';
-import { DefinitionTooltip, InfoTooltip, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  DefinitionTooltip,
+  InfoTooltip,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { DsSection, Specimen } from './ds';
 
@@ -88,7 +100,12 @@ export function InputsSection() {
           <Input type="email" placeholder="you@example.com" leadingIcon={<Mail />} />
         </Field>
         <Field label="Email (filled)">
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} leadingIcon={<Mail />} />
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            leadingIcon={<Mail />}
+          />
         </Field>
         <Field label="Handle" error="This handle is taken. Try another one.">
           <Input defaultValue="nova.k" leadingIcon={<User />} />
@@ -132,16 +149,59 @@ export function InputsSection() {
           min="20.00"
           demo
         />
-        <AmountInput label="Amount — disabled" value="" onChange={() => undefined} available="0.00" disabled />
+        <AmountInput
+          label="Amount — disabled"
+          value=""
+          onChange={() => undefined}
+          available="0.00"
+          disabled
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 laptop:grid-cols-2">
-        <AddressInput chain="arbitrum" value={addr} onChange={setAddr} onScanRequest={() => toast({ type: 'info', title: 'QR scanning needs camera access', description: 'Coming with the wallet screens.' })} />
-        <AddressInput chain="arbitrum" value="0x12ab…9f3C" onChange={() => undefined} label="Invalid address" />
-        <AddressInput chain="arbitrum" value={addrValid} onChange={() => undefined} label="Whitelisted address" addressStatus="whitelisted" />
-        <AddressInput chain="arbitrum" value="0x3f9a00000000000000000000000000000000c47e" onChange={() => undefined} label="New address (cool-down)" addressStatus="new" />
-        <AddressInput chain="solana" value="7Hq3ZtkPq5xQ8vGm4UoJcYr2NwBsLd9EaFhXk9P" onChange={() => undefined} label="Solana address" />
-        <NetworkSelect value={chain} onValueChange={setChain} helper="Only Arbitrum Sepolia is live in this testnet build." />
+        <AddressInput
+          chain="arbitrum"
+          value={addr}
+          onChange={setAddr}
+          onScanRequest={() =>
+            toast({
+              type: 'info',
+              title: 'QR scanning needs camera access',
+              description: 'Coming with the wallet screens.',
+            })
+          }
+        />
+        <AddressInput
+          chain="arbitrum"
+          value="0x12ab…9f3C"
+          onChange={() => undefined}
+          label="Invalid address"
+        />
+        <AddressInput
+          chain="arbitrum"
+          value={addrValid}
+          onChange={() => undefined}
+          label="Whitelisted address"
+          addressStatus="whitelisted"
+        />
+        <AddressInput
+          chain="arbitrum"
+          value="0x3f9a00000000000000000000000000000000c47e"
+          onChange={() => undefined}
+          label="New address (cool-down)"
+          addressStatus="new"
+        />
+        <AddressInput
+          chain="solana"
+          value="7Hq3ZtkPq5xQ8vGm4UoJcYr2NwBsLd9EaFhXk9P"
+          onChange={() => undefined}
+          label="Solana address"
+        />
+        <NetworkSelect
+          value={chain}
+          onValueChange={setChain}
+          helper="Only Arbitrum Sepolia is live in this testnet build."
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 tablet:grid-cols-2 laptop:grid-cols-3">
@@ -167,7 +227,12 @@ export function InputsSection() {
           <SearchInput shortcut={false} value="" onChange={() => undefined} />
         </Field>
         <Field label="Search S — filled" hideLabel>
-          <SearchInput size="s" value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ('')} />
+          <SearchInput
+            size="s"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onClear={() => setQ('')}
+          />
         </Field>
       </div>
     </DsSection>
@@ -181,7 +246,11 @@ export function SelectsSection() {
   const [consent, setConsent] = React.useState(false);
   const [reminders, setReminders] = React.useState(false);
   return (
-    <DsSection id="selects" title="Selects & controls" description="Select/Field, Control/Checkbox (consents never pre-checked), Control/Toggle (never default ON for spend settings).">
+    <DsSection
+      id="selects"
+      title="Selects & controls"
+      description="Select/Field, Control/Checkbox (consents never pre-checked), Control/Toggle (never default ON for spend settings)."
+    >
       <div className="grid grid-cols-1 gap-6 tablet:grid-cols-3">
         <Field label="Rows per page">
           <Select value={rows} onValueChange={setRows}>
@@ -228,7 +297,11 @@ export function SelectsSection() {
           label="I confirm I am 18+ and located in a permitted jurisdiction"
           description="Required before any gaming or financial action."
         />
-        <CheckboxField checked="indeterminate" label="Indeterminate (select all — 3 of 10 selected)" onCheckedChange={() => undefined} />
+        <CheckboxField
+          checked="indeterminate"
+          label="Indeterminate (select all — 3 of 10 selected)"
+          onCheckedChange={() => undefined}
+        />
         <CheckboxField disabled label="Disabled option" />
         <SwitchField
           checked={reminders}
@@ -259,7 +332,12 @@ export function OverlaysSection() {
           </InfoTooltip>
         </span>
         <span className="text-body-s">
-          Your <DefinitionTooltip term="Owed" definition="Refunds and rewards credited to Available automatically." /> balance
+          Your{' '}
+          <DefinitionTooltip
+            term="Owed"
+            definition="Refunds and rewards credited to Available automatically."
+          />{' '}
+          balance
         </span>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -280,7 +358,9 @@ export function OverlaysSection() {
             <DialogContent size={size}>
               <DialogHeader>
                 <DialogTitle>Cancel withdrawal WD-20931?</DialogTitle>
-                <DialogDescription>1,500.00 USDT returns to your Available balance. No fee is charged.</DialogDescription>
+                <DialogDescription>
+                  1,500.00 USDT returns to your Available balance. No fee is charged.
+                </DialogDescription>
               </DialogHeader>
               <DialogBody>
                 <div className="flex items-center justify-between rounded-md bg-bg-secondary p-4 text-body-s">
@@ -308,7 +388,9 @@ export function OverlaysSection() {
           <SheetContent side="bottom">
             <SheetHeader>
               <SheetTitle>Choose network</SheetTitle>
-              <SheetDescription>Only Arbitrum Sepolia is live in this testnet build.</SheetDescription>
+              <SheetDescription>
+                Only Arbitrum Sepolia is live in this testnet build.
+              </SheetDescription>
             </SheetHeader>
             <SheetBody>
               <NetworkSelect value="arbitrum" size="l" />
@@ -382,18 +464,55 @@ export function OverlaysSection() {
         </Popover>
       </Specimen>
 
-      <Specimen label="Toasts — live (top-right) · static cards" bodyClassName="flex-col items-start">
+      <Specimen
+        label="Toasts — live (top-right) · static cards"
+        bodyClassName="flex-col items-start"
+      >
         <div className="flex flex-wrap gap-3">
-          <Button variant="secondary" size="s" onClick={() => toast({ type: 'success', title: 'Deposit credited', description: 'DP-77380 · 2,500.00 USDT is now Available.' })}>
+          <Button
+            variant="secondary"
+            size="s"
+            onClick={() =>
+              toast({
+                type: 'success',
+                title: 'Deposit credited',
+                description: 'DP-77380 · 2,500.00 USDT is now Available.',
+              })
+            }
+          >
             Success
           </Button>
-          <Button variant="secondary" size="s" onClick={() => toast({ type: 'error', title: 'Withdrawal rejected', description: 'WD-20850 — funds returned to Available.' })}>
+          <Button
+            variant="secondary"
+            size="s"
+            onClick={() =>
+              toast({
+                type: 'error',
+                title: 'Withdrawal rejected',
+                description: 'WD-20850 — funds returned to Available.',
+              })
+            }
+          >
             Error
           </Button>
-          <Button variant="secondary" size="s" onClick={() => toast({ type: 'warning', title: 'Ethereum is congested', description: 'Fees are higher than usual (2.40 USDT).' })}>
+          <Button
+            variant="secondary"
+            size="s"
+            onClick={() =>
+              toast({
+                type: 'warning',
+                title: 'Ethereum is congested',
+                description: 'Fees are higher than usual (2.40 USDT).',
+              })
+            }
+          >
             Warning
           </Button>
-          <Button variant="secondary" size="s" onClick={() => toast({ type: 'info', title: 'Round #1,248 closes at 20:00 UTC' })}>
+          <Button
+            variant="secondary"
+            size="s"
+            onClick={() => toast({ type: 'info', title: 'Round #1,248 closes at 20:00 UTC' })}
+          >
             Info
           </Button>
           <Button
@@ -412,10 +531,26 @@ export function OverlaysSection() {
           </Button>
         </div>
         <div className="grid w-full grid-cols-1 gap-3 laptop:grid-cols-2">
-          <ToastCard type="success" title="Deposit credited" description="DP-77380 · 2,500.00 USDT is now Available." />
-          <ToastCard type="error" title="Withdrawal rejected" description="WD-20850 — destination flagged. Funds returned to Available." />
-          <ToastCard type="warning" title="Ethereum is congested" description="Typical fee 2.40 USDT. Arbitrum is cheaper (0.08)." />
-          <ToastCard type="info" title="Round #1,248 closes at 20:00 UTC" description="You hold 35 entries." />
+          <ToastCard
+            type="success"
+            title="Deposit credited"
+            description="DP-77380 · 2,500.00 USDT is now Available."
+          />
+          <ToastCard
+            type="error"
+            title="Withdrawal rejected"
+            description="WD-20850 — destination flagged. Funds returned to Available."
+          />
+          <ToastCard
+            type="warning"
+            title="Ethereum is congested"
+            description="Typical fee 2.40 USDT. Arbitrum is cheaper (0.08)."
+          />
+          <ToastCard
+            type="info"
+            title="Round #1,248 closes at 20:00 UTC"
+            description="You hold 35 entries."
+          />
           <ToastCard
             type="tx"
             title="Deposit DP-77412 confirming"
@@ -431,17 +566,39 @@ export function OverlaysSection() {
 // ── Feedback ───────────────────────────────────────────────────────────────────────────────────
 
 const ALERTS: { type: AlertType; title: string; body: string; action?: string }[] = [
-  { type: 'info', title: 'Round #1,248 closes at 20:00 UTC', body: 'Entries bought after the close join round #1,249.' },
-  { type: 'warning', title: 'Ethereum is congested', body: 'Deposits may take longer than usual. Arbitrum is unaffected.', action: 'Switch network' },
-  { type: 'security', title: 'New device sign-in — Windows · Edge · Madrid', body: 'If this wasn’t you, secure your account now.', action: 'Review' },
+  {
+    type: 'info',
+    title: 'Round #1,248 closes at 20:00 UTC',
+    body: 'Entries bought after the close join round #1,249.',
+  },
+  {
+    type: 'warning',
+    title: 'Ethereum is congested',
+    body: 'Deposits may take longer than usual. Arbitrum is unaffected.',
+    action: 'Switch network',
+  },
+  {
+    type: 'security',
+    title: 'New device sign-in — Windows · Edge · Madrid',
+    body: 'If this wasn’t you, secure your account now.',
+    action: 'Review',
+  },
   {
     type: 'restricted',
     title: 'Not available in your region',
     body: 'GLOBAL POOL games are not available in your region (United States). You can still view your account and withdraw funds.',
     action: 'Withdraw funds',
   },
-  { type: 'maintenance', title: 'Scheduled maintenance', body: '1 Dec 2026, 02:00–02:30 UTC. Withdrawals are queued, not lost.' },
-  { type: 'regulatory', title: 'Licensed jurisdictions only', body: 'Real-money games require an applicable licence and are available only in permitted jurisdictions. 18+.' },
+  {
+    type: 'maintenance',
+    title: 'Scheduled maintenance',
+    body: '1 Dec 2026, 02:00–02:30 UTC. Withdrawals are queued, not lost.',
+  },
+  {
+    type: 'regulatory',
+    title: 'Licensed jurisdictions only',
+    body: 'Real-money games require an applicable licence and are available only in permitted jurisdictions. 18+.',
+  },
 ];
 
 export function FeedbackSection() {
@@ -459,18 +616,32 @@ export function FeedbackSection() {
             type={a.type}
             title={a.title}
             onDismiss={() => setDismissed((d) => [...d, a.type])}
-            actions={a.action ? <Button size="s" variant="secondary">{a.action}</Button> : undefined}
+            actions={
+              a.action ? (
+                <Button size="s" variant="secondary">
+                  {a.action}
+                </Button>
+              ) : undefined
+            }
           >
             {a.body}
           </Alert>
         ))}
       </div>
       <Specimen label="Full-width banner (pinned under the top bar)" bodyClassName="block">
-        <Alert type="maintenance" layout="full" title="Scheduled maintenance · 1 Dec 2026, 02:00–02:30 UTC" onDismiss={() => undefined}>
+        <Alert
+          type="maintenance"
+          layout="full"
+          title="Scheduled maintenance · 1 Dec 2026, 02:00–02:30 UTC"
+          onDismiss={() => undefined}
+        >
           Games pause for 30 minutes. Balances and withdrawals are safe.
         </Alert>
       </Specimen>
-      <Specimen label="Skeleton (shimmer; static under reduced motion)" bodyClassName="items-stretch grid w-full grid-cols-1 gap-3 tablet:grid-cols-3">
+      <Specimen
+        label="Skeleton (shimmer; static under reduced motion)"
+        bodyClassName="items-stretch grid w-full grid-cols-1 gap-3 tablet:grid-cols-3"
+      >
         <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface-default p-5">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-8 w-40" />
@@ -505,7 +676,11 @@ export function FeedbackSection() {
             type="no-results"
             title="No results"
             description="No transactions match these filters."
-            actions={<Button size="s" variant="secondary">Clear all filters</Button>}
+            actions={
+              <Button size="s" variant="secondary">
+                Clear all filters
+              </Button>
+            }
           />
         </div>
         <div className="rounded-lg border border-border-subtle bg-surface-default">
@@ -514,7 +689,11 @@ export function FeedbackSection() {
             title="Couldn't load transactions"
             description="Your balances are safe. Please try again."
             reference="ERR-7F3A-2291"
-            actions={<Button size="s" variant="secondary">Try again</Button>}
+            actions={
+              <Button size="s" variant="secondary">
+                Try again
+              </Button>
+            }
           />
         </div>
       </div>
@@ -534,31 +713,58 @@ export function JackpotSection() {
       description="Rolling gold digits (1200 ms, instant under prefers-reduced-motion). Countdowns derive from the absolute close time — never fake timers. These use a DEMO clock anchored at 16:42:18 UTC."
     >
       <div className="grid grid-cols-1 items-start gap-6 laptop:grid-cols-2">
-        <div className="flex flex-col items-start gap-4">
-          <JackpotMeter amount={pool} size="xl" live demo caption="Platform fees (932.00 USDT) are not part of the pool." className="w-full" />
+        <div className="flex flex-col gap-4">
+          <JackpotMeter
+            amount={pool}
+            size="xl"
+            live
+            demo
+            caption="Platform fees (932.00 USDT) are not part of the pool."
+            className="w-full"
+          />
           <div className="flex flex-wrap gap-2">
-            <Button size="s" variant="secondary" onClick={() => setPool(add(pool, '10.00').toFixed(2))}>
+            <Button
+              size="s"
+              variant="secondary"
+              onClick={() => setPool(add(pool, '10.00').toFixed(2))}
+            >
               +1 entry (10.00)
             </Button>
-            <Button size="s" variant="secondary" onClick={() => setPool(add(pool, '350.00').toFixed(2))}>
+            <Button
+              size="s"
+              variant="secondary"
+              onClick={() => setPool(add(pool, '350.00').toFixed(2))}
+            >
               +35 entries
             </Button>
             <Button size="s" variant="ghost" onClick={() => setPool(base)}>
               Reset
             </Button>
           </div>
-          <div className="flex flex-wrap items-start gap-4">
+          <div className="grid grid-cols-1 items-center gap-4 tablet:grid-cols-2">
             <JackpotMeter amount={pool} size="l" demo />
             <JackpotMeter amount={pool} size="m" bare caption={null} />
           </div>
         </div>
         <div className="flex flex-col gap-6">
-          <Specimen label="Countdown L / M / S (to 27 Nov 2026, 20:00 UTC)" bodyClassName="flex-col items-stretch">
+          <Specimen
+            label="Countdown L / M / S (to 27 Nov 2026, 20:00 UTC)"
+            bodyClassName="flex-col items-stretch"
+          >
             <Countdown closesAt={DEMO_CURRENT_ROUND.closesAt} demoNow={DEMO_NOW} size="l" />
             <Countdown closesAt={DEMO_CURRENT_ROUND.closesAt} demoNow={DEMO_NOW} size="m" />
-            <Countdown closesAt={DEMO_CURRENT_ROUND.closesAt} demoNow={DEMO_NOW} size="s" caption={null} className="w-fit" />
+            <Countdown
+              closesAt={DEMO_CURRENT_ROUND.closesAt}
+              demoNow={DEMO_NOW}
+              size="s"
+              caption={null}
+              className="w-fit"
+            />
           </Specimen>
-          <Specimen label="Countdown — real clock (round already closed)" bodyClassName="flex-col items-stretch">
+          <Specimen
+            label="Countdown — real clock (round already closed)"
+            bodyClassName="flex-col items-stretch"
+          >
             <Countdown closesAt={DEMO_CURRENT_ROUND.closesAt} size="m" />
           </Specimen>
         </div>

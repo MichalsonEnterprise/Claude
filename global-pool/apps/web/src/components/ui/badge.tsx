@@ -180,7 +180,9 @@ export function VipBadge({
     <span
       className={cn(
         'inline-flex items-center gap-1 rounded-full border font-semibold leading-none',
-        size === 's' ? 'h-5 px-2 text-[11px] [&_svg]:size-3' : 'h-6 px-2.5 text-label-s [&_svg]:size-3.5',
+        size === 's'
+          ? 'h-5 px-2 text-[11px] [&_svg]:size-3'
+          : 'h-6 px-2.5 text-label-s [&_svg]:size-3.5',
         VIP_CLASSES[tier],
         className,
       )}

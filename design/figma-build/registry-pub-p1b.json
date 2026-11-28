@@ -1,0 +1,12 @@
+{
+ "_note": "PUB-14/18/20/23 agent (slice pub-p1b). No new library components. Entries are the SECTION and SCREEN FRAMES for page-index links. Desktop frames on page '03 — Public Website' were built by the interrupted earlier run (found by the 28 Nov 2026 continuation inventory). Mobile 390 frames (page '10 — Mobile Experience', section 'PUB-14/18/20/23 — Mobile' at X=35000, Y=0) are NOT BUILT: 3 consecutive Figma MCP limit errors. Ready-to-run idempotent scripts: design/figma-build/pending/pub-14-18-20-23/ (README.md, RUN-ORDER.json).",
+ "Section/PUB-14/18/20/23 FAQ, RG, Restricted, Cookies (page 03)": { "id": "33:205847" },
+ "[PUB-14] FAQ / 1440 / Default — All questions": { "id": "33:205848" },
+ "[PUB-14] FAQ / 1440 / Search results — “withdraw”": { "id": "33:242174" },
+ "[PUB-14] FAQ / 1440 / Search — no results “bonus code”": { "id": "36:534066" },
+ "[PUB-18] Responsible Gaming / 1440 / Default": { "id": "33:279676" },
+ "[PUB-20] Restricted Countries / 1440 / Default — grouped list": { "id": "33:323120" },
+ "[PUB-20] Restricted Countries / 1440 / Search — “united”": { "id": "34:356600" },
+ "[PUB-23] Cookie Consent / 1440 / Banner — first visit": { "id": "34:396216", "note": "1440x1024 fixed viewport" },
+ "[PUB-23] Cookie Consent / 1440 / Preferences modal": { "id": "34:409284", "note": "1440x1024 fixed viewport" }
+}

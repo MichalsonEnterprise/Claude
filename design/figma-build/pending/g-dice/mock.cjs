@@ -45,7 +45,7 @@ const figma = {
   },
   async getLocalTextStylesAsync() { return TSN.map(n => ({ name: n, id: 's' + n })); },
   async getLocalEffectStylesAsync() { return ESN.map(n => ({ name: n, id: 'e' + n })); },
-  async getLocalPaintStylesAsync() { return []; }, async getLocalGridStylesAsync() { return []; },
+  async getLocalPaintStylesAsync() { return ['Gradient/Skeleton','Gradient/Gold Jackpot','Gradient/Brand Glow'].map(n => ({ name: n, id: 'p' + n })); }, async getLocalGridStylesAsync() { return []; },
   async loadFontAsync() { },
   async getNodeByIdAsync(id) { if (id === '4:797' || id === '6:159' || /^4:\d+$/.test(id)) { const c = node('COMPONENT', { name: 'Comp ' + id }); c.createInstance = () => makeInstance('Inst of ' + id); return c; } return getComp(id); },
   createAutoLayout(dir = 'HORIZONTAL') { const f = node('FRAME', { layoutMode: dir }); figma.currentPage.appendChild(f); return f; },

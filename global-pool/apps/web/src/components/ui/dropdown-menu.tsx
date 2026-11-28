@@ -85,7 +85,10 @@ export function DropdownMenuRadioItem({
   );
 }
 
-export function DropdownMenuLabel({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
+export function DropdownMenuLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
   return (
     <DropdownMenuPrimitive.Label
       className={cn('px-3 pt-2 pb-1 text-overline uppercase text-text-tertiary', className)}
@@ -98,7 +101,12 @@ export function DropdownMenuSeparator({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border-subtle', className)} {...props} />;
+  return (
+    <DropdownMenuPrimitive.Separator
+      className={cn('-mx-1 my-1 h-px bg-border-subtle', className)}
+      {...props}
+    />
+  );
 }
 
 export function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<'span'>) {
@@ -111,7 +119,10 @@ export function DropdownMenuSubTrigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger>) {
   return (
-    <DropdownMenuPrimitive.SubTrigger className={cn(item, 'data-[state=open]:bg-surface-hover', className)} {...props}>
+    <DropdownMenuPrimitive.SubTrigger
+      className={cn(item, 'data-[state=open]:bg-surface-hover', className)}
+      {...props}
+    >
       {children}
       <ChevronRight aria-hidden className="ml-auto" />
     </DropdownMenuPrimitive.SubTrigger>

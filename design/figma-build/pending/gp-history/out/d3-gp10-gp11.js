@@ -102,7 +102,7 @@ function tc(n, name, color, ix = 0) { const t = n.findAll(x => x.type === 'TEXT'
 function card(name, o = {}) { return AL('VERTICAL', { name, p: o.p ?? 24, gap: o.gap ?? 16, fill: o.fill || 'surface/default', stroke: o.stroke || 'border/subtle', r: o.r ?? 14 }); }
 function row(name, o = {}) { return AL('HORIZONTAL', Object.assign({ name, gap: 12, align: 'CENTER' }, o)); }
 function col(name, o = {}) { return AL('VERTICAL', Object.assign({ name, gap: 8 }, o)); }
-function spacer() { return AL('HORIZONTAL', { name: 'Spacer' }); }
+function spacer() { const s = AL('HORIZONTAL', { name: 'Spacer' }); s.resize(1, 1); return s; }
 function line() { return rect(10, 1, 'border/subtle', 0, 'Divider'); }
 async function kv(k, v, o = {}) { const r = AL('HORIZONTAL', { name: 'KV ' + k, gap: 12, align: 'CENTER', justify: 'SPACE_BETWEEN' }); const kt = await T(k, o.ks || 'Body/S', 'text/secondary'); const vr = AL('HORIZONTAL', { name: 'Value', gap: 6, align: 'CENTER' }); if (o.icon) add(vr, await IC(o.icon, 16, o.ic || 'icon/muted')); if (o.node) add(vr, o.node); else add(vr, await T(v, o.vs || 'Body/S Strong', o.vc || 'text/primary', o.vw ? { w: o.vw, align: 'RIGHT' } : {})); if (o.demo) add(vr, await DEMO('XS')); add(r, kt, vr); return r; }
 async function ttl(t, o = {}) { const r = row('Title — ' + t.slice(0, 30), { gap: 8 }); add(r, await T(t, o.s || 'Heading/H5', 'text/primary')); if (o.demo !== false) add(r, await DEMO(o.ds || 'S')); if (o.right) { add(r, [spacer(), 'FILL']); for (const x of [].concat(o.right)) add(r, x); } return r; }
@@ -172,7 +172,7 @@ const { f, main } = await shell(NAME, 'My entries', 3240, 160);
 add(main, [await phead(['Global Pool', 'Entry history'], 'Entry history', 'Every entry you bought, what you paid for it and what happened to it. Each entry costs 10.00 USDT plus a 0.05 USDT platform fee and is paid from your platform balance.', [await BTN('Secondary', 'Export CSV', { lead: 'download' }), await BTN('Ghost', 'Set a participation limit', { lead: 'shield' })]), 'FILL']);
 add(main, [await subnav('My entries'), 'FILL']);
 const sr = row('Summary', { gap: 16, align: 'MIN' });
-for (const s of [['Qualifying entries · lifetime', '1,284', 'entries', '35 in the draw now', 'Round #1,248 closes 20:00 UTC'], ['Platform fees paid · lifetime', '64.20', 'USDT', '1,284 × 0.05', 'Never added to a pool'], ['Prizes won · last 5 rounds', '3,620.60', 'USDT', 'Runner-up #1,244', 'Settled to Available'], ['Refund owed', '300.00', 'USDT', '#1,245 cancelled', 'Settles 27 Nov, 21:00 UTC']]) add(sr, [await stat(...s), 'FILL']);
+for (const s of [['Qualifying entries · lifetime', '1,284', 'entries', '35 in the draw', 'Round #1,248'], ['Platform fees paid · lifetime', '64.20', 'USDT', '1,284 × 0.05', 'Not in the pool'], ['Prizes won · last 5 rounds', '3,620.60', 'USDT', 'Runner-up #1,244', 'Settled'], ['Refund owed', '300.00', 'USDT', '#1,245', 'Settles 27 Nov, 21:00']]) add(sr, [await stat(...s), 'FILL']);
 add(main, [sr, 'FILL']);
 const tb = row('Toolbar', { gap: 8 });
 const srch = await I(C.SRCH, { Size: 'M', State: 'Default' }, { 'Show shortcut': false }); await O(srch, { 'Value text': 'Search entry ID, e.g. E-1248-00981' }, 'srch'); add(tb, srch); srch.resize(300, srch.height);
@@ -182,18 +182,17 @@ add(main, [tb, 'FILL']);
 // expanded detail for the open purchase
 const det = AL('HORIZONTAL', { name: 'Detail panel — purchase #1,248', p: [20, 24, 20, 24], gap: 24, fill: 'surface/default' }); strokeSides(det, 'border/subtle', { b: 1 });
 const dc = col('Purchase facts', { gap: 12 });
-const hs = await I(C.HASH, { State: 'Default' }, { Hash: '0x3a7c…9e02', 'Show explorer link': true });
+const hs = await I(C.HASH, { State: 'Default' }, { Hash: '0x3a7c…9e02', 'Show explorer link': false });
 add(dc, await T('PURCHASE RECEIPT', 'Overline', 'text/tertiary'), [await lv('Paid from', 'Available balance · network fee 0.00'), 'FILL'], [await lv('Odds · 35 of 18,640 entries', '1st ≈ 0.188% · any prize ≈ 2.44%', { demo: true, w: 190 }), 'FILL'], [await lv('Purchase reference', '', { node: hs }), 'FILL']);
-const rk = row('Risk', { gap: 8, align: 'MIN' }); add(rk, await IC('alert-triangle', 16, 'status/warning'), await T('You can lose your stake. Entries are final once bought and are drawn by Chainlink VRF.', 'Body/S', 'text/warning', { w: 200 })); add(dc, [rk, 'FILL']);
 add(det, await I(C.TK, { State: 'Active' }), await I(C.FEE, { Type: 'Entry' }), [dc, 'FILL']);
 const cols = [{ h: 'Bought', w: 150, sort: 'Desc' }, { h: 'Round', w: 120 }, { h: 'Entries', w: 'F' }, { h: 'Paid', w: 168 }, { h: 'Status', w: 156 }, { h: 'Outcome', w: 168, right: 1 }, { h: '', w: 88 }];
 const rows = [
-  { key: '#1,248', fill: 'surface/selected', c: [{ p: '27 Nov 2026', s: '14:06 UTC', date: 1 }, { p: '#1,248', s: 'Open' }, { p: '35 entries', s: 'E-1248-00981 … E-1248-01015', ss: 'Mono/S' }, { p: '351.75 USDT', s: '350.00 + 1.75 fee' }, { st: 'Pending', lab: 'In the draw' }, { p: 'Draws 20:00 UTC', s: 'Today · VRF' }, { act: 1, exp: 1 }], after: det },
-  { key: '#1,247', c: [{ p: '26 Nov 2026', s: '10:15 UTC', date: 1 }, { p: '#1,247', s: 'Settled' }, { p: '10 entries', s: 'E-1247-04410 … E-1247-04419', ss: 'Mono/S' }, { p: '100.50 USDT', s: '100.00 + 0.50 fee' }, { st: 'Neutral', lab: 'Not selected' }, { amt: '0.00', sign: 'Neutral' }, { act: 1, exp: 0 }] },
-  { key: '#1,246', c: [{ p: '25 Nov 2026', s: '12:31 UTC', date: 1 }, { p: '#1,246', s: 'Settled' }, { p: '15 entries', s: 'E-1246-07001 … E-1246-07015', ss: 'Mono/S' }, { p: '150.75 USDT', s: '150.00 + 0.75 fee' }, { st: 'Neutral', lab: 'Not selected' }, { amt: '0.00', sign: 'Neutral' }, { act: 1, exp: 0 }] },
-  { key: '#1,245', c: [{ p: '24 Nov 2026', s: '09:40 UTC', date: 1 }, { p: '#1,245', s: 'Cancelled' }, { p: '30 entries', s: 'E-1245-00383 … E-1245-00412', ss: 'Mono/S' }, { p: '301.50 USDT', s: '300.00 + 1.50 fee' }, { st: 'Pending', lab: 'Refund owed' }, { p: '+301.50 USDT', s: '300.00 owed · 1.50 returned', pc: 'balance/owed' }, { act: 1, exp: 0 }] },
-  { key: '#1,244', c: [{ p: '23 Nov 2026', s: '16:12 UTC', date: 1 }, { p: '#1,244', s: 'Settled' }, { p: '20 entries', s: 'E-1244-11803 … E-1244-11822', ss: 'Mono/S' }, { p: '201.00 USDT', s: '200.00 + 1.00 fee' }, { st: 'Approved', lab: 'Won · runner-up' }, { amt: '+3,620.60', sign: 'Positive' }, { act: 1, exp: 0 }] }];
-const pg = await I(C.PAG, { Type: 'Load more' }); await O(pg, { Range: 'Showing 5 of 64 purchases (1,284 qualifying entries)' }, 'pg');
+  { key: '#1,248', fill: 'surface/selected', c: [{ p: '27 Nov 2026', s: '18:05 UTC', date: 1 }, { p: '#1,248', s: 'Open' }, { p: '35 entries', s: 'E-1248-00981 … E-1248-01015', ss: 'Mono/S' }, { p: '351.75 USDT', s: '350.00 + 1.75 fee' }, { st: 'Pending', lab: 'In the draw' }, { p: 'Draws 20:00 UTC', s: 'Today · VRF' }, { act: 1, exp: 1 }], after: det },
+  { key: '#1,247', c: [{ p: '26 Nov 2026', s: '12:40 UTC', date: 1 }, { p: '#1,247', s: 'Settled' }, { p: '40 entries', s: 'E-1247-04410 … E-1247-04449', ss: 'Mono/S' }, { p: '402.00 USDT', s: '400.00 + 2.00 fee' }, { st: 'Neutral', lab: 'Not selected' }, { amt: '0.00', sign: 'Neutral' }, { act: 1, exp: 0 }] },
+  { key: '#1,246', c: [{ p: '25 Nov 2026', s: '19:12 UTC', date: 1 }, { p: '#1,246', s: 'Settled' }, { p: '24 entries', s: 'E-1246-07001 … E-1246-07024', ss: 'Mono/S' }, { p: '241.20 USDT', s: '240.00 + 1.20 fee' }, { st: 'Neutral', lab: 'Not selected' }, { amt: '0.00', sign: 'Neutral' }, { act: 1, exp: 0 }] },
+  { key: '#1,245', c: [{ p: '24 Nov 2026', s: '14:22 UTC', date: 1 }, { p: '#1,245', s: 'Cancelled' }, { p: '30 entries', s: 'E-1245-00383 … E-1245-00412', ss: 'Mono/S' }, { p: '301.50 USDT', s: '300.00 + 1.50 fee' }, { st: 'Pending', lab: 'Refund owed' }, { p: '300.00 USDT owed', s: '+1.50 fee returned', pc: 'balance/owed' }, { act: 1, exp: 0 }] },
+  { key: '#1,244', c: [{ p: '23 Nov 2026', s: '16:12 UTC', date: 1 }, { p: '#1,244', s: 'Settled' }, { p: '20 entries', s: 'E-1244-11803 … E-1244-11822', ss: 'Mono/S' }, { p: '201.00 USDT', s: '200.00 + 1.00 fee' }, { st: 'Approved', lab: 'Won' }, { amt: '+3,620.60', sign: 'Positive' }, { act: 1, exp: 0 }] }];
+const pg = await I(C.PAG, { Type: 'Load more' }); await O(pg, { Range: 'Showing 5 most recent purchases · 1,284 qualifying entries lifetime' }, 'pg');
 const tbl = await table(cols, rows, 'Table — Entry history', pg);
 const tw = col('Entry history table', { gap: 12 }); add(tw, [await ttl('Purchases', { ds: 'M', right: [await T('Newest first · times in UTC', 'Caption', 'text/tertiary')] }), 'FILL'], [tbl, 'FILL'], await note('Only entries in rounds that draw count as qualifying and pay the 0.05 USDT fee. Entries in a cancelled round never qualify: their stakes become Owed and their fees go straight back to Available.', { w: 880 }));
 add(main, [tw, 'FILL']);
@@ -248,10 +247,10 @@ add(ec, [c1, 'FILL'], [c2, 'FILL'], [c3, 'FILL']); add(main, [ec, 'FILL']);
 // past rounds
 const pc = [{ h: 'Round', w: 150 }, { h: 'Pool', w: 170, right: 1 }, { h: '1st · 50%', w: 'F' }, { h: '2nd · 20%', w: 140, right: 1 }, { h: '3rd · 10%', w: 140, right: 1 }, { h: 'Runner-up · 2% ×10', w: 180, right: 1 }, { h: 'Status', w: 136 }];
 const prr = [
-  { key: '#1,247', c: [{ p: '#1,247', s: '26 Nov 2026' }, { amt: '172,950.00' }, { p: '86,475.00 USDT', s: '@orbit_77', pc: 'text/gold' }, { amt: '34,590.00' }, { amt: '17,295.00' }, { amt: '3,459.00' }, { st: 'Confirmed', lab: 'Settled' }] },
-  { key: '#1,246', c: [{ p: '#1,246', s: '25 Nov 2026' }, { amt: '168,420.00' }, { p: '84,210.00 USDT', s: '@mira.sol', pc: 'text/gold' }, { amt: '33,684.00' }, { amt: '16,842.00' }, { amt: '3,368.40' }, { st: 'Confirmed', lab: 'Settled' }] },
-  { key: '#1,245', c: [{ p: '#1,245', s: '24 Nov 2026' }, { amt: '41,200.00' }, { p: 'No prizes — round cancelled', s: 'Stakes and fees refunded' }, { p: '—' }, { p: '—' }, { p: '—' }, { st: 'Expired', lab: 'Cancelled' }] },
-  { key: '#1,244', c: [{ p: '#1,244', s: '23 Nov 2026' }, { amt: '181,030.00' }, { p: '90,515.00 USDT', s: '@kestrel', pc: 'text/gold' }, { amt: '36,206.00' }, { amt: '18,103.00' }, { amt: '3,620.60' }, { st: 'Confirmed', lab: 'Settled' }] }];
+  { key: '#1,247', c: [{ p: '#1,247', s: '26 Nov 2026' }, { amt: '172,950.00' }, { p: '86,475.00 USDT', s: '@orbit_77', pc: 'text/gold' }, { amt: '34,590.00', demo: false }, { amt: '17,295.00', demo: false }, { amt: '3,459.00', demo: false }, { st: 'Confirmed', lab: 'Settled' }] },
+  { key: '#1,246', c: [{ p: '#1,246', s: '25 Nov 2026' }, { amt: '168,420.00' }, { p: '84,210.00 USDT', s: '@mira.sol', pc: 'text/gold' }, { amt: '33,684.00', demo: false }, { amt: '16,842.00', demo: false }, { amt: '3,368.40', demo: false }, { st: 'Confirmed', lab: 'Settled' }] },
+  { key: '#1,245', c: [{ p: '#1,245', s: '24 Nov 2026' }, { amt: '41,200.00' }, { p: 'No prizes · cancelled', s: 'Stakes and fees refunded' }, { p: '—' }, { p: '—' }, { p: '—' }, { st: 'Expired', lab: 'Cancelled' }] },
+  { key: '#1,244', c: [{ p: '#1,244', s: '23 Nov 2026' }, { amt: '181,030.00' }, { p: '90,515.00 USDT', s: '@kestrel', pc: 'text/gold' }, { amt: '36,206.00', demo: false }, { amt: '18,103.00', demo: false }, { amt: '3,620.60', demo: false }, { st: 'Confirmed', lab: 'Settled' }] }];
 const pw = col('Past rounds', { gap: 12 }); add(pw, [await ttl('Same split in past rounds', { ds: 'M', right: [await BTN('Ghost', 'All rounds', { size: 'S', trail: 'arrow-right' })] }), 'FILL'], [await table(pc, prr, 'Table — Past distributions'), 'FILL'], await note('You were one of the ten runners-up in #1,244 (+3,620.60 USDT, settled to Available). Each prize is an exact share of the pool at close.', { w: 880 }));
 add(main, [pw, 'FILL']);
 await foot(main);

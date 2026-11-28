@@ -51,12 +51,19 @@ export class UsersService {
       onboardingRequired: user.onboardedAt === null,
       onboardedAt: user.onboardedAt?.toISOString() ?? null,
       country: country
-        ? { code: country, name: this.geo.countryName(country), permitted: await this.geo.isPermitted(country) }
+        ? {
+            code: country,
+            name: this.geo.countryName(country),
+            permitted: await this.geo.isPermitted(country),
+          }
         : null,
       kyc: {
         level: kycLevel,
         status: kycStatus,
-        label: kycLevel === 'none' ? 'Not verified' : `${KYC_LEVEL_LABEL[kycLevel].split(' — ')[0]} — ${kycStatus === 'verified' ? 'Verified' : kycStatus}`,
+        label:
+          kycLevel === 'none'
+            ? 'Not verified'
+            : `${KYC_LEVEL_LABEL[kycLevel].split(' — ')[0]} — ${kycStatus === 'verified' ? 'Verified' : kycStatus}`,
       },
       vip: { tier: p?.vipTier ?? 'bronze', level: p?.vipLevel ?? 1, points: p?.vipPoints ?? 0 },
       security: {
@@ -84,7 +91,10 @@ export class UsersService {
       data: {
         ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
         ...(input.marketingOptIn !== undefined
-          ? { marketingOptIn: input.marketingOptIn, marketingOptInAt: input.marketingOptIn ? new Date() : null }
+          ? {
+              marketingOptIn: input.marketingOptIn,
+              marketingOptInAt: input.marketingOptIn ? new Date() : null,
+            }
           : {}),
       },
     });
@@ -111,7 +121,9 @@ export class UsersService {
   }
 
   async revokeSession(user: AuthUser, sessionId: string, reason = 'revoked_by_user') {
-    const row = await this.prisma.session.findFirst({ where: { id: sessionId, userId: user.id, revokedAt: null } });
+    const row = await this.prisma.session.findFirst({
+      where: { id: sessionId, userId: user.id, revokedAt: null },
+    });
     if (!row) throw notFound('Session');
     await this.prisma.session.update({
       where: { id: row.id },
@@ -175,7 +187,11 @@ export class UsersService {
     if (!row.whitelistedAt) throw new AppError('BAD_REQUEST', 'This address is not whitelisted');
     await this.prisma.userWallet.update({
       where: { id: row.id },
-      data: { whitelistedAt: null, whitelistAvailableAt: null, ...(row.source === 'manual' ? { removedAt: new Date() } : {}) },
+      data: {
+        whitelistedAt: null,
+        whitelistAvailableAt: null,
+        ...(row.source === 'manual' ? { removedAt: new Date() } : {}),
+      },
     });
     return { removed: true };
   }

@@ -32,7 +32,11 @@ const TYPE: Record<ToastType, { icon: React.ReactNode; bar: string; iconClass: s
   error: { icon: <CircleX />, bar: 'bg-status-danger', iconClass: 'text-text-danger' },
   warning: { icon: <CircleAlert />, bar: 'bg-status-warning', iconClass: 'text-text-warning' },
   info: { icon: <Info />, bar: 'bg-status-info', iconClass: 'text-text-info' },
-  tx: { icon: <Loader2 className="animate-spin" />, bar: 'bg-status-info', iconClass: 'text-text-info' },
+  tx: {
+    icon: <Loader2 className="animate-spin" />,
+    bar: 'bg-status-info',
+    iconClass: 'text-text-info',
+  },
 };
 
 export interface ToastCardProps {
@@ -47,7 +51,15 @@ export interface ToastCardProps {
 }
 
 /** The visual toast card (also rendered statically on /design-system). */
-export function ToastCard({ type, title, description, progress, action, onDismiss, className }: ToastCardProps) {
+export function ToastCard({
+  type,
+  title,
+  description,
+  progress,
+  action,
+  onDismiss,
+  className,
+}: ToastCardProps) {
   const t = TYPE[type];
   return (
     <div
@@ -68,7 +80,9 @@ export function ToastCard({ type, title, description, progress, action, onDismis
             <div className="h-1.5 overflow-hidden rounded-full bg-surface-raised">
               <div
                 className="h-full rounded-full bg-status-info"
-                style={{ width: `${Math.round((progress.current / Math.max(progress.total, 1)) * 100)}%` }}
+                style={{
+                  width: `${Math.round((progress.current / Math.max(progress.total, 1)) * 100)}%`,
+                }}
               />
             </div>
             <p className="text-caption text-text-tertiary tabular-nums">
@@ -116,10 +130,13 @@ export function toast(
   props: Omit<ToastCardProps, 'onDismiss'> & { id?: string | number; duration?: number },
 ): string | number {
   const { id, duration, ...card } = props;
-  return sonnerToast.custom((tid) => <ToastCard {...card} onDismiss={() => sonnerToast.dismiss(tid)} />, {
-    id,
-    duration: duration ?? (card.type === 'tx' ? Infinity : card.type === 'error' ? 8000 : 5000),
-  });
+  return sonnerToast.custom(
+    (tid) => <ToastCard {...card} onDismiss={() => sonnerToast.dismiss(tid)} />,
+    {
+      id,
+      duration: duration ?? (card.type === 'tx' ? Infinity : card.type === 'error' ? 8000 : 5000),
+    },
+  );
 }
 
 toast.dismiss = sonnerToast.dismiss;

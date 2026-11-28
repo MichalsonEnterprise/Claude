@@ -57,7 +57,9 @@ export function GameTile({
   const accessibleName = [
     name,
     edgeLabel,
-    players != null && !restricted ? `${formatCount(players)} players${demo ? ' (demo)' : ''}` : null,
+    players != null && !restricted
+      ? `${formatCount(players)} players${demo ? ' (demo)' : ''}`
+      : null,
     restricted ? 'Not available in your region' : null,
   ]
     .filter(Boolean)
@@ -95,7 +97,12 @@ export function GameTile({
         </div>
       )}
 
-      <div className={cn('absolute inset-x-0 bottom-0 text-center', small ? 'px-1.5 pb-2' : 'px-2 pb-3')}>
+      <div
+        className={cn(
+          'absolute inset-x-0 bottom-0 text-center',
+          small ? 'px-1.5 pb-2' : 'px-2 pb-3',
+        )}
+      >
         <p
           className={cn(
             'font-bold uppercase leading-tight tracking-[-0.01em] text-text-primary [text-wrap:balance]',
@@ -118,7 +125,9 @@ export function GameTile({
             <span className="flex size-10 items-center justify-center rounded-full bg-ink-950/80 text-icon-default">
               <Lock aria-hidden className="size-5" />
             </span>
-            {!small && <p className="text-label-s text-text-primary">Not available in your region</p>}
+            {!small && (
+              <p className="text-label-s text-text-primary">Not available in your region</p>
+            )}
           </div>
         </>
       ) : (
@@ -147,7 +156,8 @@ export function GameTile({
     'group/tile relative block shrink-0 overflow-hidden rounded-lg border-2 border-transparent bg-surface-default outline-none',
     'aspect-[3/4] transition-[border-color,box-shadow] duration-150 ease-standard',
     small ? 'w-[100px] rounded-md' : 'w-40',
-    !restricted && 'hover:border-brand focus-visible:border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus',
+    !restricted &&
+      'hover:border-brand focus-visible:border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus',
     previewHover && 'border-brand',
     className,
   );

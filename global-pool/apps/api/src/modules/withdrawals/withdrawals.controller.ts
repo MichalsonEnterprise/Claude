@@ -1,6 +1,21 @@
-import { Body, Controller, Get, Headers, HttpCode, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { enabledChainKeySchema, paginationQuerySchema, positiveUsdtAmountSchema, withdrawalRequestSchema } from '@gp/shared/schemas';
+import {
+  enabledChainKeySchema,
+  paginationQuerySchema,
+  positiveUsdtAmountSchema,
+  withdrawalRequestSchema,
+} from '@gp/shared/schemas';
 import { z } from 'zod';
 
 import { DemoOnly } from '../../common/demo-only.guard';
@@ -12,7 +27,9 @@ import { STEP_UP_HEADER } from '../security/step-up.service';
 import { WithdrawalsService } from './withdrawals.service';
 
 class WithdrawalRequestDto extends createZodDto(withdrawalRequestSchema) {}
-class QuoteQueryDto extends createZodDto(z.object({ amount: positiveUsdtAmountSchema, network: enabledChainKeySchema })) {}
+class QuoteQueryDto extends createZodDto(
+  z.object({ amount: positiveUsdtAmountSchema, network: enabledChainKeySchema }),
+) {}
 class PaginationDto extends createZodDto(paginationQuerySchema) {}
 
 @ApiTags('withdrawals')
@@ -25,16 +42,23 @@ export class WithdrawalsController {
   ) {}
 
   @Get('quote')
-  @ApiOperation({ summary: 'Fee breakdown: network fee (deducted), platform fee 0.00, you receive' })
+  @ApiOperation({
+    summary: 'Fee breakdown: network fee (deducted), platform fee 0.00, you receive',
+  })
   quote(@Query() query: QuoteQueryDto) {
     return this.withdrawals.quote(query.amount, query.network);
   }
 
   @Post()
   @HttpCode(201)
-  @ApiHeader({ name: STEP_UP_HEADER, required: false, description: 'Step-up token (purpose withdrawal) — or send totpCode' })
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    required: false,
+    description: 'Step-up token (purpose withdrawal) — or send totpCode',
+  })
   @ApiOperation({
-    summary: 'Request a withdrawal (idempotent): step-up 2FA, KYC daily limit, AVAILABLE → LOCKED, risk/AML screening',
+    summary:
+      'Request a withdrawal (idempotent): step-up 2FA, KYC daily limit, AVAILABLE → LOCKED, risk/AML screening',
   })
   async request(
     @CurrentUser() user: AuthUser,
@@ -50,7 +74,12 @@ export class WithdrawalsController {
         action: 'withdrawal.requested',
         targetType: 'withdrawal',
         targetId: result.id,
-        metadata: { reference: result.reference, amount: result.amount, network: result.network, status: result.status },
+        metadata: {
+          reference: result.reference,
+          amount: result.amount,
+          network: result.network,
+          status: result.status,
+        },
       });
     }
     return result;
@@ -83,7 +112,9 @@ export class DevWithdrawalsController {
 
   @Post(':id/simulate-confirm')
   @HttpCode(200)
-  @ApiOperation({ summary: 'DEMO only: simulate broadcast + on-chain confirmation of a QUEUED withdrawal' })
+  @ApiOperation({
+    summary: 'DEMO only: simulate broadcast + on-chain confirmation of a QUEUED withdrawal',
+  })
   simulate(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
     return this.withdrawals.simulateConfirm(user.id, id);
   }

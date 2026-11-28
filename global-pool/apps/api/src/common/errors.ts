@@ -11,10 +11,7 @@ export class AppError extends HttpException {
     message: string,
     readonly details?: Record<string, unknown>,
   ) {
-    super(
-      makeErrorEnvelope(code, message, details ? { details } : {}),
-      ERROR_HTTP_STATUS[code],
-    );
+    super(makeErrorEnvelope(code, message, details ? { details } : {}), ERROR_HTTP_STATUS[code]);
   }
 }
 

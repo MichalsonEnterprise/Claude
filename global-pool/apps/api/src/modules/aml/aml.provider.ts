@@ -59,7 +59,11 @@ export class MockAmlProvider implements AmlProvider {
     const checks: AmlCheck[] = [
       { name: 'sanctions_screening', passed: !sanctioned },
       { name: 'address_format', passed: true },
-      { name: 'destination_history', passed: !input.newDestination, detail: input.whitelisted ? 'whitelisted' : 'not whitelisted' },
+      {
+        name: 'destination_history',
+        passed: !input.newDestination,
+        detail: input.whitelisted ? 'whitelisted' : 'not whitelisted',
+      },
       { name: 'velocity', passed: !velocity },
       { name: 'amount_threshold', passed: !large },
       { name: 'account_age', passed: !youngAccount },

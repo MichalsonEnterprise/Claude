@@ -38,12 +38,19 @@ export class AuditInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const options = this.reflector.get<AuditOptions | undefined>(AUDIT_ACTION, context.getHandler());
+    const options = this.reflector.get<AuditOptions | undefined>(
+      AUDIT_ACTION,
+      context.getHandler(),
+    );
     if (!options || context.getType() !== 'http') return next.handle();
     const req = context.switchToHttp().getRequest<AuditedRequest>();
     const body = (req.body ?? {}) as Record<string, unknown>;
     const base = {
-      actorType: req.admin ? ('admin' as const) : req.user ? ('user' as const) : ('system' as const),
+      actorType: req.admin
+        ? ('admin' as const)
+        : req.user
+          ? ('user' as const)
+          : ('system' as const),
       actorId: req.admin?.id ?? req.user?.id ?? null,
       actorLabel: req.admin?.name ?? req.user?.handle ?? null,
       action: options.action,

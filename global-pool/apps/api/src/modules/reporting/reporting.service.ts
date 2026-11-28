@@ -33,10 +33,28 @@ export class ReportingService {
       reconciliation,
     ] = await Promise.all([
       this.prisma.user.count(),
-      this.prisma.user.count({ where: { OR: [{ lastLoginAt: { gte: since } }, { entries: { some: { createdAt: { gte: since } } } }] } }),
-      this.prisma.deposit.aggregate({ where: { status: 'credited', creditedAt: { gte: since } }, _sum: { amount: true }, _count: true }),
-      this.prisma.withdrawal.aggregate({ where: { status: 'confirmed', confirmedAt: { gte: since } }, _sum: { amount: true }, _count: true }),
-      this.prisma.feeLedger.aggregate({ where: { createdAt: { gte: since } }, _sum: { amount: true, entryCount: true } }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { lastLoginAt: { gte: since } },
+            { entries: { some: { createdAt: { gte: since } } } },
+          ],
+        },
+      }),
+      this.prisma.deposit.aggregate({
+        where: { status: 'credited', creditedAt: { gte: since } },
+        _sum: { amount: true },
+        _count: true,
+      }),
+      this.prisma.withdrawal.aggregate({
+        where: { status: 'confirmed', confirmedAt: { gte: since } },
+        _sum: { amount: true },
+        _count: true,
+      }),
+      this.prisma.feeLedger.aggregate({
+        where: { createdAt: { gte: since } },
+        _sum: { amount: true, entryCount: true },
+      }),
       this.ledger.balancesByType(),
       this.prisma.$queryRaw<{ total: string }[]>`
         SELECT COALESCE(SUM(e.amount), 0)::text AS total
@@ -44,14 +62,23 @@ export class ReportingService {
         WHERE a.type = 'pool' AND r.status IN ('open', 'closed', 'drawing')`,
       this.prisma.prizeClaim.aggregate({ where: { status: 'owed' }, _sum: { amount: true } }),
       this.prisma.round.count({ where: { status: { in: ['open', 'closed', 'drawing'] } } }),
-      this.prisma.withdrawal.count({ where: { status: { in: ['requested', 'risk_check', 'under_review', 'queued', 'broadcast'] } } }),
+      this.prisma.withdrawal.count({
+        where: {
+          status: { in: ['requested', 'risk_check', 'under_review', 'queued', 'broadcast'] },
+        },
+      }),
       this.prisma.withdrawal.count({ where: { status: 'under_review' } }),
       this.prisma.kycRecord.count({ where: { status: { in: ['pending', 'in_review'] } } }),
-      this.prisma.amlAlert.count({ where: { status: { in: ['open', 'under_review', 'escalated'] } } }),
+      this.prisma.amlAlert.count({
+        where: { status: { in: ['open', 'under_review', 'escalated'] } },
+      }),
       this.ledger.reconcile(),
     ]);
     const bucket = (t: string) => money(byType[t] ?? '0');
-    const customerLiabilities = bucket('user_available').plus(bucket('user_locked')).plus(bucket('user_pending')).plus(bucket('user_owed'));
+    const customerLiabilities = bucket('user_available')
+      .plus(bucket('user_locked'))
+      .plus(bucket('user_pending'))
+      .plus(bucket('user_owed'));
     return {
       windowDays: 30,
       totalUsers,

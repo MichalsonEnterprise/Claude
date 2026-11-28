@@ -9,7 +9,10 @@ import { cn } from '@/lib/utils';
 /**
  * Control/Checkbox. Consent checkboxes are NEVER pre-checked (guardrail) — don't pass defaultChecked for them.
  */
-export function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+export function Checkbox({
+  className,
+  ...props
+}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
@@ -39,14 +42,25 @@ export function CheckboxField({
   description,
   className,
   ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root> & { label: React.ReactNode; description?: React.ReactNode }) {
+}: React.ComponentProps<typeof CheckboxPrimitive.Root> & {
+  label: React.ReactNode;
+  description?: React.ReactNode;
+}) {
   const auto = React.useId();
   const cid = id ?? auto;
   return (
     <div className={cn('flex items-start gap-3 py-1', className)}>
-      <Checkbox id={cid} className="mt-0.5" aria-describedby={description ? `${cid}-d` : undefined} {...props} />
+      <Checkbox
+        id={cid}
+        className="mt-0.5"
+        aria-describedby={description ? `${cid}-d` : undefined}
+        {...props}
+      />
       <div className="flex flex-col gap-0.5">
-        <label htmlFor={cid} className="text-body-s text-text-primary peer-disabled:text-text-disabled">
+        <label
+          htmlFor={cid}
+          className="text-body-s text-text-primary peer-disabled:text-text-disabled"
+        >
           {label}
         </label>
         {description && (

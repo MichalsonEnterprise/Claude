@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { randomUUID } from 'node:crypto';
@@ -13,7 +13,12 @@ import { AuditService } from '../audit/audit.service';
 import { TotpService } from '../security/totp.service';
 
 /** argon2id parameters (OWASP 2024 baseline: m=19 MiB, t=2, p=1). */
-export const ARGON2_OPTIONS = { type: argon2.argon2id, memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
+export const ARGON2_OPTIONS = {
+  type: argon2.argon2id,
+  memoryCost: 19_456,
+  timeCost: 2,
+  parallelism: 1,
+} as const;
 const INVALID = 'Invalid email, password or authenticator code';
 
 interface AdminAccessClaims {
@@ -31,7 +36,6 @@ export const hashAdminPassword = (password: string) => argon2.hash(password, ARG
  */
 @Injectable()
 export class AdminAuthService {
-  private readonly logger = new Logger(AdminAuthService.name);
   private dummyHash: Promise<string> | null = null;
 
   constructor(
@@ -47,14 +51,27 @@ export class AdminAuthService {
     if (!admin || admin.status !== 'active') {
       // Equalise timing so responses do not reveal which emails exist.
       await argon2.verify(await this.getDummyHash(), input.password).catch(() => false);
-      await this.audit.record({ actorType: 'system', action: 'admin.login.failed', reason: 'unknown_or_disabled', ip: meta.ip, userAgent: meta.userAgent, requestId: meta.requestId, outcome: 'failure', metadata: { emailHash: sha256Hex(input.email) } });
+      await this.audit.record({
+        actorType: 'system',
+        action: 'admin.login.failed',
+        reason: 'unknown_or_disabled',
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+        requestId: meta.requestId,
+        outcome: 'failure',
+        metadata: { emailHash: sha256Hex(input.email) },
+      });
       throw new AppError('UNAUTHENTICATED', INVALID);
     }
     const now = new Date();
     if (admin.lockedUntil && admin.lockedUntil > now) {
-      throw new AppError('FORBIDDEN', 'This admin account is temporarily locked after failed sign-ins', {
-        lockedUntil: admin.lockedUntil.toISOString(),
-      });
+      throw new AppError(
+        'FORBIDDEN',
+        'This admin account is temporarily locked after failed sign-ins',
+        {
+          lockedUntil: admin.lockedUntil.toISOString(),
+        },
+      );
     }
     const passwordOk = await argon2.verify(admin.passwordHash, input.password).catch(() => false);
     let totpOk = false;
@@ -71,7 +88,9 @@ export class AdminAuthService {
         where: { id: admin.id },
         data: {
           failedLoginAttempts: lock ? 0 : attempts,
-          lockedUntil: lock ? addMinutes(now, this.config.env.ADMIN_LOCKOUT_MINUTES) : admin.lockedUntil,
+          lockedUntil: lock
+            ? addMinutes(now, this.config.env.ADMIN_LOCKOUT_MINUTES)
+            : admin.lockedUntil,
         },
       });
       await this.audit.record({
@@ -93,27 +112,57 @@ export class AdminAuthService {
       data: { failedLoginAttempts: 0, lockedUntil: null, lastLoginAt: now },
     });
     const familyId = randomUUID();
-    const tokens = await this.issue(admin.id, familyId, null, new Date(now.getTime() + this.config.env.ADMIN_SESSION_TTL * 1000), meta);
-    await this.audit.record({ actorType: 'admin', actorId: admin.id, actorLabel: admin.name, action: 'admin.login', ip: meta.ip, userAgent: meta.userAgent, requestId: meta.requestId, metadata: { familyId } });
+    const tokens = await this.issue(
+      admin.id,
+      familyId,
+      null,
+      new Date(now.getTime() + this.config.env.ADMIN_SESSION_TTL * 1000),
+      meta,
+    );
+    await this.audit.record({
+      actorType: 'admin',
+      actorId: admin.id,
+      actorLabel: admin.name,
+      action: 'admin.login',
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+      requestId: meta.requestId,
+      metadata: { familyId },
+    });
     return { ...tokens, admin: await this.profile(admin.id) };
   }
 
   /** Rotate the refresh token. Re-using a rotated token revokes the whole family (token theft signal). */
   async refresh(refreshToken: string, meta: RequestMeta) {
-    const row = await this.prisma.session.findUnique({ where: { refreshTokenHash: sha256Hex(refreshToken) } });
+    const row = await this.prisma.session.findUnique({
+      where: { refreshTokenHash: sha256Hex(refreshToken) },
+    });
     if (!row || row.subject !== 'admin' || !row.adminUserId || !row.familyId) {
       throw new AppError('UNAUTHENTICATED', 'Invalid refresh token');
     }
     if (row.rotatedAt) {
       await this.revokeFamily(row.familyId, 'refresh_token_reuse');
-      await this.audit.record({ actorType: 'admin', actorId: row.adminUserId, action: 'admin.session.reuse_detected', targetType: 'session', targetId: row.familyId, outcome: 'failure', ip: meta.ip, requestId: meta.requestId });
+      await this.audit.record({
+        actorType: 'admin',
+        actorId: row.adminUserId,
+        action: 'admin.session.reuse_detected',
+        targetType: 'session',
+        targetId: row.familyId,
+        outcome: 'failure',
+        ip: meta.ip,
+        requestId: meta.requestId,
+      });
       throw new AppError('UNAUTHENTICATED', 'Session revoked — sign in again');
     }
     if (row.revokedAt || (row.expiresAt && row.expiresAt <= new Date())) {
       throw new AppError('UNAUTHENTICATED', 'Session expired — sign in again');
     }
-    const rotated = await this.prisma.session.updateMany({ where: { id: row.id, rotatedAt: null }, data: { rotatedAt: new Date() } });
-    if (rotated.count !== 1) throw new AppError('UNAUTHENTICATED', 'Session revoked — sign in again');
+    const rotated = await this.prisma.session.updateMany({
+      where: { id: row.id, rotatedAt: null },
+      data: { rotatedAt: new Date() },
+    });
+    if (rotated.count !== 1)
+      throw new AppError('UNAUTHENTICATED', 'Session revoked — sign in again');
     return this.issue(row.adminUserId, row.familyId, row.id, row.expiresAt!, meta);
   }
 
@@ -137,21 +186,41 @@ export class AdminAuthService {
     }
     if (claims.typ !== 'admin_access') throw new AppError('UNAUTHENTICATED', 'Invalid admin token');
     const live = await this.prisma.session.findFirst({
-      where: { familyId: claims.sid, adminUserId: claims.sub, revokedAt: null, rotatedAt: null, expiresAt: { gt: new Date() } },
+      where: {
+        familyId: claims.sid,
+        adminUserId: claims.sub,
+        revokedAt: null,
+        rotatedAt: null,
+        expiresAt: { gt: new Date() },
+      },
       select: { id: true },
     });
     if (!live) throw new AppError('UNAUTHENTICATED', 'Admin session revoked — sign in again');
     const profile = await this.profile(claims.sub);
-    if (profile.status !== 'active') throw new AppError('UNAUTHENTICATED', 'Admin account disabled');
-    return { id: profile.id, email: profile.email, name: profile.name, roles: profile.roles, permissions: profile.permissions, sessionFamilyId: claims.sid };
+    if (profile.status !== 'active')
+      throw new AppError('UNAUTHENTICATED', 'Admin account disabled');
+    return {
+      id: profile.id,
+      email: profile.email,
+      name: profile.name,
+      roles: profile.roles,
+      permissions: profile.permissions,
+      sessionFamilyId: claims.sid,
+    };
   }
 
   async profile(adminId: string) {
     const admin = await this.prisma.adminUser.findUniqueOrThrow({
       where: { id: adminId },
-      include: { roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } },
+      include: {
+        roles: {
+          include: { role: { include: { permissions: { include: { permission: true } } } } },
+        },
+      },
     });
-    const permissions = [...new Set(admin.roles.flatMap((r) => r.role.permissions.map((p) => p.permission.key)))].sort();
+    const permissions = [
+      ...new Set(admin.roles.flatMap((r) => r.role.permissions.map((p) => p.permission.key))),
+    ].sort();
     return {
       id: admin.id,
       email: admin.email,
@@ -165,7 +234,13 @@ export class AdminAuthService {
     };
   }
 
-  private async issue(adminId: string, familyId: string, parentId: string | null, expiresAt: Date, meta: RequestMeta) {
+  private async issue(
+    adminId: string,
+    familyId: string,
+    parentId: string | null,
+    expiresAt: Date,
+    meta: RequestMeta,
+  ) {
     const refreshToken = randomToken(48);
     await this.prisma.session.create({
       data: {
@@ -179,7 +254,10 @@ export class AdminAuthService {
         userAgent: meta.userAgent?.slice(0, 512) ?? null,
       },
     });
-    const ttl = Math.min(this.config.env.ADMIN_ACCESS_TTL, Math.max(1, Math.floor((expiresAt.getTime() - Date.now()) / 1000)));
+    const ttl = Math.min(
+      this.config.env.ADMIN_ACCESS_TTL,
+      Math.max(1, Math.floor((expiresAt.getTime() - Date.now()) / 1000)),
+    );
     const claims: AdminAccessClaims = { sub: adminId, sid: familyId, typ: 'admin_access' };
     const accessToken = await this.jwt.signAsync(claims, {
       secret: this.config.env.ADMIN_JWT_ACCESS_SECRET,
@@ -188,11 +266,20 @@ export class AdminAuthService {
       audience: 'admin',
       expiresIn: ttl,
     });
-    return { accessToken, refreshToken, tokenType: 'Bearer' as const, expiresIn: ttl, sessionExpiresAt: expiresAt.toISOString() };
+    return {
+      accessToken,
+      refreshToken,
+      tokenType: 'Bearer' as const,
+      expiresIn: ttl,
+      sessionExpiresAt: expiresAt.toISOString(),
+    };
   }
 
   private async revokeFamily(familyId: string, reason: string) {
-    await this.prisma.session.updateMany({ where: { familyId, revokedAt: null }, data: { revokedAt: new Date(), revokedReason: reason } });
+    await this.prisma.session.updateMany({
+      where: { familyId, revokedAt: null },
+      data: { revokedAt: new Date(), revokedReason: reason },
+    });
   }
 
   private getDummyHash(): Promise<string> {

@@ -45,11 +45,15 @@ export function MobileTopbar({
     <header
       className={cn(
         'z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border-subtle bg-bg-base/95 px-3 backdrop-blur-md',
-        !embedded && 'sticky top-0',
+        !embedded && 'sticky top-[var(--gp-shell-top,0px)]',
         className,
       )}
     >
-      <Link href="/" aria-label="GLOBAL POOL — lobby" className="flex shrink-0 items-center rounded-sm p-1">
+      <Link
+        href="/"
+        aria-label="GLOBAL POOL — lobby"
+        className="flex shrink-0 items-center rounded-sm p-1"
+      >
         <Logo variant="mark" height={26} title="" />
       </Link>
       <div className="ml-auto flex min-w-0 items-center gap-2">
@@ -64,9 +68,17 @@ export function MobileTopbar({
             </Button>
           </>
         )}
-        {auth === 'member' && member && <BalancePill member={member} depositDisabled={restricted} compact />}
+        {auth === 'member' && member && (
+          <BalancePill member={member} depositDisabled={restricted} compact />
+        )}
       </div>
-      <IconButton label="Open menu" aria-expanded={menuExpanded} size="l" className="-mr-1 size-11" onClick={onMenuClick}>
+      <IconButton
+        label="Open menu"
+        aria-expanded={menuExpanded}
+        size="l"
+        className="-mr-1 size-11"
+        onClick={onMenuClick}
+      >
         <Menu aria-hidden />
       </IconButton>
     </header>
@@ -110,11 +122,17 @@ export function MobileTabBar({
                   active ? 'text-text-brand' : 'text-text-tertiary hover:text-text-primary',
                 )}
               >
-                {active && <span aria-hidden className="absolute top-0 h-0.5 w-8 rounded-b-full bg-brand" />}
+                {active && (
+                  <span aria-hidden className="absolute top-0 h-0.5 w-8 rounded-b-full bg-brand" />
+                )}
                 <span className="relative">
                   <Icon aria-hidden className="size-[22px]" />
                   {count > 0 && (
-                    <CountBadge count={count} className="absolute -top-1.5 -right-2.5" aria-label={`${count} unread`} />
+                    <CountBadge
+                      count={count}
+                      className="absolute -top-1.5 -right-2.5"
+                      aria-label={`${count} unread`}
+                    />
                   )}
                 </span>
                 {tab.label}
@@ -186,7 +204,13 @@ export function MobileDrawer({
                     </p>
                   </div>
                   <Button asChild={!restricted} size="m" disabled={restricted}>
-                    {restricted ? 'Deposit' : <Link href={ROUTES.deposit} onClick={close}>Deposit</Link>}
+                    {restricted ? (
+                      'Deposit'
+                    ) : (
+                      <Link href={ROUTES.deposit} onClick={close}>
+                        Deposit
+                      </Link>
+                    )}
                   </Button>
                 </div>
               </div>
@@ -219,7 +243,13 @@ export function MobileDrawer({
             <SidebarPromoTiles poolAmount={poolAmount} demo={demo} />
           </div>
           <nav aria-label="Main" className="px-4 py-3">
-            <SidebarNav auth={auth} activeHref={activeHref} counts={counts} density="drawer" onNavigate={close} />
+            <SidebarNav
+              auth={auth}
+              activeHref={activeHref}
+              counts={counts}
+              density="drawer"
+              onNavigate={close}
+            />
           </nav>
         </div>
         <div className="flex shrink-0 flex-col gap-3 border-t border-border-subtle p-4 pb-[max(16px,env(safe-area-inset-bottom))]">

@@ -79,7 +79,10 @@ export function SelectContent({
   );
 }
 
-export function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
+export function SelectLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
       className={cn('px-3 pt-2 pb-1 text-overline uppercase text-text-tertiary', className)}
@@ -116,7 +119,9 @@ export function SelectItem({
         </SelectPrimitive.ItemText>
         {description && <span className="text-caption text-text-tertiary">{description}</span>}
       </span>
-      {aside && <span className="flex shrink-0 flex-col items-end gap-0.5 text-caption">{aside}</span>}
+      {aside && (
+        <span className="flex shrink-0 flex-col items-end gap-0.5 text-caption">{aside}</span>
+      )}
       <span className="absolute right-3 flex size-4 items-center justify-center text-icon-brand">
         <SelectPrimitive.ItemIndicator>
           <Check aria-hidden className="size-4" />
@@ -126,6 +131,14 @@ export function SelectItem({
   );
 }
 
-export function SelectSeparator({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Separator>) {
-  return <SelectPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border-subtle', className)} {...props} />;
+export function SelectSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Separator>) {
+  return (
+    <SelectPrimitive.Separator
+      className={cn('-mx-1 my-1 h-px bg-border-subtle', className)}
+      {...props}
+    />
+  );
 }

@@ -9,7 +9,12 @@ import { PlayerAuth } from '../auth/guards';
 import { NotificationsService } from './notifications.service';
 
 class NotificationsQueryDto extends createZodDto(
-  paginationQuerySchema.extend({ unread: z.enum(['true', 'false']).transform((v) => v === 'true').optional() }),
+  paginationQuerySchema.extend({
+    unread: z
+      .enum(['true', 'false'])
+      .transform((v) => v === 'true')
+      .optional(),
+  }),
 ) {}
 
 @ApiTags('notifications')

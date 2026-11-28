@@ -75,7 +75,13 @@ export interface MarkProps extends Omit<React.ComponentProps<'svg'>, 'children'>
   label?: string;
 }
 
-export function ChainMark({ chain, size = 20, label, className, ...props }: MarkProps & { chain: ChainKey }) {
+export function ChainMark({
+  chain,
+  size = 20,
+  label,
+  className,
+  ...props
+}: MarkProps & { chain: ChainKey }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -108,7 +114,14 @@ export function TokenMark({ size = 20, label, className, ...props }: MarkProps) 
     >
       <circle cx="12" cy="12" r="12" className="fill-token-usdt" />
       <path d="M6.5 6.8h11v2.6h-4.2v8.8h-2.6V9.4H6.5Z" className="fill-ink-50" />
-      <ellipse cx="12" cy="11.4" rx="5.4" ry="1.5" className="fill-none stroke-ink-50" strokeWidth={1.2} />
+      <ellipse
+        cx="12"
+        cy="11.4"
+        rx="5.4"
+        ry="1.5"
+        className="fill-none stroke-ink-50"
+        strokeWidth={1.2}
+      />
     </svg>
   );
 }

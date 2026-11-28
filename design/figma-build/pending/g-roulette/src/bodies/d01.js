@@ -1,0 +1,6 @@
+// RL-01 master (desktop) + component dumps for later scripts
+const N01 = '[RL-01] Table / 1440 / Bets placed — ready to spin';
+if (!has(N01)) { const R = await mk(N01, 120, async () => buildPlay('n', 0, 0, {})); await R.f.screenshot({ scale: 0.5 }); OUT.dump = { slip: dumpT(R.slip, 50), hs: dumpT(R.hs, 30), tb: dumpT(R.tb, 20) }; }
+else OUT.skipped = N01;
+{ const w = await figma.getNodeByIdAsync('25:15363'); const v = w.children.find(c => c.name.includes('Result')) || w.defaultVariant; OUT.wheelResult = { kids: v.children.map(c => c.name + ':' + c.type + ':' + Math.round(c.width)), t: dumpT(v, 60).filter(s => !/^[A-Za-z ]*=\d{1,2}@(\d|1[0-2])$/.test(s)).slice(0, 12), big: v.findAll(x => x.type === 'TEXT' && x.fontSize > 14).map(x => x.name + '=' + x.characters + '@' + x.fontSize + ' in ' + x.parent.name + '/' + (x.parent.parent && x.parent.parent.name)) }; }
+for (const [k, id, vn] of [['res', '23:19422', 'Lose'], ['seed', '23:23401', 'Active'], ['pf', '23:24790', 'Verified'], ['rg', '23:24937', 'Normal'], ['slipOver', '23:16674', 'Over limit']]) { const s = await figma.getNodeByIdAsync(id); const v = (s.type === 'COMPONENT_SET' ? s.children.find(c => c.name.includes(vn)) : s) || s; OUT['d_' + k] = dumpT(v, 40); }

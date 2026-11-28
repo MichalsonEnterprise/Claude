@@ -37,18 +37,25 @@ export class PermissionsGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const required =
-      this.reflector.getAllAndOverride<Permission[] | undefined>(ADMIN_PERMISSIONS, [context.getHandler(), context.getClass()]) ?? [];
+      this.reflector.getAllAndOverride<Permission[] | undefined>(ADMIN_PERMISSIONS, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? [];
     const admin = context.switchToHttp().getRequest<GpRequest>().admin;
     if (!admin) throw new AppError('UNAUTHENTICATED', 'Admin sign-in required');
     const missing = required.filter((p) => !admin.permissions.includes(p));
     if (missing.length > 0) {
-      throw new AppError('FORBIDDEN', 'Your role does not allow this action', { missingPermissions: missing });
+      throw new AppError('FORBIDDEN', 'Your role does not allow this action', {
+        missingPermissions: missing,
+      });
     }
     return true;
   }
 }
 
-export const RequirePermissions = (...permissions: Permission[]) => SetMetadata(ADMIN_PERMISSIONS, permissions);
+export const RequirePermissions = (...permissions: Permission[]) =>
+  SetMetadata(ADMIN_PERMISSIONS, permissions);
 
 /** Admin-authenticated controller/route (admin bearer token + RBAC). */
-export const AdminAuth = () => applyDecorators(UseGuards(AdminAuthGuard, PermissionsGuard), ApiBearerAuth('admin'));
+export const AdminAuth = () =>
+  applyDecorators(UseGuards(AdminAuthGuard, PermissionsGuard), ApiBearerAuth('admin'));

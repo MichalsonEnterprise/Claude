@@ -105,9 +105,13 @@ export class PlayerPolicyGuard implements CanActivate {
       const active = await this.restrictions.active(user.id);
       const hit = active.find((r) => policy.blockedBy!.includes(r));
       if (hit) {
-        throw new AppError('FORBIDDEN', 'This action is restricted on your account — contact support', {
-          restriction: hit,
-        });
+        throw new AppError(
+          'FORBIDDEN',
+          'This action is restricted on your account — contact support',
+          {
+            restriction: hit,
+          },
+        );
       }
     }
     if (policy.region) await this.geo.assertPermitted(req, user.country);

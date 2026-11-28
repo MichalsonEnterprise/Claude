@@ -59,13 +59,13 @@ export function DemoBar({
       aria-label="Demo data notice"
       data-slot="demo-bar"
       className={cn(
-        'flex min-h-9 w-full items-center justify-center gap-2 border-b border-status-warning/25 bg-amber-950 px-4 py-2 text-center text-caption text-text-warning',
+        'flex h-9 w-full items-center justify-center gap-2 overflow-hidden border-b border-status-warning/25 bg-amber-950 px-4 text-center text-caption whitespace-nowrap text-text-warning',
         className,
       )}
     >
       <TriangleAlert aria-hidden className="size-4 shrink-0" />
-      <span className="hidden tablet:inline">{message}</span>
-      <span className="tablet:hidden">{shortMessage}</span>
+      <span className="hidden truncate tablet:inline">{message}</span>
+      <span className="truncate tablet:hidden">{shortMessage}</span>
     </div>
   );
 }

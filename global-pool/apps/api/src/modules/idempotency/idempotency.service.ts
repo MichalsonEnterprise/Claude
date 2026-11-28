@@ -73,7 +73,10 @@ export class IdempotencyService {
       );
     }
     if (!row.completedAt || row.response === null) {
-      throw new AppError('CONFLICT', 'A request with this idempotency key is still being processed');
+      throw new AppError(
+        'CONFLICT',
+        'A request with this idempotency key is still being processed',
+      );
     }
     return { replayed: true, value: row.response as T };
   }

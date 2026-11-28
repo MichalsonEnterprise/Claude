@@ -58,7 +58,8 @@ function PrivyBridge({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue>(() => {
     const email = user?.email?.address ?? null;
     const wallet = user?.wallet?.address ?? null;
-    const displayName = email?.split('@')[0] ?? (wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : 'Player');
+    const displayName =
+      email?.split('@')[0] ?? (wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : 'Player');
     return {
       mode: 'privy',
       status: !ready ? 'loading' : authenticated ? 'member' : 'guest',

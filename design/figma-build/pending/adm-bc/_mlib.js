@@ -21,7 +21,7 @@ async function TSHELL(name, key, activeLabel) {
 function MPOS() { const mine = sec.children.filter(n => /^\[ADM-C[12]\]/.test(n.name)); if (mine.length) return { x: Math.max(...mine.map(n => n.x + n.width)) + 120, y: 160 }; return { x: nextX(sec), y: 160 }; }
 async function MSHELL(name, back) {
   GUARD(name); const p = MPOS(); const f = await screen(name, 390, {}); sec.appendChild(f); f.x = p.x; f.y = p.y;
-  add(f, [await DEMOBAR(), 'FILL']);
+  add(f, [await DEMOBAR('DEMO DATA — illustrative values only'), 'FILL']); // short message on 390 (decision #29)
   const bar = AL('HORIZONTAL', { name: 'Admin Topbar — Mobile', gap: 8, p: [8, 12, 8, 12], fill: 'bg/secondary', align: 'CENTER' }); strokeSides(bar, 'border/subtle', { b: 1 });
   if (back) { add(bar, await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] })); add(bar, await T(back, 'Label/L', 'text/primary')); }
   else { const lm = await I('4:792'); lm.rescale(28 / lm.width); add(bar, lm); add(bar, await T('Admin', 'Label/L', 'text/primary')); const env = AL('HORIZONTAL', { name: 'PROD', p: [2, 8, 2, 8], stroke: 'border/danger', r: 6 }); add(env, await T('PROD', 'Label/S', 'text/danger')); add(bar, env); }

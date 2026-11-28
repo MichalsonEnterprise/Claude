@@ -1,26 +1,105 @@
 {
-  "_note": "Agent adm-bc pending use_figma scripts (Figma MCP call limit hit). Each file in out/ is complete and self-contained (helpers.js verbatim + adm-bc lib + screen body), < 50k chars, syntax-checked with node. Run them in this order with use_figma (fileKey QHF8iRUMFgGMcEn3bD25jl, skillNames figma-use,figma-generate-design). Each script throws 'Frame already exists' instead of duplicating a frame, and ends with a screenshot. Section 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' on page '09 — Admin Panel' at X=70000,Y=0; fixed band rows (section-local y): C desktop 160, C laptop 3000, B desktop 6000, B laptop 9000, C tablet 12000; columns x = 120 + i*(width+120). Mobile scripts target page '10 — Mobile Experience', section 'ADM — Mobile' (X=217000,Y=0), placed after the last [ADM-C1]/[ADM-C2] frame or at nextX.",
-  "already_built": {"[ADM-C1] KYC Queue / 1440 / Default": "68:53474", "[ADM-C1] KYC Review — KYC-30418 / 1440 / In review": "75:56265", "[ADM-C2] AML Alerts / 1440 / Default": "77:56703", "[ADM-C3] Suspicious Transactions / 1440 / Default": "86:116072"},
-  "order": [
-    ["out/x1.js", "KPI delta-context fixes on C1/C2/C3 + Laptop 1280 clones of C1 queue, C1 review, C2, C3 + [ADM-C4] Sanctions Screening / 1440"],
-    ["out/c5.js", "[ADM-C5] Restricted Countries / 1440 / Default"],
-    ["out/c6.js", "[ADM-C6] Self-Exclusion / 1440 / Default"],
-    ["out/c7.js", "[ADM-C7] Responsible Gaming Reports / 1440 / Default"],
-    ["out/x5.js", "Laptop 1280 clones of C4–C7 + [ADM-B1] Supported Networks / 1440"],
-    ["out/b2.js", "[ADM-B2] Smart Contracts / 1440"],
-    ["out/b3.js", "[ADM-B3] Contract Addresses / 1440"],
-    ["out/b4.js", "[ADM-B4] Transaction Monitoring / 1440 / Live"],
-    ["out/b5.js", "[ADM-B5] Blockchain Events / 1440 / Live"],
-    ["out/b6.js", "[ADM-B6] Network Health / 1440 / Degraded — Ethereum"],
-    ["out/b7.js", "[ADM-B7] Failed Transactions / 1440"],
-    ["out/x12.js", "Laptop 1280 clones of B1–B4 + [ADM-B8] Gas Statistics / 1440"],
-    ["out/l-b2.js", "Laptop 1280 clones of B5–B8"],
-    ["out/t-c1q.js", "[ADM-C1] KYC Queue / 768 / Default"],
-    ["out/t-c1r.js", "[ADM-C1] KYC Review — KYC-30418 / 768 / In review"],
-    ["out/t-c2.js", "[ADM-C2] AML Alerts / 768 / Default"],
-    ["out/m-c1q.js", "page 10: [ADM-C1] KYC Queue / 390 / Default"],
-    ["out/m-c1r.js", "page 10: [ADM-C1] KYC Review — KYC-30418 / 390 / In review"],
-    ["out/m-c2.js", "page 10: [ADM-C2] AML Alerts / 390 / Default"]
+ "_note": "Agent adm-bc pending use_figma scripts (Figma MCP call limit hit). Each file in out/ is complete and self-contained (helpers.js verbatim + adm-bc lib + screen body), < 50k chars, syntax-checked with node. Run them in this order with use_figma (fileKey QHF8iRUMFgGMcEn3bD25jl, skillNames figma-use,figma-generate-design). Each script throws 'Frame already exists' instead of duplicating a frame, and ends with a screenshot. Section 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' on page '09 — Admin Panel' at X=70000,Y=0; fixed band rows (section-local y): C desktop 160, C laptop 3000, B desktop 6000, B laptop 9000, C tablet 12000; columns x = 120 + i*(width+120). Mobile scripts target page '10 — Mobile Experience', section 'ADM — Mobile' (X=217000,Y=0), placed after the last [ADM-C1]/[ADM-C2] frame or at nextX.",
+ "already_built": {
+  "[ADM-C1] KYC Queue / 1440 / Default": "68:53474",
+  "[ADM-C1] KYC Review — KYC-30418 / 1440 / In review": "75:56265",
+  "[ADM-C2] AML Alerts / 1440 / Default": "77:56703",
+  "[ADM-C3] Suspicious Transactions / 1440 / Default": "86:116072"
+ },
+ "order": [
+  [
+   "out/x1.js",
+   "KPI delta-context fixes on C1/C2/C3 + Laptop 1280 clones of C1 queue, C1 review, C2, C3 + [ADM-C4] Sanctions Screening / 1440"
   ],
-  "rebuild": "python3 build.py <name> re-assembles out/<name>.js from ../../helpers.js + _lib.js (+ _mlib.js for t-/m- files) + <name>.js"
+  [
+   "out/c5.js",
+   "[ADM-C5] Restricted Countries / 1440 / Default"
+  ],
+  [
+   "out/c6.js",
+   "[ADM-C6] Self-Exclusion / 1440 / Default"
+  ],
+  [
+   "out/c7.js",
+   "[ADM-C7] Responsible Gaming Reports / 1440 / Default"
+  ],
+  [
+   "out/x5.js",
+   "Laptop 1280 clones of C4–C7 + [ADM-B1] Supported Networks / 1440"
+  ],
+  [
+   "out/b2.js",
+   "[ADM-B2] Smart Contracts / 1440"
+  ],
+  [
+   "out/b3.js",
+   "[ADM-B3] Contract Addresses / 1440"
+  ],
+  [
+   "out/b4.js",
+   "[ADM-B4] Transaction Monitoring / 1440 / Live"
+  ],
+  [
+   "out/b5.js",
+   "[ADM-B5] Blockchain Events / 1440 / Live"
+  ],
+  [
+   "out/b6.js",
+   "[ADM-B6] Network Health / 1440 / Degraded — Ethereum"
+  ],
+  [
+   "out/b7.js",
+   "[ADM-B7] Failed Transactions / 1440"
+  ],
+  [
+   "out/x12.js",
+   "Laptop 1280 clones of B1–B4 + [ADM-B8] Gas Statistics / 1440"
+  ],
+  [
+   "out/l-b2.js",
+   "Laptop 1280 clones of B5–B8"
+  ],
+  [
+   "out/t-c1q.js",
+   "[ADM-C1] KYC Queue / 768 / Default"
+  ],
+  [
+   "out/t-c1r.js",
+   "[ADM-C1] KYC Review — KYC-30418 / 768 / In review"
+  ],
+  [
+   "out/t-c2.js",
+   "[ADM-C2] AML Alerts / 768 / Default"
+  ],
+  [
+   "out/m-c1q.js",
+   "page 10: [ADM-C1] KYC Queue / 390 / Default"
+  ],
+  [
+   "out/m-c1r.js",
+   "page 10: [ADM-C1] KYC Review — KYC-30418 / 390 / In review"
+  ],
+  [
+   "out/m-c2.js",
+   "page 10: [ADM-C2] AML Alerts / 390 / Default"
+  ]
+ ],
+ "rebuild": "python3 build.py <name> re-assembles out/<name>.js from ../../helpers.js + _lib.js (+ _mlib.js for t-/m- files) + <name>.js",
+ "continuation_28nov": {
+  "_note": "Continuation run (28 Nov): scripts are combined 2-3 bodies per call with combine.py (helpers verbatim + tree-shaken lib, idempotent: bodies skip if their frame exists; use_figma rolls back a failed call). Section moved to x=72000 (ADM-P section overlapped 70000-71720). Max 5 screenshots returned per call.",
+  "done": {
+   "r1 (x1+c5)": "C1Q/C1R/C2/C3 laptop clones 182:77240, 182:78431, 182:79096, 182:80044; C4 182:80815; C5 182:81717",
+   "r2 (c6+c7)": "C6 184:80848; C7 184:81751",
+   "r3 (fix-r3+x5+b2)": "C4-C7 laptop 186:112042, 186:112776, 186:113697, 186:114447; B1 186:115062; B2 186:115834",
+   "r4 (b3+b4+fix-r4)": "B3 190:160401; B4 190:161518; overflow pass 1",
+   "r5 (b5 b6 fix-r5 ovfix)": "B5 204:86357; B6 204:87285; C5/C6 cell repairs, B4 details + B3/B4 secondary lines, overflow + KPI wrap pass",
+   "r6 (b7 x12 ovfix hugcheck)": "B7 206:87491; B1-B4 laptop 206:88235/88878/89668/90610; B8 206:91534",
+   "r7 (fix-r7 l-b2 t-c1q t-c1r t-c2 hugcheck)": "B5-B8 laptop 208:167178/167901/168524/169115; tablets 208:169683, 208:170269, 208:170596",
+   "r8 (page 10: m-c1q m-c1r m-c2 ovfix)": "209:183333, 209:183698, 209:183923",
+   "r9 (fix-r9 ovfix hugcheck)": "pager totals fixed on B4/B5/C1-768/C2-768; no overflow left; 35 frames on page 09"
+  },
+  "next": [
+   "ALL FRAMES BUILT. Optional: final screenshot of C5/C6 1440+1280 and C1 review 1440 (verification only)."
+  ]
+ }
 }

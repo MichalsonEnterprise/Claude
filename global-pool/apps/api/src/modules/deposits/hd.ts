@@ -27,7 +27,8 @@ export function parseXpub(xpub: string): HDKey {
 
 /** EVM address for child `index` of the external chain (m/0/index relative to the xpub). */
 export function deriveEvmAddress(xpub: string, index: number): DerivedAddress {
-  if (!Number.isInteger(index) || index < 0 || index >= 2 ** 31) throw new RangeError('index out of range');
+  if (!Number.isInteger(index) || index < 0 || index >= 2 ** 31)
+    throw new RangeError('index out of range');
   const child = parseXpub(xpub).deriveChild(0).deriveChild(index);
   if (!child.publicKey) throw new Error('derivation produced no public key');
   const uncompressed = secp256k1.ProjectivePoint.fromHex(child.publicKey).toRawBytes(false);

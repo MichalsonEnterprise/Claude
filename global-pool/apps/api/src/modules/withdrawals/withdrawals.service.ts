@@ -1,12 +1,17 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import { Prisma, type Withdrawal, type WithdrawalStatus } from '@prisma/client';
+import type { Withdrawal, WithdrawalStatus } from '@prisma/client';
 import { CHAINS, type ChainKey } from '@gp/shared/chains';
 import { canTransitionWithdrawal, WITHDRAWAL_STATUS_LABEL, type TxStatus } from '@gp/shared/enums';
 import { withdrawalQuote } from '@gp/shared/fees';
 import { DAILY_WITHDRAWAL_LIMIT } from '@gp/shared/limits';
 import { money, toUSDTString } from '@gp/shared/money';
-import { normalizeAddress, paginate, type PaginationQuery, type WithdrawalRequest } from '@gp/shared/schemas';
+import {
+  normalizeAddress,
+  paginate,
+  type PaginationQuery,
+  type WithdrawalRequest,
+} from '@gp/shared/schemas';
 import type { Queue } from 'bullmq';
 import { randomBytes } from 'node:crypto';
 
@@ -18,9 +23,14 @@ import { PrismaService, type Tx } from '../../infra/prisma/prisma.service';
 import { JOBS, QUEUES } from '../../infra/queues/queues';
 import { AmlService } from '../aml/aml.service';
 import { AuditService } from '../audit/audit.service';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { LedgerService } from '../ledger/ledger.service';
-import { withdrawalLockLines, withdrawalReleaseLines, withdrawalSettleLines } from '../ledger/posting';
+import {
+  withdrawalLockLines,
+  withdrawalReleaseLines,
+  withdrawalSettleLines,
+} from '../ledger/posting';
 import { NotificationsService } from '../notifications/notifications.service';
 import { StepUpService } from '../security/step-up.service';
 
@@ -37,7 +47,14 @@ const TX_STATUS: Record<WithdrawalStatus, TxStatus> = {
   rejected: 'rejected',
   cancelled: 'cancelled',
 };
-const COUNTS_TOWARDS_LIMIT: WithdrawalStatus[] = ['requested', 'risk_check', 'under_review', 'queued', 'broadcast', 'confirmed'];
+const COUNTS_TOWARDS_LIMIT: WithdrawalStatus[] = [
+  'requested',
+  'risk_check',
+  'under_review',
+  'queued',
+  'broadcast',
+  'confirmed',
+];
 
 /**
  * Withdrawals: request (zod-validated, step-up 2FA, KYC daily limit, balance) moves AVAILABLE → LOCKED, then the
@@ -57,6 +74,7 @@ export class WithdrawalsService {
     private readonly audit: AuditService,
     private readonly notifications: NotificationsService,
     @InjectQueue(QUEUES.WITHDRAWALS) private readonly queue: Queue,
+    private readonly flags: FeatureFlagsService,
   ) {}
 
   quote(amount: string, network: ChainKey) {
@@ -64,11 +82,16 @@ export class WithdrawalsService {
   }
 
   async request(user: AuthUser, input: WithdrawalRequest, stepUpToken: string | null) {
+    await this.flags.assertEnabled('withdrawals.enabled', 'Withdrawals');
     const quote = withdrawalQuote(input.amount, input.network);
     if (!quote.meetsMinimum) {
-      throw new AppError('VALIDATION_FAILED', `Minimum withdrawal is ${quote.minWithdrawal} USDT (after network fees)`, {
-        quote,
-      });
+      throw new AppError(
+        'VALIDATION_FAILED',
+        `Minimum withdrawal is ${quote.minWithdrawal} USDT (after network fees)`,
+        {
+          quote,
+        },
+      );
     }
     const address = normalizeAddress(input.network, input.address);
     const addressKey = CHAINS[input.network].family === 'evm' ? address.toLowerCase() : address;
@@ -76,36 +99,81 @@ export class WithdrawalsService {
     const existing = await this.prisma.withdrawal.findUnique({
       where: { userId_idempotencyKey: { userId: user.id, idempotencyKey: input.idempotencyKey } },
     });
-    if (!existing) await this.stepUp.assert(user, 'withdrawal', { totpCode: input.totpCode, stepUpToken });
+    if (!existing) {
+      // Cheap policy checks first, so no 2FA code is consumed for a request that cannot proceed.
+      const profile = await this.prisma.userProfile.findUnique({
+        where: { userId: user.id },
+        select: { kycLevel: true },
+      });
+      if (money(DAILY_WITHDRAWAL_LIMIT[profile?.kycLevel ?? 'none']).isZero()) {
+        throw new AppError(
+          'KYC_REQUIRED',
+          'Verify your identity (KYC Level 1) before withdrawing',
+          {
+            kycLevel: profile?.kycLevel ?? 'none',
+          },
+        );
+      }
+      await this.stepUp.assert(user, 'withdrawal', { totpCode: input.totpCode, stepUpToken });
+    }
 
     const result = await this.idempotency.run(
       { scope: 'withdrawal.request', ownerId: user.id, key: input.idempotencyKey, request },
       async (tx) => {
-        const profile = await tx.userProfile.findUnique({ where: { userId: user.id }, select: { kycLevel: true } });
+        const profile = await tx.userProfile.findUnique({
+          where: { userId: user.id },
+          select: { kycLevel: true },
+        });
         const level = profile?.kycLevel ?? 'none';
         const limit = DAILY_WITHDRAWAL_LIMIT[level];
         if (money(limit).isZero()) {
-          throw new AppError('KYC_REQUIRED', 'Verify your identity (KYC Level 1) before withdrawing', { kycLevel: level });
+          throw new AppError(
+            'KYC_REQUIRED',
+            'Verify your identity (KYC Level 1) before withdrawing',
+            { kycLevel: level },
+          );
         }
         const today = await tx.withdrawal.aggregate({
-          where: { userId: user.id, createdAt: { gte: periodStart('day') }, status: { in: COUNTS_TOWARDS_LIMIT } },
+          where: {
+            userId: user.id,
+            createdAt: { gte: periodStart('day') },
+            status: { in: COUNTS_TOWARDS_LIMIT },
+          },
           _sum: { amount: true },
         });
         const usedToday = money(today._sum.amount?.toFixed() ?? '0');
         if (usedToday.plus(money(quote.amount)).gt(money(limit))) {
-          throw new AppError('VALIDATION_FAILED', `This exceeds your daily withdrawal limit of ${limit} USDT`, {
-            dailyLimit: limit,
-            usedToday: toUSDTString(usedToday),
-            kycLevel: level,
-          });
+          throw new AppError(
+            'VALIDATION_FAILED',
+            `This exceeds your daily withdrawal limit of ${limit} USDT`,
+            {
+              dailyLimit: limit,
+              usedToday: toUSDTString(usedToday),
+              kycLevel: level,
+            },
+          );
         }
         const wallet = await tx.userWallet.findUnique({
-          where: { userId_network_address: { userId: user.id, network: input.network, address: addressKey } },
+          where: {
+            userId_network_address: {
+              userId: user.id,
+              network: input.network,
+              address: addressKey,
+            },
+          },
         });
-        if (wallet?.whitelistedAt && wallet.whitelistAvailableAt && wallet.whitelistAvailableAt > new Date()) {
-          throw new AppError('ADDRESS_NOT_WHITELISTED', 'This address is in its 24 h new-address cool-down', {
-            availableAt: wallet.whitelistAvailableAt.toISOString(),
-          });
+        if (
+          wallet?.whitelistedAt &&
+          wallet.whitelistAvailableAt &&
+          wallet.whitelistAvailableAt > new Date()
+        ) {
+          throw new AppError(
+            'ADDRESS_NOT_WHITELISTED',
+            'This address is in its 24 h new-address cool-down',
+            {
+              availableAt: wallet.whitelistAvailableAt.toISOString(),
+            },
+          );
         }
         const withdrawal = await tx.withdrawal.create({
           data: {
@@ -118,7 +186,14 @@ export class WithdrawalsService {
             netAmount: quote.youReceive,
             status: 'requested',
             idempotencyKey: input.idempotencyKey,
-            events: { create: { toStatus: 'requested', actorType: 'user', actorId: user.id, note: 'Submitted' } },
+            events: {
+              create: {
+                toStatus: 'requested',
+                actorType: 'user',
+                actorId: user.id,
+                note: 'Submitted',
+              },
+            },
           },
         });
         const reference = `WD-${withdrawal.number}`;
@@ -162,8 +237,14 @@ export class WithdrawalsService {
         await this.runRiskCheck(result.value.id);
       } catch (err) {
         // Never lose a request: the queued job retries the screening.
-        this.logger.warn(`Inline risk check failed for ${result.value.id}: ${String(err)} — queued for retry`);
-        await this.queue.add(JOBS.WITHDRAWAL_RISK_CHECK, { withdrawalId: result.value.id }, { jobId: `risk-${result.value.id}` });
+        this.logger.warn(
+          `Inline risk check failed for ${result.value.id}: ${String(err)} — queued for retry`,
+        );
+        await this.queue.add(
+          JOBS.WITHDRAWAL_RISK_CHECK,
+          { withdrawalId: result.value.id },
+          { jobId: `risk-${result.value.id}` },
+        );
       }
     }
     return { ...(await this.get(user.id, result.value.id)), replayed: result.replayed };
@@ -171,18 +252,37 @@ export class WithdrawalsService {
 
   /** requested → risk_check → queued | under_review | rejected (funds returned). */
   async runRiskCheck(withdrawalId: string): Promise<WithdrawalStatus> {
-    const w = await this.prisma.withdrawal.findUniqueOrThrow({ where: { id: withdrawalId }, include: { user: true } });
+    const w = await this.prisma.withdrawal.findUniqueOrThrow({
+      where: { id: withdrawalId },
+      include: { user: true },
+    });
     if (w.status !== 'requested' && w.status !== 'risk_check') return w.status;
     if (w.status === 'requested') {
-      await this.prisma.tx((tx) => this.transition(tx, w, 'risk_check', { type: 'system', id: null }, 'Security checks started'));
+      await this.prisma.tx((tx) =>
+        this.transition(
+          tx,
+          w,
+          'risk_check',
+          { type: 'system', id: null },
+          'Security checks started',
+        ),
+      );
     }
     const [wallet, priorConfirmed, last24h] = await Promise.all([
       this.prisma.userWallet.findUnique({
-        where: { userId_network_address: { userId: w.userId, network: w.network, address: w.toAddress } },
+        where: {
+          userId_network_address: { userId: w.userId, network: w.network, address: w.toAddress },
+        },
       }),
-      this.prisma.withdrawal.count({ where: { userId: w.userId, toAddress: w.toAddress, status: 'confirmed' } }),
       this.prisma.withdrawal.count({
-        where: { userId: w.userId, createdAt: { gte: new Date(Date.now() - 86_400_000) }, id: { not: w.id } },
+        where: { userId: w.userId, toAddress: w.toAddress, status: 'confirmed' },
+      }),
+      this.prisma.withdrawal.count({
+        where: {
+          userId: w.userId,
+          createdAt: { gte: new Date(Date.now() - 86_400_000) },
+          id: { not: w.id },
+        },
       }),
     ]);
     const whitelisted = Boolean(wallet?.whitelistedAt);
@@ -210,9 +310,18 @@ export class WithdrawalsService {
       });
       const note = `${screening.checks.length} checks · risk ${screening.riskLevel}${screening.reason ? ` — ${screening.reason}` : ''}`;
       if (screening.decision === 'reject') {
-        await this.transition(tx, current, 'rejected', { type: 'system', id: null }, `Rejected — ${screening.reason ?? 'screening'}`);
+        await this.transition(
+          tx,
+          current,
+          'rejected',
+          { type: 'system', id: null },
+          `Rejected — ${screening.reason ?? 'screening'}`,
+        );
         await this.release(tx, current, 'rejected');
-        await tx.withdrawal.update({ where: { id: w.id }, data: { rejectedAt: new Date(), rejectionReason: screening.reason } });
+        await tx.withdrawal.update({
+          where: { id: w.id },
+          data: { rejectedAt: new Date(), rejectionReason: screening.reason },
+        });
         return 'rejected' as const;
       }
       const next = screening.decision === 'review' ? 'under_review' : 'queued';
@@ -221,7 +330,10 @@ export class WithdrawalsService {
         userId: w.userId,
         type: next === 'queued' ? 'withdrawal.queued' : 'withdrawal.under_review',
         title: next === 'queued' ? 'Withdrawal queued' : 'Withdrawal under review',
-        body: next === 'queued' ? 'Your withdrawal passed security checks and is queued for sending.' : (screening.reason ?? 'Manual review'),
+        body:
+          next === 'queued'
+            ? 'Your withdrawal passed security checks and is queued for sending.'
+            : (screening.reason ?? 'Manual review'),
         data: { reference: `WD-${w.number}` },
       });
       return next;
@@ -234,10 +346,19 @@ export class WithdrawalsService {
     const w = await this.prisma.withdrawal.findFirst({ where: { id, userId: user.id } });
     if (!w) throw notFound('Withdrawal');
     if (!canTransitionWithdrawal(w.status, 'cancelled')) {
-      throw new AppError('CONFLICT', `A withdrawal that is ${WITHDRAWAL_STATUS_LABEL[w.status].toLowerCase()} cannot be cancelled`);
+      throw new AppError(
+        'CONFLICT',
+        `A withdrawal that is ${WITHDRAWAL_STATUS_LABEL[w.status].toLowerCase()} cannot be cancelled`,
+      );
     }
     await this.prisma.tx(async (tx) => {
-      await this.transition(tx, w, 'cancelled', { type: 'user', id: user.id }, 'Cancelled by you — funds returned to Available');
+      await this.transition(
+        tx,
+        w,
+        'cancelled',
+        { type: 'user', id: user.id },
+        'Cancelled by you — funds returned to Available',
+      );
       await this.release(tx, w, 'cancelled');
       await tx.withdrawal.update({ where: { id }, data: { cancelledAt: new Date() } });
       await tx.adminApproval.updateMany({
@@ -252,68 +373,162 @@ export class WithdrawalsService {
    * Admin approval of an under-review withdrawal. Flagged ones need FOUR EYES: the first approval records a pending
    * admin_approvals row; a DIFFERENT admin must approve to queue it.
    */
-  async adminApprove(admin: AuthAdmin, id: string, reason: string, meta: { ip: string | null; requestId: string | null }) {
-    return this.prisma.tx(async (tx) => {
-      const w = await this.lockRow(tx, id);
-      if (w.status !== 'under_review') throw new AppError('CONFLICT', `Withdrawal is ${w.status}, not under review`);
-      if (w.requiresFourEyes) {
-        const pending = await tx.adminApproval.findFirst({
-          where: { targetType: 'withdrawal', targetId: id, action: 'withdrawal.approve', status: 'pending' },
-        });
-        if (!pending) {
-          const approval = await tx.adminApproval.create({
-            data: {
-              action: 'withdrawal.approve',
+  async adminApprove(
+    admin: AuthAdmin,
+    id: string,
+    reason: string,
+    meta: { ip: string | null; requestId: string | null },
+  ) {
+    return this.prisma
+      .tx(async (tx) => {
+        const w = await this.lockRow(tx, id);
+        if (w.status !== 'under_review')
+          throw new AppError('CONFLICT', `Withdrawal is ${w.status}, not under review`);
+        if (w.requiresFourEyes) {
+          const pending = await tx.adminApproval.findFirst({
+            where: {
               targetType: 'withdrawal',
               targetId: id,
-              requestedByAdminId: admin.id,
-              requestReason: reason,
-              payload: { reference: `WD-${w.number}`, amount: w.amount.toFixed() },
+              action: 'withdrawal.approve',
+              status: 'pending',
             },
           });
-          await this.audit.record(
-            { actorType: 'admin', actorId: admin.id, actorLabel: admin.name, action: 'withdrawal.approve.first', targetType: 'withdrawal', targetId: id, reason, outcome: 'pending_approval', ip: meta.ip, requestId: meta.requestId, metadata: { approvalId: approval.id, reference: `WD-${w.number}` } },
-            tx,
-          );
-          return { status: w.status, fourEyes: { required: true, approvals: 1, of: 2, approvalId: approval.id } };
+          if (!pending) {
+            const approval = await tx.adminApproval.create({
+              data: {
+                action: 'withdrawal.approve',
+                targetType: 'withdrawal',
+                targetId: id,
+                requestedByAdminId: admin.id,
+                requestReason: reason,
+                payload: { reference: `WD-${w.number}`, amount: w.amount.toFixed() },
+              },
+            });
+            await this.audit.record(
+              {
+                actorType: 'admin',
+                actorId: admin.id,
+                actorLabel: admin.name,
+                action: 'withdrawal.approve.first',
+                targetType: 'withdrawal',
+                targetId: id,
+                reason,
+                outcome: 'pending_approval',
+                ip: meta.ip,
+                requestId: meta.requestId,
+                metadata: { approvalId: approval.id, reference: `WD-${w.number}` },
+              },
+              tx,
+            );
+            return {
+              status: w.status,
+              fourEyes: { required: true, approvals: 1, of: 2, approvalId: approval.id },
+            };
+          }
+          if (pending.requestedByAdminId === admin.id) {
+            throw new AppError(
+              'FORBIDDEN',
+              'Four-eyes rule: a different admin must give the second approval',
+            );
+          }
+          await tx.adminApproval.update({
+            where: { id: pending.id },
+            data: {
+              status: 'approved',
+              decidedByAdminId: admin.id,
+              decisionReason: reason,
+              decidedAt: new Date(),
+            },
+          });
         }
-        if (pending.requestedByAdminId === admin.id) {
-          throw new AppError('FORBIDDEN', 'Four-eyes rule: a different admin must give the second approval');
-        }
-        await tx.adminApproval.update({
-          where: { id: pending.id },
-          data: { status: 'approved', decidedByAdminId: admin.id, decisionReason: reason, decidedAt: new Date() },
+        await this.transition(
+          tx,
+          w,
+          'queued',
+          { type: 'admin', id: admin.id },
+          `Approved after review — ${reason}`,
+        );
+        await this.audit.record(
+          {
+            actorType: 'admin',
+            actorId: admin.id,
+            actorLabel: admin.name,
+            action: 'withdrawal.approve',
+            targetType: 'withdrawal',
+            targetId: id,
+            reason,
+            ip: meta.ip,
+            requestId: meta.requestId,
+            metadata: { reference: `WD-${w.number}`, fourEyes: w.requiresFourEyes },
+          },
+          tx,
+        );
+        await this.notifications.notify(tx, {
+          userId: w.userId,
+          type: 'withdrawal.queued',
+          title: 'Withdrawal approved',
+          body: 'Your withdrawal was reviewed and is queued for sending.',
+          data: { reference: `WD-${w.number}` },
         });
-      }
-      await this.transition(tx, w, 'queued', { type: 'admin', id: admin.id }, `Approved after review — ${reason}`);
-      await this.audit.record(
-        { actorType: 'admin', actorId: admin.id, actorLabel: admin.name, action: 'withdrawal.approve', targetType: 'withdrawal', targetId: id, reason, ip: meta.ip, requestId: meta.requestId, metadata: { reference: `WD-${w.number}`, fourEyes: w.requiresFourEyes } },
-        tx,
-      );
-      await this.notifications.notify(tx, {
-        userId: w.userId,
-        type: 'withdrawal.queued',
-        title: 'Withdrawal approved',
-        body: 'Your withdrawal was reviewed and is queued for sending.',
-        data: { reference: `WD-${w.number}` },
+        return {
+          status: 'queued' as const,
+          fourEyes: {
+            required: w.requiresFourEyes,
+            approvals: w.requiresFourEyes ? 2 : 1,
+            of: w.requiresFourEyes ? 2 : 1,
+          },
+        };
+      })
+      .then(async (r) => {
+        if (r.status === 'queued') await this.enqueueBroadcast(id);
+        return r;
       });
-      return { status: 'queued' as const, fourEyes: { required: w.requiresFourEyes, approvals: w.requiresFourEyes ? 2 : 1, of: w.requiresFourEyes ? 2 : 1 } };
-    }).then(async (r) => {
-      if (r.status === 'queued') await this.enqueueBroadcast(id);
-      return r;
-    });
   }
 
-  async adminReject(admin: AuthAdmin, id: string, reason: string, meta: { ip: string | null; requestId: string | null }) {
+  async adminReject(
+    admin: AuthAdmin,
+    id: string,
+    reason: string,
+    meta: { ip: string | null; requestId: string | null },
+  ) {
     return this.prisma.tx(async (tx) => {
       const w = await this.lockRow(tx, id);
-      if (!canTransitionWithdrawal(w.status, 'rejected')) throw new AppError('CONFLICT', `Withdrawal is ${w.status} and cannot be rejected`);
-      await this.transition(tx, w, 'rejected', { type: 'admin', id: admin.id }, `Rejected — ${reason}`);
+      if (!canTransitionWithdrawal(w.status, 'rejected'))
+        throw new AppError('CONFLICT', `Withdrawal is ${w.status} and cannot be rejected`);
+      await this.transition(
+        tx,
+        w,
+        'rejected',
+        { type: 'admin', id: admin.id },
+        `Rejected — ${reason}`,
+      );
       await this.release(tx, w, 'rejected');
-      await tx.withdrawal.update({ where: { id }, data: { rejectedAt: new Date(), rejectionReason: reason } });
-      await tx.adminApproval.updateMany({ where: { targetType: 'withdrawal', targetId: id, status: 'pending' }, data: { status: 'rejected', decidedByAdminId: admin.id, decisionReason: reason, decidedAt: new Date() } });
+      await tx.withdrawal.update({
+        where: { id },
+        data: { rejectedAt: new Date(), rejectionReason: reason },
+      });
+      await tx.adminApproval.updateMany({
+        where: { targetType: 'withdrawal', targetId: id, status: 'pending' },
+        data: {
+          status: 'rejected',
+          decidedByAdminId: admin.id,
+          decisionReason: reason,
+          decidedAt: new Date(),
+        },
+      });
       await this.audit.record(
-        { actorType: 'admin', actorId: admin.id, actorLabel: admin.name, action: 'withdrawal.reject', targetType: 'withdrawal', targetId: id, reason, ip: meta.ip, requestId: meta.requestId, metadata: { reference: `WD-${w.number}`, amount: w.amount.toFixed() } },
+        {
+          actorType: 'admin',
+          actorId: admin.id,
+          actorLabel: admin.name,
+          action: 'withdrawal.reject',
+          targetType: 'withdrawal',
+          targetId: id,
+          reason,
+          ip: meta.ip,
+          requestId: meta.requestId,
+          metadata: { reference: `WD-${w.number}`, amount: w.amount.toFixed() },
+        },
         tx,
       );
       await this.notifications.notify(tx, {
@@ -334,7 +549,9 @@ export class WithdrawalsService {
   async broadcast(id: string): Promise<WithdrawalStatus> {
     const w = await this.prisma.withdrawal.findUniqueOrThrow({ where: { id } });
     if (w.status !== 'queued') return w.status;
-    this.logger.log(`WD-${w.number} queued — no testnet signer configured, waiting (no broadcast).`);
+    this.logger.log(
+      `WD-${w.number} queued — no testnet signer configured, waiting (no broadcast).`,
+    );
     return w.status;
   }
 
@@ -344,9 +561,22 @@ export class WithdrawalsService {
     await this.prisma.tx(async (tx) => {
       const w = await this.lockRow(tx, id);
       if (w.userId !== userId) throw notFound('Withdrawal');
-      if (w.status !== 'queued') throw new AppError('CONFLICT', `Withdrawal is ${w.status}; only queued withdrawals can be sent`);
-      await tx.withdrawal.update({ where: { id }, data: { txHash, broadcastAt: new Date(), isDemo: true } });
-      const sent = await this.transition(tx, w, 'broadcast', { type: 'system', id: null }, 'Sent (DEMO simulation)');
+      if (w.status !== 'queued')
+        throw new AppError(
+          'CONFLICT',
+          `Withdrawal is ${w.status}; only queued withdrawals can be sent`,
+        );
+      await tx.withdrawal.update({
+        where: { id },
+        data: { txHash, broadcastAt: new Date(), isDemo: true },
+      });
+      const sent = await this.transition(
+        tx,
+        w,
+        'broadcast',
+        { type: 'system', id: null },
+        'Sent (DEMO simulation)',
+      );
       await this.confirm(tx, sent, txHash);
     });
     return this.get(userId, id);
@@ -354,7 +584,13 @@ export class WithdrawalsService {
 
   /** broadcast → confirmed: LOCKED −amount → CHAIN_CLEARING +net, OPERATOR_REVENUE +network fee. */
   async confirm(tx: Tx, w: Withdrawal, txHash: string) {
-    const done = await this.transition(tx, w, 'confirmed', { type: 'system', id: null }, `Confirmed on-chain · ${txHash.slice(0, 6)}…${txHash.slice(-4)}`);
+    const done = await this.transition(
+      tx,
+      w,
+      'confirmed',
+      { type: 'system', id: null },
+      `Confirmed on-chain · ${txHash.slice(0, 6)}…${txHash.slice(-4)}`,
+    );
     await tx.withdrawal.update({ where: { id: w.id }, data: { confirmedAt: new Date(), txHash } });
     const record = await tx.transaction.findFirst({ where: { withdrawalId: w.id } });
     await this.ledger.post(tx, {
@@ -370,7 +606,10 @@ export class WithdrawalsService {
         platformFee: w.platformFee.toFixed(),
       }),
     });
-    await tx.transaction.updateMany({ where: { withdrawalId: w.id }, data: { txHash, completedAt: new Date() } });
+    await tx.transaction.updateMany({
+      where: { withdrawalId: w.id },
+      data: { txHash, completedAt: new Date() },
+    });
     await this.notifications.notify(tx, {
       userId: w.userId,
       type: 'withdrawal.confirmed',
@@ -383,9 +622,18 @@ export class WithdrawalsService {
 
   /** broadcast → failed: funds back to Available, no network fee charged. */
   async fail(tx: Tx, w: Withdrawal, reason: string) {
-    await this.transition(tx, w, 'failed', { type: 'system', id: null }, `Failed — ${reason}. Funds returned to Available`);
+    await this.transition(
+      tx,
+      w,
+      'failed',
+      { type: 'system', id: null },
+      `Failed — ${reason}. Funds returned to Available`,
+    );
     await this.release(tx, w, 'failed');
-    await tx.withdrawal.update({ where: { id: w.id }, data: { failedAt: new Date(), failureReason: reason } });
+    await tx.withdrawal.update({
+      where: { id: w.id },
+      data: { failedAt: new Date(), failureReason: reason },
+    });
   }
 
   async list(userId: string, query: PaginationQuery) {
@@ -399,7 +647,11 @@ export class WithdrawalsService {
       }),
       this.prisma.withdrawal.count({ where: { userId } }),
     ]);
-    return paginate(rows.map((w) => this.view(w)), total, query);
+    return paginate(
+      rows.map((w) => this.view(w)),
+      total,
+      query,
+    );
   }
 
   async get(userId: string | null, id: string) {
@@ -411,7 +663,11 @@ export class WithdrawalsService {
     return this.view(w);
   }
 
-  view(w: Withdrawal & { events?: { toStatus: WithdrawalStatus; note: string | null; createdAt: Date }[] }) {
+  view(
+    w: Withdrawal & {
+      events?: { toStatus: WithdrawalStatus; note: string | null; createdAt: Date }[];
+    },
+  ) {
     return {
       id: w.id,
       reference: `WD-${w.number}`,
@@ -429,7 +685,11 @@ export class WithdrawalsService {
       txHash: w.txHash,
       rejectionReason: w.rejectionReason,
       failureReason: w.failureReason,
-      timeline: (w.events ?? []).map((e) => ({ status: e.toStatus, label: e.note ?? WITHDRAWAL_STATUS_LABEL[e.toStatus], at: e.createdAt.toISOString() })),
+      timeline: (w.events ?? []).map((e) => ({
+        status: e.toStatus,
+        label: e.note ?? WITHDRAWAL_STATUS_LABEL[e.toStatus],
+        at: e.createdAt.toISOString(),
+      })),
       createdAt: w.createdAt.toISOString(),
       updatedAt: w.updatedAt.toISOString(),
       isDemo: w.isDemo,
@@ -438,7 +698,11 @@ export class WithdrawalsService {
 
   private async enqueueBroadcast(id: string) {
     try {
-      await this.queue.add(JOBS.WITHDRAWAL_BROADCAST, { withdrawalId: id }, { jobId: `broadcast-${id}` });
+      await this.queue.add(
+        JOBS.WITHDRAWAL_BROADCAST,
+        { withdrawalId: id },
+        { jobId: `broadcast-${id}` },
+      );
     } catch (err) {
       this.logger.warn(`Could not enqueue broadcast for ${id}: ${String(err)}`);
     }
@@ -452,21 +716,39 @@ export class WithdrawalsService {
   }
 
   /** Guarded status change: allowed edge + compare-and-set on the current status + event row + tx status. */
-  async transition(tx: Tx, w: Withdrawal, to: WithdrawalStatus, actor: Actor, note: string): Promise<Withdrawal> {
+  async transition(
+    tx: Tx,
+    w: Withdrawal,
+    to: WithdrawalStatus,
+    actor: Actor,
+    note: string,
+  ): Promise<Withdrawal> {
     if (!canTransitionWithdrawal(w.status, to)) {
       throw new AppError('CONFLICT', `Illegal withdrawal transition ${w.status} → ${to}`);
     }
-    const res = await tx.withdrawal.updateMany({ where: { id: w.id, status: w.status }, data: { status: to } });
+    const res = await tx.withdrawal.updateMany({
+      where: { id: w.id, status: w.status },
+      data: { status: to },
+    });
     if (res.count !== 1) throw new AppError('CONFLICT', 'Withdrawal changed concurrently — retry');
     await tx.withdrawalEvent.create({
-      data: { withdrawalId: w.id, fromStatus: w.status, toStatus: to, actorType: actor.type, actorId: actor.id, note },
+      data: {
+        withdrawalId: w.id,
+        fromStatus: w.status,
+        toStatus: to,
+        actorType: actor.type,
+        actorId: actor.id,
+        note,
+      },
     });
     await tx.transaction.updateMany({
       where: { withdrawalId: w.id },
       data: {
         status: TX_STATUS[to],
-        metadata: { address: w.toAddress, statusDetail: note } as Prisma.InputJsonObject,
-        ...(to === 'rejected' || to === 'cancelled' || to === 'failed' ? { completedAt: new Date() } : {}),
+        metadata: { address: w.toAddress, statusDetail: note },
+        ...(to === 'rejected' || to === 'cancelled' || to === 'failed'
+          ? { completedAt: new Date() }
+          : {}),
       },
     });
     return { ...w, status: to };

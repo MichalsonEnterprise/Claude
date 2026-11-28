@@ -8,7 +8,10 @@ import type { ReactNode } from 'react';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: { default: 'GLOBAL POOL — verifiable global jackpot (DEMO)', template: '%s · GLOBAL POOL' },
+  title: {
+    default: 'GLOBAL POOL — verifiable global jackpot (DEMO)',
+    template: '%s · GLOBAL POOL',
+  },
   description:
     'One global pool, every entry verifiable. Chainlink VRF draws on Arbitrum. DEMO / testnet build — no real money. 18+.',
   applicationName: 'GLOBAL POOL',

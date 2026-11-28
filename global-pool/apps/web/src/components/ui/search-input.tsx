@@ -46,7 +46,10 @@ export function SearchInput({
 
   return (
     <InputGroup size={size} className={cn('bg-surface-default', groupClassName)}>
-      <Search aria-hidden className={cn('text-icon-muted', size === 's' ? 'size-4' : 'size-[18px]')} />
+      <Search
+        aria-hidden
+        className={cn('text-icon-muted', size === 's' ? 'size-4' : 'size-[18px]')}
+      />
       <InputControl
         ref={ref}
         type="search"

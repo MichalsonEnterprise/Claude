@@ -12,10 +12,10 @@ add(sm, [g, 'FILL']); const dm = row('Demo', { gap: 6 }); add(dm, await DEMO('XS
 const ch = AL('HORIZONTAL', { name: 'Status chips (scroll)', gap: 8, clip: true }); for (const [l, x] of [['All', 1], ['In the draw', 0], ['Won', 0], ['Not selected', 0], ['Refunded', 0]]) add(ch, await I(C.CHIP, { State: x ? 'Selected' : 'Default' }, { Label: l, 'Show icon': false })); add(main, [ch, 'FILL']);
 const list = col('Purchase cards', { gap: 12 });
 const P = [
-  ['#1,248', '27 Nov 2026, 14:06 UTC', ['Pending', 'In the draw'], [['Entries', '35 · E-1248-00981 … 01015', { vs: 'Mono/S' }], ['Paid', '351.75 (350.00 + 1.75 fee)'], ['Outcome', 'Draws today 20:00 UTC']]],
-  ['#1,247', '26 Nov 2026, 10:15 UTC', ['Neutral', 'Not selected'], [['Entries', '__E1247__ · __R1247S__', { vs: 'Mono/S' }], ['Paid', '__P1247__ (__F1247__)'], ['Outcome', '0.00 USDT']]],
-  ['#1,246', '25 Nov 2026, 12:31 UTC', ['Neutral', 'Not selected'], [['Entries', '__E1246__ · __R1246S__', { vs: 'Mono/S' }], ['Paid', '__P1246__ (__F1246__)'], ['Outcome', '0.00 USDT']]],
-  ['#1,245', '24 Nov 2026, 09:40 UTC', ['Pending', 'Refund owed'], [['Entries', '30 · E-1245-00383 … 00412', { vs: 'Mono/S' }], ['Paid', '301.50 (300.00 + 1.50 fee)'], ['Outcome', '+301.50 · 300.00 owed', { vc: 'balance/owed' }]]],
+  ['#1,248', '27 Nov 2026, 18:05 UTC', ['Pending', 'In the draw'], [['Entries', '35 · E-1248-00981 … 01015', { vs: 'Mono/S' }], ['Paid', '351.75 (350.00 + 1.75 fee)'], ['Outcome', 'Draws today 20:00 UTC']]],
+  ['#1,247', '26 Nov 2026, 12:40 UTC', ['Neutral', 'Not selected'], [['Entries', '__E1247__ · __R1247S__', { vs: 'Mono/S' }], ['Paid', '__P1247__ (__F1247__)'], ['Outcome', '0.00 USDT']]],
+  ['#1,246', '25 Nov 2026, 19:12 UTC', ['Neutral', 'Not selected'], [['Entries', '__E1246__ · __R1246S__', { vs: 'Mono/S' }], ['Paid', '__P1246__ (__F1246__)'], ['Outcome', '0.00 USDT']]],
+  ['#1,245', '24 Nov 2026, 14:22 UTC', ['Pending', 'Refund owed'], [['Entries', '30 · E-1245-00383 … 00412', { vs: 'Mono/S' }], ['Paid', '301.50 (300.00 + 1.50 fee)'], ['Outcome', '+301.50 · 300.00 owed', { vc: 'balance/owed' }]]],
   ['#1,244', '23 Nov 2026, 16:12 UTC', ['Approved', 'Won · runner-up'], [['Entries', '20 · E-1244-11803 … 11822', { vs: 'Mono/S' }], ['Paid', '201.00 (200.00 + 1.00 fee)'], ['Outcome', '+3,620.60 USDT', { vc: 'text/gold', demo: true }]]]];
 for (const [r, d, b, kvs] of P) { const c = await mcard('Round ' + r, await badge(b[0], b[1]), kvs, { sub: d }); add(list, [c, 'FILL']); }
 add(main, [list, 'FILL']);

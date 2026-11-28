@@ -7,6 +7,7 @@ import { AppError } from '../../common/errors';
 import type { AuthUser } from '../../common/request';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { ResponsibleGamingService } from '../compliance/responsible-gaming.service';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { LedgerService } from '../ledger/ledger.service';
 import { entryPurchaseLines } from '../ledger/posting';
@@ -47,6 +48,7 @@ export class EntriesService {
     private readonly rg: ResponsibleGamingService,
     private readonly notifications: NotificationsService,
     private readonly events: PoolEventsService,
+    private readonly flags: FeatureFlagsService,
   ) {}
 
   quote(entries: number) {
@@ -55,6 +57,7 @@ export class EntriesService {
 
   async enter(user: AuthUser, roundId: string, entries: number, idempotencyKey: string) {
     const quote = entryQuote(entries);
+    await this.flags.assertEnabled('pool.entries.enabled', 'Global Pool entry sales');
     const result = await this.idempotency.run<EntryPurchaseResult & Prisma.InputJsonObject>(
       { scope: 'pool.enter', ownerId: user.id, key: idempotencyKey, request: { roundId, entries } },
       async (tx) => {
@@ -63,10 +66,14 @@ export class EntriesService {
         if (!round) throw new AppError('NOT_FOUND', 'Round not found');
         const now = new Date();
         if (round.status !== 'open' || now < round.opensAt || now >= round.closesAt) {
-          throw new AppError('ROUND_NOT_OPEN', `Round ${formatRoundNumber(round.number)} is not accepting entries`, {
-            status: round.status,
-            closesAt: round.closesAt.toISOString(),
-          });
+          throw new AppError(
+            'ROUND_NOT_OPEN',
+            `Round ${formatRoundNumber(round.number)} is not accepting entries`,
+            {
+              status: round.status,
+              closesAt: round.closesAt.toISOString(),
+            },
+          );
         }
         await this.rg.assertCanParticipate(user.id, quote.total, tx, now);
 
@@ -75,7 +82,10 @@ export class EntriesService {
         const firstEntryId = entryCode(round.number, firstSeq);
         const lastEntryId = entryCode(round.number, lastSeq);
         const reference = `EP-${round.number}-${String(firstSeq).padStart(5, '0')}-${String(lastSeq).padStart(5, '0')}`;
-        const isNewParticipant = !(await tx.entry.findFirst({ where: { roundId, userId: user.id }, select: { id: true } }));
+        const isNewParticipant = !(await tx.entry.findFirst({
+          where: { roundId, userId: user.id },
+          select: { id: true },
+        }));
 
         const record = await tx.transaction.create({
           data: {
@@ -119,10 +129,24 @@ export class EntriesService {
           })),
         });
         await tx.poolLedger.create({
-          data: { roundId, postingId: posting.id, userId: user.id, kind: 'entry', entryCount: entries, amount: quote.entryAmount },
+          data: {
+            roundId,
+            postingId: posting.id,
+            userId: user.id,
+            kind: 'entry',
+            entryCount: entries,
+            amount: quote.entryAmount,
+          },
         });
         await tx.feeLedger.create({
-          data: { postingId: posting.id, userId: user.id, roundId, kind: 'platform_entry_fee', entryCount: entries, amount: quote.platformFee },
+          data: {
+            postingId: posting.id,
+            userId: user.id,
+            roundId,
+            kind: 'platform_entry_fee',
+            entryCount: entries,
+            amount: quote.platformFee,
+          },
         });
         const updated = await tx.round.update({
           where: { id: roundId },
@@ -171,7 +195,12 @@ export class EntriesService {
         poolBalance: round.poolAmount.toFixed(2),
         platformFees: round.platformFees.toFixed(2),
         closesAt: round.closesAt.toISOString(),
-        lastPurchase: { handle: user.handle, entries, amount: result.value.entryAmount, at: result.value.purchasedAt },
+        lastPurchase: {
+          handle: user.handle,
+          entries,
+          amount: result.value.entryAmount,
+          at: result.value.purchasedAt,
+        },
         isDemo: round.isDemo,
       });
     }

@@ -24,9 +24,9 @@ export default function DesignSystemPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-h2 laptop:text-h1">GLOBAL POOL design system</h1>
         <p className="max-w-3xl text-body-m text-text-secondary">
-          React components for apps/web, built on @gp/tokens (Figma variables) with Tailwind CSS v4, Radix primitives
-          and lucide icons. Every number on this page is DEMO data from @gp/shared/demo. Props are documented in
-          docs/WEB_COMPONENTS.md.
+          React components for apps/web, built on @gp/tokens (Figma variables) with Tailwind CSS v4,
+          Radix primitives and lucide icons. Every number on this page is DEMO data from
+          @gp/shared/demo. Props are documented in docs/WEB_COMPONENTS.md.
         </p>
       </div>
       <FoundationsSection />

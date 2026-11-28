@@ -102,7 +102,7 @@ function tc(n, name, color, ix = 0) { const t = n.findAll(x => x.type === 'TEXT'
 function card(name, o = {}) { return AL('VERTICAL', { name, p: o.p ?? 24, gap: o.gap ?? 16, fill: o.fill || 'surface/default', stroke: o.stroke || 'border/subtle', r: o.r ?? 14 }); }
 function row(name, o = {}) { return AL('HORIZONTAL', Object.assign({ name, gap: 12, align: 'CENTER' }, o)); }
 function col(name, o = {}) { return AL('VERTICAL', Object.assign({ name, gap: 8 }, o)); }
-function spacer() { return AL('HORIZONTAL', { name: 'Spacer' }); }
+function spacer() { const s = AL('HORIZONTAL', { name: 'Spacer' }); s.resize(1, 1); return s; }
 function line() { return rect(10, 1, 'border/subtle', 0, 'Divider'); }
 async function kv(k, v, o = {}) { const r = AL('HORIZONTAL', { name: 'KV ' + k, gap: 12, align: 'CENTER', justify: 'SPACE_BETWEEN' }); const kt = await T(k, o.ks || 'Body/S', 'text/secondary'); const vr = AL('HORIZONTAL', { name: 'Value', gap: 6, align: 'CENTER' }); if (o.icon) add(vr, await IC(o.icon, 16, o.ic || 'icon/muted')); if (o.node) add(vr, o.node); else add(vr, await T(v, o.vs || 'Body/S Strong', o.vc || 'text/primary', o.vw ? { w: o.vw, align: 'RIGHT' } : {})); if (o.demo) add(vr, await DEMO('XS')); add(r, kt, vr); return r; }
 async function ttl(t, o = {}) { const r = row('Title — ' + t.slice(0, 30), { gap: 8 }); add(r, await T(t, o.s || 'Heading/H5', 'text/primary')); if (o.demo !== false) add(r, await DEMO(o.ds || 'S')); if (o.right) { add(r, [spacer(), 'FILL']); for (const x of [].concat(o.right)) add(r, x); } return r; }
@@ -162,7 +162,7 @@ async function btnLabel(root, nestName, label) { const b = nest(root, nestName);
 // ===== END GP-HIST LIB =====
 
 // ===== GP-HIST MOBILE LIB =====
-async function mshell(name, X, Y, o = {}) { const f = await screen(name, 390, o.h ? { h: o.h } : {}); sec.appendChild(f); f.x = X; f.y = Y; add(f, [await DEMOBAR(), 'FILL']); add(f, [await I(C.TOPM, { State: 'Member' }), 'FILL']); const main = AL('VERTICAL', { name: 'Content', p: [16, 16, 24, 16], gap: 16 }); add(f, [main, 'FILL']); return { f, main }; }
+async function mshell(name, X, Y, o = {}) { const f = await screen(name, 390, o.h ? { h: o.h } : {}); sec.appendChild(f); f.x = X; f.y = Y; add(f, [await DEMOBAR('DEMO DATA — illustrative values only'), 'FILL']); add(f, [await I(C.TOPM, { State: 'Member' }), 'FILL']); const main = AL('VERTICAL', { name: 'Content', p: [16, 16, 24, 16], gap: 16 }); add(f, [main, 'FILL']); return { f, main }; }
 async function mtab(f) { add(f, [await I(C.TAB, { Active: 'Pool' }), 'FILL']); }
 async function mhead(back, title, desc, bdg) { const w = col('Page header', { gap: 8 }); const tr = row('Title', { gap: 8 }); add(tr, await T(title, 'Heading/H3', 'text/primary')); if (bdg) add(tr, bdg); add(tr, await DEMO('S')); if (back) add(w, await BTN('Ghost', back, { size: 'S', lead: 'chevron-left' })); add(w, tr); if (desc) add(w, [await T(desc, 'Body/S', 'text/secondary', { w: 358 }), 'FILL']); return w; }
 async function mtabs(active) { const r = AL('HORIZONTAL', { name: 'Global Pool sub-nav (scrolls)', gap: 4, clip: true }); strokeSides(r, 'border/subtle', { b: 1 }); for (const l of ['Overview', 'Round history', 'My entries', 'Prize distribution', 'Fairness (VRF)']) { const t = await I(C.TABU, { State: l === active ? 'Active' : 'Default' }, { Label: l, 'Show count': l === 'My entries' }); if (l === 'My entries') setP(nest(t, 'Count'), { Count: '35' }, 'cnt'); add(r, t); } return r; }
@@ -170,7 +170,7 @@ async function sticky(f, btns) { const b = AL('HORIZONTAL', { name: 'Sticky CTA 
 async function mnote(text) { return await note(text, { w: 326 }); }
 async function mfoot(main) { const lic = await I(C.LIC, { Variant: 'Compact' }); const r = row('18+ & RG', { gap: 8 }); add(r, await I(C.B18), await T('Play responsibly ·', 'Caption', 'text/tertiary'), await T('Responsible gaming', 'Caption', 'text/brand')); const w = col('Mobile footer notes', { gap: 12 }); add(w, [lic, 'FILL'], r); add(main, [w, 'FILL']); }
 // compact mobile list card: head [title, badge], kv rows, optional footer node
-async function mcard(title, bdg, kvs, o = {}) { const c = card('Card — ' + title, { p: 16, gap: 10 }); const h = row('Head', { gap: 8 }); add(h, await T(title, o.ts || 'Label/L', 'text/primary')); if (o.sub) add(h, await T(o.sub, 'Caption', 'text/tertiary')); add(h, [spacer(), 'FILL']); if (bdg) add(h, bdg); add(c, [h, 'FILL']); for (const [k, v, vo] of kvs) add(c, [await kv(k, v, Object.assign({ vw: 190 }, vo || {})), 'FILL']); if (o.foot) for (const x of [].concat(o.foot)) add(c, [x, 'FILL']); return c; }
+async function mcard(title, bdg, kvs, o = {}) { const c = card('Card — ' + title, { p: 16, gap: 10 }); const h = row('Head', { gap: 8 }); const tcol = col('Title', { gap: 2 }); add(tcol, await T(title, o.ts || 'Label/L', 'text/primary')); if (o.sub) add(tcol, await T(o.sub, 'Caption', 'text/tertiary')); add(h, tcol, [spacer(), 'FILL']); if (bdg) add(h, bdg); add(c, [h, 'FILL']); for (const [k, v, vo] of kvs) add(c, [await kv(k, v, Object.assign({ vw: 190 }, vo || {})), 'FILL']); if (o.foot) for (const x of [].concat(o.foot)) add(c, [x, 'FILL']); return c; }
 // ===== END MOBILE LIB =====
 
 const page = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(page);
@@ -195,7 +195,7 @@ add(tl, [await stepper([
   { s: 'done', t: 'Closed — threshold not met', d: '20:00:00 UTC · 412 of 500 players · 41,200.00 of 50,000.00 USDT. No VRF request, no winners.' },
   { s: 'done', t: 'Cancellation on-chain', d: '20:00:06 UTC · RoundCancelled(#1,245) · tx 0x6b2e…31f4' },
   { s: 'done', t: 'Fees reversed · Stakes owed', d: '20:01 UTC · 1.50 USDT to Available, 300.00 USDT to Owed.' },
-  { s: 'current', t: 'Settles to Available', d: '27 Nov 2026, 21:00 UTC · daily run on Arbitrum, usually under 5 min.' }]), 'FILL']);
+  { s: 'current', t: 'Settles to Available', d: '27 Nov 2026, 21:00 UTC · refund RF-1245-0042, batch 2 of 3 on Arbitrum, usually under 5 min.' }]), 'FILL']);
 add(main, [tl, 'FILL']);
 const en = await mcard('Your 30 entries', null, [['Entry IDs', 'E-1245-00383 … E-1245-00412', { vs: 'Mono/S' }], ['Paid', '301.50 USDT'], ['Returned', '301.50 USDT in full']]);
 const tk = await I(C.TK, { State: 'Refunded' }); tk.rescale(326 / 400); add(en, tk);
@@ -222,10 +222,10 @@ add(sm, [g, 'FILL']); const dm = row('Demo', { gap: 6 }); add(dm, await DEMO('XS
 const ch = AL('HORIZONTAL', { name: 'Status chips (scroll)', gap: 8, clip: true }); for (const [l, x] of [['All', 1], ['In the draw', 0], ['Won', 0], ['Not selected', 0], ['Refunded', 0]]) add(ch, await I(C.CHIP, { State: x ? 'Selected' : 'Default' }, { Label: l, 'Show icon': false })); add(main, [ch, 'FILL']);
 const list = col('Purchase cards', { gap: 12 });
 const P = [
-  ['#1,248', '27 Nov 2026, 14:06 UTC', ['Pending', 'In the draw'], [['Entries', '35 · E-1248-00981 … 01015', { vs: 'Mono/S' }], ['Paid', '351.75 (350.00 + 1.75 fee)'], ['Outcome', 'Draws today 20:00 UTC']]],
-  ['#1,247', '26 Nov 2026, 10:15 UTC', ['Neutral', 'Not selected'], [['Entries', '10 · E-1247-04410 … 04419', { vs: 'Mono/S' }], ['Paid', '100.50 (100.00 + 0.50 fee)'], ['Outcome', '0.00 USDT']]],
-  ['#1,246', '25 Nov 2026, 12:31 UTC', ['Neutral', 'Not selected'], [['Entries', '15 · E-1246-07001 … 07015', { vs: 'Mono/S' }], ['Paid', '150.75 (150.00 + 0.75 fee)'], ['Outcome', '0.00 USDT']]],
-  ['#1,245', '24 Nov 2026, 09:40 UTC', ['Pending', 'Refund owed'], [['Entries', '30 · E-1245-00383 … 00412', { vs: 'Mono/S' }], ['Paid', '301.50 (300.00 + 1.50 fee)'], ['Outcome', '+301.50 · 300.00 owed', { vc: 'balance/owed' }]]],
+  ['#1,248', '27 Nov 2026, 18:05 UTC', ['Pending', 'In the draw'], [['Entries', '35 · E-1248-00981 … 01015', { vs: 'Mono/S' }], ['Paid', '351.75 (350.00 + 1.75 fee)'], ['Outcome', 'Draws today 20:00 UTC']]],
+  ['#1,247', '26 Nov 2026, 12:40 UTC', ['Neutral', 'Not selected'], [['Entries', '40 · E-1247-04410 … 04449', { vs: 'Mono/S' }], ['Paid', '402.00 (400.00 + 2.00 fee)'], ['Outcome', '0.00 USDT']]],
+  ['#1,246', '25 Nov 2026, 19:12 UTC', ['Neutral', 'Not selected'], [['Entries', '24 · E-1246-07001 … 07024', { vs: 'Mono/S' }], ['Paid', '241.20 (240.00 + 1.20 fee)'], ['Outcome', '0.00 USDT']]],
+  ['#1,245', '24 Nov 2026, 14:22 UTC', ['Pending', 'Refund owed'], [['Entries', '30 · E-1245-00383 … 00412', { vs: 'Mono/S' }], ['Paid', '301.50 (300.00 + 1.50 fee)'], ['Outcome', '+301.50 · 300.00 owed', { vc: 'balance/owed' }]]],
   ['#1,244', '23 Nov 2026, 16:12 UTC', ['Approved', 'Won · runner-up'], [['Entries', '20 · E-1244-11803 … 11822', { vs: 'Mono/S' }], ['Paid', '201.00 (200.00 + 1.00 fee)'], ['Outcome', '+3,620.60 USDT', { vc: 'text/gold', demo: true }]]]];
 for (const [r, d, b, kvs] of P) { const c = await mcard('Round ' + r, await badge(b[0], b[1]), kvs, { sub: d }); add(list, [c, 'FILL']); }
 add(main, [list, 'FILL']);

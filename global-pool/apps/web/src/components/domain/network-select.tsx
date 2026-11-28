@@ -6,7 +6,13 @@ import * as React from 'react';
 import { ChainMark } from '@/components/brand/chain-mark';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Field } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 export interface NetworkSelectProps {
@@ -69,14 +75,22 @@ export function NetworkSelect({
                     <span
                       className={cn(
                         'flex items-center gap-1',
-                        !c.enabled ? 'text-text-tertiary' : congested ? 'text-text-warning' : 'text-text-success',
+                        !c.enabled
+                          ? 'text-text-tertiary'
+                          : congested
+                            ? 'text-text-warning'
+                            : 'text-text-success',
                       )}
                     >
                       <span
                         aria-hidden
                         className={cn(
                           'size-1.5 rounded-full',
-                          !c.enabled ? 'bg-text-tertiary' : congested ? 'bg-status-warning' : 'bg-status-success',
+                          !c.enabled
+                            ? 'bg-text-tertiary'
+                            : congested
+                              ? 'bg-status-warning'
+                              : 'bg-status-success',
                         )}
                       />
                       {c.enabled ? c.healthLabel : c.statusLabel}

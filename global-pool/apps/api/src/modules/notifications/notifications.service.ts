@@ -27,7 +27,14 @@ export class NotificationsService {
 
   notify(
     db: Db,
-    input: { userId: string; type: NotificationType; title: string; body: string; data?: Prisma.InputJsonObject; isDemo?: boolean },
+    input: {
+      userId: string;
+      type: NotificationType;
+      title: string;
+      body: string;
+      data?: Prisma.InputJsonObject;
+      isDemo?: boolean;
+    },
   ) {
     return db.notification.create({
       data: {
@@ -42,7 +49,10 @@ export class NotificationsService {
   }
 
   async list(userId: string, query: PaginationQuery & { unread?: boolean }) {
-    const where: Prisma.NotificationWhereInput = { userId, ...(query.unread ? { readAt: null } : {}) };
+    const where: Prisma.NotificationWhereInput = {
+      userId,
+      ...(query.unread ? { readAt: null } : {}),
+    };
     const [rows, total, unread] = await Promise.all([
       this.prisma.notification.findMany({
         where,
@@ -84,7 +94,10 @@ export class NotificationsService {
   }
 
   async markAllRead(userId: string) {
-    const res = await this.prisma.notification.updateMany({ where: { userId, readAt: null }, data: { readAt: new Date() } });
+    const res = await this.prisma.notification.updateMany({
+      where: { userId, readAt: null },
+      data: { readAt: new Date() },
+    });
     return { updated: res.count };
   }
 }

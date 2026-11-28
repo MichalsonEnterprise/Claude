@@ -1,14 +1,28 @@
 {
- "_note": "Agent adm-core (ADM-00/01/02/X1 + MOB-11). No new library components were created; these are screen frame IDs on page '09 — Admin Panel', section 'ADM-00/01/02/X1 Shell, login, overview, approvals' (36:522944) at X=0, Y=0. Admin shell recipe: Notice/Demo Data + Body[Nav/Admin Sidebar (FILL height) | Main(minHeight 988)[Nav/Admin Topbar | Content p 24/28/48/28 gap 20]]. Sidebar overrides: set nested 'Group — X' State (Default/Active/No access), hide 'Item — *' children when Finance is collapsed, hide nested 'Count' on locked groups, override TEXT 'Initials', 'A. Marin' (set textAutoResize WIDTH_AND_HEIGHT), 'Finance Lead', '8 of 10 modules', '2FA session · until …'. Empty auto-layout spacers must be resized to 1px tall (they default to 100px). Build stopped by the Figma MCP account limit; ready-to-run scripts for the next frames are in pending/adm-core/out/ (assemble with pending/adm-core/build.py).",
+ "_note": "Agent adm-core (ADM-00/01/02/X1 + MOB-11). No new library components were created; these are SCREEN FRAME ids on page '09 — Admin Panel', section 'ADM-00/01/02/X1 Shell, login, overview, approvals' (36:522944) at X=0, Y=0, and on page '10 — Mobile Experience', section 'ADM — Mobile' (X=217000). Admin shell recipe: Notice/Demo Data + Body[Nav/Admin Sidebar 22:5501 (FILL height) | Main(minHeight 988)[Nav/Admin Topbar 22:6483 | Content p 24/28/48/28 gap 20]]. Sidebar overrides: nested 'Group — X' State (Default/Active/No access), hide 'Item — *' when Finance is collapsed, TEXT layers 'Initials', 'A. Marin' (set textAutoResize WIDTH_AND_HEIGHT), 'Finance Lead', '8 of 10 modules', '2FA session · …'. Four-eyes modals: Admin/Confirm With Reason Dialog 25:16172 (requester; its danger icon tile is re-tinted brand for a release), inline 960 review modal = Admin/Approval Request Card 23:24500 (own button row hidden) + decision column; inline 480 step-up 2FA modal (Input/OTP). Tablet: inline 'Admin Topbar — Tablet (inline)' + sidebar as drawer. Mobile: inline 'Admin Topbar — Mobile' + 'Admin Tab Bar — Mobile' (same as adm-bc). Remaining scripts: pending/adm-core/RUN-ORDER.json.",
  "frames": {
   "Band — ADM-00 (label)": "in section 36:522944",
   "[ADM-00] Admin shell — Approvals inbox / 1440 / Default": "36:522948",
   "[ADM-00] Admin shell — Command palette / 1440 / Results": "36:537070",
   "[ADM-00] Admin shell — Command palette / 1440 / No results": "36:540097",
-  "[ADM-00] Admin shell — No permission / 1440 / Support role opens Finance link": "39:50316"
+  "[ADM-00] Admin shell — No permission / 1440 / Support role opens Finance link": "39:50316",
+  "[ADM-01] Admin login — Sign in / 1440 / Default": "170:66492",
+  "[ADM-01] Admin login — Sign in / 1440 / Error — wrong password": "170:66727",
+  "[ADM-01] Admin login — Sign in / 1440 / Blocked — network not approved": "170:67010",
+  "[ADM-01] Admin login — 2FA / 1440 / Default": "170:67206",
+  "[ADM-01] Admin login — 2FA / 1440 / Locked — too many codes": "170:67433",
+  "[ADM-01] Session expired — Re-authenticate / 1440 / Default": "170:67648",
+  "[ADM-02] Overview / 1440 / Default": "171:73506",
+  "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Default (empty)": "178:99766",
+  "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Ready": "178:100079",
+  "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Error": "178:100360",
+  "[ADM-X1] Four-eyes — Request submitted / 1440 / Awaiting 2nd approver": "178:100654",
+  "[ADM-X1] Re-authenticate — Fresh 2FA before approving / 1440 / Default": "180:143765",
+  "[ADM-X1] Four-eyes — Second approver review / 1440 / Ready to approve": "180:144187",
+  "[ADM-X1] Four-eyes — Approved / 1440 / Released": "180:144734",
+  "[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request": "180:145242"
  },
  "pending": {
-  "pending/adm-core/out/01-adm01-adm02.js": "ADM-00 touch-ups (hide locked Compliance count, name auto-width, audit #88216) + ADM-01 Sign in Default, Error, Blocked network, 2FA Default, 2FA Locked, Session expired + ADM-02 Overview Default (42.6k chars, node --check OK, not yet run)",
-  "pending/adm-core/out/02-x1-requester.js": "ADM-X1 Confirm with reason Default/Ready/Error + Request submitted over a clone of ADM-F2 33:230322 (21.8k chars, node --check OK, not yet run)"
+  "pending/adm-core/RUN-ORDER.json": "04-laptop, 05-tablet, 06-tablet-shell, m-01-overview-alerts, m-02-approvals (see file)"
  }
 }

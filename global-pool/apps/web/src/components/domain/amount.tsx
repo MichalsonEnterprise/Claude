@@ -14,7 +14,14 @@ export interface AmountProps extends Omit<React.ComponentProps<'span'>, 'childre
 }
 
 /** USDT amount: formatUSDT() digits (tabular) + small unit. Money is formatted from decimal strings only. */
-export function Amount({ value, tone = 'neutral', unit = true, decimals = 2, className, ...props }: AmountProps) {
+export function Amount({
+  value,
+  tone = 'neutral',
+  unit = true,
+  decimals = 2,
+  className,
+  ...props
+}: AmountProps) {
   const text = formatUSDT(value, {
     symbol: false,
     decimals,
@@ -37,7 +44,9 @@ export function Amount({ value, tone = 'neutral', unit = true, decimals = 2, cla
       {...props}
     >
       <span>{text}</span>
-      {unit && <span className="text-[length:max(11px,0.5em)] font-medium text-text-secondary">USDT</span>}
+      {unit && (
+        <span className="text-[length:max(11px,0.5em)] font-medium text-text-secondary">USDT</span>
+      )}
     </span>
   );
 }

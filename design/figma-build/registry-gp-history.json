@@ -1,0 +1,18 @@
+{
+ "_note": "GP-08..11/13 History & edge states (agent key: gp-history). No reusable components were created: every frame is composed from library instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Nav/Mobile Tab Bar, Nav/Breadcrumb, Tabs/Underline, Card/Stat, Table/Header Cell, Table/Cell, Pagination, Menu/Filter Chip, Select/Chip, Input/Search, Input/Date Range, Table/Filter Button, Control/Checkbox, Control/Radio, Jackpot/Round Header, Jackpot/Threshold Bar, Jackpot/VRF Stepper, Jackpot/Prize Distribution, Jackpot/Entry Ticket, Jackpot/Counter, Card/Draw Countdown, Card/Round, Card/Balance, Chart/Donut, Tx/Hash, Tx/Fee Breakdown, Wallet/Address Chip, Wallet/Network Pill, Alert/Banner, Strip/Trust, Notice/Licence, Notice/Demo Data, Badge/*, Button/*). Inline (no library equivalent): filter popover, round-closed modal (Modal/Base slot is fixed), mobile bottom sheets, mobile refund/VRF callouts, steppers. Entries below are SECTION/FRAME ids. Desktop: page '07 — Global Pool', section 'GP-08..11/13 History & edge states' at X=32000,Y=0. Mobile: page '10 — Mobile Experience', section 'GP — Mobile C' at X=175000,Y=0.",
+ "Section/GP-08..11/13 History & edge states": {"id": "179:100736"},
+ "[GP-08] Round History / 1440 / Default": {"id": "179:100737"},
+ "[GP-08] Round History / 1440 / Filters": {"id": "179:101660"},
+ "[GP-09] Round Detail / 1440 / Cancelled → refunds (#1,245)": {"id": "182:109385"},
+ "[GP-09] Round Detail / 1440 / Default — settled (#1,244)": {"id": "182:110323"},
+ "[GP-10] Entry History / 1440 / Default": {"id": "186:29154"},
+ "[GP-11] Prize Distribution breakdown / 1440 / Default (round #1,248)": {"id": "186:30207"},
+ "[GP-13] Edge state — Round closed / 1440 / Entries arrived after close (20:00:02 UTC)": {"id": "187:101544"},
+ "[GP-13] Edge state — Round cancelled, refund owed / 1440 / Hub banner (#1,245)": {"id": "187:102333"},
+ "[GP-13] Edge state — VRF delayed / 1440 / Waiting 00:14:32 (20:14:36 UTC)": {"id": "187:103126"},
+ "Section/GP — Mobile C": {"id": "188:72141"},
+ "[GP-08] Round History / 390 / Default": {"id": "188:72142"},
+ "[GP-08] Round History / 390 / Filters (bottom sheet)": {"id": "188:72622"},
+ "[GP-09] Round Detail / 390 / Cancelled → refunds (#1,245)": {"id": "189:74382"},
+ "[GP-10] Entry History / 390 / Default": {"id": "189:74725"}
+}

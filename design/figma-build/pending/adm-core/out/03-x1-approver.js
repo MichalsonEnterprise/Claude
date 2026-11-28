@@ -120,6 +120,9 @@ const SHOT = async (ids, scale = 0.3) => { for (const id of ids) { const n = awa
 const bandX = sec.children.find(n => n.name === 'Band — ADM-X1'); if (!bandX) throw new Error('Run 02-x1-requester first (Band — ADM-X1 missing)');
 const Y = bandX.y + 120;
 const SRC = await figma.getNodeByIdAsync('36:522948'); const H2 = SRC.height + 160;
+// touch-up on the requester dialogs from #02: a release is not destructive → header icon tile from danger tint to brand tint
+async function brandTile(fid) { const f = await figma.getNodeByIdAsync(fid); const d = f && f.findOne(n => n.type === 'INSTANCE' && n.name === 'Admin/Confirm With Reason Dialog'); if (!d) return 0; let k = 0; for (const n of d.findAll(n => n.type === 'FRAME' && n.width <= 48 && n.height <= 48 && Array.isArray(n.fills) && n.fills[0] && n.fills[0].boundVariables && n.fills[0].boundVariables.color && n.fills[0].boundVariables.color.id === VAR['status/danger-tint'].id)) { n.fills = [paint('brand/tint')]; tint(n, 'icon/brand'); k++; } return k; }
+OUT.tiles = []; for (const id of ['178:99766', '178:100079', '178:100360']) OUT.tiles.push(await brandTile(id));
 const made = [];
 async function setTxt(t, v) { for (const fo of (t.fontName === figma.mixed ? t.getRangeAllFontNames(0, t.characters.length) : [t.fontName])) await figma.loadFontAsync(fo); t.characters = v; }
 async function back(name, x, y, as, session) { if (EX(name)) { OUT.skipped.push(name); return null; } const f = SRC.clone(); sec.appendChild(f); f.x = x; f.y = y; f.name = name;
@@ -201,4 +204,4 @@ const tbl = SRC.findOne(n => n.name === 'Approvals table'); const btm = SRC.find
 const ref = { rows: tbl ? tbl.children.slice(0, 2).map(r => [r.name, Math.round(r.width), r.children.map(c => c.name + ':' + Math.round(c.width) + ':' + c.layoutSizingHorizontal).join('|')]) : null,
   text: tbl ? tbl.findAll(n => n.type === 'TEXT').map(t => t.characters).filter(s => s.trim()).slice(0, 90) : null,
   bottom: btm ? btm.findAll(n => n.type === 'TEXT').map(t => t.characters).slice(0, 30) : null, tabs: tabs ? tabs.findAll(n => n.type === 'TEXT').map(t => t.characters) : null };
-return { made: made.map(f => [f.name, f.id, f.x, f.y, f.height]), skipped: OUT.skipped, ref };
+return { made: made.map(f => [f.name, f.id, f.x, f.y, f.height]), skipped: OUT.skipped, tiles: OUT.tiles, ref };

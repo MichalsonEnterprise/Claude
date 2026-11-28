@@ -17,6 +17,7 @@ import { MobileDrawer, MobileTabBar, MobileTopbar } from './mobile';
 import { ROUTES } from './nav-config';
 import type { ShellMember } from './shell-parts';
 import { Sidebar, resolveActiveHref, type ShellAuth, type SidebarMode } from './sidebar';
+import { ShellOverridesProvider, useShellOverrides } from './shell-overrides';
 import { Topbar } from './topbar';
 
 const SIDEBAR_PREF_KEY = 'gp.sidebar';
@@ -98,14 +99,18 @@ export function AppShellFrame({
   };
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div
+      className="flex min-h-dvh flex-col"
+      style={{ '--gp-shell-top': demoBar ? '36px' : '0px' } as React.CSSProperties}
+    >
       <a
         href="#main"
         className="sr-only z-[60] rounded-md bg-brand px-4 py-2 text-label-m text-text-on-primary focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Skip to content
       </a>
-      {demoBar && <DemoBar />}
+      {/* The DEMO notice stays pinned (36px); sticky shell parts offset by --gp-shell-top. */}
+      {demoBar && <DemoBar className="sticky top-0 z-40" />}
       {restricted && (
         <Alert
           type="restricted"
@@ -122,8 +127,8 @@ export function AppShellFrame({
             </>
           }
         >
-          GLOBAL POOL games are not available in your region (United States). You can still view your account and
-          withdraw funds.
+          GLOBAL POOL games are not available in your region (United States). You can still view
+          your account and withdraw funds.
         </Alert>
       )}
       <div className="flex flex-1">
@@ -162,14 +167,18 @@ export function AppShellFrame({
           <main
             id="main"
             tabIndex={-1}
-            className={cn('flex-1 px-4 pt-6 pb-10 outline-none tablet:px-6 laptop:px-8 laptop:pt-8')}
+            className={cn('flex-1 px-4 pt-6 pb-16 outline-none tablet:px-6 laptop:px-8')}
           >
             <div className="mx-auto w-full max-w-desktop">{children}</div>
           </main>
           <FooterMega className="pb-[calc(var(--gp-tabbar-h)+32px)] tablet:pb-8" />
         </div>
       </div>
-      <MobileTabBar pathname={pathname} notifications={member?.notifications} className="tablet:hidden" />
+      <MobileTabBar
+        pathname={pathname}
+        notifications={member?.notifications}
+        className="tablet:hidden"
+      />
       <MobileDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
@@ -187,8 +196,26 @@ export function AppShellFrame({
   );
 }
 
-/** Shell wired to auth + router. Used by app/(app)/layout.tsx. */
+/** Shell wired to auth + router + page overrides (region gate, dev state preview). Used by app/(app)/layout.tsx. */
 export function AppShell({
+  children,
+  wrongNetwork,
+  restricted,
+}: {
+  children: React.ReactNode;
+  wrongNetwork?: boolean;
+  restricted?: boolean;
+}) {
+  return (
+    <ShellOverridesProvider>
+      <ConnectedShell wrongNetwork={wrongNetwork} restricted={restricted}>
+        {children}
+      </ConnectedShell>
+    </ShellOverridesProvider>
+  );
+}
+
+function ConnectedShell({
   children,
   wrongNetwork,
   restricted,
@@ -199,25 +226,36 @@ export function AppShell({
 }) {
   const auth = useAuth();
   const pathname = usePathname();
+  const overrides = useShellOverrides();
   // Until the API profile/balance endpoints exist, members see the DEMO profile (with DEMO markers).
-  const member: ShellMember | null =
-    auth.status === 'member' && auth.user
+  const user = auth.status === 'member' ? auth.user : null;
+  const signedIn = Boolean(user);
+  const member: ShellMember | null = overrides.previewGuest
+    ? null
+    : user
       ? {
           ...DEMO_SHELL_MEMBER,
-          handle: auth.user.handle ?? DEMO_SHELL_MEMBER.handle,
-          initials: auth.user.isDemo ? DEMO_SHELL_MEMBER.initials : auth.user.initials,
+          handle: user.handle ?? DEMO_SHELL_MEMBER.handle,
+          initials: user.isDemo ? DEMO_SHELL_MEMBER.initials : user.initials,
         }
-      : null;
+      : overrides.previewMember
+        ? DEMO_SHELL_MEMBER
+        : null;
+  const status = overrides.previewGuest
+    ? 'guest'
+    : overrides.previewMember && !signedIn
+      ? 'member'
+      : auth.status;
   return (
     <AppShellFrame
-      auth={auth.status}
+      auth={status}
       member={member}
       pathname={pathname}
       onSignIn={auth.signIn}
       onSignUp={auth.signUp}
       onSignOut={() => void auth.signOut()}
       wrongNetwork={wrongNetwork}
-      restricted={restricted}
+      restricted={restricted ?? overrides.restricted}
     >
       {children}
     </AppShellFrame>

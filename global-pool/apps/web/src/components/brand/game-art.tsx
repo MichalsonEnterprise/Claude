@@ -18,7 +18,13 @@ export type GameArtKey =
   | 'vault-sweeper'
   | 'skyline'
   | 'pinfall'
-  | 'fortune-ring';
+  | 'fortune-ring'
+  | 'live-pool-roulette'
+  | 'mega-ring-show'
+  | 'baccarat-lounge'
+  | 'speed-twenty-one'
+  | 'sic-bo-triad'
+  | 'dragon-and-phoenix';
 
 export type TileGradient = 'gold' | 'violet' | 'sky' | 'amber' | 'red' | 'mint';
 
@@ -33,6 +39,12 @@ export const GAME_TILE_GRADIENT: Record<GameArtKey, TileGradient> = {
   skyline: 'mint',
   pinfall: 'amber',
   'fortune-ring': 'violet',
+  'live-pool-roulette': 'mint',
+  'mega-ring-show': 'violet',
+  'baccarat-lounge': 'violet',
+  'speed-twenty-one': 'sky',
+  'sic-bo-triad': 'amber',
+  'dragon-and-phoenix': 'red',
 };
 
 export const TILE_GRADIENT_CLASS: Record<TileGradient, string> = {
@@ -50,7 +62,17 @@ export function isGameArtKey(value: string): value is GameArtKey {
 
 // ── shared pieces ───────────────────────────────────────────────────────────────────────────────
 
-function CoinStack({ cx, base, count, rx = 17 }: { cx: number; base: number; count: number; rx?: number }) {
+function CoinStack({
+  cx,
+  base,
+  count,
+  rx = 17,
+}: {
+  cx: number;
+  base: number;
+  count: number;
+  rx?: number;
+}) {
   const ry = rx * 0.34;
   return (
     <g>
@@ -63,7 +85,14 @@ function CoinStack({ cx, base, count, rx = 17 }: { cx: number; base: number; cou
               className="fill-gold-pressed"
             />
             <ellipse cx={cx} cy={cy} rx={rx} ry={ry} className="fill-gold" />
-            <ellipse cx={cx} cy={cy} rx={rx - 4} ry={ry - 1.6} className="fill-none stroke-gold-strong" strokeWidth={1.2} />
+            <ellipse
+              cx={cx}
+              cy={cy}
+              rx={rx - 4}
+              ry={ry - 1.6}
+              className="fill-none stroke-gold-strong"
+              strokeWidth={1.2}
+            />
           </g>
         );
       })}
@@ -71,7 +100,14 @@ function CoinStack({ cx, base, count, rx = 17 }: { cx: number; base: number; cou
   );
 }
 
-function Die({ x, y, size, rotate, pips, tone = 'light' }: {
+function Die({
+  x,
+  y,
+  size,
+  rotate,
+  pips,
+  tone = 'light',
+}: {
   x: number;
   y: number;
   size: number;
@@ -82,15 +118,47 @@ function Die({ x, y, size, rotate, pips, tone = 'light' }: {
   const p = size / 4;
   const layout: Record<number, [number, number][]> = {
     1: [[2, 2]],
-    2: [[1, 1], [3, 3]],
-    3: [[1, 1], [2, 2], [3, 3]],
-    4: [[1, 1], [3, 1], [1, 3], [3, 3]],
-    5: [[1, 1], [3, 1], [2, 2], [1, 3], [3, 3]],
-    6: [[1, 1], [3, 1], [1, 2], [3, 2], [1, 3], [3, 3]],
+    2: [
+      [1, 1],
+      [3, 3],
+    ],
+    3: [
+      [1, 1],
+      [2, 2],
+      [3, 3],
+    ],
+    4: [
+      [1, 1],
+      [3, 1],
+      [1, 3],
+      [3, 3],
+    ],
+    5: [
+      [1, 1],
+      [3, 1],
+      [2, 2],
+      [1, 3],
+      [3, 3],
+    ],
+    6: [
+      [1, 1],
+      [3, 1],
+      [1, 2],
+      [3, 2],
+      [1, 3],
+      [3, 3],
+    ],
   };
   return (
     <g transform={`rotate(${rotate} ${x + size / 2} ${y + size / 2})`}>
-      <rect x={x + 2} y={y + 4} width={size} height={size} rx={size * 0.2} className="fill-ink-950/40" />
+      <rect
+        x={x + 2}
+        y={y + 4}
+        width={size}
+        height={size}
+        rx={size * 0.2}
+        className="fill-ink-950/40"
+      />
       <rect
         x={x}
         y={y}
@@ -106,13 +174,32 @@ function Die({ x, y, size, rotate, pips, tone = 'light' }: {
   );
 }
 
-function Card({ x, y, rotate, suit, rank }: { x: number; y: number; rotate: number; suit: 'spade' | 'heart'; rank: string }) {
+function Card({
+  x,
+  y,
+  rotate,
+  suit,
+  rank,
+}: {
+  x: number;
+  y: number;
+  rotate: number;
+  suit: 'spade' | 'heart';
+  rank: string;
+}) {
   const red = suit === 'heart';
   return (
     <g transform={`rotate(${rotate} ${x + 21} ${y + 30})`}>
       <rect x={x + 2} y={y + 4} width={42} height={60} rx={6} className="fill-ink-950/40" />
       <rect x={x} y={y} width={42} height={60} rx={6} className="fill-ink-50" />
-      <text x={x + 6} y={y + 14} fontSize="12" fontWeight="800" className={red ? 'fill-red-600' : 'fill-ink-950'} style={{ fontFamily: 'var(--gp-font-sans)' }}>
+      <text
+        x={x + 6}
+        y={y + 14}
+        fontSize="12"
+        fontWeight="800"
+        className={red ? 'fill-red-600' : 'fill-ink-950'}
+        style={{ fontFamily: 'var(--gp-font-sans)' }}
+      >
         {rank}
       </text>
       {suit === 'spade' ? (
@@ -130,7 +217,17 @@ function Card({ x, y, rotate, suit, rank }: { x: number; y: number; rotate: numb
   );
 }
 
-function Chip({ cx, cy, r, tone }: { cx: number; cy: number; r: number; tone: 'red' | 'sky' | 'mint' }) {
+function Chip({
+  cx,
+  cy,
+  r,
+  tone,
+}: {
+  cx: number;
+  cy: number;
+  r: number;
+  tone: 'red' | 'sky' | 'mint';
+}) {
   const fill = tone === 'red' ? 'fill-red-500' : tone === 'sky' ? 'fill-sky-500' : 'fill-brand';
   return (
     <g>
@@ -145,7 +242,13 @@ function Chip({ cx, cy, r, tone }: { cx: number; cy: number; r: number; tone: 'r
         strokeDasharray={`${(r - 2.5) * 0.6} ${(r - 2.5) * 0.45}`}
       />
       <circle cx={cx} cy={cy} r={r * 0.45} className={fill} />
-      <circle cx={cx} cy={cy} r={r * 0.45} className="fill-none stroke-ink-950/25" strokeWidth={1} />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r * 0.45}
+        className="fill-none stroke-ink-950/25"
+        strokeWidth={1}
+      />
     </g>
   );
 }
@@ -168,8 +271,19 @@ function GlobalPoolArt() {
         <rect x="46" y="20" width="58" height="30" rx="4" className="fill-brand" />
         <circle cx="46" cy="35" r="4" className="fill-gold-pressed" />
         <circle cx="104" cy="35" r="4" className="fill-gold-pressed" />
-        <line x1="88" y1="23" x2="88" y2="47" className="stroke-mint-900" strokeWidth={1.4} strokeDasharray="2.5 2.5" />
-        <path d="m68 27 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z" className="fill-mint-900" />
+        <line
+          x1="88"
+          y1="23"
+          x2="88"
+          y2="47"
+          className="stroke-mint-900"
+          strokeWidth={1.4}
+          strokeDasharray="2.5 2.5"
+        />
+        <path
+          d="m68 27 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z"
+          className="fill-mint-900"
+        />
         <rect x="92" y="29" width="7" height="2" rx="1" className="fill-mint-900" />
         <rect x="92" y="34" width="7" height="2" rx="1" className="fill-mint-900" />
         <rect x="92" y="39" width="5" height="2" rx="1" className="fill-mint-900" />
@@ -191,7 +305,12 @@ function OrbitRushArt() {
       </g>
       <circle cx="92" cy="92" r="22" className="fill-violet-300/60" />
       <circle cx="86" cy="86" r="6" className="fill-violet-400/70" />
-      <path d="M10 104C46 100 66 80 80 36" className="fill-none stroke-brand" strokeWidth={5} strokeLinecap="round" />
+      <path
+        d="M10 104C46 100 66 80 80 36"
+        className="fill-none stroke-brand"
+        strokeWidth={5}
+        strokeLinecap="round"
+      />
       <g transform="rotate(28 84 28)">
         <path d="M84 6c7 6 9 16 8 28H76c-1-12 1-22 8-28Z" className="fill-ink-50" />
         <path d="M76 26l-6 10h6Zm16 0 6 10h-6Z" className="fill-red-500" />
@@ -219,7 +338,14 @@ function DoubleSideArt() {
       <g transform="rotate(-18 84 46)">
         <ellipse cx="84" cy="46" rx="22" ry="24" className="fill-ink-300" />
         <ellipse cx="82" cy="46" rx="22" ry="24" className="fill-ink-200" />
-        <ellipse cx="82" cy="46" rx="15" ry="17" className="fill-none stroke-ink-400" strokeWidth={2} />
+        <ellipse
+          cx="82"
+          cy="46"
+          rx="15"
+          ry="17"
+          className="fill-none stroke-ink-400"
+          strokeWidth={2}
+        />
         <circle cx="82" cy="46" r="6" className="fill-none stroke-ink-500" strokeWidth={3} />
       </g>
       <circle cx="50" cy="72" r="31" className="fill-mint-700" />
@@ -291,11 +417,25 @@ function VaultSweeperArt() {
           const gem = (r === 0 && c === 1) || (r === 2 && c === 2) || (r === 1 && c === 0);
           return (
             <g key={`${r}${c}`}>
-              <rect x={x} y={y} width="22" height="22" rx="5" className={gem ? 'fill-mint-900' : 'fill-sky-500'} />
+              <rect
+                x={x}
+                y={y}
+                width="22"
+                height="22"
+                rx="5"
+                className={gem ? 'fill-mint-900' : 'fill-sky-500'}
+              />
               {gem ? (
                 <path d={`M${x + 11} ${y + 4}l7 6-7 9-7-9Z`} className="fill-brand" />
               ) : (
-                <rect x={x + 3} y={y + 3} width="16" height="5" rx="2.5" className="fill-ink-50/25" />
+                <rect
+                  x={x + 3}
+                  y={y + 3}
+                  width="16"
+                  height="5"
+                  rx="2.5"
+                  className="fill-ink-50/25"
+                />
               )}
             </g>
           );
@@ -316,16 +456,39 @@ function SkylineArt() {
   ];
   return (
     <>
-      <line x1="6" y1="34" x2="114" y2="34" className="stroke-ink-50" strokeWidth={2} strokeDasharray="5 4" />
+      <line
+        x1="6"
+        y1="34"
+        x2="114"
+        y2="34"
+        className="stroke-ink-50"
+        strokeWidth={2}
+        strokeDasharray="5 4"
+      />
       <rect x="84" y="24" width="28" height="12" rx="6" className="fill-ink-50" />
-      <text x="98" y="33" textAnchor="middle" fontSize="8" fontWeight="800" className="fill-ink-950" style={{ fontFamily: 'var(--gp-font-sans)' }}>
+      <text
+        x="98"
+        y="33"
+        textAnchor="middle"
+        fontSize="8"
+        fontWeight="800"
+        className="fill-ink-950"
+        style={{ fontFamily: 'var(--gp-font-sans)' }}
+      >
         2.00×
       </text>
       {towers.map(([x, top, w]) => (
         <g key={x}>
           <rect x={x} y={top} width={w} height={110 - top} className="fill-mint-900" />
           {Array.from({ length: Math.floor((106 - top) / 10) }, (_, k) => (
-            <rect key={k} x={x + 3} y={top + 5 + k * 10} width={w - 6} height="3" className="fill-brand/50" />
+            <rect
+              key={k}
+              x={x + 3}
+              y={top + 5 + k * 10}
+              width={w - 6}
+              height="3"
+              className="fill-brand/50"
+            />
           ))}
         </g>
       ))}
@@ -339,12 +502,26 @@ function SkylineArt() {
 
 function PinfallArt() {
   const rows = 6;
-  const slots = ['fill-red-500', 'fill-amber-500', 'fill-gold', 'fill-brand', 'fill-gold', 'fill-amber-500', 'fill-red-500'];
+  const slots = [
+    'fill-red-500',
+    'fill-amber-500',
+    'fill-gold',
+    'fill-brand',
+    'fill-gold',
+    'fill-amber-500',
+    'fill-red-500',
+  ];
   return (
     <>
       {Array.from({ length: rows }, (_, r) =>
         Array.from({ length: r + 2 }, (_, k) => (
-          <circle key={`${r}-${k}`} cx={60 - ((r + 1) * 12) / 2 + k * 12} cy={18 + r * 13} r="2.6" className="fill-ink-50" />
+          <circle
+            key={`${r}-${k}`}
+            cx={60 - ((r + 1) * 12) / 2 + k * 12}
+            cy={18 + r * 13}
+            r="2.6"
+            className="fill-ink-50"
+          />
         )),
       )}
       <circle cx="66" cy="44" r="5" className="fill-brand" />
@@ -356,7 +533,14 @@ function PinfallArt() {
 }
 
 function FortuneRingArt() {
-  const colors = ['fill-red-500', 'fill-gold', 'fill-sky-500', 'fill-brand', 'fill-violet-400', 'fill-amber-500'];
+  const colors = [
+    'fill-red-500',
+    'fill-gold',
+    'fill-sky-500',
+    'fill-brand',
+    'fill-violet-400',
+    'fill-amber-500',
+  ];
   const n = 18;
   const step = (Math.PI * 2) / n;
   return (
@@ -377,6 +561,178 @@ function FortuneRingArt() {
   );
 }
 
+function FeltTable({ tone = 'mint' }: { tone?: 'mint' | 'violet' }) {
+  return (
+    <>
+      <path
+        d="M6 112 22 60h76l16 52Z"
+        className={tone === 'mint' ? 'fill-mint-800' : 'fill-violet-800'}
+      />
+      <path
+        d="M6 112 22 60h76l16 52"
+        className={cn('fill-none', tone === 'mint' ? 'stroke-gold-600' : 'stroke-gold-pressed')}
+        strokeWidth={2}
+      />
+    </>
+  );
+}
+
+function LivePoolRouletteArt() {
+  const n = 14;
+  const step = (Math.PI * 2) / n;
+  return (
+    <>
+      <FeltTable />
+      <g className="stroke-ink-50/40" strokeWidth={1}>
+        {[72, 86, 100].map((y) => (
+          <line key={y} x1={22 - (y - 60) * 0.3} y1={y} x2={98 + (y - 60) * 0.3} y2={y} />
+        ))}
+        {[44, 60, 76].map((x) => (
+          <line key={x} x1={x} y1="62" x2={x + (x - 60) * 0.35} y2="110" />
+        ))}
+      </g>
+      <rect x="47" y="76" width="9" height="8" className="fill-red-500" />
+      <rect x="64" y="90" width="9" height="8" className="fill-ink-950" />
+      <ellipse cx="60" cy="34" rx="42" ry="20" className="fill-gold-pressed" />
+      <ellipse cx="60" cy="32" rx="38" ry="17" className="fill-ink-900" />
+      {Array.from({ length: n }, (_, i) => {
+        const a0 = i * step;
+        const a1 = (i + 1) * step;
+        const p = (r: number, a: number) =>
+          `${60 + r * Math.cos(a)} ${32 + r * 0.45 * Math.sin(a)}`;
+        return (
+          <path
+            key={i}
+            d={`M${p(20, a0)}L${p(35, a0)}L${p(35, a1)}L${p(20, a1)}Z`}
+            className={i === 0 ? 'fill-mint-600' : i % 2 ? 'fill-red-600' : 'fill-ink-950'}
+          />
+        );
+      })}
+      <ellipse cx="60" cy="32" rx="18" ry="8" className="fill-gold-600" />
+      <path
+        d="M60 25v14M50 32h20"
+        className="stroke-ink-100"
+        strokeWidth={2.4}
+        strokeLinecap="round"
+      />
+      <Chip cx={26} cy={96} r={8} tone="red" />
+      <Chip cx={94} cy={98} r={8} tone="sky" />
+    </>
+  );
+}
+
+function MegaRingShowArt() {
+  const colors = [
+    'fill-red-500',
+    'fill-gold',
+    'fill-sky-500',
+    'fill-brand',
+    'fill-violet-300',
+    'fill-amber-500',
+    'fill-ink-50',
+  ];
+  const n = 28;
+  const step = (Math.PI * 2) / n;
+  return (
+    <>
+      <circle cx="60" cy="74" r="58" className="fill-ink-900" />
+      {Array.from({ length: n }, (_, i) => (
+        <path
+          key={i}
+          d={wedgePath(60, 74, 34, 56, i * step, (i + 1) * step)}
+          className={colors[i % colors.length]}
+        />
+      ))}
+      <circle cx="60" cy="74" r="34" className="fill-ink-950" />
+      <circle cx="60" cy="74" r="30" className="fill-none stroke-violet-300" strokeWidth={1.6} />
+      <path d="M52 10h16l-8 14Z" className="fill-ink-50" />
+    </>
+  );
+}
+
+function BaccaratLoungeArt() {
+  return (
+    <>
+      <ellipse cx="60" cy="72" rx="58" ry="34" className="fill-gold-pressed" />
+      <ellipse cx="60" cy="70" rx="54" ry="30" className="fill-mint-800" />
+      <path d="M18 78c20 12 64 12 84 0" className="fill-none stroke-gold-600" strokeWidth={1.6} />
+      <circle cx="60" cy="72" r="6" className="fill-none stroke-brand" strokeWidth={2} />
+      <Card x={30} y={18} rotate={-8} suit="spade" rank="9" />
+      <Card x={52} y={16} rotate={6} suit="heart" rank="Q" />
+      <Chip cx={22} cy={82} r={7} tone="red" />
+      <Chip cx={60} cy={92} r={7} tone="mint" />
+      <Chip cx={98} cy={82} r={7} tone="sky" />
+    </>
+  );
+}
+
+function SpeedTwentyOneArt() {
+  return (
+    <>
+      <path d="M0 96a60 44 0 0 1 120 0v24H0Z" className="fill-violet-800" />
+      <path d="M8 96a52 36 0 0 1 104 0" className="fill-none stroke-gold" strokeWidth={2.4} />
+      <rect x="48" y="6" width="24" height="12" rx="2" className="fill-ink-950" />
+      {[
+        [16, 40, -14],
+        [44, 54, -4],
+        [72, 52, 6],
+        [96, 36, 14],
+      ].map(([x, y, r], i) => (
+        <g key={i} transform={`rotate(${r} ${x! + 9} ${y! + 12})`}>
+          <rect x={x} y={y} width="18" height="25" rx="3" className="fill-ink-50" />
+          <path
+            d={`M${x! + 9} ${y! + 18}c-4-3-6-5-6-8a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 3-2 5-6 8Z`}
+            className="fill-red-600"
+          />
+        </g>
+      ))}
+      <rect x="22" y="78" width="12" height="9" rx="2" className="fill-ink-50/80" />
+      <rect x="86" y="78" width="12" height="9" rx="2" className="fill-ink-50/80" />
+    </>
+  );
+}
+
+function SicBoTriadArt() {
+  return (
+    <>
+      <ellipse cx="60" cy="98" rx="50" ry="10" className="fill-ink-950/40" />
+      <ellipse cx="60" cy="92" rx="50" ry="10" className="fill-gold-pressed" />
+      <ellipse cx="60" cy="90" rx="44" ry="7" className="fill-gold-600" />
+      <path
+        d="M18 88V60a42 42 0 0 1 84 0v28"
+        className="fill-ink-50/15 stroke-ink-50/50"
+        strokeWidth={1.6}
+      />
+      <circle cx="60" cy="16" r="5" className="fill-ink-50/70" />
+      <Die x={26} y={58} size={26} rotate={-10} pips={4} />
+      <Die x={66} y={60} size={26} rotate={12} pips={6} />
+      <Die x={46} y={36} size={24} rotate={4} pips={3} />
+    </>
+  );
+}
+
+function DragonPhoenixArt() {
+  return (
+    <>
+      <ellipse cx="60" cy="102" rx="44" ry="7" className="fill-ink-950/30" />
+      <Card x={14} y={26} rotate={-12} suit="spade" rank="K" />
+      <Card x={64} y={26} rotate={12} suit="heart" rank="Q" />
+      <circle cx="60" cy="58" r="13" className="fill-gold" />
+      <text
+        x="60"
+        y="63"
+        textAnchor="middle"
+        fontSize="12"
+        fontWeight="800"
+        className="fill-ink-950"
+        style={{ fontFamily: 'var(--gp-font-sans)' }}
+      >
+        VS
+      </text>
+    </>
+  );
+}
+
 const ART: Record<GameArtKey, () => React.JSX.Element> = {
   'global-pool': GlobalPoolArt,
   'orbit-rush': OrbitRushArt,
@@ -388,6 +744,12 @@ const ART: Record<GameArtKey, () => React.JSX.Element> = {
   skyline: SkylineArt,
   pinfall: PinfallArt,
   'fortune-ring': FortuneRingArt,
+  'live-pool-roulette': LivePoolRouletteArt,
+  'mega-ring-show': MegaRingShowArt,
+  'baccarat-lounge': BaccaratLoungeArt,
+  'speed-twenty-one': SpeedTwentyOneArt,
+  'sic-bo-triad': SicBoTriadArt,
+  'dragon-and-phoenix': DragonPhoenixArt,
 };
 
 export function GameArt({

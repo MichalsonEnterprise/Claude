@@ -17,7 +17,7 @@ const yh = row('Refund head', { gap: 16 }); const tile = AL('HORIZONTAL', { name
 const yc = col('Amount', { gap: 4 }); const ar = row('Amount row', { gap: 8 }); add(ar, await T('300.00 USDT', 'Number/L', 'balance/owed'), await DEMO('S')); add(yc, await T('YOUR REFUND · OWED TO YOU', 'Overline', 'text/tertiary'), ar);
 add(yh, tile, [yc, 'FILL'], await badge('Pending', 'Settling 27 Nov, 21:00 UTC'));
 add(yr, [yh, 'FILL']);
-for (const [k, v, c] of [['Entry stakes · 30 × 10.00', '300.00 USDT → Owed', 'balance/owed'], ['Platform fees · 30 × 0.05', '1.50 USDT → Available (24 Nov, 20:01 UTC)', 'text/success'], ['Network fee', '0.00 USDT · paid by the platform', 'text/primary'], ['Settles to Available', '27 Nov 2026, 21:00 UTC · daily run', 'text/primary']]) add(yr, [await kv(k, v, { vc: c, demo: true }), 'FILL']);
+for (const [k, v, c] of [['Entry stakes · 30 × 10.00', '300.00 USDT → Owed', 'balance/owed'], ['Platform fees · 30 × 0.05', '1.50 USDT → Available (24 Nov, 20:01 UTC)', 'text/success'], ['Network fee', '0.00 USDT · paid by the platform', 'text/primary'], ['Refund reference', 'RF-1245-0042 · batch 2 of 3', 'text/primary'], ['Settles to Available', '27 Nov 2026, 21:00 UTC · automatic', 'text/primary']]) add(yr, [await kv(k, v, { vc: c, demo: true }), 'FILL']);
 add(yr, [line(), 'FILL']);
 add(yr, [await T('Owed funds already count toward your total balance (12,480.50 USDT) and move to Available automatically. There is nothing to claim and nothing expires.', 'Body/S', 'text/secondary', { w: 500 }), 'FILL']);
 const yb = row('Refund actions', { gap: 8 }); add(yb, await BTN('Secondary', 'View in wallet', { lead: 'wallet', size: 'S' }), await BTN('Ghost', 'How settlement works', { size: 'S' })); add(yr, yb);
@@ -33,13 +33,13 @@ add(tl, [await stepper([
   { s: 'done', t: 'Cancellation recorded on-chain', d: '20:00:06 · GlobalPool v1.3.0 on Arbitrum One emitted RoundCancelled(#1,245).', extra: hash },
   { s: 'done', t: 'Platform fees reversed', d: '20:01 · 206.00 USDT returned to 412 players. Your 1.50 USDT is back in Available.' },
   { s: 'done', t: 'Stakes recorded as Owed', d: '20:01 · 41,200.00 USDT owed to 412 players. Your 300.00 USDT is in your Owed balance.' },
-  { s: 'current', t: 'Settles to Available', d: 'Scheduled 27 Nov 2026, 21:00 · included in the daily settlement run on Arbitrum, usually under 5 minutes. No action needed.', tag: await badge('Pending', 'Scheduled') }]), 'FILL']);
+  { s: 'current', t: 'Settles to Available', d: 'Scheduled 27 Nov 2026, 21:00 · refund batch 2 of 3 on Arbitrum (contract call 0xc71e…5b02), usually under 5 minutes. No action needed.', tag: await badge('Pending', 'Scheduled') }]), 'FILL']);
 add(left, [tl, 'FILL']);
 const en = card('Card — Your entries');
 add(en, [await ttl('Your 30 entries in this round', { right: [await BTN('Ghost', 'Show all 30 entries', { size: 'S', trail: 'chevron-right' })] }), 'FILL']);
 const er = row('Entries row', { gap: 24, align: 'MIN' }); const tk = await I(C.TK, { State: 'Refunded' });
 const ec = col('Entries summary', { gap: 12 });
-for (const [k, v] of [['Entry IDs', 'E-1245-00383 … E-1245-00412'], ['Bought', '24 Nov 2026, 09:40 UTC'], ['Paid', '301.50 USDT (300.00 + 1.50 fees)'], ['Returned', '301.50 USDT in full']]) add(ec, [await lv(k, v, { vs: k === 'Entry IDs' ? 'Mono/S' : 'Body/S Strong', w: 260 }), 'FILL']);
+for (const [k, v] of [['Entry IDs', 'E-1245-00383 … E-1245-00412'], ['Bought', '24 Nov 2026, 14:22 UTC'], ['Paid', '301.50 USDT (300.00 + 1.50 fees)'], ['Returned', '301.50 USDT in full']]) add(ec, [await lv(k, v, { vs: k === 'Entry IDs' ? 'Mono/S' : 'Body/S Strong', w: 260 }), 'FILL']);
 add(er, tk, [ec, 'FILL']); add(en, [er, 'FILL']); add(left, [en, 'FILL']);
 const right = col('Right column', { gap: 24 });
 const fc = card('Card — Round facts', { gap: 12 });

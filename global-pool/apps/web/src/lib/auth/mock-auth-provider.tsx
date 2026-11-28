@@ -11,7 +11,14 @@ import type { z } from 'zod';
 import { Logo } from '@/components/brand/logo';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
-import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Field, Input } from '@/components/ui/input';
 import { OtpInput } from '@/components/ui/otp-input';
 
@@ -86,7 +93,9 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
       // UNSIGNED placeholder — the API's dev-token exchange (PRIVY_MOCK=true) is defined by the API package.
       getAccessToken: () =>
         Promise.resolve(
-          status === 'member' ? `dev-mock.${base64url(JSON.stringify({ sub: MOCK_DID, mock: true }))}` : null,
+          status === 'member'
+            ? `dev-mock.${base64url(JSON.stringify({ sub: MOCK_DID, mock: true }))}`
+            : null,
         ),
     }),
     [status],
@@ -116,7 +125,10 @@ function MockSignInDialog({
   const [step, setStep] = React.useState<'email' | 'code'>('email');
   const [email, setEmail] = React.useState('');
   const [code, setCode] = React.useState('');
-  const form = useForm<EmailStep>({ resolver: zodResolver(emailStep), defaultValues: { email: '' } });
+  const form = useForm<EmailStep>({
+    resolver: zodResolver(emailStep),
+    defaultValues: { email: '' },
+  });
 
   React.useEffect(() => {
     if (mode) {
@@ -140,7 +152,11 @@ function MockSignInDialog({
             <DemoBadge size="s" label="Dev mock" />
           </div>
           <DialogTitle>
-            {step === 'code' ? 'Check your email' : mode === 'sign-up' ? 'Create your account' : 'Sign in'}
+            {step === 'code'
+              ? 'Check your email'
+              : mode === 'sign-up'
+                ? 'Create your account'
+                : 'Sign in'}
           </DialogTitle>
           <DialogDescription>
             {step === 'code'
@@ -167,14 +183,22 @@ function MockSignInDialog({
                 </Button>
               </form>
               <div className="flex items-center gap-3 text-caption text-text-tertiary">
-                <span className="h-px flex-1 bg-border-subtle" /> or <span className="h-px flex-1 bg-border-subtle" />
+                <span className="h-px flex-1 bg-border-subtle" /> or{' '}
+                <span className="h-px flex-1 bg-border-subtle" />
               </div>
-              <Button variant="secondary" size="l" block leadingIcon={<Wallet />} onClick={onComplete}>
+              <Button
+                variant="secondary"
+                size="l"
+                block
+                leadingIcon={<Wallet />}
+                onClick={onComplete}
+              >
                 Continue with a wallet
               </Button>
               <p className="text-caption text-text-tertiary">
-                Privy is not configured (NEXT_PUBLIC_PRIVY_APP_ID is empty), so this offline mock signs you in as the
-                DEMO player {DEMO_USER.displayHandle}. We never ask for your seed phrase.
+                Privy is not configured (NEXT_PUBLIC_PRIVY_APP_ID is empty), so this offline mock
+                signs you in as the DEMO player {DEMO_USER.displayHandle}. We never ask for your
+                seed phrase.
               </p>
             </>
           ) : (
@@ -191,7 +215,12 @@ function MockSignInDialog({
               <Button type="submit" size="l" block disabled={code.length !== 6}>
                 Verify and continue
               </Button>
-              <Button variant="ghost" size="s" leadingIcon={<ArrowLeft />} onClick={() => setStep('email')}>
+              <Button
+                variant="ghost"
+                size="s"
+                leadingIcon={<ArrowLeft />}
+                onClick={() => setStep('email')}
+              >
                 Use a different email
               </Button>
             </form>

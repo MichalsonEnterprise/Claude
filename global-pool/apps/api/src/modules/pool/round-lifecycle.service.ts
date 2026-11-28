@@ -65,25 +65,41 @@ export class RoundLifecycleService {
   }
 
   async tick(now = new Date()): Promise<TickReport> {
-    const report: TickReport = { opened: [], closed: [], drawing: [], settled: [], cancelled: [], scheduled: null, errors: [] };
+    const report: TickReport = {
+      opened: [],
+      closed: [],
+      drawing: [],
+      settled: [],
+      cancelled: [],
+      scheduled: null,
+      errors: [],
+    };
     const run = async (label: string, fn: () => Promise<void>) => {
       try {
         await fn();
       } catch (err) {
-        if (!(err instanceof RandomnessNotReadyError)) this.logger.error(`${label}: ${String(err)}`);
+        if (!(err instanceof RandomnessNotReadyError))
+          this.logger.error(`${label}: ${String(err)}`);
         report.errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
-    for (const r of await this.prisma.round.findMany({ where: { status: 'scheduled', opensAt: { lte: now } } })) {
+    for (const r of await this.prisma.round.findMany({
+      where: { status: 'scheduled', opensAt: { lte: now } },
+    })) {
       await run(`open #${r.number}`, async () => {
-        const res = await this.prisma.round.updateMany({ where: { id: r.id, status: 'scheduled' }, data: { status: 'open', openedAt: now } });
+        const res = await this.prisma.round.updateMany({
+          where: { id: r.id, status: 'scheduled' },
+          data: { status: 'open', openedAt: now },
+        });
         if (res.count) {
           report.opened.push(r.number);
           this.emitStatus(r, 'open');
         }
       });
     }
-    for (const r of await this.prisma.round.findMany({ where: { status: 'open', closesAt: { lte: now } } })) {
+    for (const r of await this.prisma.round.findMany({
+      where: { status: 'open', closesAt: { lte: now } },
+    })) {
       await run(`close #${r.number}`, async () => {
         await this.close(r.id, now);
         report.closed.push(r.number);
@@ -106,7 +122,9 @@ export class RoundLifecycleService {
     }
     if (this.config.env.ROUND_AUTO_SCHEDULE) {
       await run('schedule', async () => {
-        const upcoming = await this.prisma.round.count({ where: { status: { in: ['open', 'scheduled'] }, closesAt: { gt: now } } });
+        const upcoming = await this.prisma.round.count({
+          where: { status: { in: ['open', 'scheduled'] }, closesAt: { gt: now } },
+        });
         if (upcoming === 0) {
           const round = await this.rounds.open(nextDailyWindow(now));
           report.scheduled = round.number;
@@ -120,9 +138,15 @@ export class RoundLifecycleService {
   async close(roundId: string, now = new Date()): Promise<Round> {
     const round = await this.prisma.tx(async (tx) => {
       const r = await this.lock(tx, roundId);
-      if (r.status !== 'open') throw new AppError('CONFLICT', `Round ${formatRoundNumber(r.number)} is ${r.status}`);
-      const met = r.participantsCount >= r.minParticipants && money(r.poolAmount.toFixed()).gte(money(r.minPool.toFixed()));
-      return tx.round.update({ where: { id: r.id }, data: { status: 'closed', closedAt: now, thresholdsMet: met } });
+      if (r.status !== 'open')
+        throw new AppError('CONFLICT', `Round ${formatRoundNumber(r.number)} is ${r.status}`);
+      const met =
+        r.participantsCount >= r.minParticipants &&
+        money(r.poolAmount.toFixed()).gte(money(r.minPool.toFixed()));
+      return tx.round.update({
+        where: { id: r.id },
+        data: { status: 'closed', closedAt: now, thresholdsMet: met },
+      });
     });
     this.emitStatus(round, 'closed');
     return round;
@@ -131,18 +155,25 @@ export class RoundLifecycleService {
   /** closed → drawing (randomness requested) when thresholds are met, else → cancelled with refunds. */
   async startDraw(roundId: string): Promise<'drawing' | 'cancelled'> {
     const round = await this.prisma.round.findUniqueOrThrow({ where: { id: roundId } });
-    if (round.status !== 'closed') throw new AppError('CONFLICT', `Round ${formatRoundNumber(round.number)} is ${round.status}`);
+    if (round.status !== 'closed')
+      throw new AppError('CONFLICT', `Round ${formatRoundNumber(round.number)} is ${round.status}`);
     if (!round.thresholdsMet || round.entriesCount === 0) {
       await this.cancel(roundId, 'threshold_not_met');
       return 'cancelled';
     }
     await this.randomness.request(round);
-    const res = await this.prisma.round.updateMany({ where: { id: roundId, status: 'closed' }, data: { status: 'drawing' } });
+    const res = await this.prisma.round.updateMany({
+      where: { id: roundId, status: 'closed' },
+      data: { status: 'drawing' },
+    });
     if (res.count) this.emitStatus(round, 'drawing');
     return 'drawing';
   }
 
-  async pollAndSettle(roundId: string, now = new Date()): Promise<'settled' | 'waiting' | 'cancelled'> {
+  async pollAndSettle(
+    roundId: string,
+    now = new Date(),
+  ): Promise<'settled' | 'waiting' | 'cancelled'> {
     const round = await this.prisma.round.findUniqueOrThrow({ where: { id: roundId } });
     const request = await this.prisma.randomnessRequest.findFirst({
       where: { roundId, status: { in: ['requested', 'fulfilled'] } },
@@ -158,7 +189,10 @@ export class RoundLifecycleService {
       return 'settled';
     }
     if (addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now) {
-      await this.prisma.randomnessRequest.update({ where: { id: polled.id }, data: { status: 'timed_out' } });
+      await this.prisma.randomnessRequest.update({
+        where: { id: polled.id },
+        data: { status: 'timed_out' },
+      });
       await this.cancel(roundId, 'vrf_timeout');
       return 'cancelled';
     }
@@ -173,7 +207,11 @@ export class RoundLifecycleService {
     const settled = await this.prisma.tx(
       async (tx) => {
         const round = await this.lock(tx, roundId);
-        if (round.status !== 'drawing') throw new AppError('CONFLICT', `Round ${formatRoundNumber(round.number)} is ${round.status}`);
+        if (round.status !== 'drawing')
+          throw new AppError(
+            'CONFLICT',
+            `Round ${formatRoundNumber(round.number)} is ${round.status}`,
+          );
         const request = await tx.randomnessRequest.findFirst({
           where: { roundId, status: 'fulfilled', randomWord: { not: null } },
           orderBy: { fulfilledAt: 'asc' },
@@ -181,10 +219,18 @@ export class RoundLifecycleService {
         if (!request?.randomWord) throw new AppError('CONFLICT', 'Randomness not fulfilled yet');
         const poolOnLedger = await this.ledger.balanceOf({ type: 'pool', roundId }, tx);
         if (!money(poolOnLedger).eq(money(round.poolAmount.toFixed()))) {
-          throw new AppError('CONFLICT', `Pool reconciliation failed (ledger ${poolOnLedger} ≠ projection ${round.poolAmount.toFixed()})`);
+          throw new AppError(
+            'CONFLICT',
+            `Pool reconciliation failed (ledger ${poolOnLedger} ≠ projection ${round.poolAmount.toFixed()})`,
+          );
         }
-        const entries = await tx.entry.findMany({ where: { roundId }, orderBy: { seq: 'asc' }, select: { id: true, seq: true, userId: true } });
-        if (entries.length !== round.entriesCount) throw new AppError('CONFLICT', 'Entry list does not match the round counters');
+        const entries = await tx.entry.findMany({
+          where: { roundId },
+          orderBy: { seq: 'asc' },
+          select: { id: true, seq: true, userId: true },
+        });
+        if (entries.length !== round.entriesCount)
+          throw new AppError('CONFLICT', 'Entry list does not match the round counters');
         const winners = selectWinners({
           roundId: round.onchainRoundId ?? BigInt(round.number),
           randomWord: request.randomWord as Hex,
@@ -204,7 +250,13 @@ export class RoundLifecycleService {
           metadata: { randomnessRequestId: request.requestId, randomWord: request.randomWord },
         });
         await tx.poolLedger.create({
-          data: { roundId, postingId: settlement.id, kind: 'settlement', entryCount: round.entriesCount, amount: money(round.poolAmount.toFixed()).negated().toFixed() },
+          data: {
+            roundId,
+            postingId: settlement.id,
+            kind: 'settlement',
+            entryCount: round.entriesCount,
+            amount: money(round.poolAmount.toFixed()).negated().toFixed(),
+          },
         });
         await this.ledger.post(tx, {
           kind: 'prize_award',
@@ -215,7 +267,10 @@ export class RoundLifecycleService {
           isDemo: round.isDemo,
           lines: prizeAwardLines(winners.map((w) => ({ userId: w.userId, amount: w.amount }))),
         });
-        const users = await tx.user.findMany({ where: { id: { in: [...new Set(winners.map((w) => w.userId))] } }, select: { id: true, handle: true } });
+        const users = await tx.user.findMany({
+          where: { id: { in: [...new Set(winners.map((w) => w.userId))] } },
+          select: { id: true, handle: true },
+        });
         for (const w of winners) {
           const winner = await tx.winner.create({
             data: {
@@ -230,7 +285,9 @@ export class RoundLifecycleService {
               isDemo: round.isDemo,
             },
           });
-          await tx.prizeClaim.create({ data: { winnerId: winner.id, userId: w.userId, amount: w.amount, isDemo: round.isDemo } });
+          await tx.prizeClaim.create({
+            data: { winnerId: winner.id, userId: w.userId, amount: w.amount, isDemo: round.isDemo },
+          });
           await tx.transaction.create({
             data: {
               userId: w.userId,
@@ -244,7 +301,11 @@ export class RoundLifecycleService {
               description: `Prize #${w.rank} · Round ${label}`,
               roundId,
               isDemo: round.isDemo,
-              metadata: { rank: w.rank, tier: w.tier, statusDetail: 'Owed — claim to move it to Available' },
+              metadata: {
+                rank: w.rank,
+                tier: w.tier,
+                statusDetail: 'Owed — claim to move it to Available',
+              },
             },
           });
           await this.notifications.notify(tx, {
@@ -258,8 +319,14 @@ export class RoundLifecycleService {
         }
         const winningIds = winners.map((w) => w.entryId);
         await tx.entry.updateMany({ where: { id: { in: winningIds } }, data: { status: 'won' } });
-        await tx.entry.updateMany({ where: { roundId, status: 'active' }, data: { status: 'not_won' } });
-        const done = await tx.round.update({ where: { id: roundId }, data: { status: 'settled', settledAt: new Date() } });
+        await tx.entry.updateMany({
+          where: { roundId, status: 'active' },
+          data: { status: 'not_won' },
+        });
+        const done = await tx.round.update({
+          where: { id: roundId },
+          data: { status: 'settled', settledAt: new Date() },
+        });
         await this.audit.record(
           {
             actorType: 'system',
@@ -293,10 +360,17 @@ export class RoundLifecycleService {
       async (tx) => {
         const round = await this.lock(tx, roundId);
         if (!['open', 'closed', 'drawing'].includes(round.status)) {
-          throw new AppError('CONFLICT', `Round ${formatRoundNumber(round.number)} is ${round.status}`);
+          throw new AppError(
+            'CONFLICT',
+            `Round ${formatRoundNumber(round.number)} is ${round.status}`,
+          );
         }
         const label = formatRoundNumber(round.number);
-        const stakes = await tx.entry.groupBy({ by: ['userId'], where: { roundId }, _count: { _all: true } });
+        const stakes = await tx.entry.groupBy({
+          by: ['userId'],
+          where: { roundId },
+          _count: { _all: true },
+        });
         const refunds = stakes.map((s) => ({
           userId: s.userId,
           entries: s._count._all,
@@ -304,7 +378,10 @@ export class RoundLifecycleService {
         }));
         const total = refunds.reduce((a, r) => a.plus(money(r.amount)), new MoneyDecimal(0));
         if (!total.eq(money(round.poolAmount.toFixed()))) {
-          throw new AppError('CONFLICT', `Refund total ${total.toFixed()} ≠ pool ${round.poolAmount.toFixed()}`);
+          throw new AppError(
+            'CONFLICT',
+            `Refund total ${total.toFixed()} ≠ pool ${round.poolAmount.toFixed()}`,
+          );
         }
         if (refunds.length > 0) {
           const posting = await this.ledger.post(tx, {
@@ -317,7 +394,13 @@ export class RoundLifecycleService {
             lines: roundRefundLines(roundId, refunds),
           });
           await tx.poolLedger.create({
-            data: { roundId, postingId: posting.id, kind: 'refund', entryCount: round.entriesCount, amount: total.negated().toFixed() },
+            data: {
+              roundId,
+              postingId: posting.id,
+              kind: 'refund',
+              entryCount: round.entriesCount,
+              amount: total.negated().toFixed(),
+            },
           });
           await tx.transaction.createMany({
             data: refunds.map((r) => ({
@@ -332,7 +415,11 @@ export class RoundLifecycleService {
               description: `Refund · cancelled round ${label} (${r.entries} entries)`,
               roundId,
               isDemo: round.isDemo,
-              metadata: { entries: r.entries, reason, statusDetail: 'Owed — claim to move it to Available' },
+              metadata: {
+                entries: r.entries,
+                reason,
+                statusDetail: 'Owed — claim to move it to Available',
+              },
             })),
           });
           await tx.notification.createMany({
@@ -349,7 +436,12 @@ export class RoundLifecycleService {
         await tx.entry.updateMany({ where: { roundId }, data: { status: 'refund_owed' } });
         const done = await tx.round.update({
           where: { id: roundId },
-          data: { status: 'cancelled', cancelledAt: new Date(), cancelReason: reason, thresholdsMet: reason === 'vrf_timeout' ? round.thresholdsMet : false },
+          data: {
+            status: 'cancelled',
+            cancelledAt: new Date(),
+            cancelReason: reason,
+            thresholdsMet: reason === 'vrf_timeout' ? round.thresholdsMet : false,
+          },
         });
         await this.audit.record(
           {
@@ -359,7 +451,11 @@ export class RoundLifecycleService {
             targetType: 'round',
             targetId: roundId,
             reason,
-            metadata: { roundNumber: round.number, refunded: total.toFixed(), players: refunds.length },
+            metadata: {
+              roundNumber: round.number,
+              refunded: total.toFixed(),
+              players: refunds.length,
+            },
           },
           tx,
         );
@@ -379,6 +475,12 @@ export class RoundLifecycleService {
   }
 
   private emitStatus(round: Round, status: string) {
-    this.events.emit({ type: 'round.status', roundId: round.id, roundNumber: round.number, status, at: new Date().toISOString() });
+    this.events.emit({
+      type: 'round.status',
+      roundId: round.id,
+      roundNumber: round.number,
+      status,
+      at: new Date().toISOString(),
+    });
   }
 }

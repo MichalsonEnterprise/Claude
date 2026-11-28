@@ -13,7 +13,13 @@ type TabsVariant = 'underline' | 'pill' | 'segmented';
 const VariantContext = React.createContext<TabsVariant>('underline');
 
 export function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
-  return <TabsPrimitive.Root data-slot="tabs" className={cn('flex flex-col gap-4', className)} {...props} />;
+  return (
+    <TabsPrimitive.Root
+      data-slot="tabs"
+      className={cn('flex flex-col gap-4', className)}
+      {...props}
+    />
+  );
 }
 
 export function TabsList({
@@ -30,7 +36,8 @@ export function TabsList({
           'no-scrollbar flex max-w-full items-center overflow-x-auto',
           variant === 'underline' && 'gap-6 border-b border-border-subtle',
           variant === 'pill' && 'gap-2',
-          variant === 'segmented' && 'inline-flex w-fit gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1',
+          variant === 'segmented' &&
+            'inline-flex w-fit gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1',
           className,
         )}
         {...props}
@@ -71,6 +78,15 @@ export function TabsTrigger({
   );
 }
 
-export function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
-  return <TabsPrimitive.Content data-slot="tabs-content" className={cn('outline-none', className)} {...props} />;
+export function TabsContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  return (
+    <TabsPrimitive.Content
+      data-slot="tabs-content"
+      className={cn('outline-none', className)}
+      {...props}
+    />
+  );
 }

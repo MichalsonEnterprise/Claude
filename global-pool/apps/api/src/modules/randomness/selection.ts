@@ -20,7 +20,12 @@ import { encodeAbiParameters, hexToBigInt, keccak256, stringToHex, type Hex } fr
 export const WINNERS_DOMAIN: Hex = keccak256(stringToHex('GLOBAL_POOL_WINNERS_V1'));
 export const BPS_DENOMINATOR = 10_000n;
 /** 1st 50% · 2nd 20% · 3rd 10% · 10 × runner-up 2% (PRIZE_DISTRIBUTION in @gp/shared/pool). */
-export const DEFAULT_PRIZE_SPLIT_BPS: readonly number[] = [5000, 2000, 1000, ...Array<number>(10).fill(200)];
+export const DEFAULT_PRIZE_SPLIT_BPS: readonly number[] = [
+  5000,
+  2000,
+  1000,
+  ...Array<number>(10).fill(200),
+];
 
 const TWO_256 = 1n << 256n;
 
@@ -28,10 +33,17 @@ export class SelectionError extends Error {
   override readonly name = 'SelectionError';
 }
 
-export function deriveWinnerIndices(roundId: bigint, randomWord: bigint, totalEntries: bigint, count: bigint): bigint[] {
+export function deriveWinnerIndices(
+  roundId: bigint,
+  randomWord: bigint,
+  totalEntries: bigint,
+  count: bigint,
+): bigint[] {
   if (totalEntries <= 0n) throw new SelectionError('no entries');
-  if (count <= 0n || count > totalEntries) throw new SelectionError(`invalid winner count ${count} for ${totalEntries} entries`);
-  if (randomWord < 0n || randomWord >= TWO_256) throw new SelectionError('random word out of uint256 range');
+  if (count <= 0n || count > totalEntries)
+    throw new SelectionError(`invalid winner count ${count} for ${totalEntries} entries`);
+  if (randomWord < 0n || randomWord >= TWO_256)
+    throw new SelectionError('random word out of uint256 range');
   const threshold = TWO_256 % totalEntries;
   const winners: bigint[] = [];
   const seen = new Set<bigint>();
@@ -55,8 +67,10 @@ export function deriveWinnerIndices(roundId: bigint, randomWord: bigint, totalEn
 
 export function validatePrizeSplit(bps: readonly number[]): void {
   if (bps.length === 0) throw new SelectionError('empty prize split');
-  if (bps.some((b) => !Number.isInteger(b) || b <= 0)) throw new SelectionError('prize split must be positive integers');
-  if (bps.reduce((a, b) => a + b, 0) !== Number(BPS_DENOMINATOR)) throw new SelectionError('prize split must sum to 10000 bps');
+  if (bps.some((b) => !Number.isInteger(b) || b <= 0))
+    throw new SelectionError('prize split must be positive integers');
+  if (bps.reduce((a, b) => a + b, 0) !== Number(BPS_DENOMINATOR))
+    throw new SelectionError('prize split must sum to 10000 bps');
 }
 
 /** Mirror of DrawMath.splitPool (base units). */
@@ -105,10 +119,18 @@ export function selectWinners(input: {
   validatePrizeSplit(bps);
   const n = input.entries.length;
   input.entries.forEach((e, i) => {
-    if (e.seq !== i + 1) throw new SelectionError(`entry list must be the canonical seq order (index ${i} has seq ${e.seq})`);
+    if (e.seq !== i + 1)
+      throw new SelectionError(
+        `entry list must be the canonical seq order (index ${i} has seq ${e.seq})`,
+      );
   });
   const count = Math.min(bps.length, n);
-  const indices = deriveWinnerIndices(input.roundId, hexToBigInt(input.randomWord), BigInt(n), BigInt(count));
+  const indices = deriveWinnerIndices(
+    input.roundId,
+    hexToBigInt(input.randomWord),
+    BigInt(n),
+    BigInt(count),
+  );
   const drawnBps = bps.slice(0, count);
   const missing = bps.slice(count).reduce((a, b) => a + b, 0);
   if (drawnBps.length > 0) drawnBps[0] = drawnBps[0]! + missing;

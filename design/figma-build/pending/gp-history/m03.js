@@ -17,7 +17,7 @@ add(tl, [await stepper([
   { s: 'done', t: 'Closed — threshold not met', d: '20:00:00 UTC · 412 of 500 players · 41,200.00 of 50,000.00 USDT. No VRF request, no winners.' },
   { s: 'done', t: 'Cancellation on-chain', d: '20:00:06 UTC · RoundCancelled(#1,245) · tx 0x6b2e…31f4' },
   { s: 'done', t: 'Fees reversed · Stakes owed', d: '20:01 UTC · 1.50 USDT to Available, 300.00 USDT to Owed.' },
-  { s: 'current', t: 'Settles to Available', d: '27 Nov 2026, 21:00 UTC · daily run on Arbitrum, usually under 5 min.' }]), 'FILL']);
+  { s: 'current', t: 'Settles to Available', d: '27 Nov 2026, 21:00 UTC · refund RF-1245-0042, batch 2 of 3 on Arbitrum, usually under 5 min.' }]), 'FILL']);
 add(main, [tl, 'FILL']);
 const en = await mcard('Your 30 entries', null, [['Entry IDs', 'E-1245-00383 … E-1245-00412', { vs: 'Mono/S' }], ['Paid', '301.50 USDT'], ['Returned', '301.50 USDT in full']]);
 const tk = await I(C.TK, { State: 'Refunded' }); tk.rescale(326 / 400); add(en, tk);

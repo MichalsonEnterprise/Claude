@@ -17,5 +17,9 @@ loadEnvFiles();
 const require = createRequire(import.meta.url);
 const cli = require.resolve('prisma/build/index.js', { paths: [apiRoot] });
 process.env.PRISMA_HIDE_UPDATE_MESSAGE ??= '1';
-const res = spawnSync(process.execPath, [cli, ...args], { stdio: 'inherit', cwd: apiRoot, env: process.env });
+const res = spawnSync(process.execPath, [cli, ...args], {
+  stdio: 'inherit',
+  cwd: apiRoot,
+  env: process.env,
+});
 process.exit(res.status ?? 1);

@@ -19,6 +19,10 @@ export class MockKycProvider implements KycProvider {
   readonly name = 'mock';
 
   startVerification(): Promise<KycSession> {
-    return Promise.resolve({ provider: this.name, providerRef: `mock-kyc-${randomUUID()}`, redirectUrl: null });
+    return Promise.resolve({
+      provider: this.name,
+      providerRef: `mock-kyc-${randomUUID()}`,
+      redirectUrl: null,
+    });
   }
 }

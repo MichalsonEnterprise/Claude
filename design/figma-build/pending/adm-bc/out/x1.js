@@ -222,6 +222,8 @@ async function DONE(f, extra = {}) { fitSection(sec); await f.screenshot({ scale
 const LIST = [['68:53474', 'C1Q'], ['75:56265', 'C1R'], ['77:56703', 'C2'], ['86:116072', 'C3']];
 const PG = figma.root.children.find(p => p.name === '09 — Admin Panel'); await figma.setCurrentPageAsync(PG);
 const sec = section('ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance', 70000, 0);
+// ADM-P section (56000, w 15720) ends at 71720 and overlaps x=70000: shift this section right (children move with it)
+if (Math.round(sec.x) === 70000) sec.x = 72000;
 // fixes on desktop masters before cloning
 const CTX = { '68:53474': { 'Decisions today': 'vs yesterday', 'Median time to decision': 'vs previous 7 d' }, '77:56703': { 'Open alerts': 'vs yesterday', 'Alerts closed (7 days)': 'vs previous 7 d' }, '86:116072': { 'Open cases': 'vs yesterday', 'Reports filed in November': 'vs October', 'Funds held by restriction': 'held, not seized' } };
 for (const [fid, m] of Object.entries(CTX)) { const fr = await figma.getNodeByIdAsync(fid); if (!fr) continue; for (const k of fr.findAll(n => n.type === 'INSTANCE' && n.name.startsWith('Admin/KPI Tile — '))) { const lab = k.name.replace('Admin/KPI Tile — ', ''); if (m[lab]) { const t = k.findOne(n => n.type === 'TEXT' && /^vs /.test(n.characters)); if (t) await setText(t, m[lab]); else MISS.push('ctx ' + lab); } } }

@@ -17,9 +17,7 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Swit
       )}
       {...props}
     >
-      <SwitchPrimitive.Thumb
-        className="pointer-events-none block size-[18px] rounded-full bg-ink-100 shadow-elevation-1 transition-transform duration-150 ease-standard data-[state=checked]:translate-x-5 data-[state=checked]:bg-ink-950"
-      />
+      <SwitchPrimitive.Thumb className="pointer-events-none block size-[18px] rounded-full bg-ink-100 shadow-elevation-1 transition-transform duration-150 ease-standard data-[state=checked]:translate-x-5 data-[state=checked]:bg-ink-950" />
     </SwitchPrimitive.Root>
   );
 }
@@ -31,14 +29,20 @@ export function SwitchField({
   description,
   className,
   ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root> & { label: React.ReactNode; description?: React.ReactNode }) {
+}: React.ComponentProps<typeof SwitchPrimitive.Root> & {
+  label: React.ReactNode;
+  description?: React.ReactNode;
+}) {
   const auto = React.useId();
   const sid = id ?? auto;
   return (
     <div className={cn('flex items-start gap-3 py-1', className)}>
       <Switch id={sid} aria-describedby={description ? `${sid}-d` : undefined} {...props} />
       <div className="flex flex-col gap-0.5">
-        <label htmlFor={sid} className="text-body-s text-text-primary peer-disabled:text-text-tertiary">
+        <label
+          htmlFor={sid}
+          className="text-body-s text-text-primary peer-disabled:text-text-tertiary"
+        >
           {label}
         </label>
         {description && (

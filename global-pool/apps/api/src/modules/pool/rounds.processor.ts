@@ -32,7 +32,11 @@ export class RoundsProcessor extends WorkerHost implements OnApplicationBootstra
   async process(job: Job<{ roundId?: string }>): Promise<unknown> {
     if (job.name === JOBS.ROUND_TICK) {
       const report = await this.lifecycle.tick();
-      const changed = report.opened.length + report.closed.length + report.settled.length + report.cancelled.length;
+      const changed =
+        report.opened.length +
+        report.closed.length +
+        report.settled.length +
+        report.cancelled.length;
       if (changed || report.scheduled) this.logger.log(`Round tick: ${JSON.stringify(report)}`);
       return report;
     }

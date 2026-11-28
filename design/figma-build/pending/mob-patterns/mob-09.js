@@ -96,6 +96,7 @@ const sec = section('MOB-01/02/10/12 Mobile patterns', 224000, 0);
 const C = { TOPM: '23:12908', DRAWER: '23:13536', TAB: '22:5413', REG: '16:3449', DC: '24:13861', TILE: '28:16529', LIC: '6:158', B18: '6:159', TK: '23:8534', BB: '14:1974', AV: '9:238', VIP: '6:211', KYC: '23:5565', ICB: '7:774', PILL: '20:6895', SEG: '20:6978', SRCH: '16:3820', CHIP: '17:2766', FEE: '20:8583', ADDR: '9:418', SB: '23:6697', LOGO: '4:797', MARK: '4:792', HC: '22:8309', CELL: '22:9559', PPV: '28:19099', NOTIF: '16:3356', JC: '22:8356', FOOT: '22:7450', CNT: '6:216' };
 const ART = { 'Global Pool': '24:13141', 'Orbit Rush': '24:13176', 'Orbit Rush Duel': '24:13206', 'Vault Sweeper': '24:13239', 'Skyline': '24:13297', 'Pinfall': '24:13333', 'Fortune Ring': '24:13399', 'Pool Dice': '24:13443', 'Double Side': '24:13473', 'High Card': '24:13496', 'Ascend': '24:13528', 'Pool Keno': '24:13564', 'Pool Roulette': '25:14777', 'Twenty-One': '25:14841', 'Neon Koi': '25:14992', 'Atlas Vault': '25:15031', 'Live Pool Roulette': '27:15060', 'Daily Draw 6/45': '27:15370' };
 const MISS = [];
+const SHORTMSG = 'DEMO DATA — illustrative values only';
 async function ST(n, s) { if (!n || n.type !== 'TEXT') { MISS.push('ST'); return n; } const L = n.characters.length; const fs = L ? n.getRangeAllFontNames(0, L) : [n.fontName]; await Promise.all(fs.map(f => figma.loadFontAsync(f))); n.characters = String(s); return n; }
 async function TX(root, name, s, i = 0) { const a = root.findAll(x => x.type === 'TEXT' && x.name === name); if (a[i]) await ST(a[i], s); else MISS.push('TX:' + name); return a[i]; }
 async function RB(status, label, size = 'S') { const b = await BADGE(status, size); if (label) await TX(b, 'Label', label); return b; }
@@ -115,7 +116,7 @@ async function FRAME(id, name, w, o = {}) {
   if (old) { pos = { x: old.x, y: old.y }; old.remove(); } else pos = await SLOT(id, o.rowTitle, o.rowSub);
   const f = await screen(name, w, o.h ? { h: o.h, grid: o.grid } : { grid: o.grid }); if (!o.h) f.primaryAxisSizingMode = 'AUTO';
   sec.appendChild(f); f.x = pos.x; f.y = pos.y;
-  if (o.demo !== false) add(f, [await DEMOBAR(), 'FILL']);
+  if (o.demo !== false) add(f, [await DEMOBAR(w < 768 ? SHORTMSG : undefined), 'FILL']);
   return f;
 }
 function VP(f, h = 844, name = 'Viewport 390×844') { const v = AL('VERTICAL', { name, w: f.width, h, clip: true, fill: 'bg/base' }); add(f, [v, 'FILL']); return v; }
@@ -131,7 +132,7 @@ async function HERO(o = {}) {
   const BW = o.bw || 190; const blk = rect(BW, H + 140, 'accent/gold-tint-strong', 0, 'Angled gold block'); b.appendChild(blk); blk.layoutPositioning = 'ABSOLUTE'; blk.rotation = -16; blk.x = W - BW + 68; blk.y = -40;
   const blk2 = rect(40, H + 140, 'brand/tint', 0, 'Angled mint stripe'); b.appendChild(blk2); blk2.layoutPositioning = 'ABSOLUTE'; blk2.rotation = -16; blk2.x = W - BW + 38; blk2.y = -30;
   const tk = await I(C.TK, { State: 'Active' }, { 'Show DEMO': false }); b.appendChild(tk); tk.layoutPositioning = 'ABSOLUTE'; tk.rescale(o.ts || 0.5); tk.rotation = 14; tk.x = o.tx != null ? o.tx : W - 130; tk.y = H - 100; tk.name = 'Entry ticket (cropped)';
-  for (let i = 0; i < 4; i++) { const cn = ellipse(56, 18, i === 3 ? 'accent/gold' : 'accent/gold-strong', 'Coin ' + (i + 1)); stroke(cn, 'accent/gold-soft', 1); b.appendChild(cn); cn.layoutPositioning = 'ABSOLUTE'; cn.x = W - 72; cn.y = 64 - i * 9; }
+  for (let i = 0; i < 4; i++) { const cn = ellipse(56, 18, i === 3 ? 'accent/gold' : 'accent/gold-strong', 'Coin ' + (i + 1)); stroke(cn, 'accent/gold-soft', 1); b.appendChild(cn); cn.layoutPositioning = 'ABSOLUTE'; cn.x = W - 62; cn.y = H - 68 - i * 9; }
   const ov = await T(o.over || 'GLOBAL POOL · ROUND #1,248', 'Overline', 'text/gold'); add(b, ov);
   const nr = ROW('Pool value', [], { gap: 6 }); const num = await T('186,400.00', o.ns || 'Number/L', 'accent/gold'); await gfill(num, 'Gradient/Gold Jackpot'); add(nr, num, await T('USDT', 'Label/M', 'text/secondary'), await DEMO('S')); add(b, nr);
   add(b, await T(o.sub || 'Draws 27 Nov 2026, 20:00 UTC\n10.00 USDT + 0.05 USDT fee per entry', 'Caption', 'text/secondary', { w: o.subw || 200 }));
@@ -182,7 +183,7 @@ add(c, [await SECH('GLOBAL POOL Originals', { link: 'All 12' }), 'FILL']);
 const S = 164 / 160;
 add(c, [await TILEROW([['Orbit Rush', '1,062'], ['Vault Sweeper', '146'], ['Skyline', '206'], ['Pinfall', '100']], S), 'FILL']);
 add(c, [await SECH('Table games & live', { link: 'All 9' }), 'FILL']);
-add(c, [await TILEROW([['Pool Roulette', '1,062', 'House edge 2.70%'], ['Twenty-One', '347', 'House edge ≈0.50%'], ['Live Pool Roulette', '412', 'House edge 2.70%'], ['Atlas Vault', '188', 'RTP 96.40%']], S), 'FILL']);
+add(c, [await TILEROW([['Pool Roulette', '128', 'House edge 2.70%'], ['Twenty-One', '92', 'House edge ≈0.50%'], ['Live Pool Roulette', '412', 'House edge 2.70%'], ['Atlas Vault', '188', 'RTP 96.40%']], S), 'FILL']);
 // clone → drawer open
 const old = sec.children.find(n => n.name === N2); let pos; if (old) { pos = { x: old.x, y: old.y }; old.remove(); } else pos = await SLOT('MOB-12');
 const f2 = f1.clone(); f2.name = N2; sec.appendChild(f2); f2.x = pos.x; f2.y = pos.y;

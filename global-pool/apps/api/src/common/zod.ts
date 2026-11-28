@@ -15,6 +15,9 @@ export { createZodDto } from 'nestjs-zod';
 export const ZodBody = (schema: z.ZodType) =>
   applyDecorators(
     ApiBody({
-      schema: z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' }) as Record<string, unknown>,
+      schema: z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' }) as Record<
+        string,
+        unknown
+      >,
     }),
   );

@@ -9,14 +9,12 @@ const bool = z
   .enum(['true', 'false', '1', '0', 'yes', 'no'])
   .transform((v) => v === 'true' || v === '1' || v === 'yes');
 
-const csv = z
-  .string()
-  .transform((v) =>
-    v
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean),
-  );
+const csv = z.string().transform((v) =>
+  v
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
+);
 
 const evmAddress = z.string().refine((v) => isAddress(v, { strict: false }), {
   error: 'Must be a 0x-prefixed EVM address',
@@ -65,11 +63,9 @@ export const envSchema = z.object({
   ADMIN_SESSION_TTL: duration.default(28_800),
   ADMIN_LOGIN_MAX_ATTEMPTS: z.coerce.number().int().min(1).default(5),
   ADMIN_LOCKOUT_MINUTES: z.coerce.number().int().min(1).default(15),
-  TOTP_ENCRYPTION_KEY: z
-    .string()
-    .refine((v) => Buffer.from(v, 'base64').length === 32, {
-      error: 'TOTP_ENCRYPTION_KEY must be 32 bytes, base64-encoded (openssl rand -base64 32)',
-    }),
+  TOTP_ENCRYPTION_KEY: z.string().refine((v) => Buffer.from(v, 'base64').length === 32, {
+    error: 'TOTP_ENCRYPTION_KEY must be 32 bytes, base64-encoded (openssl rand -base64 32)',
+  }),
   TOTP_ISSUER: z.string().default('GLOBAL POOL (DEMO)'),
   STEP_UP_MAX_ATTEMPTS: z.coerce.number().int().min(1).default(5),
   STEP_UP_LOCK_MINUTES: z.coerce.number().int().min(1).default(15),
@@ -120,6 +116,9 @@ export const envSchema = z.object({
 
   THROTTLE_TTL_SECONDS: z.coerce.number().int().min(1).default(60),
   THROTTLE_LIMIT: z.coerce.number().int().min(1).default(120),
+  /** Admin login attempts per IP per minute (read at request time by the route throttler). */
+  ADMIN_LOGIN_THROTTLE_LIMIT: z.coerce.number().int().min(1).default(10),
+  DEV_TOKEN_THROTTLE_LIMIT: z.coerce.number().int().min(1).default(30),
   BULLMQ_PREFIX: z.string().default('gp'),
   /** Start BullMQ workers + repeatable jobs in this process (disable for one-off scripts / some tests). */
   JOBS_ENABLED: bool.default(true),

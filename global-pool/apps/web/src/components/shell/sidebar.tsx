@@ -28,7 +28,9 @@ export function resolveActiveHref(pathname: string): string | null {
   let best: string | null = null;
   for (const item of all) {
     const match =
-      item.href === '/' ? pathname === '/' : pathname === item.href || pathname.startsWith(`${item.href}/`);
+      item.href === '/'
+        ? pathname === '/'
+        : pathname === item.href || pathname.startsWith(`${item.href}/`);
     if (match && (best === null || item.href.length > best.length)) best = item.href;
   }
   return best;
@@ -36,7 +38,15 @@ export function resolveActiveHref(pathname: string): string | null {
 
 // ── items ──────────────────────────────────────────────────────────────────────────────────────
 
-function RailTooltip({ label, enabled, children }: { label: string; enabled: boolean; children: React.ReactElement }) {
+function RailTooltip({
+  label,
+  enabled,
+  children,
+}: {
+  label: string;
+  enabled: boolean;
+  children: React.ReactElement;
+}) {
   if (!enabled) return children;
   return (
     <Tooltip>
@@ -87,7 +97,10 @@ function NavLink({
         className={cn(itemBase, density === 'drawer' ? 'h-11' : 'h-9', child && 'pl-8 rail:pl-0')}
       >
         {active && (
-          <span aria-hidden className="absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-full bg-brand" />
+          <span
+            aria-hidden
+            className="absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-full bg-brand"
+          />
         )}
         <ItemIcon icon={item.icon} />
         <span className="truncate rail:sr-only">{item.label}</span>
@@ -136,11 +149,21 @@ function NavGroup({
         <span className="truncate">{item.label}</span>
         <ChevronDown
           aria-hidden
-          className={cn('ml-auto size-4 text-icon-muted transition-transform duration-150', open && 'rotate-180')}
+          className={cn(
+            'ml-auto size-4 text-icon-muted transition-transform duration-150',
+            open && 'rotate-180',
+          )}
         />
       </button>
       <div className="hidden rail:block">
-        <NavLink item={item} activeHref={activeHref} counts={counts} rail={rail} density={density} onNavigate={onNavigate} />
+        <NavLink
+          item={item}
+          activeHref={activeHref}
+          counts={counts}
+          rail={rail}
+          density={density}
+          onNavigate={onNavigate}
+        />
       </div>
       <ul id={listId} hidden={!open} className="flex flex-col rail:hidden">
         {item.children?.map((c) => (
@@ -194,7 +217,14 @@ export function SidebarNav({
       />
     ) : (
       <li key={item.id}>
-        <NavLink item={item} activeHref={activeHref} counts={counts} rail={rail} density={density} onNavigate={onNavigate} />
+        <NavLink
+          item={item}
+          activeHref={activeHref}
+          counts={counts}
+          rail={rail}
+          density={density}
+          onNavigate={onNavigate}
+        />
       </li>
     );
   return (
@@ -221,10 +251,14 @@ export function SidebarPromoTiles({ poolAmount, demo }: { poolAmount: string; de
           <span className="flex items-center gap-1 text-label-s">
             <CircleDollarSign aria-hidden className="size-3.5" /> Global Pool
           </span>
-          <span className="text-number-s font-semibold tabular-nums">{formatUSDT(poolAmount, { symbol: false })}</span>
+          <span className="text-number-s font-semibold tabular-nums">
+            {formatUSDT(poolAmount, { symbol: false })}
+          </span>
           <span className="flex items-center gap-1.5 text-caption">
             USDT
-            {demo && <DemoBadge size="xs" className="border-ink-950/60 bg-ink-950/10 text-ink-950" />}
+            {demo && (
+              <DemoBadge size="xs" className="border-ink-950/60 bg-ink-950/10 text-ink-950" />
+            )}
           </span>
         </Link>
         <Link
@@ -238,7 +272,10 @@ export function SidebarPromoTiles({ poolAmount, demo }: { poolAmount: string; de
         </Link>
       </div>
       <div className="hidden flex-col items-center gap-2 rail:flex">
-        <RailTooltip label={`Global Pool — ${formatUSDT(poolAmount)}${demo ? ' (DEMO)' : ''}`} enabled>
+        <RailTooltip
+          label={`Global Pool — ${formatUSDT(poolAmount)}${demo ? ' (DEMO)' : ''}`}
+          enabled
+        >
           <Link
             href={ROUTES.pool}
             aria-label="Global Pool"
@@ -299,7 +336,9 @@ export function Sidebar({
       data-sidebar-state={mode}
       className={cn(
         'flex w-sidebar shrink-0 flex-col border-r border-border-subtle bg-bg-secondary transition-[width] duration-200 ease-standard rail:w-sidebar-collapsed',
-        embedded ? 'h-full' : 'sticky top-0 h-dvh',
+        embedded
+          ? 'h-full'
+          : 'sticky top-[var(--gp-shell-top,0px)] h-[calc(100dvh-var(--gp-shell-top,0px))]',
         className,
       )}
     >

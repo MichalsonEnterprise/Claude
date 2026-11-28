@@ -22,7 +22,14 @@ export interface AuditEntry {
   requestId?: string | null;
 }
 
-const REDACTED_KEYS = new Set(['password', 'mfaCode', 'totpCode', 'code', 'refreshToken', 'secret']);
+const REDACTED_KEYS = new Set([
+  'password',
+  'mfaCode',
+  'totpCode',
+  'code',
+  'refreshToken',
+  'secret',
+]);
 
 /** Drop secrets from metadata before it is hashed and stored. */
 export function redact(value: unknown): unknown {
@@ -94,11 +101,19 @@ export class AuditService {
       });
       if (rows.length === 0) break;
       const result = verifyChain(rows, prev);
-      if (!result.ok) return { ...result, checked: checked + result.checked, total: checked + rows.length };
+      if (!result.ok)
+        return { ...result, checked: checked + result.checked, total: checked + rows.length };
       checked += rows.length;
       prev = result.headHash;
       cursor = rows[rows.length - 1]!.seq;
     }
-    return { ok: true, checked, headHash: prev, firstBrokenSeq: null, problem: null, total: checked };
+    return {
+      ok: true,
+      checked,
+      headHash: prev,
+      firstBrokenSeq: null,
+      problem: null,
+      total: checked,
+    };
   }
 }

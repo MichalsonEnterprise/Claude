@@ -59,17 +59,29 @@ export function Field({
   const messageId = `${id}-message`;
   const hasMessage = Boolean(error ?? success ?? helper);
   const ctx = React.useMemo<FieldContextValue>(
-    () => ({ id, describedBy: hasMessage ? messageId : undefined, invalid: Boolean(error), disabled }),
+    () => ({
+      id,
+      describedBy: hasMessage ? messageId : undefined,
+      invalid: Boolean(error),
+      disabled,
+    }),
     [id, hasMessage, messageId, error, disabled],
   );
   return (
     <FieldContext.Provider value={ctx}>
       <div data-slot="field" className={cn('flex min-w-0 flex-col gap-2', className)}>
         {(label ?? labelAside) && (
-          <div className={cn('flex min-h-5 flex-wrap items-center justify-between gap-x-3 gap-y-1', hideLabel && 'sr-only')}>
+          <div
+            className={cn(
+              'flex min-h-5 flex-wrap items-center justify-between gap-x-3 gap-y-1',
+              hideLabel && 'sr-only',
+            )}
+          >
             {label && <Label htmlFor={id}>{label}</Label>}
             {labelAside && (
-              <div className="flex items-center gap-1.5 whitespace-nowrap text-body-s text-text-secondary">{labelAside}</div>
+              <div className="flex items-center gap-1.5 whitespace-nowrap text-body-s text-text-secondary">
+                {labelAside}
+              </div>
             )}
           </div>
         )}
@@ -110,7 +122,8 @@ export const inputGroupVariants = cva(
       size: { s: 'h-8 text-body-s', m: 'h-10 text-body-s', l: 'h-12 text-body-m' },
       state: {
         default: '',
-        error: 'border-border-danger hover:border-border-danger has-[input:focus-visible]:border-border-danger has-[input:focus-visible]:shadow-[0_0_0_3px_rgba(239,68,68,0.18)]',
+        error:
+          'border-border-danger hover:border-border-danger has-[input:focus-visible]:border-border-danger has-[input:focus-visible]:shadow-[0_0_0_3px_rgba(239,68,68,0.18)]',
         success: 'border-border-success hover:border-border-success',
       },
       disabled: {

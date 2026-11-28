@@ -36,7 +36,15 @@ export interface AvatarProps extends Omit<React.ComponentProps<'span'>, 'childre
   tone?: 'brand' | 'neutral';
 }
 
-export function Avatar({ initials, size = 'm', status, label, tone, className, ...props }: AvatarProps) {
+export function Avatar({
+  initials,
+  size = 'm',
+  status,
+  label,
+  tone,
+  className,
+  ...props
+}: AvatarProps) {
   return (
     <span
       data-slot="avatar"

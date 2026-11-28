@@ -96,6 +96,7 @@ const sec = section('MOB-01/02/10/12 Mobile patterns', 224000, 0);
 const C = { TOPM: '23:12908', DRAWER: '23:13536', TAB: '22:5413', REG: '16:3449', DC: '24:13861', TILE: '28:16529', LIC: '6:158', B18: '6:159', TK: '23:8534', BB: '14:1974', AV: '9:238', VIP: '6:211', KYC: '23:5565', ICB: '7:774', PILL: '20:6895', SEG: '20:6978', SRCH: '16:3820', CHIP: '17:2766', FEE: '20:8583', ADDR: '9:418', SB: '23:6697', LOGO: '4:797', MARK: '4:792', HC: '22:8309', CELL: '22:9559', PPV: '28:19099', NOTIF: '16:3356', JC: '22:8356', FOOT: '22:7450', CNT: '6:216' };
 const ART = { 'Global Pool': '24:13141', 'Orbit Rush': '24:13176', 'Orbit Rush Duel': '24:13206', 'Vault Sweeper': '24:13239', 'Skyline': '24:13297', 'Pinfall': '24:13333', 'Fortune Ring': '24:13399', 'Pool Dice': '24:13443', 'Double Side': '24:13473', 'High Card': '24:13496', 'Ascend': '24:13528', 'Pool Keno': '24:13564', 'Pool Roulette': '25:14777', 'Twenty-One': '25:14841', 'Neon Koi': '25:14992', 'Atlas Vault': '25:15031', 'Live Pool Roulette': '27:15060', 'Daily Draw 6/45': '27:15370' };
 const MISS = [];
+const SHORTMSG = 'DEMO DATA — illustrative values only';
 async function ST(n, s) { if (!n || n.type !== 'TEXT') { MISS.push('ST'); return n; } const L = n.characters.length; const fs = L ? n.getRangeAllFontNames(0, L) : [n.fontName]; await Promise.all(fs.map(f => figma.loadFontAsync(f))); n.characters = String(s); return n; }
 async function TX(root, name, s, i = 0) { const a = root.findAll(x => x.type === 'TEXT' && x.name === name); if (a[i]) await ST(a[i], s); else MISS.push('TX:' + name); return a[i]; }
 async function RB(status, label, size = 'S') { const b = await BADGE(status, size); if (label) await TX(b, 'Label', label); return b; }
@@ -115,7 +116,7 @@ async function FRAME(id, name, w, o = {}) {
   if (old) { pos = { x: old.x, y: old.y }; old.remove(); } else pos = await SLOT(id, o.rowTitle, o.rowSub);
   const f = await screen(name, w, o.h ? { h: o.h, grid: o.grid } : { grid: o.grid }); if (!o.h) f.primaryAxisSizingMode = 'AUTO';
   sec.appendChild(f); f.x = pos.x; f.y = pos.y;
-  if (o.demo !== false) add(f, [await DEMOBAR(), 'FILL']);
+  if (o.demo !== false) add(f, [await DEMOBAR(w < 768 ? SHORTMSG : undefined), 'FILL']);
   return f;
 }
 function VP(f, h = 844, name = 'Viewport 390×844') { const v = AL('VERTICAL', { name, w: f.width, h, clip: true, fill: 'bg/base' }); add(f, [v, 'FILL']); return v; }
@@ -131,7 +132,7 @@ async function HERO(o = {}) {
   const BW = o.bw || 190; const blk = rect(BW, H + 140, 'accent/gold-tint-strong', 0, 'Angled gold block'); b.appendChild(blk); blk.layoutPositioning = 'ABSOLUTE'; blk.rotation = -16; blk.x = W - BW + 68; blk.y = -40;
   const blk2 = rect(40, H + 140, 'brand/tint', 0, 'Angled mint stripe'); b.appendChild(blk2); blk2.layoutPositioning = 'ABSOLUTE'; blk2.rotation = -16; blk2.x = W - BW + 38; blk2.y = -30;
   const tk = await I(C.TK, { State: 'Active' }, { 'Show DEMO': false }); b.appendChild(tk); tk.layoutPositioning = 'ABSOLUTE'; tk.rescale(o.ts || 0.5); tk.rotation = 14; tk.x = o.tx != null ? o.tx : W - 130; tk.y = H - 100; tk.name = 'Entry ticket (cropped)';
-  for (let i = 0; i < 4; i++) { const cn = ellipse(56, 18, i === 3 ? 'accent/gold' : 'accent/gold-strong', 'Coin ' + (i + 1)); stroke(cn, 'accent/gold-soft', 1); b.appendChild(cn); cn.layoutPositioning = 'ABSOLUTE'; cn.x = W - 72; cn.y = 64 - i * 9; }
+  for (let i = 0; i < 4; i++) { const cn = ellipse(56, 18, i === 3 ? 'accent/gold' : 'accent/gold-strong', 'Coin ' + (i + 1)); stroke(cn, 'accent/gold-soft', 1); b.appendChild(cn); cn.layoutPositioning = 'ABSOLUTE'; cn.x = W - 62; cn.y = H - 68 - i * 9; }
   const ov = await T(o.over || 'GLOBAL POOL · ROUND #1,248', 'Overline', 'text/gold'); add(b, ov);
   const nr = ROW('Pool value', [], { gap: 6 }); const num = await T('186,400.00', o.ns || 'Number/L', 'accent/gold'); await gfill(num, 'Gradient/Gold Jackpot'); add(nr, num, await T('USDT', 'Label/M', 'text/secondary'), await DEMO('S')); add(b, nr);
   add(b, await T(o.sub || 'Draws 27 Nov 2026, 20:00 UTC\n10.00 USDT + 0.05 USDT fee per entry', 'Caption', 'text/secondary', { w: o.subw || 200 }));
@@ -176,7 +177,7 @@ const c = SCROLL(v, { p: [24, 32, 32, 32], gap: 20 });
 const hd = ROW('Page header', [COL('Title', [await T('Transaction history', 'Heading/H3'), await T('Deposits, withdrawals, entries, refunds and rewards', 'Body/S', 'text/secondary')], { gap: 4 }), SPC(), await DEMO('M'), await BTN('Secondary', 'Withdraw', { size: 'S', lead: 'withdraw' }), await BTN('Primary', 'Deposit', { size: 'S', lead: 'deposit' })], { gap: 8 }); hd.children[1].layoutSizingHorizontal = 'FILL'; add(c, [hd, 'FILL']);
 add(c, await I(C.SEG, { Segments: '4' }));
 const tb = ROW('Toolbar (wraps to 2 rows at 768)', [], { gap: 8, wrap: true, cgap: 8 }); add(c, [tb, 'FILL']);
-const se = await I(C.SRCH, { Size: 'S', State: 'Default' }); add(tb, se); se.resize(300, se.height);
+const se = await I(C.SRCH, { Size: 'S', State: 'Default' }, { 'Show shortcut': false }); add(tb, se); se.resize(300, se.height);
 add(tb, await I('23:5397', { State: 'Default' }), await BTN('Secondary', '20–27 Nov 2026', { size: 'S', lead: 'calendar' }), await BTN('Ghost', 'Export CSV', { size: 'S', lead: 'download' }));
 const card = AL('VERTICAL', { name: 'Table card', gap: 0, fill: 'surface/default', stroke: 'border/subtle', r: 14, clip: true }); add(c, [card, 'FILL']);
 const body = ROW('Table body', [], { gap: 0, align: 'MIN' }); add(card, [body, 'FILL']);
@@ -187,7 +188,7 @@ const W = { Date: 184, Network: 188, Status: 148, Amount: 208, Actions: 96 };
 const hp = await I(C.HC, { Align: 'Left', Sort: 'None' }, { Label: 'Transaction', 'Show sort icon': false }); hp.resize(232, 40); add(pin, hp);
 const hr = ROW('Header row', [], { gap: 0 }); add(cols, hr);
 for (const [k, al, so] of [['Date', 'Left', 'Desc'], ['Network', 'Left', 'None'], ['Status', 'Left', 'None'], ['Amount', 'Right', 'None'], ['Actions', 'Left', 'None']]) { const h = await I(C.HC, { Align: al, Sort: so }, { Label: k, 'Show sort icon': so !== 'None' }); h.resize(W[k], 40); if (k === 'Actions') { const l = h.findOne(x => x.name === 'Label'); if (l) l.visible = false; } add(hr, h); }
-const ROWS = [['Deposit DP-77412', 'From 0x5e1f…c0a8', '27 Nov 2026', '18:40 UTC', 'Ethereum', 'USDT · ERC-20', 'Pending', 'Confirming 7/12', 'Positive', '+1,000.00'], ['Withdrawal WD-20931', 'To 0x7c4e…a21D', '27 Nov 2026', '16:05 UTC', 'Arbitrum', 'USDT · Arbitrum One', 'Under review', 'Under review', 'Negative', '−1,500.00'], ['35 entries · #1,248', 'incl. 1.75 platform fees', '27 Nov 2026', '09:14 UTC', 'Platform balance', 'No network fee', 'Confirmed', 'Paid', 'Negative', '−351.75'], ['Deposit DP-77380', 'From 0x41aa…7d10', '24 Nov 2026', '11:32 UTC', 'BNB Chain', 'USDT · BEP-20', 'Confirmed', 'Credited', 'Positive', '+2,500.00'], ['Withdrawal WD-20877', 'To 0x12ab…9f3C', '20 Nov 2026', '14:20 UTC', 'BNB Chain', 'USDT · BEP-20', 'Confirmed', 'Completed', 'Negative', '−800.00'], ['Withdrawal WD-20850', 'Sanctions screening', '18 Nov 2026', '10:02 UTC', 'Arbitrum', 'USDT · Arbitrum One', 'Rejected', 'Rejected · returned', 'Neutral', '600.00']];
+const ROWS = [['Withdrawal WD-20931', 'To 0x7c4e…a21D', '27 Nov 2026', '18:44 UTC', 'Arbitrum', 'USDT · Arbitrum One', 'Under review', 'Under review', 'Negative', '−1,500.00'], ['Deposit DP-77412', 'From 0x5e1f…c0a8', '27 Nov 2026', '18:39 UTC', 'Ethereum', 'USDT · ERC-20', 'Pending', 'Confirming 7/12', 'Positive', '+1,000.00'], ['35 entries · #1,248', 'incl. 1.75 platform fees', '27 Nov 2026', '18:05 UTC', 'Platform balance', 'No network fee', 'Confirmed', 'Paid', 'Negative', '−351.75'], ['Deposit DP-77380', 'From 0x41aa…7d10', '24 Nov 2026', '09:12 UTC', 'BNB Chain', 'USDT · BEP-20', 'Confirmed', 'Credited', 'Positive', '+2,500.00'], ['Withdrawal WD-20877', 'To 0x12ab…9f3C', '20 Nov 2026', '14:20 UTC', 'BNB Chain', 'USDT · BEP-20', 'Confirmed', 'Completed', 'Negative', '−800.00'], ['Withdrawal WD-20850', 'Sanctions screening', '18 Nov 2026', '10:02 UTC', 'Arbitrum', 'USDT · Arbitrum One', 'Rejected', 'Rejected · returned', 'Neutral', '600.00']];
 for (const [t1, t2, d1, d2, net, std, st, sl, sign, amt] of ROWS) {
   const ct = await I(C.CELL, { Type: 'Text', Density: 'Comfortable' }, { 'Show secondary': true }); ct.resize(232, 56); await TX(ct, 'Primary', t1); await TX(ct, 'Secondary', t2); strokeSides(ct, 'border/subtle', { b: 1 }); add(pin, ct);
   const r = ROW('Row — ' + t1, [], { gap: 0 }); strokeSides(r, 'border/subtle', { b: 1 }); add(cols, r);
@@ -201,7 +202,7 @@ const more = await I(C.ICB, { Type: 'Secondary', Size: 'S', State: 'Default' }, 
 const sbar = ROW('Horizontal scrollbar', [], { gap: 12, p: [10, 16, 10, 16] }); strokeSides(sbar, 'border/subtle', { t: 1 }); add(card, [sbar, 'FILL']);
 const track = AL('HORIZONTAL', { name: 'Track', h: 4, fill: 'surface/raised', r: 9999, clip: true }); add(sbar, [track, 'FILL']); add(track, rect(260, 4, 'icon/muted', 9999, 'Thumb (visible part ≈ 55 %)'));
 add(sbar, ROW('Hint', [await T('Scroll for Amount and Actions', 'Caption', 'text/tertiary'), await IC('arrow-right', 14, 'icon/muted')], { gap: 4 }));
-const pg = ROW('Pagination (compact)', [await T('1–20 of 1,284', 'Caption', 'text/secondary'), await DEMO('XS'), SPC(), await I(C.ICB, { Type: 'Secondary', Size: 'S', State: 'Disabled' }, { Icon: ICONS['chevron-left'] }), await I(C.ICB, { Type: 'Secondary', Size: 'S', State: 'Default' }, { Icon: ICONS['chevron-right'] })], { gap: 8, p: [12, 16, 12, 16] }); pg.children[2].layoutSizingHorizontal = 'FILL'; strokeSides(pg, 'border/subtle', { t: 1 }); add(card, [pg, 'FILL']);
+const pg = ROW('Pagination (compact)', [await T('1–20 of 212', 'Caption', 'text/secondary'), await DEMO('XS'), SPC(), await I(C.ICB, { Type: 'Secondary', Size: 'S', State: 'Disabled' }, { Icon: ICONS['chevron-left'] }), await I(C.ICB, { Type: 'Secondary', Size: 'S', State: 'Default' }, { Icon: ICONS['chevron-right'] })], { gap: 8, p: [12, 16, 12, 16] }); pg.children[2].layoutSizingHorizontal = 'FILL'; strokeSides(pg, 'border/subtle', { t: 1 }); add(card, [pg, 'FILL']);
 more.x = scr.width - more.width - 8; more.y = Math.round(scr.height / 2 - more.height / 2);
 // clone the lobby frame → centred modal
 const base = sec.children.find(n => n.name === N1); let f4 = null, mh = 0;

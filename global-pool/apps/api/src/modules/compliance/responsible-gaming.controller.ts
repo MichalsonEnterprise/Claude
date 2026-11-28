@@ -29,7 +29,9 @@ export class ResponsibleGamingController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Limits (effective + pending increases + usage), self-exclusion, reality check' })
+  @ApiOperation({
+    summary: 'Limits (effective + pending increases + usage), self-exclusion, reality check',
+  })
   state(@CurrentUser() user: AuthUser) {
     return this.rg.state(user.id);
   }

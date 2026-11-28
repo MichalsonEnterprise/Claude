@@ -1,15 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Prisma, type Deposit } from '@prisma/client';
+import type { Deposit } from '@prisma/client';
 import { CHAINS, type ChainKey } from '@gp/shared/chains';
 import { fromBaseUnits, toUSDTString } from '@gp/shared/money';
 import { paginate, type PaginationQuery } from '@gp/shared/schemas';
-import { parseAbiItem, type Address, type Hex } from 'viem';
+import { parseAbiItem, type Address } from 'viem';
 import { randomBytes } from 'node:crypto';
 
 import { usdt } from '../../common/money';
 import { PrismaService, type Tx } from '../../infra/prisma/prisma.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { ResponsibleGamingService } from '../compliance/responsible-gaming.service';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { LedgerService } from '../ledger/ledger.service';
 import { depositCreditedLines, depositDetectedLines } from '../ledger/posting';
@@ -17,7 +18,9 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { AppConfig } from '../../config/app-config';
 import { DepositAddressService } from './deposit-address.service';
 
-const TRANSFER_EVENT = parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)');
+const TRANSFER_EVENT = parseAbiItem(
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+);
 const ADDRESS_CHUNK = 200;
 
 export interface DetectedTransfer {
@@ -61,6 +64,7 @@ export class DepositsService {
     private readonly rg: ResponsibleGamingService,
     private readonly idempotency: IdempotencyService,
     private readonly config: AppConfig,
+    private readonly flags: FeatureFlagsService,
   ) {}
 
   async list(userId: string, query: PaginationQuery) {
@@ -73,7 +77,11 @@ export class DepositsService {
       }),
       this.prisma.deposit.count({ where: { userId } }),
     ]);
-    return paginate(rows.map((d) => this.view(d)), total, query);
+    return paginate(
+      rows.map((d) => this.view(d)),
+      total,
+      query,
+    );
   }
 
   view(d: Deposit) {
@@ -118,7 +126,9 @@ export class DepositsService {
     });
     if (inserted.count === 0) return null;
     const deposit = await tx.deposit.findUniqueOrThrow({
-      where: { network_txHash_logIndex: { network: t.network, txHash: t.txHash, logIndex: t.logIndex } },
+      where: {
+        network_txHash_logIndex: { network: t.network, txHash: t.txHash, logIndex: t.logIndex },
+      },
     });
     const reference = `DP-${deposit.number}`;
     const record = await tx.transaction.create({
@@ -184,7 +194,9 @@ export class DepositsService {
         data: {
           status: 'completed',
           completedAt: new Date(),
-          metadata: { statusDetail: `Credited · ${confirmations} / ${deposit.requiredConfirmations} confirmations` },
+          metadata: {
+            statusDetail: `Credited · ${confirmations} / ${deposit.requiredConfirmations} confirmations`,
+          },
         },
       });
     }
@@ -203,7 +215,11 @@ export class DepositsService {
    * DEMO-only: simulate a confirmed test-USDT deposit. Posts exactly the same ledger entries as a real deposit
    * (detected → credited) so balances and reconciliation behave identically.
    */
-  async simulate(userId: string, input: { network: ChainKey; amount: string; idempotencyKey: string }) {
+  async simulate(
+    userId: string,
+    input: { network: ChainKey; amount: string; idempotencyKey: string },
+  ) {
+    await this.flags.assertEnabled('deposits.enabled', 'Deposits');
     return this.idempotency.run(
       { scope: 'deposit.simulate', ownerId: userId, key: input.idempotencyKey, request: input },
       async (tx) => {
@@ -225,7 +241,7 @@ export class DepositsService {
         const required = this.blockchain.requiredConfirmations(input.network);
         await this.credit(tx, deposit!, required);
         const fresh = await tx.deposit.findUniqueOrThrow({ where: { id: deposit!.id } });
-        return { ...this.view(fresh), simulated: true } as Prisma.InputJsonObject;
+        return { ...this.view(fresh), simulated: true };
       },
     );
   }
@@ -251,7 +267,10 @@ export class DepositsService {
     const end = minBig(head, start + BigInt(this.config.env.DEPOSIT_WATCHER_MAX_BLOCK_RANGE) - 1n);
     let detected = 0;
     if (start <= end) {
-      const assigned = await this.prisma.depositAddress.findMany({ where: { network }, select: { address: true, userId: true } });
+      const assigned = await this.prisma.depositAddress.findMany({
+        where: { network },
+        select: { address: true, userId: true },
+      });
       const owner = new Map(assigned.map((a) => [a.address.toLowerCase(), a.userId]));
       const addresses = [...owner.keys()] as Address[];
       for (let i = 0; i < addresses.length; i += ADDRESS_CHUNK) {
@@ -266,7 +285,10 @@ export class DepositsService {
           });
         } catch (err) {
           this.logger.warn(`getLogs ${start}-${end} failed: ${String(err)}`);
-          return { status: 'skipped', reason: 'RPC getLogs failed (will retry from the same block)' };
+          return {
+            status: 'skipped',
+            reason: 'RPC getLogs failed (will retry from the same block)',
+          };
         }
         for (const log of logs) {
           const to = log.args.to?.toLowerCase();
@@ -278,7 +300,7 @@ export class DepositsService {
             this.recordDetected(tx, {
               network,
               userId,
-              txHash: log.transactionHash as Hex,
+              txHash: log.transactionHash,
               logIndex: log.logIndex ?? 0,
               blockNumber: log.blockNumber ?? null,
               from: log.args.from?.toLowerCase() ?? null,
@@ -297,12 +319,23 @@ export class DepositsService {
       });
     }
     const credited = await this.updateConfirmations(network, head);
-    return { status: 'ok', fromBlock: start.toString(), toBlock: end.toString(), detected, credited };
+    return {
+      status: 'ok',
+      fromBlock: start.toString(),
+      toBlock: end.toString(),
+      detected,
+      credited,
+    };
   }
 
   async updateConfirmations(network: ChainKey, head: bigint): Promise<number> {
     const open = await this.prisma.deposit.findMany({
-      where: { network, status: { in: ['detected', 'confirming'] }, blockNumber: { not: null }, isDemo: false },
+      where: {
+        network,
+        status: { in: ['detected', 'confirming'] },
+        blockNumber: { not: null },
+        isDemo: false,
+      },
     });
     let credited = 0;
     for (const d of open) {
@@ -310,10 +343,17 @@ export class DepositsService {
       if (conf >= d.requiredConfirmations) {
         if (await this.prisma.tx((tx) => this.credit(tx, d, conf))) credited++;
       } else if (conf !== d.confirmations) {
-        await this.prisma.deposit.update({ where: { id: d.id }, data: { confirmations: Math.max(conf, 0) } });
+        await this.prisma.deposit.update({
+          where: { id: d.id },
+          data: { confirmations: Math.max(conf, 0) },
+        });
         await this.prisma.transaction.updateMany({
           where: { depositId: d.id },
-          data: { metadata: { statusDetail: `${Math.max(conf, 0)} / ${d.requiredConfirmations} confirmations` } },
+          data: {
+            metadata: {
+              statusDetail: `${Math.max(conf, 0)} / ${d.requiredConfirmations} confirmations`,
+            },
+          },
         });
       }
     }

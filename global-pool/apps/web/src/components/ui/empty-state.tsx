@@ -22,17 +22,30 @@ export interface EmptyStateProps {
 }
 
 /** Table/Empty State: No data · No results · Error. */
-export function EmptyState({ type = 'no-data', title, description, actions, icon, reference, className }: EmptyStateProps) {
+export function EmptyState({
+  type = 'no-data',
+  title,
+  description,
+  actions,
+  icon,
+  reference,
+  className,
+}: EmptyStateProps) {
   const Icon = ICONS[type];
   return (
     <div
       role={type === 'error' ? 'alert' : undefined}
-      className={cn('flex flex-col items-center justify-center gap-3 px-6 py-12 text-center', className)}
+      className={cn(
+        'flex flex-col items-center justify-center gap-3 px-6 py-12 text-center',
+        className,
+      )}
     >
       <span
         className={cn(
           'flex size-12 items-center justify-center rounded-lg [&_svg]:size-6',
-          type === 'error' ? 'bg-status-danger-tint text-text-danger' : 'bg-surface-raised text-icon-muted',
+          type === 'error'
+            ? 'bg-status-danger-tint text-text-danger'
+            : 'bg-surface-raised text-icon-muted',
         )}
       >
         {icon ?? <Icon aria-hidden />}
@@ -42,7 +55,9 @@ export function EmptyState({ type = 'no-data', title, description, actions, icon
         {description && <p className="text-body-s text-text-secondary">{description}</p>}
         {reference && <p className="font-mono text-mono-s text-text-tertiary">Ref {reference}</p>}
       </div>
-      {actions && <div className="mt-2 flex flex-wrap items-center justify-center gap-3">{actions}</div>}
+      {actions && (
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-3">{actions}</div>
+      )}
     </div>
   );
 }

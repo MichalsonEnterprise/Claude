@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MAX_ENTRIES_PER_PURCHASE, MIN_ENTRIES_PER_PURCHASE } from '@gp/shared/fees';
 import { enterRoundSchema, paginationQuerySchema } from '@gp/shared/schemas';
@@ -14,9 +24,13 @@ import { RoundsService } from './rounds.service';
 class EnterRoundDto extends createZodDto(enterRoundSchema.omit({ roundId: true })) {}
 class PaginationDto extends createZodDto(paginationQuerySchema) {}
 class QuoteDto extends createZodDto(
-  z.object({ entries: z.coerce.number().int().min(MIN_ENTRIES_PER_PURCHASE).max(MAX_ENTRIES_PER_PURCHASE) }),
+  z.object({
+    entries: z.coerce.number().int().min(MIN_ENTRIES_PER_PURCHASE).max(MAX_ENTRIES_PER_PURCHASE),
+  }),
 ) {}
-class LimitDto extends createZodDto(z.object({ limit: z.coerce.number().int().min(1).max(50).default(10) })) {}
+class LimitDto extends createZodDto(
+  z.object({ limit: z.coerce.number().int().min(1).max(50).default(10) }),
+) {}
 
 @ApiTags('pool')
 @Controller('pool')
@@ -27,7 +41,9 @@ export class PoolController {
   ) {}
 
   @Get('rounds/current')
-  @ApiOperation({ summary: 'Current round (open → next scheduled → latest) with pool, thresholds and prize table' })
+  @ApiOperation({
+    summary: 'Current round (open → next scheduled → latest) with pool, thresholds and prize table',
+  })
   async current() {
     const round = await this.rounds.current();
     if (!round) throw notFound('Round');
@@ -41,7 +57,9 @@ export class PoolController {
   }
 
   @Get('quote')
-  @ApiOperation({ summary: 'Entry quote: n × 10.00 + platform fee n × 0.05 (separate line) + network fee 0.00' })
+  @ApiOperation({
+    summary: 'Entry quote: n × 10.00 + platform fee n × 0.05 (separate line) + network fee 0.00',
+  })
   quote(@Query() query: QuoteDto) {
     return this.entries.quote(query.entries);
   }
@@ -59,7 +77,9 @@ export class PoolController {
   }
 
   @Get('rounds/:number/verify')
-  @ApiOperation({ summary: 'Verification bundle: VRF word, algorithm, recomputed winners vs stored winners' })
+  @ApiOperation({
+    summary: 'Verification bundle: VRF word, algorithm, recomputed winners vs stored winners',
+  })
   verify(@Param('number', ParseIntPipe) number: number) {
     return this.rounds.verification(number);
   }
@@ -75,7 +95,8 @@ export class PoolController {
   @HttpCode(201)
   @PlayerAuth(GAMING_POLICY)
   @ApiOperation({
-    summary: 'Buy entries (idempotent): RG limits, balance check, AVAILABLE → POOL + FEES in one DB transaction',
+    summary:
+      'Buy entries (idempotent): RG limits, balance check, AVAILABLE → POOL + FEES in one DB transaction',
   })
   enter(
     @CurrentUser() user: AuthUser,

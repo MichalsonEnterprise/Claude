@@ -18,8 +18,20 @@ export interface AuditHashInput {
 
 /** hash = sha256(prevHash + "\n" + canonical JSON of the row content). Changing any field breaks the chain. */
 export function auditHash(row: AuditHashInput): string {
-  const { prevHash, ...content } = row;
-  return sha256Hex(`${prevHash}\n${canonicalJson(content)}`);
+  // Pick the hashed fields explicitly: DB rows carry extra columns (id, seq, hash, ip, request id …).
+  const content = {
+    actorType: row.actorType,
+    actorId: row.actorId,
+    actorLabel: row.actorLabel,
+    action: row.action,
+    targetType: row.targetType,
+    targetId: row.targetId,
+    reason: row.reason,
+    outcome: row.outcome,
+    metadata: row.metadata,
+    createdAt: row.createdAt,
+  };
+  return sha256Hex(`${row.prevHash}\n${canonicalJson(content)}`);
 }
 
 export interface ChainRow extends AuditHashInput {
@@ -36,7 +48,10 @@ export interface ChainVerification {
 }
 
 /** Verify a contiguous, seq-ordered slice of the chain starting from `expectedPrev`. */
-export function verifyChain(rows: readonly ChainRow[], expectedPrev = GENESIS_HASH): ChainVerification {
+export function verifyChain(
+  rows: readonly ChainRow[],
+  expectedPrev = GENESIS_HASH,
+): ChainVerification {
   let prev = expectedPrev;
   for (const row of rows) {
     if (row.prevHash !== prev) {

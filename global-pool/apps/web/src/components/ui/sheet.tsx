@@ -45,9 +45,7 @@ export function SheetContent({
 }) {
   return (
     <SheetPrimitive.Portal>
-      <SheetPrimitive.Overlay
-        className="fixed inset-0 z-50 bg-scrim-overlay data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
-      />
+      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-scrim-overlay data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
       <SheetPrimitive.Content
         data-slot="sheet-content"
         data-side={side}
@@ -55,7 +53,10 @@ export function SheetContent({
         {...props}
       >
         {side === 'bottom' && (
-          <div aria-hidden className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-border-strong" />
+          <div
+            aria-hidden
+            className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-border-strong"
+          />
         )}
         {children}
         {showClose && (
@@ -98,7 +99,10 @@ export function SheetFooter({ className, ...props }: React.ComponentProps<'div'>
   return (
     <div
       data-slot="sheet-footer"
-      className={cn('flex flex-col gap-3 border-t border-border-subtle bg-surface-overlay px-4 py-4', className)}
+      className={cn(
+        'flex flex-col gap-3 border-t border-border-subtle bg-surface-overlay px-4 py-4',
+        className,
+      )}
       {...props}
     />
   );

@@ -11,7 +11,14 @@ import { RoundsService } from './rounds.service';
 @Global()
 @Module({
   controllers: [PoolController],
-  providers: [PoolEventsService, RoundsService, EntriesService, RoundLifecycleService, PoolGateway, RoundsProcessor],
+  providers: [
+    PoolEventsService,
+    RoundsService,
+    EntriesService,
+    RoundLifecycleService,
+    PoolGateway,
+    RoundsProcessor,
+  ],
   exports: [RoundsService, EntriesService, RoundLifecycleService, PoolEventsService],
 })
 export class PoolModule {}

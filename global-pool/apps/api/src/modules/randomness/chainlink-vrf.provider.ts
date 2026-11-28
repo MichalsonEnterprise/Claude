@@ -64,17 +64,26 @@ export class ChainlinkVrfProvider implements RandomnessProvider {
     });
     const last = logs.at(-1);
     if (!last?.args.requestId) {
-      throw new RandomnessNotReadyError(`No DrawRequested event for round ${round.roundNumber} yet (requestDraw not sent)`);
+      throw new RandomnessNotReadyError(
+        `No DrawRequested event for round ${round.roundNumber} yet (requestDraw not sent)`,
+      );
     }
     return {
       requestId: last.args.requestId.toString(),
       network: 'arbitrum',
       requestTxHash: last.transactionHash ?? null,
-      metadata: { attempt: last.args.attempt, entriesMerkleRoot: last.args.entriesMerkleRoot, totalEntries: last.args.totalEntries?.toString() },
+      metadata: {
+        attempt: last.args.attempt,
+        entriesMerkleRoot: last.args.entriesMerkleRoot,
+        totalEntries: last.args.totalEntries?.toString(),
+      },
     };
   }
 
-  async fulfillment(request: { requestId: string; round: RandomnessRoundInfo }): Promise<RandomnessFulfillment | null> {
+  async fulfillment(request: {
+    requestId: string;
+    round: RandomnessRoundInfo;
+  }): Promise<RandomnessFulfillment | null> {
     const { client, contract } = this.ready();
     const logs = await client.getLogs({
       address: contract,

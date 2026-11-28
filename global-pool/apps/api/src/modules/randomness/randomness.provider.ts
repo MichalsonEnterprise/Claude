@@ -28,7 +28,11 @@ export interface RandomnessProvider {
   readonly kind: 'mock' | 'chainlink_vrf_v2_5';
   request(round: RandomnessRoundInfo): Promise<RandomnessRequestResult>;
   /** null while not fulfilled yet. */
-  fulfillment(request: { requestId: string; round: RandomnessRoundInfo; requestedAt: Date }): Promise<RandomnessFulfillment | null>;
+  fulfillment(request: {
+    requestId: string;
+    round: RandomnessRoundInfo;
+    requestedAt: Date;
+  }): Promise<RandomnessFulfillment | null>;
 }
 
 export const RANDOMNESS_PROVIDER = Symbol('RANDOMNESS_PROVIDER');

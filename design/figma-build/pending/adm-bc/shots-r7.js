@@ -1,0 +1,1 @@
+for (const nm of ['[ADM-B2] Smart Contracts / 1280 / Default', '[ADM-C4] Sanctions Screening / 1280 / Default']) { const fr = sec.children.find(n => n.name === nm); if (fr) await fr.screenshot({ scale: 0.3 }); }

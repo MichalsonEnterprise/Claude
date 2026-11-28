@@ -1,0 +1,21 @@
+{
+ "_note": "PUB-05/08/09/13 agent (slice pub-p1a). No reusable components created: every frame is composed from library instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Shell/Footer Mega, Footer, Nav/Mobile Tab Bar, Card/Network, Card/Winner, Card/Feature, Card/FAQ Item, Card/Security Score, Jackpot/* , Tx/Fee Breakdown, Wallet/*, Table/*, Tile/Game Art, Menu/Filter Chip, Select/Chip, Tabs/*). All 16 frames were checked by audit script (text render bounds vs clipping ancestors) + screenshots. Continuation 28 Nov 2026: personal anti-phishing code AURORA-27 replaced by illustrative SUNSET-42 on the public Security Center (decision #29). Prepared idempotent mobile scripts: pending/pub-p1a/.",
+ "Section/PUB-05/08/09/13 (page 03)": {"id": "33:149513"},
+ "[PUB-05] Winners Hall / 1440 / Default": {"id": "33:149514"},
+ "[PUB-05] Winners Hall / 1440 / Filtered": {"id": "33:196810"},
+ "[PUB-05] Winners Hall / 1440 / Empty": {"id": "33:219380"},
+ "[PUB-05] Winners Hall / 768 / Default": {"id": "34:394740"},
+ "[PUB-05] Winners Hall / 768 / Empty": {"id": "34:407847"},
+ "[PUB-08] How It Works / 1440 / Default": {"id": "33:245465"},
+ "[PUB-09] Supported Networks / 1440 / Default — Arbitrum details": {"id": "33:281751"},
+ "[PUB-09] Supported Networks / 1440 / Ethereum details (congested)": {"id": "33:318074"},
+ "[PUB-13] Security Center / 1440 / Default": {"id": "34:345543"},
+ "Section/PUB-05/08/09/13 — Mobile (page 10)": {"id": "34:423942"},
+ "[PUB-05] Winners Hall / 390 / Default": {"id": "34:423943"},
+ "[PUB-05] Winners Hall / 390 / Filters — bottom sheet open": {"id": "34:448213"},
+ "[PUB-05] Winners Hall / 390 / Empty": {"id": "34:464733"},
+ "[PUB-08] How It Works / 390 / Default": {"id": "34:483545"},
+ "[PUB-09] Supported Networks / 390 / Default": {"id": "34:496159"},
+ "[PUB-09] Supported Networks / 390 / Ethereum details — bottom sheet": {"id": "36:513983"},
+ "[PUB-13] Security Center / 390 / Default": {"id": "36:523496"}
+}

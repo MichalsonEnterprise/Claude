@@ -35,7 +35,8 @@ export function useCountdown(target: string | Date, demoNow?: string | Date): Co
   const anchorMs = demoNow ? new Date(demoNow).getTime() : null;
   const [mountedAt] = React.useState(() => Date.now());
   const compute = React.useCallback(
-    () => partsUntil(targetMs, anchorMs !== null ? anchorMs + (Date.now() - mountedAt) : Date.now()),
+    () =>
+      partsUntil(targetMs, anchorMs !== null ? anchorMs + (Date.now() - mountedAt) : Date.now()),
     [targetMs, anchorMs, mountedAt],
   );
   const [parts, setParts] = React.useState<CountdownParts>(compute);
@@ -59,6 +60,8 @@ export interface CountdownProps {
   caption?: React.ReactNode | null;
   /** Text shown when the time has passed. */
   doneLabel?: string;
+  /** Screen-reader prefix, e.g. 'Closes in' (default) or 'Opens in'. */
+  label?: string;
   className?: string;
 }
 
@@ -69,6 +72,7 @@ export function Countdown({
   size = 'm',
   caption,
   doneLabel = 'Round closed — drawing',
+  label = 'Closes in',
   className,
 }: CountdownProps) {
   const p = useCountdown(closesAt, demoNow);
@@ -84,13 +88,21 @@ export function Countdown({
         role="timer"
         aria-live="off"
         suppressHydrationWarning
-        aria-label={p.done ? doneLabel : `Closes in ${p.hours} hours ${p.minutes} minutes — at ${absolute}`}
+        aria-label={
+          p.done ? doneLabel : `${label} ${p.hours} hours ${p.minutes} minutes — at ${absolute}`
+        }
         className="flex items-center gap-1.5"
       >
         {units.map(([value, short, long], i) => (
           <React.Fragment key={short}>
             {i > 0 && (
-              <span aria-hidden className={cn('font-semibold text-text-tertiary', size === 'l' ? 'text-h3' : 'text-h5')}>
+              <span
+                aria-hidden
+                className={cn(
+                  'font-semibold text-text-tertiary',
+                  size === 'l' ? 'text-h3' : 'text-h5',
+                )}
+              >
                 :
               </span>
             )}

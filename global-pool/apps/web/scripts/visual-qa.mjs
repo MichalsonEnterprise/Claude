@@ -23,14 +23,20 @@ const SHOTS = [
   ['shell-member-full_1440', '/design-system/shell?auth=member', 1440, 1024, { fullPage: true }],
   ['shell-member-rail_1180', '/design-system/shell?auth=member', 1180, 900, {}],
   ['shell-member-drawer-topbar_900', '/design-system/shell?auth=member', 900, 900, {}],
-  ['shell-wrong-network_1440', '/design-system/shell?auth=member&state=wrong-network', 1440, 600, {}],
+  [
+    'shell-wrong-network_1440',
+    '/design-system/shell?auth=member&state=wrong-network',
+    1440,
+    600,
+    {},
+  ],
   ['shell-restricted_1440', '/design-system/shell?auth=guest&state=restricted', 1440, 900, {}],
   ['shell-guest_390', '/design-system/shell?auth=guest', 390, 844, {}],
   ['shell-member_390', '/design-system/shell?auth=member', 390, 844, {}],
   ['shell-member-full_390', '/design-system/shell?auth=member', 390, 844, { fullPage: true }],
   ['shell-drawer-open_390', '/design-system/shell?auth=member', 390, 844, { openDrawer: true }],
-  ['lobby-placeholder_1440', '/', 1440, 1024, {}],
-  ['lobby-placeholder_390', '/', 390, 844, {}],
+  ['lobby_1440', '/', 1440, 1024, {}],
+  ['lobby_390', '/', 390, 844, {}],
 ];
 
 const browser = await chromium.launch();
@@ -44,7 +50,8 @@ for (const [name, url, width, height, opts] of SHOTS) {
   // 404s from <Link> prefetches of routes later agents will build are expected; list them separately.
   page.on('response', (r) => r.status() === 404 && missing.add(new URL(r.url()).pathname));
   page.on('console', (m) => {
-    if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text());
+    if (m.type() === 'error' && !m.text().startsWith('Failed to load resource'))
+      errors.push(m.text());
   });
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(BASE + url, { waitUntil: 'load' });
@@ -54,17 +61,25 @@ for (const [name, url, width, height, opts] of SHOTS) {
     await page.getByRole('button', { name: 'Open menu' }).click();
     await page.waitForTimeout(450);
   }
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
   if (overflow > 0) problems.push(`${name}: horizontal overflow ${overflow}px`);
   if (errors.length) problems.push(`${name}: console errors → ${errors.slice(0, 3).join(' | ')}`);
   for (const m of missing) missingRoutes.add(m);
-  await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage: Boolean(opts.fullPage), animations: 'disabled' });
+  await page.screenshot({
+    path: path.join(OUT, `${name}.png`),
+    fullPage: Boolean(opts.fullPage),
+    animations: 'disabled',
+  });
   console.info(`✓ ${name} (${width}×${height})`);
   await context.close();
 }
 await browser.close();
 if (missingRoutes.size) {
-  console.info(`\nRoutes not built yet (404 on prefetch, expected): ${[...missingRoutes].sort().join(', ')}`);
+  console.info(
+    `\nRoutes not built yet (404 on prefetch, expected): ${[...missingRoutes].sort().join(', ')}`,
+  );
 }
 if (problems.length) {
   console.warn(`\n${problems.length} issue(s):\n- ${problems.join('\n- ')}`);

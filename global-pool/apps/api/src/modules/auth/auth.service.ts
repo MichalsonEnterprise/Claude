@@ -28,9 +28,13 @@ export class AuthService {
   async onboard(user: AuthUser, input: Onboarding, req: Request): Promise<void> {
     if (user.onboarded) throw new AppError('CONFLICT', 'Onboarding is already complete');
     if (!(await this.geo.isPermitted(input.country))) {
-      throw new AppError('GEO_RESTRICTED', 'GLOBAL POOL is not available in your country of residence', {
-        country: input.country,
-      });
+      throw new AppError(
+        'GEO_RESTRICTED',
+        'GLOBAL POOL is not available in your country of residence',
+        {
+          country: input.country,
+        },
+      );
     }
     const region = await this.geo.checkRequest(req);
     if (!region.permitted) {

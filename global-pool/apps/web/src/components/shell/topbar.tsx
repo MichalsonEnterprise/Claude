@@ -63,14 +63,18 @@ export function Topbar({
     <header
       className={cn(
         'z-30 flex h-topbar shrink-0 items-center gap-3 border-b border-border-subtle bg-bg-base/95 px-4 backdrop-blur-md laptop:gap-4 laptop:px-8',
-        !embedded && 'sticky top-0',
+        !embedded && 'sticky top-[var(--gp-shell-top,0px)]',
         className,
       )}
     >
       <IconButton label="Toggle navigation" aria-expanded={menuExpanded} onClick={onMenuClick}>
         <Menu aria-hidden />
       </IconButton>
-      <Link href="/" aria-label="GLOBAL POOL — lobby" className="flex shrink-0 items-center rounded-sm">
+      <Link
+        href="/"
+        aria-label="GLOBAL POOL — lobby"
+        className="flex shrink-0 items-center rounded-sm"
+      >
         <Logo height={34} title="" />
       </Link>
 
@@ -105,7 +109,11 @@ export function Topbar({
             <Button variant="ghost" onClick={onSignIn}>
               Sign in
             </Button>
-            <Button onClick={onSignUp} disabled={restricted} title={restricted ? 'Not available in your region' : undefined}>
+            <Button
+              onClick={onSignUp}
+              disabled={restricted}
+              title={restricted ? 'Not available in your region' : undefined}
+            >
               Sign up
             </Button>
             <LanguageMenu variant="icon" />

@@ -12,7 +12,9 @@ export class ReferralsController {
   constructor(private readonly affiliates: AffiliatesService) {}
 
   @Get('me')
-  @ApiOperation({ summary: 'Your referral code / link and stats (STUB — accrual not implemented yet)' })
+  @ApiOperation({
+    summary: 'Your referral code / link and stats (STUB — accrual not implemented yet)',
+  })
   me(@CurrentUser() user: AuthUser) {
     return this.affiliates.myReferrals(user.id);
   }

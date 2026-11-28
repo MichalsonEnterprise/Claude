@@ -23,7 +23,10 @@ export function passwordStrength(value: string): PasswordStrength {
   return 'weak';
 }
 
-const STRENGTH: Record<Exclude<PasswordStrength, 'empty'>, { label: string; bars: number; cls: string }> = {
+const STRENGTH: Record<
+  Exclude<PasswordStrength, 'empty'>,
+  { label: string; bars: number; cls: string }
+> = {
   weak: { label: 'Weak', bars: 1, cls: 'bg-status-danger' },
   fair: { label: 'Fair', bars: 2, cls: 'bg-status-warning' },
   strong: { label: 'Strong', bars: 4, cls: 'bg-status-success' },
@@ -55,7 +58,11 @@ export function PasswordInput({
             aria-pressed={visible}
             className="-mr-1.5 flex size-8 items-center justify-center rounded-sm text-icon-muted hover:bg-surface-hover hover:text-icon-default"
           >
-            {visible ? <EyeOff aria-hidden className="size-[18px]" /> : <Eye aria-hidden className="size-[18px]" />}
+            {visible ? (
+              <EyeOff aria-hidden className="size-[18px]" />
+            ) : (
+              <Eye aria-hidden className="size-[18px]" />
+            )}
           </button>
         }
         {...props}
@@ -66,7 +73,10 @@ export function PasswordInput({
             {[0, 1, 2, 3].map((i) => (
               <span
                 key={i}
-                className={cn('h-1 rounded-full', spec && i < spec.bars ? spec.cls : 'bg-surface-raised')}
+                className={cn(
+                  'h-1 rounded-full',
+                  spec && i < spec.bars ? spec.cls : 'bg-surface-raised',
+                )}
               />
             ))}
           </div>

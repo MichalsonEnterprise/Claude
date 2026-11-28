@@ -1,38 +1,150 @@
 {
  "_note": "BJ Blackjack screens (agent key: g-blackjack). No new library components were created: these are SECTION and FRAME ids for navigation, prototypes and ledger updates. Desktop play frames use Shell/Sidebar Collapsed (Originals active) + Shell/Topbar Desktop Member; History/Rules/Fairness pages use Shell/Sidebar Expanded with Item/Twenty-One active. Inline-built pieces (no library component yet): felt table (named layers 'Felt table' > 'Dealer zone' / 'Felt print' / 'Player hands' / 'Felt status'), 'Bet panel' with 'Panel actions', card shoe + table-limits placard, mini card chips, result chips, prompt cards (insurance / connection lost / limit / region), mobile 'RG session strip', mobile insurance bottom sheet, mobile result card, basic-strategy chart. Hand IDs BJ-40508…BJ-40518 and limits 1.00–1,000.00 USDT per hand are DEMO values introduced here.",
- "Section/BJ Blackjack (page 08)": { "id": "32:93468", "type": "SECTION", "x": 64000, "y": 0 },
- "Section/Games — Mobile Blackjack (page 10)": { "id": "34:362882", "type": "SECTION", "x": 210000, "y": 0 },
- "[BJ-01] Table + betting / 1440 / Bet placed — ready to deal": { "id": "32:93469", "type": "FRAME", "note": "master; all desktop play states are clones of it" },
- "[BJ-02] Dealing / 1440 / Dealing — cards in play": { "id": "33:132557", "type": "FRAME" },
- "[BJ-03] Player decision / 1440 / Your move — Hit, Stand, Double, Split": { "id": "33:133278", "type": "FRAME" },
- "[BJ-03] Player decision / 1440 / Insurance offered — dealer shows an Ace": { "id": "33:157616", "type": "FRAME" },
- "[BJ-03] Player decision / 1440 / Split — playing hand 1 of 2": { "id": "33:158401", "type": "FRAME" },
- "[BJ-04] Dealer turn / 1440 / Dealer draws on 16": { "id": "33:159183", "type": "FRAME" },
- "[BJ-05] Result / 1440 / Win — 20 beats 18": { "id": "33:177551", "type": "FRAME" },
- "[BJ-05] Result / 1440 / Lose — dealer 20 beats 18": { "id": "33:178442", "type": "FRAME" },
- "[BJ-05] Result / 1440 / Push — 19 each": { "id": "33:179332", "type": "FRAME" },
- "[BJ-05] Result / 1440 / Blackjack — paid 3:2": { "id": "33:180225", "type": "FRAME" },
- "[BJ-05] Result / 1440 / Bust — 25": { "id": "33:181115", "type": "FRAME" },
- "[BJ-06] History / 1440 / My hands — today": { "id": "33:274454", "type": "FRAME" },
- "[BJ-07] Rules / 1440 / Rules & payouts": { "id": "33:275983", "type": "FRAME" },
- "[BJ-08] Provably-fair verification / 1440 / Hand BJ-40517 verified": { "id": "33:295080", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 1440 / Connection lost — hand held on server": { "id": "33:210010", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 1440 / Reconnected — hand restored": { "id": "33:210793", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 1440 / Loading table": { "id": "33:211529", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)": { "id": "33:212197", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 1440 / Daily loss limit reached": { "id": "33:213009", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 1440 / Region restricted (United States)": { "id": "33:213876", "type": "FRAME" },
- "[BJ-01] Table + betting / 768 / Bet placed — ready to deal": { "id": "33:313734", "type": "FRAME" },
- "[BJ-01] Table + betting / 390 / Bet placed — ready to deal": { "id": "34:362883", "type": "FRAME", "note": "mobile master; mobile play states are clones of it" },
- "[BJ-02] Dealing / 390 / Dealing — cards in play": { "id": "34:387956", "type": "FRAME" },
- "[BJ-03] Player decision / 390 / Your move — Hit, Stand, Double, Split": { "id": "34:388278", "type": "FRAME" },
- "[BJ-03] Player decision / 390 / Insurance offered — bottom sheet": { "id": "34:388630", "type": "FRAME" },
- "[BJ-04] Dealer turn / 390 / Dealer draws on 16": { "id": "34:389017", "type": "FRAME" },
- "[BJ-05] Result / 390 / Win — 20 beats 18": { "id": "34:389351", "type": "FRAME" },
- "[BJ-06] History / 390 / My hands — today": { "id": "34:422477", "type": "FRAME" },
- "[BJ-07] Rules / 390 / Rules & payouts": { "id": "34:422986", "type": "FRAME" },
- "[BJ-08] Provably-fair verification / 390 / Hand BJ-40517 verified": { "id": "34:423480", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 390 / Connection lost — hand held on server": { "id": "34:404947", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)": { "id": "34:405313", "type": "FRAME" },
- "[BJ-09] Recovery & errors / 390 / Region restricted (United States)": { "id": "34:405639", "type": "FRAME" }
+ "Section/BJ Blackjack (page 08)": {
+  "id": "32:93468",
+  "type": "SECTION",
+  "x": 64000,
+  "y": 0
+ },
+ "Section/Games — Mobile Blackjack (page 10)": {
+  "id": "34:362882",
+  "type": "SECTION",
+  "x": 210000,
+  "y": 0
+ },
+ "[BJ-01] Table + betting / 1440 / Bet placed — ready to deal": {
+  "id": "32:93469",
+  "type": "FRAME",
+  "note": "master; all desktop play states are clones of it"
+ },
+ "[BJ-02] Dealing / 1440 / Dealing — cards in play": {
+  "id": "33:132557",
+  "type": "FRAME"
+ },
+ "[BJ-03] Player decision / 1440 / Your move — Hit, Stand, Double, Split": {
+  "id": "33:133278",
+  "type": "FRAME"
+ },
+ "[BJ-03] Player decision / 1440 / Insurance offered — dealer shows an Ace": {
+  "id": "33:157616",
+  "type": "FRAME"
+ },
+ "[BJ-03] Player decision / 1440 / Split — playing hand 1 of 2": {
+  "id": "33:158401",
+  "type": "FRAME"
+ },
+ "[BJ-04] Dealer turn / 1440 / Dealer draws on 16": {
+  "id": "33:159183",
+  "type": "FRAME"
+ },
+ "[BJ-05] Result / 1440 / Win — 20 beats 18": {
+  "id": "33:177551",
+  "type": "FRAME"
+ },
+ "[BJ-05] Result / 1440 / Lose — dealer 20 beats 18": {
+  "id": "33:178442",
+  "type": "FRAME"
+ },
+ "[BJ-05] Result / 1440 / Push — 19 each": {
+  "id": "33:179332",
+  "type": "FRAME"
+ },
+ "[BJ-05] Result / 1440 / Blackjack — paid 3:2": {
+  "id": "33:180225",
+  "type": "FRAME"
+ },
+ "[BJ-05] Result / 1440 / Bust — 25": {
+  "id": "33:181115",
+  "type": "FRAME"
+ },
+ "[BJ-06] History / 1440 / My hands — today": {
+  "id": "33:274454",
+  "type": "FRAME"
+ },
+ "[BJ-07] Rules / 1440 / Rules & payouts": {
+  "id": "33:275983",
+  "type": "FRAME"
+ },
+ "[BJ-08] Provably-fair verification / 1440 / Hand BJ-40517 verified": {
+  "id": "33:295080",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 1440 / Connection lost — hand held on server": {
+  "id": "33:210010",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 1440 / Reconnected — hand restored": {
+  "id": "33:210793",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 1440 / Loading table": {
+  "id": "33:211529",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)": {
+  "id": "33:212197",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 1440 / Daily loss limit reached": {
+  "id": "33:213009",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 1440 / Region restricted (United States)": {
+  "id": "33:213876",
+  "type": "FRAME"
+ },
+ "[BJ-01] Table + betting / 768 / Bet placed — ready to deal": {
+  "id": "33:313734",
+  "type": "FRAME"
+ },
+ "[BJ-01] Table + betting / 390 / Bet placed — ready to deal": {
+  "id": "34:362883",
+  "type": "FRAME",
+  "note": "mobile master; mobile play states are clones of it"
+ },
+ "[BJ-02] Dealing / 390 / Dealing — cards in play": {
+  "id": "34:387956",
+  "type": "FRAME"
+ },
+ "[BJ-03] Player decision / 390 / Your move — Hit, Stand, Double, Split": {
+  "id": "34:388278",
+  "type": "FRAME"
+ },
+ "[BJ-03] Player decision / 390 / Insurance offered — bottom sheet": {
+  "id": "34:388630",
+  "type": "FRAME"
+ },
+ "[BJ-04] Dealer turn / 390 / Dealer draws on 16": {
+  "id": "34:389017",
+  "type": "FRAME"
+ },
+ "[BJ-05] Result / 390 / Win — 20 beats 18": {
+  "id": "34:389351",
+  "type": "FRAME"
+ },
+ "[BJ-06] History / 390 / My hands — today": {
+  "id": "34:422477",
+  "type": "FRAME"
+ },
+ "[BJ-07] Rules / 390 / Rules & payouts": {
+  "id": "34:422986",
+  "type": "FRAME"
+ },
+ "[BJ-08] Provably-fair verification / 390 / Hand BJ-40517 verified": {
+  "id": "34:423480",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 390 / Connection lost — hand held on server": {
+  "id": "34:404947",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)": {
+  "id": "34:405313",
+  "type": "FRAME"
+ },
+ "[BJ-09] Recovery & errors / 390 / Region restricted (United States)": {
+  "id": "34:405639",
+  "type": "FRAME"
+ },
+ "_continuation_28nov": "Continuation 28 Nov 2026: all 21 desktop/tablet frames (page 08, section 32:93468) and 12 mobile frames (page 10, section 34:362882) were present, so no frames were rebuilt. Audit (text clipping, placeholders, missing fonts, container overflow) plus screenshots. Fixed: (1) [BJ-01] 768 RG/Session Bar instance 33:313866 overflowed its 704 px width by ~46 px. Third divider and empty 'Message' spacer hidden, gap 12 (space/3), SPACE_BETWEEN, hug height; now 704x60 with every item visible. (2) [BJ-06] 1440 Hands table 33:275432: 'Verify' ghost buttons ran 6 px past the table edge. Last 'Cell' of all 10 rows set to 74 px; Verify cells use padding space/1, so the labels align with the PROOF header. Intentional overflows left as is: mobile 'Card B — in flight' cropped by the felt edge (BJ-02/BJ-04 390) and the horizontal filter-chip scroller (BJ-06 390)."
 }

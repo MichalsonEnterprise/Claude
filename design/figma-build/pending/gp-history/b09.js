@@ -15,7 +15,7 @@ const W = [['1st', '@kestrel', 'E-1244-03318', '90,515.00'], ['2nd', '@lumen.eth
 for (const [t, h, e, a] of W) { const r = row('Winner ' + h, { gap: 12, p: [8, 12, 8, 12], r: 10, fill: h.includes('you') ? 'surface/selected' : undefined }); const tag = AL('HORIZONTAL', { name: 'Tier', p: [2, 8, 2, 8], r: 9999, fill: t === 'Runner-up' ? 'surface/raised' : 'accent/gold-tint' }); add(tag, await T(t, 'Label/S', t === 'Runner-up' ? 'text/secondary' : 'text/gold')); const lc = col('Who', { gap: 2 }); add(lc, await T(h, 'Body/S Strong', 'text/primary'), await T(e, e.startsWith('E-') ? 'Mono/S' : 'Caption', 'text/tertiary')); add(r, tag, [lc, 'FILL'], await T(a + (a.includes('each') ? '' : ' USDT'), 'Number/S', 'text/gold'), await DEMO('XS')); add(wl, [r, 'FILL']); }
 add(ra, pd, [wl, 'FILL']); add(main, [ra, 'FILL']);
 const rb = row('Row — VRF & you', { gap: 24, align: 'MIN' });
-const vrf = await I(C.VRF, { Step: 'Settled' }); await O(vrf, { '~#1,248': '#1,244', '~0x9f2c…e71a': '0x51d8…a4c3', '~20:00:41': '20:00:39', '~20:02:10': '20:02:05' }, 'vrf');
+const vrf = await I(C.VRF, { Step: 'Settled' }); await O(vrf, { '~#1,248': '#1,244', '~0x9f2c…e71a': '0x51d8…a4c3', '~20:00:41': '20:00:39', '~37 s': '35 s' }, 'vrf');
 const yc = card('Card — Your result'); add(yc, [await ttl('Your result in #1,244'), 'FILL']);
 const amt = row('Prize', { gap: 8 }); const pt = await T('+3,620.60 USDT', 'Number/L', 'accent/gold'); await gfill(pt, 'Gradient/Gold Jackpot'); add(amt, pt, await badge('Confirmed', 'Settled to Available'));
 add(yc, amt);

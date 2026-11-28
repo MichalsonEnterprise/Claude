@@ -1,0 +1,15 @@
+{
+ "slice": "pub-p1b (PUB-14 FAQ, PUB-18 Responsible Gaming, PUB-20 Restricted Countries, PUB-23 Cookie consent)",
+ "status_28nov": "Desktop 1440 frames exist (8, page 03 section 33:205847). ALL 390 mobile frames missing — 3 consecutive Figma MCP limit errors.",
+ "fileKey": "QHF8iRUMFgGMcEn3bD25jl",
+ "skillNames": "figma-use,figma-generate-design",
+ "order": [
+  {"file": "00-read.js", "readonly": true, "why": "inventory page-10 section + desktop copy; align data arrays in m1/m3/m4 with the desktop frames, then python3 build.py"},
+  {"file": "out/m1-faq.js", "frames": ["[PUB-14] FAQ / 390 / Default — All questions", "[PUB-14] FAQ / 390 / Search results — “withdraw”", "[PUB-14] FAQ / 390 / Search — no results “bonus code”"]},
+  {"file": "out/m2-rg.js", "frames": ["[PUB-18] Responsible Gaming / 390 / Default"]},
+  {"file": "out/m3-restricted.js", "frames": ["[PUB-20] Restricted Countries / 390 / Default — grouped list", "[PUB-20] Restricted Countries / 390 / Search — “united”"]},
+  {"file": "out/m4-cookie.js", "frames": ["[PUB-23] Cookie Consent / 390 / Banner — first visit", "[PUB-23] Cookie Consent / 390 / Preferences — bottom sheet"]}
+ ],
+ "idempotent": "each script removes a same-named frame in the section before rebuilding; restack() re-flows the column (x 120 / 630 / 1140 / 1650) with 160 px gaps",
+ "dry_run": "node _mock-run.cjs out/*.js  (all 4 pass the mock, 28 Nov 2026)"
+}

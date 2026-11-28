@@ -4,7 +4,12 @@ import { paginate, type PaginationQuery } from '@gp/shared/schemas';
 
 import { notFound } from '../../common/errors';
 import { PrismaService, type Db } from '../../infra/prisma/prisma.service';
-import { MockAmlProvider, type AmlProvider, type AmlScreeningInput, type AmlScreeningResult } from './aml.provider';
+import {
+  MockAmlProvider,
+  type AmlProvider,
+  type AmlScreeningInput,
+  type AmlScreeningResult,
+} from './aml.provider';
 
 @Injectable()
 export class AmlService {
@@ -16,7 +21,10 @@ export class AmlService {
     return this.provider.name;
   }
 
-  async screenWithdrawal(db: Db, input: AmlScreeningInput & { withdrawalId: string }): Promise<AmlScreeningResult> {
+  async screenWithdrawal(
+    db: Db,
+    input: AmlScreeningInput & { withdrawalId: string },
+  ): Promise<AmlScreeningResult> {
     const started = performance.now();
     const result = await this.provider.screenWithdrawal(input);
     if (result.riskLevel !== 'low') {
@@ -50,7 +58,10 @@ export class AmlService {
         orderBy: { createdAt: 'desc' },
         skip: (query.page - 1) * query.pageSize,
         take: query.pageSize,
-        include: { user: { select: { publicId: true, handle: true } }, withdrawal: { select: { number: true } } },
+        include: {
+          user: { select: { publicId: true, handle: true } },
+          withdrawal: { select: { number: true } },
+        },
       }),
       this.prisma.amlAlert.count({ where }),
     ]);
@@ -72,12 +83,23 @@ export class AmlService {
     );
   }
 
-  async resolve(id: string, adminId: string, resolution: 'resolved' | 'dismissed' | 'escalated', note: string, db: Db = this.prisma) {
+  async resolve(
+    id: string,
+    adminId: string,
+    resolution: 'resolved' | 'dismissed' | 'escalated',
+    note: string,
+    db: Db = this.prisma,
+  ) {
     const alert = await db.amlAlert.findUnique({ where: { id } });
     if (!alert) throw notFound('AML alert');
     return db.amlAlert.update({
       where: { id },
-      data: { status: resolution, resolution: note, resolvedAt: new Date(), resolvedByAdminId: adminId },
+      data: {
+        status: resolution,
+        resolution: note,
+        resolvedAt: new Date(),
+        resolvedByAdminId: adminId,
+      },
     });
   }
 }

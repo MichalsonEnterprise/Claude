@@ -1,7 +1,16 @@
 'use client';
 
 import { cva } from 'class-variance-authority';
-import { Construction, Globe2, Info, Scale, ShieldAlert, TriangleAlert, X, type LucideIcon } from 'lucide-react';
+import {
+  Construction,
+  Globe2,
+  Info,
+  Scale,
+  ShieldAlert,
+  TriangleAlert,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
@@ -11,9 +20,13 @@ import { cn } from '@/lib/utils';
  * Inline (radius 14) or Full width (pinned under / above the top bar). Security, regional restriction and
  * regulatory notices are never dismissible.
  */
-export type AlertType = 'info' | 'warning' | 'security' | 'restricted' | 'maintenance' | 'regulatory';
+export type AlertType =
+  'info' | 'warning' | 'security' | 'restricted' | 'maintenance' | 'regulatory';
 
-const SPEC: Record<AlertType, { icon: LucideIcon; dismissible: boolean; role: 'status' | 'alert' }> = {
+const SPEC: Record<
+  AlertType,
+  { icon: LucideIcon; dismissible: boolean; role: 'status' | 'alert' }
+> = {
   info: { icon: Info, dismissible: true, role: 'status' },
   warning: { icon: TriangleAlert, dismissible: true, role: 'status' },
   security: { icon: ShieldAlert, dismissible: false, role: 'alert' },
@@ -29,7 +42,8 @@ const alertVariants = cva('relative flex w-full gap-3 text-body-s', {
       warning: 'border-status-warning/30 bg-status-warning-tint [&_[data-icon]]:text-text-warning',
       security: 'border-status-danger/35 bg-status-danger-tint [&_[data-icon]]:text-text-danger',
       restricted: 'border-status-danger/35 bg-red-950 [&_[data-icon]]:text-text-danger',
-      maintenance: 'border-status-pending/30 bg-status-pending-tint [&_[data-icon]]:text-status-pending',
+      maintenance:
+        'border-status-pending/30 bg-status-pending-tint [&_[data-icon]]:text-status-pending',
       regulatory: 'border-border-default bg-surface-default [&_[data-icon]]:text-icon-muted',
     },
     layout: {

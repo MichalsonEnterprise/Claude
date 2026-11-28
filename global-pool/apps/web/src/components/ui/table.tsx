@@ -11,7 +11,10 @@ export function TableContainer({ className, ...props }: React.ComponentProps<'di
   return (
     <div
       data-slot="table-container"
-      className={cn('relative w-full overflow-x-auto rounded-lg border border-border-subtle bg-surface-default', className)}
+      className={cn(
+        'relative w-full overflow-x-auto rounded-lg border border-border-subtle bg-surface-default',
+        className,
+      )}
       {...props}
     />
   );
@@ -33,11 +36,19 @@ export function Table({
 }
 
 export function TableHeader({ className, ...props }: React.ComponentProps<'thead'>) {
-  return <thead data-slot="table-header" className={cn('bg-bg-secondary/60', className)} {...props} />;
+  return (
+    <thead data-slot="table-header" className={cn('bg-bg-secondary/60', className)} {...props} />
+  );
 }
 
 export function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
-  return <tbody data-slot="table-body" className={cn('[&_tr:last-child]:border-0', className)} {...props} />;
+  return (
+    <tbody
+      data-slot="table-body"
+      className={cn('[&_tr:last-child]:border-0', className)}
+      {...props}
+    />
+  );
 }
 
 export function TableFooter({ className, ...props }: React.ComponentProps<'tfoot'>) {
@@ -128,12 +139,22 @@ export function TableCell({
 
 export function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) {
   return (
-    <caption data-slot="table-caption" className={cn('py-3 text-caption text-text-tertiary', className)} {...props} />
+    <caption
+      data-slot="table-caption"
+      className={cn('py-3 text-caption text-text-tertiary', className)}
+      {...props}
+    />
   );
 }
 
 /** Two-line cell content: primary + secondary caption. */
-export function CellStack({ primary, secondary }: { primary: React.ReactNode; secondary?: React.ReactNode }) {
+export function CellStack({
+  primary,
+  secondary,
+}: {
+  primary: React.ReactNode;
+  secondary?: React.ReactNode;
+}) {
   return (
     <span className="flex flex-col">
       <span className="text-body-s text-text-primary">{primary}</span>

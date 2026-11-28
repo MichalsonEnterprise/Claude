@@ -48,7 +48,11 @@ export class DepositAddressService implements OnModuleInit {
       mkdirSync(resolve(file, '..'), { recursive: true });
       writeFileSync(
         file,
-        JSON.stringify({ xpub, note: 'DEV ONLY throwaway testnet xpub (private seed discarded). Git-ignored.' }, null, 2),
+        JSON.stringify(
+          { xpub, note: 'DEV ONLY throwaway testnet xpub (private seed discarded). Git-ignored.' },
+          null,
+          2,
+        ),
       );
       this.logger.warn(`DEPOSIT_XPUB unset — generated a throwaway DEV xpub (${file})`);
       return xpub;
@@ -60,15 +64,19 @@ export class DepositAddressService implements OnModuleInit {
   /** Get (or assign) the player's deposit address for an enabled network. */
   async forUser(userId: string, network: ChainKey) {
     const chain = CHAINS[network];
-    if (!chain.enabled) throw new AppError('NETWORK_NOT_AVAILABLE', `${chain.name} deposits are coming soon`);
-    if (chain.family !== 'evm') throw new AppError('NETWORK_NOT_AVAILABLE', `${chain.name} is not supported yet`);
+    if (!chain.enabled)
+      throw new AppError('NETWORK_NOT_AVAILABLE', `${chain.name} deposits are coming soon`);
+    if (chain.family !== 'evm')
+      throw new AppError('NETWORK_NOT_AVAILABLE', `${chain.name} is not supported yet`);
     const existing = await this.prisma.depositAddress.findUnique({
       where: { userId_network: { userId, network } },
     });
     if (existing) return this.view(existing);
     const row = await this.prisma.tx(async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(${INDEX_LOCK})`;
-      const again = await tx.depositAddress.findUnique({ where: { userId_network: { userId, network } } });
+      const again = await tx.depositAddress.findUnique({
+        where: { userId_network: { userId, network } },
+      });
       if (again) return again;
       const last = await tx.depositAddress.findFirst({
         where: { network, xpubFingerprint: this.fingerprint },
@@ -91,7 +99,12 @@ export class DepositAddressService implements OnModuleInit {
     return this.view(row);
   }
 
-  private view(row: { network: ChainKey; addressChecksum: string; derivationIndex: number; createdAt: Date }) {
+  private view(row: {
+    network: ChainKey;
+    addressChecksum: string;
+    derivationIndex: number;
+    createdAt: Date;
+  }) {
     const chain = CHAINS[row.network];
     return {
       network: row.network,

@@ -12,4 +12,4 @@ Run order (each file is the full use_figma code; all are idempotent, removing ol
 When everything is done, delete the cache node 78:57471.
 
 STATUS 28 Nov 2026: all four scripts were run successfully (call1, call2_tab, call3_mob + fixes, call5_inspect), and the cache node 78:57471 was deleted afterwards.
-Frame IDs are in ../../registry-adm-pool.json. Nothing remains to run.
+Frame IDs are in ../../registry-adm-pool.json. call7_fix46.js applied (P4 1440 settlement column fixed). Remaining if not yet applied: call8_p6cell.js (P6 blank Runner-up share cell; replaces the cell with a clone of the 3rd-prize share cell). It needs no cache.

@@ -56,7 +56,10 @@ export const buttonVariants = cva(
 );
 
 /** While loading the button is disabled (no double submit) but keeps its colour, with a spinner. */
-const LOADING_KEEPS_COLOUR: Record<NonNullable<VariantProps<typeof buttonVariants>['variant']>, string> = {
+const LOADING_KEEPS_COLOUR: Record<
+  NonNullable<VariantProps<typeof buttonVariants>['variant']>,
+  string
+> = {
   primary: 'disabled:bg-brand disabled:text-text-on-primary',
   secondary: 'disabled:border-border-default disabled:bg-surface-raised disabled:text-text-primary',
   ghost: 'disabled:text-text-primary',
@@ -69,8 +72,7 @@ export type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>['var
 export type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>['size']>;
 
 export interface ButtonProps
-  extends React.ComponentProps<'button'>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /** Render the child element (e.g. next/link) with button styles. */
   asChild?: boolean;
   /** Shows a spinner, sets aria-busy and disables the button. */
@@ -145,7 +147,8 @@ const iconButtonVariants = cva(
 );
 
 export interface IconButtonProps
-  extends Omit<React.ComponentProps<'button'>, 'aria-label'>,
+  extends
+    Omit<React.ComponentProps<'button'>, 'aria-label'>,
     VariantProps<typeof iconButtonVariants> {
   /** Accessible name — required because the button has no visible text. */
   label: string;

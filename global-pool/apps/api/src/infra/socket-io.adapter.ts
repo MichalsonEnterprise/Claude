@@ -16,6 +16,6 @@ export class GpIoAdapter extends IoAdapter {
       ...options,
       cors: { origin: this.origins, credentials: true },
       serveClient: false,
-    } as ServerOptions);
+    });
   }
 }

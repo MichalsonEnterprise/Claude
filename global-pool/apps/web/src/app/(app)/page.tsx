@@ -1,61 +1,43 @@
-import { DEMO_CURRENT_ROUND, DEMO_GAMES } from '@gp/shared/demo';
-import Link from 'next/link';
+import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
+import type { Metadata } from 'next';
 
-import { isGameArtKey } from '@/components/brand/game-art';
-import { GameTile } from '@/components/domain/game-tile';
-import { JackpotMeter } from '@/components/domain/jackpot-meter';
-import { Button } from '@/components/ui/button';
-import { DemoBadge } from '@/components/ui/demo-badge';
+import { HomePage } from '@/components/home/home-page';
+import { prefetchHome } from '@/lib/data/queries';
+import { parseHomePreview, statePreviewEnabled } from '@/lib/home-preview';
+
+export const metadata: Metadata = {
+  title: { absolute: 'GLOBAL POOL — one global pool, every entry verifiable (DEMO)' },
+  description:
+    'One global jackpot round at a time: 10.00 USDT per entry + a separate 0.05 USDT platform fee, winners drawn with Chainlink VRF on Arbitrum. DEMO / testnet build — no real money. 18+.',
+};
 
 /**
- * Lobby placeholder — the homepage agent replaces this with PUB-01 (hero carousel, pool live, rows, …).
- * It only proves the shell + design system render together.
+ * PUB-01 Homepage / public lobby (route "/", inside the casino shell).
+ *
+ * Data: server-prefetched TanStack queries (src/lib/data/queries.ts → mock DEMO fetchers by default,
+ * NEXT_PUBLIC_DATA_SOURCE=api for the NestJS API), hydrated into the client sections.
+ *
+ * Dev-only state preview — `?state=<flags>` (comma-separated; `next dev` or NEXT_PUBLIC_STATE_PREVIEW=true):
+ *   /                          guest, active round (default; signed-in players see the member view)
+ *   /?state=member             logged in as DEMO @nova.k: balance chip, "Your 35 entries", odds
+ *   /?state=restricted         restricted region (United States): gating banner, disabled CTAs,
+ *                              withdraw / self-exclusion still available, no bypass hints
+ *   /?state=no-round           between rounds: last result + "Round #1,249 opens 28 Nov 2026, 08:00 UTC"
+ *   /?state=guest              force the logged-out view while signed in
+ *   combine: /?state=member,no-round · /?state=member,restricted
  */
-export default function LobbyPage() {
-  const originals = DEMO_GAMES.filter((g) => isGameArtKey(g.slug)).slice(0, 7);
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { state } = await searchParams;
+  const preview = parseHomePreview(state);
+  const queryClient = new QueryClient();
+  await prefetchHome(queryClient, preview.scenario);
   return (
-    <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-4 rounded-xl border border-border-gold bg-surface-default bg-gradient-gold-tint p-6 laptop:flex-row laptop:items-center laptop:justify-between">
-        <div className="flex flex-col gap-2">
-          <p className="flex items-center gap-2 text-overline uppercase text-text-gold">
-            Global Pool · Round #1,248 <DemoBadge size="s" />
-          </p>
-          <h1 className="text-h2 laptop:text-h1">One global pool. Every entry verifiable.</h1>
-          <p className="text-body-m text-text-secondary">
-            Entry 10.00 USDT + 0.05 USDT platform fee · 18+ · You can lose your stake.
-          </p>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <JackpotMeter amount={DEMO_CURRENT_ROUND.poolBalance ?? '0.00'} live demo />
-          <Button variant="gold" size="l" asChild>
-            <Link href="/pool">Participate</Link>
-          </Button>
-        </div>
-      </section>
-      <section aria-labelledby="originals" className="flex flex-col gap-3">
-        <h2 id="originals" className="text-h5">
-          GLOBAL POOL Originals
-        </h2>
-        <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 tablet:mx-0 tablet:px-0">
-          {originals.map((g) =>
-            isGameArtKey(g.slug) ? (
-              <GameTile
-                key={g.id}
-                game={g.slug}
-                name={g.name}
-                subtitle={g.category === 'jackpot' ? 'JACKPOT ROUNDS' : 'GLOBAL POOL ORIGINAL'}
-                href={g.category === 'jackpot' ? '/pool' : `/games/${g.slug}`}
-                edgeLabel={g.edgeLabel}
-                players={g.players}
-                tag={g.category === 'jackpot' ? 'live' : undefined}
-              />
-            ) : null,
-          )}
-        </div>
-      </section>
-      <p className="text-body-s text-text-tertiary">
-        Component catalogue: <Link className="text-text-brand underline" href="/design-system">/design-system</Link>
-      </p>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <HomePage preview={preview} previewEnabled={statePreviewEnabled} />
+    </HydrationBoundary>
   );
 }

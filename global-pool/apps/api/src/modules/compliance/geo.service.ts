@@ -70,7 +70,12 @@ export class GeoService {
     if (!country) {
       return { country: null, countryName: null, permitted: !this.config.isProduction, source };
     }
-    return { country, countryName: this.countryName(country), permitted: await this.isPermitted(country), source };
+    return {
+      country,
+      countryName: this.countryName(country),
+      permitted: await this.isPermitted(country),
+      source,
+    };
   }
 
   /**
@@ -85,9 +90,13 @@ export class GeoService {
       });
     }
     if (declaredCountry && !(await this.isPermitted(declaredCountry))) {
-      throw new AppError('GEO_RESTRICTED', 'GLOBAL POOL is not available in your country of residence', {
-        country: declaredCountry,
-      });
+      throw new AppError(
+        'GEO_RESTRICTED',
+        'GLOBAL POOL is not available in your country of residence',
+        {
+          country: declaredCountry,
+        },
+      );
     }
   }
 
@@ -97,7 +106,9 @@ export class GeoService {
 
   private async rules(): Promise<Map<string, 'blocked' | 'allowed'>> {
     if (this.cache && Date.now() - this.cache.at < 60_000) return this.cache.rules;
-    const rows = await this.prisma.geoRule.findMany({ select: { countryCode: true, status: true } });
+    const rows = await this.prisma.geoRule.findMany({
+      select: { countryCode: true, status: true },
+    });
     const rules = new Map(rows.map((r) => [r.countryCode.toUpperCase(), r.status]));
     this.cache = { at: Date.now(), rules };
     return rules;

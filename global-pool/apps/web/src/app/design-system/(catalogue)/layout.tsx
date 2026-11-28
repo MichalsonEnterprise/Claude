@@ -22,13 +22,21 @@ export default function DesignSystemLayout({ children }: { children: ReactNode }
         <Link href="/" aria-label="GLOBAL POOL — lobby">
           <Logo height={32} title="" />
         </Link>
-        <span className="hidden text-label-m text-text-secondary tablet:inline">Design system · @gp/web</span>
-        <Link href="/design-system/shell" className="ml-auto text-label-m text-text-brand hover:underline">
+        <span className="hidden text-label-m text-text-secondary tablet:inline">
+          Design system · @gp/web
+        </span>
+        <Link
+          href="/design-system/shell"
+          className="ml-auto text-label-m text-text-brand hover:underline"
+        >
           Live shell preview →
         </Link>
       </header>
       <div className="mx-auto flex w-full max-w-[1440px] gap-10 px-4 py-8 tablet:px-8">
-        <nav aria-label="Sections" className="sticky top-24 hidden h-fit w-48 shrink-0 laptop:block">
+        <nav
+          aria-label="Sections"
+          className="sticky top-24 hidden h-fit w-48 shrink-0 laptop:block"
+        >
           <ul className="flex flex-col gap-1">
             {DS_SECTIONS.map(([id, label]) => (
               <li key={id}>

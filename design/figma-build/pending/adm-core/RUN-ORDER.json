@@ -1,0 +1,35 @@
+{
+  "_note": "Agent adm-core (ADM-00/01/02/X1 + MOB-11). Every script in out/ is self-contained (helpers.js verbatim + _lib.js + includes), < 50k chars, node --check OK and IDEMPOTENT (frames are skipped by exact name). Rebuild with: python3 build.py <name> (handles //#include and retargets m-* scripts to page '10 — Mobile Experience' / section 'ADM — Mobile'). Run with use_figma (fileKey QHF8iRUMFgGMcEn3bD25jl, skillNames figma-use,figma-generate-design). Page 09 section 'ADM-00/01/02/X1 Shell, login, overview, approvals' = 36:522944.",
+  "done": {
+    "01a-adm01": "ran 28 Nov 2026 — ADM-01 sign in default 170:66492 + 5 states",
+    "01b-adm02": "ran 28 Nov 2026 — ADM-02 overview 1440 171:73506",
+    "02-x1-requester": "ran 28 Nov 2026 — 178:99766 / 178:100079 / 178:100360 / 178:100654",
+    "03-x1-approver": "ran 28 Nov 2026 — 180:143765 / 180:144187 / 180:144734 / 180:145242"
+  },
+  "order": [
+    [
+      "out/07-states.js",
+      "1440: [ADM-01] Session timeout — Warning (x=3240, ADM-01 row) + [ADM-02] Overview — Restricted role Support L2 (x=1680, ADM-02 row)"
+    ],
+    [
+      "out/04-laptop.js",
+      "Laptop 1280 band: ADM-00 inbox, ADM-01 sign in, ADM-02 overview (rebuilt), ADM-X1 confirm Ready + consistency touch-ups on the #03 approver frames"
+    ],
+    [
+      "out/05-tablet.js",
+      "Tablet 768 band (needs #04 first so the band sits below the laptop band): ADM-02 overview, ADM-01 sign in, ADM-X1 confirm Ready"
+    ],
+    [
+      "out/06-tablet-shell.js",
+      "ADM-00 at 768: navigation drawer open, command palette, no-permission (needs #05)"
+    ],
+    [
+      "out/m-01-overview-alerts.js",
+      "page 10: [ADM-02 · MOB-11] Overview / 390, [MOB-11] Alerts / 390 / Operations"
+    ],
+    [
+      "out/m-02-approvals.js",
+      "page 10: [MOB-11] Approvals queue / 390 / Open, [ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet"
+    ]
+  ]
+}

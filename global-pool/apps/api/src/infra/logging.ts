@@ -14,7 +14,8 @@ export function loggerParams(config: AppConfig): Params {
       level: config.env.LOG_LEVEL,
       genReqId: (req: IncomingMessage, res: ServerResponse) => {
         const incoming = req.headers['x-request-id'];
-        const id = typeof incoming === 'string' && REQUEST_ID.test(incoming) ? incoming : randomUUID();
+        const id =
+          typeof incoming === 'string' && REQUEST_ID.test(incoming) ? incoming : randomUUID();
         res.setHeader('X-Request-Id', id);
         return id;
       },

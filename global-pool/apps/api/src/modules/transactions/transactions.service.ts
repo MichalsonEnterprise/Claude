@@ -43,24 +43,36 @@ export class TransactionsService {
       }),
       this.prisma.transaction.count({ where }),
     ]);
-    return paginate(rows.map((r) => this.view(r)), total, query);
+    return paginate(
+      rows.map((r) => this.view(r)),
+      total,
+      query,
+    );
   }
 
   async get(userId: string, reference: string) {
     const row = await this.prisma.transaction.findFirst({
       where: { userId, OR: [{ reference }, ...(isUuid(reference) ? [{ id: reference }] : [])] },
-      include: { withdrawal: { include: { events: { orderBy: { createdAt: 'asc' } } } }, deposit: true },
+      include: {
+        withdrawal: { include: { events: { orderBy: { createdAt: 'asc' } } } },
+        deposit: true,
+      },
     });
     if (!row) throw notFound('Transaction');
     const timeline = row.withdrawal
-      ? row.withdrawal.events.map((e) => ({ label: e.note ?? e.toStatus, status: e.toStatus, at: e.createdAt.toISOString() }))
+      ? row.withdrawal.events.map((e) => ({
+          label: e.note ?? e.toStatus,
+          status: e.toStatus,
+          at: e.createdAt.toISOString(),
+        }))
       : [{ label: row.description, status: row.status, at: row.createdAt.toISOString() }];
     return { ...this.view(row), timeline };
   }
 
   view(row: Row) {
     const meta = (row.metadata ?? {}) as Record<string, unknown>;
-    const address = row.withdrawal?.toAddress ?? (typeof meta.address === 'string' ? meta.address : null);
+    const address =
+      row.withdrawal?.toAddress ?? (typeof meta.address === 'string' ? meta.address : null);
     const confirmations = row.deposit
       ? { current: row.deposit.confirmations, required: row.deposit.requiredConfirmations }
       : null;

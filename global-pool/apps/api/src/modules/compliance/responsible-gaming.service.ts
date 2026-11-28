@@ -48,8 +48,7 @@ export class ResponsibleGamingService {
         limit,
         minutes: row.minutes,
         used,
-        remaining:
-          limit !== null && used !== null ? toUSDTString(maxZero(sub(limit, used))) : null,
+        remaining: limit !== null && used !== null ? toUSDTString(maxZero(sub(limit, used))) : null,
         pendingIncrease: row.pendingEffectiveAt
           ? {
               amount: usdtOrNull(row.pendingAmount),
@@ -121,7 +120,11 @@ export class ResponsibleGamingService {
     const row = await this.prisma.rgSelfExclusion.create({
       data: { userId, duration: input.duration, startsAt: now, endsAt },
     });
-    return { duration: row.duration, startsAt: row.startsAt.toISOString(), endsAt: endsAt?.toISOString() ?? null };
+    return {
+      duration: row.duration,
+      startsAt: row.startsAt.toISOString(),
+      endsAt: endsAt?.toISOString() ?? null,
+    };
   }
 
   async setRealityCheck(userId: string, intervalMinutes: number) {
@@ -152,9 +155,13 @@ export class ResponsibleGamingService {
   async assertNotSelfExcluded(userId: string, db: Db = this.prisma): Promise<void> {
     const ex = await this.activeSelfExclusion(userId, db);
     if (ex) {
-      throw new AppError('SELF_EXCLUDED', 'You are self-excluded — gaming and deposits are paused', {
-        endsAt: ex.endsAt?.toISOString() ?? null,
-      });
+      throw new AppError(
+        'SELF_EXCLUDED',
+        'You are self-excluded — gaming and deposits are paused',
+        {
+          endsAt: ex.endsAt?.toISOString() ?? null,
+        },
+      );
     }
   }
 
@@ -189,12 +196,16 @@ export class ResponsibleGamingService {
       if (l.type !== 'deposit' || l.amount === null) continue;
       const used = await this.usage(userId, 'deposit', l.period, now, db);
       if (money(used).plus(money(amount)).gt(money(l.amount))) {
-        throw new AppError('RG_LIMIT_EXCEEDED', `This would exceed your ${l.period}ly deposit limit`, {
-          type: 'deposit',
-          period: l.period,
-          limit: toUSDTString(l.amount.toFixed()),
-          used,
-        });
+        throw new AppError(
+          'RG_LIMIT_EXCEEDED',
+          `This would exceed your ${l.period}ly deposit limit`,
+          {
+            type: 'deposit',
+            period: l.period,
+            limit: toUSDTString(l.amount.toFixed()),
+            used,
+          },
+        );
       }
     }
   }
@@ -228,7 +239,11 @@ export class ResponsibleGamingService {
   }
 
   /** Limits with due pending increases applied (and persisted). */
-  private async effectiveLimits(userId: string, now: Date, db: Db = this.prisma): Promise<RgLimit[]> {
+  private async effectiveLimits(
+    userId: string,
+    now: Date,
+    db: Db = this.prisma,
+  ): Promise<RgLimit[]> {
     const rows = await db.rgLimit.findMany({ where: { userId }, orderBy: { type: 'asc' } });
     const out: RgLimit[] = [];
     for (const row of rows) {

@@ -1,0 +1,35 @@
+{
+ "_note": "Agent g-crash (CR-01..CR-08, Orbit Rush). Screens only — no new library components. Composed from Shell/Sidebar (Collapsed, Member), Shell/Topbar Desktop/Mobile, Game/Multiplier Readout, Game/Crash Curve, Game/History Strip (Crash), RG/Session Bar, Notice/Licence, Badge/DEMO, Button/*, Nav/Mobile Tab Bar, Tile/Game Art/Orbit Rush. Inline pieces (component gaps): crash bet panel (Manual/Auto tabs, amount field, quick amounts, auto cash-out toggle + target, odds summary), live-bets list, mobile sticky bet bar, round-history table/cards with crash-point pills, crash-point distribution bars, auto-play settings dialog/bottom sheet, crash verifier (seed/hash/salt rows), connection-lost overlay, insufficient-balance alert.",
+ "sections": {
+  "CR Crash (page 08 — Games)": "32:90237",
+  "Games — Mobile Crash (page 10 — Mobile Experience)": "see README (section id not returned by the read-only inventory)"
+ },
+ "frames": {
+  "[CR-01] Orbit Rush — Pre-round betting / 1440 / Bets open": "32:90238",
+  "[CR-02] Orbit Rush — Active run / 1440 / Running 1.64× · bet live": "33:124526",
+  "[CR-03] Orbit Rush — Cashed out / 1440 / Auto cash-out at 2.00× · round still running": "33:156588",
+  "[CR-04] Orbit Rush — Crashed / 1440 / Result · you cashed out at 2.00×": "33:191216",
+  "[CR-04] Orbit Rush — Crashed / 1440 / Result · stake lost (target 5.00× not reached)": "33:209124",
+  "[CR-05] Orbit Rush — Round history & statistics / 1440 / Default": "33:284530",
+  "[CR-06] Orbit Rush — Auto cash-out & auto-play settings / 1440 / Dialog open · consent unticked": "33:311252",
+  "[CR-07] Orbit Rush — Provably-fair verification / 1440 / Verified · round CR-55102": "34:331972",
+  "[CR-08] Orbit Rush — Error states / 1440 / Connection lost · bet protected": "33:227442",
+  "[CR-08] Orbit Rush — Error states / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)": "33:239177",
+  "[CR-08] Orbit Rush — Error states / 1440 / Daily loss limit reached": "33:258312",
+  "[CR-08] Orbit Rush — Error states / 1440 / Region restricted (DEMO · United States)": "33:259170",
+  "[CR-01] Orbit Rush — Pre-round betting / 768 / Bets open": "34:350701",
+  "[CR-02] Orbit Rush — Active run / 768 / Running 1.64× · bet live": "34:351583",
+  "Dev notes — Orbit Rush": "36:527187",
+  "[CR-01] Orbit Rush — Pre-round betting / 390 / Bets open": "34:386552",
+  "[CR-02] Orbit Rush — Active run / 390 / Running 1.64× · bet live": "34:410457",
+  "[CR-03] Orbit Rush — Cashed out / 390 / Auto cash-out at 2.00×": "34:420337",
+  "[CR-04] Orbit Rush — Crashed / 390 / Result · you cashed out at 2.00×": "34:420839",
+  "[CR-05] Orbit Rush — Round history & statistics / 390 / Default": "34:446321",
+  "[CR-06] Orbit Rush — Auto cash-out & auto-play / 390 / Bottom sheet · consent unticked (full sheet shown, scrolls in product)": "34:480272",
+  "[CR-07] Orbit Rush — Provably-fair verification / 390 / Verified · round CR-55102": "34:492427",
+  "[CR-08] Orbit Rush — Error states / 390 / Connection lost · bet protected": "36:511112",
+  "[CR-08] Orbit Rush — Error states / 390 / Region restricted (DEMO · United States)": "36:511527",
+  "[CR-08] Orbit Rush — Error states / 390 / Daily loss limit reached": "36:519473",
+  "[CR-08] Orbit Rush — Error states / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)": "198:77380"
+ }
+}

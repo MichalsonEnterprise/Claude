@@ -52,7 +52,11 @@ export function CardTitle({
   ...props
 }: React.ComponentProps<'h3'> & { as?: 'h2' | 'h3' | 'h4' | 'p' }) {
   return (
-    <Comp data-slot="card-title" className={cn('text-h5 text-text-primary', className)} {...props} />
+    <Comp
+      data-slot="card-title"
+      className={cn('text-h5 text-text-primary', className)}
+      {...props}
+    />
   );
 }
 
@@ -68,7 +72,11 @@ export function CardDescription({ className, ...props }: React.ComponentProps<'p
 
 export function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="card-action" className={cn('flex shrink-0 items-center gap-2', className)} {...props} />
+    <div
+      data-slot="card-action"
+      className={cn('flex shrink-0 items-center gap-2', className)}
+      {...props}
+    />
   );
 }
 
@@ -80,7 +88,10 @@ export function CardFooter({ className, ...props }: React.ComponentProps<'div'>)
   return (
     <div
       data-slot="card-footer"
-      className={cn('mt-auto flex items-center gap-3 border-t border-border-subtle pt-4', className)}
+      className={cn(
+        'mt-auto flex items-center gap-3 border-t border-border-subtle pt-4',
+        className,
+      )}
       {...props}
     />
   );
@@ -88,10 +99,5 @@ export function CardFooter({ className, ...props }: React.ComponentProps<'div'>)
 
 /** Overline label used across cards ("POOL BALANCE", "CATEGORY"). */
 export function Overline({ className, ...props }: React.ComponentProps<'p'>) {
-  return (
-    <p
-      className={cn('text-overline uppercase text-text-tertiary', className)}
-      {...props}
-    />
-  );
+  return <p className={cn('text-overline uppercase text-text-tertiary', className)} {...props} />;
 }

@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 
 import { ShellPreview } from './shell-preview';
 
-export const metadata: Metadata = { title: 'Shell preview', robots: { index: false, follow: false } };
+export const metadata: Metadata = {
+  title: 'Shell preview',
+  robots: { index: false, follow: false },
+};
 
 /**
  * Live responsive shell for visual QA: /design-system/shell?auth=guest|member&state=default|wrong-network|restricted
@@ -16,5 +19,11 @@ export default async function ShellPreviewPage({
   const sp = await searchParams;
   const auth = sp.auth === 'member' ? 'member' : 'guest';
   const state = typeof sp.state === 'string' ? sp.state : 'default';
-  return <ShellPreview auth={auth} wrongNetwork={state === 'wrong-network'} restricted={state === 'restricted'} />;
+  return (
+    <ShellPreview
+      auth={auth}
+      wrongNetwork={state === 'wrong-network'}
+      restricted={state === 'restricted'}
+    />
+  );
 }

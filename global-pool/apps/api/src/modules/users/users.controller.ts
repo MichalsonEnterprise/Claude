@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Headers, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { totpCodeSchema, whitelistAddressSchema } from '@gp/shared/schemas';
 import { z } from 'zod';
@@ -73,7 +83,9 @@ export class UsersController {
   @Post('wallets/whitelist')
   @PlayerPolicy({ onboarded: true })
   @ApiHeader({ name: STEP_UP_HEADER, required: false })
-  @ApiOperation({ summary: 'Whitelist a withdrawal address (step-up: whitelist_change; 24 h cool-down)' })
+  @ApiOperation({
+    summary: 'Whitelist a withdrawal address (step-up: whitelist_change; 24 h cool-down)',
+  })
   async whitelist(
     @CurrentUser() user: AuthUser,
     @Body() body: WhitelistDto,

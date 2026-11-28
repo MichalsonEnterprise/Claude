@@ -15,7 +15,11 @@ export class KycService {
   async status(userId: string) {
     const [profile, records] = await Promise.all([
       this.prisma.userProfile.findUnique({ where: { userId }, select: { kycLevel: true } }),
-      this.prisma.kycRecord.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take: 10 }),
+      this.prisma.kycRecord.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      }),
     ]);
     const level = profile?.kycLevel ?? 'none';
     return {
@@ -37,7 +41,8 @@ export class KycService {
   }
 
   async start(userId: string, level: Exclude<KycLevel, 'none'>) {
-    const current = (await this.prisma.userProfile.findUnique({ where: { userId } }))?.kycLevel ?? 'none';
+    const current =
+      (await this.prisma.userProfile.findUnique({ where: { userId } }))?.kycLevel ?? 'none';
     if (KYC_LEVEL_RANK[current] >= KYC_LEVEL_RANK[level]) {
       throw new AppError('CONFLICT', `You are already verified at ${KYC_LEVEL_LABEL[current]}`);
     }
@@ -52,7 +57,13 @@ export class KycService {
         submittedAt: new Date(),
       },
     });
-    return { recordId: record.id, status: record.status, level, redirectUrl: session.redirectUrl, provider: session.provider };
+    return {
+      recordId: record.id,
+      status: record.status,
+      level,
+      redirectUrl: session.redirectUrl,
+      provider: session.provider,
+    };
   }
 
   /** Mock provider callback / DEMO approval: mark the latest pending record verified and raise the level. */
@@ -64,10 +75,21 @@ export class KycService {
         orderBy: { createdAt: 'desc' },
       });
       if (pending) {
-        await tx.kycRecord.update({ where: { id: pending.id }, data: { status: 'verified', reviewedAt: now } });
+        await tx.kycRecord.update({
+          where: { id: pending.id },
+          data: { status: 'verified', reviewedAt: now },
+        });
       } else {
         await tx.kycRecord.create({
-          data: { userId, level, status: 'verified', provider: this.provider.name, submittedAt: now, reviewedAt: now, isDemo },
+          data: {
+            userId,
+            level,
+            status: 'verified',
+            provider: this.provider.name,
+            submittedAt: now,
+            reviewedAt: now,
+            isDemo,
+          },
         });
       }
       await tx.userProfile.update({ where: { userId }, data: { kycLevel: level } });

@@ -28,7 +28,12 @@ export function ShellPreview({
   restricted: boolean;
 }) {
   const pathname = usePathname();
-  const preview = () => toast({ type: 'info', title: 'Preview only', description: 'Sign-in is wired in the real (app) shell.' });
+  const preview = () =>
+    toast({
+      type: 'info',
+      title: 'Preview only',
+      description: 'Sign-in is wired in the real (app) shell.',
+    });
   const games = DEMO_GAMES.filter((g) => isGameArtKey(g.slug));
   return (
     <AppShellFrame
@@ -49,7 +54,9 @@ export function ShellPreview({
                 Global Pool · Round #1,248 <DemoBadge size="s" />
               </p>
               <h1 className="text-h2 laptop:text-h1">One global pool. Every entry verifiable.</h1>
-              <p className="text-body-m text-text-secondary">Closes 27 Nov 2026, 20:00 UTC · 3,412 participants</p>
+              <p className="text-body-m text-text-secondary">
+                Closes 27 Nov 2026, 20:00 UTC · 3,412 participants
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="gold" size="l" disabled={restricted}>
@@ -67,7 +74,12 @@ export function ShellPreview({
             <CardHeader>
               <CardTitle>Global Pool</CardTitle>
             </CardHeader>
-            <JackpotMeter amount={DEMO_CURRENT_ROUND.poolBalance ?? '0.00'} live demo caption="Platform fees (932.00 USDT) are not part of the pool." />
+            <JackpotMeter
+              amount={DEMO_CURRENT_ROUND.poolBalance ?? '0.00'}
+              live
+              demo
+              caption="Platform fees (932.00 USDT) are not part of the pool."
+            />
             <Countdown closesAt={DEMO_CURRENT_ROUND.closesAt} demoNow={DEMO_NOW} />
             <Button size="l" block disabled={restricted}>
               Enter round
@@ -95,9 +107,24 @@ export function ShellPreview({
         </section>
         {auth === 'member' && (
           <section className="grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-4">
-            <BalanceCard type="available" amount={DEMO_BALANCES.available} total={DEMO_BALANCES.total} demo />
-            <BalanceCard type="locked" amount={DEMO_BALANCES.locked} total={DEMO_BALANCES.total} demo />
-            <BalanceCard type="pending" amount={DEMO_BALANCES.pending} total={DEMO_BALANCES.total} demo />
+            <BalanceCard
+              type="available"
+              amount={DEMO_BALANCES.available}
+              total={DEMO_BALANCES.total}
+              demo
+            />
+            <BalanceCard
+              type="locked"
+              amount={DEMO_BALANCES.locked}
+              total={DEMO_BALANCES.total}
+              demo
+            />
+            <BalanceCard
+              type="pending"
+              amount={DEMO_BALANCES.pending}
+              total={DEMO_BALANCES.total}
+              demo
+            />
             <BalanceCard type="owed" amount={DEMO_BALANCES.owed} total={DEMO_BALANCES.total} demo />
           </section>
         )}

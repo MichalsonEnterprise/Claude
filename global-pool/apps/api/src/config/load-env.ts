@@ -8,7 +8,8 @@ export function findApiRoot(start = __dirname): string {
     const pkg = resolve(dir, 'package.json');
     if (existsSync(pkg)) {
       try {
-        if ((JSON.parse(readFileSync(pkg, 'utf8')) as { name?: string }).name === '@gp/api') return dir;
+        if ((JSON.parse(readFileSync(pkg, 'utf8')) as { name?: string }).name === '@gp/api')
+          return dir;
       } catch {
         // keep walking
       }

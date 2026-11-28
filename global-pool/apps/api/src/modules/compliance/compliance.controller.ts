@@ -11,7 +11,9 @@ export class ComplianceController {
   constructor(private readonly geo: GeoService) {}
 
   @Get('region')
-  @ApiOperation({ summary: 'Is the platform available from the current location? (no bypass hints, by design)' })
+  @ApiOperation({
+    summary: 'Is the platform available from the current location? (no bypass hints, by design)',
+  })
   async region(@Req() req: GpRequest) {
     const check = await this.geo.checkRequest(req);
     return { ...check, minAge: MIN_AGE };

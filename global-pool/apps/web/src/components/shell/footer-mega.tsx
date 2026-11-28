@@ -90,10 +90,13 @@ function LinkColumn({ col }: { col: FooterColumn }) {
       {/* ≥768: open column */}
       <div className="hidden flex-col gap-3 tablet:flex">
         <h2 className="text-label-m text-text-primary">{col.title}</h2>
-        <ul className="flex flex-col gap-2.5">
+        <ul className="flex flex-col gap-3">
           {col.links.map((l) => (
             <li key={l.label}>
-              <Link href={l.href} className="text-body-s text-text-secondary hover:text-text-primary">
+              <Link
+                href={l.href}
+                className="text-body-s text-text-secondary hover:text-text-primary"
+              >
                 {l.label}
               </Link>
             </li>
@@ -104,7 +107,10 @@ function LinkColumn({ col }: { col: FooterColumn }) {
       <details className="group border-b border-border-subtle tablet:hidden">
         <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between text-label-m text-text-primary [&::-webkit-details-marker]:hidden">
           {col.title}
-          <ChevronDown aria-hidden className="size-4 text-icon-muted transition-transform group-open:rotate-180" />
+          <ChevronDown
+            aria-hidden
+            className="size-4 text-icon-muted transition-transform group-open:rotate-180"
+          />
         </summary>
         <ul className="flex flex-col pb-3">
           {col.links.map((l) => (
@@ -136,21 +142,26 @@ function TrustPill({ icon, children }: { icon: React.ReactNode; children: React.
 export function FooterMega({ className }: { className?: string }) {
   return (
     <footer
-      className={cn('border-t border-border-subtle bg-bg-secondary px-4 pt-10 pb-8 tablet:px-6 laptop:px-8', className)}
+      className={cn(
+        'border-t border-border-subtle bg-bg-secondary px-4 pt-10 pb-8 tablet:px-6 laptop:px-8',
+        className,
+      )}
     >
       <div className="mx-auto flex w-full max-w-desktop flex-col gap-10">
         <div className="grid gap-8 laptop:grid-cols-[minmax(0,1fr)_400px] laptop:gap-16">
           <div className="flex flex-col gap-4">
-            <Logo height={34} />
+            <Logo height={40} />
             <p className="max-w-[660px] text-body-s text-text-secondary">
-              GLOBAL POOL is a verifiable global jackpot and crypto gaming platform. One shared pool runs in rounds with
-              published rules, and every draw is settled on-chain with Chainlink VRF on Arbitrum — entries, fees and
-              payouts can be checked against the contract. GLOBAL POOL Originals publish their house edge and use
-              provably fair seeds you can verify after every round.
+              GLOBAL POOL is a verifiable global jackpot and crypto gaming platform. One shared pool
+              runs in rounds with published rules, and every draw is settled on-chain with Chainlink
+              VRF on Arbitrum — entries, fees and payouts can be checked against the contract.
+              GLOBAL POOL Originals (Orbit Rush, Pool Dice, Double Side, Pool Roulette, Twenty-One
+              and more) publish their house edge and use provably fair seeds you can verify after
+              every round.
             </p>
             <p className="max-w-[660px] text-body-s text-text-secondary">
-              Entries cost 10.00 USDT plus a 0.05 USDT platform fee per qualifying entry; platform fees are never added
-              to the pool. Play only with money you can afford to lose.
+              Entries cost 10.00 USDT plus a 0.05 USDT platform fee per qualifying entry; platform
+              fees are never added to the pool. Play only with money you can afford to lose.
             </p>
           </div>
           <div className="flex flex-col gap-3">
@@ -165,8 +176,8 @@ export function FooterMega({ className }: { className?: string }) {
               </a>
             </p>
             <p className="text-body-s text-text-secondary">
-              Found a vulnerability? Security reports only — we follow coordinated disclosure and never ask for your keys
-              or seed phrase.
+              Found a vulnerability? Security reports only — we follow coordinated disclosure and
+              never ask for your keys or seed phrase.
             </p>
             <p className="flex items-center gap-2 text-body-s text-text-secondary">
               <Mail aria-hidden className="size-4 text-icon-muted" /> Security:
@@ -180,8 +191,12 @@ export function FooterMega({ className }: { className?: string }) {
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-overline uppercase text-text-tertiary">Trust &amp; fairness</span>
           <TrustPill icon={<Link2 aria-hidden />}>Chainlink VRF · Arbitrum</TrustPill>
-          <TrustPill icon={<Box aria-hidden />}>Smart contracts audited — DEMO placeholder</TrustPill>
-          <TrustPill icon={<Landmark aria-hidden />}>Licensed operator — DEMO placeholder</TrustPill>
+          <TrustPill icon={<Box aria-hidden />}>
+            Smart contracts audited — DEMO placeholder
+          </TrustPill>
+          <TrustPill icon={<Landmark aria-hidden />}>
+            Licensed operator — DEMO placeholder
+          </TrustPill>
         </div>
 
         <section aria-labelledby="footer-rg" className="flex flex-col gap-3">
@@ -189,7 +204,8 @@ export function FooterMega({ className }: { className?: string }) {
             <AgeBadge /> Responsible gaming
           </h2>
           <p className="text-body-s text-text-secondary">
-            Gambling can be harmful. Set deposit, loss and session limits, take a break or self-exclude at any time from{' '}
+            Gambling can be harmful. Set deposit, loss and session limits, take a break or
+            self-exclude at any time from{' '}
             <Link href={ROUTES.responsibleGaming} className="text-text-brand hover:underline">
               Responsible gaming
             </Link>{' '}
@@ -213,7 +229,7 @@ export function FooterMega({ className }: { className?: string }) {
           </ul>
         </section>
 
-        <div className="grid border-t border-border-subtle pt-8 tablet:grid-cols-3 tablet:gap-8 laptop:grid-cols-6">
+        <div className="grid border-t border-border-subtle pt-8 tablet:grid-cols-3 tablet:gap-8 laptop:grid-cols-6 laptop:gap-x-0">
           {COLUMNS.map((col) => (
             <LinkColumn key={col.title} col={col} />
           ))}
@@ -241,7 +257,10 @@ export function FooterMega({ className }: { className?: string }) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="text-overline uppercase text-text-tertiary">Supported networks</span>
             {CHAIN_DISPLAY_ORDER.map((key) => (
-              <span key={key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+              <span
+                key={key}
+                className="inline-flex items-center gap-1.5 text-caption text-text-secondary"
+              >
                 <ChainMark chain={key} size={18} />
                 {CHAINS[key].name}
                 {!CHAINS[key].enabled && <span className="text-text-tertiary">(soon)</span>}
@@ -256,15 +275,17 @@ export function FooterMega({ className }: { className?: string }) {
 
         <div className="flex flex-col gap-4 border-t border-border-subtle pt-6">
           <p className="text-caption text-text-tertiary">
-            Licence &amp; jurisdiction. GLOBAL POOL is operated by [Operator Ltd — DEMO placeholder] under gaming licence
-            [No. 0000/DEMO — placeholder] issued by [Regulator — DEMO placeholder]. Real-money games and Global Pool
-            participation are offered only in permitted jurisdictions and only to people aged 18 or over (or the higher
-            legal age where you live). Access from restricted countries is blocked — see Restricted countries. Outcomes
-            are determined by verifiable randomness and you can lose your stake.
+            Licence &amp; jurisdiction. GLOBAL POOL is operated by [Operator Ltd — DEMO placeholder]
+            under gaming licence [No. 0000/DEMO — placeholder] issued by [Regulator — DEMO
+            placeholder]. Real-money games and Global Pool participation are offered only in
+            permitted jurisdictions and only to people aged 18 or over (or the higher legal age
+            where you live). Access from restricted countries is blocked — see Restricted countries.
+            Outcomes are determined by verifiable randomness and you can lose your stake.
           </p>
           <DemoBadge size="s" className="w-fit" />
           <p className="flex items-center gap-3 text-caption text-text-tertiary">
-            <AgeBadge /> © 2026 GLOBAL POOL. All rights reserved. DEMO / testnet build — no real money.
+            <AgeBadge /> © 2026 GLOBAL POOL. All rights reserved. DEMO / testnet build — no real
+            money.
           </p>
         </div>
       </div>

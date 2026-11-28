@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { RandomnessRequest, Round } from '@prisma/client';
-import type { Address } from 'viem';
 
+import { toJson } from '../../common/money';
 import { AppConfig } from '../../config/app-config';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
@@ -22,11 +22,12 @@ export class RandomnessService {
     if (config.env.RANDOMNESS_PROVIDER === 'chainlink') {
       this.provider = new ChainlinkVrfProvider({
         client: blockchain.client('arbitrum'),
-        poolContract: (config.env.POOL_CONTRACT_ADDRESS as Address | undefined) ?? null,
+        poolContract: config.env.POOL_CONTRACT_ADDRESS ?? null,
         requestConfirmations: config.env.VRF_REQUEST_CONFIRMATIONS,
       });
     } else {
-      if (config.isProduction) throw new Error('RANDOMNESS_PROVIDER=mock is not allowed in production');
+      if (config.isProduction)
+        throw new Error('RANDOMNESS_PROVIDER=mock is not allowed in production');
       this.provider = new MockVrfProvider();
     }
   }
@@ -59,7 +60,7 @@ export class RandomnessService {
         network: res.network,
         requestTxHash: res.requestTxHash,
         requestedAt: new Date(),
-        metadata: (res.metadata ?? {}) as object,
+        metadata: toJson(res.metadata),
         isDemo: round.isDemo,
       },
     });

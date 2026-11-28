@@ -123,7 +123,13 @@ export interface LogoProps extends Omit<React.ComponentProps<'svg'>, 'children'>
   title?: string;
 }
 
-export function Logo({ variant = 'full', height, title = 'GLOBAL POOL', className, ...props }: LogoProps) {
+export function Logo({
+  variant = 'full',
+  height,
+  title = 'GLOBAL POOL',
+  className,
+  ...props
+}: LogoProps) {
   const decorative = title === '';
   const a11y = decorative
     ? ({ 'aria-hidden': true } as const)

@@ -10,7 +10,12 @@ import { AppConfig } from '../../config/app-config';
 export interface PrivyLinkedAccounts {
   email: string | null;
   emailVerified: boolean;
-  wallets: { address: string; chainType: 'ethereum' | 'solana'; walletClient: string | null; embedded: boolean }[];
+  wallets: {
+    address: string;
+    chainType: 'ethereum' | 'solana';
+    walletClient: string | null;
+    embedded: boolean;
+  }[];
 }
 
 export interface VerifiedPrivyToken {
@@ -58,7 +63,9 @@ export class PrivyService {
         'Player auth is DISABLED: PRIVY_APP_ID is not set (or PRIVY_MOCK=true) and the DEV MOCK is refused in production.',
       );
     } else if (mode === 'mock') {
-      this.logger.warn('Player auth runs in DEV MOCK mode (locally signed tokens) — never use in production.');
+      this.logger.warn(
+        'Player auth runs in DEV MOCK mode (locally signed tokens) — never use in production.',
+      );
     }
   }
 
@@ -115,7 +122,8 @@ export class PrivyService {
     sessionId?: string;
     ttlSeconds?: number;
   }): Promise<{ token: string; did: string; sessionId: string; expiresAt: string }> {
-    if (this.mode !== 'mock') throw new AppError('FORBIDDEN', 'Mock tokens are only available in DEV MOCK mode');
+    if (this.mode !== 'mock')
+      throw new AppError('FORBIDDEN', 'Mock tokens are only available in DEV MOCK mode');
     const did = input.did ?? `did:privy:mock-${randomUUID()}`;
     const sessionId = input.sessionId ?? `mock-sid-${randomUUID()}`;
     const ttl = input.ttlSeconds ?? 3600;
@@ -160,7 +168,11 @@ export class PrivyService {
       mockLinked: {
         email: claims.email ?? null,
         emailVerified: Boolean(claims.email),
-        wallets: (claims.wallets ?? []).map((w) => ({ ...w, walletClient: 'mock', embedded: false })),
+        wallets: (claims.wallets ?? []).map((w) => ({
+          ...w,
+          walletClient: 'mock',
+          embedded: false,
+        })),
       },
     };
   }
@@ -188,7 +200,10 @@ export class PrivyService {
     if (!this.client) {
       const { PRIVY_APP_ID, PRIVY_APP_SECRET } = this.config.env;
       if (!PRIVY_APP_ID || !PRIVY_APP_SECRET) {
-        throw new AppError('SERVICE_UNAVAILABLE', 'Privy is not configured (PRIVY_APP_ID / PRIVY_APP_SECRET)');
+        throw new AppError(
+          'SERVICE_UNAVAILABLE',
+          'Privy is not configured (PRIVY_APP_ID / PRIVY_APP_SECRET)',
+        );
       }
       this.client = new PrivyClient(PRIVY_APP_ID, PRIVY_APP_SECRET);
     }

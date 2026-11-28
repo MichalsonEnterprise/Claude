@@ -1,0 +1,313 @@
+{
+  "summary": "GLOBAL POOL code foundation: shared/tokens packages, Next.js design system + shell + homepage, NestJS API core with Prisma schema, auth, ledger, pool, admin",
+  "agentCount": 4,
+  "logs": [],
+  "result": {
+    "shared": {
+      "report": "Shared packages and repo tooling are done. Typecheck, lint, test (tokens 82 tests, shared 56) and build pass for both packages. Workspace-wide typecheck and lint also pass, including @gp/contracts. Nothing is committed.\n\nFOR WEB/API AGENTS:\n- dist/ is git-ignored. Run 'pnpm build:packages' (builds only tokens and shared) after install, or whenever you change them. Install with 'flock /tmp/gp-pnpm.lock pnpm install'.\n- Pinned versions: TypeScript ~5.9.3 (typescript-eslint does not support TS 7), ESLint ^9.39.5 (eslint-config-next@15 does not accept ESLint 10), zod ^4.6.7 (zod 4 API: { error }, z.uuid(), z.iso.datetime()), vitest ^4.1.12, tsup ^8.5.1, decimal.js ^10.6, viem ^2.58.\n- ESLint, per package: import { createConfig } from '../../eslint.config.mjs'; export default createConfig({ tsconfigRootDir: import.meta.dirname, typeChecked: true, extra: [...] }). Root also has prettier.config.mjs and tsconfig.base.json (strict, noUncheckedIndexedAccess, Bundler resolution); Nest can override module settings.\n- Web CSS imports, in this order: @import 'tailwindcss'; then '@gp/tokens/tokens.css', '@gp/tokens/theme.css', '@gp/tokens/text-styles.css'.\n- theme.css removes Tailwind's default palette, so bg-white and bg-slate-500 do not exist. Use token classes: bg-bg-base, bg-surface-default/raised, text-text-primary/secondary/tertiary, border-border-default, bg-brand with text-text-on-primary, text-gold, bg-status-*-tint, text-balance-*, rounded-xs..2xl (rounded-lg = 14px), p-4 (spacing base 4px), w-sidebar, h-topbar, max-w-desktop, shadow-elevation-1..4, shadow-focus-ring, ease-standard, bg-gradient-gold-jackpot, text-h1 / text-number-m, and breakpoints tablet: / laptop: / desktop:.\n- shadcn slots (background, foreground, primary, muted, accent, destructive, border, input, ring, card, popover) are already mapped to tokens.\n- Fonts: override --gp-font-sans / --gp-font-mono on :root (for example with next/font variables). Defaults are 'Inter Variable' and 'Geist Mono'.\n- @gp/tokens JS exports: tokens, colors (resolved hex keyed like 'bg-base'), primitiveColors, cssVar().\n- @gp/shared (ESM + CJS + d.ts). Sub-paths: /money /fees /pool /chains /enums /limits /format /schemas /types /demo.\n  - money: parseUSDT, toUSDTString ('351.75'; at least 2 dp, at most 6 dp; throws above 6 dp), formatUSDT ('1,234.50 USDT'; uses the typographic minus U+2212 and truncates by default), add/sub/mul/sum/percentOf, compare/eq/gt, roundDown, toBaseUnits/fromBaseUnits. JS numbers are accepted only as safe integers; decimals must be strings.\n  - fees: entryQuote(n), withdrawalQuote(amount, chain) (also returns meetsMinimum).\n  - pool: prizeBreakdown, ROUND_THRESHOLDS, oddsDisclosure.\n  - chains: CHAINS / ENABLED_CHAINS (only Arbitrum Sepolia 421614 is enabled).\n  - enums: lowercase snake_case values (keep Prisma enums identical), plus WITHDRAWAL_TRANSITIONS, ROLE_PERMISSIONS, PERMISSION_POLICY and LedgerAccountType.\n  - schemas: withdrawalRequestSchema, enterRoundSchema, onboardingSchema (= registerSchema), adminLoginSchema (= loginSchema), verifyEmailSchema, totpChallengeSchema, paginationQuerySchema, transactionsQuerySchema, rgLimitUpdateSchema, selfExclusionSchema, errorEnvelopeSchema, makeErrorEnvelope, ERROR_HTTP_STATUS, zodIssues.\n  - demo: DEMO aggregate plus DEMO_* exports. Every record has isDemo: true. Ids are deterministic UUIDs that start with de0000 (round #1,248 = de000002-0000-4000-8000-000000001248); the seed should reuse them.\n- Dockerfile script contract: apps/api must provide build and start:prod, plus db:migrate:deploy (CI also calls it with if-present). apps/web must provide build and start. API listens on :4000 (/health), web on :3000.",
+      "verified": [
+        "Install (from global-pool): 'flock /tmp/gp-pnpm.lock pnpm install' succeeded, and 'pnpm install --frozen-lockfile' says up to date, so the lockfile matches the manifests.",
+        "@gp/tokens: build, typecheck (tsc with checkJs on the generator), lint (type-aware) and test (82 passed) all pass. The tests check that every semantic token resolves to a valid colour, check the Figma anchor colours, and run the real Tailwind v4.3.5 compiler to confirm the documented classes are generated and the default palette is gone.",
+        "@gp/shared: build (tsup ESM + CJS + d.ts/d.cts, shared chunks), typecheck, lint and test (56 passed) all pass. Tests cover entryQuote(35).total = 351.75, sum of balances = 12,480.50, 18,640 x 0.05 = 932.00 with no float drift, WD-20931 receives 1,499.92, the prize split sums to the pool, address checksum and base58 validation, and isDemo on every DEMO record.",
+        "Consumer check from a scratch project: ESM and CJS imports work at runtime, MoneyError is the same class across sub-path entry points, and TypeScript resolves the packages under bundler, nodenext (CJS and ESM) and node10 with skipLibCheck off.",
+        "ESLint really lints 32 files with type information; a probe file confirmed parseFloat and floating promises are flagged.",
+        "Workspace-wide 'pnpm -r typecheck' and 'pnpm -r lint' pass (tokens, shared, contracts).",
+        "'docker compose config --quiet' says the compose file is valid; all 4 services have healthchecks.",
+        "The CI workflow parses as YAML and its step list is correct. .env.example is not git-ignored; dist/ is."
+      ],
+      "failing": [
+        "Not verified: Docker image builds. There is no Docker daemon here, and apps/api and apps/web do not exist yet, so the Dockerfile targets cannot be built.",
+        "Not verified: the CI workflow against the GitHub Actions schema. Running an npx validator was denied by the permission classifier, so it has only been YAML-parsed.",
+        "Repo-wide 'pnpm format:check' is not clean: Prettier was applied only to my files, not to docs/ or packages/contracts. It is not a CI step."
+      ],
+      "decisions": [
+        "BUSINESS (assumed): RESTRICTED_COUNTRIES placeholder is US,CU,IR,KP,SY. The real restricted list needs a legal decision.",
+        "BUSINESS (assumed): daily withdrawal limit for KYC 'none' is 0.00, meaning KYC Level 1 is required to withdraw. L1 2,000 and L3 100,000 come from the Figma build notes; L2 25,000 is from demo-data.md.",
+        "BUSINESS (assumed): prizes are rounded down to 6 dp and prizeBreakdown returns the leftover dust as 'remainder' (0 for 2-dp pools). Where that dust goes is for the API and the owner to decide.",
+        "Odds: the sheet's 2.44% is an upper bound (35 x 13 / 18,640). The exact chance without replacement is about 2.41%. DEMO_ODDS_EXAMPLE keeps 2.44 for the designs and also carries the exact figure; oddsDisclosure() assumes winners are distinct entries drawn uniformly, so the API's selection algorithm must match it.",
+        "Player auth deviation (Privy owner decision): registerSchema is an alias of onboardingSchema (consents that must be explicitly true, plus country and handle). loginSchema is an alias of adminLoginSchema (email, password, mandatory TOTP in one step). There is no player password.",
+        "Demo data is taken from demo-data.md first. Values it lacks come from design/figma-build/built.json: daily rounds 08:00-20:00 UTC, round #1,245 with 41,200.00 pool and 412 players, WD-20850 = 250.00 on Polygon, the latest-entry feed rows, extra player counts (Pool Roulette 518), and the RG increase effective 28 Nov 2026 21:42 UTC.",
+        "Demo values I made up because no source has them: the times of day for DP-77380 and the WD-20877 request, and the feed timestamps. Where no value exists the field is null (e.g. participants for rounds #1,247/#1,246/#1,244).",
+        "Demo full wallet addresses are obvious zero-padded placeholders built from the truncated forms, so they can never be real wallets. Display the addressDisplay field.",
+        "The current round #1,248 is status open with draw null. The post-close VRF draw and winners are a separate scenario: DEMO_ROUND_1248_SETTLED. DEMO_AS_OF is 2026-11-27T18:44:30Z, but countdowns must use the real clock (today the round already shows as closed).",
+        "Tailwind: the default palette and radius scale are reset, spacing is 4px in px (tokens are px), breakpoints are in rem, and text styles exist both as Tailwind utilities and as plain classes in the components layer so utilities can still override them.",
+        "Chains list testnet ids only (no mainnet chain ids or RPCs). BNB USDT is recorded with 18 decimals.",
+        "One root Dockerfile with api and web targets, so I wrote nothing inside apps/. Compose host ports can be overridden so it can coexist with dev-services.sh.",
+        "Changed outside my packages, as the task required: global-pool/package.json (devDeps and scripts) and pnpm-workspace.yaml (onlyBuiltDependencies: esbuild)."
+      ],
+      "next": [
+        "API: Prisma enums must use exactly the @gp/shared values. Seed from the DEMO data reusing its de0000 UUIDs. Map exceptions through makeErrorEnvelope / ERROR_HTTP_STATUS. Add the db:migrate:deploy and start:prod scripts. Add needed build-script packages (prisma, @prisma/engines, argon2) to onlyBuiltDependencies in pnpm-workspace.yaml.",
+        "Web: import the 3 token CSS files after tailwindcss, set --gp-font-sans / --gp-font-mono from next/font, and use only token classes. Reuse formatUSDT, formatDateTimeUTC and formatCountdown so nothing is formatted with JS floats.",
+        "Owner or legal to confirm: the RESTRICTED_COUNTRIES list, withdrawal limits by KYC level, where prize rounding dust goes, and which odds wording to show (2.44% upper bound or 2.41% exact).",
+        "Move to ESLint 10 once the web app can use an eslint-config-next version that supports it.",
+        "Once a daemon and the apps exist: build the Dockerfile targets, run 'docker compose up', and check the workflow with actionlint."
+      ]
+    },
+    "api": {
+      "report": "I built apps/api (@gp/api), the GLOBAL POOL backend: NestJS 11, Prisma 6, PostgreSQL, Redis/BullMQ, socket.io, with request validation from the @gp/shared zod schemas. Typecheck, lint, test (34 unit + 30 e2e) and build all pass, and the built server boots: /health returns 200 with database and Redis up, /docs serves Swagger UI and /docs-json lists 83 operations. Nothing is committed.\n\nTwo things first. Prisma refused `migrate reset` because it detected an AI agent, and I did not bypass that guard. Instead the e2e setup only runs `migrate deploy`. Separately, I made a shell mistake: one command let the shell run backtick text from a markdown string as commands. I stopped it and checked: nothing ran beyond \"command not found\" errors. .env, the database and the docs were unchanged, and no processes were left running.\n\nWhat is in apps/api:\n- Config: env is validated with zod at boot. The API refuses to start with REAL_MONEY_ENABLED=true, weak secrets or a wrong-size TOTP key.\n- HTTP layer: pino logging with request ids and secret redaction, helmet, CORS, rate limiting, a global filter that returns every error in the shared error envelope, and Swagger.\n- Data model: 46 tables in prisma/schema.prisma. The init migration adds database triggers that block UPDATE/DELETE/TRUNCATE on the ledger, pool_ledger, fee_ledger, audit_logs and withdrawal_events, and reject any posting whose lines do not sum to zero.\n- Seed: prisma/seed.ts runs only with DEMO_MODE=true and checks its own totals before finishing.\n- Modules (24): auth, security (2FA), users, wallet, deposits, withdrawals, transactions, pool, randomness, games, notifications, compliance, kyc, aml, affiliates (stub), admin, audit, reporting, blockchain, feature-flags, platform, health, ledger, idempotency.\n- Background jobs: BullMQ workers for the deposit watcher, withdrawal processing and round settlement; they start only when JOBS_ENABLED=true.\n- WebSocket: namespace /pool sends pool:snapshot on connect, pool:update after each entry purchase, and round:status on lifecycle changes.\n\nKey behaviours:\n- Ledger: append-only double entry. Balances are always computed from the ledger. Locked = funds held for pending withdrawals + the player's stake in rounds not yet settled.\n- Entering a round is one DB transaction with an idempotency key. 35 entries take 351.75 from Available: 350.00 into the round pool (shown as Locked) and 1.75 into fees, never into the pool.\n- Winner selection is a bit-for-bit copy of the contract's DrawMath.deriveWinners/splitPool. Unit tests check it against the Solidity-proven vectors in packages/contracts.\n- GET /pool/rounds/:number/verify returns the random word and recomputes the winners for comparison.\n- No endpoint can set results, pick winners, settle by hand, change balances or edit ledger rows. The e2e tests confirm such paths return 404.\n\nThe DEMO seed reconciles exactly. @nova.k has Available 9,215.30, Locked 1,850.00, Pending 1,000.00, Owed 415.20, total 12,480.50. Round #1,248 is open with 3,412 participants, 18,640 entries, a 186,400.00 pool and 932.00 in fees; @nova.k holds E-1248-00981 to 01015. The ledger sums to 0.00.\n\nCommands run (all pass):\n- `pnpm --filter @gp/api typecheck`, `lint` and `build`\n- `pnpm --filter @gp/api test`: unit 9 files / 34 tests, e2e 3 files / 30 tests against globalpool_test\n- `pnpm install --frozen-lockfile --offline`: the lockfile matches the manifests\n- `prettier --check` on apps/api and the two docs\n- `node dist/src/main.js`, then curl /health, /docs, /docs-json and several player and admin endpoints\n\nEndpoints (full table with auth and descriptions in docs/API.md):\n- Public: /health, /config, /config/chains, /compliance/region, /games, /games/:slug, /auth/config.\n- Pool (public reads): /pool/rounds/current, /pool/rounds, /pool/rounds/:number with /verify and /feed, /pool/winners, /pool/quote.\n- Auth: /auth/session, /auth/onboarding, /auth/logout, /auth/dev/token (DEV MOCK only).\n- 2FA: /auth/2fa (status), enroll, confirm, challenge, backup-codes, disable, /auth/anti-phishing.\n- Users: /me (GET/PATCH), /me/sessions (+ DELETE one), /me/wallets, /me/wallets/whitelist (+ DELETE).\n- Wallet: /wallet/balances, /wallet/lifetime, /wallet/owed/claim.\n- Deposits: /deposits/address, /deposits.\n- Withdrawals: /withdrawals (POST/GET), /withdrawals/quote, /withdrawals/:id, /withdrawals/:id/cancel.\n- Entries: POST /pool/rounds/:roundId/entries, GET /pool/rounds/:roundId/my-entries.\n- Other player routes: /transactions, /transactions/:reference, /responsible-gaming (+ limits, self-exclusion, reality-check, reality-check/ack), /kyc, /kyc/start, /notifications (+ read, read-all), /referrals/me.\n- DEMO only (404 in production): /dev/deposits/simulate, /dev/withdrawals/:id/simulate-confirm, /dev/kyc/approve.\n- Admin auth: /admin/auth/login, refresh, logout, me.\n- Admin: dashboard, users and users/:id, restrictions (apply and lift), withdrawals queue with approve/reject, approvals, audit-logs and audit-logs/verify, ledger/reconciliation, ledger/balances, rounds (read-only), aml/alerts and resolve, feature-flags, affiliates.\n\nFiles outside apps/api, all additive:\n- global-pool/pnpm-workspace.yaml: added @prisma/client, @prisma/engines, prisma, argon2 and @swc/core to onlyBuiltDependencies.\n- pnpm-lock.yaml: updated for the new dependencies.\n- .env.example: appended an \"API extras\" section.\n- docs/API.md and docs/ARCHITECTURE.md: new; ARCHITECTURE.md covers the backend part only.\n- global-pool/.env: created from .env.example (git-ignored).\n- The vitest config renames to .mts are staged in the git index (`git mv`), not committed.\n\nDev credentials are in apps/api/.dev/demo-admins.json and demo-player.json (git-ignored, confirmed). A @nova.k token comes from POST /auth/dev/token with did:privy:demo-nova-k.\n\nNot verified, and known gaps:\n- Real Privy mode: no app id was available, so only the DEV MOCK was tested. @privy-io/server-auth is deprecated upstream in favour of @privy-io/node; I used it per the owner decision.\n- The deposit watcher was never run against a real RPC with test-USDT; only its \"skip when unconfigured\" path ran. It has no reorg handling.\n- ChainlinkVrfProvider was not tested against a deployed GlobalPoolRounds.\n- The API does not yet write to the contract (openRound, commitEntries, recordSettlement), and entries do not store the per-entry salts the contract's Merkle tree needs.\n- No withdrawal signer is wired: queued withdrawals wait; the DEMO endpoint simulates the confirmation.\n- Docker images were not built (no Docker daemon). Prisma on node:22-bookworm-slim probably needs openssl installed.\n- docker-compose sets NODE_ENV=production, where the DEV MOCK is refused, so player sign-in is disabled there unless a Privy app id is set.\n- Not built yet: game session endpoints, email sending, referral accrual, enforcement of the session-time RG limit, OpenAPI response schemas, a Redis-backed throttler and socket.io adapter for multiple replicas.\n- The e2e suite never truncates the test DB, so it grows with every run.\n- In the dev database I deleted two rows that my own boot test had created a few minutes earlier (an empty auto-scheduled round #1 and its ledger account) so the seed could run. No other data was touched.\n\nFacts worth remembering, both learned this session: Prisma 6 blocks `migrate reset` for AI agents unless the user gives explicit consent, so agents should use `migrate deploy` with unique test data. The DEMO seed writes its dev credentials to apps/api/.dev/.",
+      "verified": [
+        "pnpm --filter @gp/api typecheck: exit 0",
+        "pnpm --filter @gp/api lint (type-aware ESLint): exit 0",
+        "pnpm --filter @gp/api test: 9 unit files / 34 tests and 3 e2e files / 30 tests pass against globalpool_test (migrations applied with migrate deploy)",
+        "pnpm --filter @gp/api build: exit 0; dist/src/main.js and dist/prisma/seed.js produced",
+        "flock /tmp/gp-pnpm.lock pnpm install --frozen-lockfile --offline succeeds (lockfile matches the manifests)",
+        "prettier --check apps/api docs/API.md docs/ARCHITECTURE.md: clean",
+        "Built API on :4000: /health returns 200 with database and Redis up; /docs returns HTML; /docs-json is OpenAPI 3.0.0 with 83 operations; no error-level log lines",
+        "DEMO seed on the dev DB: @nova.k Available 9215.30 / Locked 1850.00 / Pending 1000.00 / Owed 415.20 / Total 12480.50; round #1,248 open with 3412 participants, 18640 entries, pool 186400.00, fees 932.00; ledger total 0.00, no unbalanced postings",
+        "Live API as @nova.k: /me, balance breakdown, my entries E-1248-00981 to 01015 with odds 2.44% (approx) / 0.188% (1st), feed order juno88, atlas_q, Hidden, pixelfox, tidewalker, and transaction history all match demo-data.md",
+        "Admin smoke with seeded credentials: S. Iyer login with TOTP; dashboard KPIs come from the ledger; WD-20931 sits in the review queue needing two approvers; audit chain verifies ok; POST /admin/rounds/1248/winner returns 404",
+        "E2E: dev-mock token, session upsert and onboarding consents, then /me; a false consent gives 400, US residence gives 451, gaming routes before onboarding give 403",
+        "E2E: DEMO deposit credits Available and replays idempotently; 35 entries give Available -351.75, Locked +350.00, FEES +1.75, pool 350.00; replay returns the identical body; same key with another body gives 409; overspend gives 422 INSUFFICIENT_FUNDS with no partial writes",
+        "E2E: RG participation limit gives 422 with remaining 48.25; a limit increase stays pending; self-exclusion blocks entries but not withdrawals",
+        "E2E: withdrawal checks run in order (KYC_REQUIRED, then STEP_UP_REQUIRED, then wrong code rejected); with a valid TOTP the request is under_review, Locked +100, timeline requested, risk_check, under_review; idempotent replay",
+        "E2E: admin login requires TOTP; one generic error message; lockout after 5 failures; refresh rotation revokes the whole family on reuse; a player token is rejected on admin routes",
+        "E2E: a restriction needs permission, reason and MFA and writes a hash-chained audit row; the chain verifies; UPDATE on audit_logs and ledger rows is rejected by the database",
+        "E2E: four-eyes (same admin twice gives 403, a second admin queues the withdrawal); DEMO confirmation settles the ledger; reject returns the funds and is audited",
+        "E2E: round settles from mock VRF with 13 distinct winners whose prizes sum to the pool; owed credited; verify endpoint recomputation matches; settling twice is impossible; threshold miss cancels with stakes (not fees) refunded to Owed; owed claim is idempotent; closed round gives 409 ROUND_NOT_OPEN",
+        "E2E: WebSocket /pool sends pool:snapshot on connect and pool:update (5 entries, 50.00 pool, 0.25 fees) after a purchase",
+        "E2E: six result-altering or ledger-editing admin paths all return 404",
+        "Unit: winner selection matches every Solidity-proven vector in packages/contracts/test/fixtures/round-1248.json, including the 18,640-entry draw and its prize amounts"
+      ],
+      "failing": [
+        "Not run: real Privy verification (no PRIVY_APP_ID); only the DEV MOCK path is tested",
+        "Not run: deposit watcher against a real Arbitrum Sepolia RPC with test-USDT (only the skip path ran); no reorg handling",
+        "Not run: ChainlinkVrfProvider against a deployed GlobalPoolRounds contract",
+        "Not built: on-chain mirroring writes (openRound, commitEntries, recordSettlement) and per-entry commitment salts",
+        "Not built: withdrawal broadcast (no testnet signer); queued withdrawals wait, DEMO simulate-confirm only",
+        "Not run: Docker image build (no daemon); Prisma on node:22-bookworm-slim probably needs openssl",
+        "Not run: prisma migrate reset (blocked for AI agents; needs explicit user consent). The e2e suite uses migrate deploy and never truncates, so the test DB grows each run",
+        "Gap: docker-compose runs NODE_ENV=production, where the DEV MOCK is refused, so player sign-in is disabled there without a Privy app id",
+        "Stubs or not built: referral accrual, game session endpoints, email delivery, session-time RG enforcement, OpenAPI response schemas, multi-replica throttler / socket.io Redis adapter"
+      ],
+      "decisions": [
+        "Business assumption: platform fees are not refunded when a round is cancelled; only stakes go to Owed (matches demo-data: 300.00 refund for 30 entries)",
+        "Business assumption: prizes are credited to Owed at settlement and claimed to Available (POST /wallet/owed/claim claims everything owed at once)",
+        "Business assumption: a withdrawal to a non-whitelisted or first-time destination goes to under_review with four-eyes approval; 10,000 USDT and above also goes to review; the DEMO sanctions list auto-rejects",
+        "Business assumption: KYC level none means no withdrawals (DAILY_WITHDRAWAL_LIMIT none = 0); the KYC check runs before step-up so no 2FA code is wasted",
+        "Business assumption: withdrawals stay allowed while self-excluded or abroad (no obstruction); only an admin withdrawals_frozen restriction blocks them",
+        "Business assumption: on-chain deposits below the minimum or over an RG deposit limit are still credited (they are the player's funds); limits are enforced on the DEMO simulation only",
+        "Prize dust goes to the 1st prize, matching contract DrawMath.splitPool (the @gp/shared prizeBreakdown instead leaves a remainder; identical for 2-decimal pools); when a round has fewer entries than prizes, the 1st prize absorbs the undrawn shares",
+        "Locked balance = USER_LOCKED account + the player's attributed stake lines in POOL accounts of open, closed or drawing rounds",
+        "DEMO rounds close at their real time but are not drawn unless DEMO_ROUNDS_AUTO_SETTLE=true, so the DEMO balances stay stable",
+        "The DEMO seed shifts all demo dates by whole days so round #1,248 closes at the next 20:00 UTC; DEMO_SEED_SHIFT_DAYS=0 keeps the exact snapshot",
+        "DEMO history before 1 Nov is one honestly labelled demo_opening_balance posting; rounds #1,244-#1,247 are seeded as snapshots with only their listed winners; the round #1,248 crowd is generated DEMO players",
+        "Player sessions are Privy sessions tracked by sid (revocable); no player JWT is issued; JWT_ACCESS_SECRET signs single-use step-up tokens",
+        "Admin MFA is TOTP only (no backup codes); a locked admin account returns 403 with lockedUntil; geo check fails closed in production when the country is unknown",
+        "The DEV MOCK is refused in production (per .env.example), which disables player sign-in in docker-compose unless a Privy app id is set",
+        "Used @privy-io/server-auth per the owner decision even though it is deprecated upstream in favour of @privy-io/node",
+        "Implemented the selection algorithm inside the API (viem) instead of depending on @gp/contracts, whose build needs Foundry; tests cross-check it against the contracts fixture when present",
+        "Did not bypass Prisma's AI-agent guard on migrate reset; deleted only two rows my own boot test had created in the dev DB (empty round #1 and its ledger account) so the seed could run",
+        "Test runner is vitest with unplugin-swc (needed for Nest decorator metadata), matching the shared packages; vitest configs renamed to .mts (rename staged in the git index, not committed)"
+      ],
+      "next": [
+        "Wire the API to the contract: a keeper job with a testnet operator key for openRound / commitEntries (entry Merkle tree with per-entry salts stored on entries) / requestDraw / recordSettlement, then switch RANDOMNESS_PROVIDER=chainlink and test against the deployed GlobalPoolRounds",
+        "Add a testnet withdrawal signer (throwaway key, test-USDT transfer via viem), confirmation tracking and failure handling; add a treasury sweep for deposit addresses",
+        "Deploy test-USDT, set ARBITRUM_SEPOLIA_RPC_URL / TEST_USDT_ADDRESS_ARBITRUM_SEPOLIA / DEPOSIT_XPUB, run the deposit watcher live and add reorg handling",
+        "Dockerfile: install openssl in the base image for Prisma and test docker compose up; decide how player auth should work in the compose DEMO stack (a Privy app id, or NODE_ENV=development)",
+        "Web integration: point the frontend at /auth/session, /auth/onboarding, /wallet/balances, /pool/rounds/current, POST /pool/rounds/:id/entries and socket.io /pool; dev login via POST /auth/dev/token with did:privy:demo-nova-k",
+        "Real Privy app: set PRIVY_APP_ID / PRIVY_APP_SECRET / PRIVY_VERIFICATION_KEY and test the verification and linked-account sync path",
+        "Add OpenAPI response schemas, a Redis throttler store and the socket.io Redis adapter for multi-replica deployment; consider a separate worker process (JOBS_ENABLED split)",
+        "Build the remaining pieces: game sessions (commit-reveal simulation), referral commission accrual, email delivery with the anti-phishing code, admin KYC review, rounds.schedule with MFA, session-time RG enforcement",
+        "Ask the user whether a destructive reset of globalpool_test (db:migrate:test) may be run periodically, since agents cannot run migrate reset without consent"
+      ]
+    },
+    "web": {
+      "ds": {
+        "report": "The apps/web foundation (@gp/web) is built and verified. Typecheck, lint and tests (16) pass, the build has no warnings, and the Playwright screenshots at 1440 and 390 show no horizontal overflow and no console errors. Nothing is committed. I stopped the dev server, so port 3000 is free.\n\nWHAT EXISTS (all under /home/user/Claude/global-pool/apps/web, plus /home/user/Claude/global-pool/docs/WEB_COMPONENTS.md)\n- Stack: Next 15.5.29 App Router, React 19.3, TypeScript strict (shared tsconfig.base), Tailwind v4 via @tailwindcss/postcss. Imports order: tailwindcss, then @gp/tokens tokens.css, theme.css, text-styles.css, then tw-animate-css. Also TanStack Query, react-hook-form + @hookform/resolvers + zod 4, lucide-react, Radix via the `radix-ui` package, sonner, clsx + tailwind-merge (token-aware `cn`) and cva.\n- Fonts work offline: @fontsource-variable/inter and geist (Geist Mono).\n- Config files: next.config.ts, eslint.config.mjs (shared createConfig plus Next core-web-vitals, react-hooks and jsx-a11y), postcss.config.mjs, vitest.config.ts, components.json (shadcn). Scripts: dev, build, start, typecheck, lint, test, visual.\n- shadcn: the CLI was reachable (`pnpm dlx shadcn@4.23.1 add …`, run under flock). Its generated components were then restyled with the GP tokens. The CLI also installed two packages we don't want (`cn`, `next-themes`); I removed both.\n- Auth (src/lib/auth):\n  - `useAuth()` returns { mode, status, user, signIn, signUp, signOut, getAccessToken }.\n  - Privy is used when NEXT_PUBLIC_PRIVY_APP_ID is set and NEXT_PUBLIC_PRIVY_MOCK is not 'true'. It loads only in that case, offers email, Google, Apple and wallet login, and is set to Arbitrum Sepolia.\n  - Otherwise a DEV MOCK dialog runs (email, then any 6-digit code, or wallet) and signs you in as the DEMO user @nova.k.\n- Components:\n  - src/components/ui: the full primitive set from the brief.\n  - src/components/brand: Logo / LogoMark as inline SVG, ChainMark / TokenMark, and GameArt for 10 original games.\n  - src/components/domain: Amount, StatCard, BalanceCard, NetworkPill, AddressChip, AmountInput, AddressInput, NetworkSelect, Countdown, JackpotMeter, GameTile.\n  - src/components/shell: nav-config, Sidebar (also exports SidebarNav, SidebarPromoTiles), Topbar, MobileTopbar, MobileTabBar, MobileDrawer, FooterMega, AppShell / AppShellFrame.\n- Routes:\n  - `app/(app)/layout.tsx` wraps pages in the shell. `(app)/page.tsx` is a placeholder lobby for the homepage agent to replace.\n  - `app/(auth)/layout.tsx` is a focused layout with no shell.\n  - `/design-system` is the kitchen sink: every component and state on DEMO data.\n  - `/design-system/shell?auth=guest|member&state=default|wrong-network|restricted` is a live responsive shell.\n- Responsive shell: 240px sidebar from 1280px (the burger collapses it to 72px and the choice is remembered), 72px rail from 1024 to 1279px (rail tooltips), drawer below 1024px, and mobile top bar 56 + tab bar 56 below 768px.\n- Accessibility: skip link, landmarks, aria labels, 44px touch targets on mobile.\n\nTESTS AND QA\n- Tests: test/logic.test.ts and test/components.test.tsx (server-rendered checks of money formatting, DEMO markers, status badges, button loading, game tile disclosure and restricted state, logo).\n- QA script: scripts/visual-qa.mjs, run with `pnpm --filter @gp/web visual` (server must be running). Screenshots are in /home/user/Claude/global-pool/apps/web/test-results/visual/ (17 PNGs, git-ignored).\n\nVISUAL DEFECTS FOUND AND FIXED\n- Sidebar item spacing (now 36px rows like Figma) and the sidebar footer being cut off below the fold.\n- JackpotMeter overflowing its plaque on narrow cards (now sized to its container) and collapsing inside shrink-to-fit parents.\n- Countdown showed \"UTC UTC\" and digits were not vertically centred.\n- Game tile titles/subtitles truncating, and the restricted-tile text overlapping the title.\n- Logo dollar signs too small.\n- Loading buttons looked disabled (they now keep their colour while disabled).\n- Amount \"USDT\" unit too large.\n- Field label rows squeezing.\n- Footer community icons overflowing.\n- Kitchen-sink grids not stretching.\n- The DEMO bar is now pinned at the top and the sticky top bar and sidebar sit below it.\n\nREMAINING DIFFERENCES FROM THE REFERENCE RENDER\n- Game art is original simplified SVG, not the Figma tile art.\n- Sidebar and menu icons are lucide approximations.\n- The logo dollar wave is approximated.\n- The top-bar search is about 60px left of the Figma position.\n- Countdown boxes stretch to their container.\n- The lobby page is a placeholder.",
+        "verified": [
+          "Install: `flock /tmp/gp-pnpm.lock pnpm install` (plus `pnpm --filter @gp/web add viem@^2.58.8` and `add -D vitest@^4.1.12`, both under flock) succeeded.",
+          "`pnpm --filter @gp/web typecheck` (tsc --noEmit, strict) passes: exit 0.",
+          "`pnpm --filter @gp/web lint` (type-aware, plus next core-web-vitals, react-hooks and jsx-a11y) passes: 0 problems.",
+          "`pnpm --filter @gp/web test` (vitest run) passes: 2 files, 16 tests.",
+          "`pnpm --filter @gp/web build` (next build) passes with 0 warnings. Routes: / static, /_not-found, /design-system static, /design-system/shell dynamic. First-load JS 139 kB for / and 311 kB for /design-system.",
+          "Prettier --check passes for apps/web/** and docs/WEB_COMPONENTS.md.",
+          "A build with Privy enabled (NEXT_PUBLIC_PRIVY_APP_ID=dummy, NEXT_PUBLIC_PRIVY_MOCK=false) succeeds. At runtime with that dummy id the shell renders with no page errors; auth stays in its loading skeleton because Privy cannot initialise without a real app id.",
+          "`pnpm --filter @gp/web start` plus scripts/visual-qa.mjs produced 15 screenshots (design-system at 1440 and 390 full page; shell guest/member at 1440, 1180 rail, 900 drawer top bar and 390; wrong network; restricted; drawer open at 390; lobby at 1440 and 390). No horizontal overflow and no console errors (404 prefetches of routes not built yet are listed separately). Two more screenshots come from ad-hoc flow checks (flow-mock-signed-in_1440, privy-mode-smoke_1440).",
+          "Playwright flow checks: an invalid email shows a zod error; email then code signs in, shows the member balance pill (9,215.30 USDT, DEMO) and stores gp.devMockSession; Log out from the avatar menu returns to guest; at 1440 the burger collapses the sidebar 240→72 and the rail tooltip shows 'Winners'; at 1180 the burger expands the rail 72→240; at 900 the burger opens the drawer dialog; JackpotMeter '+35 entries' updates the value to 186,750.00 USDT; the first Tab stop is 'Skip to content'.",
+          "I inspected the screenshots myself and compared them with design/reference/home/PUB-01 parts 1, 2 and 6 and with brand_logo.png. Shell layout, sidebar groups, top bar guest and member, DEMO bar, logo and footer structure match closely."
+        ],
+        "failing": [
+          "None of the required checks fail.",
+          "Not verified: the real Privy login against a real app id (none configured, and no network access to Privy). With an invalid or unreachable app id, auth stays 'loading' (skeleton buttons) indefinitely; there is no timeout fallback yet.",
+          "Known gap: Privy's hosted modal is only themed by colour (accent, background). Custom GLOBAL POOL email → 6-digit-code screens (≈ AUTH-04) need Privy's headless hooks (useLoginWithEmail etc.) and are not built. The DEV MOCK dialog shows the target look.",
+          "Known gap: player onboarding (unchecked consents, country) is not built. The (auth) route group has a layout only.",
+          "Known gap: the mock getAccessToken() returns an UNSIGNED 'dev-mock.<base64url>' placeholder. The API agent must define the dev-token exchange (PRIVY_MOCK_SIGNING_SECRET stays server-side).",
+          "Known gap: member data in the shell (balance 9,215.30, notifications 3, 35 entries) comes from DEMO_SHELL_MEMBER, not the API. Wrong-network and restricted states are props only; there is no detection logic.",
+          "Known gap: none of the nav routes exist yet, so every link except / and /design-system 404s. Search is UI only (no results page or command palette). In the language menu only English is selectable; the region is a static 'Portugal (permitted)'.",
+          "Known gap: /design-system and /design-system/shell are reachable in production builds (noindex only). Consider gating them.",
+          "Housekeeping: an orchestrator snapshot commit included apps/web/tsconfig.tsbuildinfo (1 MB). I removed `incremental`, deleted the file and added apps/web/.gitignore (*.tsbuildinfo). The next commit should record that deletion.",
+          "Full-page screenshots at 390 show the fixed tab bar in mid-page. This is a screenshot artifact, not a layout bug."
+        ],
+        "decisions": [
+          "Business/UX assumption: the DEMO bar is sticky and always visible (36px) and the sticky top bar and sidebar are offset below it (--gp-shell-top). Figma shows it only at the top of the page; pinning it is stricter for the DEMO guardrail.",
+          "Business assumption: Privy login methods are email, Google, Apple and wallet (EVM + Solana); embedded wallets are created for users without one; the default and only chain is Arbitrum Sepolia, defined inline with the public RPC so viem's whole chain registry isn't bundled.",
+          "Business assumption: NetworkSelect lets you pick only chains enabled in @gp/shared/chains (Arbitrum for the MVP). The other four show 'Coming soon'; the footer lists them as '(soon)'. allowDisabledChains exists for DEMO screens.",
+          "UX assumption: the children of the sidebar 'Casino games' group (Table games, GP Studios slots, Live tables, Draws & bingo) are my invention because the Figma group is collapsed. Originals follows Figma exactly (Orbit Rush, Pool Dice, Double Side, Pool Roulette, Twenty-One).",
+          "The URL map (ROUTES in src/components/shell/nav-config.ts: /pool, /pool/entries, /games/<slug>, /wallet, /wallet/deposit, /transactions, /responsible-gaming, /account, /account/notifications, /search, /legal/*, …) is my proposal for later agents.",
+          "Restricted region: a full-width banner that cannot be dismissed ('You can still view your account and withdraw funds', with no VPN hint). Sign up and Deposit are disabled and tiles show a lock plus 'Not available in your region'.",
+          "Tile gradients follow the registry Card/Game mapping: Global Pool gold, Pool Roulette red, Orbit Rush violet, Pool Dice sky, Double Side amber, Twenty-One mint. The four extra originals (Vault Sweeper, Skyline, Pinfall, Fortune Ring) got art too.",
+          "Countdowns never fake time. `demoNow` anchors a DEMO clock (16:42:18 UTC gives 03:17:42 to the 20:00 UTC close); without it the real clock is used (the round already closed, so it shows 00:00:00 'Round closed — drawing').",
+          "Used the unified `radix-ui` package (what shadcn CLI 4 generates) instead of separate @radix-ui/* packages, and kept tw-animate-css for the Radix enter/exit animations.",
+          "next.config: eslint.ignoreDuringBuilds (lint runs as its own step), outputFileTracingRoot set to the pnpm workspace root (the repo root has an unrelated package-lock.json), a webpack alias that drops the optional Privy peer '@farcaster/mini-app-solana', and basic security headers.",
+          "Added vitest (^4.1.12, as in the other packages) to apps/web. JSX is compiled with oxc's automatic runtime because Vite 8 no longer uses esbuild; tsconfig keeps jsx: preserve for Next.",
+          "PasswordInput (with strength meter) exists only for admin and step-up flows, because players have no passwords (owner decision #3). The OTP field is one real input with autocomplete=one-time-code.",
+          "Shared packages were not modified. The only edits outside apps/web are docs/WEB_COMPONENTS.md (new) and pnpm-lock.yaml (dependency changes)."
+        ],
+        "next": [
+          "Homepage agent: replace /home/user/Claude/global-pool/apps/web/src/app/(app)/page.tsx with PUB-01 (hero carousel, Global Pool live card, rows of game carousels, recent wins, live bets, trust and networks strips, FAQ). Reuse GameTile, JackpotMeter, Countdown, StatCard, Card, Tabs and Table, follow docs/WEB_COMPONENTS.md, and re-run `pnpm --filter @gp/web visual` after adding /, /pool etc. to SHOTS.",
+          "Auth agent: build Privy headless screens in the GP visual language (email, then 6-digit code, social and wallet; ≈ AUTH-02/04/09) and an onboarding route in app/(auth) (18+, permitted jurisdiction, terms/privacy, all unchecked; separate marketing opt-in; country) using onboardingSchema from @gp/shared/schemas. Add a timeout/error fallback when Privy never becomes ready.",
+          "API integration: an API client plus TanStack Query hooks for profile, balances, notifications and the current round, replacing DEMO_SHELL_MEMBER and the DEMO constants. Wire getAccessToken to the API's Privy and dev-mock verification.",
+          "Detection hooks to drive the shell's restricted and wrongNetwork props: geo/region from the API, and the connected wallet's chain versus 421614 (with switch-chain via Privy).",
+          "Build the routes listed as 404 by the QA script (wallet, transactions, pool entries, responsible gaming, account, games, promotions, VIP, support, legal pages).",
+          "Optionally gate /design-system behind an env flag in production, and add Playwright e2e for the shell and mock auth to CI."
+        ]
+      },
+      "home": {
+        "report": "The homepage (PUB-01 at 1440, MOB-03 at 390) is built in apps/web at route / inside the casino shell. It covers all sections H1 to H12, a typed TanStack Query data layer, and four switchable states. Typecheck, lint and tests (35, of which 19 are new) pass, and the build passes both with and without the preview flag. Playwright screenshots of every state at 1440 and 390 show no horizontal overflow and no console errors. Section-by-section side-by-side crops against the reference render are close; the remaining differences are listed below. Nothing is committed and port 3000 is free.\n\nWHAT I BUILT (all under /home/user/Claude/global-pool/apps/web)\n- Route: src/app/(app)/page.tsx is a server page. It reads the dev ?state= preview, prefetches every query with prefetchHome() and hydrates HomePage through HydrationBoundary. Its doc comment lists every state.\n- Sections in src/components/home/:\n  - home-page.tsx: composes the page and holds the state logic.\n  - hero.tsx (H1): 3-slide carousel (Global Pool, Orbit Rush Sprint, Daily rewards) with pause and dots; auto-advances every 9 s, pauses on hover/focus and under reduced motion. Gold banner with entry tickets and coin art; side promos (Provably Fair, VIP, Welcome offer, members see Rakeback); Draw card using JackpotMeter and a Countdown to the absolute close time.\n  - pool-live.tsx (H2): inline SVG chart (pool-chart.tsx: monotone curve, hover and arrow-key crosshair, screen-reader table), latest entries, draw-threshold meters, per-entry breakdown 10.00 + 0.05 + 0.00 = 10.05, prize-distribution dialog.\n  - games.tsx (H3): Originals and Table & live rails, 6 category tiles, licence note.\n  - activity.tsx (H4): recent-wins strip with tabs; live-bets table with Latest entries / Big wins / Round history tabs and a rows selector.\n  - info-sections.tsx: H5 How it works (5 steps), H6 networks, H8 security.\n  - fairness.tsx (H7): explainer, VRF stepper, and a verifier that really recomputes SHA-256 and HMAC-SHA256 in the browser (src/lib/fairness/dice.ts). Editing the client seed or nonce shows a mismatch.\n  - programs.tsx: H9 VIP, H10 affiliate with a decimal.js calculator (20% of platform fees).\n  - faq.tsx (H11): Radix accordion, support and RG cards, SEO text, Contact and support.\n  - H12 is the shell FooterMega.\n  - Shared pieces: primitives.tsx, art.tsx, home-context.tsx (useHomeView).\n- Data layer, src/lib/data/:\n  - types.ts: view models.\n  - queries.ts: server-safe query keys, options and prefetchHome.\n  - hooks.ts: client hooks, plus useServerNow (clock = server snapshot time + real elapsed time, no fake timers).\n  - source.ts: NEXT_PUBLIC_DATA_SOURCE=api switches to the API for /pool/rounds/current, /pool/rounds/:n/feed, /games and /compliance/region. Everything else is mock and marked api: not yet.\n  - mock-home.ts: DEMO extras built on @gp/shared/demo, all isDemo true.\n- State preview, src/lib/home-preview.ts: /?state=member, restricted, no-round, guest, combinable (e.g. member,no-round). Enabled only in next dev or in builds with NEXT_PUBLIC_STATE_PREVIEW=true. A dev switcher renders at the end of the page when it is on.\n- Shell bridge: src/components/shell/shell-overrides.tsx. Pages render ShellOverride (restricted, previewMember, previewGuest); AppShell now reads it.\n- States:\n  - Guest active round (default).\n  - Member: balance pill and Deposit in the top bar, a Your 35 entries pill with about 2.44% odds, entries and available-balance block in the Draw card, Add entries, highlighted You row.\n  - Restricted (United States): region banner with Withdraw funds and Restricted countries, Sign up and every gaming or deposit CTA disabled, tiles locked, promotions, activity, categories, VIP and affiliate removed, Region cards (Sign in to withdraw, Close account / self-exclude, Restricted countries), no VPN or bypass hints.\n  - No active round: Round 1,248 settled result, countdown to 28 Nov 2026 08:00 UTC, Notify me, winners list, Settled status.\n- Mobile 390: everything stacked. Promos, steps, networks, security and VIP tiers become horizontal snap rails. The live-bets table scrolls sideways with a hint line. Mobile top bar and tab bar come from the shell.\n\nEDITS TO EXISTING FILES (additive)\n- game-art.tsx: 6 new original art keys (live-pool-roulette, mega-ring-show, baccarat-lounge, speed-twenty-one, sic-bo-triad, dragon-and-phoenix).\n- JackpotMeter: unitSize prop.\n- Countdown: label prop. This fixes the screen-reader label for opens-in, which used to say Closes in.\n- app-shell.tsx: main padding is now top 24 at laptop (matches Figma; was 32) and bottom 64. This applies to every page.\n- footer-mega.tsx: 6-column grid without gaps so the community icons fit; link gap 12; logo height 40; Originals names added to the about text.\n- visual-qa.mjs: lobby shot names updated.\n- package.json: new visual:home script.\n- docs/WEB_COMPONENTS.md: Homepage and Data layer sections.\n- New QA script: scripts/home-qa.mjs.\n\nREMAINING DIFFERENCES FROM THE REFERENCE RENDER\n- Countdown shows 01:15:30, anchored at DEMO_AS_OF 18:44:30 UTC. Figma shows 03:17:42.\n- Networks section: Figma shows 5 operational networks. Per owner decision 2, only Arbitrum is live and the other four show Coming soon; the heading reads Deposit USDT on Arbitrum. Step 2 and the SEO copy follow the same rule.\n- Affiliate key facts use demo-data.md (12 months tracking; payout in USDT, min 20.00, KYC L2 + 2FA) instead of Figma's 30-day cookie and Monthly, no minimum.\n- VIP level-up rewards are described as USDT to Available with no wagering (demo-data and shared DEMO), not bonus funds as in Figma.\n- Player counts come from @gp/shared: Live Pool Roulette 412 (Figma 388), Pool Roulette 518 (Figma 212).\n- Verifier values differ (hash 9687fca9..., client seed nova-k-7f30fa) so the sample genuinely verifies to roll 73.21.\n- While round 1,248 is open, the Draw randomness card shows round 1,247 (DEMO request id 0x4b7e...a913). Figma showed 1,248 as settled, which contradicts an open round.\n- Hero and game art are original simplified SVG/HTML. Ticket and coin placement is close but not pixel-exact.\n- Relative feed times differ (19 s vs 12 s and so on).\n- Page height 10,056 vs 9,685. About 120 px is the dev switcher (absent in the normal build); the rest comes from slightly taller H5, H6 and FAQ blocks.\n- At 390, the chart's Min pool 50K label touches the curve.\n- The sidebar keeps the LIVE badge in the no-round state.\n- Search shortcut shows Ctrl K on Linux instead of the Mac symbol.\n\nNOT VERIFIED\n- The API data-source mode was not run against the live API.\n- The member state was checked with the dev preview and the shell overrides, not with a real Privy login.",
+        "verified": [
+          "cd global-pool/apps/web && pnpm typecheck: pass (tsc --noEmit, no errors)",
+          "pnpm lint: pass (eslint with type-aware rules, jsx-a11y and react-hooks; 0 problems)",
+          "pnpm test: pass. 3 files, 35 tests; new test/home.test.tsx has 19: preview parsing, DEMO data invariants, prefetch hydration cache, real SHA-256/HMAC verification of 73.21, affiliate math 40x120x0.05x20% = 48.00, initials, chart helpers, and server-rendered hero/pool-live/networks for the guest, restricted, member and no-round states",
+          "NEXT_PUBLIC_STATE_PREVIEW=true pnpm build: pass (/ is dynamic, 46.8 kB)",
+          "Plain pnpm build: pass. In that build /?state=restricted renders no restricted banner and no dev switcher, so the preview is off in production",
+          "pnpm visual:home: 8 full-page screenshots (guest, member, restricted, no-round at 1440 and 390) in apps/web/test-results/visual/home-*.png; no horizontal overflow and no console errors",
+          "pnpm visual (the existing design-system and shell QA): still passes with no overflow or console errors",
+          "Side-by-side crops against the reference, section by section, saved in apps/web/test-results/visual/compare/*.png; the visible differences found were fixed over 3 iterations",
+          "Playwright interaction test (all pass): countdown ticks from the absolute time (01:15:30, then 01:15:26), chart arrow keys and hover tooltip on cancelled round 1,245, prize dialog shows 93,200.00, Round history tab, verifier passes on load and flags a changed nonce, calculator gives 120.00 for 100 players, FAQ accordion opens, carousel moves to slide 2, restricted state disables Sign up and keeps Withdraw funds with no VPN text, member state shows the balance pill, no page errors",
+          "Server on port 3000 stopped at the end"
+        ],
+        "failing": [
+          "None of the verification commands fail.",
+          "Unverified: NEXT_PUBLIC_DATA_SOURCE=api mode was never run against the live NestJS API, so its response-shape mapping is untested.",
+          "Unverified: the member state was only checked through the dev preview and shell overrides, not a real Privy or mock-auth login (mock-auth reuses the same DEMO member data).",
+          "Known limitation: the restricted banner and preview member chrome in the shell appear after hydration (client-side ShellOverride), so the shell shows a brief flash on the first server render. The page content itself renders the correct state on the server.",
+          "Pre-existing, not mine: prettier --check flags apps/web/tsconfig.json."
+        ],
+        "decisions": [
+          "Assumed the Provably Fair algorithm for the verifier teaser: commitment = SHA-256(serverSeed); roll = floor(first 4 bytes of HMAC-SHA256(serverSeed, clientSeed:nonce) as uint32 x 10000 / 2^32) / 100. No spec exists in the API. This needs the games/fairness team's confirmation.",
+          "The networks UI follows owner decision 2 (only Arbitrum Sepolia live; the others show Coming soon), which deviates from Figma's 5 operational networks. All copy is derived from ENABLED_CHAINS so it updates automatically when the flags change.",
+          "Affiliate key facts and VIP level-up reward terms follow demo-data.md and @gp/shared (the single source) instead of the conflicting values the Figma agent invented.",
+          "The DEMO clock anchor is DEMO_AS_OF (18:44:30 UTC); between rounds it is 21:12:40 UTC. The countdown is always closesAt minus the server clock plus real elapsed time.",
+          "Homepage-only DEMO extras live in apps/web/src/lib/data/mock-home.ts, not in @gp/shared: the 14-day pool chart (rounds 1,235 to 1,243 are chart-only values), recent wins, live bets, VIP weekly rates, the verifier sample, and a DEMO VRF request id for round 1,247. I did not change @gp/shared.",
+          "The restricted state hides promotions, activity feeds, categories, VIP and affiliate, locks every game tile and disables gaming and deposit CTAs. Withdraw, self-exclusion and Restricted countries links stay. The pool chart and entries feed remain visible as information.",
+          "Guest Enter round and Participate buttons in the Draw card and H2 open sign-up. The hero Participate links to /pool, which another agent builds.",
+          "The dev preview is enabled only when NODE_ENV is development or the build sets NEXT_PUBLIC_STATE_PREVIEW=true. QA builds use the flag; the plain build ignores ?state.",
+          "Shell main padding changed for every page in the shell: 24 top at laptop (matches Figma) and 64 bottom.",
+          "The hero carousel has 3 real slides with a pause control, rather than static decorative dots."
+        ],
+        "next": [
+          "API: add GET /pool/history?days=14, activity feeds (recent wins, live bets, round history), the latest VRF draw, and an Originals verifier sample. Then move the mock-home.ts extras into @gp/shared/demo and the API seed, and point the queries.ts entries marked api: not yet at the API.",
+          "Run the homepage with NEXT_PUBLIC_DATA_SOURCE=api against the seeded API and fix any shape mismatches (/pool/rounds/current, /pool/rounds/:n/feed, /games, /compliance/region).",
+          "Resolve the region gate on the server (middleware or header from the GeoService) so the shell renders the restricted banner without a hydration flash; keep ShellOverride for the dev preview only.",
+          "Connect the member data to the authenticated API: /wallet/balances for the balance pill and Draw card, /pool/rounds/:roundId/my-entries for Your 35 entries and odds, using getAccessToken().",
+          "Games/fairness team: confirm or replace the dice algorithm in src/lib/fairness/dice.ts and the provably-fair page spec.",
+          "Build the routes the homepage links to (currently 404 on prefetch): /pool (+ /rules, /how-it-works, /rounds/:n), /provably-fair, /vip, /affiliates, /promotions/*, /games/:slug, /wallet/deposit, /security, /status, /legal/*.",
+          "Shell follow-ups: drop the sidebar LIVE badge when no round is open, and add a gated variant of the sidebar game nav for restricted regions.",
+          "Mobile polish: move the chart's Min pool label clear of the curve at 390 widths."
+        ]
+      }
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Shared"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Build"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "dev:shared",
+      "phaseIndex": 1,
+      "phaseTitle": "Shared",
+      "agentId": "a3465dac29da31083",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795829437338,
+      "queuedAt": 1795829437331,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Shared packages and repo tooling are done. Typecheck, lint,…",
+      "promptPreview": "You are a senior full-stack engineer on GLOBAL POOL (Web3 global jackpot + crypto gaming platform). FIRST read /home/user/Claude/global-pool/docs/DEV_CONVENTIONS.md and follow it exactly (guardrails, stack, layout, pnpm+flock, verification, no git commits, report format). Also read /home/user/Claude/global-pool/packages/tokens/tokens.json and /home/user/Claude/design/figma-build/demo-data.md. Loca…",
+      "promptFramed": true,
+      "lastProgressAt": 1795831475433,
+      "tokens": 371458,
+      "toolCalls": 96,
+      "durationMs": 2038095,
+      "resultPreview": "{\"report\":\"Shared packages and repo tooling are done. Typecheck, lint, test (tokens 82 tests, shared 56) and build pass for both packages. Workspace-wide typecheck and lint also pass, including @gp/contracts. Nothing is committed.\\n\\nFOR WEB/API AGENTS:\\n- dist/ is git-ignored. Run 'pnpm build:packages' (builds only tokens and shared) after install, or whenever you change them. Install with 'flock…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "dev:api-core",
+      "phaseIndex": 2,
+      "phaseTitle": "Build",
+      "agentId": "ac91ff62c35ea41d3",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795831478236,
+      "queuedAt": 1795831478225,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "I built apps/api (@gp/api), the GLOBAL POOL backend: NestJS…",
+      "promptPreview": "You are a senior full-stack engineer on GLOBAL POOL (Web3 global jackpot + crypto gaming platform). FIRST read /home/user/Claude/global-pool/docs/DEV_CONVENTIONS.md and follow it exactly (guardrails, stack, layout, pnpm+flock, verification, no git commits, report format). Also read /home/user/Claude/global-pool/packages/tokens/tokens.json and /home/user/Claude/design/figma-build/demo-data.md. Loca…",
+      "promptFramed": true,
+      "lastProgressAt": 1795835574121,
+      "tokens": 638678,
+      "toolCalls": 152,
+      "durationMs": 4095884,
+      "resultPreview": "{\"report\":\"I built apps/api (@gp/api), the GLOBAL POOL backend: NestJS 11, Prisma 6, PostgreSQL, Redis/BullMQ, socket.io, with request validation from the @gp/shared zod schemas. Typecheck, lint, test (34 unit + 30 e2e) and build all pass, and the built server boots: /health returns 200 with database and Redis up, /docs serves Swagger UI and /docs-json lists 83 operations. Nothing is committed.\\n\\…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "dev:web-design-system",
+      "phaseIndex": 2,
+      "phaseTitle": "Build",
+      "agentId": "a23e9160277c090e8",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795831478237,
+      "queuedAt": 1795831478226,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "The apps/web foundation (@gp/web) is built and verified. Ty…",
+      "promptPreview": "You are a senior full-stack engineer on GLOBAL POOL (Web3 global jackpot + crypto gaming platform). FIRST read /home/user/Claude/global-pool/docs/DEV_CONVENTIONS.md and follow it exactly (guardrails, stack, layout, pnpm+flock, verification, no git commits, report format). Also read /home/user/Claude/global-pool/packages/tokens/tokens.json and /home/user/Claude/design/figma-build/demo-data.md. Loca…",
+      "promptFramed": true,
+      "lastProgressAt": 1795834405012,
+      "tokens": 535916,
+      "toolCalls": 174,
+      "durationMs": 2926771,
+      "resultPreview": "{\"report\":\"The apps/web foundation (@gp/web) is built and verified. Typecheck, lint and tests (16) pass, the build has no warnings, and the Playwright screenshots at 1440 and 390 show no horizontal overflow and no console errors. Nothing is committed. I stopped the dev server, so port 3000 is free.\\n\\nWHAT EXISTS (all under /home/user/Claude/global-pool/apps/web, plus /home/user/Claude/global-pool…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "dev:web-homepage",
+      "phaseIndex": 2,
+      "phaseTitle": "Build",
+      "agentId": "a80f3d455b79f6083",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795834405021,
+      "queuedAt": 1795834405016,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "The homepage (PUB-01 at 1440, MOB-03 at 390) is built in ap…",
+      "promptPreview": "You are a senior full-stack engineer on GLOBAL POOL (Web3 global jackpot + crypto gaming platform). FIRST read /home/user/Claude/global-pool/docs/DEV_CONVENTIONS.md and follow it exactly (guardrails, stack, layout, pnpm+flock, verification, no git commits, report format). Also read /home/user/Claude/global-pool/packages/tokens/tokens.json and /home/user/Claude/design/figma-build/demo-data.md. Loca…",
+      "promptFramed": true,
+      "lastProgressAt": 1795837216371,
+      "tokens": 588375,
+      "toolCalls": 212,
+      "durationMs": 2811350,
+      "resultPreview": "{\"report\":\"The homepage (PUB-01 at 1440, MOB-03 at 390) is built in apps/web at route / inside the casino shell. It covers all sections H1 to H12, a typed TanStack Query data layer, and four switchable states. Typecheck, lint and tests (35, of which 19 are new) pass, and the build passes both with and without the preview flag. Playwright screenshots of every state at 1440 and 390 show no horizonta…"
+    }
+  ],
+  "totalTokens": 2134427,
+  "totalToolCalls": 634
+}

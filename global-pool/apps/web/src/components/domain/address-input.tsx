@@ -17,7 +17,9 @@ const SOLANA_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 export function isValidAddress(chain: ChainKey, value: string): boolean {
   const v = value.trim();
   if (!v) return false;
-  return CHAINS[chain].family === 'solana' ? SOLANA_ADDRESS.test(v) : isAddress(v, { strict: false });
+  return CHAINS[chain].family === 'solana'
+    ? SOLANA_ADDRESS.test(v)
+    : isAddress(v, { strict: false });
 }
 
 export interface AddressInputProps {
@@ -58,8 +60,16 @@ export function AddressInput({
   const filled = value.trim().length > 0;
   const valid = filled && isValidAddress(chain, value);
   const message =
-    error ?? (filled && !valid ? `Not a valid ${name} address — check the network before you continue.` : undefined);
-  const success = valid && !message ? (addressStatus === 'whitelisted' ? `Whitelisted ${name} address` : `Valid ${name} address`) : undefined;
+    error ??
+    (filled && !valid
+      ? `Not a valid ${name} address — check the network before you continue.`
+      : undefined);
+  const success =
+    valid && !message
+      ? addressStatus === 'whitelisted'
+        ? `Whitelisted ${name} address`
+        : `Valid ${name} address`
+      : undefined;
 
   const paste = async () => {
     try {
@@ -77,10 +87,18 @@ export function AddressInput({
         labelAside={showNetwork ? <NetworkPill chain={chain} size="s" /> : undefined}
         error={message}
         success={success}
-        helper={!filled ? `Only send USDT on ${name}. Sending on another network can lose funds.` : undefined}
+        helper={
+          !filled
+            ? `Only send USDT on ${name}. Sending on another network can lose funds.`
+            : undefined
+        }
         disabled={disabled}
       >
-        <InputGroup size="l" state={message ? 'error' : success ? 'success' : 'default'} className="pr-1.5">
+        <InputGroup
+          size="l"
+          state={message ? 'error' : success ? 'success' : 'default'}
+          className="pr-1.5"
+        >
           <InputControl
             value={value}
             onChange={(e) => onChange(e.target.value.trim())}
@@ -108,8 +126,9 @@ export function AddressInput({
         <div className="flex gap-2.5 rounded-md border border-status-warning/30 bg-status-warning-tint p-3 text-body-s">
           <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-text-warning" />
           <p className="text-text-secondary">
-            <span className="font-medium text-text-primary">New address.</span> For your security, withdrawals to a
-            newly added address unlock after a {cooldownHours} h cool-down. You can cancel the address any time.
+            <span className="font-medium text-text-primary">New address.</span> For your security,
+            withdrawals to a newly added address unlock after a {cooldownHours} h cool-down. You can
+            cancel the address any time.
           </p>
         </div>
       )}

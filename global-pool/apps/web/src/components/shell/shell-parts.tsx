@@ -66,14 +66,24 @@ export function BalancePill({
   className?: string;
 }) {
   return (
-    <div className={cn('flex h-10 items-center rounded-md border border-border-default bg-bg-secondary', className)}>
+    <div
+      className={cn(
+        'flex h-10 items-center rounded-md border border-border-default bg-bg-secondary',
+        className,
+      )}
+    >
       <Link
         href={ROUTES.wallet}
         className="flex h-full items-center gap-2 rounded-l-md pr-2.5 pl-3 transition-colors hover:bg-surface-hover"
         aria-label={`Available balance ${formatUSDT(member.available)}${member.demo ? ' (demo)' : ''} — open wallet`}
       >
         <TokenMark size={compact ? 16 : 18} />
-        <span className={cn('tabular-nums text-text-primary', compact ? 'text-label-s' : 'text-label-m')}>
+        <span
+          className={cn(
+            'tabular-nums text-text-primary',
+            compact ? 'text-label-s' : 'text-label-m',
+          )}
+        >
           {formatUSDT(member.available, { symbol: false })}
         </span>
         {member.demo && <DemoBadge size="xs" />}
@@ -110,7 +120,13 @@ export function NotificationsButton({ count, className }: { count: number; class
 
 // ── Wrong network (Button/Wallet State=Wrong network) ───────────────────────────────────────────
 
-export function WrongNetworkButton({ onSwitch, compact = false }: { onSwitch?: () => void; compact?: boolean }) {
+export function WrongNetworkButton({
+  onSwitch,
+  compact = false,
+}: {
+  onSwitch?: () => void;
+  compact?: boolean;
+}) {
   return (
     <button
       type="button"
@@ -190,7 +206,16 @@ export function UserMenu({ member, onSignOut }: { member: ShellMember; onSignOut
 
 // ── Language & region (Nav/Language Trigger + Menu/Language & Region) ───────────────────────────
 
-const LANGUAGES = ['English', 'Português', 'Español', 'Deutsch', 'Français', 'Polski', 'Türkçe', '日本語'];
+const LANGUAGES = [
+  'English',
+  'Português',
+  'Español',
+  'Deutsch',
+  'Français',
+  'Polski',
+  'Türkçe',
+  '日本語',
+];
 
 export function LanguageMenu({
   variant = 'full',
@@ -227,7 +252,9 @@ export function LanguageMenu({
           {LANGUAGES.map((l) => (
             <DropdownMenuRadioItem key={l} value={l} disabled={l !== 'English'}>
               {l}
-              {l !== 'English' && <span className="ml-auto pr-6 text-caption text-text-tertiary">Soon</span>}
+              {l !== 'English' && (
+                <span className="ml-auto pr-6 text-caption text-text-tertiary">Soon</span>
+              )}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

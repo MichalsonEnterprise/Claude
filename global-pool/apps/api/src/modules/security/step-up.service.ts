@@ -36,7 +36,13 @@ export class StepUpService {
   async challenge(user: AuthUser, purpose: StepUpPurpose, code: string) {
     const outcome = await this.totp.verifyActive({ userId: user.id }, code);
     const ttl = this.config.env.STEP_UP_TOKEN_TTL;
-    const claims: StepUpClaims = { sub: user.id, sid: user.sessionId, purpose, typ: 'step_up', jti: randomUUID() };
+    const claims: StepUpClaims = {
+      sub: user.id,
+      sid: user.sessionId,
+      purpose,
+      typ: 'step_up',
+      jti: randomUUID(),
+    };
     const token = await this.jwt.signAsync(claims, {
       secret: this.config.env.JWT_ACCESS_SECRET,
       algorithm: 'HS256',
@@ -68,18 +74,33 @@ export class StepUpService {
           audience: 'step-up',
         });
       } catch {
-        throw new AppError('STEP_UP_REQUIRED', 'Your security confirmation expired — confirm again', {
-          reason: 'invalid_token',
-          purpose,
-        });
+        throw new AppError(
+          'STEP_UP_REQUIRED',
+          'Your security confirmation expired — confirm again',
+          {
+            reason: 'invalid_token',
+            purpose,
+          },
+        );
       }
-      if (claims.typ !== 'step_up' || claims.sub !== user.id || claims.sid !== user.sessionId || claims.purpose !== purpose) {
+      if (
+        claims.typ !== 'step_up' ||
+        claims.sub !== user.id ||
+        claims.sid !== user.sessionId ||
+        claims.purpose !== purpose
+      ) {
         throw new AppError('STEP_UP_REQUIRED', 'Security confirmation does not match this action', {
           reason: 'invalid_token',
           purpose,
         });
       }
-      const fresh = await this.redis.set(`gp:stepup:used:${claims.jti}`, '1', 'EX', this.config.env.STEP_UP_TOKEN_TTL + 60, 'NX');
+      const fresh = await this.redis.set(
+        `gp:stepup:used:${claims.jti}`,
+        '1',
+        'EX',
+        this.config.env.STEP_UP_TOKEN_TTL + 60,
+        'NX',
+      );
       if (fresh !== 'OK') {
         throw new AppError('STEP_UP_REQUIRED', 'This security confirmation was already used', {
           reason: 'token_reused',
@@ -95,7 +116,9 @@ export class StepUpService {
     const status = await this.totp.status({ userId: user.id });
     throw new AppError(
       'STEP_UP_REQUIRED',
-      status.enabled ? 'Confirm this action with your authenticator code' : 'Set up two-factor authentication first',
+      status.enabled
+        ? 'Confirm this action with your authenticator code'
+        : 'Set up two-factor authentication first',
       { reason: status.enabled ? 'code_required' : 'enroll_2fa', purpose },
     );
   }

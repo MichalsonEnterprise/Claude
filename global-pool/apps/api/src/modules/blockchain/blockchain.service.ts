@@ -34,15 +34,17 @@ export class BlockchainService {
   /** Test-USDT contract for a network (env), or null when deposits are disabled. */
   tokenAddress(network: ChainKey): Address | null {
     if (network !== 'arbitrum') return null;
-    return (this.config.env.TEST_USDT_ADDRESS_ARBITRUM_SEPOLIA as Address | undefined) ?? null;
+    return this.config.env.TEST_USDT_ADDRESS_ARBITRUM_SEPOLIA ?? null;
   }
 
   poolContract(): Address | null {
-    return (this.config.env.POOL_CONTRACT_ADDRESS as Address | undefined) ?? null;
+    return this.config.env.POOL_CONTRACT_ADDRESS ?? null;
   }
 
   requiredConfirmations(network: ChainKey): number {
-    return network === 'arbitrum' ? this.config.env.DEPOSIT_CONFIRMATIONS_ARBITRUM : CHAINS[network].confirmations;
+    return network === 'arbitrum'
+      ? this.config.env.DEPOSIT_CONFIRMATIONS_ARBITRUM
+      : CHAINS[network].confirmations;
   }
 
   /** Configuration overview (no secrets). */
@@ -56,7 +58,8 @@ export class BlockchainService {
         chainId: chain.testnet.chainId,
         enabled: chain.enabled,
         status: chain.status,
-        rpcConfigured: key === 'arbitrum' ? Boolean(this.config.env.ARBITRUM_SEPOLIA_RPC_URL) : false,
+        rpcConfigured:
+          key === 'arbitrum' ? Boolean(this.config.env.ARBITRUM_SEPOLIA_RPC_URL) : false,
         tokenConfigured: Boolean(this.tokenAddress(key)),
         poolContractConfigured: key === 'arbitrum' ? Boolean(this.poolContract()) : false,
         confirmations: this.requiredConfirmations(key),

@@ -18,7 +18,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <Logo height={32} title="" />
         </Link>
       </header>
-      <main id="main" className="flex flex-1 items-start justify-center px-4 py-10 tablet:items-center">
+      <main
+        id="main"
+        className="flex flex-1 items-start justify-center px-4 py-10 tablet:items-center"
+      >
         {children}
       </main>
     </div>

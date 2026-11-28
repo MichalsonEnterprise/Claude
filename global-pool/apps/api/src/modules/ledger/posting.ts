@@ -51,7 +51,9 @@ export const USER_BUCKET_TYPES: readonly UserBucketAccountType[] = [
   LedgerAccountType.USER_OWED,
 ];
 
-export function isUserBucket(ref: AccountRef): ref is { type: UserBucketAccountType; userId: string } {
+export function isUserBucket(
+  ref: AccountRef,
+): ref is { type: UserBucketAccountType; userId: string } {
   return (USER_BUCKET_TYPES as readonly string[]).includes(ref.type);
 }
 
@@ -113,9 +115,7 @@ export function normalizePosting(lines: readonly PostingLineInput[]): Normalized
 
 /** Σ of signed amounts (for assertions / reconciliation). */
 export function sumLines(lines: readonly { amount: MoneyInput }[]): string {
-  return toUSDTString(
-    lines.reduce((acc, l) => acc.plus(parseUSDT(l.amount)), new MoneyDecimal(0)),
-  );
+  return toUSDTString(lines.reduce((acc, l) => acc.plus(parseUSDT(l.amount)), new MoneyDecimal(0)));
 }
 
 // ── Posting templates (one per business event) ──────────────────────────────────────────────────
@@ -197,7 +197,8 @@ export function withdrawalSettleLines(
   const lines: PostingLineInput[] = [
     { account: { type: 'user_locked', userId }, amount: amount.negated() },
   ];
-  if (!net.isZero()) lines.push({ account: { type: 'chain_clearing', network }, amount: net, userId });
+  if (!net.isZero())
+    lines.push({ account: { type: 'chain_clearing', network }, amount: net, userId });
   if (!networkFee.isZero())
     lines.push({ account: { type: 'operator_revenue' }, amount: networkFee, userId });
   if (!platformFee.isZero()) lines.push({ account: { type: 'fees' }, amount: platformFee, userId });

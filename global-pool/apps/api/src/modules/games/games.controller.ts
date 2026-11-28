@@ -6,7 +6,9 @@ import { z } from 'zod';
 import { createZodDto } from '../../common/zod';
 import { GamesService } from './games.service';
 
-class GamesQueryDto extends createZodDto(z.object({ category: z.enum(GAME_CATEGORIES).optional() })) {}
+class GamesQueryDto extends createZodDto(
+  z.object({ category: z.enum(GAME_CATEGORIES).optional() }),
+) {}
 
 @ApiTags('games')
 @Controller('games')
@@ -14,7 +16,9 @@ export class GamesController {
   constructor(private readonly games: GamesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Game catalogue (house edge disclosed; simulation mode — no real-money play)' })
+  @ApiOperation({
+    summary: 'Game catalogue (house edge disclosed; simulation mode — no real-money play)',
+  })
   list(@Query() query: GamesQueryDto) {
     return this.games.list(query.category);
   }

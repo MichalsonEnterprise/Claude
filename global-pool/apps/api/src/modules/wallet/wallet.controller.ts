@@ -18,7 +18,8 @@ export class WalletController {
 
   @Get('balances')
   @ApiOperation({
-    summary: 'Available / Locked / Pending / Owed / Total — computed from the append-only double-entry ledger',
+    summary:
+      'Available / Locked / Pending / Owed / Total — computed from the append-only double-entry ledger',
   })
   balances(@CurrentUser() user: AuthUser) {
     return this.wallet.balances(user.id);
@@ -32,7 +33,9 @@ export class WalletController {
 
   @Post('owed/claim')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Claim everything owed (refunds, prizes, rewards) to Available (idempotent)' })
+  @ApiOperation({
+    summary: 'Claim everything owed (refunds, prizes, rewards) to Available (idempotent)',
+  })
   async claim(@CurrentUser() user: AuthUser, @Body() body: ClaimOwedDto) {
     const { replayed, value } = await this.wallet.claimOwed(user.id, body.idempotencyKey);
     return { ...value, replayed };

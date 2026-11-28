@@ -102,7 +102,7 @@ function tc(n, name, color, ix = 0) { const t = n.findAll(x => x.type === 'TEXT'
 function card(name, o = {}) { return AL('VERTICAL', { name, p: o.p ?? 24, gap: o.gap ?? 16, fill: o.fill || 'surface/default', stroke: o.stroke || 'border/subtle', r: o.r ?? 14 }); }
 function row(name, o = {}) { return AL('HORIZONTAL', Object.assign({ name, gap: 12, align: 'CENTER' }, o)); }
 function col(name, o = {}) { return AL('VERTICAL', Object.assign({ name, gap: 8 }, o)); }
-function spacer() { return AL('HORIZONTAL', { name: 'Spacer' }); }
+function spacer() { const s = AL('HORIZONTAL', { name: 'Spacer' }); s.resize(1, 1); return s; }
 function line() { return rect(10, 1, 'border/subtle', 0, 'Divider'); }
 async function kv(k, v, o = {}) { const r = AL('HORIZONTAL', { name: 'KV ' + k, gap: 12, align: 'CENTER', justify: 'SPACE_BETWEEN' }); const kt = await T(k, o.ks || 'Body/S', 'text/secondary'); const vr = AL('HORIZONTAL', { name: 'Value', gap: 6, align: 'CENTER' }); if (o.icon) add(vr, await IC(o.icon, 16, o.ic || 'icon/muted')); if (o.node) add(vr, o.node); else add(vr, await T(v, o.vs || 'Body/S Strong', o.vc || 'text/primary', o.vw ? { w: o.vw, align: 'RIGHT' } : {})); if (o.demo) add(vr, await DEMO('XS')); add(r, kt, vr); return r; }
 async function ttl(t, o = {}) { const r = row('Title — ' + t.slice(0, 30), { gap: 8 }); add(r, await T(t, o.s || 'Heading/H5', 'text/primary')); if (o.demo !== false) add(r, await DEMO(o.ds || 'S')); if (o.right) { add(r, [spacer(), 'FILL']); for (const x of [].concat(o.right)) add(r, x); } return r; }
@@ -162,7 +162,7 @@ async function btnLabel(root, nestName, label) { const b = nest(root, nestName);
 // ===== END GP-HIST LIB =====
 
 // ===== GP-HIST MOBILE LIB =====
-async function mshell(name, X, Y, o = {}) { const f = await screen(name, 390, o.h ? { h: o.h } : {}); sec.appendChild(f); f.x = X; f.y = Y; add(f, [await DEMOBAR(), 'FILL']); add(f, [await I(C.TOPM, { State: 'Member' }), 'FILL']); const main = AL('VERTICAL', { name: 'Content', p: [16, 16, 24, 16], gap: 16 }); add(f, [main, 'FILL']); return { f, main }; }
+async function mshell(name, X, Y, o = {}) { const f = await screen(name, 390, o.h ? { h: o.h } : {}); sec.appendChild(f); f.x = X; f.y = Y; add(f, [await DEMOBAR('DEMO DATA — illustrative values only'), 'FILL']); add(f, [await I(C.TOPM, { State: 'Member' }), 'FILL']); const main = AL('VERTICAL', { name: 'Content', p: [16, 16, 24, 16], gap: 16 }); add(f, [main, 'FILL']); return { f, main }; }
 async function mtab(f) { add(f, [await I(C.TAB, { Active: 'Pool' }), 'FILL']); }
 async function mhead(back, title, desc, bdg) { const w = col('Page header', { gap: 8 }); const tr = row('Title', { gap: 8 }); add(tr, await T(title, 'Heading/H3', 'text/primary')); if (bdg) add(tr, bdg); add(tr, await DEMO('S')); if (back) add(w, await BTN('Ghost', back, { size: 'S', lead: 'chevron-left' })); add(w, tr); if (desc) add(w, [await T(desc, 'Body/S', 'text/secondary', { w: 358 }), 'FILL']); return w; }
 async function mtabs(active) { const r = AL('HORIZONTAL', { name: 'Global Pool sub-nav (scrolls)', gap: 4, clip: true }); strokeSides(r, 'border/subtle', { b: 1 }); for (const l of ['Overview', 'Round history', 'My entries', 'Prize distribution', 'Fairness (VRF)']) { const t = await I(C.TABU, { State: l === active ? 'Active' : 'Default' }, { Label: l, 'Show count': l === 'My entries' }); if (l === 'My entries') setP(nest(t, 'Count'), { Count: '35' }, 'cnt'); add(r, t); } return r; }
@@ -170,7 +170,7 @@ async function sticky(f, btns) { const b = AL('HORIZONTAL', { name: 'Sticky CTA 
 async function mnote(text) { return await note(text, { w: 326 }); }
 async function mfoot(main) { const lic = await I(C.LIC, { Variant: 'Compact' }); const r = row('18+ & RG', { gap: 8 }); add(r, await I(C.B18), await T('Play responsibly ·', 'Caption', 'text/tertiary'), await T('Responsible gaming', 'Caption', 'text/brand')); const w = col('Mobile footer notes', { gap: 12 }); add(w, [lic, 'FILL'], r); add(main, [w, 'FILL']); }
 // compact mobile list card: head [title, badge], kv rows, optional footer node
-async function mcard(title, bdg, kvs, o = {}) { const c = card('Card — ' + title, { p: 16, gap: 10 }); const h = row('Head', { gap: 8 }); add(h, await T(title, o.ts || 'Label/L', 'text/primary')); if (o.sub) add(h, await T(o.sub, 'Caption', 'text/tertiary')); add(h, [spacer(), 'FILL']); if (bdg) add(h, bdg); add(c, [h, 'FILL']); for (const [k, v, vo] of kvs) add(c, [await kv(k, v, Object.assign({ vw: 190 }, vo || {})), 'FILL']); if (o.foot) for (const x of [].concat(o.foot)) add(c, [x, 'FILL']); return c; }
+async function mcard(title, bdg, kvs, o = {}) { const c = card('Card — ' + title, { p: 16, gap: 10 }); const h = row('Head', { gap: 8 }); const tcol = col('Title', { gap: 2 }); add(tcol, await T(title, o.ts || 'Label/L', 'text/primary')); if (o.sub) add(tcol, await T(o.sub, 'Caption', 'text/tertiary')); add(h, tcol, [spacer(), 'FILL']); if (bdg) add(h, bdg); add(c, [h, 'FILL']); for (const [k, v, vo] of kvs) add(c, [await kv(k, v, Object.assign({ vw: 190 }, vo || {})), 'FILL']); if (o.foot) for (const x of [].concat(o.foot)) add(c, [x, 'FILL']); return c; }
 // ===== END MOBILE LIB =====
 
 const page = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(page);

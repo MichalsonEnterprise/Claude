@@ -6,6 +6,7 @@ import { Logger } from 'nestjs-pino';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 
 import { AppConfig } from './config/app-config';
+import { GpIoAdapter } from './infra/socket-io.adapter';
 
 export function buildOpenApi(app: INestApplication): OpenAPIObject {
   const config = new DocumentBuilder()
@@ -22,8 +23,19 @@ export function buildOpenApi(app: INestApplication): OpenAPIObject {
       ].join('\n'),
     )
     .setVersion('0.1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT', description: 'Privy / DEV MOCK token' }, 'player')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT', description: 'Admin access token' }, 'admin')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Privy / DEV MOCK token',
+      },
+      'player',
+    )
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', description: 'Admin access token' },
+      'admin',
+    )
     .build();
   return cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
 }
@@ -53,11 +65,18 @@ export function configureApp(app: NestExpressApplication): void {
     origin: config.env.CORS_ORIGINS,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Step-Up-Token', 'Idempotency-Key'],
+    allowedHeaders: [
+      'Authorization',
+      'Content-Type',
+      'X-Request-Id',
+      'X-Step-Up-Token',
+      'Idempotency-Key',
+    ],
     exposedHeaders: ['X-Request-Id'],
     maxAge: 600,
   });
   app.useBodyParser('json', { limit: '256kb' });
+  app.useWebSocketAdapter(new GpIoAdapter(app, config.env.CORS_ORIGINS));
   SwaggerModule.setup('docs', app, () => buildOpenApi(app), {
     jsonDocumentUrl: 'docs-json',
     customSiteTitle: 'GLOBAL POOL API (DEMO)',

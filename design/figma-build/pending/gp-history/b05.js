@@ -38,10 +38,10 @@ add(ec, [c1, 'FILL'], [c2, 'FILL'], [c3, 'FILL']); add(main, [ec, 'FILL']);
 // past rounds
 const pc = [{ h: 'Round', w: 150 }, { h: 'Pool', w: 170, right: 1 }, { h: '1st · 50%', w: 'F' }, { h: '2nd · 20%', w: 140, right: 1 }, { h: '3rd · 10%', w: 140, right: 1 }, { h: 'Runner-up · 2% ×10', w: 180, right: 1 }, { h: 'Status', w: 136 }];
 const prr = [
-  { key: '#1,247', c: [{ p: '#1,247', s: '26 Nov 2026' }, { amt: '172,950.00' }, { p: '86,475.00 USDT', s: '@orbit_77', pc: 'text/gold' }, { amt: '34,590.00' }, { amt: '17,295.00' }, { amt: '3,459.00' }, { st: 'Confirmed', lab: 'Settled' }] },
-  { key: '#1,246', c: [{ p: '#1,246', s: '25 Nov 2026' }, { amt: '168,420.00' }, { p: '84,210.00 USDT', s: '@mira.sol', pc: 'text/gold' }, { amt: '33,684.00' }, { amt: '16,842.00' }, { amt: '3,368.40' }, { st: 'Confirmed', lab: 'Settled' }] },
-  { key: '#1,245', c: [{ p: '#1,245', s: '24 Nov 2026' }, { amt: '41,200.00' }, { p: 'No prizes — round cancelled', s: 'Stakes and fees refunded' }, { p: '—' }, { p: '—' }, { p: '—' }, { st: 'Expired', lab: 'Cancelled' }] },
-  { key: '#1,244', c: [{ p: '#1,244', s: '23 Nov 2026' }, { amt: '181,030.00' }, { p: '90,515.00 USDT', s: '@kestrel', pc: 'text/gold' }, { amt: '36,206.00' }, { amt: '18,103.00' }, { amt: '3,620.60' }, { st: 'Confirmed', lab: 'Settled' }] }];
+  { key: '#1,247', c: [{ p: '#1,247', s: '26 Nov 2026' }, { amt: '172,950.00' }, { p: '86,475.00 USDT', s: '@orbit_77', pc: 'text/gold' }, { amt: '34,590.00', demo: false }, { amt: '17,295.00', demo: false }, { amt: '3,459.00', demo: false }, { st: 'Confirmed', lab: 'Settled' }] },
+  { key: '#1,246', c: [{ p: '#1,246', s: '25 Nov 2026' }, { amt: '168,420.00' }, { p: '84,210.00 USDT', s: '@mira.sol', pc: 'text/gold' }, { amt: '33,684.00', demo: false }, { amt: '16,842.00', demo: false }, { amt: '3,368.40', demo: false }, { st: 'Confirmed', lab: 'Settled' }] },
+  { key: '#1,245', c: [{ p: '#1,245', s: '24 Nov 2026' }, { amt: '41,200.00' }, { p: 'No prizes · cancelled', s: 'Stakes and fees refunded' }, { p: '—' }, { p: '—' }, { p: '—' }, { st: 'Expired', lab: 'Cancelled' }] },
+  { key: '#1,244', c: [{ p: '#1,244', s: '23 Nov 2026' }, { amt: '181,030.00' }, { p: '90,515.00 USDT', s: '@kestrel', pc: 'text/gold' }, { amt: '36,206.00', demo: false }, { amt: '18,103.00', demo: false }, { amt: '3,620.60', demo: false }, { st: 'Confirmed', lab: 'Settled' }] }];
 const pw = col('Past rounds', { gap: 12 }); add(pw, [await ttl('Same split in past rounds', { ds: 'M', right: [await BTN('Ghost', 'All rounds', { size: 'S', trail: 'arrow-right' })] }), 'FILL'], [await table(pc, prr, 'Table — Past distributions'), 'FILL'], await note('You were one of the ten runners-up in #1,244 (+3,620.60 USDT, settled to Available). Each prize is an exact share of the pool at close.', { w: 880 }));
 add(main, [pw, 'FILL']);
 await foot(main);

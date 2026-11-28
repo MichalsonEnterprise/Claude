@@ -1,0 +1,137 @@
+{
+ "_note": "Agent g-dice (DI-01..DI-07 + GM-01). NOTHING BUILT OR VERIFIED in Figma by the 28 Nov 2026 continuation run: all 3 attempts (including the read-only inventory) hit the Figma MCP seat limit. No section/frame/component ids exist yet from this run; an earlier interrupted run may have left frames in section 'DI Dice & GM-01' (page 08, X=32000,Y=0) or 'Games — Mobile Dice' (page 10, X=196000,Y=0) — run pending/g-dice/out/00a + 00b first. Ready-to-run idempotent scripts (helpers.js verbatim, <50k chars, mock dry-run OK): pending/g-dice/out/01…13 (see RUN-ORDER.json, README.md). No new library components are created; inline pieces (dice slider/track/thumb/roll marker, bet panel fields, linked target/chance/multiplier inputs, prompt cards, mobile RG strip, mobile odds tiles, mobile result card, roll cards, bottom sheets) are component gaps.",
+ "frames_planned": [
+  {
+   "frame": "[DI-01] Dice interface / 1440 / Default — roll over 50.50",
+   "script": "out/01_d_di01_master.js"
+  },
+  {
+   "frame": "[DI-02] Number selection / 1440 / Dragging target to 34.00 — odds update live",
+   "script": "out/02_d_di02_states.js"
+  },
+  {
+   "frame": "[DI-02] Number selection / 1440 / Roll under 50.50 — 50.50% · 1.9604×",
+   "script": "out/02_d_di02_states.js"
+  },
+  {
+   "frame": "[DI-02] Number selection / 1440 / Out of range — win chance above 98.00%",
+   "script": "out/02_d_di02_states.js"
+  },
+  {
+   "frame": "[DI-03] Rolling / 1440 / Rolling — stake locked",
+   "script": "out/03_d_di03_di04.js"
+  },
+  {
+   "frame": "[DI-04] Result / 1440 / Win — rolled 73.21 (+10.00 USDT)",
+   "script": "out/03_d_di03_di04.js"
+  },
+  {
+   "frame": "[DI-04] Result / 1440 / Lose — rolled 31.07 (−10.00 USDT)",
+   "script": "out/03_d_di03_di04.js"
+  },
+  {
+   "frame": "[DI-05] History / 1440 / My rolls — today",
+   "script": "out/04_d_di05_history.js"
+  },
+  {
+   "frame": "[DI-06] Provably-fair verification / 1440 / Roll D-88213 verified",
+   "script": "out/05_d_di06_pf.js"
+  },
+  {
+   "frame": "[DI-06] Provably-fair verification / 1440 / Mismatch — server seed from another pair",
+   "script": "out/05_d_di06_pf.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 1440 / Loading game",
+   "script": "out/06_d_di07_a.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 1440 / Connection lost — roll held on server",
+   "script": "out/06_d_di07_a.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+   "script": "out/06_d_di07_a.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 1440 / Bet above table max (1,500.00 > 1,000.00 USDT)",
+   "script": "out/07_d_di07_b.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 1440 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)",
+   "script": "out/07_d_di07_b.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 1440 / Region restricted (United States)",
+   "script": "out/07_d_di07_b.js"
+  },
+  {
+   "frame": "[GM-01] Reality check / 1440 / 60-minute reminder over Pool Dice",
+   "script": "out/08_d_gm01_overlays.js"
+  },
+  {
+   "frame": "[GM-01] Session bar / 1440 / Approaching daily loss limit — session details open (DEMO scenario)",
+   "script": "out/08_d_gm01_overlays.js"
+  },
+  {
+   "frame": "[GM-01] Spec — Game session RG bar & reality check / Board",
+   "script": "out/08b_d_gm01_spec.js"
+  },
+  {
+   "frame": "[DI-01] Dice interface / 768 / Default — roll over 50.50",
+   "script": "out/09_t_di01_768.js"
+  },
+  {
+   "frame": "[DI-01] Dice interface / 390 / Default — roll over 50.50",
+   "script": "out/10_m_di01_di02_di03.js"
+  },
+  {
+   "frame": "[DI-02] Number selection / 390 / Dragging target to 34.00 — odds update live",
+   "script": "out/10_m_di01_di02_di03.js"
+  },
+  {
+   "frame": "[DI-03] Rolling / 390 / Rolling — stake locked",
+   "script": "out/10_m_di01_di02_di03.js"
+  },
+  {
+   "frame": "[DI-04] Result / 390 / Win — rolled 73.21 (+10.00 USDT)",
+   "script": "out/11_m_di04_gm01.js"
+  },
+  {
+   "frame": "[DI-04] Result / 390 / Lose — rolled 31.07 (−10.00 USDT)",
+   "script": "out/11_m_di04_gm01.js"
+  },
+  {
+   "frame": "[GM-01] Reality check / 390 / Bottom sheet over Pool Dice — 60 minutes",
+   "script": "out/11_m_di04_gm01.js"
+  },
+  {
+   "frame": "[GM-01] Session strip / 390 / Approaching daily loss limit — session sheet (DEMO scenario)",
+   "script": "out/11_m_di04_gm01.js"
+  },
+  {
+   "frame": "[DI-05] History / 390 / My rolls — today",
+   "script": "out/12_m_di05_di06.js"
+  },
+  {
+   "frame": "[DI-06] Provably-fair verification / 390 / Roll D-88213 verified",
+   "script": "out/12_m_di05_di06.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 390 / Connection lost — roll held on server",
+   "script": "out/13_m_di07.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+   "script": "out/13_m_di07.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 390 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)",
+   "script": "out/13_m_di07.js"
+  },
+  {
+   "frame": "[DI-07] Errors & limits / 390 / Region restricted (United States)",
+   "script": "out/13_m_di07.js"
+  }
+ ]
+}

@@ -12,8 +12,14 @@ export class AffiliatesService {
   ) {}
 
   async myReferrals(userId: string) {
-    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { handle: true, publicId: true } });
-    const code = (user.handle ?? user.publicId).replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 10);
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { handle: true, publicId: true },
+    });
+    const code = (user.handle ?? user.publicId)
+      .replace(/[^a-z0-9]/gi, '')
+      .toUpperCase()
+      .slice(0, 10);
     const [signUps, qualified] = await Promise.all([
       this.prisma.referral.count({ where: { referrerUserId: userId } }),
       this.prisma.referral.count({ where: { referrerUserId: userId, qualifiedAt: { not: null } } }),
@@ -29,6 +35,13 @@ export class AffiliatesService {
 
   async listAffiliates() {
     const rows = await this.prisma.affiliate.findMany({ orderBy: { code: 'asc' } });
-    return rows.map((a) => ({ id: a.id, code: a.code, name: a.name, plan: a.plan, status: a.status, isDemo: a.isDemo }));
+    return rows.map((a) => ({
+      id: a.id,
+      code: a.code,
+      name: a.name,
+      plan: a.plan,
+      status: a.status,
+      isDemo: a.isDemo,
+    }));
   }
 }

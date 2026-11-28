@@ -1,27 +1,23 @@
 {
- "_note": "Agent mob-patterns (MOB-01/02/10/12). NOTHING BUILT YET: every use_figma call hit the Figma MCP seat limit (3 consecutive limit errors, 27 Nov 2026 ~23:50), so no section, frame or component ids exist. Ready-to-run scripts (helpers.js verbatim, <50k chars, idempotent, run in order 01→10): design/figma-build/pending/mob-patterns/mob-01.js … mob-10.js. Target: page '10 — Mobile Experience', section 'MOB-01/02/10/12 Mobile patterns' created at X=224000, Y=0 (X=96000 would overlap 'USR — Mobile B' at X=98000). No new library components are created by these scripts; inline pieces (mobile tx card, entry round card, tablet top bar, tab-item Pressed/Focus spec cells, mobile hero banner) are documented as component gaps.",
- "frames_planned": [
-  "[MOB-01] Public header / 390 / Guest — menu closed",
-  "[MOB-01] Full-screen menu / 390 / Guest — menu open",
-  "[MOB-01] Public header / 390 / Member — menu closed",
-  "[MOB-01] Full-screen menu / 390 / Member — menu open",
-  "[MOB-01] Public header / 390 / Restricted region (United States)",
-  "[MOB-01] Spec — Header & full-screen menu / Board",
-  "[MOB-02] Tab bar — Home active / 390 / Member",
-  "[MOB-02] Tab bar — Pool active / 390 / Member",
-  "[MOB-02] Tab bar — Games active / 390 / Member",
-  "[MOB-02] Tab bar — Wallet active / 390 / Member",
-  "[MOB-02] Tab bar — Account active / 390 / Member",
-  "[MOB-02] Spec — Bottom tab bar states & rules / Board",
-  "[MOB-10] Transactions — cards / 390 / Default",
-  "[MOB-10] Transactions — card detail / 390 / Bottom sheet — WD-20931 under review",
-  "[MOB-10] Entries — cards / 390 / Default",
-  "[MOB-10] Entries — cards / 390 / Loading (skeleton cards)",
-  "[MOB-10] Spec — Table → card mapping / Board",
-  "[MOB-12] Tablet behaviour sheet / Board",
-  "[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)",
-  "[MOB-12] Tablet 768 — Navigation / 768 / Drawer open",
-  "[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column",
-  "[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)"
- ]
+ "_note": "Agent mob-patterns (MOB-01/02/10/12) — continuation run 28 Nov 2026. Section 'MOB-01/02/10/12 Mobile patterns' = 188:158877 on page '10 — Mobile Experience' at X=224000, Y=0 (X=96000 would overlap 'USR — Mobile A/B'). No new library components were created; inline pieces documented as component gaps: mobile tx card, entry round card, tablet top bar (no 768 Shell/Topbar variant), tab-item Pressed/Focus spec cells, mobile hero banner. Scripts: pending/mob-patterns (finished ones in out/).",
+ "frames": {
+  "[MOB-01] Public header / 390 / Guest — menu closed": "188:158881",
+  "[MOB-01] Full-screen menu / 390 / Guest — menu open": "188:159315",
+  "[MOB-01] Public header / 390 / Member — menu closed": "188:159806",
+  "[MOB-01] Full-screen menu / 390 / Member — menu open": "188:160218",
+  "[MOB-01] Public header / 390 / Restricted region (United States)": "188:160530",
+  "[MOB-01] Spec — Header & full-screen menu / Board": "188:160887",
+  "[MOB-02] Tab bar — Home active / 390 / Member": "190:74734",
+  "[MOB-02] Tab bar — Pool active / 390 / Member": "190:75438",
+  "[MOB-02] Tab bar — Games active / 390 / Member": "190:75598",
+  "[MOB-02] Tab bar — Wallet active / 390 / Member": "192:144096",
+  "[MOB-02] Tab bar — Account active / 390 / Member": "192:144357",
+  "[MOB-02] Spec — Bottom tab bar states & rules / Board": "192:144563",
+  "[MOB-10] Transactions — cards / 390 / Default": "193:144654",
+  "[MOB-10] Transactions — card detail / 390 / Bottom sheet — WD-20931 under review": "193:145037",
+  "[MOB-10] Entries — cards / 390 / Default": "194:77008",
+  "[MOB-10] Entries — cards / 390 / Loading (skeleton cards)": "194:77291",
+  "[MOB-10] Spec — Table → card mapping / Board": "196:77250",
+  "[MOB-12] Tablet behaviour sheet / Board": "199:77678"
+ }
 }

@@ -30,7 +30,8 @@ export interface AmountInputProps {
   className?: string;
 }
 
-function sanitize(raw: string, decimals: number): string {
+/** Keep digits and one decimal point, at most `decimals` fraction digits ("1,5" → "1.5"). Exported for tests. */
+export function sanitizeAmount(raw: string, decimals: number): string {
   const cleaned = raw.replace(/,/g, '.').replace(/[^\d.]/g, '');
   const [int = '', ...rest] = cleaned.split('.');
   if (rest.length === 0) return int.replace(/^0+(?=\d)/, '');
@@ -72,7 +73,8 @@ export function AmountInput({
       labelAside={
         <>
           <span>
-            Available <span className="text-text-primary tabular-nums">{formatUSDT(available)}</span>
+            Available{' '}
+            <span className="text-text-primary tabular-nums">{formatUSDT(available)}</span>
           </span>
           {demo && <DemoBadge size="xs" />}
         </>
@@ -88,7 +90,7 @@ export function AmountInput({
           autoComplete="off"
           placeholder="0.00"
           value={value}
-          onChange={(e) => onChange(sanitize(e.target.value, decimals))}
+          onChange={(e) => onChange(sanitizeAmount(e.target.value, decimals))}
           className="text-number-m tabular-nums"
         />
         <span className="flex items-center gap-1.5 text-label-m text-text-secondary">

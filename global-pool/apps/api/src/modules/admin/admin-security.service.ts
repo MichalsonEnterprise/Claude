@@ -13,19 +13,31 @@ import { TotpService } from '../security/totp.service';
 export class AdminSecurityService {
   constructor(private readonly totp: TotpService) {}
 
-  async assertSensitive(admin: AuthAdmin, permission: Permission, input: { reason?: string; mfaCode?: string }) {
+  async assertSensitive(
+    admin: AuthAdmin,
+    permission: Permission,
+    input: { reason?: string; mfaCode?: string },
+  ) {
     if (!admin.permissions.includes(permission)) {
-      throw new AppError('FORBIDDEN', 'Your role does not allow this action', { missingPermissions: [permission] });
+      throw new AppError('FORBIDDEN', 'Your role does not allow this action', {
+        missingPermissions: [permission],
+      });
     }
     const policy = PERMISSION_POLICY[permission];
     if (policy.requiresReason && (!input.reason || input.reason.trim().length < 5)) {
-      throw new AppError('VALIDATION_FAILED', 'A written reason (min. 5 characters) is required', { field: 'reason' });
+      throw new AppError('VALIDATION_FAILED', 'A written reason (min. 5 characters) is required', {
+        field: 'reason',
+      });
     }
     if (policy.requiresMfa) {
       if (!input.mfaCode) {
-        throw new AppError('STEP_UP_REQUIRED', 'Confirm with your authenticator code', { reason: 'mfa_required' });
+        throw new AppError('STEP_UP_REQUIRED', 'Confirm with your authenticator code', {
+          reason: 'mfa_required',
+        });
       }
-      await this.totp.verifyActive({ adminUserId: admin.id }, input.mfaCode, { allowBackup: false });
+      await this.totp.verifyActive({ adminUserId: admin.id }, input.mfaCode, {
+        allowBackup: false,
+      });
     }
     return policy;
   }

@@ -22,7 +22,10 @@ export default createConfig({
       files: TSX,
       rules: {
         // React event handlers may return promises (form submit, async onClick).
-        '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+        '@typescript-eslint/no-misused-promises': [
+          'error',
+          { checksVoidReturn: { attributes: false } },
+        ],
         // Money is never a JS float (DEV_CONVENTIONS): use @gp/shared/money helpers.
         'no-restricted-globals': [
           'error',

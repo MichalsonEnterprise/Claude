@@ -1,0 +1,2 @@
+# Local build artefacts (the root .gitignore covers .next/, test-results/, node_modules/)
+*.tsbuildinfo

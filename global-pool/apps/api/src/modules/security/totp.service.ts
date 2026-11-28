@@ -38,7 +38,10 @@ export class TotpService {
   ) {}
 
   /** Start (or restart) enrolment: a new pending secret. An ACTIVE factor must be disabled first. */
-  async enroll(owner: TotpOwner, label: string): Promise<{ secret: string; otpauthUrl: string; issuer: string }> {
+  async enroll(
+    owner: TotpOwner,
+    label: string,
+  ): Promise<{ secret: string; otpauthUrl: string; issuer: string }> {
     const existing = await this.find(owner);
     if (existing?.status === 'active') {
       throw new AppError('CONFLICT', 'Two-factor authentication is already enabled');
@@ -48,7 +51,13 @@ export class TotpService {
     if (existing) {
       await this.prisma.totpSecret.update({
         where: { id: existing.id },
-        data: { secretEnc, status: 'pending', failedAttempts: 0, lockedUntil: null, lastUsedStep: null },
+        data: {
+          secretEnc,
+          status: 'pending',
+          failedAttempts: 0,
+          lockedUntil: null,
+          lastUsedStep: null,
+        },
       });
     } else {
       await this.prisma.totpSecret.create({ data: { ...owner, secretEnc, status: 'pending' } });
@@ -61,7 +70,8 @@ export class TotpService {
   async confirm(owner: TotpOwner, code: string): Promise<{ backupCodes: string[] }> {
     const row = await this.find(owner);
     if (!row) throw new AppError('BAD_REQUEST', 'Start two-factor enrolment first');
-    if (row.status === 'active') throw new AppError('CONFLICT', 'Two-factor authentication is already enabled');
+    if (row.status === 'active')
+      throw new AppError('CONFLICT', 'Two-factor authentication is already enabled');
     const outcome = await this.verifyRow(row, code, { allowBackup: false });
     if (!outcome.ok) this.throwInvalid(outcome);
     await this.prisma.totpSecret.update({
@@ -73,7 +83,10 @@ export class TotpService {
 
   async regenerateBackupCodes(totpSecretId: string): Promise<string[]> {
     const codes = Array.from({ length: BACKUP_CODE_COUNT }, () => {
-      const raw = Array.from({ length: 8 }, () => BACKUP_ALPHABET[randomInt(BACKUP_ALPHABET.length)]).join('');
+      const raw = Array.from(
+        { length: 8 },
+        () => BACKUP_ALPHABET[randomInt(BACKUP_ALPHABET.length)],
+      ).join('');
       return `${raw.slice(0, 4)}-${raw.slice(4)}`;
     });
     await this.prisma.$transaction([
@@ -100,7 +113,8 @@ export class TotpService {
       pending: row?.status === 'pending',
       method: row?.status === 'active' ? ('authenticator_app' as const) : null,
       backupCodesRemaining: remaining,
-      lockedUntil: row?.lockedUntil && row.lockedUntil > new Date() ? row.lockedUntil.toISOString() : null,
+      lockedUntil:
+        row?.lockedUntil && row.lockedUntil > new Date() ? row.lockedUntil.toISOString() : null,
     };
   }
 
@@ -111,7 +125,11 @@ export class TotpService {
   }
 
   /** Verify a code for an ACTIVE factor (TOTP, or a single-use backup code when allowed). Throws on failure. */
-  async verifyActive(owner: TotpOwner, code: string, options: { allowBackup?: boolean } = {}): Promise<VerifyOutcome> {
+  async verifyActive(
+    owner: TotpOwner,
+    code: string,
+    options: { allowBackup?: boolean } = {},
+  ): Promise<VerifyOutcome> {
     const row = await this.find(owner);
     if (!row || row.status !== 'active') {
       throw new AppError('STEP_UP_REQUIRED', 'Set up two-factor authentication first', {
@@ -124,7 +142,11 @@ export class TotpService {
   }
 
   /** Low-level check with replay protection + lockout bookkeeping. Never throws for a wrong code. */
-  async verifyRow(row: TotpSecret, code: string, options: { allowBackup: boolean }): Promise<VerifyOutcome> {
+  async verifyRow(
+    row: TotpSecret,
+    code: string,
+    options: { allowBackup: boolean },
+  ): Promise<VerifyOutcome> {
     const { STEP_UP_MAX_ATTEMPTS: max, STEP_UP_LOCK_MINUTES: lockMinutes } = this.config.env;
     const now = new Date();
     if (row.lockedUntil && row.lockedUntil > now) {
@@ -142,7 +164,7 @@ export class TotpService {
         epochTolerance: EPOCH_TOLERANCE_SECONDS,
         ...(row.lastUsedStep !== null ? { afterTimeStep: row.lastUsedStep } : {}),
       });
-      const step = result.valid && 'timeStep' in result ? (result.timeStep as number) : null;
+      const step = result.valid && 'timeStep' in result ? result.timeStep : null;
       if (step !== null) {
         // Conditional update = atomic replay protection under concurrency.
         const claimed = await this.prisma.totpSecret.updateMany({
@@ -156,7 +178,11 @@ export class TotpService {
       }
     } else if (options.allowBackup && /^[A-Za-z0-9]{4}-?[A-Za-z0-9]{4}$/.test(trimmed)) {
       const used = await this.prisma.backupCode.updateMany({
-        where: { totpSecretId: row.id, codeHash: sha256Hex(normalizeBackup(trimmed)), usedAt: null },
+        where: {
+          totpSecretId: row.id,
+          codeHash: sha256Hex(normalizeBackup(trimmed)),
+          usedAt: null,
+        },
         data: { usedAt: now },
       });
       if (used.count === 1) {
@@ -175,7 +201,12 @@ export class TotpService {
       where: { id: row.id },
       data: { failedAttempts: lockedUntil ? 0 : failed, lockedUntil },
     });
-    return { ok: false, method: null, attemptsRemaining: lockedUntil ? 0 : max - failed, lockedUntil };
+    return {
+      ok: false,
+      method: null,
+      attemptsRemaining: lockedUntil ? 0 : max - failed,
+      lockedUntil,
+    };
   }
 
   private throwInvalid(outcome: VerifyOutcome): never {

@@ -60,10 +60,25 @@ export class WalletService {
         reference: `prize:${p.id}`,
       })),
     ];
+    const rewards = await this.prisma.transaction.findMany({
+      where: { userId, type: 'reward', status: 'pending' },
+      orderBy: { createdAt: 'asc' },
+    });
+    owedItems.push(
+      ...rewards.map((r) => ({
+        label: r.description,
+        amount: usdt(r.amount),
+        reference: r.reference,
+      })),
+    );
     const itemized = owedItems.reduce((acc, i) => acc.plus(money(i.amount)), new MoneyDecimal(0));
     const otherOwed = money(b.owed).minus(itemized);
     if (otherOwed.gt(0)) {
-      owedItems.push({ label: 'Rewards owed', amount: toUSDTString(otherOwed), reference: 'rewards' });
+      owedItems.push({
+        label: 'Rewards owed',
+        amount: toUSDTString(otherOwed),
+        reference: 'rewards',
+      });
     }
     return {
       ...b,
@@ -109,8 +124,14 @@ export class WalletService {
           metadata: { amount: owed },
         });
         const now = new Date();
-        await tx.prizeClaim.updateMany({ where: { userId, status: 'owed' }, data: { status: 'claimed', claimedAt: now } });
-        await tx.entry.updateMany({ where: { userId, status: 'refund_owed' }, data: { status: 'refunded' } });
+        await tx.prizeClaim.updateMany({
+          where: { userId, status: 'owed' },
+          data: { status: 'claimed', claimedAt: now },
+        });
+        await tx.entry.updateMany({
+          where: { userId, status: 'refund_owed' },
+          data: { status: 'refunded' },
+        });
         await tx.transaction.updateMany({
           where: { userId, type: { in: ['prize', 'refund', 'reward'] }, status: 'pending' },
           data: { status: 'completed', completedAt: now },

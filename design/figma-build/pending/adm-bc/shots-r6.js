@@ -1,0 +1,1 @@
+for (const nm of ['[ADM-B1] Supported Networks / 1280 / Default', '[ADM-B3] Contract Addresses / 1280 / Default', '[ADM-B4] Transaction Monitoring / 1280 / Live']) { const fr = sec.children.find(n => n.name === nm); if (fr) await fr.screenshot({ scale: 0.35 }); }

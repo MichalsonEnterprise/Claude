@@ -78,7 +78,12 @@ export const PRIMARY_NAV: NavItem[] = [
       { id: 'orbit-rush', label: 'Orbit Rush', href: ROUTES.game('orbit-rush'), icon: ChartSpline },
       { id: 'pool-dice', label: 'Pool Dice', href: ROUTES.game('pool-dice'), icon: Dice5 },
       { id: 'double-side', label: 'Double Side', href: ROUTES.game('double-side'), icon: Coins },
-      { id: 'pool-roulette', label: 'Pool Roulette', href: ROUTES.game('pool-roulette'), icon: Disc3 },
+      {
+        id: 'pool-roulette',
+        label: 'Pool Roulette',
+        href: ROUTES.game('pool-roulette'),
+        icon: Disc3,
+      },
       { id: 'twenty-one', label: 'Twenty-One', href: ROUTES.game('twenty-one'), icon: Spade },
     ],
   },
@@ -105,8 +110,21 @@ export const PRIMARY_NAV: NavItem[] = [
 
 export const ACCOUNT_NAV: NavItem[] = [
   { id: 'wallet', label: 'Wallet', href: ROUTES.wallet, icon: Wallet },
-  { id: 'entries', label: 'My entries', href: ROUTES.entries, icon: Ticket, memberOnly: true, countKey: 'entries' },
-  { id: 'transactions', label: 'Transactions', href: ROUTES.transactions, icon: ArrowLeftRight, memberOnly: true },
+  {
+    id: 'entries',
+    label: 'My entries',
+    href: ROUTES.entries,
+    icon: Ticket,
+    memberOnly: true,
+    countKey: 'entries',
+  },
+  {
+    id: 'transactions',
+    label: 'Transactions',
+    href: ROUTES.transactions,
+    icon: ArrowLeftRight,
+    memberOnly: true,
+  },
   { id: 'rg', label: 'Responsible gaming', href: ROUTES.responsibleGaming, icon: HeartHandshake },
   { id: 'support', label: 'Support', href: ROUTES.support, icon: LifeBuoy },
 ];

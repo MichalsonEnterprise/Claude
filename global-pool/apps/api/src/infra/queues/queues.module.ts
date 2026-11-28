@@ -25,7 +25,11 @@ import { QUEUES } from './queues';
         },
       }),
     }),
-    BullModule.registerQueue({ name: QUEUES.DEPOSITS }, { name: QUEUES.WITHDRAWALS }, { name: QUEUES.ROUNDS }),
+    BullModule.registerQueue(
+      { name: QUEUES.DEPOSITS },
+      { name: QUEUES.WITHDRAWALS },
+      { name: QUEUES.ROUNDS },
+    ),
   ],
   exports: [BullModule],
 })

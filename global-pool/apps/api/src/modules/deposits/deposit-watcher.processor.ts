@@ -25,7 +25,10 @@ export class DepositWatcherProcessor extends WorkerHost implements OnApplication
     await this.queue.upsertJobScheduler(
       'deposit-watcher',
       { every: this.config.env.DEPOSIT_WATCHER_POLL_SECONDS * 1000 },
-      { name: JOBS.DEPOSIT_WATCH, opts: { attempts: 1, removeOnComplete: true, removeOnFail: 100 } },
+      {
+        name: JOBS.DEPOSIT_WATCH,
+        opts: { attempts: 1, removeOnComplete: true, removeOnFail: 100 },
+      },
     );
     void this.worker.run();
   }

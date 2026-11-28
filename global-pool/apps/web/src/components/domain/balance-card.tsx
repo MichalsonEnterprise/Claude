@@ -94,11 +94,18 @@ export function BalanceCard({
   const Icon = spec.icon;
   const totalDec = total !== undefined ? money(total) : null;
   const share =
-    totalDec && !totalDec.isZero() ? money(amount).div(totalDec).times(100).toDecimalPlaces(1) : null;
+    totalDec && !totalDec.isZero()
+      ? money(amount).div(totalDec).times(100).toDecimalPlaces(1)
+      : null;
   return (
     <Card className={cn('gap-4', className)}>
       <div className="flex items-center gap-2.5">
-        <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-md [&_svg]:size-[18px]', spec.tile)}>
+        <span
+          className={cn(
+            'flex size-9 shrink-0 items-center justify-center rounded-md [&_svg]:size-[18px]',
+            spec.tile,
+          )}
+        >
           <Icon aria-hidden />
         </span>
         <p className="text-body-s-strong text-text-secondary">{spec.label}</p>
@@ -115,7 +122,10 @@ export function BalanceCard({
           aria-valuemax={100}
           aria-valuenow={share.toNumber()}
         >
-          <div className={cn('h-full rounded-full', spec.bar)} style={{ width: `${share.toFixed(1)}%` }} />
+          <div
+            className={cn('h-full rounded-full', spec.bar)}
+            style={{ width: `${share.toFixed(1)}%` }}
+          />
         </div>
       )}
       {composition && <p className="text-caption text-text-tertiary">{composition}</p>}

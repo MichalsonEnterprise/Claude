@@ -2,7 +2,7 @@
   "name": "@gp/api",
   "version": "0.1.0",
   "private": true,
-  "description": "GLOBAL POOL API — NestJS 11 + Prisma 6 + PostgreSQL + Redis/BullMQ. Hybrid-custody double-entry ledger, Global Pool rounds with verifiable randomness, Privy player auth, separate admin auth. DEMO / testnet only.",
+  "description": "GLOBAL POOL API \u2014 NestJS 11 + Prisma 6 + PostgreSQL + Redis/BullMQ. Hybrid-custody double-entry ledger, Global Pool rounds with verifiable randomness, Privy player auth, separate admin auth. DEMO / testnet only.",
   "license": "UNLICENSED",
   "scripts": {
     "dev": "pnpm start:dev",
@@ -12,21 +12,20 @@
     "build": "pnpm db:generate && nest build -p tsconfig.build.json",
     "typecheck": "pnpm db:generate && tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
-    "test": "pnpm db:generate && vitest run --config vitest.config.ts",
-    "test:unit": "vitest run --config vitest.config.ts",
-    "test:e2e": "pnpm db:generate && vitest run --config vitest.e2e.config.ts",
-    "test:all": "pnpm test && pnpm test:e2e",
+    "test": "pnpm db:generate && vitest run --config vitest.config.mts && vitest run --config vitest.e2e.config.mts",
+    "test:unit": "vitest run --config vitest.config.mts",
+    "test:e2e": "pnpm db:generate && vitest run --config vitest.e2e.config.mts",
     "db:generate": "node scripts/prisma.mjs generate",
     "db:migrate": "node scripts/prisma.mjs migrate dev",
     "db:migrate:deploy": "node scripts/prisma.mjs migrate deploy",
     "db:migrate:test": "node scripts/prisma.mjs migrate reset --force --skip-seed --skip-generate --test-db",
     "db:reset": "node scripts/prisma.mjs migrate reset --force",
-    "db:seed": "node scripts/run-with-env.mjs tsx prisma/seed.ts",
+    "db:seed": "tsx prisma/seed.ts",
     "db:seed:prod": "node dist/prisma/seed.js",
     "db:studio": "node scripts/prisma.mjs studio"
   },
   "prisma": {
-    "seed": "node scripts/run-with-env.mjs tsx prisma/seed.ts"
+    "seed": "node_modules/.bin/tsx prisma/seed.ts"
   },
   "dependencies": {
     "@gp/shared": "workspace:*",

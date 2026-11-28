@@ -1,0 +1,1 @@
+for (const nm of ['[ADM-B4] Transaction Monitoring / 1440 / Live', '[ADM-C1] KYC Queue / 1280 / Default', '[ADM-C2] AML Alerts / 1280 / Default']) { const fr = sec.children.find(n => n.name === nm); if (fr) await fr.screenshot({ scale: nm.includes('1440') ? 0.5 : 0.35 }); }

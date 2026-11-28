@@ -40,7 +40,9 @@ export class HealthController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Liveness + readiness: PostgreSQL and Redis checks (503 when a dependency is down)' })
+  @ApiOperation({
+    summary: 'Liveness + readiness: PostgreSQL and Redis checks (503 when a dependency is down)',
+  })
   async health(@Res({ passthrough: true }) res: Response) {
     const [database, redis] = await Promise.all([
       timed(() => this.prisma.$queryRaw`SELECT 1`),

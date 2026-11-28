@@ -93,7 +93,10 @@ export class PlayerIdentityService {
   }
 
   /** Sync linked email + wallets from Privy (wallets are upserted, never deleted here). */
-  async syncLinkedAccounts(user: Pick<User, 'id' | 'email'>, linked: PrivyLinkedAccounts): Promise<void> {
+  async syncLinkedAccounts(
+    user: Pick<User, 'id' | 'email'>,
+    linked: PrivyLinkedAccounts,
+  ): Promise<void> {
     if (linked.email && linked.email !== user.email) {
       await this.prisma.user.update({
         where: { id: user.id },

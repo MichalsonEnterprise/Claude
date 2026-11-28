@@ -1,0 +1,1 @@
+for (const nm of ['[ADM-B5] Blockchain Events / 1280 / Live', '[ADM-B6] Network Health / 1280 / Degraded — Ethereum', '[ADM-B7] Failed Transactions / 1280 / Default', '[ADM-B8] Gas Statistics / 1280 / Default', '[ADM-B1] Supported Networks / 1280 / Default']) { const fr = sec.children.find(n => n.name === nm); if (fr) await fr.screenshot({ scale: 0.3 }); }

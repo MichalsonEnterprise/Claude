@@ -15,7 +15,11 @@ export function DsSection({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-24 border-t border-border-subtle pt-10">
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className="scroll-mt-24 border-t border-border-subtle pt-10"
+    >
       <div className="mb-6 flex flex-col gap-1">
         <h2 id={`${id}-title`} className="text-h3">
           {title}
@@ -50,7 +54,12 @@ export function Specimen({
 /** Horizontal scroll frame for previews wider than the viewport (shell parts on mobile). */
 export function Frame({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('max-w-full overflow-x-auto rounded-lg border border-dashed border-border-default', className)}>
+    <div
+      className={cn(
+        'max-w-full overflow-x-auto rounded-lg border border-dashed border-border-default',
+        className,
+      )}
+    >
       {children}
     </div>
   );

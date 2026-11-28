@@ -16,7 +16,9 @@ export class TransactionsController {
   constructor(private readonly transactions: TransactionsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Paginated, filtered activity history (type, status, network, from/to)' })
+  @ApiOperation({
+    summary: 'Paginated, filtered activity history (type, status, network, from/to)',
+  })
   list(@CurrentUser() user: AuthUser, @Query() query: TransactionsQueryDto) {
     return this.transactions.list(user.id, query);
   }

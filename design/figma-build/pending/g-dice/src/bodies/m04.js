@@ -1,0 +1,16 @@
+// Mobile DI-07 errors & limits (x 3180)
+{ const X = 3180; const shots = [];
+  shots.push((await mk('[DI-07] Errors & limits / 390 / Connection lost — roll held on server', X, async () => buildM('n', { balance: '9,205.30', avail: '9,205.30', panelOff: true, thumb: 'locked', roll: { v: '41.86', state: 'rolling', ghost: true },
+    top: { label: 'ROLL D-88213 · WAITING FOR CONNECTION', meta: 'Stake received 18:42:06 UTC', color: 'text/warning' }, read: { over: 'RESULT PENDING', value: '41.86', color: 'text/tertiary' },
+    cta: { label: 'Reconnecting…', state: 'Disabled', lead: 'wifi-off' }, ctaNote: 'Roll D-88213 · 10.00 USDT locked',
+    block: { tone: 'warning', icon: 'wifi-off', title: 'Connection lost', body: 'Roll D-88213 reached the server and settles there. You’ll see the result when you’re back online.', facts: [['Attempt', '2 of 5'], ['Stake', '10.00 USDT', true]], actions: [await BTN('Secondary', 'Retry now', { size: 'S', lead: 'refresh' }), await BTN('Ghost', 'My rolls', { size: 'S', lead: 'history' })] }, blockY: 16 }))).f);
+  shots.push((await mk('[DI-07] Errors & limits / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)', X, async () => buildM('n', { balance: '4.20', avail: '4.20', amtErr: 'More than your available balance (4.20 USDT).',
+    panelNotice: { tone: 'info', icon: 'deposit', title: 'Top up to keep playing', body: 'Deposit USDT on 5 networks (min 10.00) or lower your bet to 4.20 or less.' },
+    cta: { label: 'Deposit USDT', lead: 'deposit' }, cta2: { label: 'Bet 4.20 USDT instead', lead: 'minus' }, ctaNote: 'Min deposit 10.00 USDT · 5 networks' }))).f);
+  shots.push((await mk('[DI-07] Errors & limits / 390 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)', X, async () => buildM('n', { rgm: { danger: true, net: '−200.00 USDT', lim: '200.00 / 200.00 USDT', pct: 1, msg: 'Daily loss limit reached · play paused until 00:00 UTC' }, panelOff: true, thumb: 'locked', sliderOff: true,
+    cta: { label: 'Paused until 00:00 UTC', state: 'Disabled', lead: 'pause-circle' }, ctaNote: 'Your balance and withdrawals aren’t affected',
+    block: { tone: 'info', icon: 'shield', title: 'Daily loss limit reached', body: 'Play is paused in every game until 28 Nov 2026, 00:00 UTC. Lowering the limit applies now; raising it waits 24 h.', actions: [await BTN('Secondary', 'View limits', { size: 'S', lead: 'sliders' }), await BTN('Ghost', 'Take a break', { size: 'S', lead: 'pause-circle' })] }, blockY: 16 }))).f);
+  shots.push((await mk('[DI-07] Errors & limits / 390 / Region restricted (United States)', X, async () => buildM('n', { region: true, panelOff: true, thumb: 'locked', sliderOff: true,
+    cta: { label: 'Withdraw funds', lead: 'withdraw' }, ctaNote: 'Games aren’t available in the United States',
+    block: { tone: 'warning', icon: 'globe', title: 'Not available in your region', body: 'GLOBAL POOL games aren’t licensed in the United States. You can still see your history and withdraw your balance.', note: 'Please don’t use a VPN or proxy to get around this.', actions: [await BTN('Ghost', 'Restricted countries', { size: 'S', lead: 'globe' }), await BTN('Ghost', 'Support', { size: 'S', lead: 'chat' })] }, blockY: 16 }))).f);
+  for (const f of shots) await f.screenshot({ scale: 0.45 }); }

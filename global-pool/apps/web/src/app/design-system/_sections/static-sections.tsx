@@ -15,9 +15,25 @@ import { GameTile } from '@/components/domain/game-tile';
 import { NetworkPill } from '@/components/domain/network-pill';
 import { StatCard } from '@/components/domain/stat-card';
 import { Avatar } from '@/components/ui/avatar';
-import { AgeBadge, CountBadge, STATUS_SPEC, StatusBadge, Tag, VipBadge, type BadgeStatus } from '@/components/ui/badge';
+import {
+  AgeBadge,
+  CountBadge,
+  STATUS_SPEC,
+  StatusBadge,
+  Tag,
+  VipBadge,
+  type BadgeStatus,
+} from '@/components/ui/badge';
 import { Button, IconButton } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Overline } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Overline,
+} from '@/components/ui/card';
 import { DemoBadge, DemoBar } from '@/components/ui/demo-badge';
 import {
   CellStack,
@@ -85,7 +101,10 @@ export function FoundationsSection() {
       title="Foundations"
       description="Tokens come from @gp/tokens (mirror of the Figma variables). Only semantic classes are used in product code; Tailwind's default palette is removed."
     >
-      <Specimen label="Semantic colours" bodyClassName="items-stretch grid grid-cols-2 gap-3 tablet:grid-cols-4 laptop:grid-cols-6">
+      <Specimen
+        label="Semantic colours"
+        bodyClassName="items-stretch grid grid-cols-2 gap-3 tablet:grid-cols-4 laptop:grid-cols-6"
+      >
         {SWATCHES.map((name) => (
           <div key={name} className="flex flex-col gap-1.5">
             <span
@@ -99,21 +118,38 @@ export function FoundationsSection() {
       </Specimen>
       <Specimen label="Typography (Inter · Geist Mono)" bodyClassName="flex-col items-start gap-2">
         {TYPE.map(([cls, sample]) => (
-          <p key={cls} className={`${cls} ${cls === 'text-mono-m' ? 'font-mono' : ''} max-w-full truncate`}>
+          <p
+            key={cls}
+            className={`${cls} ${cls === 'text-mono-m' ? 'font-mono' : ''} max-w-full truncate`}
+          >
             {sample}
           </p>
         ))}
       </Specimen>
       <Specimen label="Radius xs 4 · sm 6 · md 10 · lg 14 · xl 20 · 2xl 28">
-        {['rounded-xs', 'rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl'].map((r) => (
-          <span key={r} className={`flex size-16 items-center justify-center border border-border-default bg-surface-raised text-caption text-text-tertiary ${r}`}>
-            {r.replace('rounded-', '')}
-          </span>
-        ))}
+        {['rounded-xs', 'rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl'].map(
+          (r) => (
+            <span
+              key={r}
+              className={`flex size-16 items-center justify-center border border-border-default bg-surface-raised text-caption text-text-tertiary ${r}`}
+            >
+              {r.replace('rounded-', '')}
+            </span>
+          ),
+        )}
       </Specimen>
       <Specimen label="Elevation 1–4 · focus ring">
-        {['shadow-elevation-1', 'shadow-elevation-2', 'shadow-elevation-3', 'shadow-elevation-4', 'shadow-focus-ring'].map((s) => (
-          <span key={s} className={`flex h-16 w-28 items-center justify-center rounded-lg bg-surface-default text-caption text-text-tertiary ${s}`}>
+        {[
+          'shadow-elevation-1',
+          'shadow-elevation-2',
+          'shadow-elevation-3',
+          'shadow-elevation-4',
+          'shadow-focus-ring',
+        ].map((s) => (
+          <span
+            key={s}
+            className={`flex h-16 w-28 items-center justify-center rounded-lg bg-surface-default text-caption text-text-tertiary ${s}`}
+          >
             {s.replace('shadow-', '')}
           </span>
         ))}
@@ -131,7 +167,11 @@ export function FoundationsSection() {
           'bg-gradient-tile-red',
           'bg-gradient-tile-mint',
         ].map((g) => (
-          <span key={g} className={`h-16 w-24 rounded-md border border-border-subtle ${g}`} title={g} />
+          <span
+            key={g}
+            className={`h-16 w-24 rounded-md border border-border-subtle ${g}`}
+            title={g}
+          />
         ))}
       </Specimen>
     </DsSection>
@@ -315,8 +355,15 @@ export function BadgesSection() {
 
 export function CardsSection() {
   return (
-    <DsSection id="cards" title="Cards" description="Card variants, Card/Stat and Card/Balance (values reconcile: 12,480.50 = 9,215.30 + 1,850.00 + 1,000.00 + 415.20).">
-      <Specimen label="Card variants" bodyClassName="items-stretch grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-3">
+    <DsSection
+      id="cards"
+      title="Cards"
+      description="Card variants, Card/Stat and Card/Balance (values reconcile: 12,480.50 = 9,215.30 + 1,850.00 + 1,000.00 + 415.20)."
+    >
+      <Specimen
+        label="Card variants"
+        bodyClassName="items-stretch grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-3"
+      >
         {(['default', 'raised', 'outline', 'sunken', 'gold', 'interactive'] as const).map((v) => (
           <Card key={v} variant={v}>
             <CardHeader>
@@ -337,7 +384,10 @@ export function CardsSection() {
           </Card>
         ))}
       </Specimen>
-      <Specimen label="StatCard — up / down / neutral · M / L" bodyClassName="items-stretch grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-3">
+      <Specimen
+        label="StatCard — up / down / neutral · M / L"
+        bodyClassName="items-stretch grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-3"
+      >
         <StatCard
           label="Pool balance"
           value="186,400.00"
@@ -353,7 +403,12 @@ export function CardsSection() {
           series={[44, 43, 43.5, 42, 42.4, 41.6, 41.2]}
           demo
         />
-        <StatCard label="System health" value="99.97%" delta={{ value: '0.00 pp', trend: 'neutral', context: 'vs yesterday' }} demo />
+        <StatCard
+          label="System health"
+          value="99.97%"
+          delta={{ value: '0.00 pp', trend: 'neutral', context: 'vs yesterday' }}
+          demo
+        />
         <StatCard
           size="l"
           icon={<Users />}
@@ -365,9 +420,25 @@ export function CardsSection() {
           className="tablet:col-span-2"
         />
       </Specimen>
-      <Specimen label="BalanceCard — Total / Available / Locked / Pending / Owed" bodyClassName="items-stretch grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-3">
-        <BalanceCard type="total" amount={DEMO_BALANCES.total} composition="Available + Locked + Pending + Owed" updatedLabel="Updated 18:42 UTC" demo />
-        <BalanceCard type="available" amount={DEMO_BALANCES.available} total={DEMO_BALANCES.total} composition="Usable and withdrawable now" updatedLabel="Updated 18:42 UTC" demo />
+      <Specimen
+        label="BalanceCard — Total / Available / Locked / Pending / Owed"
+        bodyClassName="items-stretch grid grid-cols-1 gap-4 tablet:grid-cols-2 laptop:grid-cols-3"
+      >
+        <BalanceCard
+          type="total"
+          amount={DEMO_BALANCES.total}
+          composition="Available + Locked + Pending + Owed"
+          updatedLabel="Updated 18:42 UTC"
+          demo
+        />
+        <BalanceCard
+          type="available"
+          amount={DEMO_BALANCES.available}
+          total={DEMO_BALANCES.total}
+          composition="Usable and withdrawable now"
+          updatedLabel="Updated 18:42 UTC"
+          demo
+        />
         <BalanceCard
           type="locked"
           amount={DEMO_BALANCES.locked}
@@ -375,7 +446,13 @@ export function CardsSection() {
           composition="350.00 in 35 entries (round #1,248) + 1,500.00 pending withdrawal WD-20931"
           demo
         />
-        <BalanceCard type="pending" amount={DEMO_BALANCES.pending} total={DEMO_BALANCES.total} composition="DP-77412 on Ethereum · 7 / 12 confirmations" demo />
+        <BalanceCard
+          type="pending"
+          amount={DEMO_BALANCES.pending}
+          total={DEMO_BALANCES.total}
+          composition="DP-77412 on Ethereum · 7 / 12 confirmations"
+          demo
+        />
         <BalanceCard
           type="owed"
           amount={DEMO_BALANCES.owed}
@@ -392,7 +469,11 @@ export function CardsSection() {
 
 export function TabsSection() {
   return (
-    <DsSection id="tabs" title="Tabs" description="Underline (page sections), Pill (lobby filters), Segmented (2–4 options). Arrow keys move focus.">
+    <DsSection
+      id="tabs"
+      title="Tabs"
+      description="Underline (page sections), Pill (lobby filters), Segmented (2–4 options). Arrow keys move focus."
+    >
       <Specimen label="Underline" bodyClassName="block">
         <Tabs defaultValue="overview">
           <TabsList variant="underline">
@@ -469,7 +550,11 @@ const TX_STATUS: Record<TxStatus, BadgeStatus> = {
 export function DataSection() {
   const rows = DEMO_TRANSACTIONS.slice(0, 6);
   return (
-    <DsSection id="data" title="Data display" description="Table primitives (Comfortable 56 / Compact 40), Amount tones, AddressChip, NetworkPill.">
+    <DsSection
+      id="data"
+      title="Data display"
+      description="Table primitives (Comfortable 56 / Compact 40), Amount tones, AddressChip, NetworkPill."
+    >
       <Specimen label="Table — transactions (DEMO)" bodyClassName="block">
         <TableContainer>
           <Table>
@@ -495,7 +580,9 @@ export function DataSection() {
                       secondary={tx.description}
                     />
                   </TableCell>
-                  <TableCell className="text-text-secondary">{formatDateTimeUTC(tx.createdAt)}</TableCell>
+                  <TableCell className="text-text-secondary">
+                    {formatDateTimeUTC(tx.createdAt)}
+                  </TableCell>
                   <TableCell>
                     {tx.network ? (
                       <span className="flex items-center gap-2">
@@ -509,7 +596,10 @@ export function DataSection() {
                     <StatusBadge status={TX_STATUS[tx.status]} label={TX_STATUS_LABEL[tx.status]} />
                   </TableCell>
                   <TableCell align="right">
-                    <Amount value={tx.direction === 'out' ? `-${tx.amount}` : tx.amount} tone="signed" />
+                    <Amount
+                      value={tx.direction === 'out' ? `-${tx.amount}` : tx.amount}
+                      tone="signed"
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -560,22 +650,76 @@ export function GamesSection() {
               key={g.id}
               game={g.slug}
               name={g.name}
-              subtitle={g.category === 'jackpot' ? 'JACKPOT ROUNDS' : g.category === 'table' ? 'TABLE GAME' : 'GLOBAL POOL ORIGINAL'}
+              subtitle={
+                g.category === 'jackpot'
+                  ? 'JACKPOT ROUNDS'
+                  : g.category === 'table'
+                    ? 'TABLE GAME'
+                    : 'GLOBAL POOL ORIGINAL'
+              }
               href={`/games/${g.slug}`}
               edgeLabel={g.edgeLabel}
               players={g.players}
-              tag={g.slug === 'global-pool' ? 'live' : g.slug === 'orbit-rush' ? 'hot' : g.slug === 'skyline' ? 'new' : undefined}
+              tag={
+                g.slug === 'global-pool'
+                  ? 'live'
+                  : g.slug === 'orbit-rush'
+                    ? 'hot'
+                    : g.slug === 'skyline'
+                      ? 'new'
+                      : undefined
+              }
             />
           ) : null,
         )}
       </Specimen>
       <Specimen label="Hover preview · restricted · small (S 100×133)">
-        <GameTile game="orbit-rush" name="Orbit Rush" href="/games/orbit-rush" edgeLabel="1.00% house edge" players={1062} previewHover />
-        <GameTile game="global-pool" name="Global Pool" subtitle="JACKPOT ROUNDS" href="/pool" edgeLabel="Fee 0.05 USDT / entry" players={3412} previewHover />
-        <GameTile game="pool-roulette" name="Pool Roulette" href="/games/pool-roulette" edgeLabel="2.70% house edge" restricted />
-        <GameTile game="twenty-one" name="Twenty-One" href="/games/twenty-one" edgeLabel="≈0.50% house edge" size="s" />
-        <GameTile game="pool-dice" name="Pool Dice" href="/games/pool-dice" edgeLabel="1.00% house edge" size="s" />
-        <GameTile game="double-side" name="Double Side" href="/games/double-side" edgeLabel="2.00% house edge (1.96×)" size="s" restricted />
+        <GameTile
+          game="orbit-rush"
+          name="Orbit Rush"
+          href="/games/orbit-rush"
+          edgeLabel="1.00% house edge"
+          players={1062}
+          previewHover
+        />
+        <GameTile
+          game="global-pool"
+          name="Global Pool"
+          subtitle="JACKPOT ROUNDS"
+          href="/pool"
+          edgeLabel="Fee 0.05 USDT / entry"
+          players={3412}
+          previewHover
+        />
+        <GameTile
+          game="pool-roulette"
+          name="Pool Roulette"
+          href="/games/pool-roulette"
+          edgeLabel="2.70% house edge"
+          restricted
+        />
+        <GameTile
+          game="twenty-one"
+          name="Twenty-One"
+          href="/games/twenty-one"
+          edgeLabel="≈0.50% house edge"
+          size="s"
+        />
+        <GameTile
+          game="pool-dice"
+          name="Pool Dice"
+          href="/games/pool-dice"
+          edgeLabel="1.00% house edge"
+          size="s"
+        />
+        <GameTile
+          game="double-side"
+          name="Double Side"
+          href="/games/double-side"
+          edgeLabel="2.00% house edge (1.96×)"
+          size="s"
+          restricted
+        />
       </Specimen>
     </DsSection>
   );

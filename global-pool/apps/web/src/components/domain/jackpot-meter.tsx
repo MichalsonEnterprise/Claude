@@ -18,7 +18,10 @@ function RollingDigit({ digit }: { digit: number }) {
         style={{ transform: `translateY(-${digit}em)` }}
       >
         {DIGITS.map((d) => (
-          <span key={d} className="block h-[1em] bg-gradient-gold-jackpot bg-clip-text text-center text-transparent">
+          <span
+            key={d}
+            className="block h-[1em] bg-gradient-gold-jackpot bg-clip-text text-center text-transparent"
+          >
             {d}
           </span>
         ))}
@@ -53,6 +56,8 @@ export interface JackpotMeterProps {
   caption?: React.ReactNode;
   /** Render without the plaque frame (inline in heroes). */
   bare?: boolean;
+  /** "USDT" at full size (Card/Draw Countdown plaque) or half size (default). */
+  unitSize?: 'half' | 'full';
   className?: string;
 }
 
@@ -68,14 +73,16 @@ export function JackpotMeter({
   demo = false,
   caption,
   bare = false,
+  unitSize = 'half',
   className,
 }: JackpotMeterProps) {
   const text = formatUSDT(amount, { symbol: false });
   return (
     <div
       className={cn(
-        '@container flex w-full flex-col items-center gap-2 text-center',
-        !bare && 'rounded-lg border border-border-gold bg-gold-900/60 bg-gradient-gold-tint px-5 py-4 shadow-inner-hairline',
+        '@container flex w-full min-w-64 flex-col items-center gap-2 text-center',
+        !bare &&
+          'rounded-lg border border-border-gold bg-gold-900/60 bg-gradient-gold-tint px-5 py-4 shadow-inner-hairline',
         className,
       )}
     >
@@ -84,14 +91,30 @@ export function JackpotMeter({
         {live && <StatusBadge status="live" uppercase />}
         {demo && <DemoBadge size="s" />}
       </div>
-      <p className={cn('flex items-baseline gap-2 font-semibold leading-none tabular-nums', SIZE[size])}>
+      <p
+        className={cn(
+          'flex items-baseline font-semibold leading-none tabular-nums',
+          unitSize === 'half' ? 'gap-2' : 'gap-[0.25em]',
+          SIZE[size],
+        )}
+      >
         <span className="sr-only">{formatUSDT(amount)}</span>
         <span aria-hidden className="inline-flex">
           {[...text].map((ch, i) =>
-            /\d/.test(ch) ? <RollingDigit key={i} digit={Number(ch)} /> : <StaticGlyph key={i} ch={ch} />,
+            /\d/.test(ch) ? (
+              <RollingDigit key={i} digit={Number(ch)} />
+            ) : (
+              <StaticGlyph key={i} ch={ch} />
+            ),
           )}
         </span>
-        <span aria-hidden className="bg-gradient-gold-jackpot bg-clip-text text-[0.5em] text-transparent">
+        <span
+          aria-hidden
+          className={cn(
+            'bg-gradient-gold-jackpot bg-clip-text text-transparent',
+            unitSize === 'half' ? 'text-[0.5em]' : 'leading-none',
+          )}
+        >
           USDT
         </span>
       </p>

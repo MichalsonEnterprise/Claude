@@ -27,7 +27,9 @@ export class DepositsController {
   ) {}
 
   @Get('address')
-  @ApiOperation({ summary: 'Your per-user deposit address (HD-derived, Arbitrum Sepolia test-USDT)' })
+  @ApiOperation({
+    summary: 'Your per-user deposit address (HD-derived, Arbitrum Sepolia test-USDT)',
+  })
   address(@CurrentUser() user: AuthUser, @Query() query: DepositAddressQueryDto) {
     return this.addresses.forUser(user.id, query.network);
   }
@@ -48,7 +50,8 @@ export class DevDepositsController {
   @Post('simulate')
   @HttpCode(200)
   @ApiOperation({
-    summary: 'DEMO only: simulate a confirmed test-USDT deposit (same ledger postings as a real one; idempotent)',
+    summary:
+      'DEMO only: simulate a confirmed test-USDT deposit (same ledger postings as a real one; idempotent)',
   })
   async simulate(@CurrentUser() user: AuthUser, @Body() body: SimulateDepositDto) {
     const { replayed, value } = await this.deposits.simulate(user.id, body);

@@ -102,7 +102,7 @@ function tc(n, name, color, ix = 0) { const t = n.findAll(x => x.type === 'TEXT'
 function card(name, o = {}) { return AL('VERTICAL', { name, p: o.p ?? 24, gap: o.gap ?? 16, fill: o.fill || 'surface/default', stroke: o.stroke || 'border/subtle', r: o.r ?? 14 }); }
 function row(name, o = {}) { return AL('HORIZONTAL', Object.assign({ name, gap: 12, align: 'CENTER' }, o)); }
 function col(name, o = {}) { return AL('VERTICAL', Object.assign({ name, gap: 8 }, o)); }
-function spacer() { return AL('HORIZONTAL', { name: 'Spacer' }); }
+function spacer() { const s = AL('HORIZONTAL', { name: 'Spacer' }); s.resize(1, 1); return s; }
 function line() { return rect(10, 1, 'border/subtle', 0, 'Divider'); }
 async function kv(k, v, o = {}) { const r = AL('HORIZONTAL', { name: 'KV ' + k, gap: 12, align: 'CENTER', justify: 'SPACE_BETWEEN' }); const kt = await T(k, o.ks || 'Body/S', 'text/secondary'); const vr = AL('HORIZONTAL', { name: 'Value', gap: 6, align: 'CENTER' }); if (o.icon) add(vr, await IC(o.icon, 16, o.ic || 'icon/muted')); if (o.node) add(vr, o.node); else add(vr, await T(v, o.vs || 'Body/S Strong', o.vc || 'text/primary', o.vw ? { w: o.vw, align: 'RIGHT' } : {})); if (o.demo) add(vr, await DEMO('XS')); add(r, kt, vr); return r; }
 async function ttl(t, o = {}) { const r = row('Title — ' + t.slice(0, 30), { gap: 8 }); add(r, await T(t, o.s || 'Heading/H5', 'text/primary')); if (o.demo !== false) add(r, await DEMO(o.ds || 'S')); if (o.right) { add(r, [spacer(), 'FILL']); for (const x of [].concat(o.right)) add(r, x); } return r; }
@@ -250,7 +250,7 @@ add(im, [line(), 'FILL'], await T('IF THE RESPONSE KEEPS FAILING', 'Overline', '
 add(im, [await stepper([
   { s: 'current', t: 'Waiting for the original request', d: 'Chainlink fulfils request 0x9f2c…e71a as soon as the network catches up. Typical response: under 1 minute.' },
   { s: 'todo', t: 'Request re-sent by the contract', d: 'After 1 hour without a response (21:00:04 UTC) the contract re-requests randomness for the same entries.' },
-  { s: 'todo', t: 'Round cancelled and refunded', d: 'After 24 hours without a response the round is cancelled under the contract rules: every stake becomes Owed and every fee returns to Available.' }]), 'FILL']);
+  { s: 'todo', t: 'Round cancelled and refunded', d: 'After 24 hours without a response (28 Nov 2026, 20:00:04 UTC) the round is cancelled under the contract rules: every stake becomes Owed and every fee returns to Available.' }]), 'FILL']);
 const nx = card('Card — Next round', { gap: 12 }); add(nx, [await ttl('Round #1,249 is not affected'), 'FILL'], [await T('It opens on schedule on 28 Nov 2026 at 08:00 UTC. You can already set a reminder.', 'Body/S', 'text/secondary', { w: 480 }), 'FILL'], await BTN('Ghost', 'Remind me at 08:00 UTC', { size: 'S', lead: 'bell' }));
 add(rc, [im, 'FILL'], [nx, 'FILL']);
 add(r, vrf, [rc, 'FILL']); add(main, [r, 'FILL']);

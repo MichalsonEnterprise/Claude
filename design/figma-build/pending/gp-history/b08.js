@@ -18,7 +18,7 @@ add(im, [line(), 'FILL'], await T('IF THE RESPONSE KEEPS FAILING', 'Overline', '
 add(im, [await stepper([
   { s: 'current', t: 'Waiting for the original request', d: 'Chainlink fulfils request 0x9f2c…e71a as soon as the network catches up. Typical response: under 1 minute.' },
   { s: 'todo', t: 'Request re-sent by the contract', d: 'After 1 hour without a response (21:00:04 UTC) the contract re-requests randomness for the same entries.' },
-  { s: 'todo', t: 'Round cancelled and refunded', d: 'After 24 hours without a response the round is cancelled under the contract rules: every stake becomes Owed and every fee returns to Available.' }]), 'FILL']);
+  { s: 'todo', t: 'Round cancelled and refunded', d: 'After 24 hours without a response (28 Nov 2026, 20:00:04 UTC) the round is cancelled under the contract rules: every stake becomes Owed and every fee returns to Available.' }]), 'FILL']);
 const nx = card('Card — Next round', { gap: 12 }); add(nx, [await ttl('Round #1,249 is not affected'), 'FILL'], [await T('It opens on schedule on 28 Nov 2026 at 08:00 UTC. You can already set a reminder.', 'Body/S', 'text/secondary', { w: 480 }), 'FILL'], await BTN('Ghost', 'Remind me at 08:00 UTC', { size: 'S', lead: 'bell' }));
 add(rc, [im, 'FILL'], [nx, 'FILL']);
 add(r, vrf, [rc, 'FILL']); add(main, [r, 'FILL']);

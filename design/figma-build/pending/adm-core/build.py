@@ -11,7 +11,10 @@ for n in names:
     body = open(os.path.join(here, n + '.js')).read()
     import re as _re
     body = _re.sub(r'^//#include (\S+)\s*$', lambda m: open(os.path.join(here, m.group(1))).read(), body, flags=_re.M)
-    code = helpers + '\n' + lib + '\n' + body
+    L = lib
+    if n.startswith('m-'):  # mobile scripts target page 10 / section 'ADM — Mobile'
+        L = L.replace("p.name === '09 — Admin Panel'", "p.name === '10 — Mobile Experience'").replace("section('ADM-00/01/02/X1 Shell, login, overview, approvals', 0, 0)", "section('ADM — Mobile', 217000, 0)")
+    code = helpers + '\n' + L + '\n' + body
     p = os.path.join(out, n + '.js'); open(p, 'w').write(code)
     chk = os.path.join(out, '.check.mjs'); open(chk, 'w').write('async function __x(){\n' + code + '\n}\n')
     r = subprocess.run(['node', '--check', chk], capture_output=True, text=True)

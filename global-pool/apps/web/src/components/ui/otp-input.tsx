@@ -65,7 +65,13 @@ export function OtpInput({
               key={i}
               className={cn(
                 'relative flex h-14 w-12 items-center justify-center rounded-md border bg-surface-default font-mono text-number-m text-text-primary transition-colors',
-                isInvalid ? 'border-border-danger' : active ? 'border-border-focus shadow-[0_0_0_3px_rgba(91,232,156,0.18)]' : ch ? 'border-border-strong' : 'border-border-default',
+                isInvalid
+                  ? 'border-border-danger'
+                  : active
+                    ? 'border-border-focus shadow-[0_0_0_3px_rgba(91,232,156,0.18)]'
+                    : ch
+                      ? 'border-border-strong'
+                      : 'border-border-default',
                 isDisabled && 'border-border-subtle bg-bg-secondary text-text-disabled',
               )}
             >
