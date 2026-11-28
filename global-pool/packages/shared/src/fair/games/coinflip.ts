@@ -31,7 +31,13 @@ export function playCoinflip(seed: SeedInput, params: CoinflipParams): CoinflipO
     throw new FairError('Pick heads or tails', 'INVALID_PARAMS');
   }
   const { side, u32 } = coinSide(seed);
-  return { side, pick: params.pick, u32, multiplier: COINFLIP_RULES.multiplier, win: side === params.pick };
+  return {
+    side,
+    pick: params.pick,
+    u32,
+    multiplier: COINFLIP_RULES.multiplier,
+    win: side === params.pick,
+  };
 }
 
 export function coinflipPayout(stake: string, outcome: CoinflipOutcome): string {

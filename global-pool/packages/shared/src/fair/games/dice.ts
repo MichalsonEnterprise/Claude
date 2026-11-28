@@ -34,7 +34,8 @@ export interface DiceOutcome {
 const TARGET = /^\d{1,2}\.\d{2}$/;
 
 export function diceWinChance(params: DiceParams): Money {
-  if (!TARGET.test(params.target)) throw new FairError('Target must look like 50.50', 'INVALID_PARAMS');
+  if (!TARGET.test(params.target))
+    throw new FairError('Target must look like 50.50', 'INVALID_PARAMS');
   const t = money(params.target);
   if (params.condition !== 'over' && params.condition !== 'under') {
     throw new FairError('Condition must be over or under', 'INVALID_PARAMS');

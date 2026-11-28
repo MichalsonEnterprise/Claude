@@ -144,8 +144,10 @@ export function coveredNumbers(bet: Pick<RouletteBet, 'type' | 'numbers'>): numb
 
 /** Validates the slip (types, layout, per-spot and table limits) and returns the total stake. */
 export function validateRouletteBets(bets: RouletteBet[]): Money {
-  if (!Array.isArray(bets) || bets.length === 0) throw new FairError('Place at least one bet', 'INVALID_PARAMS');
-  if (bets.length > ROULETTE_RULES.maxSpots) throw new FairError('Too many bets on one spin', 'INVALID_PARAMS');
+  if (!Array.isArray(bets) || bets.length === 0)
+    throw new FairError('Place at least one bet', 'INVALID_PARAMS');
+  if (bets.length > ROULETTE_RULES.maxSpots)
+    throw new FairError('Too many bets on one spin', 'INVALID_PARAMS');
   let total = money(0);
   const seen = new Set<string>();
   for (const b of bets) {
@@ -154,10 +156,15 @@ export function validateRouletteBets(bets: RouletteBet[]): Money {
     const spot = `${b.type}:${key(covered)}`;
     if (seen.has(spot)) throw new FairError('Each spot appears once on the slip', 'INVALID_PARAMS');
     seen.add(spot);
-    total = total.plus(parseStake(b.amount, ROULETTE_RULES.minPerSpot, ROULETTE_RULES.maxPerSpot, 'Bet per spot'));
+    total = total.plus(
+      parseStake(b.amount, ROULETTE_RULES.minPerSpot, ROULETTE_RULES.maxPerSpot, 'Bet per spot'),
+    );
   }
   if (total.gt(ROULETTE_RULES.tableMax)) {
-    throw new FairError(`Total stake is above the table maximum of ${ROULETTE_RULES.tableMax}`, 'BET_ABOVE_MAX');
+    throw new FairError(
+      `Total stake is above the table maximum of ${ROULETTE_RULES.tableMax}`,
+      'BET_ABOVE_MAX',
+    );
   }
   return total;
 }

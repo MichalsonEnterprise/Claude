@@ -126,7 +126,8 @@ export function scaleU32(u32: number, n: number): number {
   if (!Number.isInteger(u32) || u32 < 0 || u32 >= TWO_POW_32) {
     throw new FairError('u32 out of range', 'INTERNAL');
   }
-  if (!Number.isInteger(n) || n < 1 || n >= 2_097_152) throw new FairError('n out of range', 'INTERNAL');
+  if (!Number.isInteger(n) || n < 1 || n >= 2_097_152)
+    throw new FairError('n out of range', 'INTERNAL');
   return Math.floor((u32 * n) / TWO_POW_32);
 }
 

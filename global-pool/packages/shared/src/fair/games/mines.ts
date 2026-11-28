@@ -39,7 +39,8 @@ export function minePositions(seed: SeedInput, mines: number): number[] {
 export function minesExactMultiplier(mines: number, gems: number): Money {
   validateMines(mines);
   const safe = MINES_RULES.tiles - mines;
-  if (!Number.isInteger(gems) || gems < 0 || gems > safe) throw new FairError('Invalid gem count', 'INTERNAL');
+  if (!Number.isInteger(gems) || gems < 0 || gems > safe)
+    throw new FairError('Invalid gem count', 'INTERNAL');
   let m = money(99).div(100);
   for (let i = 0; i < gems; i++) m = m.times(MINES_RULES.tiles - i).div(safe - i);
   return m;
@@ -69,11 +70,23 @@ export interface MinesState {
 
 export function minesStart(mines: number): MinesState {
   validateMines(mines);
-  return { mines, revealed: [], hitMine: null, status: 'active', multiplier: '1.00', payout: '0.00' };
+  return {
+    mines,
+    revealed: [],
+    hitMine: null,
+    status: 'active',
+    multiplier: '1.00',
+    payout: '0.00',
+  };
 }
 
 /** Reveal one tile (mutates). The board comes from the seeds; nothing about the pick changes it. */
-export function minesReveal(s: MinesState, board: readonly number[], tile: number, stake: string): MinesState {
+export function minesReveal(
+  s: MinesState,
+  board: readonly number[],
+  tile: number,
+  stake: string,
+): MinesState {
   if (s.status !== 'active') throw new FairError('This round is over', 'ROUND_OVER');
   if (!Number.isInteger(tile) || tile < 0 || tile >= MINES_RULES.tiles) {
     throw new FairError('Tile must be 0–24', 'INVALID_PARAMS');
@@ -95,7 +108,8 @@ export function minesReveal(s: MinesState, board: readonly number[], tile: numbe
 
 export function minesCashOut(s: MinesState, stake: string): MinesState {
   if (s.status !== 'active') throw new FairError('This round is over', 'ROUND_OVER');
-  if (s.revealed.length === 0) throw new FairError('Reveal at least one tile before cashing out', 'ACTION_NOT_ALLOWED');
+  if (s.revealed.length === 0)
+    throw new FairError('Reveal at least one tile before cashing out', 'ACTION_NOT_ALLOWED');
   s.status = 'cashed_out';
   const p = payoutOf(stake, s.multiplier);
   s.payout = creditString(p.gt(MINES_RULES.maxPayout) ? MINES_RULES.maxPayout : p);

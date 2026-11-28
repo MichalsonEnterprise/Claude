@@ -26,17 +26,70 @@ const MEDIUM: Record<number, string[]> = {
   10: alternate(['1.50', '2.00', '1.50', '3.00', '1.90']),
   20: alternate(['1.50', '2.00', '1.50', '3.00', '1.50', '2.00', '1.80', '3.00', '1.50', '2.00']),
   30: alternate([
-    '1.50', '2.00', '1.50', '3.00', '1.50', '2.00', '1.50', '1.70', '2.00', '3.00',
-    '1.50', '2.00', '1.50', '2.00', '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '1.70',
+    '2.00',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '2.00',
+    '3.00',
   ]),
   40: alternate([
-    '1.50', '2.00', '1.50', '3.00', '1.50', '2.00', '1.50', '1.60', '2.00', '3.00',
-    '1.50', '2.00', '1.50', '2.00', '3.00', '1.50', '2.00', '1.50', '3.00', '2.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '1.60',
+    '2.00',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '2.00',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '3.00',
+    '2.00',
   ]),
   50: alternate([
-    '1.50', '2.00', '1.50', '3.00', '1.50', '2.00', '1.50', '2.00', '2.00', '3.00',
-    '1.50', '2.00', '1.50', '2.00', '3.00', '1.50', '2.00', '1.50', '3.00', '2.00',
-    '1.50', '2.00', '1.50', '3.00', '1.50',
+    '1.50',
+    '2.00',
+    '1.50',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '2.00',
+    '2.00',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '2.00',
+    '3.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '3.00',
+    '2.00',
+    '1.50',
+    '2.00',
+    '1.50',
+    '3.00',
+    '1.50',
   ]),
 };
 
@@ -45,8 +98,12 @@ function highRing(n: number): string[] {
   return Array.from({ length: n }, (_, i) => (i === 0 ? top : '0.00'));
 }
 
-export const WHEEL_LAYOUTS: Readonly<Record<WheelRisk, Readonly<Record<number, readonly string[]>>>> = {
-  low: Object.fromEntries(WHEEL_SEGMENTS.map((n) => [n, Array.from({ length: n / 10 }, () => LOW_10).flat()])),
+export const WHEEL_LAYOUTS: Readonly<
+  Record<WheelRisk, Readonly<Record<number, readonly string[]>>>
+> = {
+  low: Object.fromEntries(
+    WHEEL_SEGMENTS.map((n) => [n, Array.from({ length: n / 10 }, () => LOW_10).flat()]),
+  ),
   medium: MEDIUM,
   high: Object.fromEntries(WHEEL_SEGMENTS.map((n) => [n, highRing(n)])),
 };
@@ -65,7 +122,8 @@ export interface WheelOutcome {
 
 export function wheelLayout(params: WheelParams): readonly string[] {
   const l = WHEEL_LAYOUTS[params.risk]?.[params.segments];
-  if (!l) throw new FairError('Risk must be low, medium or high and segments 10–50', 'INVALID_PARAMS');
+  if (!l)
+    throw new FairError('Risk must be low, medium or high and segments 10–50', 'INVALID_PARAMS');
   return l;
 }
 

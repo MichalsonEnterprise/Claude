@@ -36,8 +36,10 @@ export function parseStake(value: MoneyInput, min: string, max: string, what = '
   if (d.decimalPlaces() > STAKE_DECIMALS) {
     throw new FairError(`${what} has at most ${STAKE_DECIMALS} decimals`, 'INVALID_STAKE');
   }
-  if (d.lt(money(min))) throw new FairError(`${what} is below the minimum of ${min}`, 'BET_BELOW_MIN');
-  if (d.gt(money(max))) throw new FairError(`${what} is above the maximum of ${max}`, 'BET_ABOVE_MAX');
+  if (d.lt(money(min)))
+    throw new FairError(`${what} is below the minimum of ${min}`, 'BET_BELOW_MIN');
+  if (d.gt(money(max)))
+    throw new FairError(`${what} is above the maximum of ${max}`, 'BET_ABOVE_MAX');
   return d;
 }
 

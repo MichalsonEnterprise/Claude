@@ -75,7 +75,8 @@ export const crashCommitment = (roundSeed: string): string => sha256Hex(roundSee
  * seeds[length] = terminal and seeds[i−1] = sha256(seeds[i]). seeds[0] is the public chain commitment.
  */
 export function buildHashChain(terminalSeed: string, length: number): string[] {
-  if (!Number.isInteger(length) || length < 1) throw new FairError('Chain length must be ≥ 1', 'INTERNAL');
+  if (!Number.isInteger(length) || length < 1)
+    throw new FairError('Chain length must be ≥ 1', 'INTERNAL');
   const out = new Array<string>(length + 1);
   out[length] = terminalSeed;
   for (let i = length; i > 0; i--) out[i - 1] = sha256Hex(out[i]!);
@@ -122,7 +123,8 @@ export function timeToReachMs(multiplier: string): number {
 
 export function validateCrashTarget(target: string | null | undefined): string | null {
   if (target === null || target === undefined || target === '') return null;
-  if (!/^\d+(\.\d{1,2})?$/.test(target)) throw new FairError('Auto cash-out looks like 2.00', 'INVALID_PARAMS');
+  if (!/^\d+(\.\d{1,2})?$/.test(target))
+    throw new FairError('Auto cash-out looks like 2.00', 'INVALID_PARAMS');
   const t = money(target);
   if (t.lt(CRASH_RULES.minTarget) || t.gt(CRASH_RULES.maxTarget)) {
     throw new FairError('Auto cash-out must be between 1.01× and 1,000.00×', 'OUT_OF_RANGE');

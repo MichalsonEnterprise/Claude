@@ -269,6 +269,33 @@ enum GameSessionStatus {
   finished
 }
 
+/// games engine (P1): a bet row in game_results. `active` = a stateful round in progress (Twenty-One hand,
+/// Vault Sweeper board, High Card run); instant games are inserted `settled`.
+enum GameBetStatus {
+  active
+  settled
+}
+
+/// DEMO credit movements (no cash value — never USDT).
+enum DemoCreditEntryKind {
+  opening
+  reset
+  stake
+  payout
+}
+
+enum CrashRoundStatus {
+  betting
+  running
+  crashed
+}
+
+enum CrashBetStatus {
+  active
+  cashed_out
+  lost
+}
+
 // ─── Players ────────────────────────────────────────────────────────────────────────────────────
 
 model User {
@@ -308,6 +335,8 @@ model User {
   selfExclusions     RgSelfExclusion[]
   rgSettings         RgSettings?
   favouriteGames     UserFavouriteGame[]
+  demoCredits        DemoCreditAccount?
+  crashBets          CrashBet[]
   restrictions       UserRestriction[]
   referralsMade      Referral[]          @relation("referrer")
   referredBy         Referral?           @relation("referred")
@@ -1116,6 +1145,9 @@ model GameSession {
   clientSeed     String            @map("client_seed")
   nonce          Int               @default(0)
   isSimulation   Boolean           @default(true) @map("is_simulation")
+  /// games engine: the server seed of an ACTIVE seed pair, AES-256-GCM encrypted at rest. `serverSeed` stays null
+  /// until the pair is rotated (revealed); then it holds the plain seed and this column is cleared.
+  serverSeedEnc  String?           @map("server_seed_enc")
   startedAt      DateTime          @default(now()) @map("started_at")
   endedAt        DateTime?         @map("ended_at")
   createdAt      DateTime          @default(now()) @map("created_at")
@@ -1129,21 +1161,156 @@ model GameSession {
   @@map("game_sessions")
 }
 
+/// One bet (games engine: DEMO credits only, never USDT). Settled from the seed pair of `session` at `nonce`.
 model GameResult {
-  id        String   @id @default(uuid()) @db.Uuid
-  sessionId String   @map("session_id") @db.Uuid
-  nonce     Int
-  outcome   Json
-  /// Simulation stake / payout (0 for non-monetary play).
-  stake     Decimal  @default(0) @db.Decimal(20, 6)
-  payout    Decimal  @default(0) @db.Decimal(20, 6)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String        @id @default(uuid()) @db.Uuid
+  sessionId      String        @map("session_id") @db.Uuid
+  nonce          Int
+  outcome        Json
+  /// Simulation stake / payout in DEMO credits (no cash value).
+  stake          Decimal       @default(0) @db.Decimal(20, 6)
+  payout         Decimal       @default(0) @db.Decimal(20, 6)
+  /// games engine (additive): denormalised owner + game for queries (backfilled from the session).
+  userId         String?       @map("user_id") @db.Uuid
+  gameId         String?       @map("game_id") @db.Uuid
+  /// Public reference number (e.g. D-10482 / BJ-10483); prefix per game.
+  refNumber      Int           @default(autoincrement()) @map("ref_number")
+  status         GameBetStatus @default(settled)
+  /// Effective multiplier payout ÷ stake (DEMO), set at settlement.
+  multiplier     Decimal?      @db.Decimal(20, 6)
+  /// Always DEMO (REAL_MONEY_ENABLED=false makes any other currency impossible).
+  currency       String        @default("DEMO")
+  /// Bet parameters as submitted (target, picks, bets…), needed by the verifier.
+  params         Json?
+  /// Server-held state of a stateful round (public parts only; hidden cards / mines are re-derived from the seed).
+  state          Json?
+  rulesVersion   String?       @map("rules_version")
+  idempotencyKey String?       @map("idempotency_key")
+  settledAt      DateTime?     @map("settled_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
   session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, nonce])
+  @@unique([userId, idempotencyKey])
+  @@index([userId, gameId, createdAt])
+  @@index([gameId, createdAt])
+  @@index([status])
   @@map("game_results")
+}
+
+/// DEMO credits: a per-user PLAY balance with NO cash value. Never bought, never withdrawn, never converted to or
+/// from USDT and never linked to the USDT ledger, wallet balances, pool or fee ledgers. Starts at 1,000.00; a
+/// reset to 1,000.00 is allowed once per hour (audited).
+model DemoCreditAccount {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @unique @map("user_id") @db.Uuid
+  balance     Decimal   @default(1000) @db.Decimal(20, 6)
+  lastResetAt DateTime? @map("last_reset_at")
+  resets      Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries DemoCreditEntry[]
+
+  @@map("demo_credit_accounts")
+}
+
+/// Movements of DEMO credits (opening, stake, payout, reset) with the running balance. Append-only in code.
+model DemoCreditEntry {
+  id           String              @id @default(uuid()) @db.Uuid
+  accountId    String              @map("account_id") @db.Uuid
+  userId       String              @map("user_id") @db.Uuid
+  kind         DemoCreditEntryKind
+  /// Signed: + into the play balance, − out of it.
+  amount       Decimal             @db.Decimal(20, 6)
+  balanceAfter Decimal             @map("balance_after") @db.Decimal(20, 6)
+  gameSlug     String?             @map("game_slug")
+  /// game_results.id or crash_bets.id
+  betId        String?             @map("bet_id") @db.Uuid
+  createdAt    DateTime            @default(now()) @map("created_at")
+
+  account DemoCreditAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([betId])
+  @@map("demo_credit_entries")
+}
+
+/// Orbit Rush hash chain: seeds[i-1] = sha256(seeds[i]); `commitment` = seeds[0] is public from creation.
+model CrashChain {
+  id              String   @id @default(uuid()) @db.Uuid
+  length          Int
+  /// Terminal seed seeds[length], AES-256-GCM encrypted at rest (round seeds are re-derived by hashing).
+  terminalSeedEnc String   @map("terminal_seed_enc")
+  commitment      String   @unique
+  /// Public salt mixed into every crash point (published with the chain).
+  salt            String
+  nextIndex       Int      @default(1) @map("next_index")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  rounds CrashRound[]
+
+  @@map("crash_chains")
+}
+
+/// One Orbit Rush round: committed before betting opens, crash point stored and the seed revealed after the crash.
+model CrashRound {
+  id             String           @id @default(uuid()) @db.Uuid
+  number         Int              @unique @default(autoincrement())
+  chainId        String           @map("chain_id") @db.Uuid
+  chainIndex     Int              @map("chain_index")
+  status         CrashRoundStatus @default(betting)
+  /// sha256(seed) — shown before betting opens.
+  commitment     String
+  /// Revealed after the crash.
+  seed           String?
+  crashPoint     Decimal?         @map("crash_point") @db.Decimal(10, 2)
+  bettingOpensAt DateTime         @map("betting_opens_at")
+  startedAt      DateTime         @map("started_at")
+  crashedAt      DateTime?        @map("crashed_at")
+  nextRoundAt    DateTime?        @map("next_round_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  chain CrashChain @relation(fields: [chainId], references: [id])
+  bets  CrashBet[]
+
+  @@unique([chainId, chainIndex])
+  @@index([status])
+  @@map("crash_rounds")
+}
+
+/// A DEMO-credit bet on an Orbit Rush round (one per player per round). Auto cash-out runs on the server.
+model CrashBet {
+  id                String         @id @default(uuid()) @db.Uuid
+  roundId           String         @map("round_id") @db.Uuid
+  userId            String         @map("user_id") @db.Uuid
+  refNumber         Int            @default(autoincrement()) @map("ref_number")
+  stake             Decimal        @db.Decimal(20, 6)
+  autoCashOut       Decimal?       @map("auto_cash_out") @db.Decimal(10, 2)
+  status            CrashBetStatus @default(active)
+  cashOutMultiplier Decimal?       @map("cash_out_multiplier") @db.Decimal(10, 2)
+  payout            Decimal        @default(0) @db.Decimal(20, 6)
+  /// manual | auto | cap
+  cashOutKind       String?        @map("cash_out_kind")
+  cashedOutAt       DateTime?      @map("cashed_out_at")
+  currency          String         @default("DEMO")
+  idempotencyKey    String         @map("idempotency_key")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  round CrashRound @relation(fields: [roundId], references: [id])
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roundId, userId])
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt])
+  @@map("crash_bets")
 }
 
 // ─── Growth ─────────────────────────────────────────────────────────────────────────────────────

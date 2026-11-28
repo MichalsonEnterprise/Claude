@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { DEMO_CREDITS_CURRENCY, DEMO_CREDITS_LABEL, GAME_BET_FEE, fairGame } from '@gp/shared/fair';
 import type { Game, GameCategory } from '@prisma/client';
 
 import { notFound } from '../../common/errors';
@@ -38,6 +39,31 @@ export class GamesService {
       mode: g.mode,
       realMoney: false,
       isDemo: g.isDemo,
+      play: this.play(g),
+    };
+  }
+
+  /** Playable engine games: published limits, edge and rules (DEMO credits, no cash value). */
+  private play(g: Game) {
+    const info = fairGame(g.slug);
+    if (!info || g.mode !== 'simulation') return { playable: false as const };
+    return {
+      playable: true as const,
+      kind: info.kind,
+      mode: info.mode,
+      currency: DEMO_CREDITS_CURRENCY,
+      creditsLabel: DEMO_CREDITS_LABEL,
+      fee: GAME_BET_FEE,
+      minBet: info.minBet,
+      maxBet: info.maxBet,
+      tableMax: info.tableMax ?? null,
+      maxPayout: info.maxPayout ?? null,
+      houseEdgePercent: info.houseEdgePercent,
+      rtpPercent: info.rtpPercent,
+      rulesVersion: info.rulesVersion,
+      rules: info.rules,
+      provablyFair: true,
+      realMoney: false,
     };
   }
 }

@@ -60,7 +60,9 @@ export const placeBetSchema = z.object({
 export type PlaceBetInput = z.infer<typeof placeBetSchema>;
 
 export const clientSeedSchema = z.object({
-  clientSeed: z.string().regex(CLIENT_SEED_PATTERN, '1–64 letters, digits, dot, dash or underscore'),
+  clientSeed: z
+    .string()
+    .regex(CLIENT_SEED_PATTERN, '1–64 letters, digits, dot, dash or underscore'),
 });
 
 export const startBlackjackSchema = z.object({ stake: credits, currency, idempotencyKey });
@@ -77,7 +79,10 @@ export const startMinesSchema = z.object({
   currency,
   idempotencyKey,
 });
-export const minesRevealSchema = z.object({ tile: z.number().int().min(0).max(24), idempotencyKey });
+export const minesRevealSchema = z.object({
+  tile: z.number().int().min(0).max(24),
+  idempotencyKey,
+});
 export const startHiloSchema = z.object({ stake: credits, currency, idempotencyKey });
 export const hiloActionSchema = z.object({
   action: z.enum(['higher_or_same', 'lower_or_same', 'skip']),

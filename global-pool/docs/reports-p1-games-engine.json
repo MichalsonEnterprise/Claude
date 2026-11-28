@@ -1,0 +1,100 @@
+[
+  {
+    "key": "engine",
+    "report": "KEY engine is finished, and every check I ran in the engine's own scope passes. Games run on DEMO credits only. These credits have no cash value and are never linked to the USDT ledger, wallet, pool or fee ledgers. There is no fee on game bets (\"Fees 0.00\").\n\nWhat was built:\n\n1) `@gp/shared/fair` (new subpath, exported in package.json and tsup; added dependency `@noble/hashes@1.8.0`, the same version viem uses). Files are in `/home/user/Claude/global-pool/packages/shared/src/fair/`.\n- `stream.ts`: the HMAC-SHA256 byte stream (key = server seed, message = `clientSeed:nonce:cursor`). It provides `uniformInt` (rejection sampling, so no modulo bias), `scaleU32` (an exact `floor(u32×n/2^32)` for published \"f × n\" formulas; precision is documented), `nextU52` (BigInt), forward Fisher–Yates, and commit/verify.\n- `credits.ts`: DEMO credit constants plus stake and payout helpers. All maths uses decimal.js; payouts are truncated to 6 decimals.\n- `games/*`: pure rule functions and payout tables for Pool Dice (#34), Double Side, Pool Roulette (#35: `pocket = floor(f×37)`, all bet types including zero bets, 5,000.00 table maximum), Orbit Rush (#42: hash chain, 1-in-100 instant crash, 1,000.00× cap, decimal.js curve `m(t)=e^(0.1117t)`), Twenty-One, Skyline, Fortune Ring, Pool Keno, Pinfall, Vault Sweeper and High Card.\n  - Twenty-One: 6 decks, S17, 3:2, double after split, split once, split Aces get one card, dealer peeks, insurance 2:1, lazy forward Fisher–Yates shoe.\n- `catalogue.ts`: published limits, edges, rule versions and reference prefixes.\n- `schemas.ts`: zod request schemas.\n- `play.ts`: `playInstant()` and `verifyBet()`, the same code the browser verifier will use.\n- `vectors.json`: test vectors whose HMAC blocks were computed independently with node:crypto.\n- Tests in `/home/user/Claude/global-pool/packages/shared/test/fair/` (stream, vectors, rules, rtp). The RTP tests prove each game's RTP exactly over its whole outcome space, then run Monte-Carlo checks with fixed seeds (100k–200k bets per game, including Twenty-One played with basic strategy).\n\n2) Prisma: additive migration `/home/user/Claude/global-pool/apps/api/prisma/migrations/20261128190000_games_engine`.\n- New tables: `demo_credit_accounts` and `demo_credit_entries` (a trigger rejects any UPDATE), `crash_chains`, `crash_rounds`, `crash_bets`.\n- Existing tables reused and extended:\n  - `game_sessions` is the seed pair; it gains `server_seed_enc`, the server seed encrypted with AES-GCM while the pair is active.\n  - `game_results` is the bet; it gains user and game ids, a reference number, status, multiplier, currency, params, server-held state, rules version, idempotency key and settled time.\n- Partial unique indexes: one active seed pair per player and game, one active round per player and game, one live crash round.\n- Existing DEMO history rows were backfilled. After applying it to the dev DB, the Prisma diff against the schema is empty.\n\n3) API, in `/home/user/Claude/global-pool/apps/api/src/modules/games/` (`engine/*`, `play.controller.ts`, `admin-games.controller.ts`, `games.module.ts`, plus `games.service.ts` extended with a `play` block).\n- Credits: `GET /games/credits` (balance, plus session and today totals for the RG/Session Bar) and `POST /games/credits/reset` (once per hour, audited).\n- Seeds: GET seeds, change client seed, rotate. Rotating reveals the old server seed and is refused while a round is open.\n- Instant games: `POST/GET /games/:slug/bets` (idempotent).\n- Bets: `GET /games/bets/:id` and `/verify`. The API re-derives the outcome itself once the seed is revealed.\n- Stateful games: Twenty-One hands (actions hit, stand, double, split, insurance; a current-hand endpoint for reconnect), Vault Sweeper (reveal, cash out), High Card (call, skip, cash out).\n- Orbit Rush REST: state, rounds, public verify, bets, cash out.\n- socket.io `/crash`: snapshot, phase, 100 ms ticks, bets, cash-outs and crash events; bet and cash-out over the socket use the same checks as REST.\n- Crash loop: an interval loop that runs only with `JOBS_ENABLED`, with one leader replica chosen through a Redis lease. `tick(now)` is also the manual helper tests call, with a pinned `GameClock`.\n- Admin, read-only (`games.read`): `/admin/games/overview` (measured vs published RTP), `/admin/games/bets`, `/admin/games/orbit-rush/rounds`.\n- Server-side policy on every new bet:\n  - gaming policy: onboarding, region (451), self-exclusion and cooling-off (403), `gaming_blocked`;\n  - RG time rules;\n  - a due reality check blocks the next bet (409 `REALITY_CHECK_DUE`), never mid-round;\n  - the loss limit, counted in DEMO credits;\n  - bet min/max and table limits; DEMO balance (422 `INSUFFICIENT_FUNDS`);\n  - REAL_MONEY guard: any non-DEMO currency or non-simulation game is refused with 403 `REAL_MONEY_DISABLED`;\n  - idempotency keys and a per-IP bet throttle (`GAMES_BET_THROTTLE_LIMIT`, added to `.env.example`).\n\n4) Docs: new `/home/user/Claude/global-pool/docs/GAMES.md` (API contract per game, fairness formulas, house edges, limits, DEMO-credit policy, decisions). `docs/API.md` has a new games section and the `/crash` socket section; `docs/ARCHITECTURE.md` had one line updated.\n\nFigma: I used 6 of the 15 allowed screenshots (GM-03, 04, 05, 06, 07, 08) to read the P2 payout and rule numbers. They are saved in `/home/user/Claude/design/reference/games/`. I built no web pages (none are in this key's scope), so there are no Playwright screenshots or web e2e from me.\n\nLedger status, counted from the engine side (backend contract):\n- Backend implemented and verified for DI (Pool Dice), CF, RL, CR, BJ, GM-03 to GM-08, and GM-01 (data via `/games/credits` session plus the RG endpoints).\n- Every one of these screens is PARTIAL overall, because their UI belongs to the other keys.\n- PUB-04 only needs the catalogue `play` block, which is implemented.",
+    "implemented": [
+      {
+        "id": "@gp/shared/fair",
+        "status": "IMPLEMENTED",
+        "note": "Byte stream, integer helpers, 11 game rule modules, catalogue, schemas, playInstant/verifyBet; 137 shared tests green (includes exact RTP proofs and fixed-seed Monte-Carlo)"
+      },
+      {
+        "id": "vectors.json",
+        "status": "IMPLEMENTED",
+        "note": "packages/shared/src/fair/vectors.json; HMAC blocks computed independently with node:crypto; regenerate with test/fair/gen-vectors.ts"
+      },
+      {
+        "id": "prisma-migration-20261128190000_games_engine",
+        "status": "IMPLEMENTED",
+        "note": "Additive; applied to the dev DB (Prisma diff afterwards is empty) and to the test DB via e2e global setup"
+      },
+      {
+        "id": "DEMO credits (balance/reset/session)",
+        "status": "IMPLEMENTED",
+        "note": "e2e: starts at 1,000.00, reset once per hour (429), audit row written, player's USDT ledger and transactions untouched"
+      },
+      {
+        "id": "seed pairs (commit/rotate/client seed)",
+        "status": "IMPLEMENTED",
+        "note": "e2e: nonce counts bets, rotation reveals the seed, rotation blocked (409) while a round is open"
+      },
+      {
+        "id": "instant games (DI, CF, RL, GM-04 Pinfall, GM-05 Skyline, GM-06 Fortune Ring, GM-07 Keno) API",
+        "status": "IMPLEMENTED",
+        "note": "e2e round trip bet → rotate → verify passes (matches=true) for all 7; web UI owned by other keys, so screens are PARTIAL"
+      },
+      {
+        "id": "BJ Twenty-One API",
+        "status": "IMPLEMENTED",
+        "note": "e2e: 6 full hands incl. insurance/split/double when dealt, current-hand recovery, verify matches; rule paths unit-tested with fixed card sequences"
+      },
+      {
+        "id": "GM-03 Vault Sweeper / GM-08 High Card API",
+        "status": "IMPLEMENTED",
+        "note": "e2e start/reveal/action/cash-out + verify; designed numbers (1.12/1.47/1.71/1.99×, 76.92% · 1.28×, 2.15× run) unit-tested"
+      },
+      {
+        "id": "CR Orbit Rush (REST + /crash socket + loop)",
+        "status": "IMPLEMENTED",
+        "note": "e2e with manual ticks: commitment before betting, bets close at take-off, manual cash-out, server auto cash-out incl. after a socket disconnect, crash, public verify (commitment/chain/crash point). Live JOBS_ENABLED loop smoke-tested on port 4211 against the dev DB for ~30 s (10 ticks/s, auto cash-out, round verify), then stopped"
+      },
+      {
+        "id": "admin read-only monitoring",
+        "status": "IMPLEMENTED",
+        "note": "e2e: support role reads overview/bets/rounds; outcome-changing paths return 404; live crash point never shown"
+      },
+      {
+        "id": "docs/GAMES.md + docs/API.md",
+        "status": "IMPLEMENTED"
+      },
+      {
+        "id": "UI screens DI/CF/RL/CR/BJ/GM-01..08/PUB-04",
+        "status": "PARTIAL",
+        "note": "Not in the engine key (no web pages); the backend contract for them is ready"
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/shared test → 9 files, 137 tests passed (fair suite: stream, vectors, rules, rtp; the RTP file takes ~41 s)",
+      "pnpm --filter @gp/shared typecheck → pass; lint → pass; build (tsup) → pass, dist/fair.* emitted",
+      "pnpm --filter @gp/api typecheck && lint && test → all pass: unit 15 files / 64 tests, e2e 14 files / 117 tests (EXIT 0), including the new test/games.e2e-spec.ts (17 tests, also passed in 3 separate runs)",
+      "API compiled with tsc -p tsconfig.build.json into a temporary private outDir (no errors), run on port 4211 against the dev DB with JOBS_ENABLED=true, ROUND_AUTO_SCHEDULE=false and a separate BULLMQ prefix: crash loop emitted ~181 ticks in 18 s, a socket bet auto-cashed-out at 1.10×, REST dice bet/credits/rounds OK. Server killed and the temporary dir deleted",
+      "pnpm --filter @gp/web typecheck → pass against the new shared build (no web files touched)",
+      "Prisma migrate diff (dev DB vs schema) → empty after the migration"
+    ],
+    "failing": [
+      "pnpm --filter @gp/web lint → 1 error in apps/web/e2e/integration/j1-new-player.spec.ts:143 (no-unnecessary-type-assertion). That untracked file belongs to another agent, not the engine key; I did not fix it.",
+      "Not run by me: pnpm --filter @gp/web test, any web production build, Playwright screenshots/e2e — the engine key has no web pages. pnpm --filter @gp/api build was not run: it deletes the shared apps/api/dist that other agents' dev servers use. The same tsc compile ran clean into a private dir instead."
+    ],
+    "decisions": [
+      "DEMO credits instead of USDT everywhere in games (owner instruction). The Figma frames show wallet USDT; the UI must mirror the layout but show 'DEMO credits · no cash value' (deviation to note on every game screen)",
+      "Pool Dice multiplier = 99 ÷ chance TRUNCATED to 4 dp, so under 50.50 gives 1.9603× instead of Figma #34's 1.9604×. This guarantees the published 1.00% edge is never undercut",
+      "Pool Dice win chance 0.01–98.00% (decision #34 / DI frames); the PUB-04 copy says 1–98%, so the copy needs aligning",
+      "Twenty-One min bet 1.00 (BJ frames); PUB-04 says 0.10, conflict flagged. A pair for splitting = same value (e.g. K+Q)",
+      "Pinfall / Keno / Fortune Ring: the designed tables (16·Medium, 6-pick Classic, Medium·30) are kept exactly; all other tables were generated by me with exact RTP ≤ 99.00% (Keno 98.65–99.00%, Pinfall 98.98–99.00%, wheels exactly 99.00%). The designers' Pinfall 16·Medium returns 99.016% (edge 0.98%); the owner can change 100×→94× if strict 1% is wanted",
+      "High Card edge applied per call (GM-08 copy), so a k-call run returns 0.99^k. Max payout 100,000.00 applied to Vault Sweeper (GM-03 copy) and to High Card for consistency",
+      "Orbit Rush: exactly 1 in 100 rounds is an instant crash; including rounds that bust before 1.01×, about 1.98% of rounds show 1.00×, which is mathematically forced by a 1% edge at every target. Crash salt is public per chain; nonce 0; chain length 10,000",
+      "RG: the loss limit also applies to DEMO play, counted separately in DEMO credits; the participation limit stays USDT-only; a due reality check (pause on) blocks the next bet with 409; continuing an open round (hit/stand/reveal/cash-out) is allowed while self-excluded, but stake-adding actions are not",
+      "Changing the client seed rotates the pair (reveals the old server seed); both are refused while a stateful round is open",
+      "Server seeds are AES-GCM encrypted at rest while active (reusing the TOTP_ENCRYPTION_KEY pattern already used for round salts)",
+      "Crash bets live in crash_bets (there is no per-player seed pair), so /history/game-rounds (rg-history module) does not list Orbit Rush; GET /games/orbit-rush/bets covers it",
+      "Admin monitoring is a games-module controller under /admin/games using the exported AdminModule guards; admin files are unchanged",
+      "Opening the seeds panel (GET /games/:slug/seeds) creates the player's first seed pair, so /history/games may list that game with 0 bets"
+    ],
+    "next": [
+      "Web keys: build the game screens on these endpoints. Use apiRequest() and @gp/shared/fair: verifyBet() and the published tables for the browser verifier; the catalogue `play` block for limits, edge and 'Fees 0.00'; the session fields of GET /games/credits for the RG/Session Bar; the socket.io /crash namespace with auth.token for Orbit Rush",
+      "Owner / designers to decide: Pool Dice 1.9603× vs 1.9604× display; dice win-chance range (PUB-04 copy); Twenty-One min bet 1.00 vs 0.10; Pinfall 16·Medium 99.016% RTP; High Card per-call edge",
+      "Optional: add OpenAPI response schemas for the games endpoints (src/infra/openapi/response-schemas.ts) and include crash bets in the rg-history /history/games aggregation (module owned by rg-history)",
+      "Possible memory notes for the main session to consider saving (learned in this session, not from memory): the games engine lives in packages/shared/src/fair (@gp/shared/fair) and apps/api/src/modules/games; DEMO credits only; e2e tests pin GameClock and call CrashEngineService.tick() for crash rounds. The only memory used was the GLOBAL POOL Figma project note (file key / design kit), which only confirmed context; no memory content asked for any extra action"
+    ]
+  }
+]

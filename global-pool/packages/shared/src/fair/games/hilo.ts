@@ -59,7 +59,8 @@ export class HiloDeck {
   }
 }
 
-export const rankOf = (code: string): number => RANKS.indexOf(code[0] as (typeof RANKS)[number]) + 1;
+export const rankOf = (code: string): number =>
+  RANKS.indexOf(code[0] as (typeof RANKS)[number]) + 1;
 
 /** Chance (out of 13) that a call wins from `rank`. */
 export function hiloChance13(rank: number, call: HiloCall): number {
@@ -68,12 +69,18 @@ export function hiloChance13(rank: number, call: HiloCall): number {
 
 export function hiloStepMultiplier(rank: number, call: HiloCall): Money {
   const c = hiloChance13(rank, call);
-  if (c >= 13 || c <= 0) throw new FairError('That call cannot lose — pick the other call or skip', 'ACTION_NOT_ALLOWED');
+  if (c >= 13 || c <= 0)
+    throw new FairError(
+      'That call cannot lose — pick the other call or skip',
+      'ACTION_NOT_ALLOWED',
+    );
   return money(99).times(13).div(money(c).times(100));
 }
 
 /** Offer for the current card: chance % and multiplier per call (null when not offered). */
-export function hiloOffer(rank: number): Record<HiloCall, { chance: string; multiplier: string } | null> {
+export function hiloOffer(
+  rank: number,
+): Record<HiloCall, { chance: string; multiplier: string } | null> {
   const offer = (call: HiloCall) => {
     const c = hiloChance13(rank, call);
     if (c >= 13) return null;
@@ -87,17 +94,31 @@ export function hiloOffer(rank: number): Record<HiloCall, { chance: string; mult
 
 export function hiloStart(deck: HiloDeck): HiloState {
   const c = deck.next();
-  return { start: c.code, steps: [], exact: '1', multiplier: '1.00', status: 'active', payout: '0.00', cardsDrawn: deck.drawn };
+  return {
+    start: c.code,
+    steps: [],
+    exact: '1',
+    multiplier: '1.00',
+    status: 'active',
+    payout: '0.00',
+    cardsDrawn: deck.drawn,
+  };
 }
 
 export function hiloCurrent(s: HiloState): string {
   return s.steps.length ? s.steps[s.steps.length - 1]!.card : s.start;
 }
 
-export function hiloPlay(s: HiloState, deck: HiloDeck, action: HiloCall | 'skip', stake: string): HiloState {
+export function hiloPlay(
+  s: HiloState,
+  deck: HiloDeck,
+  action: HiloCall | 'skip',
+  stake: string,
+): HiloState {
   if (s.status !== 'active') throw new FairError('This run is over', 'ROUND_OVER');
   if (deck.drawn !== s.cardsDrawn) throw new FairError('Deck position mismatch', 'INTERNAL');
-  if (s.cardsDrawn >= HILO_RULES.maxCards) throw new FairError('Card limit reached — cash out', 'ACTION_NOT_ALLOWED');
+  if (s.cardsDrawn >= HILO_RULES.maxCards)
+    throw new FairError('Card limit reached — cash out', 'ACTION_NOT_ALLOWED');
   const rank = rankOf(hiloCurrent(s));
   if (action === 'skip') {
     const c = deck.next();

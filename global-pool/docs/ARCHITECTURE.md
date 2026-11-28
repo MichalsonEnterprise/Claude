@@ -180,5 +180,5 @@ A deposit-sweep / treasury process (deposit addresses are xpub-derived; sweeping
 `GlobalPoolRounds` + funded VRF subscription on Arbitrum Sepolia (the mirror is proven on Anvil only); KMS/HSM signers
 instead of env keys; replacement (speed-up / cancel) transactions for stuck withdrawals (today: same-bytes
 re-broadcast, `dropped` only when the nonce is used elsewhere); real KYC / AML providers; referral commission accrual;
-game sessions (commit–reveal simulation); a Redis-backed throttler. RG session-time enforcement and reality checks
+a Redis-backed throttler. (Games — commit–reveal seeds, DEMO credits, Orbit Rush loop — are built: see GAMES.md.) RG session-time enforcement and reality checks
 are owned by the RG module (rg-history batch).

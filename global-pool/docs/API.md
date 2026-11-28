@@ -83,7 +83,7 @@ pnpm --filter @gp/api start:dev                     # http://localhost:4000 · /
 | `pool`           | rounds, entries, live projections, lifecycle (close → draw → settle / cancel), WebSocket gateway `/pool`                                                                                   |
 | `randomness`     | provider interface, `MockVrfProvider` (dev), `ChainlinkVrfProvider` (VRF fulfilment watcher: `DrawRequested` / `DrawFulfilled` of `GlobalPoolRounds` with confirmations), winner selection |
 | `onchain-rounds` | round mirroring on `GlobalPoolRounds` (openRound → commitEntries with salted entry commitments → requestDraw → recordSettlement / cancelRound), public proofs and manifest                 |
-| `games`          | catalogue from the DB (house edge disclosed; simulation mode only)                                                                                                                         |
+| `games`          | catalogue + provably-fair games engine (DEMO credits only, commit–reveal seeds, instant / stateful games, Orbit Rush crash loop + `/crash` socket, read-only admin monitoring) — see GAMES.md |
 | `notifications`  | in-app notifications (email-worthy types are also queued for email)                                                                                                                        |
 | `email`          | email adapter: `log` (dev console) / `smtp` (nodemailer) / `disabled`; BullMQ `emails` worker; anti-phishing code + DEMO notice in every email; honours A9 preferences                     |
 | `compliance`     | geo rules + `RESTRICTED_COUNTRIES`, 18+, responsible gaming (limits, cool-down, self-exclusion, reality checks), admin restrictions                                                        |
@@ -225,10 +225,31 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 
 ### games
 
+**DEMO credits only — no cash value** (never bought, withdrawn or converted; never on the USDT ledger, wallet, pool or
+fee ledgers; no fee on game bets). Provably fair (commit–reveal seeds, HMAC-SHA256 byte stream from
+`@gp/shared/fair`). Full contract, formulas, house edges and limits: **[GAMES.md](./GAMES.md)**.
+
 | Method | Path            | Auth   | Description                                                                 |
 | ------ | --------------- | ------ | --------------------------------------------------------------------------- |
-| GET    | `/games`        | public | Game catalogue (house edge disclosed; simulation mode — no real-money play) |
+| GET    | `/games`        | public | Game catalogue (house edge disclosed; simulation mode — no real-money play); playable games carry `play { currency: 'DEMO', fee: '0.00', minBet, maxBet, houseEdgePercent, rtpPercent, rules }` |
 | GET    | `/games/{slug}` | public |                                                                             |
+| GET    | `/games/credits` | player | DEMO credit balance (starts at 1,000.00), reset availability, DEMO session + today summary |
+| POST   | `/games/credits/reset` | player | Back to 1,000.00 — once per hour (429 otherwise), not while a round is open; audited |
+| GET    | `/games/{slug}/seeds` | player | Active seed pair (server seed hash, client seed, nonce) + revealed pairs |
+| POST   | `/games/{slug}/seeds/client` · `/seeds/rotate` | player | Change the client seed / rotate: reveals the server seed, commits a new one (409 while a round is open) |
+| POST   | `/games/{slug}/bets` | player | Instant bet (Pool Dice, Double Side, Pool Roulette, Skyline, Fortune Ring, Pool Keno, Pinfall) — idempotent |
+| GET    | `/games/{slug}/bets` | player | My bets for a game (paginated) + totals |
+| GET    | `/games/bets/{id}` · `/games/bets/{id}/verify` | player | One bet · verification bundle (re-derived by the API once the seed is revealed) |
+| GET/POST | `/games/twenty-one/hands[/current]` · `/hands/{id}/action` | player | Twenty-One: deal, `hit|stand|double|split|insurance`, reconnect |
+| GET/POST | `/games/vault-sweeper/rounds[/current]` · `/{id}/reveal` · `/{id}/cashout` | player | Vault Sweeper (mines) |
+| GET/POST | `/games/high-card/rounds[/current]` · `/{id}/action` · `/{id}/cashout` | player | High Card (hi-lo) |
+| GET    | `/games/orbit-rush/state` · `/rounds` · `/rounds/{number}` · `/rounds/{number}/verify` | public | Orbit Rush live state (no crash point before the crash), history, public verification |
+| POST   | `/games/orbit-rush/bets` · `/bets/{id}/cashout` · GET `/bets` · `/bets/current` | player | Crash bets (betting window only), manual cash-out; auto cash-out runs server-side |
+| GET    | `/admin/games/overview` · `/admin/games/bets` · `/admin/games/orbit-rush/rounds` | admin `games.read` | Read-only monitoring: measured vs published RTP, bets, rounds — no outcome controls |
+
+New bets use the gaming policy (onboarded, permitted region, not self-excluded / on a break, no `gaming_blocked`), RG
+time rules, a due reality check (`409 REALITY_CHECK_DUE`, only between bets) and the player's loss limit counted in DEMO
+credits. Any currency other than `DEMO` or a non-simulation game → `403 REAL_MONEY_DISABLED`.
 
 ### responsible-gaming
 
@@ -373,6 +394,16 @@ The socket is read-only: clients cannot change state over it. CORS follows `CORS
 `SOCKET_IO_REDIS_ADAPTER=true` broadcasts go through the socket.io Redis adapter (`@socket.io/redis-adapter`,
 channel prefix `BULLMQ_PREFIX`), so an event raised on any API replica (e.g. the worker that settles a round) reaches
 clients connected to every replica.
+
+### WebSocket: socket.io namespace `/crash` (Orbit Rush)
+
+| Event | Direction | Payload |
+| ----- | --------- | ------- |
+| `crash:snapshot` | server → client | on connect / `crash:subscribe`: live round (commitment, phase — never the crash point before the crash), multiplier, live bets, last 20 crash points |
+| `crash:phase` · `crash:tick` · `crash:bet` · `crash:cashout` · `crash:crashed` | server → client | phase changes, 100 ms multiplier frames, bets, cash-outs, crash (crash point + revealed seed) |
+| `crash:bet` · `crash:cashout` | client → server (handshake `auth.token`) | place a bet / cash out; ack `{ ok, bet }` or `{ ok: false, error }` (same policy as REST) |
+
+The crash loop runs only with `JOBS_ENABLED=true` (one replica, Redis lease); see [GAMES.md](./GAMES.md#4-orbit-rush-crash).
 
 ### Capabilities that deliberately do not exist
 
@@ -634,7 +665,7 @@ Tables: `users`, `user_profiles`, `user_wallets`, `deposit_addresses`, `sessions
 `responsible_gaming_limits`, `responsible_gaming_self_exclusions`, `responsible_gaming_settings`, `deposits`,
 `withdrawals`, `withdrawal_events`, `transactions`, `ledger_accounts`, `ledger_postings`, `ledger_entries`,
 `pool_ledger`, `fee_ledger`, `rounds`, `entries`, `winners`, `prize_claims`, `randomness_requests`, `games`,
-`game_sessions`, `game_results`, `referrals`, `affiliates`, `vip_levels`, `notifications`, `admin_users`,
+`game_sessions`, `game_results`, `demo_credit_accounts`, `demo_credit_entries`, `crash_chains`, `crash_rounds`, `crash_bets`, `referrals`, `affiliates`, `vip_levels`, `notifications`, `admin_users`,
 `admin_roles`, `admin_permissions`, `admin_role_permissions`, `admin_user_roles`, `admin_approvals`, `audit_logs`,
 `idempotency_keys`, `feature_flags`, `chain_cursors`, and for on-chain operations `chain_signer_nonces`,
 `chain_transactions` (signed-tx outbox), `round_chain_ops`, `entry_commitments` (append-only) and `round_payouts`

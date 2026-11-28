@@ -6,7 +6,18 @@
 import { money } from '../money';
 import { FAIR_GAMES, type FairGameSlug } from './catalogue';
 import { creditString, parseStake } from './credits';
-import { blackjack, coinflip, crash, dice, hilo, keno, mines, plinko, roulette, wheel } from './games';
+import {
+  blackjack,
+  coinflip,
+  crash,
+  dice,
+  hilo,
+  keno,
+  mines,
+  plinko,
+  roulette,
+  wheel,
+} from './games';
 import { FairError, verifyServerSeed, type SeedInput } from './stream';
 
 export interface InstantResult {
@@ -21,7 +32,9 @@ export interface InstantResult {
 }
 
 const ratio = (payout: string, stake: string) =>
-  money(stake).isZero() ? '0.0000' : money(payout).div(money(stake)).toDecimalPlaces(4, 1).toFixed(4);
+  money(stake).isZero()
+    ? '0.0000'
+    : money(payout).div(money(stake)).toDecimalPlaces(4, 1).toFixed(4);
 
 /** Settle one instant bet (pure). Throws FairError for invalid parameters or limits. */
 export function playInstant(
@@ -82,7 +95,10 @@ export function playInstant(
       const o = plinko.playPlinko(seed, params as unknown as plinko.PlinkoParams);
       return done(stake, plinko.plinkoPayout(stake, o), o);
     }
-    default:
+    case 'vault-sweeper':
+    case 'high-card':
+    case 'twenty-one':
+    case 'orbit-rush':
       throw new FairError(`${info.name} is not an instant game`, 'INVALID_GAME');
   }
 }
@@ -109,7 +125,11 @@ export interface VerifyResult {
 }
 
 export function verifyBet(input: VerifyInput): VerifyResult {
-  const seed: SeedInput = { serverSeed: input.serverSeed, clientSeed: input.clientSeed, nonce: input.nonce };
+  const seed: SeedInput = {
+    serverSeed: input.serverSeed,
+    clientSeed: input.clientSeed,
+    nonce: input.nonce,
+  };
   const commitmentValid = verifyServerSeed(input.serverSeed, input.serverSeedHash);
   const p = input.params;
   switch (input.slug) {
@@ -121,7 +141,11 @@ export function verifyBet(input: VerifyInput): VerifyResult {
         (p.picks as number[]) ?? [],
         Boolean(p.cashedOut),
       );
-      return { commitmentValid, outcome: r as unknown as Record<string, unknown>, payout: r.payout };
+      return {
+        commitmentValid,
+        outcome: r as unknown as Record<string, unknown>,
+        payout: r.payout,
+      };
     }
     case 'high-card': {
       const r = hilo.replayHilo(
@@ -130,7 +154,11 @@ export function verifyBet(input: VerifyInput): VerifyResult {
         (p.actions as (hilo.HiloCall | 'skip')[]) ?? [],
         Boolean(p.cashedOut),
       );
-      return { commitmentValid, outcome: r as unknown as Record<string, unknown>, payout: r.payout };
+      return {
+        commitmentValid,
+        outcome: r as unknown as Record<string, unknown>,
+        payout: r.payout,
+      };
     }
     case 'twenty-one': {
       const r = blackjack.replayBlackjack(
@@ -139,10 +167,15 @@ export function verifyBet(input: VerifyInput): VerifyResult {
         (p.actions as blackjack.BjAction[]) ?? [],
         typeof p.decks === 'number' ? p.decks : blackjack.BLACKJACK_RULES.decks,
       );
-      return { commitmentValid, outcome: r as unknown as Record<string, unknown>, payout: r.totalPayout };
+      return {
+        commitmentValid,
+        outcome: r as unknown as Record<string, unknown>,
+        payout: r.totalPayout,
+      };
     }
     case 'orbit-rush': {
-      const cp = crash.crashPointOf(input.serverSeed, String(p.salt ?? input.clientSeed));
+      const salt = typeof p.salt === 'string' ? p.salt : input.clientSeed;
+      const cp = crash.crashPointOf(input.serverSeed, salt);
       const chainOk =
         typeof p.chainIndex === 'number' && typeof p.chainCommitment === 'string'
           ? crash.verifyChainSeed(input.serverSeed, p.chainIndex, p.chainCommitment)
@@ -153,8 +186,19 @@ export function verifyBet(input: VerifyInput): VerifyResult {
         payout: '0.00',
       };
     }
-    default: {
-      const r = playInstant(input.slug, seed, p, input.slug === 'pool-roulette' ? undefined : input.stake);
+    case 'pool-dice':
+    case 'double-side':
+    case 'pool-roulette':
+    case 'skyline':
+    case 'fortune-ring':
+    case 'pool-keno':
+    case 'pinfall': {
+      const r = playInstant(
+        input.slug,
+        seed,
+        p,
+        input.slug === 'pool-roulette' ? undefined : input.stake,
+      );
       return { commitmentValid, outcome: r.outcome, payout: r.payout };
     }
   }

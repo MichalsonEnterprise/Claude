@@ -33,6 +33,8 @@ export interface FairGameInfo {
   /** Mines / hi-lo: maximum payout per bet. */
   maxPayout?: string;
   rulesVersion: string;
+  /** Prefix of public bet references (D-10482, BJ-10483 …). */
+  refPrefix: string;
   /** Plain-language rule lines (published with the game). */
   rules: string[];
 }
@@ -50,6 +52,7 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'pool-dice/1',
+    refPrefix: 'D',
     rules: [
       'Each roll is a number from 0.00 to 99.99; every value is equally likely.',
       'Roll over T wins on T…99.99 (win chance 100 − T %); roll under T wins on 0.00…T − 0.01 (win chance T %).',
@@ -66,6 +69,7 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'double-side/1',
+    refPrefix: 'CF',
     rules: ['Heads or tails, 50.00 % each. A correct call pays 1.96× (house edge 2.00 %).'],
   }),
   'pool-roulette': g({
@@ -79,6 +83,7 @@ export const FAIR_GAMES = {
     maxBet: '1000.00',
     tableMax: '5000.00',
     rulesVersion: 'pool-roulette/1',
+    refPrefix: 'RL',
     rules: [
       'European wheel: 0–36, single zero. Straight 35:1, split 17:1, street 11:1, corner 8:1, six line 5:1, dozen / column 2:1, even money 1:1.',
       'Outside bets lose on 0. Limits 0.10–1,000.00 per spot, 5,000.00 per spin.',
@@ -94,7 +99,10 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'skyline/1',
-    rules: ['Pick a target from 1.01× to 1,000.00×. Win chance = 99 ÷ target %. A win pays bet × target.'],
+    refPrefix: 'SK',
+    rules: [
+      'Pick a target from 1.01× to 1,000.00×. Win chance = 99 ÷ target %. A win pays bet × target.',
+    ],
   }),
   'fortune-ring': g({
     slug: 'fortune-ring',
@@ -106,7 +114,10 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'fortune-ring/1',
-    rules: ['Risk low / medium / high, 10–50 segments, every segment equally likely; every ring returns 99.00 %.'],
+    refPrefix: 'FR',
+    rules: [
+      'Risk low / medium / high, 10–50 segments, every segment equally likely; every ring returns 99.00 %.',
+    ],
   }),
   'pool-keno': g({
     slug: 'pool-keno',
@@ -118,7 +129,10 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'pool-keno/1',
-    rules: ['Pick 1–10 numbers from 1–40; 10 are drawn. The payout table for your picks and risk is shown before you bet (exact RTP 98.65–99.00 % per table).'],
+    refPrefix: 'PK',
+    rules: [
+      'Pick 1–10 numbers from 1–40; 10 are drawn. The payout table for your picks and risk is shown before you bet (exact RTP 98.65–99.00 % per table).',
+    ],
   }),
   pinfall: g({
     slug: 'pinfall',
@@ -130,7 +144,10 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'pinfall/1',
-    rules: ['8–16 rows, risk low / medium / high; each peg bounces left or right with equal chance (exact RTP per board 98.98–99.02 %).'],
+    refPrefix: 'PF',
+    rules: [
+      '8–16 rows, risk low / medium / high; each peg bounces left or right with equal chance (exact RTP per board 98.98–99.02 %).',
+    ],
   }),
   'vault-sweeper': g({
     slug: 'vault-sweeper',
@@ -143,7 +160,10 @@ export const FAIR_GAMES = {
     maxBet: '1000.00',
     maxPayout: '100000.00',
     rulesVersion: 'vault-sweeper/1',
-    rules: ['1–24 mines on a 5×5 board. Multiplier = 0.99 ÷ chance that all your picks are gems (2 decimals). Max payout 100,000.00.'],
+    refPrefix: 'VS',
+    rules: [
+      '1–24 mines on a 5×5 board. Multiplier = 0.99 ÷ chance that all your picks are gems (2 decimals). Max payout 100,000.00.',
+    ],
   }),
   'high-card': g({
     slug: 'high-card',
@@ -156,7 +176,10 @@ export const FAIR_GAMES = {
     maxBet: '1000.00',
     maxPayout: '100000.00',
     rulesVersion: 'high-card/1',
-    rules: ['Ace low, King high, fresh 52-card deck each draw. Each right call multiplies the run by 0.99 ÷ chance (1.00 % edge per call). Skips are free.'],
+    refPrefix: 'HC',
+    rules: [
+      'Ace low, King high, fresh 52-card deck each draw. Each right call multiplies the run by 0.99 ÷ chance (1.00 % edge per call). Skips are free.',
+    ],
   }),
   'twenty-one': g({
     slug: 'twenty-one',
@@ -168,6 +191,7 @@ export const FAIR_GAMES = {
     minBet: '1.00',
     maxBet: '1000.00',
     rulesVersion: 'twenty-one/1',
+    refPrefix: 'BJ',
     rules: [
       '6 decks shuffled from your seeds for every hand. Dealer stands on soft 17. Blackjack pays 3:2.',
       'Double on any first two cards (also after a split). Split a pair once; split Aces get one card each.',
@@ -185,6 +209,7 @@ export const FAIR_GAMES = {
     minBet: '0.10',
     maxBet: '1000.00',
     rulesVersion: 'orbit-rush/1',
+    refPrefix: 'CR',
     rules: [
       'One crash point per round, fixed by a hash-chain seed committed before betting opens.',
       'About 1 in 100 rounds crashes instantly at 1.00×. Multipliers are capped at 1,000.00×; open bets cash out there.',

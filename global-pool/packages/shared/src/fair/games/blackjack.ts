@@ -33,12 +33,20 @@ export type CardCode = string; // 'AS', 'TD', 'KC', …
 /** Unshuffled shoe: deck by deck, suits S H D C, ranks A … K. */
 export function unshuffledShoe(decks: number = BLACKJACK_RULES.decks): CardCode[] {
   const out: CardCode[] = [];
-  for (let d = 0; d < decks; d++) for (const s of SUITS) for (const r of RANKS) out.push(`${r}${s}`);
+  for (let d = 0; d < decks; d++)
+    for (const s of SUITS) for (const r of RANKS) out.push(`${r}${s}`);
   return out;
 }
 
+/** Where cards come from: the seeded {@link Shoe} in play; a fixed list in rule tests. */
+export interface CardSource {
+  readonly decks: number;
+  position: number;
+  draw(): CardCode;
+}
+
 /** Lazily shuffled shoe: computes the forward Fisher–Yates only as far as cards are dealt. */
-export class Shoe {
+export class Shoe implements CardSource {
   private readonly stream: ByteStream;
   private readonly base: CardCode[];
   private readonly swapped = new Map<number, CardCode>();
@@ -153,7 +161,16 @@ export interface BjState {
 const isTenOrAce = (c: CardCode) => cardValue(c) === 10 || cardValue(c) === 1;
 
 function newHand(cards: CardCode[], stake: string, fromSplit = false, splitAces = false): BjHand {
-  return { cards, stake, doubled: false, fromSplit, splitAces, done: false, result: null, payout: '0.00' };
+  return {
+    cards,
+    stake,
+    doubled: false,
+    fromSplit,
+    splitAces,
+    done: false,
+    result: null,
+    payout: '0.00',
+  };
 }
 
 function recomputeTotals(s: BjState): void {
@@ -172,7 +189,7 @@ function recomputeTotals(s: BjState): void {
 }
 
 /** Deal a new hand: player, dealer up, player, dealer hole. */
-export function bjDeal(shoe: Shoe, stake: string): BjState {
+export function bjDeal(shoe: CardSource, stake: string): BjState {
   const p1 = shoe.draw();
   const d1 = shoe.draw();
   const p2 = shoe.draw();
@@ -204,7 +221,7 @@ export function bjDeal(shoe: Shoe, stake: string): BjState {
 }
 
 /** Dealer peek (Ace or 10 showing) and naturals. */
-function afterPeek(s: BjState, shoe: Shoe): void {
+function afterPeek(s: BjState, shoe: CardSource): void {
   const dealerBj = isNatural(s.dealer);
   s.dealerBlackjack = isTenOrAce(s.dealer[0]!) ? dealerBj : false;
   if (isTenOrAce(s.dealer[0]!)) s.log.push({ action: 'peek', hand: null, cards: [] });
@@ -242,14 +259,18 @@ export function actionCost(s: BjState, action: BjAction): string {
 }
 
 /** Apply one player action (mutates and returns the state). Throws FairError for an illegal action. */
-export function bjApply(s: BjState, shoe: Shoe, action: BjAction): BjState {
+export function bjApply(s: BjState, shoe: CardSource, action: BjAction): BjState {
   if (shoe.position !== s.position) throw new FairError('Shoe position mismatch', 'INTERNAL');
   if (!allowedActions(s).includes(action.type)) {
     throw new FairError(`"${action.type}" is not possible right now`, 'ACTION_NOT_ALLOWED');
   }
   if (action.type === 'insurance') {
     s.insurance!.taken = action.accept;
-    s.log.push({ action: action.accept ? 'insurance' : 'insurance_declined', hand: null, cards: [] });
+    s.log.push({
+      action: action.accept ? 'insurance' : 'insurance_declined',
+      hand: null,
+      cards: [],
+    });
     afterPeek(s, shoe);
     if (s.insurance!.taken && s.dealerBlackjack) {
       s.insurance!.payout = creditString(money(s.insurance!.stake).times(3));
@@ -301,7 +322,7 @@ export function bjApply(s: BjState, shoe: Shoe, action: BjAction): BjState {
 }
 
 /** Move to the next unfinished hand (dealing a split hand's second card) or play the dealer. */
-function advance(s: BjState, shoe: Shoe): void {
+function advance(s: BjState, shoe: CardSource): void {
   for (let i = 0; i < s.hands.length; i++) {
     const h = s.hands[i]!;
     if (h.done) continue;
@@ -321,7 +342,7 @@ function advance(s: BjState, shoe: Shoe): void {
 }
 
 /** Dealer plays (only if a hand is still standing) and every hand is settled. */
-function finish(s: BjState, shoe: Shoe, dealerPlays: boolean): void {
+function finish(s: BjState, shoe: CardSource, dealerPlays: boolean): void {
   s.holeRevealed = true;
   const live = s.hands.some((h) => handValue(h.cards).total <= 21);
   const naturalOnly = s.hands.length === 1 && isNatural(s.hands[0]!.cards);
@@ -385,7 +406,12 @@ export function actionsOf(s: BjState): BjAction[] {
   for (const e of s.log) {
     if (e.action === 'insurance') out.push({ type: 'insurance', accept: true });
     else if (e.action === 'insurance_declined') out.push({ type: 'insurance', accept: false });
-    else if (e.action === 'hit' || e.action === 'stand' || e.action === 'double' || e.action === 'split') {
+    else if (
+      e.action === 'hit' ||
+      e.action === 'stand' ||
+      e.action === 'double' ||
+      e.action === 'split'
+    ) {
       out.push({ type: e.action });
     }
   }
