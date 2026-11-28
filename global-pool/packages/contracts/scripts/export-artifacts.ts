@@ -26,7 +26,9 @@ interface ForgeArtifact {
 }
 
 /** Reads the Foundry `out/` artifacts into the exported shape. */
-export async function readLocalArtifacts(): Promise<Record<string, { abi: unknown[]; bytecode: string }>> {
+export async function readLocalArtifacts(): Promise<
+  Record<string, { abi: unknown[]; bytecode: string }>
+> {
   const out: Record<string, { abi: unknown[]; bytecode: string }> = {};
   for (const { name, source } of LOCAL_ARTIFACTS) {
     const file = fileURLToPath(new URL(`out/${source}/${name}.json`, root));

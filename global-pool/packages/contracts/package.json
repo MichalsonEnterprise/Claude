@@ -27,6 +27,7 @@
       }
     },
     "./abi/GlobalPoolRounds.json": "./abi/GlobalPoolRounds.json",
+    "./artifacts/local-devnet.json": "./artifacts/local-devnet.json",
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -42,11 +43,12 @@
   "files": [
     "dist",
     "abi",
+    "artifacts",
     "src"
   ],
   "scripts": {
     "dev": "sh scripts/forge.sh build --watch",
-    "build": "sh scripts/forge.sh build && node scripts/export-abi.ts && tsup",
+    "build": "sh scripts/forge.sh build && node scripts/export-abi.ts && node scripts/export-artifacts.ts && tsup",
     "build:ts": "tsup",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "sh scripts/forge.sh fmt --check && eslint .",
@@ -59,6 +61,7 @@
     "gas-report": "sh scripts/forge.sh test --gas-report --match-contract GlobalPoolRoundsTest",
     "fixture": "node scripts/build-fixture.ts",
     "abi": "node scripts/export-abi.ts",
+    "artifacts": "node scripts/export-artifacts.ts",
     "deploy:dry-run": "sh scripts/forge.sh script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia"
   },
   "dependencies": {

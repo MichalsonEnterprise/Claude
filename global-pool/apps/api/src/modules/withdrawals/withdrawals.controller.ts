@@ -14,6 +14,7 @@ import {
   enabledChainKeySchema,
   paginationQuerySchema,
   positiveUsdtAmountSchema,
+  withdrawalPrecheckQuerySchema,
   withdrawalRequestSchema,
 } from '@gp/shared/schemas';
 import { z } from 'zod';
@@ -24,6 +25,7 @@ import { createZodDto } from '../../common/zod';
 import { AuditService } from '../audit/audit.service';
 import { PlayerAuth, WITHDRAWAL_POLICY } from '../auth/guards';
 import { STEP_UP_HEADER } from '../security/step-up.service';
+import { WithdrawalPrecheckService } from './withdrawal-precheck.service';
 import { WithdrawalsService } from './withdrawals.service';
 
 class WithdrawalRequestDto extends createZodDto(withdrawalRequestSchema) {}
@@ -31,6 +33,7 @@ class QuoteQueryDto extends createZodDto(
   z.object({ amount: positiveUsdtAmountSchema, network: enabledChainKeySchema }),
 ) {}
 class PaginationDto extends createZodDto(paginationQuerySchema) {}
+class PrecheckQueryDto extends createZodDto(withdrawalPrecheckQuerySchema) {}
 
 @ApiTags('withdrawals')
 @PlayerAuth(WITHDRAWAL_POLICY)
@@ -39,6 +42,7 @@ export class WithdrawalsController {
   constructor(
     private readonly withdrawals: WithdrawalsService,
     private readonly audit: AuditService,
+    private readonly prechecks: WithdrawalPrecheckService,
   ) {}
 
   @Get('quote')
@@ -47,6 +51,21 @@ export class WithdrawalsController {
   })
   quote(@Query() query: QuoteQueryDto) {
     return this.withdrawals.quote(query.amount, query.network);
+  }
+
+  @Get('precheck')
+  @ApiOperation({
+    summary:
+      'Read-only risk validation before 2FA: KYC, limits, balance, account security, AML preview, address risk, network',
+  })
+  precheck(@CurrentUser() user: AuthUser, @Query() query: PrecheckQueryDto) {
+    return this.prechecks.precheck(user, query);
+  }
+
+  @Get('ref/:reference')
+  @ApiOperation({ summary: 'One withdrawal by its reference (WD-20931) with its screening checks' })
+  byReference(@CurrentUser() user: AuthUser, @Param('reference') reference: string) {
+    return this.prechecks.byReference(user.id, reference);
   }
 
   @Post()
