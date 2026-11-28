@@ -1,0 +1,35 @@
+const PG = figma.root.children.find(p => p.name === '09 — Admin Panel'); await figma.setCurrentPageAsync(PG);
+const sec = section('ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance', 70000, 0);
+const LIST = [["[ADM-B1] Supported Networks / 1440 / Default", "B1"], ["[ADM-B2] Smart Contracts / 1440 / Default", "B2"], ["[ADM-B3] Contract Addresses / 1440 / Default", "B3"], ["[ADM-B4] Transaction Monitoring / 1440 / Live", "B4"]];
+const made = [];
+for (const [srcName, key] of LIST) {
+  const src = sec.children.find(n => n.name === srcName); if (!src) { MISS.push('missing ' + srcName); continue; }
+  const nm = src.name.replace('/ 1440 /', '/ 1280 /'); if (sec.children.find(n => n.name === nm)) { MISS.push('exists ' + nm); continue; }
+  const band = src.name.startsWith('[ADM-C') ? 'C-1280' : 'B-1280';
+  const p = POS(band, key); const f = src.clone(); sec.appendChild(f); f.name = nm; f.x = p.x; f.y = p.y;
+  f.resize(1280, f.height); f.primaryAxisSizingMode = 'AUTO';
+  const bc = __COLS['Breakpoint']; const bm = bc.modes.find(m => m.name === 'Laptop 1280'); if (bm) f.setExplicitVariableModeForCollection(bc, bm.modeId);
+  for (const t of f.findAll(n => n.name.startsWith('Table — ') && n.name.includes('{hideL:'))) { const ks = t.name.match(/\{hideL:([^}]*)\}/)[1].split(','); for (const n of t.findAll(x => ks.some(k => x.name === 'Col/' + k || x.name === 'H/' + k))) n.visible = false; }
+  for (const n of f.findAll(x => x.name.includes('[hideL]'))) n.visible = false;
+  made.push(f);
+}
+const NAME = '[ADM-B8] Gas Statistics / 1440 / Default';
+const { f, c } = await SHELL(NAME, POS('B-1440', 'B8'), 'B', 7, 'SI', 'Search network or operation…');
+await HEAD(c, ['Admin', 'Blockchain', 'Gas statistics'], 'Gas statistics', 'Network fees paid by players (deducted from withdrawals, shown before they confirm) and by the treasury (sweeps, VRF callbacks, payouts). 14 days to 27 Nov 2026, 18:44 UTC. USDT equivalents, DEMO.', { badges: [await DEMO('M')], actions: [await BTN('Secondary', '14 Nov – 27 Nov 2026', { size: 'S', lead: 'calendar' }), await BTN('Secondary', 'Export CSV', { size: 'S', lead: 'download' })] });
+await ROW(c, [await KPI('Flat', 'Paid by treasury (14 d)', '1,842.36', 'USDT', '+4.8%', 'Sweeps, VRF callbacks, payout batches · 78.8 % on Ethereum', 'vs previous 14 d'), await KPI('Flat', 'Charged to players (14 d)', '2,304.50', 'USDT', '15,430 withdrawals', 'Network fee only — the platform withdrawal fee is 0.00', 'pass-through'), await KPI('Flat', 'Cost per VRF draw', '0.21', 'USDT', '14 draws', 'Callback gas on Arbitrum · included in treasury fees', 'avg')], { spark: 1 });
+// stacked daily bars (inline chart)
+const days = ['14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27'];
+const tot = [118.2, 121.4, 119.8, 126.1, 122.6, 117.9, 124.3, 129.7, 131.2, 127.4, 136.8, 141.6, 175.8, 149.56];
+const ch = CARD('Treasury network fees per day', { gap: 16 }); add(c, [ch, 'FILL']); await CHEAD(ch, 'Treasury network fees per day · USDT', { icon: 'bar-chart' });
+const lg = AL('HORIZONTAL', { name: 'Legend', gap: 16 }); for (const [l, tok] of [['Ethereum', 'chart/series-1'], ['Arbitrum', 'chart/series-2'], ['Other (BNB, Polygon, Solana)', 'chart/other']]) { const li = await I('25:17311', { Key: 'Rect', State: 'Default' }, { Label: l, 'Show value': false }); const key = li.findOne(n => n.name === 'Key'); if (key && 'fills' in key) key.fills = [paint(tok)]; add(lg, li); } add(ch, lg);
+const plot = AL('HORIZONTAL', { name: 'Plot', gap: 12 }); add(ch, [plot, 'FILL']);
+const ya = ALW('VERTICAL', { name: 'Y axis', h: 208, justify: 'SPACE_BETWEEN', align: 'MAX' }); for (const t of ['200', '150', '100', '50', '0']) add(ya, await T(t, 'Caption', 'text/tertiary')); add(plot, ya);
+const gs = AL('HORIZONTAL', { name: 'Days', gap: 0 }); add(plot, [gs, 'FILL']);
+for (let i = 0; i < days.length; i++) { const v = tot[i]; const eth = v * 0.788, arb = v * 0.143, oth = v - eth - arb; const g = AL('VERTICAL', { name: 'Day ' + days[i] + ' · ' + v.toFixed(2), gap: 8, align: 'CENTER' }); const col = ALW('VERTICAL', { name: 'Stack', h: 200, justify: 'MAX', align: 'CENTER' }); strokeSides(col, 'chart/baseline', { b: 1 }); add(col, rect(24, Math.round(oth), 'chart/other', 0, 'Other'), rect(24, Math.round(arb), 'chart/series-2', 0, 'Arbitrum'), rect(24, Math.round(eth), i === 13 ? 'chart/series-4' : 'chart/series-1', 0, 'Ethereum')); add(g, [col, 'FILL']); add(g, await T(days[i] + ' Nov', 'Caption', i === 13 ? 'text/primary' : 'text/tertiary')); add(gs, [g, 'FILL']); }
+await WT(ch, '27 Nov is a partial day (to 18:44 UTC): 149.56 USDT so far, lighter Ethereum segment. The 26 Nov peak (175.80) matches the start of the Ethereum gas spike.', 'Caption', 'text/tertiary', 700);
+const N = [['BNB Chain', '1.0 gwei', '0.12', '96.40', '466.80', '3,890', 5.2], ['Polygon', '38 gwei', '0.02', '21.10', '54.20', '2,710', 1.1], ['Arbitrum', '0.02 gwei', '0.08', '263.40', '462.40', '5,780', 14.3], ['Ethereum', '34 gwei', '2.40', '1,452.06', '1,296.00', '540', 78.8], ['Solana', '5,000 µlamports', '0.01', '9.40', '25.10', '2,510', 0.5]];
+const rows = []; for (const n of N) rows.push([{ T: 'Network', p: n[0] }, { T: 'Text', p: n[1], mono: 1, c: 'text/secondary' }, CR(await T(n[2], 'Number/S', 'text/primary')), CR(await T(n[3], 'Number/S', 'text/primary')), CR(await T(n[4], 'Number/S', 'text/primary')), CR(await T(n[5], 'Number/S', 'text/secondary')), C(await BAR(Math.max(1, Math.round(n[6])), n[0] === 'Ethereum' ? 'chart/series-1' : n[0] === 'Arbitrum' ? 'chart/series-2' : 'chart/other', 160), await T(n[6].toFixed(1) + ' %', 'Body/S Strong', 'text/primary'))]);
+await TABLE(c, 'By network', [{ k: 'net', l: 'Network', w: 156 }, { k: 'gas', l: 'Avg gas price', w: 156 }, { k: 'fee', l: 'Fee per withdrawal', w: 152, r: 1 }, { k: 'tre', l: 'Treasury paid', w: 140, r: 1 }, { k: 'ply', l: 'Players paid', w: 140, r: 1 }, { k: 'n', l: 'Withdrawals', w: 116, r: 1 }, { k: 'share', l: 'Share of treasury fees', w: 'FILL' }], rows, { hideL: ['gas', 'n'], head: await TH('By network · 14 days', { meta: 'Totals: treasury 1,842.36 · players 2,304.50 USDT' }) });
+await NOTE(c, 'info', 'info', 'Players always see the network fee and the amount they will receive before confirming a withdrawal. Treasury-paid fees are an operating cost and never come out of the prize pool.', { w: 900 });
+for (const m of made) await m.screenshot({ scale: 0.3 });
+return await DONE(f, { laptop: made.map(m => [m.id, m.name, Math.round(m.height)]) });

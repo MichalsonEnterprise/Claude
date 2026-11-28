@@ -2052,7 +2052,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 1440 + L 1280 + T 768. KPI tiles (Admin/KPI Tile), Admin/Filter Bar, compact users table built from Table/Header Cell + Table/Cell + Table/Risk Cell + KYC chips, Pagination. Laptop hides Country; tablet hides Country/Balance/Last active and wraps KPIs 2x2. Every row carries DEMO; no balance or bulk-edit actions.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U2",
@@ -2062,7 +2064,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L/T. @nova.k profile header (identity, status badges, read-only ledger-derived balances 12,480.50 = 9,215.30 + 1,850.00 + 1,000.00 + 415.20), 9-tab bar, Summary tab: open items, lifetime activity, recent transactions, AML meter, compliance snapshot, RG limits, admin activity. On tablet the tab bar becomes a section picker and the columns stack.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U3",
@@ -2072,7 +2076,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. PII masked by default ('Reveal a field' needs a reason and is logged; no PII edits), account facts, devices and sessions (User/Device Row), security, consent (read-only), support context.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U4",
@@ -2082,7 +2088,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. Full-width withdrawal address book (whitelisted / 24 h cooldown / own wallet / blocked sanctions hit), connected wallets (player-only actions hidden), screening results, address rules, 'Flag for review' (reason + 2FA). Admins cannot add, edit or redirect addresses.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U5",
@@ -2092,7 +2100,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. Three-level verification tracker, documents table with watermarked and logged 'View', review history timeline, KYC status, limits by level, 'Request information'. Laptop hides the Expires column.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U6",
@@ -2102,7 +2112,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. 90-day risk score line chart (token-bound vectors, Medium threshold, spike annotation tied to RS-3291), score breakdown table summing to 18, screening results, Admin/Risk Score Meter, monitoring alerts, allowed actions. Scores are read-only; no override.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U7",
@@ -2112,7 +2124,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. Lifetime flows strip that reconciles to the 12,480.50 balance, Admin/Filter Bar, 10-row compact Table/Cell ledger (fees column explicit), Pagination, append-only and no-edit notice. Laptop hides the Type column.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U8",
@@ -2122,7 +2136,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Default, Apply (custom modal: restriction type, impact on user, duration, reason category + reason, Input/OTP 2FA, four-eyes notice, audit notice, user-facing message), Restriction active (RS-3307, approved by a different admin, success toast, history entry), Lift (Admin/Confirm With Reason Dialog: reason + 2FA, no second approver). L: Default + Apply. T: Default + Apply. Restrictions never touch balances or ledger entries.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U9",
@@ -2132,7 +2148,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. Player-set limits with meters (participation 351.75/500.00, loss 24.60/200.00, weekly deposit 3,500.00/5,000.00 with pending 24 h increase), play pattern, markers of harm, RG interaction timeline, protection status, admin actions (log, contact, operator time-out). Admins cannot loosen limits.",
+  "by": "adm-users"
  },
  {
   "id": "ADM-U10",
@@ -2142,7 +2160,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "User Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/L. Hash-chain integrity banner, Admin/Filter Bar, Admin/Audit Log Header + 8 Audit Log Rows (role chips, hashes, entry numbers), cursor pagination, immutability note. Laptop hides the IP column (IP stays in row detail).",
+  "by": "adm-users"
  },
  {
   "id": "ADM-F1",
@@ -2152,7 +2172,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Done at D, L and T, each checked on screenshot. Content: KPIs, network watchers, filter bar, deposits table (DP-77412 at 7/12 confirming), held-deposit routing to Compliance, read-only notes. At 1280 the Tx-hash column is hidden. At 768 the table becomes stacked row cards and a scrollable Finance sub-nav replaces the sidebar.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F2",
@@ -2162,7 +2184,9 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop is complete: queue plus WD-20931 detail (under review, AML-3317, first payout to a whitelisted address) and 4 states — approve dialog with reason+2FA, reject validation error, awaiting second approver (AR-1042, self-approval disabled), approved/broadcasting by K. Osei. Laptop and tablet queue and detail are verified. MOBILE 390 IS MISSING: the Figma MCP quota ran out. The ready script is /home/user/Claude/design/figma-build/pending/adm-f2-mobile.js; running it once builds the queue, the detail with a sticky Reject/Approve bar, and the approve bottom sheet.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F3",
@@ -2172,7 +2196,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D and L. Fee rule 0.05 USDT per qualifying entry; the fee escrow is kept separate from the pool. 30-day bar chart totals 60,700.00. Fees-by-round table: #1,248 932.00 in escrow; #1,245 206.00 released to players. Fee changes are dual-approved and apply only from the next round.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F4",
@@ -2182,7 +2208,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D, L and T. Liabilities 241,010.40 = 186,400.00 escrow + 52,310.40 owed prizes + 2,300.00 refunds outstanding, matching the contract balance. Shows the round #1,248 waterfall with Prize Distribution, the owed-prize holds and a rounds ledger. 'Immutable by design' panel; no money-moving controls.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F5",
@@ -2192,7 +2220,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D and L. Append-only double-entry journals for @nova.k (DP-77412, WD-20931 lock, 35-entry purchase, #1,245 refund plus fee release). Debits and credits balance at 3,153.25. Hash-chain integrity banner and chain explainer. CE-0031 shows a correction as a new entry awaiting a second approver; edit and delete are not available to any role.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F6",
@@ -2202,7 +2232,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D and L. The hourly run checks 9 scopes: 7 match, 1 mismatch (Treasury BNB, −12.40, INV-0192) and 1 pending (DP-77412). Investigation timeline, CE-0031, 24-run history. The fix is always a reviewed correcting entry, never a ledger edit. At 1280 the snapshot column was hidden after the last laptop screenshot; that change was not re-checked visually.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F7",
@@ -2212,7 +2244,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D and L. Round #1,245 RefundOnCancel: threshold bar, 38,900.00 of 41,200.00 claimed, 2,300.00 outstanding across 19 players (@nova.k 300.00). Allowed actions are reminder and report only; 'Issue manual refund' is disabled. Separate list of returns that are not refunds (WD-20850, DP-77398).",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F8",
@@ -2222,7 +2256,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D and L. Gross 811,850.70 − rewards 115,120.30 = net 696,730.40. Product share bars, weekly net revenue bars that sum to the 30-day total, a revenue statement tied to ledger sources (network fees 18,204.12 excluded), and scheduled reports.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-F9",
@@ -2232,7 +2268,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Finance",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Export CSV modal over Revenue reports in 4 states at D (Configure, Generating 62%, Ready with SHA-256, expiry and audit entry, Error over the 500,000-row limit with a background-export option) plus Configure at L. Personal data is off by default; a reason is required; watermark and audit-log notice shown. The modal footers changed after the spacer fix and were not re-screenshotted.",
+  "by": "adm-finance"
  },
  {
   "id": "ADM-G1",
@@ -2312,7 +2350,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 and 1280 built and checked in screenshots (side-stats and KPI-copy fixes applied). The 768 tablet frame is still missing; its script is ready (out_tab.js).",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P2",
@@ -2322,7 +2362,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 and 1280 built and checked in screenshots. The 768 tablet frame is still missing (script ready). Numbers match ADM-F4: 241,010.40 = 186,400.00 pool + 52,310.40 owed prizes + 2,300.00 refunds outstanding.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P3",
@@ -2332,7 +2374,9 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 and 1280 built and checked in screenshots. The 768 tablet frame (out_tab.js) and the 390 mobile frame on page 10 (out_Lm3.js) are still missing; both scripts are ready.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P4",
@@ -2342,7 +2386,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 and 1280 built. A column-width fix was applied afterwards (Round 150, 1st prize 170 and hidden at 1280) but I did not take a new screenshot after it.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P5",
@@ -2352,7 +2398,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 and 1280 built. Column widths were fixed and two summary stats hidden at 1280 afterwards, with no new screenshot.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P6",
@@ -2362,7 +2410,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 and 1280 built and checked in screenshots. One cell still reads '2.00% ea…' (truncated); the fix was in a call that hit the rate limit.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P7",
@@ -2372,7 +2422,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 and 1280 (Fulfilled state, snapshot 20:01 UTC) built and checked in screenshots. Not built: the 768 tablet frame and the 'Delayed' scenario state. Both scripts are ready.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P8",
@@ -2382,7 +2434,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 and 1280 (auto-claim batch 3 of 4, snapshot 20:03 UTC) built and checked in screenshots. The 768 tablet frame is still missing (script ready).",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P9",
@@ -2392,7 +2446,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "The Figma MCP rate limit blocked the build. The script for 1440 + 1280 (round #1,245 refunds aligned with ADM-F7: 38,900.00 refunded, 2,300.00 outstanding across 19 players) is ready in out_A.js.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-P10",
@@ -2402,7 +2458,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "The rate limit blocked the build. Ready: out_A.js (1440 + 1280 default) and states.js (pause request with reason + 2FA + four-eyes, approver view for K. Osei, paused after dual approval AR-1039). states.js reads the P10 default frame ID from the P10ID variable that out_A.js sets.",
+  "by": "adm-pool"
  },
  {
   "id": "ADM-B1",
@@ -2412,7 +2470,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/x5.js. Laptop 1280 is in out/x12.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B2",
@@ -2422,7 +2482,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/b2.js. Laptop 1280 is in out/x12.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B3",
@@ -2432,7 +2494,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/b3.js. Laptop 1280 is in out/x12.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B4",
@@ -2442,7 +2506,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/b4.js. Laptop 1280 is in out/x12.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B5",
@@ -2452,7 +2518,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/b5.js. Laptop 1280 is in out/l-b2.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B6",
@@ -2462,7 +2530,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/b6.js. Laptop 1280 is in out/l-b2.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B7",
@@ -2472,7 +2542,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/b7.js. Laptop 1280 is in out/l-b2.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-B8",
@@ -2482,7 +2554,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/x12.js (inline stacked daily bar chart). Laptop 1280 is in out/l-b2.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C1",
@@ -2492,7 +2566,9 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 queue (68:53474) and review detail KYC-30418 (75:56265) are built. The queue passed its re-screenshot after fixes. The review passed its screenshot; a later text fix (textarea placeholder, risk-meter user/factors) has not been re-screenshotted. Still missing: Laptop 1280 clones (out/x1.js), Tablet 768 (out/t-c1q.js, out/t-c1r.js) and Mobile 390 (out/m-c1q.js, out/m-c1r.js).",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C2",
@@ -2502,7 +2578,9 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 (77:56703) is built: alerts table plus AML-5530 preview with risk meter, funds flow and controlled actions. Passed its re-screenshot after the column-width and pagination fix. Still missing: Laptop 1280 (out/x1.js), Tablet 768 (out/t-c2.js) and Mobile 390 (out/m-c2.js).",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C3",
@@ -2512,7 +2590,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 (86:116072) is built and its screenshot passed: tipping-off warning, cases table, STR-0094 stepper, evidence pack and MLRO filing panel. Laptop 1280 is still missing (out/x1.js).",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C4",
@@ -2522,7 +2602,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Ready-to-run script: out/x1.js (builds C4 desktop plus the C1–C3 laptop clones). Laptop 1280 is in out/x5.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C5",
@@ -2532,7 +2614,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/c5.js. Laptop 1280 is in out/x5.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C6",
@@ -2542,7 +2626,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/c6.js. Laptop 1280 is in out/x5.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-C7",
@@ -2552,7 +2638,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Desktop script: out/c7.js (inline grouped bar charts). Laptop 1280 is in out/x5.js.",
+  "by": "adm-chain-comp"
  },
  {
   "id": "ADM-A1",

@@ -129,9 +129,8 @@ async function SIDEBAR(mod, active, who) {
 async function TOPBAR(who, ph) { const tb = await I('22:6483', { Environment: 'Production' }); const W = WHO[who]; await setT(tb, 'Placeholder', ph); const av = byMain(tb, 'User/Avatar'); if (av) setP(av, 'Initials', W[0]); await setT(tb, 'A. Marin', W[1]); await setT(tb, 'Finance Lead', W[2]); return tb; }
 // band layout inside the section: C desktop / C laptop / C tablet / B desktop / B laptop
 const ORDER = { C: ['C1Q', 'C1R', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'], B: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8'] };
-const BANDS = ['C-1440', 'C-1280', 'C-768', 'B-1440', 'B-1280'];
-function bandOf(f) { const m = f.name.match(/^\[ADM-([BC])\d[^\/]*\/ (\d+) \//); return m ? m[1] + '-' + m[2] : null; }
-function POS(band, key) { const [m, w] = band.split('-'); const col = ORDER[m].indexOf(key); const x = 120 + col * (Number(w) + 120); const inBand = sec.children.filter(f => bandOf(f) === band); if (inBand.length) return { x, y: Math.min(...inBand.map(f => f.y)) }; const bi = BANDS.indexOf(band); const prev = sec.children.filter(f => { const b = BANDS.indexOf(bandOf(f)); return b >= 0 && b < bi; }); return { x, y: prev.length ? Math.max(...prev.map(f => f.y + f.height)) + 240 : 160 }; }
+const BY = { 'C-1440': 160, 'C-1280': 3000, 'B-1440': 6000, 'B-1280': 9000, 'C-768': 12000 };
+function POS(band, key) { const [m, w] = band.split('-'); const col = ORDER[m].indexOf(key); return { x: 120 + col * (Number(w) + 120), y: BY[band] }; }
 function GUARD(name) { if (sec.children.find(n => n.name === name)) throw new Error('Frame already exists: ' + name); }
 async function SHELL(name, pos, mod, active, who, ph) {
   GUARD(name); const f = await screen(name, 1440, {}); sec.appendChild(f); f.x = pos.x; f.y = pos.y;

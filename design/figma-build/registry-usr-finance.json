@@ -31,5 +31,9 @@
  "[USR-F5] Refunds / 1440 / Default": {
   "id": "88:50964",
   "type": "FRAME"
+ },
+ "[USR-F6] Complete Transaction History / 1440 / Default": {
+  "id": "90:114727",
+  "type": "FRAME"
  }
 }

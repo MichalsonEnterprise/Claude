@@ -1,0 +1,26 @@
+{
+  "_note": "Agent adm-bc pending use_figma scripts (Figma MCP call limit hit). Each file in out/ is complete and self-contained (helpers.js verbatim + adm-bc lib + screen body), < 50k chars, syntax-checked with node. Run them in this order with use_figma (fileKey QHF8iRUMFgGMcEn3bD25jl, skillNames figma-use,figma-generate-design). Each script throws 'Frame already exists' instead of duplicating a frame, and ends with a screenshot. Section 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' on page '09 — Admin Panel' at X=70000,Y=0; fixed band rows (section-local y): C desktop 160, C laptop 3000, B desktop 6000, B laptop 9000, C tablet 12000; columns x = 120 + i*(width+120). Mobile scripts target page '10 — Mobile Experience', section 'ADM — Mobile' (X=217000,Y=0), placed after the last [ADM-C1]/[ADM-C2] frame or at nextX.",
+  "already_built": {"[ADM-C1] KYC Queue / 1440 / Default": "68:53474", "[ADM-C1] KYC Review — KYC-30418 / 1440 / In review": "75:56265", "[ADM-C2] AML Alerts / 1440 / Default": "77:56703", "[ADM-C3] Suspicious Transactions / 1440 / Default": "86:116072"},
+  "order": [
+    ["out/x1.js", "KPI delta-context fixes on C1/C2/C3 + Laptop 1280 clones of C1 queue, C1 review, C2, C3 + [ADM-C4] Sanctions Screening / 1440"],
+    ["out/c5.js", "[ADM-C5] Restricted Countries / 1440 / Default"],
+    ["out/c6.js", "[ADM-C6] Self-Exclusion / 1440 / Default"],
+    ["out/c7.js", "[ADM-C7] Responsible Gaming Reports / 1440 / Default"],
+    ["out/x5.js", "Laptop 1280 clones of C4–C7 + [ADM-B1] Supported Networks / 1440"],
+    ["out/b2.js", "[ADM-B2] Smart Contracts / 1440"],
+    ["out/b3.js", "[ADM-B3] Contract Addresses / 1440"],
+    ["out/b4.js", "[ADM-B4] Transaction Monitoring / 1440 / Live"],
+    ["out/b5.js", "[ADM-B5] Blockchain Events / 1440 / Live"],
+    ["out/b6.js", "[ADM-B6] Network Health / 1440 / Degraded — Ethereum"],
+    ["out/b7.js", "[ADM-B7] Failed Transactions / 1440"],
+    ["out/x12.js", "Laptop 1280 clones of B1–B4 + [ADM-B8] Gas Statistics / 1440"],
+    ["out/l-b2.js", "Laptop 1280 clones of B5–B8"],
+    ["out/t-c1q.js", "[ADM-C1] KYC Queue / 768 / Default"],
+    ["out/t-c1r.js", "[ADM-C1] KYC Review — KYC-30418 / 768 / In review"],
+    ["out/t-c2.js", "[ADM-C2] AML Alerts / 768 / Default"],
+    ["out/m-c1q.js", "page 10: [ADM-C1] KYC Queue / 390 / Default"],
+    ["out/m-c1r.js", "page 10: [ADM-C1] KYC Review — KYC-30418 / 390 / In review"],
+    ["out/m-c2.js", "page 10: [ADM-C2] AML Alerts / 390 / Default"]
+  ],
+  "rebuild": "python3 build.py <name> re-assembles out/<name>.js from ../../helpers.js + _lib.js (+ _mlib.js for t-/m- files) + <name>.js"
+}

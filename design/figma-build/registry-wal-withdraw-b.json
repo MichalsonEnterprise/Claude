@@ -1,0 +1,43 @@
+{
+ "_note": "Agent wal-withdraw-b — WAL-15..19 withdraw steps 6–9 (screens only, no new library components). Page '06 — Wallet & Transactions', section 'WAL-15..19 Withdraw steps 6–9' (91:27627) at X=52000, Y=0: desktop columns x = 120 / 1680 / 3240 / 4800 / 6360 (WAL-15 / 16 / 17 / 18 / 19), states stacked below their default (+160), tablet 768 row below all desktop frames (+240). Mobile: page '10 — Mobile Experience', section 'WAL — Mobile D (Withdraw 6–9)' at X=154000, Y=0 (columns x = 120 + i*510). Composed from Shell/Sidebar, Shell/Topbar Desktop/Mobile, Nav/Stepper (9) + Nav/Stepper Mobile, Tabs/Underline, Input/OTP, User/KYC Status Chip, Table/Risk Cell, Wallet/Network Pill, Wallet/Address Chip, Wallet/Balance Breakdown Compact, Tx/Hash, Badge/Status, Badge/DEMO, Notice/Demo Data, Button/*, Nav/Mobile Tab Bar. Inline (no component exists): automatic-check list rows, vertical withdrawal timeline, anti-phishing code block, receipt list, option rows, bottom sheet shell. Build scripts: design/figma-build/pending/wal-withdraw-b/ (run `python3 build.py`, paste out/<name>.js).",
+ "Section/WAL-15..19 Withdraw steps 6–9": {
+  "id": "91:27627",
+  "type": "SECTION"
+ },
+ "WAL-15 Withdraw — Step 6 Risk Validation / 1440 / Pass": {
+  "id": "91:27628",
+  "type": "FRAME"
+ },
+ "WAL-15 Withdraw — Step 6 Risk Validation / 1440 / KYC required — separate DEMO scenario (Level 1 account)": {
+  "id": "91:28512",
+  "type": "FRAME"
+ },
+ "WAL-15 Withdraw — Step 6 Risk Validation / 1440 / Flagged — manual review": {
+  "id": "91:29357",
+  "type": "FRAME"
+ },
+ "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 1440 / Default — email code + authenticator": {
+  "id": "97:31028",
+  "type": "FRAME"
+ },
+ "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 1440 / Wrong code": {
+  "id": "97:31941",
+  "type": "FRAME"
+ },
+ "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 1440 / Locked (15 min)": {
+  "id": "97:32764",
+  "type": "FRAME"
+ },
+ "WAL-17 Withdraw — Step 8 Pending / 1440 / Processing": {
+  "id": "102:38421",
+  "type": "FRAME"
+ },
+ "WAL-17 Withdraw — Step 8 Pending / 1440 / Queued": {
+  "id": "102:39385",
+  "type": "FRAME"
+ },
+ "WAL-17 Withdraw — Step 8 Pending / 1440 / Manual review": {
+  "id": "102:40262",
+  "type": "FRAME"
+ }
+}

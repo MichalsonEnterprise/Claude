@@ -129,9 +129,8 @@ async function SIDEBAR(mod, active, who) {
 async function TOPBAR(who, ph) { const tb = await I('22:6483', { Environment: 'Production' }); const W = WHO[who]; await setT(tb, 'Placeholder', ph); const av = byMain(tb, 'User/Avatar'); if (av) setP(av, 'Initials', W[0]); await setT(tb, 'A. Marin', W[1]); await setT(tb, 'Finance Lead', W[2]); return tb; }
 // band layout inside the section: C desktop / C laptop / C tablet / B desktop / B laptop
 const ORDER = { C: ['C1Q', 'C1R', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'], B: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8'] };
-const BANDS = ['C-1440', 'C-1280', 'C-768', 'B-1440', 'B-1280'];
-function bandOf(f) { const m = f.name.match(/^\[ADM-([BC])\d[^\/]*\/ (\d+) \//); return m ? m[1] + '-' + m[2] : null; }
-function POS(band, key) { const [m, w] = band.split('-'); const col = ORDER[m].indexOf(key); const x = 120 + col * (Number(w) + 120); const inBand = sec.children.filter(f => bandOf(f) === band); if (inBand.length) return { x, y: Math.min(...inBand.map(f => f.y)) }; const bi = BANDS.indexOf(band); const prev = sec.children.filter(f => { const b = BANDS.indexOf(bandOf(f)); return b >= 0 && b < bi; }); return { x, y: prev.length ? Math.max(...prev.map(f => f.y + f.height)) + 240 : 160 }; }
+const BY = { 'C-1440': 160, 'C-1280': 3000, 'B-1440': 6000, 'B-1280': 9000, 'C-768': 12000 };
+function POS(band, key) { const [m, w] = band.split('-'); const col = ORDER[m].indexOf(key); return { x: 120 + col * (Number(w) + 120), y: BY[band] }; }
 function GUARD(name) { if (sec.children.find(n => n.name === name)) throw new Error('Frame already exists: ' + name); }
 async function SHELL(name, pos, mod, active, who, ph) {
   GUARD(name); const f = await screen(name, 1440, {}); sec.appendChild(f); f.x = pos.x; f.y = pos.y;
@@ -158,7 +157,7 @@ async function CHEAD(card, title, o = {}) { const r = AL('HORIZONTAL', { name: '
 async function KV(parent, k, v, o = {}) { const r = AL('HORIZONTAL', { name: 'KV ' + k, gap: 12, align: 'CENTER', p: o.line ? [8, 0, 8, 0] : 0 }); add(r, await T(k, 'Body/S', 'text/tertiary')); add(r, [SPC(), 'FILL']); if (o.node) add(r, o.node); else add(r, await T(v, o.style || 'Body/S Strong', o.color || 'text/primary')); add(parent, [r, 'FILL']); if (o.line) strokeSides(r, 'border/subtle', { b: 1 }); return r; }
 const TONE = { warning: ['status/warning-tint', 'status/warning'], danger: ['status/danger-tint', 'status/danger'], info: ['status/info-tint', 'status/info'], success: ['status/success-tint', 'status/success'], neutral: ['surface/raised', 'icon/muted'], brand: ['brand/tint-subtle', 'icon/brand'] };
 async function NOTE(parent, icon, tone, text, o = {}) { const F = TONE[tone]; const r = AL('HORIZONTAL', { name: 'Callout — ' + (o.title || tone), gap: 12, p: [12, 16, 12, 16], fill: F[0], r: 10, align: o.actions ? 'CENTER' : undefined }); add(r, await IC(icon, 18, F[1])); const col = AL('VERTICAL', { name: 'Text', gap: 2 }); if (o.title) add(col, await T(o.title, 'Body/S Strong', 'text/primary')); await WT(col, text, 'Body/S', 'text/secondary', o.w || 400); add(r, [col, 'FILL']); for (const b of (o.actions || [])) add(r, b); add(parent, [r, 'FILL']); return r; }
-async function KPI(trend, label, value, unit, delta, def) { const k = await I('23:15270', { Trend: trend }); await setTs(k, { Label: label, Value: value, Unit: unit, 'Delta value': delta, Definition: def }); k.name = 'Admin/KPI Tile — ' + label; return k; }
+async function KPI(trend, label, value, unit, delta, def, ctx) { const k = await I('23:15270', { Trend: trend }); await setTs(k, { Label: label, Value: value, Unit: unit, 'Delta value': delta, Definition: def }); if (ctx) { const t = k.findOne(n => n.type === 'TEXT' && /^vs /.test(n.characters)); if (t) await setText(t, ctx); } k.name = 'Admin/KPI Tile — ' + label; return k; }
 async function ROW(parent, kids, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', gap: o.gap ?? 16, align: o.align }); for (const k of kids) { if (Array.isArray(k)) add(r, k); else add(r, [k, 'FILL']); if (o.spark) { const kk = Array.isArray(k) ? k[0] : k; const sp = kk.findOne && kk.findOne(n => n.name === 'Sparkline'); if (sp) { try { sp.layoutSizingHorizontal = 'FILL'; } catch (e) { MISS.push('spark'); } } } } add(parent, [r, 'FILL']); return r; }
 async function TABS(parent, tabs, active) { const r = AL('HORIZONTAL', { name: 'Tabs', gap: 0 }); strokeSides(r, 'border/subtle', { b: 1 }); for (const [l, cnt] of tabs) { const t = await I('20:6831', { State: l === active ? 'Active' : 'Default' }, { Label: l, 'Show count': !!cnt }); if (cnt) { const c = findI(t, 'Count') || byMain(t, 'Badge/Count'); if (c) setP(c, 'Count', cnt); } add(r, t); } add(parent, [r, 'FILL']); return r; }
 async function CHIP(l, sel, icon) { const p = { Label: l, 'Show icon': !!icon }; if (icon) p.Icon = ICONS[icon] || CHAINS[icon]; return await I('17:2766', { State: sel ? 'Selected' : 'Default' }, p); }
@@ -208,7 +207,8 @@ async function TABLE(parent, name, cols, rows, o = {}) {
 function C(...n) { return { T: 'custom', n }; }
 function CR(...n) { return { T: 'custom', n, right: 1 }; }
 async function TH(title, o = {}) { const h = AL('HORIZONTAL', { name: 'Table title', gap: 8, p: [14, 16, 14, 16], align: 'CENTER' }); strokeSides(h, 'border/subtle', { b: 1 }); add(h, await T(title, 'Heading/H5', 'text/primary')); for (const b of (o.badges || [])) add(h, b); add(h, [SPC(), 'FILL']); if (o.meta) add(h, await T(o.meta, 'Caption', 'text/tertiary')); add(h, await DEMO('M')); for (const b of (o.right || [])) add(h, b); return h; }
-async function PAGER(type, range) { const p = await I('23:16756', { Type: type }); if (range) await setT(p, 'Range', range); return p; }
+function PAGEFIX(p, per, last) { if (!p) return; if (per) { const b = p.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Button/Secondary')); if (b) setP(b, 'Label', String(per)); } if (last) { for (let k = 1; k <= 5; k++) { const it = findI(p, 'Page ' + k); if (it && k > last) it.visible = false; } const g = p.findOne(n => n.name === 'Gap'); if (g) g.visible = last > 6; const lp = findI(p, 'Page 65'); if (lp) { if (last > 5) setP(lp, 'Page', String(last)); else lp.visible = false; } } }
+async function PAGER(type, range, per, last) { const p = await I('23:16756', { Type: type }); if (range) await setT(p, 'Range', range); PAGEFIX(p, per, last); return p; }
 async function MONO(s, c = 'text/primary') { return await T(s, 'Mono/S', c); }
 async function ICT(icon, color, s, tc = 'text/primary', st = 'Body/S') { const r = AL('HORIZONTAL', { name: 'Icon text — ' + String(s).slice(0, 24), gap: 6, align: 'CENTER' }); add(r, await IC(icon, 16, color), await T(s, st, tc)); return r; }
 async function PILL(chain, status, label) { const p = await I('9:377', { Chain: chain, Status: status }, { 'Show status label': label !== false, 'Show chevron': false }); return p; }
@@ -221,41 +221,40 @@ async function DONE(f, extra = {}) { fitSection(sec); await f.screenshot({ scale
 
 const PG = figma.root.children.find(p => p.name === '09 — Admin Panel'); await figma.setCurrentPageAsync(PG);
 const sec = section('ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance', 70000, 0);
-// targeted fixes on C1 review (textarea copy, risk meter user/factors) + C1 queue check
-const R1 = await figma.getNodeByIdAsync('75:56265'); if (R1) for (const t of R1.findAll(n => n.type === 'TEXT')) { const ch = t.characters; if (ch.startsWith('Tell us what happened')) await setText(t, 'Required for Reject or Request more information. Visible to Compliance only — never shown to the user.'); else if (ch.startsWith('Never share passwords')) await setText(t, 'Kept in the case file for 5 years'); else if (ch.includes('@nova.k')) await setText(t, ch.replace('@nova.k', '@atlas_q')); else if (ch.startsWith('Verified KYC L2')) await setText(t, 'Account age 85 days · deposits from 1 verified wallet · no sanctions or PEP hits'); }
-const Q1 = await figma.getNodeByIdAsync('68:53474'); if (Q1) await Q1.screenshot({ scale: 0.4 });
-const NAME = '[ADM-C2] AML Alerts / 1440 / Default';
-const { f, c } = await SHELL(NAME, POS('C-1440', 'C2'), 'C', 1, 'KO', 'Search alert ID, user, tx hash…');
-await HEAD(c, ['Admin', 'Compliance', 'AML alerts'], 'AML alerts', 'Transaction-monitoring rules raise alerts for a person to review. Closing an alert needs a written reason; escalating opens a suspicious-transaction case. Holding funds uses Account restrictions (reason + 2FA + four-eyes). Rules never move or change balances.', { badges: [await ST('Live', 'Live'), await DEMO('M')], actions: [await BTN('Secondary', 'Rules library · 34 active', { size: 'S', lead: 'sliders' }), await BTN('Primary', 'Take next alert', { size: 'S', lead: 'play' })] });
-await ROW(c, [await KPI('Flat', 'Open alerts', '23', 'alerts', '+3 today', 'High 4 · medium 11 · low 8 · 1 past SLA'), await KPI('Up', 'Alerts closed (7 days)', '142', 'alerts', '+9.2%', 'Median time to close 9 h 40 min · SLA 24 h'), await KPI('Flat', 'Closed as no issue (30 days)', '64%', '', '0.0 pp', 'False-positive rate · rules are tuned monthly by the MLRO')], { spark: 1 });
-await TABS(c, [['Open', '23'], ['Assigned to me', '6'], ['Escalated', '2'], ['Closed · 7 days', '142']], 'Open');
-await TOOLBAR(c, 'Search alert ID, user, WD-/DP- ID or tx hash', [['Risk: high · 4', false], ['Past SLA · 1', false], ['Rule: any', false]], { date: 'Raised: last 7 days', summary: '23 open alerts · sorted by risk score (high → low)', sort: 'Sort: risk ↓' });
-async function age(s, tone) { return C(await IC('clock', 14, tone === 'danger' ? 'status/danger' : tone === 'warning' ? 'status/warning' : 'icon/muted'), await T(s, 'Body/S Strong', tone === 'danger' ? 'text/danger' : tone === 'warning' ? 'text/warning' : 'text/primary')); }
-const A = [
-  ['AML-5509', 'KE', '@kestrel', 'Sanctions proximity · 1 hop', 'R-01 · WD-20952', 'High', 86, '12,400.00', ['Under review', 'Escalated · STR-0093'], ['Case open', null]],
-  ['AML-5530', 'SA', '@sable', 'Mixer exposure · 2 hops', 'R-07 · WD-20960', 'High', 72, '4,800.00', ['Under review', 'In review'], ['2 h 10 min', 'warning']],
-  ['AML-5528', 'TW', '@tidewalker', 'Rapid in-out · 96 % out in 3 h', 'R-02 · WD-20957', 'High', 69, '9,600.00', ['Pending', 'New'], ['5 h 30 min', null]],
-  ['AML-5519', 'Q9', '@quasar_9', 'Structuring · 6 deposits < 1,000', 'R-11 · DP-77301…77366', 'Medium', 58, '5,820.00', ['Under review', 'In review'], ['11 h 05 min', null]],
-  ['AML-5521', 'DS', '@drift.sol', 'Shared device · 3 accounts', 'R-19 · 3 accounts', 'Medium', 52, '2,140.00', ['Pending', 'New'], ['Past SLA', 'danger']],
-  ['AML-3317', 'NK', '@nova.k', 'New address · 3× median payout', 'R-05 · WD-20931', 'Medium', 41, '1,500.00', ['Under review', 'In review'], ['19 h 15 min', null]],
-  ['AML-5524', 'MS', '@mira.sol', 'Velocity · 14 withdrawals / 24 h', 'R-09 · 14 withdrawals', 'Low', 27, '2,380.00', ['Pending', 'New'], ['21 h 40 min', null]],
-  ['AML-5515', 'O7', '@orbit_77', 'Large prize withdrawal', 'R-21 · WD-20899', 'Low', 24, '80,000.00', ['Approved', 'Closed — no issue'], ['Closed 17:20', null]]];
-const rows = [];
-for (const a of A) rows.push([{ T: 'Text', p: a[0], mono: 1 }, { T: 'User', i: a[1], p: a[2] }, { T: 'Text', p: a[3], s: a[4] }, { T: 'Risk', lv: a[5], sc: a[6] }, { T: 'Amount', p: a[7] }, { T: 'Status', st: a[8][0], p: a[8][1] }, await age(...a[9]), { T: 'Actions' }]);
-await TABLE(c, 'AML alerts', [{ k: 'alert', l: 'Alert', w: 104 }, { k: 'user', l: 'User', w: 148 }, { k: 'rule', l: 'Rule · linked activity', w: 'FILL' }, { k: 'risk', l: 'Risk', w: 124, sort: 'Desc' }, { k: 'amount', l: 'Amount', w: 132, r: 1 }, { k: 'status', l: 'Status', w: 156 }, { k: 'sla', l: 'SLA left', w: 124 }, { k: 'act', l: '', w: 44 }], rows, { density: 'Comfortable', sel: [1], hideL: ['amount', 'sla'], head: await TH('Open alerts', { meta: 'Updated 18:44 UTC · WebSocket' }), foot: await PAGER('Numbered', '1–8 of 23') });
-// selected alert preview
-const pv = CARD('Selected alert — AML-5530', { stroke: 'border/brand', gap: 20 }); add(c, [pv, 'FILL']);
-await CHEAD(pv, 'AML-5530 · @sable · counterparty exposure', { icon: 'shield-alert', ic: 'status/danger', badges: [await ST('Under review', 'In review')], right: [await BTN('Ghost', 'Open full alert', { size: 'S', trail: 'arrow-right' })] });
-const cols = AL('HORIZONTAL', { name: 'Columns', gap: 24 }); add(pv, [cols, 'FILL']);
-const why = AL('VERTICAL', { name: 'Why it fired', gap: 12 }); add(cols, [why, 'FILL']);
-add(why, await T('Why this alert fired · rule R-07', 'Label/L', 'text/primary'));
-await WT(why, 'The destination of withdrawal WD-20960 is two transfers away from a cluster that a chain-analytics provider (DEMO) labels as mixer-linked. The deposit arrived on Arbitrum and the withdrawal goes out on BNB Chain after 2.4 % play.', 'Body/S', 'text/secondary', 420);
-const flow = AL('VERTICAL', { name: 'Funds flow', gap: 6 }); add(why, [flow, 'FILL']);
-for (const [ic, t1, t2, tone] of [['arrow-down-left', 'Deposit DP-77290 · 5,000.00 USDT', 'Arbitrum · 26 Nov 2026, 09:12 UTC · tx 0x7b31…d4e2', 'neutral'], ['dice', 'Play · 120.00 USDT wagered (2.4 %)', 'Pool Dice and Orbit Rush · 26 Nov, 09:20–09:41 UTC', 'neutral'], ['arrow-up-right', 'Withdrawal request WD-20960 · 4,800.00 USDT', 'to 0x5d2a…e81B on BNB Chain · requested 27 Nov, 16:44 UTC · not broadcast', 'warning'], ['link', 'Destination is 2 hops from a mixer-linked cluster', 'Exposure 31 % of inbound volume · provider report attached (DEMO)', 'danger']]) {
-  const r = AL('HORIZONTAL', { name: 'Flow — ' + t1, gap: 10, p: [8, 12, 8, 12], fill: TONE[tone][0], r: 10, align: 'CENTER' }); add(r, await IC(ic, 16, TONE[tone][1])); const tx = AL('VERTICAL', { name: 'Text', gap: 2 }); await WT(tx, t1, 'Body/S Strong', 'text/primary', 300); await WT(tx, t2, 'Caption', 'text/tertiary', 300); add(r, [tx, 'FILL']); add(flow, [r, 'FILL']); }
-const rm = await RISKM('High', '@sable', 'Destination 2 hops from a mixer-linked cluster · deposit on Arbitrum, payout on BNB Chain · 2.4 % played', 'Policy AML-3.2: hold the payout and escalate if exposure is confirmed'); add(cols, rm);
-const act = ALW('VERTICAL', { name: 'Actions', gap: 10, w: 300 }); add(cols, act);
-add(act, await T('Next step', 'Label/L', 'text/primary'));
-for (const [ty, l, ic] of [['Primary', 'Escalate to STR case', 'shield-alert'], ['Secondary', 'Request info from user', 'mail'], ['Secondary', 'Request withdrawal hold', 'lock'], ['Ghost', 'Close — no issue', 'check']]) { const b = await BTN(ty, l, { size: 'M', lead: ic }); add(act, [b, 'FILL']); }
-await NOTE(act, 'eye-off', 'neutral', 'A hold and closing both need a reason; the hold also needs 2FA and a second approver. WD-20960 stays “Under review” for the user — never mention the alert (no tipping-off).', { w: 220 });
-return await DONE(f);
+const LIST = [["[ADM-C4] Sanctions Screening / 1440 / Default", "C4"], ["[ADM-C5] Restricted Countries / 1440 / Default", "C5"], ["[ADM-C6] Self-Exclusion / 1440 / Default", "C6"], ["[ADM-C7] Responsible Gaming Reports / 1440 / Default", "C7"]];
+const made = [];
+for (const [srcName, key] of LIST) {
+  const src = sec.children.find(n => n.name === srcName); if (!src) { MISS.push('missing ' + srcName); continue; }
+  const nm = src.name.replace('/ 1440 /', '/ 1280 /'); if (sec.children.find(n => n.name === nm)) { MISS.push('exists ' + nm); continue; }
+  const band = src.name.startsWith('[ADM-C') ? 'C-1280' : 'B-1280';
+  const p = POS(band, key); const f = src.clone(); sec.appendChild(f); f.name = nm; f.x = p.x; f.y = p.y;
+  f.resize(1280, f.height); f.primaryAxisSizingMode = 'AUTO';
+  const bc = __COLS['Breakpoint']; const bm = bc.modes.find(m => m.name === 'Laptop 1280'); if (bm) f.setExplicitVariableModeForCollection(bc, bm.modeId);
+  for (const t of f.findAll(n => n.name.startsWith('Table — ') && n.name.includes('{hideL:'))) { const ks = t.name.match(/\{hideL:([^}]*)\}/)[1].split(','); for (const n of t.findAll(x => ks.some(k => x.name === 'Col/' + k || x.name === 'H/' + k))) n.visible = false; }
+  for (const n of f.findAll(x => x.name.includes('[hideL]'))) n.visible = false;
+  made.push(f);
+}
+const NAME = '[ADM-B1] Supported Networks / 1440 / Default';
+const { f, c } = await SHELL(NAME, POS('B-1440', 'B1'), 'B', 0, 'SI', 'Search network, token, contract…');
+await HEAD(c, ['Admin', 'Blockchain', 'Supported networks'], 'Supported networks', 'Networks and token standards accepted for USDT deposits and withdrawals. Any change needs a reason, 2FA and a second approver, takes effect after a 1-hour delay and is written to the audit log. Values are DEMO.', { badges: [await ST('Live', 'Live'), await DEMO('M')], actions: [await BTN('Secondary', 'Config history', { size: 'S', lead: 'history' }), await BTN('Primary', 'Propose change', { size: 'S', lead: 'plus' })] });
+await NOTE(c, 'alert-triangle', 'warning', 'Average confirmation 4 min 12 s (normal 2 min 30 s) since 17:20 UTC — incident INC-0457. Players see a slower-network notice and the 2.40 USDT network fee before they confirm. Deposits and withdrawals stay enabled.', { title: 'Ethereum is congested', w: 760, actions: [await BTN('Ghost', 'Open incident', { size: 'S', trail: 'arrow-right' })] });
+const st = CARD('Live status', { dir: 'HORIZONTAL', gap: 12, p: [14, 20, 14, 20], align: 'CENTER' }); add(c, [st, 'FILL']);
+add(st, await T('Live status', 'Label/L', 'text/primary')); add(st, [SPC(), 'FILL']);
+for (const [ch, s] of [['BNB Chain', 'Operational'], ['Polygon', 'Operational'], ['Arbitrum', 'Operational'], ['Ethereum', 'Degraded'], ['Solana', 'Operational']]) add(st, await PILL(ch, s));
+add(st, await DEMO('S'));
+async function onoff(on, lab) { return C(await IC(on ? 'check-circle' : 'pause-circle', 16, on ? 'status/success' : 'status/warning'), await T(lab || (on ? 'Enabled' : 'Paused'), 'Body/S', on ? 'text/secondary' : 'text/warning')); }
+const N = [['BNB Chain', 'USDT · BEP-20', '15', '0.12', '64,820.40', 'Operational'], ['Polygon', 'USDT · PoS', '64', '0.02', '21,305.75', 'Operational'], ['Arbitrum', 'USDT · Arbitrum One', '20', '0.08', '118,940.10', 'Operational'], ['Ethereum', 'USDT · ERC-20', '12', '2.40', '39,610.00', 'Degraded'], ['Solana', 'USDT · SPL', '32 (finalized)', '0.01', '15,488.20', 'Operational']];
+const rows = []; for (const n of N) rows.push([C(await PILL(n[0], n[5], false)), { T: 'Text', p: n[1], s: 'Token contract 0xFd08…Cbb9 · illustrative' }, await onoff(1), await onoff(1), CR(await T(n[2], 'Number/S', 'text/primary')), CR(await T(n[3], 'Number/S', n[0] === 'Ethereum' ? 'text/warning' : 'text/primary'), await T('USDT', 'Caption', 'text/tertiary')), { T: 'Amount', p: n[4] }, { T: 'Actions' }]);
+await TABLE(c, 'Network configuration', [{ k: 'net', l: 'Network', w: 168 }, { k: 'token', l: 'Token standard', w: 'FILL' }, { k: 'dep', l: 'Deposits', w: 116 }, { k: 'wd', l: 'Withdrawals', w: 124 }, { k: 'conf', l: 'Confirmations', w: 128, r: 1 }, { k: 'fee', l: 'Network fee', w: 128, r: 1 }, { k: 'hot', l: 'Hot wallet', w: 168, r: 1 }, { k: 'act', l: '', w: 44 }], rows, { density: 'Comfortable', hideL: ['hot'], head: await TH('Network configuration · v31', { meta: 'Last change 21 Nov 2026 · S. Iyer + K. Osei' }) });
+const lim = CARD('Limits & safeguards', { gap: 10 }); await CHEAD(lim, 'Limits & safeguards · all networks', { icon: 'shield-check' });
+for (const [k, v] of [['Minimum deposit', '10.00 USDT'], ['Minimum withdrawal', '20.00 USDT'], ['Daily limit · KYC L2', '25,000.00 USDT'], ['Platform withdrawal fee', '0.00 USDT'], ['New-address cooldown', '24 h'], ['Address format check', 'Per chain · on'], ['Unsupported token sent', 'Held for recovery']]) await KV(lim, k, v, { line: 1 });
+const pcard = CARD('Pending change CFG-0088', { stroke: 'border/brand', gap: 12 }); await CHEAD(pcard, 'CFG-0088 · Pause Solana deposits', { icon: 'pause-circle', badges: [await ST('Pending', 'Awaiting 2nd approver')] });
+await KV(pcard, 'Window', '1 Dec 2026, 02:00–02:30 UTC'); await KV(pcard, 'Why', 'Validator upgrade · matches announcement AN-88'); await KV(pcard, 'Requested by', 'S. Iyer · 27 Nov 2026, 17:50 UTC'); await KV(pcard, 'Second approver', 'A. Marin (Finance) — pending');
+await NOTE(pcard, 'info', 'info', 'Withdrawals on Solana continue. Players see “Deposits on Solana are paused until 02:30 UTC” with the other networks suggested.', { w: 380 });
+add(pcard, await BTN('Secondary', 'View request', { size: 'S', trail: 'arrow-right' }));
+await WT(pcard, 'You requested this change, so you can’t approve it.', 'Caption', 'text/tertiary', 380);
+const hist = CARD('Recent changes', { gap: 8 }); await CHEAD(hist, 'Recent changes', { icon: 'history', demo: false });
+for (const [v, d, t, who] of [['v31', '21 Nov 2026', 'Polygon confirmations 128 → 64', 'S. Iyer + K. Osei'], ['v30', '6 Nov 2026', 'Ethereum fee estimate source → provider B', 'S. Iyer + A. Marin'], ['v29', '22 Oct 2026', 'Solana finality: confirmed → finalized (32)', 'S. Iyer + K. Osei']]) { const r = AL('HORIZONTAL', { name: v, gap: 12, p: [8, 0, 8, 0], align: 'CENTER' }); strokeSides(r, 'border/subtle', { b: 1 }); add(r, await T(v, 'Mono/S', 'text/brand')); const tx = AL('VERTICAL', { name: 'Text', gap: 2 }); await WT(tx, t, 'Body/S Strong', 'text/primary', 260); add(tx, await T(d + ' · ' + who, 'Caption', 'text/tertiary')); add(r, [tx, 'FILL']); add(hist, [r, 'FILL']); }
+await ROW(c, [lim, pcard], { gap: 24 }); add(c, [hist, 'FILL']);
+for (const m of made) await m.screenshot({ scale: 0.3 });
+return await DONE(f, { laptop: made.map(m => [m.id, m.name, Math.round(m.height)]) });
