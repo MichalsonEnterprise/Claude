@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 09:20 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 10:50 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
@@ -15,7 +15,7 @@ Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verifie
 | Figma throughput | **Blocker-ish:** Figma MCP tool-call limit on the Pro/Full seat (≈200/day + per-minute cap) throttles design work since 27 Nov 22:50 UTC; ~1 call/min effective. Agents saved ready-to-run scripts in `design/figma-build/pending/` and `queue/`. |
 
 ## 2. Figma progress (details: `FIGMA_PROGRESS.md`, ledger `design/figma-build/ledger.json`)
-Ledger (306 rows): **204 verified · 31 built · 10 in progress · 61 not started** (28 Nov 09:15 UTC). P0: 112 verified / 2 built / 12 not started (prototypes PRO-01…05, state matrices ERR-01/02/03/05/07, ADM-S3, MOB-08). Figma quota reset confirmed 28 Nov 08:05 UTC; continuation wave running (P0 first: cont:adm-core, auth-b, gp-hub, usr-gaming, g-dice, pub-pool-lobby, pub-gates-pf, wal-deposit, then proto-a/b and err-a/b).
+Ledger (306 rows): **221 verified · 31 built · 10 in progress · 44 not started** (28 Nov 10:45 UTC). P0: **122 / 126 verified** (left: CMP-01 buttons and MOB-06 built-not-verified, ADM-S3 audit logs and MOB-08 mobile games not started). New: prototypes PRO-01…10 on page 11 (196 navigate reactions, 0 dead ends) and state matrices ERR-01…07 on page 12. Wave 3 running: admin roles/permissions/audit, roulette, coinflip, crash, blackjack, round history, tablet sheet, game details, FAQ/RG/restricted/cookies, admin games, catalogue, promotions. Figma quota reset confirmed 28 Nov 08:05 UTC; continuation wave running (P0 first: cont:adm-core, auth-b, gp-hub, usr-gaming, g-dice, pub-pool-lobby, pub-gates-pf, wal-deposit, then proto-a/b and err-a/b).
 
 ### Screens ready for coding (verified/built in Figma)
 - **01/02 Design system & components:** DS-01…09, CMP-01…18, casino kit (shell, lobby, catalogue, promotions)
