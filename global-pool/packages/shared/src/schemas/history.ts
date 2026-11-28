@@ -186,13 +186,19 @@ export interface GameActivityView {
 export interface GamesOverviewView {
   activeRounds: MyRoundEntriesView[];
   recentGames: GameActivityView[];
+  /** Global Pool (ledger) and simulation games are reported separately — never mixed into one total. */
   last30d: {
-    wagered: string;
-    returned: string;
-    net: string;
     poolEntries: number;
+    /** Entry amounts + platform fees. */
     poolSpent: string;
+    /** Prizes + refunds credited. */
+    poolReturned: string;
+    /** Signed: returned − spent. */
+    poolNet: string;
     gameBets: number;
+    /** Simulation stakes (non-monetary until real-money games are approved). */
+    simWagered: string;
+    simNet: string;
   };
   isDemo: boolean;
 }

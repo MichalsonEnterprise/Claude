@@ -301,7 +301,7 @@ export class KycFlowService {
         status: 'not_started',
         provider: 'mock',
         providerRef: `mock-kyc-${randomUUID()}`,
-        details: { version: 1, level, documents: [] } as unknown as Prisma.InputJsonValue,
+        details: { version: 1, level, documents: [] },
       },
     });
     return this.view(userId);

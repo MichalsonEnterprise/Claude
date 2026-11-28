@@ -99,7 +99,7 @@
    "r9 (fix-r9 ovfix hugcheck)": "pager totals fixed on B4/B5/C1-768/C2-768; no overflow left; 35 frames on page 09"
   },
   "next": [
-   "ALL FRAMES BUILT. Optional: final screenshot of C5/C6 1440+1280 and C1 review 1440 (verification only)."
+   "DONE — all 38 frames built and verified by screenshot (final check of C5/C6 1440+1280 and C1 review 1440 passed 28 Nov 04:02 UTC). Nothing left to run."
   ]
  }
 }

@@ -445,10 +445,27 @@ describe('player history', () => {
     const winnings = await t.http().get('/history/winnings').set(bearer(p.token)).expect(200);
     expect(winnings.body).toMatchObject({ owed: { total: '0.00' }, lifetimePrizes: '0.00' });
     const games = await t.http().get('/history/games').set(bearer(p.token)).expect(200);
-    expect(games.body.last30d).toMatchObject({ poolEntries: 8, poolSpent: '80.40', net: '-80.40' });
+    expect(games.body.last30d).toMatchObject({
+      poolEntries: 8,
+      poolSpent: '80.40',
+      poolNet: '-80.40',
+    });
   });
 
   it('favourites can be added (idempotent) and removed; game history starts empty', async () => {
+    await t.prisma.game.upsert({
+      where: { slug: 'pool-dice' },
+      create: {
+        slug: 'pool-dice',
+        name: 'Pool Dice',
+        category: 'originals',
+        mechanic: 'dice',
+        houseEdgePercent: '1.000',
+        edgeLabel: '1.00% house edge',
+        icon: 'dice',
+      },
+      update: {},
+    });
     await t.http().put('/history/favourites/pool-dice').set(bearer(p.token)).expect(200);
     const twice = await t
       .http()

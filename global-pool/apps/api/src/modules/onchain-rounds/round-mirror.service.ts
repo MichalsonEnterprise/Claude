@@ -35,6 +35,8 @@ const STATUS_NAME: Record<number, string> = Object.fromEntries(
 export interface StepResult {
   done: boolean;
   op: RoundChainOp | null;
+  /** True when this call observed the step becoming confirmed (used to audit exactly once). */
+  changed: boolean;
 }
 
 export class MirrorMismatchError extends Error {
@@ -167,13 +169,15 @@ export class RoundMirrorService {
       orderBy: { attempt: 'desc' },
       include: { chainTx: true },
     });
-    if (latest?.status === 'confirmed' && !spec.newAttempt) return { done: true, op: latest };
+    if (latest?.status === 'confirmed' && !spec.newAttempt) {
+      return { done: true, op: latest, changed: false };
+    }
 
     let state = await this.read(round);
     await this.recordStatus(round, state);
     if (spec.done(state) && !spec.newAttempt) {
       spec.check?.(state);
-      return { done: true, op: await this.confirmOp(round, step, latest) };
+      return { done: true, op: await this.confirmOp(round, step, latest), changed: true };
     }
 
     let op: (RoundChainOp & { chainTx?: unknown }) | null = latest;
@@ -183,7 +187,7 @@ export class RoundMirrorService {
         this.config.env.CHAIN_WRITE_CONFIRMATIONS,
         this.config.env.CHAIN_TX_WAIT_SECONDS * 1000,
       );
-      if (res.state === 'pending') return { done: false, op };
+      if (res.state === 'pending') return { done: false, op, changed: false };
       state = await this.read(round);
       await this.recordStatus(round, state);
       if (res.state === 'mined' && spec.done(state)) {
@@ -192,7 +196,7 @@ export class RoundMirrorService {
           where: { id: op.id },
           data: { status: 'confirmed', blockNumber: res.row.blockNumber, error: null },
         });
-        return { done: true, op: confirmed };
+        return { done: true, op: confirmed, changed: true };
       }
       op = await this.prisma.roundChainOp.update({
         where: { id: op.id },
@@ -201,7 +205,11 @@ export class RoundMirrorService {
       if (spec.done(state)) {
         // Someone else's transaction achieved the effect (e.g. a permissionless cancel / draw request).
         spec.check?.(state);
-        return { done: true, op: await this.confirmOp(round, step, null, (op.attempt ?? 0) + 1) };
+        return {
+          done: true,
+          op: await this.confirmOp(round, step, null, op.attempt + 1),
+          changed: true,
+        };
       }
     }
 
@@ -244,7 +252,7 @@ export class RoundMirrorService {
       this.config.env.CHAIN_TX_WAIT_SECONDS * 1000,
     );
     const current = await this.prisma.roundChainOp.findUniqueOrThrow({ where: { id: pending.id } });
-    if (res.state === 'pending') return { done: false, op: current };
+    if (res.state === 'pending') return { done: false, op: current, changed: false };
     state = await this.read(round);
     await this.recordStatus(round, state);
     if (res.state === 'mined' && spec.done(state)) {
@@ -255,6 +263,7 @@ export class RoundMirrorService {
           where: { id: pending.id },
           data: { status: 'confirmed', blockNumber: res.row.blockNumber, error: null },
         }),
+        changed: true,
       };
     }
     return {
@@ -263,6 +272,7 @@ export class RoundMirrorService {
         where: { id: pending.id },
         data: { status: 'failed', error: `transaction ${res.state}` },
       }),
+      changed: false,
     };
   }
 
@@ -440,6 +450,13 @@ export class RoundMirrorService {
     });
     if (!res.done) return { ...res, thresholdsMet: null };
     const met = await this.readView<boolean>('thresholdsMet', round);
+    if (res.changed) {
+      await this.auditStep(round, 'round.entries_committed_onchain', res, {
+        entriesRoot: root,
+        totalEntries: round.entriesCount,
+        thresholdsMet: met,
+      });
+    }
     return { ...res, thresholdsMet: met };
   }
 
@@ -552,21 +569,7 @@ export class RoundMirrorService {
           args: [this.onchainId(round), root, pool],
         }),
     });
-    if (res.done) {
-      await this.audit.record({
-        actorType: 'system',
-        actorLabel: 'round-mirror',
-        action: 'round.settlement_recorded_onchain',
-        targetType: 'round',
-        targetId: round.id,
-        metadata: {
-          roundNumber: round.number,
-          payoutsRoot: root,
-          txHash: res.op?.txHash ?? null,
-          chainId: this.blockchain.chainId,
-        },
-      });
-    }
+    if (res.changed) await this.auditStep(round, 'round.settlement_recorded_onchain', res, { payoutsRoot: root });
     return res;
   }
 
@@ -777,6 +780,28 @@ export class RoundMirrorService {
         proof: p.proof as Prisma.JsonArray,
       })),
     };
+  }
+
+  private async auditStep(
+    round: Round,
+    action: string,
+    res: StepResult,
+    extra: Record<string, unknown>,
+  ): Promise<void> {
+    await this.audit.record({
+      actorType: 'system',
+      actorLabel: 'round-mirror',
+      action,
+      targetType: 'round',
+      targetId: round.id,
+      metadata: {
+        roundNumber: round.number,
+        chainId: this.blockchain.chainId,
+        contract: round.contractAddress,
+        txHash: res.op?.txHash ?? null,
+        ...extra,
+      },
+    });
   }
 
   /** Logged-and-swallowed wrapper for best-effort calls from the lifecycle. */

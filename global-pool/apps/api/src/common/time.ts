@@ -17,7 +17,7 @@ export const addHours = (d: Date, h: number) => new Date(d.getTime() + h * 3_600
 export const addMinutes = (d: Date, m: number) => new Date(d.getTime() + m * 60_000);
 export const addDays = (d: Date, days: number) => new Date(d.getTime() + days * 86_400_000);
 
-/** Self-exclusion end from a SelfExclusionDuration ('24h' | '7d' | '30d' | '6m' | '1y' | 'permanent'). */
+/** Self-exclusion end from a SelfExclusionDuration ('24h' | '7d' | '30d' | '6m' | '1y' | '5y' | 'permanent'). */
 export function selfExclusionEnd(duration: string, from: Date): Date | null {
   switch (duration) {
     case '24h':
@@ -34,6 +34,11 @@ export function selfExclusionEnd(duration: string, from: Date): Date | null {
     case '1y': {
       const d = new Date(from);
       d.setUTCFullYear(d.getUTCFullYear() + 1);
+      return d;
+    }
+    case '5y': {
+      const d = new Date(from);
+      d.setUTCFullYear(d.getUTCFullYear() + 5);
       return d;
     }
     case 'permanent':

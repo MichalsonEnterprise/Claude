@@ -51,7 +51,7 @@ describe('account preferences (A1 / A9)', () => {
     const res = await t.http().get('/me/preferences').set(bearer(p.token)).expect(200);
     expect(res.body.language).toBe('en');
     expect(res.body.marketingOptIn).toBe(false);
-    const cats = Object.fromEntries(
+    const cats: Record<string, { locked?: boolean; channels: object }> = Object.fromEntries(
       (
         res.body.notifications.categories as { key: string; locked: boolean; channels: object }[]
       ).map((c) => [c.key, c]),
@@ -64,7 +64,7 @@ describe('account preferences (A1 / A9)', () => {
       locked: false,
       channels: { email: false, push: false, inApp: false },
     });
-    expect(cats.rg_reality_checks.channels).toEqual({ email: null, push: null, inApp: true });
+    expect(cats.rg_reality_checks?.channels).toEqual({ email: null, push: null, inApp: true });
   });
 
   it('never lets locked categories be switched off; promotions opt-in syncs marketingOptIn', async () => {
@@ -81,15 +81,15 @@ describe('account preferences (A1 / A9)', () => {
         quietHours: { enabled: true, from: '23:00', to: '08:00' },
       })
       .expect(200);
-    const cats = Object.fromEntries(
+    const cats: Record<string, { locked?: boolean; channels: object }> = Object.fromEntries(
       (res.body.notifications.categories as { key: string; channels: object }[]).map((c) => [
         c.key,
         c,
       ]),
     );
-    expect(cats.security_signins.channels).toEqual({ email: true, push: true, inApp: true });
-    expect(cats.offers_promotions.channels).toEqual({ email: true, push: false, inApp: false });
-    expect(cats.rg_reality_checks.channels).toEqual({ email: null, push: null, inApp: true });
+    expect(cats.security_signins?.channels).toEqual({ email: true, push: true, inApp: true });
+    expect(cats.offers_promotions?.channels).toEqual({ email: true, push: false, inApp: false });
+    expect(cats.rg_reality_checks?.channels).toEqual({ email: null, push: null, inApp: true });
     expect(res.body.marketingOptIn).toBe(true);
     expect(res.body.notifications.quietHours).toEqual({
       enabled: true,

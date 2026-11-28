@@ -28,6 +28,7 @@ import { IdempotencyModule } from './modules/idempotency/idempotency.module';
 import { KycModule } from './modules/kyc/kyc.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { OnchainRoundsModule } from './modules/onchain-rounds/onchain-rounds.module';
 import { PlatformModule } from './modules/platform/platform.module';
 import { PoolModule } from './modules/pool/pool.module';
 import { RandomnessModule } from './modules/randomness/randomness.module';
@@ -72,6 +73,7 @@ import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
     SecurityModule,
     AuthModule,
     RandomnessModule,
+    OnchainRoundsModule,
     ReportingModule,
     AffiliatesModule,
     // features

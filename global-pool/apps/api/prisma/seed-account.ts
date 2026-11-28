@@ -5,7 +5,7 @@
  * Idempotent and additive: it only fills empty KYC details and inserts rows with deterministic DEMO ids
  * (`de0000a1-…`), so it can run on every `db:seed` (fresh or existing DEMO database). Never touches the ledger.
  */
-import type { Prisma, PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 const NOVA = 'de000001-0000-4000-8000-000000048213';
 const DAY = 86_400_000;
@@ -13,7 +13,9 @@ const DAY = 86_400_000;
 /** Deterministic DEMO notification ids (prefix de0000a1 = account DEMO rows). */
 const nid = (n: number) => `de0000a1-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
-export async function seedAccountDemo(prisma: PrismaClient): Promise<{ kyc: boolean; notifications: number }> {
+export async function seedAccountDemo(
+  prisma: PrismaClient,
+): Promise<{ kyc: boolean; notifications: number }> {
   const nova = await prisma.user.findUnique({ where: { id: NOVA }, select: { id: true } });
   if (!nova) return { kyc: false, notifications: 0 };
 
@@ -36,7 +38,7 @@ export async function seedAccountDemo(prisma: PrismaClient): Promise<{ kyc: bool
   const empty =
     record &&
     (!record.details ||
-      (typeof record.details === 'object' && Object.keys(record.details as object).length === 0));
+      (typeof record.details === 'object' && Object.keys(record.details).length === 0));
   if (record && empty) {
     const submitted = record.submittedAt ?? record.createdAt;
     const reviewed = record.reviewedAt ?? submitted;
@@ -113,13 +115,20 @@ export async function seedAccountDemo(prisma: PrismaClient): Promise<{ kyc: bool
     };
     await prisma.kycRecord.update({
       where: { id: record.id },
-      data: { details: details as unknown as Prisma.InputJsonValue },
+      data: { details: details },
     });
     kyc = true;
   }
 
   // ── Notification centre (USR-02): Security 2 · Transactions 4 · Rounds 4 · Promotions 2 ────────
-  const rows: { n: number; type: string; title: string; body: string; at: string; read?: boolean }[] = [
+  const rows: {
+    n: number;
+    type: string;
+    title: string;
+    body: string;
+    at: string;
+    read?: boolean;
+  }[] = [
     {
       n: 1,
       type: 'security.new_device',

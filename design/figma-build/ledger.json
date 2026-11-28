@@ -2264,7 +2264,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "All four 1440 frames from the earlier run are kept. This run hid the locked Compliance count, changed the audit ref to #88216 and made the admin name auto-width. Still to build: the 1280 inbox (out/04-laptop.js) and three 768 frames — navigation drawer open, command palette, no permission (out/06-tablet-shell.js, which needs 05 first).",
+  "by": "adm-core"
  },
  {
   "id": "ADM-01",
@@ -2274,7 +2276,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Six 1440 frames built: Sign in, Error (wrong password), Blocked (network not approved, no workaround), 2FA, 2FA locked (absolute unlock 18:57 UTC), Session expired. Five were checked in screenshots; the Session expired one was not shown. Still to build: Session timeout warning 1440 (01:42 left, sign-out at 19:02 UTC; out/07-states.js), Sign in 1280 (out/04) and Sign in 768 (out/05).",
+  "by": "adm-core"
  },
  {
   "id": "ADM-02",
@@ -2284,7 +2288,9 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 Default built and checked in a screenshot, Super Admin S. Iyer. Shows every brief KPI using demo-data figures (deposits 12,846,500.00, withdrawals 10,932,140.00, fees 60,700.00 = 1,214,000 × 0.05, users 184,320 / 41,206, liabilities 186,400.00 + 52,310.40 = 238,710.40, 1 active round, 37 pending withdrawals, KYC 214). Also: queue cards, four-eyes list, health gauge 99.97%, services, KYC statistics, round #1,248 monitor (read-only), network health and audit feed. The header overflow was fixed. Still to build: Restricted role (Support L2) 1440 (out/07), 1280 (out/04), 768 (out/05) and 390 (out/m-01-overview-alerts.js).",
+  "by": "adm-core"
  },
  {
   "id": "ADM-U1",
@@ -2415,7 +2421,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "Done at D, L and T, each checked on screenshot. Content: KPIs, network watchers, filter bar, deposits table (DP-77412 at 7/12 confirming), held-deposit routing to Compliance, read-only notes. At 1280 the Tx-hash column is hidden. At 768 the table becomes stacked row cards and a scrollable Finance sub-nav replaces the sidebar.",
+  "note": "Unchanged from the earlier run: D, L and T exist and were checked on screenshot. The 28 Nov inventory confirmed all frames hug their height.",
   "by": "adm-finance"
  },
  {
@@ -2426,8 +2432,8 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Finance",
-  "status": "IN PROGRESS",
-  "note": "Desktop is complete: queue plus WD-20931 detail (under review, AML-3317, first payout to a whitelisted address) and 4 states — approve dialog with reason+2FA, reject validation error, awaiting second approver (AR-1042, self-approval disabled), approved/broadcasting by K. Osei. Laptop and tablet queue and detail are verified. MOBILE 390 IS MISSING: the Figma MCP quota ran out. The ready script is /home/user/Claude/design/figma-build/pending/adm-f2-mobile.js; running it once builds the queue, the detail with a sticky Reject/Approve bar, and the approve bottom sheet.",
+  "status": "VERIFIED",
+  "note": "All required sizes exist: D, L, T and now M. Desktop has the queue plus WD-20931 detail in 5 states; L and T have queue + detail. Mobile 390 (page 10, 'ADM — Mobile'): the queue uses stacked request cards (stats strip, search, filter chips, 4 FIFO requests with risk, SLA 'Due in …' and AML / high-risk lines, Admin Tab Bar with More active). The WD-20931 detail has a sticky bar: ask for info · Reject · Approve 1 of 2. The Approve bottom sheet has reason category, written reason 131/500, 2FA, the four-eyes note (second approver must be Compliance or Super Admin) and the audit-log notice. The Reject sheet shows the validation error (9 of 20 characters, nothing changed, funds would return to Available 10,715.30). Screenshots were checked after a targeted fix: the queue time line and the sheets compacted to 755 px. The desktop/L/T detail SLA countdown now reads '3 h 07 min left', matching the queue at 18:48 UTC.",
   "by": "adm-finance"
  },
  {
@@ -2439,7 +2445,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "D and L. Fee rule 0.05 USDT per qualifying entry; the fee escrow is kept separate from the pool. 30-day bar chart totals 60,700.00. Fees-by-round table: #1,248 932.00 in escrow; #1,245 206.00 released to players. Fee changes are dual-approved and apply only from the next round.",
+  "note": "Unchanged: D and L verified.",
   "by": "adm-finance"
  },
  {
@@ -2451,7 +2457,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "D, L and T. Liabilities 241,010.40 = 186,400.00 escrow + 52,310.40 owed prizes + 2,300.00 refunds outstanding, matching the contract balance. Shows the round #1,248 waterfall with Prize Distribution, the owed-prize holds and a rounds ledger. 'Immutable by design' panel; no money-moving controls.",
+  "note": "Unchanged: D, L and T verified.",
   "by": "adm-finance"
  },
  {
@@ -2463,7 +2469,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "D and L. Append-only double-entry journals for @nova.k (DP-77412, WD-20931 lock, 35-entry purchase, #1,245 refund plus fee release). Debits and credits balance at 3,153.25. Hash-chain integrity banner and chain explainer. CE-0031 shows a correction as a new entry awaiting a second approver; edit and delete are not available to any role.",
+  "note": "Unchanged: D and L verified.",
   "by": "adm-finance"
  },
  {
@@ -2475,7 +2481,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "D and L. The hourly run checks 9 scopes: 7 match, 1 mismatch (Treasury BNB, −12.40, INV-0192) and 1 pending (DP-77412). Investigation timeline, CE-0031, 24-run history. The fix is always a reviewed correcting entry, never a ledger edit. At 1280 the snapshot column was hidden after the last laptop screenshot; that change was not re-checked visually.",
+  "note": "D and L. The 1280 frame was re-screenshotted on 28 Nov after the snapshot column was hidden: no clipping or overlap.",
   "by": "adm-finance"
  },
  {
@@ -2487,7 +2493,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "D and L. Round #1,245 RefundOnCancel: threshold bar, 38,900.00 of 41,200.00 claimed, 2,300.00 outstanding across 19 players (@nova.k 300.00). Allowed actions are reminder and report only; 'Issue manual refund' is disabled. Separate list of returns that are not refunds (WD-20850, DP-77398).",
+  "note": "Unchanged: D and L verified.",
   "by": "adm-finance"
  },
  {
@@ -2499,7 +2505,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "D and L. Gross 811,850.70 − rewards 115,120.30 = net 696,730.40. Product share bars, weekly net revenue bars that sum to the 30-day total, a revenue statement tied to ledger sources (network fees 18,204.12 excluded), and scheduled reports.",
+  "note": "Unchanged: D and L verified.",
   "by": "adm-finance"
  },
  {
@@ -2511,7 +2517,7 @@
   "page": "09",
   "group": "Finance",
   "status": "VERIFIED",
-  "note": "Export CSV modal over Revenue reports in 4 states at D (Configure, Generating 62%, Ready with SHA-256, expiry and audit entry, Error over the 500,000-row limit with a background-export option) plus Configure at L. Personal data is off by default; a reason is required; watermark and audit-log notice shown. The modal footers changed after the spacer fix and were not re-screenshotted.",
+  "note": "D (Configure, Generating, Ready, Error) and L (Configure). The Configure, Ready and Error modal footers were re-screenshotted on 28 Nov after the spacer fix and pass.",
   "by": "adm-finance"
  },
  {
@@ -2606,8 +2612,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "IN PROGRESS",
-  "note": "1440 and 1280 built and checked in screenshots (side-stats and KPI-copy fixes applied). The 768 tablet frame is still missing; its script is ready (out_tab.js).",
+  "status": "VERIFIED",
+  "note": "D 67:52462, L 69:54384 (earlier run, checked in screenshots), T 172:71873 built this run. The T screenshot passed and its overflow scan was clean apart from the intended clipped sub-nav scroller.",
   "by": "adm-pool"
  },
  {
@@ -2618,8 +2624,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "IN PROGRESS",
-  "note": "1440 and 1280 built and checked in screenshots. The 768 tablet frame is still missing (script ready). Numbers match ADM-F4: 241,010.40 = 186,400.00 pool + 52,310.40 owed prizes + 2,300.00 refunds outstanding.",
+  "status": "VERIFIED",
+  "note": "D 69:55111, L 69:55930, T 172:72701. At 768 the reconciliation header caption overflowed and a scope cell was truncated; both were shortened and the re-screenshot passed. 241,010.40 = 186,400.00 + 52,310.40 + 2,300.00.",
   "by": "adm-pool"
  },
  {
@@ -2630,8 +2636,8 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "IN PROGRESS",
-  "note": "1440 and 1280 built and checked in screenshots. The 768 tablet frame (out_tab.js) and the 390 mobile frame on page 10 (out_Lm3.js) are still missing; both scripts are ready.",
+  "status": "VERIFIED",
+  "note": "D 69:56617, L 69:57532, T 172:73435 (redundant explorer button hidden at 768, re-checked). M 173:71504 on page 10, section ADM — Mobile 173:71503. It was first built at a fixed 800 px height and set to hug (2321 px). Entry cards were fixed to wrap with DEMO moved to the handle row. Uses an inline admin top bar, sticky countdown bar and Admin Tab Bar with Pool active. Screenshots passed.",
   "by": "adm-pool"
  },
  {
@@ -2642,8 +2648,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "BUILT",
-  "note": "1440 and 1280 built. A column-width fix was applied afterwards (Round 150, 1st prize 170 and hidden at 1280) but I did not take a new screenshot after it.",
+  "status": "VERIFIED",
+  "note": "D 79:57471 and L 79:58445 screenshotted this run. The 1440 Settlement column truncated, so its copy was shortened after measuring (e.g. 'Due 20:00 UTC', '20:02 · 1 held', 'Refunds 393 / 412'); the table re-screenshot passed.",
   "by": "adm-pool"
  },
  {
@@ -2654,8 +2660,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "BUILT",
-  "note": "1440 and 1280 built. Column widths were fixed and two summary stats hidden at 1280 afterwards, with no new screenshot.",
+  "status": "VERIFIED",
+  "note": "D 79:59267 and L 79:60246 screenshotted this run. The overflow scan was clean.",
   "by": "adm-pool"
  },
  {
@@ -2667,7 +2673,7 @@
   "page": "09",
   "group": "Global Pool Management",
   "status": "BUILT",
-  "note": "1440 and 1280 built and checked in screenshots. One cell still reads '2.00% ea…' (truncated); the fix was in a call that hit the rate limit.",
+  "note": "D 80:59955 and L 80:61181 exist; the '2.00% each' text was shortened to '2.00%'. Defect: the Runner-up row's Share cell in 'Table — Split' renders blank on both frames, although its text is visible, 76×20 px and has a fill. Fix not applied because of the Figma MCP limit (3 consecutive refusals). Ready script: design/figma-build/pending/adm-pool/call8_p6cell.js (clones the 3rd-prize share cell, sets 2.00%).",
   "by": "adm-pool"
  },
  {
@@ -2678,8 +2684,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "IN PROGRESS",
-  "note": "1440 and 1280 (Fulfilled state, snapshot 20:01 UTC) built and checked in screenshots. Not built: the 768 tablet frame and the 'Delayed' scenario state. Both scripts are ready.",
+  "status": "VERIFIED",
+  "note": "Fulfilled: D 80:62189, L 80:63106, T 172:74324 (passed). New 1440 state 'Delayed — no fulfilment after 12 min (scenario)' 171:72535: alert banner, waiting KV values, the delay rule marked Now, history row awaiting fulfilment. Screenshot passed; the stepper's elapsed time was then set to 00:12:26 to match the header.",
   "by": "adm-pool"
  },
  {
@@ -2690,8 +2696,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "IN PROGRESS",
-  "note": "1440 and 1280 (auto-claim batch 3 of 4, snapshot 20:03 UTC) built and checked in screenshots. The 768 tablet frame is still missing (script ready).",
+  "status": "VERIFIED",
+  "note": "D 80:63898, L 80:64936, T 172:75163. The T screenshot passed and the overflow scan was clean.",
   "by": "adm-pool"
  },
  {
@@ -2702,8 +2708,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED",
-  "note": "The Figma MCP rate limit blocked the build. The script for 1440 + 1280 (round #1,245 refunds aligned with ADM-F7: 38,900.00 refunded, 2,300.00 outstanding across 19 players) is ready in out_A.js.",
+  "status": "VERIFIED",
+  "note": "D 171:67227, L 171:68123. Round #1,245 RefundOnCancel matches ADM-F7: obligation 41,200.00 (4,120 entries), 38,900.00 claimed, 2,300.00 outstanding across 19 accounts (@nova.k 300.00), fees released 206.00. Claims by day, the 6 largest unclaimed accounts, and contract-defined operations only (reminder; refundUnclaimed disabled until 1 Dec 20:00 UTC). The 1280 'Claim window' cell was shortened and re-checked.",
   "by": "adm-pool"
  },
  {
@@ -2714,8 +2720,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "NOT STARTED",
-  "note": "The rate limit blocked the build. Ready: out_A.js (1440 + 1280 default) and states.js (pause request with reason + 2FA + four-eyes, approver view for K. Osei, paused after dual approval AR-1039). states.js reads the P10 default frame ID from the P10ID variable that out_A.js sets.",
+  "status": "VERIFIED",
+  "note": "D 171:68868 and L 171:69583 (Request column hidden at 1280, history reasons shortened, re-checked). Policy columns: contract decides / admins may (audited) / nobody can. Circuit breaker pauses NEW entries only. Breaker history, governance (48 h timelock, 3-of-5 multisig). Three 1440 states, all screenshots passed: pause request dialog with reason, incident, 2FA and four-eyes (171:70215); approver view for K. Osei, Compliance Officer (171:70991); new entries paused after dual approval AR-1039, contract card set to Paused (171:71700).",
   "by": "adm-pool"
  },
  {
@@ -2726,8 +2732,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/x5.js. Laptop 1280 is in out/x12.js.",
+  "status": "VERIFIED",
+  "note": "1440 (186:115062) and 1280 (206:88235). Both screenshots passed. At 1280 the Live status strip now wraps, and the token line reads 'USDT 0xFd08…Cbb9 · illustrative'.",
   "by": "adm-chain-comp"
  },
  {
@@ -2738,8 +2744,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/b2.js. Laptop 1280 is in out/x12.js.",
+  "status": "VERIFIED",
+  "note": "1440 (186:115834) and 1280 (206:88878). The VRFConsumer and Treasury cards got their own subtitles. Last event moved to 26 Nov 2026, 20:02 UTC so it is not later than the 18:44 UTC snapshot. Approval column widened.",
   "by": "adm-chain-comp"
  },
  {
@@ -2750,8 +2756,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/b3.js. Laptop 1280 is in out/x12.js.",
+  "status": "VERIFIED",
+  "note": "1440 (190:160401) and 1280 (206:89668). Label cells switched to the Comfortable variant so each row shows its description line.",
   "by": "adm-chain-comp"
  },
  {
@@ -2762,8 +2768,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/b4.js. Laptop 1280 is in out/x12.js.",
+  "status": "VERIFIED",
+  "note": "1440 (190:161518) and 1280 (206:90610). The reference column shows the transfer type. The DP-77412 details list moved under the cards at full width. Pager total reads 1–20 of 4,203.",
   "by": "adm-chain-comp"
  },
  {
@@ -2774,8 +2780,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/b5.js. Laptop 1280 is in out/l-b2.js.",
+  "status": "VERIFIED",
+  "note": "1440 (204:86357) and 1280 (208:167178). Labelled as a 20:05 UTC snapshot taken after round #1,248 settled. Pager total reads 1–20 of 18,912.",
   "by": "adm-chain-comp"
  },
  {
@@ -2786,8 +2792,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/b6.js. Laptop 1280 is in out/l-b2.js.",
+  "status": "VERIFIED",
+  "note": "1440 (204:87285) and 1280 (208:167901), state Degraded — Ethereum (INC-0457).",
   "by": "adm-chain-comp"
  },
  {
@@ -2798,8 +2804,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/b7.js. Laptop 1280 is in out/l-b2.js.",
+  "status": "VERIFIED",
+  "note": "1440 (206:87491) and 1280 (208:168524). Since column widened and the SW-1179 failure text shortened, so nothing truncates.",
   "by": "adm-chain-comp"
  },
  {
@@ -2810,8 +2816,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Blockchain Management",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/x12.js (inline stacked daily bar chart). Laptop 1280 is in out/l-b2.js.",
+  "status": "VERIFIED",
+  "note": "1440 (206:91534) and 1280 (208:169115), with an inline stacked daily bar chart.",
   "by": "adm-chain-comp"
  },
  {
@@ -2822,8 +2828,8 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Compliance",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 queue (68:53474) and review detail KYC-30418 (75:56265) are built. The queue passed its re-screenshot after fixes. The review passed its screenshot; a later text fix (textarea placeholder, risk-meter user/factors) has not been re-screenshotted. Still missing: Laptop 1280 clones (out/x1.js), Tablet 768 (out/t-c1q.js, out/t-c1r.js) and Mobile 390 (out/m-c1q.js, out/m-c1r.js).",
+  "status": "VERIFIED",
+  "note": "All four sizes for both queue and review: 1440 68:53474 + 75:56265 (the review was re-screenshotted after the earlier run's text fix and passed); 1280 182:77240 + 182:78431; 768 208:169683 + 208:170269; 390 on page 10 209:183333 + 209:183698.",
   "by": "adm-chain-comp"
  },
  {
@@ -2834,8 +2840,8 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "Compliance",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 (77:56703) is built: alerts table plus AML-5530 preview with risk meter, funds flow and controlled actions. Passed its re-screenshot after the column-width and pagination fix. Still missing: Laptop 1280 (out/x1.js), Tablet 768 (out/t-c2.js) and Mobile 390 (out/m-c2.js).",
+  "status": "VERIFIED",
+  "note": "1440 77:56703, 1280 182:79096, 768 208:170596, 390 on page 10 209:183923.",
   "by": "adm-chain-comp"
  },
  {
@@ -2846,8 +2852,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 (86:116072) is built and its screenshot passed: tipping-off warning, cases table, STR-0094 stepper, evidence pack and MLRO filing panel. Laptop 1280 is still missing (out/x1.js).",
+  "status": "VERIFIED",
+  "note": "1440 86:116072 (KPI comparison labels fixed) and 1280 182:80044.",
   "by": "adm-chain-comp"
  },
  {
@@ -2858,8 +2864,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED",
-  "note": "Ready-to-run script: out/x1.js (builds C4 desktop plus the C1–C3 laptop clones). Laptop 1280 is in out/x5.js.",
+  "status": "VERIFIED",
+  "note": "1440 182:80815 (screening table columns widened) and 1280 186:112042.",
   "by": "adm-chain-comp"
  },
  {
@@ -2870,8 +2876,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/c5.js. Laptop 1280 is in out/x5.js.",
+  "status": "VERIFIED",
+  "note": "1440 182:81717 and 1280 186:112776. Play & entries column widened. The CH-0042 card header wraps instead of pushing its badges out of the card. Final screenshots passed.",
   "by": "adm-chain-comp"
  },
  {
@@ -2882,8 +2888,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/c6.js. Laptop 1280 is in out/x5.js.",
+  "status": "VERIFIED",
+  "note": "1440 184:80848 and 1280 186:113697. Type, Ends, Source, Balance and Status columns widened. Final screenshots passed.",
   "by": "adm-chain-comp"
  },
  {
@@ -2894,8 +2900,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Compliance",
-  "status": "NOT STARTED",
-  "note": "Desktop script: out/c7.js (inline grouped bar charts). Laptop 1280 is in out/x5.js.",
+  "status": "VERIFIED",
+  "note": "1440 184:81751 and 1280 186:114447, with inline grouped bar charts.",
   "by": "adm-chain-comp"
  },
  {
@@ -3076,7 +3082,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Eight 1440 frames built and checked in screenshots. Requester side: Admin/Confirm With Reason Dialog in Default, Ready and Error over a clone of the WD-20931 detail, plus Request submitted (AR-1042, audit #88,190). Approver side: step-up 2FA re-authentication; second-approver review modal (Approval Request Card + reason + what-happens + Reject/Approve); Approved & released at 20:31 UTC, matching the demo-data success path; Self-approval blocked, with eligible approvers listed. Still to build: 1280 Ready (out/04), 768 Ready (out/05), and consistency touch-ups on 180:144187, 180:144734 and 180:145242 (included in out/04).",
+  "by": "adm-core"
  },
  {
   "id": "MOB-01",
@@ -3086,7 +3094,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "6 frames checked on screenshots: Guest and Member header with the menu closed, Guest and Member full-screen menu (Shell/Mobile Drawer), Restricted region (US: Nav/Region Banner pinned, Sign up disabled, tiles Restricted, Withdraw kept, no bypass hint) and the spec board. Two later fixes were not re-screenshotted on these frames: the short DEMO notice (decision #29) and the hero coin stack moved so it no longer covers the DEMO badge. Both used the same code that passed on the MOB-02 frames. Twenty-One player count set to 92 (a text property only).",
+  "by": "mob-patterns"
  },
  {
   "id": "MOB-02",
@@ -3096,7 +3106,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "One 390 frame per active tab, all checked on screenshots: Home; Pool with a sticky participate bar above the tab bar (fee and 'You can lose your stake'); Games, with search copy fixed to 'Search 33 games…' and no ⌘K; Wallet (Balance Breakdown Compact, DP-77412, WD-20931); Account (security nudge text now wraps). Plus a spec board with all 5 Active variants and inline Pressed/Focus cells.",
+  "by": "mob-patterns"
  },
  {
   "id": "MOB-03",
@@ -3188,9 +3200,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "The financial-history (transactions) part is complete: 9 USR-F mobile frames turn tables into stacked Tx cards. The entries/rounds part belongs to the usr-gaming slice and was not checked here.",
-  "by": "usr-finance"
+  "status": "VERIFIED",
+  "note": "Transactions as stacked cards grouped by day, re-ordered and re-timed to demo-data ('Showing 8 of 212'). WD-20931 detail bottom sheet re-checked after its status badge moved into the sheet header. Entries as round cards: #1,248 open with odds and fee maths, #1,245 cancelled with refund owed, #1,244 runner-up +3,620.60. Skeleton loading state. Table→card mapping board. The fix that wraps the prize caption was confirmed from the row height (78 px), not from a new screenshot.",
+  "by": "mob-patterns"
  },
  {
   "id": "MOB-11",
@@ -3200,7 +3212,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Scripts ready and syntax-checked. out/m-01-overview-alerts.js builds Overview / 390 and Alerts / 390 / Operations; out/m-02-approvals.js builds Approvals queue / 390 / Open and the AR-1042 review bottom sheet. They use the same inline mobile admin top bar and tab bar as the adm-bc slice.",
+  "by": "adm-core"
  },
  {
   "id": "MOB-12",
@@ -3210,7 +3224,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Only part A of the board is built and checked on a screenshot: header, column headers, Navigation (sidebar → drawer → tab bar) and Grids (12/8/4 columns read from the grid styles). Not built because of 3 Figma MCP limit errors in a row: board part B (Tables, Modals & overlays, switch-point strip) and the 768 frames 'Navigation / 768 / Drawer closed (lobby)', 'Navigation / 768 / Drawer open', 'Tables / 768 / Horizontal scroll with pinned column' and 'Modals / 768 / Centred modal (participation preview)'. Ready-to-run patched scripts: pending/mob-patterns/mob-08.js, mob-09.js, mob-10.js.",
+  "by": "mob-patterns"
  },
  {
   "id": "PRO-01",

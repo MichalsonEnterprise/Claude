@@ -12,6 +12,10 @@ export interface AuthDialogState {
   next?: string;
   /** Route to replace when the dialog is dismissed without signing in (the /sign-in page uses "/"). */
   returnTo?: string;
+  /** Prefill for the email field (e.g. /verify?email=…). */
+  email?: string;
+  /** Keep the browser URL in sync with the view (/sign-in, /sign-up, /verify) — route pages only. */
+  syncUrl?: boolean;
 }
 
 export interface SessionExpiredState {

@@ -1,0 +1,1006 @@
+{
+  "summary": "Build GLOBAL POOL screens in Figma: one agent per module slice (args = list of slice keys), desktop on module page + mobile on page 10, verified per frame",
+  "agentCount": 5,
+  "logs": [],
+  "result": [
+    {
+      "key": "adm-core",
+      "section": "36:522944 — page '09 — Admin Panel', section 'ADM-00/01/02/X1 Shell, login, overview, approvals' (X=0, Y=0). Mobile section 'ADM — Mobile' on page 10 (X=217000): none of my frames are in it yet, because the Figma MCP limit stopped the run. Run stopped under conventions §10 after 3 limit errors in a row. Ready-to-run scripts for all remaining frames are in /home/user/Claude/design/figma-build/pending/adm-core/ (RUN-ORDER.json, out/*.js, README.md). Frame IDs are also in /home/user/Claude/design/figma-build/registry-adm-core.json.",
+      "created": [
+        {
+          "name": "[ADM-01] Admin login — Sign in / 1440 / Default",
+          "id": "170:66492"
+        },
+        {
+          "name": "[ADM-01] Admin login — Sign in / 1440 / Error — wrong password",
+          "id": "170:66727"
+        },
+        {
+          "name": "[ADM-01] Admin login — Sign in / 1440 / Blocked — network not approved",
+          "id": "170:67010"
+        },
+        {
+          "name": "[ADM-01] Admin login — 2FA / 1440 / Default",
+          "id": "170:67206"
+        },
+        {
+          "name": "[ADM-01] Admin login — 2FA / 1440 / Locked — too many codes",
+          "id": "170:67433"
+        },
+        {
+          "name": "[ADM-01] Session expired — Re-authenticate / 1440 / Default",
+          "id": "170:67648"
+        },
+        {
+          "name": "Band — ADM-01",
+          "id": "170:66489"
+        },
+        {
+          "name": "[ADM-02] Overview / 1440 / Default",
+          "id": "171:73506"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Default (empty)",
+          "id": "178:99766"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Ready",
+          "id": "178:100079"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Error",
+          "id": "178:100360"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Request submitted / 1440 / Awaiting 2nd approver",
+          "id": "178:100654"
+        },
+        {
+          "name": "[ADM-X1] Re-authenticate — Fresh 2FA before approving / 1440 / Default",
+          "id": "180:143765"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Second approver review / 1440 / Ready to approve",
+          "id": "180:144187"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Approved / 1440 / Released",
+          "id": "180:144734"
+        },
+        {
+          "name": "[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request",
+          "id": "180:145242"
+        },
+        {
+          "name": "(kept from earlier run) [ADM-00] Admin shell — Approvals inbox / 1440 / Default",
+          "id": "36:522948"
+        },
+        {
+          "name": "(kept from earlier run) [ADM-00] Admin shell — Command palette / 1440 / Results",
+          "id": "36:537070"
+        },
+        {
+          "name": "(kept from earlier run) [ADM-00] Admin shell — Command palette / 1440 / No results",
+          "id": "36:540097"
+        },
+        {
+          "name": "(kept from earlier run, touched up) [ADM-00] Admin shell — No permission / 1440 / Support role opens Finance link",
+          "id": "39:50316"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "ADM-00",
+          "status": "PARTIAL",
+          "note": "All four 1440 frames from the earlier run are kept. This run hid the locked Compliance count, changed the audit ref to #88216 and made the admin name auto-width. Still to build: the 1280 inbox (out/04-laptop.js) and three 768 frames — navigation drawer open, command palette, no permission (out/06-tablet-shell.js, which needs 05 first)."
+        },
+        {
+          "id": "ADM-01",
+          "status": "PARTIAL",
+          "note": "Six 1440 frames built: Sign in, Error (wrong password), Blocked (network not approved, no workaround), 2FA, 2FA locked (absolute unlock 18:57 UTC), Session expired. Five were checked in screenshots; the Session expired one was not shown. Still to build: Session timeout warning 1440 (01:42 left, sign-out at 19:02 UTC; out/07-states.js), Sign in 1280 (out/04) and Sign in 768 (out/05)."
+        },
+        {
+          "id": "ADM-02",
+          "status": "PARTIAL",
+          "note": "1440 Default built and checked in a screenshot, Super Admin S. Iyer. Shows every brief KPI using demo-data figures (deposits 12,846,500.00, withdrawals 10,932,140.00, fees 60,700.00 = 1,214,000 × 0.05, users 184,320 / 41,206, liabilities 186,400.00 + 52,310.40 = 238,710.40, 1 active round, 37 pending withdrawals, KYC 214). Also: queue cards, four-eyes list, health gauge 99.97%, services, KYC statistics, round #1,248 monitor (read-only), network health and audit feed. The header overflow was fixed. Still to build: Restricted role (Support L2) 1440 (out/07), 1280 (out/04), 768 (out/05) and 390 (out/m-01-overview-alerts.js)."
+        },
+        {
+          "id": "ADM-X1",
+          "status": "PARTIAL",
+          "note": "Eight 1440 frames built and checked in screenshots. Requester side: Admin/Confirm With Reason Dialog in Default, Ready and Error over a clone of the WD-20931 detail, plus Request submitted (AR-1042, audit #88,190). Approver side: step-up 2FA re-authentication; second-approver review modal (Approval Request Card + reason + what-happens + Reject/Approve); Approved & released at 20:31 UTC, matching the demo-data success path; Self-approval blocked, with eligible approvers listed. Still to build: 1280 Ready (out/04), 768 Ready (out/05), and consistency touch-ups on 180:144187, 180:144734 and 180:145242 (included in out/04)."
+        },
+        {
+          "id": "MOB-11",
+          "status": "NOT STARTED",
+          "note": "Scripts ready and syntax-checked. out/m-01-overview-alerts.js builds Overview / 390 and Alerts / 390 / Operations; out/m-02-approvals.js builds Approvals queue / 390 / Open and the AR-1042 review bottom sheet. They use the same inline mobile admin top bar and tab bar as the adm-bc slice."
+        }
+      ],
+      "issues": [
+        "STOPPED BY FIGMA MCP LIMIT (conventions §10): 3 limit errors in a row on the final attempt. Calls succeeded only intermittently all session: 5 builds went through, 7 calls hit the limit. Remaining frames, in run order, all with idempotent scripts in /home/user/Claude/design/figma-build/pending/adm-core/out/: (1) 07-states.js → [ADM-01] Session timeout — Warning / 1440 / 01:42 left; [ADM-02] Overview / 1440 / Restricted role — Support L2. (2) 04-laptop.js → [ADM-00] Admin shell — Approvals inbox / 1280 / Default; [ADM-01] Admin login — Sign in / 1280 / Default; [ADM-02] Overview / 1280 / Default; [ADM-X1] Four-eyes — Confirm with reason / 1280 / Ready; plus touch-ups. (3) 05-tablet.js (after 04) → [ADM-02] Overview / 768 / Default; [ADM-01] Admin login — Sign in / 768 / Default; [ADM-X1] Four-eyes — Confirm with reason / 768 / Ready. (4) 06-tablet-shell.js (after 05) → [ADM-00] Admin shell — Navigation drawer / 768 / Open; [ADM-00] Admin shell — Command palette / 768 / Results; [ADM-00] Admin shell — No permission / 768 / Support role opens Finance link. (5) m-01-overview-alerts.js → [ADM-02 · MOB-11] Overview / 390 / Default; [MOB-11] Alerts / 390 / Operations. (6) m-02-approvals.js → [MOB-11] Approvals queue / 390 / Open; [ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet.",
+        "Known inconsistencies until out/04-laptop.js runs, which fixes them. (a) 180:145242 Self-approval blocked: the backdrop is a clone of the K. Osei approvals inbox, so its 'Your role' column, the 'Waiting for me' count and possibly the sidebar or top-bar admin still read as K. Osei while the modal says A. Marin. (b) 180:144187 review: the nested Approval Request Card keeps its default 'Expires in …' text instead of 1 h 49 min. (c) 180:144734 approved: the card's default decision time does not yet read 20:31 UTC. Also to check after it runs: the signed-in admin label in the sidebar of the K. Osei approver frames. At screenshot scale it may still show the inbox's original name.",
+        "The old non-idempotent script pending/adm-core/out/01-adm01-adm02.js was removed. Its source was renamed _obsolete-01-adm01-adm02.js.txt. It was replaced by 01a/01b, which have already run. Do not re-run the old one.",
+        "Built inline because no matching component exists (candidates for the library): the 960 px four-eyes review modal (Admin/Approval Request Card with its own button row hidden, plus a decision column); the 480 px step-up 2FA modal (Modal/2FA carries the player anti-phishing code AURORA-27, which is wrong for admins); the session-timeout warning modal (pending); the tablet admin top bar; the mobile admin top bar and tab bar (same pattern as adm-bc); and mobile alert and approval cards (pending).",
+        "Admin/Confirm With Reason Dialog (25:16172) hard-codes a danger-tint header icon tile because its example is 'Reject'. On the X1 'Release' frames the tile was re-tinted to brand/tint and the submit button swapped to Primary. Suggest a Tone or Action property on the component.",
+        "Approval routing comes from the earlier-built 1440 inbox (36:522948, K. Osei's view): AR-1047 Pinfall max bet (S. Iyer, 'Super Admin only'), AR-1045 lift suspension @juno88 (R. Duarte), AR-1049 KYC export REG-221 (K. Osei, own request), AR-1042 release WD-20931 (A. Marin). This route has a conflict. AR-1047 was requested by the only Super Admin and is marked 'Super Admin only', so with a roster of 1 Super Admin nobody can decide it. The orchestrator may want to reassign its requester. The mobile scripts follow the desktop data as it stands.",
+        "New DEMO identifiers and values not in demo-data.md (all DEMO-badged): gross revenue 30 d 811,850.70 USDT; KPI deltas (+8.4% / +6.9% / +5.6% / 0.0% / +3.2% / −2.1%); KYC 30 d 6,480 submitted = 5,912 approved + 354 rejected + 214 pending, L1 3,920 / L2 2,236 / L3 324, median review 6 h 40 min; service p95 latencies; audit #88,190 (AR-1042 request), #88,391 (AR-1042 approval at 20:31 UTC), #88205 (blocked sign-in at 18:33 UTC); policies FIN-2.3 and SYS-1.1; admin idle timeout 15 min; step-up 2FA valid 5 min for one decision; sign-in lock until 18:57 UTC; session ended at 19:02 UTC. Times are consistent with WD-20931 in demo-data: AR-1042 requested 18:20, expires 22:20, approved 20:31, sent 20:32.",
+        "Decision for decisions.md. ADM-X1 flow: requester confirm-with-reason + 2FA → request (4 h expiry) → approver step-up 2FA if their 2FA session has lapsed → second-approver review with their own reason → approved, or rejected with a reason. Self-approval is blocked, the requester can withdraw, an expired request changes nothing, and amount, address and network cannot be edited during review. Role-based visibility on Overview (pending frame): data the role may not see is left out, not blurred."
+      ]
+    },
+    {
+      "key": "adm-pool",
+      "section": "67:52461",
+      "created": [
+        {
+          "name": "[ADM-P9] Refund Status / 1440 / Default",
+          "id": "171:67227"
+        },
+        {
+          "name": "[ADM-P9] Refund Status / 1280 / Default",
+          "id": "171:68123"
+        },
+        {
+          "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Default — entries open",
+          "id": "171:68868"
+        },
+        {
+          "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1280 / Default — entries open",
+          "id": "171:69583"
+        },
+        {
+          "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Pause request — reason + 2FA + four-eyes",
+          "id": "171:70215"
+        },
+        {
+          "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Second approval — approver view",
+          "id": "171:70991"
+        },
+        {
+          "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / New entries paused — after dual approval",
+          "id": "171:71700"
+        },
+        {
+          "name": "[ADM-P7] VRF Status / 1440 / Delayed — no fulfilment after 12 min (scenario)",
+          "id": "171:72535"
+        },
+        {
+          "name": "[ADM-P1] Pool Overview / 768 / Default",
+          "id": "172:71873"
+        },
+        {
+          "name": "[ADM-P2] Pool Balance / 768 / Default",
+          "id": "172:72701"
+        },
+        {
+          "name": "[ADM-P3] Active Round / 768 / Open — monitoring",
+          "id": "172:73435"
+        },
+        {
+          "name": "[ADM-P7] VRF Status / 768 / Fulfilled — round #1,248",
+          "id": "172:74324"
+        },
+        {
+          "name": "[ADM-P8] Settlement Status / 768 / Crediting — batch 3 of 4",
+          "id": "172:75163"
+        },
+        {
+          "name": "Section ADM — Mobile (page 10, X=217000 Y=0)",
+          "id": "173:71503"
+        },
+        {
+          "name": "[ADM-P3] Active Round / 390 / Open — monitoring (page 10)",
+          "id": "173:71504"
+        },
+        {
+          "name": "[ADM-P1] Pool Overview / 1440 / Default (earlier run, kept)",
+          "id": "67:52462"
+        },
+        {
+          "name": "[ADM-P1] Pool Overview / 1280 / Default (earlier run, kept)",
+          "id": "69:54384"
+        },
+        {
+          "name": "[ADM-P2] Pool Balance / 1440 / Default (earlier run, kept)",
+          "id": "69:55111"
+        },
+        {
+          "name": "[ADM-P2] Pool Balance / 1280 / Default (earlier run, kept)",
+          "id": "69:55930"
+        },
+        {
+          "name": "[ADM-P3] Active Round / 1440 / Open — monitoring (earlier run, kept)",
+          "id": "69:56617"
+        },
+        {
+          "name": "[ADM-P3] Active Round / 1280 / Open — monitoring (earlier run, kept)",
+          "id": "69:57532"
+        },
+        {
+          "name": "[ADM-P4] Historical Rounds / 1440 / Default (earlier run, settlement column fixed)",
+          "id": "79:57471"
+        },
+        {
+          "name": "[ADM-P4] Historical Rounds / 1280 / Default (earlier run, kept)",
+          "id": "79:58445"
+        },
+        {
+          "name": "[ADM-P5] Participant List / 1440 / Default (earlier run, kept)",
+          "id": "79:59267"
+        },
+        {
+          "name": "[ADM-P5] Participant List / 1280 / Default (earlier run, kept)",
+          "id": "79:60246"
+        },
+        {
+          "name": "[ADM-P6] Prize Distribution / 1440 / Default (earlier run, kept)",
+          "id": "80:59955"
+        },
+        {
+          "name": "[ADM-P6] Prize Distribution / 1280 / Default (earlier run, kept)",
+          "id": "80:61181"
+        },
+        {
+          "name": "[ADM-P7] VRF Status / 1440 / Fulfilled — round #1,248 (earlier run, kept)",
+          "id": "80:62189"
+        },
+        {
+          "name": "[ADM-P7] VRF Status / 1280 / Fulfilled — round #1,248 (earlier run, kept)",
+          "id": "80:63106"
+        },
+        {
+          "name": "[ADM-P8] Settlement Status / 1440 / Crediting — batch 3 of 4 (earlier run, kept)",
+          "id": "80:63898"
+        },
+        {
+          "name": "[ADM-P8] Settlement Status / 1280 / Crediting — batch 3 of 4 (earlier run, kept)",
+          "id": "80:64936"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "ADM-P1",
+          "status": "VERIFIED",
+          "note": "D 67:52462, L 69:54384 (earlier run, checked in screenshots), T 172:71873 built this run. The T screenshot passed and its overflow scan was clean apart from the intended clipped sub-nav scroller."
+        },
+        {
+          "id": "ADM-P2",
+          "status": "VERIFIED",
+          "note": "D 69:55111, L 69:55930, T 172:72701. At 768 the reconciliation header caption overflowed and a scope cell was truncated; both were shortened and the re-screenshot passed. 241,010.40 = 186,400.00 + 52,310.40 + 2,300.00."
+        },
+        {
+          "id": "ADM-P3",
+          "status": "VERIFIED",
+          "note": "D 69:56617, L 69:57532, T 172:73435 (redundant explorer button hidden at 768, re-checked). M 173:71504 on page 10, section ADM — Mobile 173:71503. It was first built at a fixed 800 px height and set to hug (2321 px). Entry cards were fixed to wrap with DEMO moved to the handle row. Uses an inline admin top bar, sticky countdown bar and Admin Tab Bar with Pool active. Screenshots passed."
+        },
+        {
+          "id": "ADM-P4",
+          "status": "VERIFIED",
+          "note": "D 79:57471 and L 79:58445 screenshotted this run. The 1440 Settlement column truncated, so its copy was shortened after measuring (e.g. 'Due 20:00 UTC', '20:02 · 1 held', 'Refunds 393 / 412'); the table re-screenshot passed."
+        },
+        {
+          "id": "ADM-P5",
+          "status": "VERIFIED",
+          "note": "D 79:59267 and L 79:60246 screenshotted this run. The overflow scan was clean."
+        },
+        {
+          "id": "ADM-P6",
+          "status": "BUILT",
+          "note": "D 80:59955 and L 80:61181 exist; the '2.00% each' text was shortened to '2.00%'. Defect: the Runner-up row's Share cell in 'Table — Split' renders blank on both frames, although its text is visible, 76×20 px and has a fill. Fix not applied because of the Figma MCP limit (3 consecutive refusals). Ready script: design/figma-build/pending/adm-pool/call8_p6cell.js (clones the 3rd-prize share cell, sets 2.00%)."
+        },
+        {
+          "id": "ADM-P7",
+          "status": "VERIFIED",
+          "note": "Fulfilled: D 80:62189, L 80:63106, T 172:74324 (passed). New 1440 state 'Delayed — no fulfilment after 12 min (scenario)' 171:72535: alert banner, waiting KV values, the delay rule marked Now, history row awaiting fulfilment. Screenshot passed; the stepper's elapsed time was then set to 00:12:26 to match the header."
+        },
+        {
+          "id": "ADM-P8",
+          "status": "VERIFIED",
+          "note": "D 80:63898, L 80:64936, T 172:75163. The T screenshot passed and the overflow scan was clean."
+        },
+        {
+          "id": "ADM-P9",
+          "status": "VERIFIED",
+          "note": "D 171:67227, L 171:68123. Round #1,245 RefundOnCancel matches ADM-F7: obligation 41,200.00 (4,120 entries), 38,900.00 claimed, 2,300.00 outstanding across 19 accounts (@nova.k 300.00), fees released 206.00. Claims by day, the 6 largest unclaimed accounts, and contract-defined operations only (reminder; refundUnclaimed disabled until 1 Dec 20:00 UTC). The 1280 'Claim window' cell was shortened and re-checked."
+        },
+        {
+          "id": "ADM-P10",
+          "status": "VERIFIED",
+          "note": "D 171:68868 and L 171:69583 (Request column hidden at 1280, history reasons shortened, re-checked). Policy columns: contract decides / admins may (audited) / nobody can. Circuit breaker pauses NEW entries only. Breaker history, governance (48 h timelock, 3-of-5 multisig). Three 1440 states, all screenshots passed: pause request dialog with reason, incident, 2FA and four-eyes (171:70215); approver view for K. Osei, Compliance Officer (171:70991); new entries paused after dual approval AR-1039, contract card set to Paused (171:71700)."
+        }
+      ],
+      "issues": [
+        "Figma MCP tool-call limit: 3 consecutive refusals on the final fix call, so I stopped (conventions §10). One frame fix remains: ADM-P6 80:59955 and 80:61181, where the Runner-up Share cell in 'Table — Split' renders blank. Ready script: /home/user/Claude/design/figma-build/pending/adm-pool/call8_p6cell.js (needs no cache, idempotent enough to run once).",
+        "Data conflict: ADM-P9 and ADM-F7 (verified) use a round #1,245 refund obligation of 41,200.00 USDT (4,120 entries; 38,900.00 claimed + 2,300.00 outstanding). demo-data.md line 150 (added later by usr-finance) says #1,245 closed at 46,850.00 / 50,000.00 USDT. These cannot both hold at 10.00 per entry, so one source of truth is needed. Logged as decisions.md #34.",
+        "Design vs contract mismatch (needs a product decision, not changed): the ADM-P7 delay rules, the new P7 Delayed state ('no re-request; auto-cancel + refunds after 24 h') and P9 ('GlobalPool.refundUnclaimed()' pushes refunds on-chain) conflict with global-pool/packages/contracts/src/GlobalPoolRounds.sol. The contract allows a permissionless re-request after DRAW_REQUEST_TIMEOUT = 24 h with the same committed entries (first fulfilment wins), never cancels a round once its draw is requested, handles refunds in the off-chain ledger, and lets OPERATOR_ROLE cancel an Open round for operational/compliance reasons (P10's policy columns do not mention this). Player-side GP 'VRF delayed' screens probably carry the same assumption.",
+        "The temporary helper-cache text node 78:57471 ('adm-pool script cache — delete') was deleted after the builds. The continuation scripts in design/figma-build/pending/adm-pool/ (call1, call2_tab, call3_mob) need it recreated from lib_code.js if they are ever re-run; call5/7/8 do not need it.",
+        "The DEMO bar on ADM-P3 390 was shortened to 'DEMO DATA — every figure here is illustrative'. decisions.md #29 standardises 'DEMO DATA — illustrative values only' on 390 frames; align if strict consistency is wanted. Section 'ADM — Mobile' (173:71503) was created by this run, and the ADM-F2 and ADM-B/C mobile scripts will add to it at nextX.",
+        "At 768, the Global Pool sub-nav is a clipped horizontal scroller with a chevron, scrolled so the active tab is visible. Tabs past the edge (e.g. 'Refunds', 'Policy & breaker') are intentionally clipped. No collapsed admin sidebar or tablet admin top-bar component exists, so the tablet top bar is built inline (same as ADM-F tablet frames)."
+      ]
+    },
+    {
+      "key": "adm-chain-comp",
+      "section": "68:53473 — 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' on page '09 — Admin Panel', now at X=72000, Y=0 (12,600 × 13,863). Mobile frames are in section 173:71503 'ADM — Mobile' on page '10 — Mobile Experience' (X=217000).",
+      "created": [
+        {
+          "name": "[ADM-C1] KYC Queue / 1440 / Default (earlier run)",
+          "id": "68:53474"
+        },
+        {
+          "name": "[ADM-C1] KYC Review — KYC-30418 / 1440 / In review (earlier run)",
+          "id": "75:56265"
+        },
+        {
+          "name": "[ADM-C2] AML Alerts / 1440 / Default (earlier run)",
+          "id": "77:56703"
+        },
+        {
+          "name": "[ADM-C3] Suspicious Transactions / 1440 / Default (earlier run)",
+          "id": "86:116072"
+        },
+        {
+          "name": "[ADM-C1] KYC Queue / 1280 / Default",
+          "id": "182:77240"
+        },
+        {
+          "name": "[ADM-C1] KYC Review — KYC-30418 / 1280 / In review",
+          "id": "182:78431"
+        },
+        {
+          "name": "[ADM-C2] AML Alerts / 1280 / Default",
+          "id": "182:79096"
+        },
+        {
+          "name": "[ADM-C3] Suspicious Transactions / 1280 / Default",
+          "id": "182:80044"
+        },
+        {
+          "name": "[ADM-C4] Sanctions Screening / 1440 / Default",
+          "id": "182:80815"
+        },
+        {
+          "name": "[ADM-C5] Restricted Countries / 1440 / Default",
+          "id": "182:81717"
+        },
+        {
+          "name": "[ADM-C6] Self-Exclusion / 1440 / Default",
+          "id": "184:80848"
+        },
+        {
+          "name": "[ADM-C7] Responsible Gaming Reports / 1440 / Default",
+          "id": "184:81751"
+        },
+        {
+          "name": "[ADM-C4] Sanctions Screening / 1280 / Default",
+          "id": "186:112042"
+        },
+        {
+          "name": "[ADM-C5] Restricted Countries / 1280 / Default",
+          "id": "186:112776"
+        },
+        {
+          "name": "[ADM-C6] Self-Exclusion / 1280 / Default",
+          "id": "186:113697"
+        },
+        {
+          "name": "[ADM-C7] Responsible Gaming Reports / 1280 / Default",
+          "id": "186:114447"
+        },
+        {
+          "name": "[ADM-C1] KYC Queue / 768 / Default",
+          "id": "208:169683"
+        },
+        {
+          "name": "[ADM-C1] KYC Review — KYC-30418 / 768 / In review",
+          "id": "208:170269"
+        },
+        {
+          "name": "[ADM-C2] AML Alerts / 768 / Default",
+          "id": "208:170596"
+        },
+        {
+          "name": "[ADM-C1] KYC Queue / 390 / Default (page 10)",
+          "id": "209:183333"
+        },
+        {
+          "name": "[ADM-C1] KYC Review — KYC-30418 / 390 / In review (page 10)",
+          "id": "209:183698"
+        },
+        {
+          "name": "[ADM-C2] AML Alerts / 390 / Default (page 10)",
+          "id": "209:183923"
+        },
+        {
+          "name": "[ADM-B1] Supported Networks / 1440 / Default",
+          "id": "186:115062"
+        },
+        {
+          "name": "[ADM-B2] Smart Contracts / 1440 / Default",
+          "id": "186:115834"
+        },
+        {
+          "name": "[ADM-B3] Contract Addresses / 1440 / Default",
+          "id": "190:160401"
+        },
+        {
+          "name": "[ADM-B4] Transaction Monitoring / 1440 / Live",
+          "id": "190:161518"
+        },
+        {
+          "name": "[ADM-B5] Blockchain Events / 1440 / Live",
+          "id": "204:86357"
+        },
+        {
+          "name": "[ADM-B6] Network Health / 1440 / Degraded — Ethereum",
+          "id": "204:87285"
+        },
+        {
+          "name": "[ADM-B7] Failed Transactions / 1440 / Default",
+          "id": "206:87491"
+        },
+        {
+          "name": "[ADM-B8] Gas Statistics / 1440 / Default",
+          "id": "206:91534"
+        },
+        {
+          "name": "[ADM-B1] Supported Networks / 1280 / Default",
+          "id": "206:88235"
+        },
+        {
+          "name": "[ADM-B2] Smart Contracts / 1280 / Default",
+          "id": "206:88878"
+        },
+        {
+          "name": "[ADM-B3] Contract Addresses / 1280 / Default",
+          "id": "206:89668"
+        },
+        {
+          "name": "[ADM-B4] Transaction Monitoring / 1280 / Live",
+          "id": "206:90610"
+        },
+        {
+          "name": "[ADM-B5] Blockchain Events / 1280 / Live",
+          "id": "208:167178"
+        },
+        {
+          "name": "[ADM-B6] Network Health / 1280 / Degraded — Ethereum",
+          "id": "208:167901"
+        },
+        {
+          "name": "[ADM-B7] Failed Transactions / 1280 / Default",
+          "id": "208:168524"
+        },
+        {
+          "name": "[ADM-B8] Gas Statistics / 1280 / Default",
+          "id": "208:169115"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "ADM-B1",
+          "status": "VERIFIED",
+          "note": "1440 (186:115062) and 1280 (206:88235). Both screenshots passed. At 1280 the Live status strip now wraps, and the token line reads 'USDT 0xFd08…Cbb9 · illustrative'."
+        },
+        {
+          "id": "ADM-B2",
+          "status": "VERIFIED",
+          "note": "1440 (186:115834) and 1280 (206:88878). The VRFConsumer and Treasury cards got their own subtitles. Last event moved to 26 Nov 2026, 20:02 UTC so it is not later than the 18:44 UTC snapshot. Approval column widened."
+        },
+        {
+          "id": "ADM-B3",
+          "status": "VERIFIED",
+          "note": "1440 (190:160401) and 1280 (206:89668). Label cells switched to the Comfortable variant so each row shows its description line."
+        },
+        {
+          "id": "ADM-B4",
+          "status": "VERIFIED",
+          "note": "1440 (190:161518) and 1280 (206:90610). The reference column shows the transfer type. The DP-77412 details list moved under the cards at full width. Pager total reads 1–20 of 4,203."
+        },
+        {
+          "id": "ADM-B5",
+          "status": "VERIFIED",
+          "note": "1440 (204:86357) and 1280 (208:167178). Labelled as a 20:05 UTC snapshot taken after round #1,248 settled. Pager total reads 1–20 of 18,912."
+        },
+        {
+          "id": "ADM-B6",
+          "status": "VERIFIED",
+          "note": "1440 (204:87285) and 1280 (208:167901), state Degraded — Ethereum (INC-0457)."
+        },
+        {
+          "id": "ADM-B7",
+          "status": "VERIFIED",
+          "note": "1440 (206:87491) and 1280 (208:168524). Since column widened and the SW-1179 failure text shortened, so nothing truncates."
+        },
+        {
+          "id": "ADM-B8",
+          "status": "VERIFIED",
+          "note": "1440 (206:91534) and 1280 (208:169115), with an inline stacked daily bar chart."
+        },
+        {
+          "id": "ADM-C1",
+          "status": "VERIFIED",
+          "note": "All four sizes for both queue and review: 1440 68:53474 + 75:56265 (the review was re-screenshotted after the earlier run's text fix and passed); 1280 182:77240 + 182:78431; 768 208:169683 + 208:170269; 390 on page 10 209:183333 + 209:183698."
+        },
+        {
+          "id": "ADM-C2",
+          "status": "VERIFIED",
+          "note": "1440 77:56703, 1280 182:79096, 768 208:170596, 390 on page 10 209:183923."
+        },
+        {
+          "id": "ADM-C3",
+          "status": "VERIFIED",
+          "note": "1440 86:116072 (KPI comparison labels fixed) and 1280 182:80044."
+        },
+        {
+          "id": "ADM-C4",
+          "status": "VERIFIED",
+          "note": "1440 182:80815 (screening table columns widened) and 1280 186:112042."
+        },
+        {
+          "id": "ADM-C5",
+          "status": "VERIFIED",
+          "note": "1440 182:81717 and 1280 186:112776. Play & entries column widened. The CH-0042 card header wraps instead of pushing its badges out of the card. Final screenshots passed."
+        },
+        {
+          "id": "ADM-C6",
+          "status": "VERIFIED",
+          "note": "1440 184:80848 and 1280 186:113697. Type, Ends, Source, Balance and Status columns widened. Final screenshots passed."
+        },
+        {
+          "id": "ADM-C7",
+          "status": "VERIFIED",
+          "note": "1440 184:81751 and 1280 186:114447, with inline grouped bar charts."
+        }
+      ],
+      "issues": [
+        "Section moved: I created it at X=70000 as assigned, then moved it to X=72000 because 'ADM-P1..P10' (x 56000, width 15720) overlapped it up to x 71720. It now ends at x 84,600, before 'ADM-A/M…' at 86,000. Children moved with it, and later scripts find the section by name.",
+        "Figma MCP rate limit was hit 5 times: twice in a row on r5, then 3 times on the last read-only verification call (two in a row, then a fresh 12-minute wait). I never had to stop: after each cool-down the retry succeeded. Nothing is left to build.",
+        "Findings about the tooling, from this run: a use_figma call that throws is rolled back completely (B3/B4 did not exist after the failed r4). Only about 5 screenshots come back per call. Pending scripts are now idempotent (each screen is skipped if its frame already exists).",
+        "Library component defaults that needed overriding on every instance (should be fixed in the components): (1) Table/Cell Type=Text Density=Compact has no secondary line, so B3/B4 cells were swapped to Comfortable. (2) Pagination Type=Cursor ships '1–20 of 1,284', replaced with each page's real total. (3) Admin/Contract Card ships one subtitle and 'RoundSettled · 27 Nov 2026, 20:02 UTC' for every contract, which is after the 18:44 UTC admin snapshot. (4) Admin/KPI Tile definition text does not wrap at 1280, so it was resized per instance; tiles in the same row now have uneven heights. (5) Notice/Demo Data's long message clips at 390, so mobile frames use 'DEMO DATA — illustrative values only' (same as decision #29).",
+        "Laptop 1280 frames are clones of the 1440 masters with the Breakpoint mode set and low-priority table columns hidden. At 1280 a few component cells still truncate by design (B5 event details, the B4 search placeholder), and the C1 queue hides its trailing tab and wraps its filter row.",
+        "All admin screens are a 27 Nov 2026 18:44 UTC snapshot except ADM-B5, which is a 20:05 UTC snapshot taken after round #1,248 settled; its subtitle says so.",
+        "Files updated: registry-adm-bc.json (all 38 frame ids, section move); decisions.md entry #35 (layout and compliance rules for this slice); pending/adm-bc/RUN-ORDER.json (marked done); new pending/adm-bc/combine.py plus snippets ovfix.js, hugcheck.js, fix-r3/r4/r5/r7/r9.js, shots-*.js; _mlib.js mobile shell now uses the short DEMO message. No library components were created.",
+        "Memory: used the project note project_global_pool_figma.md (file key, BC.GAME-style direction) for context only; nothing new learned about the user."
+      ]
+    },
+    {
+      "key": "mob-patterns",
+      "section": "188:158877",
+      "created": [
+        {
+          "name": "Section — MOB-01/02/10/12 Mobile patterns (page 10, X=224000, Y=0)",
+          "id": "188:158877"
+        },
+        {
+          "name": "[MOB-01] Public header / 390 / Guest — menu closed",
+          "id": "188:158881"
+        },
+        {
+          "name": "[MOB-01] Full-screen menu / 390 / Guest — menu open",
+          "id": "188:159315"
+        },
+        {
+          "name": "[MOB-01] Public header / 390 / Member — menu closed",
+          "id": "188:159806"
+        },
+        {
+          "name": "[MOB-01] Full-screen menu / 390 / Member — menu open",
+          "id": "188:160218"
+        },
+        {
+          "name": "[MOB-01] Public header / 390 / Restricted region (United States)",
+          "id": "188:160530"
+        },
+        {
+          "name": "[MOB-01] Spec — Header & full-screen menu / Board",
+          "id": "188:160887"
+        },
+        {
+          "name": "[MOB-02] Tab bar — Home active / 390 / Member",
+          "id": "190:74734"
+        },
+        {
+          "name": "[MOB-02] Tab bar — Pool active / 390 / Member",
+          "id": "190:75438"
+        },
+        {
+          "name": "[MOB-02] Tab bar — Games active / 390 / Member",
+          "id": "190:75598"
+        },
+        {
+          "name": "[MOB-02] Tab bar — Wallet active / 390 / Member",
+          "id": "192:144096"
+        },
+        {
+          "name": "[MOB-02] Tab bar — Account active / 390 / Member",
+          "id": "192:144357"
+        },
+        {
+          "name": "[MOB-02] Spec — Bottom tab bar states & rules / Board",
+          "id": "192:144563"
+        },
+        {
+          "name": "[MOB-10] Transactions — cards / 390 / Default",
+          "id": "193:144654"
+        },
+        {
+          "name": "[MOB-10] Transactions — card detail / 390 / Bottom sheet — WD-20931 under review",
+          "id": "193:145037"
+        },
+        {
+          "name": "[MOB-10] Entries — cards / 390 / Default",
+          "id": "194:77008"
+        },
+        {
+          "name": "[MOB-10] Entries — cards / 390 / Loading (skeleton cards)",
+          "id": "194:77291"
+        },
+        {
+          "name": "[MOB-10] Spec — Table → card mapping / Board",
+          "id": "196:77250"
+        },
+        {
+          "name": "[MOB-12] Tablet behaviour sheet / Board (part A only: header, Navigation, Grids)",
+          "id": "199:77678"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "MOB-01",
+          "status": "VERIFIED",
+          "note": "6 frames checked on screenshots: Guest and Member header with the menu closed, Guest and Member full-screen menu (Shell/Mobile Drawer), Restricted region (US: Nav/Region Banner pinned, Sign up disabled, tiles Restricted, Withdraw kept, no bypass hint) and the spec board. Two later fixes were not re-screenshotted on these frames: the short DEMO notice (decision #29) and the hero coin stack moved so it no longer covers the DEMO badge. Both used the same code that passed on the MOB-02 frames. Twenty-One player count set to 92 (a text property only)."
+        },
+        {
+          "id": "MOB-02",
+          "status": "VERIFIED",
+          "note": "One 390 frame per active tab, all checked on screenshots: Home; Pool with a sticky participate bar above the tab bar (fee and 'You can lose your stake'); Games, with search copy fixed to 'Search 33 games…' and no ⌘K; Wallet (Balance Breakdown Compact, DP-77412, WD-20931); Account (security nudge text now wraps). Plus a spec board with all 5 Active variants and inline Pressed/Focus cells."
+        },
+        {
+          "id": "MOB-10",
+          "status": "VERIFIED",
+          "note": "Transactions as stacked cards grouped by day, re-ordered and re-timed to demo-data ('Showing 8 of 212'). WD-20931 detail bottom sheet re-checked after its status badge moved into the sheet header. Entries as round cards: #1,248 open with odds and fee maths, #1,245 cancelled with refund owed, #1,244 runner-up +3,620.60. Skeleton loading state. Table→card mapping board. The fix that wraps the prize caption was confirmed from the row height (78 px), not from a new screenshot."
+        },
+        {
+          "id": "MOB-12",
+          "status": "PARTIAL",
+          "note": "Only part A of the board is built and checked on a screenshot: header, column headers, Navigation (sidebar → drawer → tab bar) and Grids (12/8/4 columns read from the grid styles). Not built because of 3 Figma MCP limit errors in a row: board part B (Tables, Modals & overlays, switch-point strip) and the 768 frames 'Navigation / 768 / Drawer closed (lobby)', 'Navigation / 768 / Drawer open', 'Tables / 768 / Horizontal scroll with pinned column' and 'Modals / 768 / Centred modal (participation preview)'. Ready-to-run patched scripts: pending/mob-patterns/mob-08.js, mob-09.js, mob-10.js."
+        }
+      ],
+      "issues": [
+        "STOPPED EARLY under conventions §10: 3 Figma MCP limit errors in a row (mob-08). Not built yet: (1) MOB-12 board part B (Topic 3 Tables, Topic 4 Modals & overlays, 'Breakpoint ranges' strip), to be appended to board 199:77678. (2) '[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)'. (3) '[MOB-12] Tablet 768 — Navigation / 768 / Drawer open'. (4) '[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column'. (5) '[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)'. Run /home/user/Claude/design/figma-build/pending/mob-patterns/mob-08.js, then mob-09.js, then mob-10.js (mob-10 clones the drawer-closed frame from mob-09). Each script is idempotent and already patched; see README.md in that folder.",
+        "Placement: all four rows are in one section on page 10 at X=224000. The assigned module-section X=96000 would overlap 'USR — Mobile A' (91000–93160) and 'USR — Mobile B' (98000). The 224000–231000 gap fits the planned width (about 5,750 px including the 768 frames).",
+        "Component gaps (built inline from tokens): mobile transaction card, entry round-group card, mobile hero banner, tablet top bar (Shell/Topbar has no 768 variant), Pressed/Focus cells for tab-bar items (Nav/Mobile Tab Bar has no such variants), bottom-sheet scaffold (scrim + grabber + sheet).",
+        "Library defaults that needed overrides: Input/Search's default placeholder is 'Search transactions…' and its ⌘K shortcut shows on phones (overridden per instance). Menu/Filter Chip shows a chain icon by default ('Show icon' turned off). Notice/Demo Data's full message clips at 390 (short message used, as in #29).",
+        "Script bug fixed: the kit's SHEET() gives the overlay the same name as the sheet, so a fix script that searched by name moved the wrong node (the 'USDT' label of a list card). It was repaired and the sheet re-checked on a screenshot. Later scripts locate the sheet through 'Sheet header'.parent.",
+        "Data aligned to demo-data/decisions inside the prepared scripts: WD-20931 18:44 (decision by 22:44 UTC), DP-77412 18:39, #1,248 entries 18:05, DP-77380 09:12, refund #1,245 20:00 with 1.50 fees reversed, 212 transaction rows (not 1,284), and player counts per decision #34. Decisions entry 36 appended to /home/user/Claude/design/figma-build/decisions.md; frame ids written to /home/user/Claude/design/figma-build/registry-mob-patterns.json.",
+        "Spec board MOB-10 (196:77250), cosmetic: annotation pins 1, 3 and 4 slightly overlap the icon, chain mark and status badge on the example mobile card."
+      ]
+    },
+    {
+      "key": "adm-finance",
+      "section": "32:95639 (ADM-F1..F9 Finance, page '09 — Admin Panel', X=28000 Y=0); mobile frames in 173:71503 ('ADM — Mobile', page '10 — Mobile Experience', X=217000 Y=0)",
+      "created": [
+        {
+          "name": "[ADM-F2] Withdrawals — Queue / 390 / Default",
+          "id": "209:77692"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Under review",
+          "id": "209:78027"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Approve sheet (reason + 2FA)",
+          "id": "209:78251"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Reject sheet (validation error)",
+          "id": "209:78467"
+        },
+        {
+          "name": "[ADM-F1] Deposits / 1440 / Default",
+          "id": "32:95640"
+        },
+        {
+          "name": "[ADM-F1] Deposits / 1280 / Default",
+          "id": "34:465998"
+        },
+        {
+          "name": "[ADM-F1] Deposits / 768 / Default",
+          "id": "34:493822"
+        },
+        {
+          "name": "[ADM-F2] Withdrawals — Queue / 1440 / Default",
+          "id": "33:142492"
+        },
+        {
+          "name": "[ADM-F2] Withdrawals — Queue / 1280 / Default",
+          "id": "34:466991"
+        },
+        {
+          "name": "[ADM-F2] Withdrawals — Queue / 768 / Default",
+          "id": "36:517676"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 1440 / Under review",
+          "id": "33:230322"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 1440 / Approve step 1 (reason + 2FA)",
+          "id": "33:255525"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 1440 / Reject (validation error)",
+          "id": "33:255802"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 1440 / Awaiting 2nd approver",
+          "id": "33:256090"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 1440 / Approved — broadcasting",
+          "id": "33:256794"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 1280 / Under review",
+          "id": "34:468177"
+        },
+        {
+          "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 768 / Under review",
+          "id": "36:518219"
+        },
+        {
+          "name": "[ADM-F3] Platform Fees / 1440 / Default",
+          "id": "33:285615"
+        },
+        {
+          "name": "[ADM-F3] Platform Fees / 1280 / Default",
+          "id": "34:468777"
+        },
+        {
+          "name": "[ADM-F4] Pool Accounting / 1440 / Default",
+          "id": "33:317318"
+        },
+        {
+          "name": "[ADM-F4] Pool Accounting / 1280 / Default",
+          "id": "34:469376"
+        },
+        {
+          "name": "[ADM-F4] Pool Accounting / 768 / Default",
+          "id": "36:528629"
+        },
+        {
+          "name": "[ADM-F5] Financial Ledger / 1440 / Default",
+          "id": "34:353316"
+        },
+        {
+          "name": "[ADM-F5] Financial Ledger / 1280 / Default",
+          "id": "34:470066"
+        },
+        {
+          "name": "[ADM-F6] Reconciliation / 1440 / Mismatch open",
+          "id": "34:372667"
+        },
+        {
+          "name": "[ADM-F6] Reconciliation / 1280 / Mismatch open",
+          "id": "34:470654"
+        },
+        {
+          "name": "[ADM-F7] Refunds / 1440 / Default",
+          "id": "34:398768"
+        },
+        {
+          "name": "[ADM-F7] Refunds / 1280 / Default",
+          "id": "34:471375"
+        },
+        {
+          "name": "[ADM-F8] Revenue Reports / 1440 / Default",
+          "id": "34:417617"
+        },
+        {
+          "name": "[ADM-F8] Revenue Reports / 1280 / Default",
+          "id": "34:472066"
+        },
+        {
+          "name": "[ADM-F9] Export CSV — Revenue reports / 1440 / Configure",
+          "id": "34:443539"
+        },
+        {
+          "name": "[ADM-F9] Export CSV — Revenue reports / 1440 / Generating",
+          "id": "34:443786"
+        },
+        {
+          "name": "[ADM-F9] Export CSV — Revenue reports / 1440 / Ready",
+          "id": "34:444049"
+        },
+        {
+          "name": "[ADM-F9] Export CSV — Revenue reports / 1440 / Error — too many rows",
+          "id": "34:444305"
+        },
+        {
+          "name": "[ADM-F9] Export CSV — Revenue reports / 1280 / Configure",
+          "id": "36:516894"
+        },
+        {
+          "name": "Section/ADM-F1..F9 Finance",
+          "id": "32:95639"
+        },
+        {
+          "name": "Section/ADM — Mobile",
+          "id": "173:71503"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "ADM-F1",
+          "status": "VERIFIED",
+          "note": "Unchanged from the earlier run: D, L and T exist and were checked on screenshot. The 28 Nov inventory confirmed all frames hug their height."
+        },
+        {
+          "id": "ADM-F2",
+          "status": "VERIFIED",
+          "note": "All required sizes exist: D, L, T and now M. Desktop has the queue plus WD-20931 detail in 5 states; L and T have queue + detail. Mobile 390 (page 10, 'ADM — Mobile'): the queue uses stacked request cards (stats strip, search, filter chips, 4 FIFO requests with risk, SLA 'Due in …' and AML / high-risk lines, Admin Tab Bar with More active). The WD-20931 detail has a sticky bar: ask for info · Reject · Approve 1 of 2. The Approve bottom sheet has reason category, written reason 131/500, 2FA, the four-eyes note (second approver must be Compliance or Super Admin) and the audit-log notice. The Reject sheet shows the validation error (9 of 20 characters, nothing changed, funds would return to Available 10,715.30). Screenshots were checked after a targeted fix: the queue time line and the sheets compacted to 755 px. The desktop/L/T detail SLA countdown now reads '3 h 07 min left', matching the queue at 18:48 UTC."
+        },
+        {
+          "id": "ADM-F3",
+          "status": "VERIFIED",
+          "note": "Unchanged: D and L verified."
+        },
+        {
+          "id": "ADM-F4",
+          "status": "VERIFIED",
+          "note": "Unchanged: D, L and T verified."
+        },
+        {
+          "id": "ADM-F5",
+          "status": "VERIFIED",
+          "note": "Unchanged: D and L verified."
+        },
+        {
+          "id": "ADM-F6",
+          "status": "VERIFIED",
+          "note": "D and L. The 1280 frame was re-screenshotted on 28 Nov after the snapshot column was hidden: no clipping or overlap."
+        },
+        {
+          "id": "ADM-F7",
+          "status": "VERIFIED",
+          "note": "Unchanged: D and L verified."
+        },
+        {
+          "id": "ADM-F8",
+          "status": "VERIFIED",
+          "note": "Unchanged: D and L verified."
+        },
+        {
+          "id": "ADM-F9",
+          "status": "VERIFIED",
+          "note": "D (Configure, Generating, Ready, Error) and L (Configure). The Configure, Ready and Error modal footers were re-screenshotted on 28 Nov after the spacer fix and pass."
+        }
+      ],
+      "issues": [
+        "DATA CONFLICT (needs one source of truth): the admin ADM-F2 frames at 1440/1280/768/390 say WD-20931 was requested 17:55 UTC, SLA due 21:55, with 2 screening flags including 'amount 3.1× the 90-day median of 480.00'. demo-data.md and the player screens (WAL-15..19, MOB-07, MOB-10, USR-F) say submitted 18:44 UTC, decision by 22:44, and only the new-destination flag; the demo withdrawal history implies a median near 1,000. Mobile was kept consistent with the desktop admin frames and the conflict is logged as decisions.md #43. Fixing the admin side means re-timing WD-20931 and re-sorting the FIFO queue (it would move from oldest to about 9th of 37), plus the audit trail and SLA watch.",
+        "Admin mobile tab bar is inconsistent across slices. ADM-F2 matches adm-core/adm-bc (Overview · Approvals 4 · KYC 214 · Alerts 23 · More), but ADM-P3 390 (adm-pool) swaps KYC for Pool. Suggest picking one set.",
+        "Component gaps, built inline with tokens (same as the other admin mobile slices): Admin mobile top bar, Admin Tab Bar, admin bottom sheet (grabber, header, body, footer), queue request card, sticky action bar. No library components were created.",
+        "Section 'ADM — Mobile' (173:71503) currently holds only ADM-P3 (x=120) and the 4 ADM-F2 frames (x=630 and 1140, y=160–3924). The adm-core/adm-bc mobile frames are scripted to go in a row below (their MROW helper), so no overlap is expected.",
+        "The old pending/adm-f2-mobile.js was superseded and renamed to pending/adm-finance/_obsolete-adm-f2-mobile.js.txt. Finished scripts are in /home/user/Claude/design/figma-build/pending/adm-finance/out/ (m-f2-mobile.js, m-f2-fix1.js, f-fix09.js); README.md is updated.",
+        "The Figma MCP limit was hit on 4 of 9 use_figma calls. Each was handled per conventions §10 (prepare, then retry once). Everything assigned was completed; nothing remains."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Screens"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "cont:adm-core",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a7298822461db4927",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795832902926,
+      "queuedAt": 1795832902911,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "36:522944 — page '09 — Admin Panel', section 'ADM-00/01/02/…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795834932671,
+      "tokens": 498158,
+      "toolCalls": 91,
+      "durationMs": 2029744,
+      "resultPreview": "{\"section\":\"36:522944 — page '09 — Admin Panel', section 'ADM-00/01/02/X1 Shell, login, overview, approvals' (X=0, Y=0). Mobile section 'ADM — Mobile' on page 10 (X=217000): none of my frames are in it yet, because the Figma MCP limit stopped the run. Run stopped under conventions §10 after 3 limit errors in a row. Ready-to-run scripts for all remaining frames are in /home/user/Claude/design/figma…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "cont:adm-pool",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a1987b3f749249359",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795832902926,
+      "queuedAt": 1795832902912,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "67:52461",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795834016398,
+      "tokens": 334956,
+      "toolCalls": 74,
+      "durationMs": 1113466,
+      "resultPreview": "{\"section\":\"67:52461\",\"created\":[{\"name\":\"[ADM-P9] Refund Status / 1440 / Default\",\"id\":\"171:67227\"},{\"name\":\"[ADM-P9] Refund Status / 1280 / Default\",\"id\":\"171:68123\"},{\"name\":\"[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Default — entries open\",\"id\":\"171:68868\"},{\"name\":\"[ADM-P10] Immutable by Design & Circuit Breaker / 1280 / Default — entries open\",\"id\":\"171:69583\"},{\"name\":\"[ADM-P…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "cont:adm-chain-comp",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "ab530bfba0ce149a9",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795834016408,
+      "queuedAt": 1795832902912,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "68:53473 — 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' …",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795838636924,
+      "tokens": 645083,
+      "toolCalls": 73,
+      "durationMs": 4620516,
+      "resultPreview": "{\"section\":\"68:53473 — 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' on page '09 — Admin Panel', now at X=72000, Y=0 (12,600 × 13,863). Mobile frames are in section 173:71503 'ADM — Mobile' on page '10 — Mobile Experience' (X=217000).\",\"created\":[{\"name\":\"[ADM-C1] KYC Queue / 1440 / Default (earlier run)\",\"id\":\"68:53474\"},{\"name\":\"[ADM-C1] KYC Review — KYC-30418 / 1440 / In review (earlier run)\"…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "cont:mob-patterns",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "af0c783c2b4d5b800",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795834932679,
+      "queuedAt": 1795832902912,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "188:158877",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795836467556,
+      "tokens": 422881,
+      "toolCalls": 58,
+      "durationMs": 1534877,
+      "resultPreview": "{\"section\":\"188:158877\",\"created\":[{\"name\":\"Section — MOB-01/02/10/12 Mobile patterns (page 10, X=224000, Y=0)\",\"id\":\"188:158877\"},{\"name\":\"[MOB-01] Public header / 390 / Guest — menu closed\",\"id\":\"188:158881\"},{\"name\":\"[MOB-01] Full-screen menu / 390 / Guest — menu open\",\"id\":\"188:159315\"},{\"name\":\"[MOB-01] Public header / 390 / Member — menu closed\",\"id\":\"188:159806\"},{\"name\":\"[MOB-01] Full-scre…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "cont:adm-finance",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "aeb50a04bc1a98351",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795836467566,
+      "queuedAt": 1795832902912,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "32:95639 (ADM-F1..F9 Finance, page '09 — Admin Panel', X=28…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795837403869,
+      "tokens": 292419,
+      "toolCalls": 43,
+      "durationMs": 936302,
+      "resultPreview": "{\"section\":\"32:95639 (ADM-F1..F9 Finance, page '09 — Admin Panel', X=28000 Y=0); mobile frames in 173:71503 ('ADM — Mobile', page '10 — Mobile Experience', X=217000 Y=0)\",\"created\":[{\"name\":\"[ADM-F2] Withdrawals — Queue / 390 / Default\",\"id\":\"209:77692\"},{\"name\":\"[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Under review\",\"id\":\"209:78027\"},{\"name\":\"[ADM-F2] Withdrawal WD-20931 — Detail / 390 / App…"
+    }
+  ],
+  "totalTokens": 2193497,
+  "totalToolCalls": 339
+}

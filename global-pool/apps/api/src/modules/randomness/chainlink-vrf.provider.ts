@@ -20,6 +20,7 @@ export interface ChainlinkVrfConfig {
   poolContract: Address | null;
   /** First block to scan (contract deployment block); undefined = last ~50k blocks. */
   fromBlock?: bigint;
+  /** Confirmations a DrawFulfilled event needs before its word is used (VRF_FULFILLMENT_CONFIRMATIONS). */
   requestConfirmations: number;
 }
 
@@ -28,10 +29,11 @@ export class RandomnessNotReadyError extends Error {
 }
 
 /**
- * Chainlink VRF v2.5 adapter for the GlobalPoolRounds contract on Arbitrum Sepolia (read-only).
- * The contract's `requestDraw(roundId)` is permissionless once entries are committed; a keeper (later batch) sends
- * it. This adapter reads `DrawRequested` / `DrawFulfilled` events for the round and returns the stored VRF word.
- * It never signs transactions.
+ * Chainlink VRF v2.5 adapter for the GlobalPoolRounds contract on Arbitrum Sepolia / local Anvil (read-only).
+ * The contract's `requestDraw(roundId)` is permissionless once entries are committed; the round mirror's keeper
+ * (RoundMirrorService) sends it. This adapter is the VRF fulfilment watcher: it reads `DrawRequested` /
+ * `DrawFulfilled` events for the round and returns the stored VRF word once the event has the configured
+ * confirmations. It never signs transactions.
  */
 export class ChainlinkVrfProvider implements RandomnessProvider {
   readonly kind = 'chainlink_vrf_v2_5' as const;
@@ -85,20 +87,26 @@ export class ChainlinkVrfProvider implements RandomnessProvider {
     round: RandomnessRoundInfo;
   }): Promise<RandomnessFulfillment | null> {
     const { client, contract } = this.ready();
+    // Any request of the round: after a 24 h re-request, whichever outstanding request is fulfilled FIRST is final
+    // (the contract stores exactly one word per round and ignores later callbacks).
     const logs = await client.getLogs({
       address: contract,
       event: DRAW_FULFILLED_EVENT,
-      args: { roundId: request.round.onchainRoundId, requestId: BigInt(request.requestId) },
+      args: { roundId: request.round.onchainRoundId },
       fromBlock: await this.fromBlock(client),
       toBlock: 'latest',
     });
     const log = logs[0];
     if (!log || log.args.randomWord === undefined || log.blockNumber === null) return null;
+    const fulfilledRequestId = log.args.requestId?.toString();
     const head = await client.getBlockNumber();
     const confirmations = Number(head - log.blockNumber + 1n);
     if (confirmations < this.cfg.requestConfirmations) return null;
     const block = await client.getBlock({ blockNumber: log.blockNumber });
     return {
+      ...(fulfilledRequestId && fulfilledRequestId !== request.requestId
+        ? { requestId: fulfilledRequestId }
+        : {}),
       randomWord: toHex(log.args.randomWord, { size: 32 }),
       fulfilledAt: new Date(Number(block.timestamp) * 1000),
       fulfillTxHash: log.transactionHash ?? null,

@@ -2428,11 +2428,23 @@
   ]
  },
  "adm-finance": {
-  "section": "32:95639 (page '09 — Admin Panel', section 'ADM-F1..F9 Finance' at X=28000, Y=0). Mobile section 'ADM — Mobile' on page 10 was NOT touched: the Figma MCP quota ran out.",
+  "section": "32:95639 (ADM-F1..F9 Finance, page '09 — Admin Panel', X=28000 Y=0); mobile frames in 173:71503 ('ADM — Mobile', page '10 — Mobile Experience', X=217000 Y=0)",
   "created": [
    {
-    "name": "Section/ADM-F1..F9 Finance",
-    "id": "32:95639"
+    "name": "[ADM-F2] Withdrawals — Queue / 390 / Default",
+    "id": "209:77692"
+   },
+   {
+    "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Under review",
+    "id": "209:78027"
+   },
+   {
+    "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Approve sheet (reason + 2FA)",
+    "id": "209:78251"
+   },
+   {
+    "name": "[ADM-F2] Withdrawal WD-20931 — Detail / 390 / Reject sheet (validation error)",
+    "id": "209:78467"
    },
    {
     "name": "[ADM-F1] Deposits / 1440 / Default",
@@ -2557,137 +2569,327 @@
    {
     "name": "[ADM-F9] Export CSV — Revenue reports / 1280 / Configure",
     "id": "36:516894"
+   },
+   {
+    "name": "Section/ADM-F1..F9 Finance",
+    "id": "32:95639"
+   },
+   {
+    "name": "Section/ADM — Mobile",
+    "id": "173:71503"
    }
   ],
   "issues": [
-   "QUOTA: the Figma MCP plan limit ('tool call limit for your Full seat on the Professional plan') stopped ADM-F2 Mobile 390 on page 10. Three retries over about 20 minutes failed. Pending script: /home/user/Claude/design/figma-build/pending/adm-f2-mobile.js (29.9k chars, helpers included, refuses to run if [ADM-F2] mobile frames already exist).",
-   "HELPER BUG (affects every agent): screen() in helpers.js calls resize(w, 800) and never resets the height to hug, so frames stay fixed at 800px tall and clip their content. My frames set primaryAxisSizingMode='AUTO' after screen(). The orchestrator should fix helpers.js or tell other agents.",
-   "PITFALL: an empty AL() frame used as a spacer keeps its default 100px height, which inflates rows. I fixed all 27 in my section by resizing them to 1px. Same pitfall in other agents' work if they use spacers.",
-   "COMPONENT GAPS: (a) Table/Example Admin Withdrawals (23:22259) is 1240 wide and nested cell resizes do not persist, so its Request column collapses at the 1136 admin content width. I rebuilt the queue from Table/Cell, Table/Risk Cell, Table/Bulk Action Bar and Pagination instances. (b) Nav/Admin Sidebar has no collapsed variant and Nav/Admin Topbar does not fit 768, so tablet frames use an inline admin top bar plus a scrollable Finance sub-nav. (c) Nothing exists for an admin mobile top bar or admin mobile tab bar; Nav/Mobile Tab Bar is player-only. The pending mobile script builds both inline. (d) Control/Checkbox will not hug, so compact lists use the Table/Cell Checkbox. (e) No generic modal body or bottom-sheet slot exists (Modal/Base and Sheet/Bottom have fixed content), so the F9 modal and the F2 mobile sheet are built inline with tokens. (f) The approve dialog reuses Admin/Confirm With Reason Dialog with its Danger button swapped to Primary.",
-   "LAYOUT: the section is capped at 14,000px wide because the next section starts at X=42000. Row 1 at y=160 holds 8 desktop columns: F1, F2 queue, F2 detail (states stacked below), F3–F7. F8 (x=4800) and the F9 states (x=6360, stacked) sit in a second band at y=2400. The laptop row is at y=11010. Tablet frames and the F9 laptop are at y=13300.",
-   "DATA CONSISTENCY: the F3 and F8 30-day platform-fee delta is 0.0%, matching the KPI-tile default used by Overview. WD-20931 timeline: requested 17:55, detail viewed 18:15, AR-1042 at 18:20 (A. Marin), approved by K. Osei 18:51, broadcast 18:52. The queue card shows 'Needs 2nd approver 4', matching the topbar's 4 approvals. The brief's 'new destination' is read as a first payout to 0x7c4e…a21D, whitelisted 14 Oct 2026, which keeps demo-data intact. Invented supporting figures, all DEMO-badged: owed-prize breakdown 34,590.00 + 3,368.40 + 14,352.00 = 52,310.40; #1,245 refunds 38,900.00 claimed + 2,300.00 outstanding; revenue lines; INV-0192 / CE-0031.",
-   "Not re-screenshotted after the last tweaks (structurally low risk): the F2 approve dialog title shortened, the awaiting-state card buttons (self-approval disabled), the F2 queue date shortened, the F6 laptop snapshot column hidden, and F9 footers / F5 CE-0031 rows after the spacer fix.",
-   "Frame IDs are recorded in /home/user/Claude/design/figma-build/registry-adm-finance.json. No new library components were created."
+   "DATA CONFLICT (needs one source of truth): the admin ADM-F2 frames at 1440/1280/768/390 say WD-20931 was requested 17:55 UTC, SLA due 21:55, with 2 screening flags including 'amount 3.1× the 90-day median of 480.00'. demo-data.md and the player screens (WAL-15..19, MOB-07, MOB-10, USR-F) say submitted 18:44 UTC, decision by 22:44, and only the new-destination flag; the demo withdrawal history implies a median near 1,000. Mobile was kept consistent with the desktop admin frames and the conflict is logged as decisions.md #43. Fixing the admin side means re-timing WD-20931 and re-sorting the FIFO queue (it would move from oldest to about 9th of 37), plus the audit trail and SLA watch.",
+   "Admin mobile tab bar is inconsistent across slices. ADM-F2 matches adm-core/adm-bc (Overview · Approvals 4 · KYC 214 · Alerts 23 · More), but ADM-P3 390 (adm-pool) swaps KYC for Pool. Suggest picking one set.",
+   "Component gaps, built inline with tokens (same as the other admin mobile slices): Admin mobile top bar, Admin Tab Bar, admin bottom sheet (grabber, header, body, footer), queue request card, sticky action bar. No library components were created.",
+   "Section 'ADM — Mobile' (173:71503) currently holds only ADM-P3 (x=120) and the 4 ADM-F2 frames (x=630 and 1140, y=160–3924). The adm-core/adm-bc mobile frames are scripted to go in a row below (their MROW helper), so no overlap is expected.",
+   "The old pending/adm-f2-mobile.js was superseded and renamed to pending/adm-finance/_obsolete-adm-f2-mobile.js.txt. Finished scripts are in /home/user/Claude/design/figma-build/pending/adm-finance/out/ (m-f2-mobile.js, m-f2-fix1.js, f-fix09.js); README.md is updated.",
+   "The Figma MCP limit was hit on 4 of 9 use_figma calls. Each was handled per conventions §10 (prepare, then retry once). Everything assigned was completed; nothing remains."
   ]
  },
  "adm-pool": {
   "section": "67:52461",
   "created": [
    {
-    "name": "Section/ADM-P1..P10 Global Pool management (page 09, X=56000 Y=0)",
-    "id": "67:52461"
+    "name": "[ADM-P9] Refund Status / 1440 / Default",
+    "id": "171:67227"
    },
    {
-    "name": "[ADM-P1] Pool Overview / 1440 / Default",
+    "name": "[ADM-P9] Refund Status / 1280 / Default",
+    "id": "171:68123"
+   },
+   {
+    "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Default — entries open",
+    "id": "171:68868"
+   },
+   {
+    "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1280 / Default — entries open",
+    "id": "171:69583"
+   },
+   {
+    "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Pause request — reason + 2FA + four-eyes",
+    "id": "171:70215"
+   },
+   {
+    "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Second approval — approver view",
+    "id": "171:70991"
+   },
+   {
+    "name": "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / New entries paused — after dual approval",
+    "id": "171:71700"
+   },
+   {
+    "name": "[ADM-P7] VRF Status / 1440 / Delayed — no fulfilment after 12 min (scenario)",
+    "id": "171:72535"
+   },
+   {
+    "name": "[ADM-P1] Pool Overview / 768 / Default",
+    "id": "172:71873"
+   },
+   {
+    "name": "[ADM-P2] Pool Balance / 768 / Default",
+    "id": "172:72701"
+   },
+   {
+    "name": "[ADM-P3] Active Round / 768 / Open — monitoring",
+    "id": "172:73435"
+   },
+   {
+    "name": "[ADM-P7] VRF Status / 768 / Fulfilled — round #1,248",
+    "id": "172:74324"
+   },
+   {
+    "name": "[ADM-P8] Settlement Status / 768 / Crediting — batch 3 of 4",
+    "id": "172:75163"
+   },
+   {
+    "name": "Section ADM — Mobile (page 10, X=217000 Y=0)",
+    "id": "173:71503"
+   },
+   {
+    "name": "[ADM-P3] Active Round / 390 / Open — monitoring (page 10)",
+    "id": "173:71504"
+   },
+   {
+    "name": "[ADM-P1] Pool Overview / 1440 / Default (earlier run, kept)",
     "id": "67:52462"
    },
    {
-    "name": "[ADM-P1] Pool Overview / 1280 / Default",
+    "name": "[ADM-P1] Pool Overview / 1280 / Default (earlier run, kept)",
     "id": "69:54384"
    },
    {
-    "name": "[ADM-P2] Pool Balance / 1440 / Default",
+    "name": "[ADM-P2] Pool Balance / 1440 / Default (earlier run, kept)",
     "id": "69:55111"
    },
    {
-    "name": "[ADM-P2] Pool Balance / 1280 / Default",
+    "name": "[ADM-P2] Pool Balance / 1280 / Default (earlier run, kept)",
     "id": "69:55930"
    },
    {
-    "name": "[ADM-P3] Active Round / 1440 / Open — monitoring",
+    "name": "[ADM-P3] Active Round / 1440 / Open — monitoring (earlier run, kept)",
     "id": "69:56617"
    },
    {
-    "name": "[ADM-P3] Active Round / 1280 / Open — monitoring",
+    "name": "[ADM-P3] Active Round / 1280 / Open — monitoring (earlier run, kept)",
     "id": "69:57532"
    },
    {
-    "name": "[ADM-P4] Historical Rounds / 1440 / Default",
+    "name": "[ADM-P4] Historical Rounds / 1440 / Default (earlier run, settlement column fixed)",
     "id": "79:57471"
    },
    {
-    "name": "[ADM-P4] Historical Rounds / 1280 / Default",
+    "name": "[ADM-P4] Historical Rounds / 1280 / Default (earlier run, kept)",
     "id": "79:58445"
    },
    {
-    "name": "[ADM-P5] Participant List / 1440 / Default",
+    "name": "[ADM-P5] Participant List / 1440 / Default (earlier run, kept)",
     "id": "79:59267"
    },
    {
-    "name": "[ADM-P5] Participant List / 1280 / Default",
+    "name": "[ADM-P5] Participant List / 1280 / Default (earlier run, kept)",
     "id": "79:60246"
    },
    {
-    "name": "[ADM-P6] Prize Distribution / 1440 / Default",
+    "name": "[ADM-P6] Prize Distribution / 1440 / Default (earlier run, kept)",
     "id": "80:59955"
    },
    {
-    "name": "[ADM-P6] Prize Distribution / 1280 / Default",
+    "name": "[ADM-P6] Prize Distribution / 1280 / Default (earlier run, kept)",
     "id": "80:61181"
    },
    {
-    "name": "[ADM-P7] VRF Status / 1440 / Fulfilled — round #1,248",
+    "name": "[ADM-P7] VRF Status / 1440 / Fulfilled — round #1,248 (earlier run, kept)",
     "id": "80:62189"
    },
    {
-    "name": "[ADM-P7] VRF Status / 1280 / Fulfilled — round #1,248",
+    "name": "[ADM-P7] VRF Status / 1280 / Fulfilled — round #1,248 (earlier run, kept)",
     "id": "80:63106"
    },
    {
-    "name": "[ADM-P8] Settlement Status / 1440 / Crediting — batch 3 of 4",
+    "name": "[ADM-P8] Settlement Status / 1440 / Crediting — batch 3 of 4 (earlier run, kept)",
     "id": "80:63898"
    },
    {
-    "name": "[ADM-P8] Settlement Status / 1280 / Crediting — batch 3 of 4",
+    "name": "[ADM-P8] Settlement Status / 1280 / Crediting — batch 3 of 4 (earlier run, kept)",
     "id": "80:64936"
-   },
-   {
-    "name": "TEMPORARY hidden+locked text node 'adm-pool script cache — delete' (helper library cache, must be deleted)",
-    "id": "78:57471"
    }
   ],
   "issues": [
-   "BLOCKER: the account-wide Figma MCP limit (Pro Full seat: 10 calls/min, 200/day, shared by all parallel agents) rejected most calls from about 22:55 UTC. It has rejected every attempt since about 00:00 UTC, including after waits of up to 9 min, so the daily cap looks exhausted. Not yet built: ADM-P9 and ADM-P10 (1440 + 1280), the P10 states, the P7 'Delayed' state, tablet 768 frames for P1/P2/P3/P7/P8, and the P3 390 mobile frame on page 10 ('ADM — Mobile', X=217000). Ready-to-run scripts are in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/adm-pool/: out_A.js (P9+P10), states.js (append after out_A.js), out_tab.js (tablets), out_Lm3.js (mobile).",
-   "CLEANUP NEEDED: to cut payload size under the rate limit, I stored the GP helpers (verbatim minus comments) plus my kit in hidden, locked text node 78:57471 ('adm-pool script cache — delete') inside section 67:52461. Later calls ran it with AsyncFunction. The remaining scripts depend on this node. Delete it once they have run, or now if they will be rewritten with helpers pasted inline.",
-   "Deviation from conventions §1: after 23:52 UTC, calls loaded the helpers from that cached node instead of pasting them. Also, two or three screens per call (desktop plus a laptop clone) instead of one, to save calls.",
-   "Data conflict: ADM-F7 (Finance Refunds) says round #1,245 'Closed 26 Nov 2026, 08:00 UTC'. The daily-round schedule in Chart/Line-Area and Chart/Timeline puts #1,245 at 24 Nov 2026, 20:00 UTC, which is what my screens use. Needs an orchestrator decision.",
-   "Time-snapshot conflict: the demo countdown 03:17:42 to the 20:00 UTC close implies 16:42:18 UTC, which P1–P6 use. Other admin screens and components use 18:00–18:44 UTC (e.g. reconciliation '18:00 UTC', audit #88,213 at 18:42). P7 and P8 are deliberately post-draw snapshots (20:01 and 20:03 UTC) so they can show demo VRF request 0x9f2c…e71a.",
-   "I aligned pool accounting with ADM-F4/F7 instead of inventing numbers. Owed prizes 52,310.40 = #1,247 2nd prize 34,590.00 held (KYC-8841) + #1,246 runner-up 3,368.40 held (AML-3290) + 3 unclaimed prizes from #1,238–#1,243 totalling 14,352.00. Refunds outstanding 2,300.00 (19 players). Settlement is modelled as contract allocation followed by idempotent auto-claim batches; flagged winners stay held.",
-   "Nav/Admin Sidebar 22:5501 has no free child-item slots for Global Pool Management (only Finance's 8 children exist, and relabelling 18 slots cannot fit 10 groups + 10 children). The group is shown Active with no children, and the 10 module pages use an in-page Tabs/Underline sub-nav. On tablet that sub-nav becomes a clipped scroller with a chevron.",
-   "I did not use Admin/Event Stream Row and Admin/Reconciliation Row (fixed 1136 px, they overflow at 1280). Tables are built from Table/Header Cell + Table/Cell (Compact) instances, with column-priority markers ([l-]/[t-]) to hide columns at laptop and tablet widths.",
-   "Compact Table/Cell Text variant has no Secondary or DEMO layer, so DEMO badges sit in panel headers, table footers and user cells.",
-   "Unverified by screenshot: the last small fixes (P1 side-stats HUG, P3 'every block' label hidden, P4/P5 column widths)."
+   "Figma MCP tool-call limit: 3 consecutive refusals on the final fix call, so I stopped (conventions §10). One frame fix remains: ADM-P6 80:59955 and 80:61181, where the Runner-up Share cell in 'Table — Split' renders blank. Ready script: /home/user/Claude/design/figma-build/pending/adm-pool/call8_p6cell.js (needs no cache, idempotent enough to run once).",
+   "Data conflict: ADM-P9 and ADM-F7 (verified) use a round #1,245 refund obligation of 41,200.00 USDT (4,120 entries; 38,900.00 claimed + 2,300.00 outstanding). demo-data.md line 150 (added later by usr-finance) says #1,245 closed at 46,850.00 / 50,000.00 USDT. These cannot both hold at 10.00 per entry, so one source of truth is needed. Logged as decisions.md #34.",
+   "Design vs contract mismatch (needs a product decision, not changed): the ADM-P7 delay rules, the new P7 Delayed state ('no re-request; auto-cancel + refunds after 24 h') and P9 ('GlobalPool.refundUnclaimed()' pushes refunds on-chain) conflict with global-pool/packages/contracts/src/GlobalPoolRounds.sol. The contract allows a permissionless re-request after DRAW_REQUEST_TIMEOUT = 24 h with the same committed entries (first fulfilment wins), never cancels a round once its draw is requested, handles refunds in the off-chain ledger, and lets OPERATOR_ROLE cancel an Open round for operational/compliance reasons (P10's policy columns do not mention this). Player-side GP 'VRF delayed' screens probably carry the same assumption.",
+   "The temporary helper-cache text node 78:57471 ('adm-pool script cache — delete') was deleted after the builds. The continuation scripts in design/figma-build/pending/adm-pool/ (call1, call2_tab, call3_mob) need it recreated from lib_code.js if they are ever re-run; call5/7/8 do not need it.",
+   "The DEMO bar on ADM-P3 390 was shortened to 'DEMO DATA — every figure here is illustrative'. decisions.md #29 standardises 'DEMO DATA — illustrative values only' on 390 frames; align if strict consistency is wanted. Section 'ADM — Mobile' (173:71503) was created by this run, and the ADM-F2 and ADM-B/C mobile scripts will add to it at nextX.",
+   "At 768, the Global Pool sub-nav is a clipped horizontal scroller with a chevron, scrolled so the active tab is visible. Tabs past the edge (e.g. 'Refunds', 'Policy & breaker') are intentionally clipped. No collapsed admin sidebar or tablet admin top-bar component exists, so the tablet top bar is built inline (same as ADM-F tablet frames)."
   ]
  },
  "adm-chain-comp": {
-  "section": "Section \"ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance\" on page \"09 — Admin Panel\", created at X=70000, Y=0. Its node id was never read back because the Figma call limit hit before a read call. The frames inside are 68:53474, 75:56265, 77:56703 and 86:116072. Page \"10 — Mobile Experience\" section \"ADM — Mobile\" (X=217000) was not created yet.",
+  "section": "68:53473 — 'ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance' on page '09 — Admin Panel', now at X=72000, Y=0 (12,600 × 13,863). Mobile frames are in section 173:71503 'ADM — Mobile' on page '10 — Mobile Experience' (X=217000).",
   "created": [
    {
-    "name": "[ADM-C1] KYC Queue / 1440 / Default",
+    "name": "[ADM-C1] KYC Queue / 1440 / Default (earlier run)",
     "id": "68:53474"
    },
    {
-    "name": "[ADM-C1] KYC Review — KYC-30418 / 1440 / In review",
+    "name": "[ADM-C1] KYC Review — KYC-30418 / 1440 / In review (earlier run)",
     "id": "75:56265"
    },
    {
-    "name": "[ADM-C2] AML Alerts / 1440 / Default",
+    "name": "[ADM-C2] AML Alerts / 1440 / Default (earlier run)",
     "id": "77:56703"
    },
    {
-    "name": "[ADM-C3] Suspicious Transactions / 1440 / Default",
+    "name": "[ADM-C3] Suspicious Transactions / 1440 / Default (earlier run)",
     "id": "86:116072"
+   },
+   {
+    "name": "[ADM-C1] KYC Queue / 1280 / Default",
+    "id": "182:77240"
+   },
+   {
+    "name": "[ADM-C1] KYC Review — KYC-30418 / 1280 / In review",
+    "id": "182:78431"
+   },
+   {
+    "name": "[ADM-C2] AML Alerts / 1280 / Default",
+    "id": "182:79096"
+   },
+   {
+    "name": "[ADM-C3] Suspicious Transactions / 1280 / Default",
+    "id": "182:80044"
+   },
+   {
+    "name": "[ADM-C4] Sanctions Screening / 1440 / Default",
+    "id": "182:80815"
+   },
+   {
+    "name": "[ADM-C5] Restricted Countries / 1440 / Default",
+    "id": "182:81717"
+   },
+   {
+    "name": "[ADM-C6] Self-Exclusion / 1440 / Default",
+    "id": "184:80848"
+   },
+   {
+    "name": "[ADM-C7] Responsible Gaming Reports / 1440 / Default",
+    "id": "184:81751"
+   },
+   {
+    "name": "[ADM-C4] Sanctions Screening / 1280 / Default",
+    "id": "186:112042"
+   },
+   {
+    "name": "[ADM-C5] Restricted Countries / 1280 / Default",
+    "id": "186:112776"
+   },
+   {
+    "name": "[ADM-C6] Self-Exclusion / 1280 / Default",
+    "id": "186:113697"
+   },
+   {
+    "name": "[ADM-C7] Responsible Gaming Reports / 1280 / Default",
+    "id": "186:114447"
+   },
+   {
+    "name": "[ADM-C1] KYC Queue / 768 / Default",
+    "id": "208:169683"
+   },
+   {
+    "name": "[ADM-C1] KYC Review — KYC-30418 / 768 / In review",
+    "id": "208:170269"
+   },
+   {
+    "name": "[ADM-C2] AML Alerts / 768 / Default",
+    "id": "208:170596"
+   },
+   {
+    "name": "[ADM-C1] KYC Queue / 390 / Default (page 10)",
+    "id": "209:183333"
+   },
+   {
+    "name": "[ADM-C1] KYC Review — KYC-30418 / 390 / In review (page 10)",
+    "id": "209:183698"
+   },
+   {
+    "name": "[ADM-C2] AML Alerts / 390 / Default (page 10)",
+    "id": "209:183923"
+   },
+   {
+    "name": "[ADM-B1] Supported Networks / 1440 / Default",
+    "id": "186:115062"
+   },
+   {
+    "name": "[ADM-B2] Smart Contracts / 1440 / Default",
+    "id": "186:115834"
+   },
+   {
+    "name": "[ADM-B3] Contract Addresses / 1440 / Default",
+    "id": "190:160401"
+   },
+   {
+    "name": "[ADM-B4] Transaction Monitoring / 1440 / Live",
+    "id": "190:161518"
+   },
+   {
+    "name": "[ADM-B5] Blockchain Events / 1440 / Live",
+    "id": "204:86357"
+   },
+   {
+    "name": "[ADM-B6] Network Health / 1440 / Degraded — Ethereum",
+    "id": "204:87285"
+   },
+   {
+    "name": "[ADM-B7] Failed Transactions / 1440 / Default",
+    "id": "206:87491"
+   },
+   {
+    "name": "[ADM-B8] Gas Statistics / 1440 / Default",
+    "id": "206:91534"
+   },
+   {
+    "name": "[ADM-B1] Supported Networks / 1280 / Default",
+    "id": "206:88235"
+   },
+   {
+    "name": "[ADM-B2] Smart Contracts / 1280 / Default",
+    "id": "206:88878"
+   },
+   {
+    "name": "[ADM-B3] Contract Addresses / 1280 / Default",
+    "id": "206:89668"
+   },
+   {
+    "name": "[ADM-B4] Transaction Monitoring / 1280 / Live",
+    "id": "206:90610"
+   },
+   {
+    "name": "[ADM-B5] Blockchain Events / 1280 / Live",
+    "id": "208:167178"
+   },
+   {
+    "name": "[ADM-B6] Network Health / 1280 / Degraded — Ethereum",
+    "id": "208:167901"
+   },
+   {
+    "name": "[ADM-B7] Failed Transactions / 1280 / Default",
+    "id": "208:168524"
+   },
+   {
+    "name": "[ADM-B8] Gas Statistics / 1280 / Default",
+    "id": "208:169115"
    }
   ],
   "issues": [
-   "Figma MCP call limit: I stopped as conventions §10 requires after 3 failures in a row ('You've reached the Figma MCP tool call limit…') at about 00:12, 00:19 and 00:32 UTC. The waits between attempts ran from 3 to 12 minutes. Over the session 5 of about 13 calls succeeded, so the limit looks shared with the other agents running in parallel.",
-   "Frames still to build: 12 of 15 desktop masters (C4, C5, C6, C7, B1–B8), all 15 Laptop 1280 frames plus the C1 review laptop frame, 3 Tablet 768 frames (C1 queue, C1 review, C2) and 3 Mobile 390 frames on page 10 / 'ADM — Mobile' (C1 queue, C1 review, C2).",
-   "Every remaining frame has a complete script (helpers.js verbatim + adm-bc lib + body, each under 50k characters and checked with node --check) in /home/user/Claude/design/figma-build/pending/adm-bc/out/. Run order and the frames each script creates are in /home/user/Claude/design/figma-build/pending/adm-bc/RUN-ORDER.json. The scripts refuse to create a duplicate frame name and end with a screenshot. Sources and the build tool are in the same folder (_lib.js, _mlib.js, build.py).",
-   "Fixes not yet applied to built frames (they are included in out/x1.js): (1) on 68:53474, 77:56703 and 86:116072 the Admin/KPI Tile delta context still reads 'vs previous 30 d' even where the metric is daily or weekly; (2) on C3 86:116072 the 'Funds held by restriction' KPI definition text runs past the tile's right edge.",
-   "Component quirks the next agent should know: Admin/Risk Score Meter has '@nova.k' and L2 factors hard-coded (override by matching the text). Input/Textarea defaults to support-form copy ('Tell us what happened… WD-20931' / 'Never share passwords…'), which must be overridden. The 'vs previous 30 d' layer in Admin/KPI Tile is not named 'Delta context'. Pagination defaults to 'Rows per page 20' and 'Page 65'. The User/KYC Status Chip with Status=Pending ('Pending review') is too wide for table columns under about 190 px, so C1 uses text cells instead.",
-   "Pieces built inline because no component exists: the tablet admin top bar and scrollable Compliance sub-nav (there is no collapsed or tablet admin shell; same approach as adm-finance); the mobile admin top bar, tab bar and sticky action bar (pattern from adm-finance's pending F2 mobile script); the grouped bar charts on C7 and the stacked daily bar chart on B8, built from chart/* tokens (no Chart component fits that data); an illustrative passport mock and evidence tiles on the KYC review; and the funds-flow and evidence rows on C2/C3.",
-   "Layout decision (not yet logged in decisions.md): Laptop 1280 frames are clones of the desktop masters with Breakpoint=Laptop 1280 and FILL reflow. Low-priority table columns are hidden through a '{hideL:…}' tag on the table name and '[hideL]' layers. Bands inside the section use fixed rows (section-local y): Compliance desktop 160, Compliance laptop 3000, Blockchain desktop 6000, Blockchain laptop 9000, Compliance tablet 12000; columns are placed at x = 120 + i·(width+120).",
-   "Registry written: /home/user/Claude/design/figma-build/registry-adm-bc.json. It lists the frames built so far; no new library components were created. New DEMO IDs introduced (KYC-30352…30440, AML-55xx, STR-0086…0094, RS-3312, SCR-77xx, CH-0042, CFG-0088, AC-0017, INC-0457, WD-20918/20924, SW-1179, IN-0093) are listed in that file and are consistent with demo-data.md, AML-3317/WD-20931 and WD-20952 @kestrel (risk 86) from ADM-F2."
+   "Section moved: I created it at X=70000 as assigned, then moved it to X=72000 because 'ADM-P1..P10' (x 56000, width 15720) overlapped it up to x 71720. It now ends at x 84,600, before 'ADM-A/M…' at 86,000. Children moved with it, and later scripts find the section by name.",
+   "Figma MCP rate limit was hit 5 times: twice in a row on r5, then 3 times on the last read-only verification call (two in a row, then a fresh 12-minute wait). I never had to stop: after each cool-down the retry succeeded. Nothing is left to build.",
+   "Findings about the tooling, from this run: a use_figma call that throws is rolled back completely (B3/B4 did not exist after the failed r4). Only about 5 screenshots come back per call. Pending scripts are now idempotent (each screen is skipped if its frame already exists).",
+   "Library component defaults that needed overriding on every instance (should be fixed in the components): (1) Table/Cell Type=Text Density=Compact has no secondary line, so B3/B4 cells were swapped to Comfortable. (2) Pagination Type=Cursor ships '1–20 of 1,284', replaced with each page's real total. (3) Admin/Contract Card ships one subtitle and 'RoundSettled · 27 Nov 2026, 20:02 UTC' for every contract, which is after the 18:44 UTC admin snapshot. (4) Admin/KPI Tile definition text does not wrap at 1280, so it was resized per instance; tiles in the same row now have uneven heights. (5) Notice/Demo Data's long message clips at 390, so mobile frames use 'DEMO DATA — illustrative values only' (same as decision #29).",
+   "Laptop 1280 frames are clones of the 1440 masters with the Breakpoint mode set and low-priority table columns hidden. At 1280 a few component cells still truncate by design (B5 event details, the B4 search placeholder), and the C1 queue hides its trailing tab and wraps its filter row.",
+   "All admin screens are a 27 Nov 2026 18:44 UTC snapshot except ADM-B5, which is a 20:05 UTC snapshot taken after round #1,248 settled; its subtitle says so.",
+   "Files updated: registry-adm-bc.json (all 38 frame ids, section move); decisions.md entry #35 (layout and compliance rules for this slice); pending/adm-bc/RUN-ORDER.json (marked done); new pending/adm-bc/combine.py plus snippets ovfix.js, hugcheck.js, fix-r3/r4/r5/r7/r9.js, shots-*.js; _mlib.js mobile shell now uses the short DEMO message. No library components were created.",
+   "Memory: used the project note project_global_pool_figma.md (file key, BC.GAME-style direction) for context only; nothing new learned about the user."
   ]
  },
  "usr-core": {
@@ -5111,6 +5313,191 @@
    "STILL TO VERIFY by screenshot (14 frames, read-only, no building needed): 34:421433, 33:250900, 33:286269, 34:328793, 34:360672, 34:399536 (1440) and 33:166714, 33:215941, 34:421954, 33:252086, 33:287480, 34:329977, 34:361789, 34:400728 (1280). Ready-to-run read-only scripts are in /home/user/Claude/design/figma-build/pending/adm-games/ (RUN-ORDER.json plus verify-1-desktop.js … verify-5-laptop.js). Once they pass, upgrade the rows to VERIFIED.",
    "Time inconsistency: the Game Management screens are a ~16:42 UTC snapshot of 27 Nov 2026 (G1 'refreshed 16:42:10 UTC', CR-0418 requested 15:12 UTC, maintenance 'until 17:30 UTC'). The other admin modules use 18:44 UTC (decision #35). This is logged as decision #44 in /home/user/Claude/design/figma-build/decisions.md. Align it if one admin-wide time is wanted.",
    "Files changed in this run: I appended decision #44 to /home/user/Claude/design/figma-build/decisions.md. /home/user/Claude/design/figma-build/registry-adm-games.json already lists every frame ID and was left unchanged. No Figma nodes were created or changed in this run."
+  ]
+ },
+ "adm-core": {
+  "section": "36:522944 — page '09 — Admin Panel', section 'ADM-00/01/02/X1 Shell, login, overview, approvals' (X=0, Y=0). Mobile section 'ADM — Mobile' on page 10 (X=217000): none of my frames are in it yet, because the Figma MCP limit stopped the run. Run stopped under conventions §10 after 3 limit errors in a row. Ready-to-run scripts for all remaining frames are in /home/user/Claude/design/figma-build/pending/adm-core/ (RUN-ORDER.json, out/*.js, README.md). Frame IDs are also in /home/user/Claude/design/figma-build/registry-adm-core.json.",
+  "created": [
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1440 / Default",
+    "id": "170:66492"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1440 / Error — wrong password",
+    "id": "170:66727"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1440 / Blocked — network not approved",
+    "id": "170:67010"
+   },
+   {
+    "name": "[ADM-01] Admin login — 2FA / 1440 / Default",
+    "id": "170:67206"
+   },
+   {
+    "name": "[ADM-01] Admin login — 2FA / 1440 / Locked — too many codes",
+    "id": "170:67433"
+   },
+   {
+    "name": "[ADM-01] Session expired — Re-authenticate / 1440 / Default",
+    "id": "170:67648"
+   },
+   {
+    "name": "Band — ADM-01",
+    "id": "170:66489"
+   },
+   {
+    "name": "[ADM-02] Overview / 1440 / Default",
+    "id": "171:73506"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Default (empty)",
+    "id": "178:99766"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Ready",
+    "id": "178:100079"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Error",
+    "id": "178:100360"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Request submitted / 1440 / Awaiting 2nd approver",
+    "id": "178:100654"
+   },
+   {
+    "name": "[ADM-X1] Re-authenticate — Fresh 2FA before approving / 1440 / Default",
+    "id": "180:143765"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Second approver review / 1440 / Ready to approve",
+    "id": "180:144187"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Approved / 1440 / Released",
+    "id": "180:144734"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request",
+    "id": "180:145242"
+   },
+   {
+    "name": "(kept from earlier run) [ADM-00] Admin shell — Approvals inbox / 1440 / Default",
+    "id": "36:522948"
+   },
+   {
+    "name": "(kept from earlier run) [ADM-00] Admin shell — Command palette / 1440 / Results",
+    "id": "36:537070"
+   },
+   {
+    "name": "(kept from earlier run) [ADM-00] Admin shell — Command palette / 1440 / No results",
+    "id": "36:540097"
+   },
+   {
+    "name": "(kept from earlier run, touched up) [ADM-00] Admin shell — No permission / 1440 / Support role opens Finance link",
+    "id": "39:50316"
+   }
+  ],
+  "issues": [
+   "STOPPED BY FIGMA MCP LIMIT (conventions §10): 3 limit errors in a row on the final attempt. Calls succeeded only intermittently all session: 5 builds went through, 7 calls hit the limit. Remaining frames, in run order, all with idempotent scripts in /home/user/Claude/design/figma-build/pending/adm-core/out/: (1) 07-states.js → [ADM-01] Session timeout — Warning / 1440 / 01:42 left; [ADM-02] Overview / 1440 / Restricted role — Support L2. (2) 04-laptop.js → [ADM-00] Admin shell — Approvals inbox / 1280 / Default; [ADM-01] Admin login — Sign in / 1280 / Default; [ADM-02] Overview / 1280 / Default; [ADM-X1] Four-eyes — Confirm with reason / 1280 / Ready; plus touch-ups. (3) 05-tablet.js (after 04) → [ADM-02] Overview / 768 / Default; [ADM-01] Admin login — Sign in / 768 / Default; [ADM-X1] Four-eyes — Confirm with reason / 768 / Ready. (4) 06-tablet-shell.js (after 05) → [ADM-00] Admin shell — Navigation drawer / 768 / Open; [ADM-00] Admin shell — Command palette / 768 / Results; [ADM-00] Admin shell — No permission / 768 / Support role opens Finance link. (5) m-01-overview-alerts.js → [ADM-02 · MOB-11] Overview / 390 / Default; [MOB-11] Alerts / 390 / Operations. (6) m-02-approvals.js → [MOB-11] Approvals queue / 390 / Open; [ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet.",
+   "Known inconsistencies until out/04-laptop.js runs, which fixes them. (a) 180:145242 Self-approval blocked: the backdrop is a clone of the K. Osei approvals inbox, so its 'Your role' column, the 'Waiting for me' count and possibly the sidebar or top-bar admin still read as K. Osei while the modal says A. Marin. (b) 180:144187 review: the nested Approval Request Card keeps its default 'Expires in …' text instead of 1 h 49 min. (c) 180:144734 approved: the card's default decision time does not yet read 20:31 UTC. Also to check after it runs: the signed-in admin label in the sidebar of the K. Osei approver frames. At screenshot scale it may still show the inbox's original name.",
+   "The old non-idempotent script pending/adm-core/out/01-adm01-adm02.js was removed. Its source was renamed _obsolete-01-adm01-adm02.js.txt. It was replaced by 01a/01b, which have already run. Do not re-run the old one.",
+   "Built inline because no matching component exists (candidates for the library): the 960 px four-eyes review modal (Admin/Approval Request Card with its own button row hidden, plus a decision column); the 480 px step-up 2FA modal (Modal/2FA carries the player anti-phishing code AURORA-27, which is wrong for admins); the session-timeout warning modal (pending); the tablet admin top bar; the mobile admin top bar and tab bar (same pattern as adm-bc); and mobile alert and approval cards (pending).",
+   "Admin/Confirm With Reason Dialog (25:16172) hard-codes a danger-tint header icon tile because its example is 'Reject'. On the X1 'Release' frames the tile was re-tinted to brand/tint and the submit button swapped to Primary. Suggest a Tone or Action property on the component.",
+   "Approval routing comes from the earlier-built 1440 inbox (36:522948, K. Osei's view): AR-1047 Pinfall max bet (S. Iyer, 'Super Admin only'), AR-1045 lift suspension @juno88 (R. Duarte), AR-1049 KYC export REG-221 (K. Osei, own request), AR-1042 release WD-20931 (A. Marin). This route has a conflict. AR-1047 was requested by the only Super Admin and is marked 'Super Admin only', so with a roster of 1 Super Admin nobody can decide it. The orchestrator may want to reassign its requester. The mobile scripts follow the desktop data as it stands.",
+   "New DEMO identifiers and values not in demo-data.md (all DEMO-badged): gross revenue 30 d 811,850.70 USDT; KPI deltas (+8.4% / +6.9% / +5.6% / 0.0% / +3.2% / −2.1%); KYC 30 d 6,480 submitted = 5,912 approved + 354 rejected + 214 pending, L1 3,920 / L2 2,236 / L3 324, median review 6 h 40 min; service p95 latencies; audit #88,190 (AR-1042 request), #88,391 (AR-1042 approval at 20:31 UTC), #88205 (blocked sign-in at 18:33 UTC); policies FIN-2.3 and SYS-1.1; admin idle timeout 15 min; step-up 2FA valid 5 min for one decision; sign-in lock until 18:57 UTC; session ended at 19:02 UTC. Times are consistent with WD-20931 in demo-data: AR-1042 requested 18:20, expires 22:20, approved 20:31, sent 20:32.",
+   "Decision for decisions.md. ADM-X1 flow: requester confirm-with-reason + 2FA → request (4 h expiry) → approver step-up 2FA if their 2FA session has lapsed → second-approver review with their own reason → approved, or rejected with a reason. Self-approval is blocked, the requester can withdraw, an expired request changes nothing, and amount, address and network cannot be edited during review. Role-based visibility on Overview (pending frame): data the role may not see is left out, not blurred."
+  ]
+ },
+ "mob-patterns": {
+  "section": "188:158877",
+  "created": [
+   {
+    "name": "Section — MOB-01/02/10/12 Mobile patterns (page 10, X=224000, Y=0)",
+    "id": "188:158877"
+   },
+   {
+    "name": "[MOB-01] Public header / 390 / Guest — menu closed",
+    "id": "188:158881"
+   },
+   {
+    "name": "[MOB-01] Full-screen menu / 390 / Guest — menu open",
+    "id": "188:159315"
+   },
+   {
+    "name": "[MOB-01] Public header / 390 / Member — menu closed",
+    "id": "188:159806"
+   },
+   {
+    "name": "[MOB-01] Full-screen menu / 390 / Member — menu open",
+    "id": "188:160218"
+   },
+   {
+    "name": "[MOB-01] Public header / 390 / Restricted region (United States)",
+    "id": "188:160530"
+   },
+   {
+    "name": "[MOB-01] Spec — Header & full-screen menu / Board",
+    "id": "188:160887"
+   },
+   {
+    "name": "[MOB-02] Tab bar — Home active / 390 / Member",
+    "id": "190:74734"
+   },
+   {
+    "name": "[MOB-02] Tab bar — Pool active / 390 / Member",
+    "id": "190:75438"
+   },
+   {
+    "name": "[MOB-02] Tab bar — Games active / 390 / Member",
+    "id": "190:75598"
+   },
+   {
+    "name": "[MOB-02] Tab bar — Wallet active / 390 / Member",
+    "id": "192:144096"
+   },
+   {
+    "name": "[MOB-02] Tab bar — Account active / 390 / Member",
+    "id": "192:144357"
+   },
+   {
+    "name": "[MOB-02] Spec — Bottom tab bar states & rules / Board",
+    "id": "192:144563"
+   },
+   {
+    "name": "[MOB-10] Transactions — cards / 390 / Default",
+    "id": "193:144654"
+   },
+   {
+    "name": "[MOB-10] Transactions — card detail / 390 / Bottom sheet — WD-20931 under review",
+    "id": "193:145037"
+   },
+   {
+    "name": "[MOB-10] Entries — cards / 390 / Default",
+    "id": "194:77008"
+   },
+   {
+    "name": "[MOB-10] Entries — cards / 390 / Loading (skeleton cards)",
+    "id": "194:77291"
+   },
+   {
+    "name": "[MOB-10] Spec — Table → card mapping / Board",
+    "id": "196:77250"
+   },
+   {
+    "name": "[MOB-12] Tablet behaviour sheet / Board (part A only: header, Navigation, Grids)",
+    "id": "199:77678"
+   }
+  ],
+  "issues": [
+   "STOPPED EARLY under conventions §10: 3 Figma MCP limit errors in a row (mob-08). Not built yet: (1) MOB-12 board part B (Topic 3 Tables, Topic 4 Modals & overlays, 'Breakpoint ranges' strip), to be appended to board 199:77678. (2) '[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)'. (3) '[MOB-12] Tablet 768 — Navigation / 768 / Drawer open'. (4) '[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column'. (5) '[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)'. Run /home/user/Claude/design/figma-build/pending/mob-patterns/mob-08.js, then mob-09.js, then mob-10.js (mob-10 clones the drawer-closed frame from mob-09). Each script is idempotent and already patched; see README.md in that folder.",
+   "Placement: all four rows are in one section on page 10 at X=224000. The assigned module-section X=96000 would overlap 'USR — Mobile A' (91000–93160) and 'USR — Mobile B' (98000). The 224000–231000 gap fits the planned width (about 5,750 px including the 768 frames).",
+   "Component gaps (built inline from tokens): mobile transaction card, entry round-group card, mobile hero banner, tablet top bar (Shell/Topbar has no 768 variant), Pressed/Focus cells for tab-bar items (Nav/Mobile Tab Bar has no such variants), bottom-sheet scaffold (scrim + grabber + sheet).",
+   "Library defaults that needed overrides: Input/Search's default placeholder is 'Search transactions…' and its ⌘K shortcut shows on phones (overridden per instance). Menu/Filter Chip shows a chain icon by default ('Show icon' turned off). Notice/Demo Data's full message clips at 390 (short message used, as in #29).",
+   "Script bug fixed: the kit's SHEET() gives the overlay the same name as the sheet, so a fix script that searched by name moved the wrong node (the 'USDT' label of a list card). It was repaired and the sheet re-checked on a screenshot. Later scripts locate the sheet through 'Sheet header'.parent.",
+   "Data aligned to demo-data/decisions inside the prepared scripts: WD-20931 18:44 (decision by 22:44 UTC), DP-77412 18:39, #1,248 entries 18:05, DP-77380 09:12, refund #1,245 20:00 with 1.50 fees reversed, 212 transaction rows (not 1,284), and player counts per decision #34. Decisions entry 36 appended to /home/user/Claude/design/figma-build/decisions.md; frame ids written to /home/user/Claude/design/figma-build/registry-mob-patterns.json.",
+   "Spec board MOB-10 (196:77250), cosmetic: annotation pins 1, 3 and 4 slightly overlap the icon, chain mark and status badge on the example mobile card."
   ]
  }
 }

@@ -12,6 +12,7 @@ import { AuditService } from '../audit/audit.service';
 import { LedgerService } from '../ledger/ledger.service';
 import { prizeAwardLines, roundRefundLines, roundSettlementLines } from '../ledger/posting';
 import { NotificationsService } from '../notifications/notifications.service';
+import { MirrorMismatchError, RoundMirrorService } from '../onchain-rounds/round-mirror.service';
 import { RandomnessNotReadyError } from '../randomness/chainlink-vrf.provider';
 import { RandomnessService } from '../randomness/randomness.service';
 import { selectWinners } from '../randomness/selection';
@@ -58,7 +59,13 @@ export class RoundLifecycleService {
     private readonly audit: AuditService,
     private readonly events: PoolEventsService,
     private readonly config: AppConfig,
+    private readonly mirror: RoundMirrorService,
   ) {}
+
+  /** The round is mirrored on GlobalPoolRounds (on-chain commit / VRF draw / settlement record). */
+  private mirrored(round: Round): boolean {
+    return round.chainMirror && this.mirror.enabled;
+  }
 
   private autoSettle(round: Round): boolean {
     return !round.isDemo || this.config.env.DEMO_ROUNDS_AUTO_SETTLE;
@@ -97,6 +104,10 @@ export class RoundLifecycleService {
         }
       });
     }
+    // On-chain mirror housekeeping: publish rules of open rounds, record settlements / cancellations.
+    for (const r of await this.mirror.pendingRounds()) {
+      await run(`mirror #${r.number}`, () => this.mirror.sync(r));
+    }
     for (const r of await this.prisma.round.findMany({
       where: { status: 'open', closesAt: { lte: now } },
     })) {
@@ -109,7 +120,9 @@ export class RoundLifecycleService {
       if (!this.autoSettle(r)) continue;
       await run(`draw #${r.number}`, async () => {
         const status = await this.startDraw(r.id);
-        (status === 'cancelled' ? report.cancelled : report.drawing).push(r.number);
+        if (status !== 'waiting') {
+          (status === 'cancelled' ? report.cancelled : report.drawing).push(r.number);
+        }
       });
     }
     for (const r of await this.prisma.round.findMany({ where: { status: 'drawing' } })) {
@@ -152,12 +165,31 @@ export class RoundLifecycleService {
     return round;
   }
 
-  /** closed → drawing (randomness requested) when thresholds are met, else → cancelled with refunds. */
-  async startDraw(roundId: string): Promise<'drawing' | 'cancelled'> {
+  /**
+   * closed → drawing (randomness requested) when thresholds are met, else → cancelled with refunds.
+   * Mirrored rounds first commit the frozen entry list on-chain; the CONTRACT's threshold check decides, then the
+   * keeper sends requestDraw (or cancelRound). 'waiting' = an on-chain transaction is still pending (next tick).
+   */
+  async startDraw(roundId: string): Promise<'drawing' | 'cancelled' | 'waiting'> {
     const round = await this.prisma.round.findUniqueOrThrow({ where: { id: roundId } });
     if (round.status !== 'closed')
       throw new AppError('CONFLICT', `Round ${formatRoundNumber(round.number)} is ${round.status}`);
-    if (!round.thresholdsMet || round.entriesCount === 0) {
+    if (this.mirrored(round)) {
+      const committed = await this.mirror.commit(round);
+      if (!committed.done) return 'waiting';
+      const dbMet = Boolean(round.thresholdsMet) && round.entriesCount > 0;
+      if (committed.thresholdsMet && !dbMet) {
+        throw new MirrorMismatchError('Contract says thresholds are met but the database does not');
+      }
+      if (!committed.thresholdsMet) {
+        const cancelled = await this.mirror.cancelForThresholds(round);
+        if (!cancelled.done) return 'waiting';
+        await this.cancel(roundId, 'threshold_not_met');
+        return 'cancelled';
+      }
+      const requested = await this.mirror.requestDraw(round);
+      if (!requested.done) return 'waiting';
+    } else if (!round.thresholdsMet || round.entriesCount === 0) {
       await this.cancel(roundId, 'threshold_not_met');
       return 'cancelled';
     }
@@ -185,8 +217,41 @@ export class RoundLifecycleService {
     }
     const polled = await this.randomness.poll(round, request);
     if (polled.status === 'fulfilled') {
-      await this.settle(roundId);
+      if (this.mirrored(round)) await this.mirror.verifyDraw(round, polled.randomWord as Hex);
+      const settled = await this.settle(roundId);
+      if (this.mirrored(settled)) {
+        await this.mirror.tryStep(`record settlement #${settled.number}`, () =>
+          this.mirror.recordSettlement(settled),
+        );
+      }
       return 'settled';
+    }
+    if (this.mirrored(round)) {
+      // A requested on-chain draw can never be cancelled: after the contract's 24 h timeout the keeper re-requests
+      // (same committed entries; whichever request is fulfilled first is final). Disclosed in the audit log.
+      if (
+        addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now &&
+        (await this.mirror.canReRequest(round))
+      ) {
+        const res = await this.mirror.requestDraw(round, { reRequest: true });
+        if (res.done || res.op?.status === 'sent') {
+          await this.prisma.randomnessRequest.update({
+            where: { id: polled.id },
+            data: { status: 'timed_out' },
+          });
+          await this.audit.record({
+            actorType: 'system',
+            actorLabel: 'round-lifecycle',
+            action: 'round.draw_rerequested',
+            targetType: 'round',
+            targetId: round.id,
+            reason: 'VRF request unfulfilled for 24 h',
+            metadata: { roundNumber: round.number, previousRequestId: polled.requestId },
+          });
+          if (res.done) await this.randomness.request(round);
+        }
+      }
+      return 'waiting';
     }
     if (addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now) {
       await this.prisma.randomnessRequest.update({

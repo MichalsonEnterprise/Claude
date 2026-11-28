@@ -568,8 +568,8 @@ export class HistoryService {
     const poolEntries = await this.prisma.entry.count({
       where: { userId, createdAt: { gte: d30 } },
     });
-    const gameWagered = recentGames.reduce((a, g) => a.plus(money(g.wagered)), money(0));
-    const gameNet = recentGames.reduce((a, g) => a.plus(money(g.net)), money(0));
+    const simWagered = recentGames.reduce((a, g) => a.plus(money(g.wagered)), money(0));
+    const simNet = recentGames.reduce((a, g) => a.plus(money(g.net)), money(0));
     const poolSpent = money(pool._sum.netAmount?.toFixed() ?? '0');
     const returned = money(prizes._sum.netAmount?.toFixed() ?? '0').plus(
       money(refunds._sum.netAmount?.toFixed() ?? '0'),
@@ -578,12 +578,13 @@ export class HistoryService {
       activeRounds,
       recentGames,
       last30d: {
-        wagered: toUSDTString(poolSpent.plus(gameWagered)),
-        returned: toUSDTString(returned.plus(gameWagered.plus(gameNet))),
-        net: toUSDTString(returned.minus(poolSpent).plus(gameNet)),
         poolEntries,
         poolSpent: toUSDTString(poolSpent),
+        poolReturned: toUSDTString(returned),
+        poolNet: toUSDTString(returned.minus(poolSpent)),
         gameBets: recentGames.reduce((a, g) => a + g.bets, 0),
+        simWagered: toUSDTString(simWagered),
+        simNet: toUSDTString(simNet),
       },
       isDemo: activeRounds.some((r) => r.isDemo),
     };

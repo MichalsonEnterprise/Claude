@@ -48,7 +48,7 @@ export interface ResolvedNotificationCategory {
 
 function asPrefs(value: Prisma.JsonValue | null | undefined): StoredPreferences {
   return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as StoredPreferences)
+    ? (value)
     : {};
 }
 
@@ -195,7 +195,7 @@ export class AccountService {
     await this.prisma.userProfile.update({
       where: { userId },
       data: {
-        preferences: { ...prefs, notifications } as Prisma.InputJsonObject,
+        preferences: { ...prefs, notifications },
         marketingOptIn,
         marketingOptInAt: marketingOptIn ? new Date() : null,
       },
