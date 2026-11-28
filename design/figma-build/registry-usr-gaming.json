@@ -1,27 +1,119 @@
 {
- "_note": "USR-G1..G7 Gaming (agent key: usr-gaming). No new library components were created: every screen is composed from existing instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Nav/Breadcrumb, Tabs/Underline, Tabs/Pill, Table/*, Jackpot/*, Card/*, Tile/Game Generic, RG/Session Bar, Nav/Mobile Tab Bar ...). Entries below are SCREEN FRAMES (type FRAME) for page-index links. Desktop frames: page '05 — User Dashboard', section 'USR-G1..G7 Gaming' (32:97624) at X=12000,Y=0. Mobile frames: page '10 — Mobile Experience', section 'USR — Mobile B' (34:432314) at X=98000,Y=0. Pieces built inline from tokens (no library component existed): Export dialog body (Modal/Base slot is fixed), filter popovers, settlement timeline, settlement receipt card, mobile bet/game list rows, mobile session strip.",
- "Section/USR-G1..G7 Gaming": { "id": "32:97624", "type": "SECTION" },
- "Section/USR — Mobile B": { "id": "34:432314", "type": "SECTION" },
- "[USR-G1] My Games / 1440 / Default": { "id": "34:411209", "type": "FRAME" },
- "[USR-G2] My Entries / 1440 / Default": { "id": "32:97641", "type": "FRAME" },
- "[USR-G2] My Entries / 1440 / Empty": { "id": "32:116296", "type": "FRAME" },
- "[USR-G2] My Entries / 1440 / Filters": { "id": "33:146972", "type": "FRAME" },
- "[USR-G3] My Active Rounds / 1440 / Live": { "id": "33:175611", "type": "FRAME" },
- "[USR-G3] My Active Rounds / 1440 / Empty": { "id": "33:198857", "type": "FRAME" },
- "[USR-G4] My Results / 1440 / Default": { "id": "33:222628", "type": "FRAME" },
- "[USR-G5] My Winnings / 1440 / Owed": { "id": "33:253282", "type": "FRAME" },
- "[USR-G5] My Winnings / 1440 / Settled": { "id": "33:277301", "type": "FRAME" },
- "[USR-G6] Game History / 1440 / Default": { "id": "33:308312", "type": "FRAME" },
- "[USR-G6] Game History / 1440 / Filters": { "id": "34:327461", "type": "FRAME" },
- "[USR-G6] Game History / 1440 / Export": { "id": "34:342896", "type": "FRAME" },
- "[USR-G7] Favourites / 1440 / Default": { "id": "34:370504", "type": "FRAME" },
- "[USR-G7] Favourites / 1440 / Empty": { "id": "34:389924", "type": "FRAME" },
- "[USR-G2] My Entries / 390 / Default": { "id": "34:432315", "type": "FRAME" },
- "[USR-G2] My Entries / 390 / Empty": { "id": "34:448425", "type": "FRAME" },
- "[USR-G3] My Active Rounds / 390 / Live": { "id": "34:475816", "type": "FRAME" },
- "[USR-G3] My Active Rounds / 390 / Empty": { "id": "34:486169", "type": "FRAME" },
- "[USR-G4] My Results / 390 / Default": { "id": "34:503168", "type": "FRAME" },
- "[USR-G5] My Winnings / 390 / Owed": { "id": "36:514932", "type": "FRAME" },
- "[USR-G5] My Winnings / 390 / Settled": { "id": "36:524169", "type": "FRAME" },
- "[USR-G6] Game History / 390 / Default": { "id": "36:535016", "type": "FRAME" }
+ "_note": "USR-G1..G7 Gaming (agent key: usr-gaming). No new library components were created: every screen is composed from existing instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Nav/Breadcrumb, Tabs/Underline, Tabs/Pill, Table/*, Jackpot/*, Card/*, Tile/Game Generic, RG/Session Bar, Nav/Mobile Tab Bar ...). Entries below are SCREEN FRAMES (type FRAME) for page-index links. Desktop frames: page '05 — User Dashboard', section 'USR-G1..G7 Gaming' (32:97624) at X=12000,Y=0. Mobile frames: page '10 — Mobile Experience', section 'USR — Mobile B' (34:432314) at X=98000,Y=0. Pieces built inline from tokens (no library component existed): Export dialog body (Modal/Base slot is fixed), filter popovers, settlement timeline, settlement receipt card, mobile bet/game list rows, mobile session strip. Continuation 28 Nov 2026: added G1 390 Default, G7 390 Default/Empty, G2 390 Filters (bottom sheet) and G6 390 Export (bottom sheet); scripts in pending/usr-gaming.",
+ "Section/USR-G1..G7 Gaming": {
+  "id": "32:97624",
+  "type": "SECTION"
+ },
+ "Section/USR — Mobile B": {
+  "id": "34:432314",
+  "type": "SECTION"
+ },
+ "[USR-G1] My Games / 1440 / Default": {
+  "id": "34:411209",
+  "type": "FRAME"
+ },
+ "[USR-G2] My Entries / 1440 / Default": {
+  "id": "32:97641",
+  "type": "FRAME"
+ },
+ "[USR-G2] My Entries / 1440 / Empty": {
+  "id": "32:116296",
+  "type": "FRAME"
+ },
+ "[USR-G2] My Entries / 1440 / Filters": {
+  "id": "33:146972",
+  "type": "FRAME"
+ },
+ "[USR-G3] My Active Rounds / 1440 / Live": {
+  "id": "33:175611",
+  "type": "FRAME"
+ },
+ "[USR-G3] My Active Rounds / 1440 / Empty": {
+  "id": "33:198857",
+  "type": "FRAME"
+ },
+ "[USR-G4] My Results / 1440 / Default": {
+  "id": "33:222628",
+  "type": "FRAME"
+ },
+ "[USR-G5] My Winnings / 1440 / Owed": {
+  "id": "33:253282",
+  "type": "FRAME"
+ },
+ "[USR-G5] My Winnings / 1440 / Settled": {
+  "id": "33:277301",
+  "type": "FRAME"
+ },
+ "[USR-G6] Game History / 1440 / Default": {
+  "id": "33:308312",
+  "type": "FRAME"
+ },
+ "[USR-G6] Game History / 1440 / Filters": {
+  "id": "34:327461",
+  "type": "FRAME"
+ },
+ "[USR-G6] Game History / 1440 / Export": {
+  "id": "34:342896",
+  "type": "FRAME"
+ },
+ "[USR-G7] Favourites / 1440 / Default": {
+  "id": "34:370504",
+  "type": "FRAME"
+ },
+ "[USR-G7] Favourites / 1440 / Empty": {
+  "id": "34:389924",
+  "type": "FRAME"
+ },
+ "[USR-G2] My Entries / 390 / Default": {
+  "id": "34:432315",
+  "type": "FRAME"
+ },
+ "[USR-G2] My Entries / 390 / Empty": {
+  "id": "34:448425",
+  "type": "FRAME"
+ },
+ "[USR-G3] My Active Rounds / 390 / Live": {
+  "id": "34:475816",
+  "type": "FRAME"
+ },
+ "[USR-G3] My Active Rounds / 390 / Empty": {
+  "id": "34:486169",
+  "type": "FRAME"
+ },
+ "[USR-G4] My Results / 390 / Default": {
+  "id": "34:503168",
+  "type": "FRAME"
+ },
+ "[USR-G5] My Winnings / 390 / Owed": {
+  "id": "36:514932",
+  "type": "FRAME"
+ },
+ "[USR-G5] My Winnings / 390 / Settled": {
+  "id": "36:524169",
+  "type": "FRAME"
+ },
+ "[USR-G6] Game History / 390 / Default": {
+  "id": "36:535016",
+  "type": "FRAME"
+ },
+ "[USR-G1] My Games / 390 / Default": {
+  "id": "149:124836",
+  "type": "FRAME"
+ },
+ "[USR-G7] Favourites / 390 / Default": {
+  "id": "151:63647",
+  "type": "FRAME"
+ },
+ "[USR-G7] Favourites / 390 / Empty": {
+  "id": "151:64719",
+  "type": "FRAME"
+ },
+ "[USR-G2] My Entries / 390 / Filters": {
+  "id": "152:64961",
+  "type": "FRAME"
+ },
+ "[USR-G6] Game History / 390 / Export": {
+  "id": "152:65321",
+  "type": "FRAME"
+ }
 }

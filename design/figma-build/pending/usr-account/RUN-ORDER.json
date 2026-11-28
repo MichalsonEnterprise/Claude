@@ -1,0 +1,32 @@
+{
+ "slice": "usr-account",
+ "status_28nov_0215": "Desktop: all 20 frames exist (built by the interrupted earlier run) in section 32:72712 on page 05 - D1..D7 are NOT needed (they skip by exact name, but the earlier run used different state names, so DO NOT run them: they would add duplicates). Mobile: 4 frames exist in 'USR — Mobile C' 34:484195 (A1 Edit, A2, A3 Manage (On), A3 Enable). Run M1, M2, M3 for the 11 missing mobile frames, then R1 to fix the desktop section overlap.",
+ "how": "Pass the FULL content of each out/<file> as use_figma code (fileKey QHF8iRUMFgGMcEn3bD25jl, sessionId 55ee4abe-3cf3-4b8a-9391-56f6bca3e3ce, skillNames 'figma-use,figma-generate-design'). Idempotent: frames whose exact name exists are skipped.",
+ "order": [
+  {
+   "file": "out/F3_mobile_a8_sessions.README.txt",
+   "page": "10 — Mobile Experience",
+   "note": "pending only if the agent report says F3 not applied"
+  },
+  {
+   "file": "out/V1_V3_verify.js",
+   "note": "run with the V3 ids"
+  },
+  {
+   "file": "out/V1_V3_verify.js",
+   "note": "run with ids 34:484196, 34:495793, 36:510785, 36:537760 (mobile, earlier run)"
+  }
+ ],
+ "not_needed": [
+  "out/D1_a1.js",
+  "out/D2_a2_a3.js",
+  "out/D3_a3_states.js",
+  "out/D4_a4_kyc.js",
+  "out/D5_a5_a6.js",
+  "out/D6_a7_a8.js",
+  "out/D7_a9_a10.js",
+  "out/P0_probe.js"
+ ],
+ "status_28nov_0240": "DONE: M1, M2, M3 (11 mobile frames, ids in registry-usr-account.json), R1 (desktop re-band, section 7,920 x 13,890). Verified by screenshot: all 15 mobile frames' new ones + desktop A1 Edit/Saved, A2, A3 Manage/Disable/Enable/Reset, A4 Not started/Pending/Approved. Remaining (read-only/minor): out/V1_V3_verify.js with the V2 and V3 id lists (A4 Rejected/Expired, A5, A6, A7 x2, A8 x2, A9, A10), and out/F1_mobile_otp_icon.js (hide a leftover timer icon under the OTP in 155:87455 + screenshot the earlier run's 4 mobile frames).",
+ "status_28nov_0300": "F2 done: mobile A5 now lists 4 documents like desktop A5 (passport, selfie, utility bill, rejected national ID), OTP timer row hidden in the 2FA disable sheet. Remaining read-only: V3 ids (A7 Revoke, A8 x2, A9, A10 desktop) and a screenshot pass over the earlier run's 4 mobile frames (34:484196, 34:495793, 36:510785, 36:537760)."
+}

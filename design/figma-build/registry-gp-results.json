@@ -24,5 +24,29 @@
  "[GP-12] Provably Fair verification / 1440 / Failed — value mismatch": {
   "id": "76:21087"
  },
- "_pending": "Not built (Figma MCP rate limit, stopped after 3 consecutive failures per conventions §10): page '10 — Mobile Experience' section 'GP — Mobile B' (X=168000,Y=0) frames [GP-05] 390 Drawing + Delayed, [GP-06] 390 Win + Not selected, [GP-07] 390 Default, [GP-12] 390 Verified + Failed; plus hiding the default Input/Text helper text on 76:20293 / 76:21087. Ready batched scripts: scratchpad gp0507/mb1.js, mb2.js, mb3.js."
+ "Section/GP — Mobile B": {
+  "id": "151:65122"
+ },
+ "[GP-05] Round Drawing / 390 / Drawing — VRF fulfilled, settling": {
+  "id": "151:66521"
+ },
+ "[GP-05] Round Drawing / 390 / Delayed — VRF response overdue": {
+  "id": "151:66817"
+ },
+ "[GP-06] Round Result — winner view / 390 / Win — illustrative outcome": {
+  "id": "152:65592"
+ },
+ "[GP-06] Round Result — winner view / 390 / Not selected": {
+  "id": "152:65942"
+ },
+ "[GP-07] Round Result — public view / 390 / Default": {
+  "id": "153:66253"
+ },
+ "[GP-12] Provably Fair verification / 390 / Verified": {
+  "id": "153:66888"
+ },
+ "[GP-12] Provably Fair verification / 390 / Failed — value mismatch": {
+  "id": "153:67227"
+ },
+ "_mobile_note": "Continuation run 28 Nov 2026: 7 mobile 390 frames built on page '10 — Mobile Experience' section 'GP — Mobile B' (151:65122, X=168000,Y=0). Columns: GP-05 x=120, GP-06 x=630, GP-07 x=1140, GP-12 x=1650 (states stacked below). Pattern: Notice/Demo Data with short message (decision #29), Shell/Topbar Mobile, back + H5 title + status badge, angled-block banner with cropped Jackpot/Entry Ticket, stacked cards, wrapping compliance strip (Notice/Licence Compact + 18+ + RG + Round rules), sticky CTA bar, Nav/Mobile Tab Bar (Active=Pool). GP-07 is a guest view with Shell/Footer Mega Mobile."
 }

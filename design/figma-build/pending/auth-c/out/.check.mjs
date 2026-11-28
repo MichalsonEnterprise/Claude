@@ -89,132 +89,93 @@ async function BADGE(status, size = 'S') { return await I('6:119', { Status: sta
 function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n => n.type === 'SECTION' && n.name === name); if (!s) { s = figma.createSection(); s.name = name; s.x = x; s.y = y; s.fills = [paint('bg/secondary')]; } return s; }
 // ===== END GP HELPERS =====
 
-// ===== KYC DESKTOP LIB (AUTH-11..17) — paste AFTER helpers.js =====
-const PG = figma.root.children.find(p => p.name === '04 — Authentication'); await figma.setCurrentPageAsync(PG);
-const sec = section('AUTH-11..17 KYC', 24000, 0);
+// ===== KYC MOBILE LIB (AUTH-11..17, page 10) — paste AFTER helpers.js =====
+const PG = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(PG);
+const sec = section('AUTH — Mobile C', 77000, 0);
 const LBL = ['Intro', 'Details', 'Document', 'Liveness', 'Review'];
 async function setT(root, name, s, i = 0) { const t = root.findAll(n => n.type === 'TEXT' && n.name === name)[i]; if (!t) return null; for (const f of t.getRangeAllFontNames(0, t.characters.length)) await figma.loadFontAsync(f); t.characters = s; return t; }
 async function tx(p, s, st = 'Body/S', c = 'text/secondary', fw = true) { const t = await T(s, st, c, { w: 100 }); p.appendChild(t); if (fw) t.layoutSizingHorizontal = 'FILL'; return t; }
 function box(p, dir, o = {}, mode = 'FILL') { const b = AL(dir, o); p.appendChild(b); if (mode === 'FILL') b.layoutSizingHorizontal = 'FILL'; return b; }
 async function li(p, icon, s, o = {}) { const r = box(p, 'HORIZONTAL', { name: o.name || 'Item — ' + s.slice(0, 32), gap: o.gap ?? 10 }); r.appendChild(await IC(icon, o.is || 18, o.ic || 'icon/brand')); await tx(r, s, o.st || 'Body/S', o.c || 'text/secondary'); return r; }
-async function stepper(p, cur, o = {}) { const r = box(p, 'HORIZONTAL', { name: 'Stepper — Intro → Details → Document → Liveness → Review' }); for (let i = 0; i < 5; i++) { const st = o.err === i ? 'Error' : (o.done || i < cur) ? 'Complete' : i === cur ? 'Current' : 'Upcoming'; const s = await I('14:1193', { State: st }, { Number: String(i + 1), Label: LBL[i], 'Show leading line': i > 0, 'Show trailing line': i < 4 }); r.appendChild(s); s.layoutSizingHorizontal = 'FILL'; } return r; }
 function R(p, x, y, w, h, c, r = 0, nm = 'Shape') { const n = rect(w, h, c, r, nm); p.appendChild(n); n.x = x; n.y = y; return n; }
 function E(p, x, y, w, h, c, nm = 'Shape') { const n = ellipse(w, h, c, nm); p.appendChild(n); n.x = x; n.y = y; return n; }
 async function TT(p, x, y, s, st, c) { const t = await T(s, st, c); p.appendChild(t); t.x = x; t.y = y; return t; }
-function band(p, y, c, h = 120, rot = -14) { const b = R(p, -80, y, 560, h, c, 0, 'Angled colour block'); b.rotation = rot; return b; }
+function band(p, y, c, h = 120, rot = -14) { const b = R(p, -80, y, 600, h, c, 0, 'Angled colour block'); b.rotation = rot; return b; }
 async function idCard(p, x, y, rot, o = {}) { const c = figma.createFrame(); c.name = 'Illustration — ID card ' + (o.back ? 'back' : 'front') + ' (DEMO)'; c.resize(240, 152); fill(c, 'paper/50'); radius(c, 14); c.clipsContent = true; p.appendChild(c);
   R(c, 0, 0, 240, 28, 'mint/600', 0, 'Header band'); await TT(c, 14, 7, o.back ? 'IDENTITY CARD · BACK' : 'IDENTITY CARD', 'Overline', 'text/on-primary');
   if (!o.back) { R(c, 14, 40, 62, 78, 'paper/200', 6, 'Photo'); E(c, 31, 50, 28, 32, 'paper/600', 'Head'); R(c, 21, 86, 48, 32, 'paper/600', 14, 'Shoulders'); await TT(c, 90, 38, 'KARLSSON', 'Label/M', 'ink/800'); await TT(c, 90, 56, 'NOVA', 'Label/S', 'ink/600'); R(c, 90, 80, 96, 6, 'paper/300', 4); R(c, 90, 92, 120, 6, 'paper/300', 4); R(c, 90, 104, 70, 6, 'paper/300', 4); R(c, 194, 40, 32, 24, 'paper/300', 4, 'Chip'); }
   else { for (let i = 0; i < 18; i++) R(c, 14 + i * 7, 40, i % 3 ? 3 : 5, 34, 'ink/700', 0, 'Barcode'); R(c, 150, 40, 76, 6, 'paper/300', 4); R(c, 150, 52, 60, 6, 'paper/300', 4); R(c, 150, 64, 70, 6, 'paper/300', 4); await TT(c, 14, 112, 'KARLSSON<<NOVA<<<<<<<<', 'Mono/S', 'ink/600'); }
   await TT(c, 14, o.back ? 92 : 124, 'IDPRT0004821<<<<<<<<<', 'Mono/S', 'ink/600');
-  if (o.hl) { const h = R(c, 84, 34, 112, 40, null, 6, 'Highlight — name'); stroke(h, 'brand/primary', 2); }
   c.x = x; c.y = y; c.rotation = rot; return c; }
-async function passport(p, x, y, rot) { const c = figma.createFrame(); c.name = 'Illustration — passport (DEMO)'; c.resize(150, 200); fill(c, 'mint/800'); radius(c, 10); c.clipsContent = true; p.appendChild(c); R(c, 0, 0, 14, 200, 'mint/900', 0, 'Spine'); const g = await IC('globe', 64, 'mint/400'); c.appendChild(g); g.x = 50; g.y = 62; await TT(c, 44, 26, 'PASSPORT', 'Overline', 'mint/400'); c.x = x; c.y = y; c.rotation = rot; return c; }
-async function dialog(o) {
-  const d = AL('HORIZONTAL', { name: 'KYC dialog', fill: 'surface/overlay', stroke: 'border/subtle', r: 20, clip: true }); await fx(d, 'Elevation/4 — Modal');
-  const side = AL('VERTICAL', { name: 'Context panel', fill: 'bg/secondary', w: 340 }); strokeSides(side, 'border/subtle', { r: 1 }); d.appendChild(side); side.layoutSizingVertical = 'FILL';
-  const sp = box(side, 'VERTICAL', { name: 'Panel copy', gap: 12, p: [32, 32, 24, 32] }); sp.appendChild(await I('4:797'));
-  const sq = box(sp, 'VERTICAL', { name: 'Panel heading', gap: 8, p: [12, 0, 0, 0] }); await tx(sq, o.over, 'Overline', 'text/brand'); await tx(sq, o.st, 'Heading/H4', 'text/primary'); if (o.sb) await tx(sq, o.sb, 'Body/S', 'text/secondary');
-  const art = figma.createFrame(); art.name = 'Art — ' + o.artName; art.resize(340, 230); art.clipsContent = true; fill(art, 'bg/secondary'); side.appendChild(art); art.layoutSizingHorizontal = 'FILL'; await o.art(art); const db = await DEMO('XS'); art.appendChild(db); db.x = 340 - 47 - 16; db.y = 12;
-  const fs = box(side, 'VERTICAL', { name: 'Panel facts', gap: 14, p: [24, 32, 24, 32] }); for (const [ic, s] of o.facts) await li(fs, ic, s);
-  const gr = box(side, 'VERTICAL', { name: 'Spacer' }); gr.layoutSizingVertical = 'FILL';
-  const ft = box(side, 'VERTICAL', { name: 'Panel footer', gap: 12, p: [20, 32, 28, 32] }); strokeSides(ft, 'border/subtle', { t: 1 });
-  await li(ft, 'lock', 'Encrypted in transit and at rest. Used only for identity verification and AML checks.', { ic: 'icon/muted', is: 16, st: 'Caption', c: 'text/tertiary' });
-  const lr = box(ft, 'HORIZONTAL', { name: 'Licence & 18+', gap: 8, align: 'CENTER' }, 'HUG'); lr.appendChild(await I('6:159')); lr.appendChild(await I('6:158', { Variant: 'Compact' }));
-  const main = AL('VERTICAL', { name: 'Main', w: 740, gap: 24, p: [28, 40, 32, 40] }); d.appendChild(main);
-  const hd = box(main, 'HORIZONTAL', { name: 'Header', gap: 12, align: 'CENTER' }); hd.appendChild(await T('Identity verification', 'Heading/H5', 'text/primary')); hd.appendChild(await I('23:5565', { Status: o.chip[0], Level: o.chip[1] })); box(hd, 'HORIZONTAL', { name: 'Spacer', h: 1 });
-  hd.appendChild(await BTN('Ghost', 'Help', { size: 'S', lead: 'help-circle' })); const cl = await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS.x }); cl.name = 'Button/Icon — Close'; hd.appendChild(cl);
-  if (o.step != null) await stepper(main, o.step, o.so || {});
-  return { d, side, main };
+async function artBanner(p, name, h, draw) { const a = figma.createFrame(); a.name = 'Art — ' + name; a.resize(358, h); fill(a, 'surface/raised'); radius(a, 14); a.clipsContent = true; p.appendChild(a); a.layoutSizingHorizontal = 'FILL'; await draw(a); const db = await DEMO('XS'); a.appendChild(db); db.x = 358 - 47 - 12; db.y = 12; return a; }
+// mobile screen: DEMOBAR → Shell/Topbar Mobile (Member) → flow header (back, title, KYC chip, step progress) → content
+async function mscreen(name, col, o = {}) {
+  const xs = 120 + col * 510; let ys = 440; for (const c of sec.children) if (Math.abs(c.x - xs) < 2) ys = Math.max(ys, c.y + c.height + 160);
+  const f = await screen(name, 390, {}); sec.appendChild(f); f.x = xs; f.y = ys;
+  const bar = await DEMOBAR('DEMO DATA — illustrative values only'); f.appendChild(bar); bar.layoutSizingHorizontal = 'FILL';
+  const tb = await I('23:12908', { State: 'Member' }); f.appendChild(tb); tb.layoutSizingHorizontal = 'FILL';
+  const sh = box(f, 'VERTICAL', { name: 'Flow header', gap: 10, p: [8, 16, 14, 8], fill: 'bg/secondary' }); strokeSides(sh, 'border/subtle', { b: 1 });
+  const r = box(sh, 'HORIZONTAL', { name: 'Title row', gap: 4, align: 'CENTER' }); const bk = await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] }); bk.name = 'Button/Icon — Back (44)'; r.appendChild(bk);
+  await tx(r, 'Verification', 'Label/L', 'text/primary'); r.appendChild(await I('23:5565', { Status: o.chip[0], Level: o.chip[1] }));
+  if (o.step != null) { const pg = box(sh, 'VERTICAL', { name: 'Step progress (5 steps)', gap: 8, p: [0, 0, 0, 8] }); const pr = box(pg, 'HORIZONTAL', { name: 'Labels', gap: 8 }); await tx(pr, 'Step ' + (o.step + 1) + ' of 5 · ' + LBL[o.step], 'Label/M', 'text/brand'); pr.appendChild(await T(o.step < 4 ? 'Next: ' + LBL[o.step + 1] : 'Last step', 'Caption', 'text/tertiary'));
+    const sg = box(pg, 'HORIZONTAL', { name: 'Segments', gap: 4 }); for (let i = 0; i < 5; i++) { const s = rect(10, 4, o.err === i ? 'status/danger' : i <= o.step ? 'brand/primary' : 'border/default', 9999, 'Segment ' + (i + 1) + ' — ' + LBL[i]); sg.appendChild(s); s.layoutSizingHorizontal = 'FILL'; } }
+  const body = box(f, 'VERTICAL', { name: 'Content', gap: 20, p: [20, 16, 24, 16] });
+  return { f, body };
 }
-async function footer(main, left, note, right) { const f = box(main, 'HORIZONTAL', { name: 'Footer actions', gap: 16, align: 'CENTER', p: [20, 0, 0, 0] }); strokeSides(f, 'border/subtle', { t: 1 }); for (const n of left) f.appendChild(n); const t = await tx(f, note || ' ', 'Caption', 'text/tertiary'); t.textAlignHorizontal = 'RIGHT'; for (const n of right) f.appendChild(n); return f; }
-async function shell(name, col, d) {
-  const xs = 120 + col * 1560; let ys = 440; for (const c of sec.children) if (Math.abs(c.x - xs) < 2) ys = Math.max(ys, c.y + c.height + 160);
-  const f = await screen(name, 1440, {}); sec.appendChild(f); f.x = xs; f.y = ys;
-  const bar = await DEMOBAR(); f.appendChild(bar); bar.layoutSizingHorizontal = 'FILL';
-  const sdc = d.children[0], mn = d.children[1]; const need = sdc.children.filter(c => c.name !== 'Spacer').reduce((a, c) => a + c.height, 0); if (need > mn.height) mn.minHeight = Math.ceil(need);
-  const H = Math.max(1024, Math.ceil(d.height) + 112);
-  const vp = AL('HORIZONTAL', { name: 'Viewport — member lobby behind KYC dialog', clip: true, w: 1440, h: H }); f.appendChild(vp);
-  const sb = await I('23:6697', { State: 'Expanded', Auth: 'Member' }); vp.appendChild(sb); sb.layoutSizingVertical = 'FILL';
-  const mc = AL('VERTICAL', { name: 'Main column', fill: 'bg/base', clip: true }); vp.appendChild(mc); mc.layoutSizingHorizontal = 'FILL'; mc.layoutSizingVertical = 'FILL';
-  const tb = await I('23:9832', { State: 'Member' }); mc.appendChild(tb); tb.layoutSizingHorizontal = 'FILL';
-  const lc = box(mc, 'VERTICAL', { name: 'Lobby content (dimmed)', gap: 24, p: [24, 32, 24, 32] });
-  for (const [id, v] of [['23:23986', {}], ['23:20415', {}], ['23:18243', { Layout: 'Fits' }]]) { const n = await I(id, v); lc.appendChild(n); n.layoutSizingHorizontal = 'FILL'; }
-  const sc = rect(1440, H, 'scrim/overlay', 0, 'Scrim'); f.appendChild(sc); sc.layoutPositioning = 'ABSOLUTE'; sc.x = 0; sc.y = bar.height;
-  f.appendChild(d); d.layoutPositioning = 'ABSOLUTE'; d.x = Math.round((1440 - d.width) / 2); d.y = Math.round(bar.height + (H - d.height) / 2);
+// sticky CTA bar (+ optional tab bar) then place + fit
+async function mfinish(f, o = {}) {
+  if (o.cta) { const s = box(f, 'VERTICAL', { name: 'Sticky CTA', gap: 10, p: [12, 16, o.tab ? 12 : 28, 16], fill: 'surface/default' }); strokeSides(s, 'border/subtle', { t: 1 }); if (o.note) { const t = await tx(s, o.note, 'Caption', 'text/tertiary'); t.textAlignHorizontal = 'CENTER'; } for (const b of o.cta) { s.appendChild(b); b.layoutSizingHorizontal = 'FILL'; } }
+  if (o.tab) { const t = await I('22:5413', { Active: 'Account' }); f.appendChild(t); t.layoutSizingHorizontal = 'FILL'; }
   fitSection(sec); return f;
 }
-// ===== END KYC LIB =====
+// ===== END KYC MOBILE LIB =====
 
-// ===== AUTH-17 Rejected (MODE: 'Reasons' | 'Resubmit') =====
+// ===== Mobile AUTH-15 Pending / AUTH-16 Approved / AUTH-17 Rejected (MODE 'Pending'|'Approved'|'Rejected'|'Resubmit') =====
 async function build(MODE) {
-  const NAME = 'AUTH-17 KYC Rejected / 1440 / ' + MODE;
+  const NAME = ({ Pending: 'AUTH-15 KYC Pending / 390 / Default', Approved: 'AUTH-16 KYC Approved / 390 / Default', Rejected: 'AUTH-17 KYC Rejected / 390 / Reasons', Resubmit: 'AUTH-17 KYC Rejected / 390 / Resubmit' })[MODE];
   if (sec.children.find(c => c.name === NAME)) return { skipped: NAME };
-  const RS = MODE === 'Resubmit';
 
-async function stamp(p, x, y, s, c, rot) { const b = AL('HORIZONTAL', { name: 'Stamp — ' + s, p: [8, 14, 8, 14], r: 6, stroke: c, sw: 3, fill: 'bg/secondary', gap: 6, align: 'CENTER' }); p.appendChild(b); b.appendChild(await T(s, 'Label/L', c)); b.x = x; b.y = y; b.rotation = rot; return b; }
-const { d, side, main } = await dialog(RS ? { over: 'Resubmission', st: 'Only 2 things to redo', sb: 'We kept everything that passed, so this takes about 3 minutes.', artName: 'ID card marked resubmit', chip: ['Rejected', 'L2'], step: 4, so: { err: 2 },
-    art: async (a) => { band(a, 118, 'mint/700', 160, -12); band(a, 94, 'brand/primary', 14, -12); await passport(a, 186, 30, 10); await idCard(a, 16, 90, -8); },
-    facts: [['check-circle', 'Selfie video — passed, kept'], ['check-circle', 'Date of birth and address — passed, kept'], ['clock', 'Review usually under 10 minutes, up to 24 h']] }
-  : { over: 'Level 2 · Not approved yet', st: 'You can fix this', sb: 'Most resubmissions are approved on the next try. Your Level 1 account keeps working meanwhile.', artName: 'ID card marked resubmit', chip: ['Rejected', 'L2'], step: 4, so: { err: 2 },
-    art: async (a) => { band(a, 118, 'mint/700', 160, -12); band(a, 94, 'brand/primary', 14, -12); await idCard(a, 40, 60, -6); await stamp(a, 156, 150, 'RESUBMIT', 'status/danger', 8); },
-    facts: [['check-circle', 'Only redo what failed — your selfie video passed'], ['clock', 'Resubmissions are reviewed in under 10 minutes, up to 24 h'], ['wallet', 'Deposits, play and withdrawals up to 2,000.00 USDT a day still work'], ['chat', 'Think we got it wrong? Ask a specialist to re-check']] });
-const tb = box(main, 'HORIZONTAL', { name: 'Status hero', gap: 16 });
-const it = AL('HORIZONTAL', { name: 'State icon', w: 56, h: 56, r: 14, fill: RS ? 'brand/tint' : 'status/danger-tint', justify: 'CENTER', align: 'CENTER' }); tb.appendChild(it); it.appendChild(await IC(RS ? 'edit' : 'alert-triangle', 28, RS ? 'icon/brand' : 'status/danger'));
-const hc = box(tb, 'VERTICAL', { name: 'Copy', gap: 6 });
-const ol = box(hc, 'HORIZONTAL', { name: 'Overline row', gap: 8, align: 'CENTER' }); ol.appendChild(await T(RS ? 'Fix and resubmit · reference KYC-48213-1127' : 'Reviewed 27 Nov 2026, 17:21 UTC · reference KYC-48213-1127', 'Overline', RS ? 'text/brand' : 'text/danger')); ol.appendChild(await DEMO('XS'));
-await tx(hc, RS ? 'Fix 2 items and submit again' : 'We couldn’t verify your ID yet', 'Heading/H3', 'text/primary');
-await tx(hc, RS ? 'Your last name and a valid document. Everything else from your first submission is kept.' : 'We found 3 issues with the document you sent. Fix them and resubmit — it takes about 3 minutes.', 'Body/M', 'text/secondary');
-if (!RS) {
-  const rl = box(main, 'VERTICAL', { name: 'Reasons (category + what we found + how to fix)', gap: 12 });
-  for (const [ic, cat, found, fix, act] of [
-    ['calendar', 'Document expired', 'The national ID card expired on 02 Jan 2026. We can only accept documents that are valid on the day you submit.', 'Upload a valid document. If your ID card is being renewed, your passport or driving licence works too.', 'Upload a different document'],
-    ['eye-off', 'Photo too blurry', 'The back of the card was out of focus, so the document number and the machine-readable lines couldn’t be read.', 'Lay the card flat on a dark surface, turn the flash off and tap to focus before you take the photo.', 'See photo tips'],
-    ['user-x', 'Name doesn’t match', 'The document shows KARLSSON-SILVA, but your profile says Karlsson.', 'If your legal name has changed, update your last name to match your ID. We re-check it automatically.', 'Edit personal details']]) {
-    const c = box(rl, 'HORIZONTAL', { name: 'Reason — ' + cat, gap: 16, p: 16, fill: 'surface/default', stroke: 'border/subtle', r: 14 });
-    const t = AL('HORIZONTAL', { name: 'Icon', w: 40, h: 40, r: 10, fill: 'status/danger-tint', justify: 'CENTER', align: 'CENTER' }); c.appendChild(t); t.appendChild(await IC(ic, 20, 'status/danger'));
-    const cc = box(c, 'VERTICAL', { name: 'Copy', gap: 6 }); const h = box(cc, 'HORIZONTAL', { name: 'Head', gap: 8, align: 'CENTER' }); h.appendChild(await T(cat, 'Label/L', 'text/primary')); const bd = await BADGE('Rejected', 'S'); await setT(bd, 'Label', 'Needs fixing'); h.appendChild(bd);
-    await tx(cc, found, 'Body/S', 'text/secondary');
-    const fx3 = box(cc, 'HORIZONTAL', { name: 'How to fix', gap: 8, p: [10, 12, 10, 12], fill: 'surface/raised', r: 10 }); fx3.appendChild(await IC('wrench', 16, 'icon/brand')); const fc = box(fx3, 'VERTICAL', { name: 'Copy', gap: 2 }); await tx(fc, 'How to fix', 'Label/S', 'text/brand'); await tx(fc, fix, 'Body/S', 'text/primary');
-    cc.appendChild(await T(act + ' →', 'Label/M', 'text/brand'));
-  }
-  const ps = box(main, 'HORIZONTAL', { name: 'What passed', gap: 16, align: 'CENTER', wrap: true, cgap: 8 }); ps.appendChild(await T('Passed:', 'Label/M', 'text/tertiary'));
-  for (const s of ['Selfie video', 'Date of birth', 'Address', 'Sanctions & PEP screening']) { const r = box(ps, 'HORIZONTAL', { name: 'Passed — ' + s, gap: 6, align: 'CENTER' }, 'HUG'); r.appendChild(await IC('check-circle', 16, 'status/success')); r.appendChild(await T(s, 'Label/M', 'text/primary')); }
-  await footer(main, [await BTN('Ghost', 'Ask for a re-check', { size: 'L', lead: 'chat' })], 'Your Level 1 limits stay active: up to 2,000.00 USDT a day.', [await BTN('Primary', 'Fix and resubmit', { size: 'L', trail: 'arrow-right' })]);
+const CFG = { Pending: { n: 'AUTH-15 KYC Pending / 390 / Default', col: 4, chip: ['Pending', 'L2'] }, Approved: { n: 'AUTH-16 KYC Approved / 390 / Default', col: 5, chip: ['Approved', 'L2'] }, Rejected: { n: 'AUTH-17 KYC Rejected / 390 / Reasons', col: 6, chip: ['Rejected', 'L2'] }, Resubmit: { n: 'AUTH-17 KYC Rejected / 390 / Resubmit', col: 6, chip: ['Rejected', 'L2'] } }[MODE];
+const { f, body } = await mscreen(CFG.n, CFG.col, { chip: CFG.chip, step: MODE === 'Resubmit' ? 4 : null, err: MODE === 'Resubmit' ? 2 : null });
+async function hero(ic, bg, c, over, title, sub) { const h = box(body, 'VERTICAL', { name: 'Status hero', gap: 10 }); const it = AL('HORIZONTAL', { name: 'State icon', w: 56, h: 56, r: 14, fill: bg, justify: 'CENTER', align: 'CENTER' }); h.appendChild(it); it.appendChild(await IC(ic, 28, c)); const o = box(h, 'HORIZONTAL', { name: 'Overline row', gap: 8, align: 'CENTER' }); await tx(o, over, 'Overline', c === 'icon/brand' ? 'text/brand' : c); o.appendChild(await DEMO('XS')); await tx(h, title, 'Heading/H4', 'text/primary'); await tx(h, sub, 'Body/S', 'text/secondary'); }
+if (MODE === 'Pending') {
+  await hero('hourglass', 'status/pending-tint', 'status/pending', 'Pending review · 16:58 UTC', 'We’re reviewing your documents', 'Reference KYC-48213-1127. You don’t need to do anything else right now.');
+  const pc = box(body, 'VERTICAL', { name: 'Processing time', gap: 6, p: 16, fill: 'surface/default', stroke: 'border/subtle', r: 14 }); await tx(pc, 'Typical review time', 'Caption', 'text/tertiary'); await tx(pc, 'Under 10 min', 'Number/L', 'text/primary'); await tx(pc, 'Up to 24 h if a specialist needs to take a look. We review around the clock.', 'Caption', 'text/secondary');
+  const tr = box(body, 'VERTICAL', { name: 'Review progress (icon + label)', gap: 12, p: 16, fill: 'surface/default', stroke: 'border/subtle', r: 14 });
+  for (const [ic, c, h, s] of [['check-circle', 'status/success', 'Submitted', '16:58 UTC · details, ID card and video'], ['spinner', 'status/pending', 'Automated checks — in progress', 'Document, face match, sanctions and PEP'], ['clock', 'icon/muted', 'Specialist review — only if needed', 'When the automated result is unclear'], ['mail', 'icon/muted', 'Decision', 'By email and in-app notification']]) { const r = box(tr, 'HORIZONTAL', { name: 'Step — ' + h, gap: 10 }); r.appendChild(await IC(ic, 18, c)); const rc = box(r, 'VERTICAL', { name: 'Copy', gap: 2 }); await tx(rc, h, 'Label/M', c === 'icon/muted' ? 'text/secondary' : 'text/primary'); await tx(rc, s, 'Caption', 'text/tertiary'); }
+  const al = await I('30:17116', { Type: 'Info', Layout: 'Inline' }); al.name = 'Alert/Banner — keep playing on Level 1'; body.appendChild(al); al.layoutSizingHorizontal = 'FILL'; await setT(al, 'Title', 'Keep playing while we check'); await setT(al, 'Body', 'Level 1 limits apply until we finish: up to 2,000.00 USDT a day.'); await setT(al, 'Label', 'View my limits');
+  await li(body, 'bell', 'We’ll notify you here and email n•••@example.com. You can close this screen.', { ic: 'icon/muted', st: 'Caption', c: 'text/tertiary' });
+  await mfinish(f, { cta: [await BTN('Primary', 'Back to lobby', { size: 'L' })], tab: true });
+} else if (MODE === 'Approved') {
+  await artBanner(body, 'Verified shield', 150, async (a) => { band(a, 92, 'mint/700', 150, -12); band(a, 70, 'brand/primary', 12, -12); await idCard(a, 18, 70, -10); const s = await I('23:10035', { Motif: 'Shield' }); a.appendChild(s); s.rescale(0.875); s.x = 196; s.y = 6; });
+  await hero('shield-check', 'status/success-tint', 'status/success', 'Approved · 17:06 UTC', 'You’re verified — Level 2', 'Thanks, Nova. Your higher limits are active now.');
+  const lh = box(body, 'HORIZONTAL', { name: 'Head', gap: 8, align: 'CENTER' }); await tx(lh, 'Your new daily limits', 'Heading/H5', 'text/primary'); lh.appendChild(await DEMO('S'));
+  for (const [ic, h] of [['deposit', 'Deposits per day'], ['withdraw', 'Withdrawals per day']]) { const c = box(body, 'VERTICAL', { name: 'Limit — ' + h, gap: 6, p: 16, fill: 'surface/default', stroke: 'border/success', r: 14 }); const r = box(c, 'HORIZONTAL', { name: 'Label', gap: 8, align: 'CENTER' }); r.appendChild(await IC(ic, 18, 'icon/brand')); await tx(r, h, 'Label/M', 'text/secondary'); await tx(c, '25,000.00 USDT', 'Number/L', 'text/primary'); await li(c, 'trending-up', 'Up from 2,000.00 USDT on Level 1', { ic: 'status/success', is: 16, st: 'Caption', c: 'text/success' }); }
+  const rg = box(body, 'VERTICAL', { name: 'Responsible gaming note', gap: 6, p: 16, fill: 'status/info-tint', r: 14 }); await li(rg, 'sliders', 'Your own limits haven’t changed', { ic: 'status/info', st: 'Label/L', c: 'text/primary' }); await tx(rg, 'Deposit limit 5,000.00 USDT a week and daily loss limit 200.00 USDT still apply.', 'Body/S', 'text/secondary'); rg.appendChild(await T('Review in Responsible gaming', 'Label/M', 'text/brand'));
+  await li(body, 'layers', 'Need more than 25,000.00 USDT a day? Level 3 — Enhanced is available on request.', { ic: 'icon/muted', st: 'Caption', c: 'text/tertiary' });
+  await mfinish(f, { cta: [await BTN('Primary', 'Go to wallet', { size: 'L', lead: 'wallet' })], note: 'Confirmation sent to n•••@example.com.', tab: true });
+} else if (MODE === 'Rejected') {
+  await hero('alert-triangle', 'status/danger-tint', 'status/danger', 'Reviewed 17:21 UTC · KYC-48213-1127', 'We couldn’t verify your ID yet', '3 issues with the document you sent. Fix them and resubmit — about 3 minutes.');
+  for (const [ic, cat, found, fix] of [['calendar', 'Document expired', 'Your ID card expired on 02 Jan 2026.', 'Upload a valid document — a passport or driving licence works too.'], ['eye-off', 'Photo too blurry', 'The back of the card was out of focus.', 'Card flat on a dark surface, flash off, tap to focus.'], ['user-x', 'Name doesn’t match', 'Document: KARLSSON-SILVA · profile: Karlsson.', 'Update your last name to match your ID.']]) {
+    const c = box(body, 'VERTICAL', { name: 'Reason — ' + cat, gap: 8, p: 14, fill: 'surface/default', stroke: 'border/subtle', r: 14 }); const h = box(c, 'HORIZONTAL', { name: 'Head', gap: 10, align: 'CENTER' }); const t = AL('HORIZONTAL', { name: 'Icon', w: 36, h: 36, r: 10, fill: 'status/danger-tint', justify: 'CENTER', align: 'CENTER' }); h.appendChild(t); t.appendChild(await IC(ic, 18, 'status/danger')); await tx(h, cat, 'Label/L', 'text/primary');
+    await tx(c, found, 'Body/S', 'text/secondary'); const fx3 = box(c, 'HORIZONTAL', { name: 'How to fix', gap: 8, p: [10, 12, 10, 12], fill: 'surface/raised', r: 10 }); fx3.appendChild(await IC('wrench', 16, 'icon/brand')); await tx(fx3, 'How to fix: ' + fix, 'Body/S', 'text/primary'); }
+  const ps = box(body, 'HORIZONTAL', { name: 'What passed', gap: 12, wrap: true, cgap: 8 }); for (const s of ['Selfie video', 'Date of birth', 'Address']) { const r = box(ps, 'HORIZONTAL', { name: 'Passed — ' + s, gap: 6, align: 'CENTER' }, 'HUG'); r.appendChild(await IC('check-circle', 16, 'status/success')); r.appendChild(await T(s, 'Label/M', 'text/primary')); }
+  await li(body, 'wallet', 'Your Level 1 limits stay active: up to 2,000.00 USDT a day.', { ic: 'icon/muted', st: 'Caption', c: 'text/tertiary' });
+  await mfinish(f, { cta: [await BTN('Primary', 'Fix and resubmit', { size: 'L', trail: 'arrow-right' }), await BTN('Ghost', 'Ask for a re-check', { size: 'L', lead: 'chat' })], tab: true });
 } else {
-  async function sect(n, title, badge) { const c = box(main, 'VERTICAL', { name: 'Item ' + n + ' — ' + title, gap: 12, p: 16, fill: 'surface/default', stroke: 'border/subtle', r: 14 }); const h = box(c, 'HORIZONTAL', { name: 'Head', gap: 10, align: 'CENTER' }); const b = AL('HORIZONTAL', { name: 'Number', w: 24, h: 24, r: 9999, fill: 'brand/tint', justify: 'CENTER', align: 'CENTER' }); h.appendChild(b); b.appendChild(await T(String(n), 'Label/S', 'text/brand')); await tx(h, title, 'Label/L', 'text/primary'); const bd = await BADGE(badge[0], 'S'); await setT(bd, 'Label', badge[1]); h.appendChild(bd); return c; }
-  const s1 = await sect(1, 'Update your last name', ['Approved', 'Fixed']);
-  const r1 = box(s1, 'HORIZONTAL', { name: 'Fields', gap: 20 });
-  for (const [lab, val, st, hp] of [['First name(s)', 'Nova', 'Filled', 'Unchanged'], ['Last name(s)', 'Karlsson-Silva', 'Success', 'Now matches your document']]) { const n = await I('13:762', { State: st, Size: 'M' }, { Label: lab, 'Show leading icon': false, 'Show trailing icon': false, 'Show helper': true }); n.name = 'Input/Text — ' + lab; await setT(n, 'Value text', val); await setT(n, 'Helper text', hp); r1.appendChild(n); n.layoutSizingHorizontal = 'FILL'; }
-  const s2 = await sect(2, 'Upload a valid document', ['Approved', 'Fixed']);
-  await li(s2, 'id-card', 'Passport · issued in Portugal · valid until 03 May 2034 · photo page only', { ic: 'icon/brand', c: 'text/primary', st: 'Label/M' });
-  const up = await I('20:9454', { State: 'Uploaded' }, { Label: 'Passport — photo page', Description: 'All four corners visible, no glare', 'Show privacy note': false }); up.name = 'Input/File Upload — passport (Uploaded)'; await setT(up, 'File name', 'passport_photo_page.jpg'); await setT(up, 'Meta text', 'Uploaded · 2.9 MB · all quality checks passed'); s2.appendChild(up); up.layoutSizingHorizontal = 'FILL';
-  const s3 = await sect(3, 'Selfie video', ['Neutral', 'Kept']); await li(s3, 'check-circle', 'Passed on 27 Nov 2026 — you don’t need to record it again.', { ic: 'status/success', is: 16 });
-  const cb = await I('20:3205', { Value: 'Unchecked', State: 'Default' }, { Label: 'I confirm these details are accurate and belong to me', 'Show description': true }); cb.name = 'Control/Checkbox — accuracy declaration (unchecked)'; main.appendChild(cb); cb.layoutSizingHorizontal = 'FILL'; await setT(cb, 'Description', 'Giving false information can lead to your verification being refused and your account being closed.');
-  await footer(main, [await BTN('Secondary', 'Back', { size: 'L', lead: 'arrow-left' })], 'Tick the confirmation to submit. Review usually takes under 10 minutes, up to 24 h.', [await BTN('Primary', 'Submit again', { size: 'L', state: 'Disabled', lead: 'check' })]);
+  const hd = box(body, 'VERTICAL', { name: 'Title', gap: 8 }); await tx(hd, 'Fix 2 items and submit again', 'Heading/H4', 'text/primary'); await tx(hd, 'Everything that passed is kept: selfie video, date of birth and address.', 'Body/S', 'text/secondary');
+  async function sect(n, title, badge) { const c = box(body, 'VERTICAL', { name: 'Item ' + n + ' — ' + title, gap: 12, p: 14, fill: 'surface/default', stroke: 'border/subtle', r: 14 }); const h = box(c, 'HORIZONTAL', { name: 'Head', gap: 10, align: 'CENTER' }); const b = AL('HORIZONTAL', { name: 'Number', w: 24, h: 24, r: 9999, fill: 'brand/tint', justify: 'CENTER', align: 'CENTER' }); h.appendChild(b); b.appendChild(await T(String(n), 'Label/S', 'text/brand')); await tx(h, title, 'Label/L', 'text/primary'); const bd = await BADGE(badge[0], 'S'); await setT(bd, 'Label', badge[1]); h.appendChild(bd); return c; }
+  const s1 = await sect(1, 'Last name', ['Approved', 'Fixed']); const n1 = await I('13:762', { State: 'Success', Size: 'L' }, { Label: 'Last name(s)', 'Show leading icon': false, 'Show trailing icon': false, 'Show helper': true }); n1.name = 'Input/Text L — Last name(s)'; await setT(n1, 'Value text', 'Karlsson-Silva'); await setT(n1, 'Helper text', 'Now matches your document'); s1.appendChild(n1); n1.layoutSizingHorizontal = 'FILL';
+  const s2 = await sect(2, 'Valid document', ['Approved', 'Fixed']); await tx(s2, 'Passport · Portugal · valid until 03 May 2034', 'Label/M', 'text/primary'); const up = await I('20:9454', { State: 'Uploaded' }, { Label: 'Passport — photo page', Description: 'All four corners visible, no glare', 'Show privacy note': false }); up.name = 'Input/File Upload — passport (Uploaded)'; await setT(up, 'File name', 'passport_photo_page.jpg'); await setT(up, 'Meta text', 'Uploaded · 2.9 MB · checks passed'); s2.appendChild(up); up.layoutSizingHorizontal = 'FILL';
+  const s3 = await sect(3, 'Selfie video', ['Neutral', 'Kept']); await li(s3, 'check-circle', 'Passed on 27 Nov 2026 — no need to record again.', { ic: 'status/success', is: 16 });
+  const cb = await I('20:3205', { Value: 'Unchecked', State: 'Default' }, { Label: 'I confirm these details are accurate and belong to me', 'Show description': false }); cb.name = 'Control/Checkbox — accuracy declaration (unchecked)'; body.appendChild(cb); cb.layoutSizingHorizontal = 'FILL';
+  await mfinish(f, { cta: [await BTN('Primary', 'Submit again', { size: 'L', state: 'Disabled', lead: 'check' })], note: 'Tick the confirmation to submit · review usually under 10 min, up to 24 h.' });
 }
-const f = await shell('AUTH-17 KYC Rejected / 1440 / ' + MODE, 6, d);
-await f.screenshot({ scale: 0.5 });
-return { frame: f.id, size: [f.width, f.height], dlg: [d.width, d.height] };
+await f.screenshot({ scale: 0.5 }); return { frame: f.id, size: [f.width, f.height] };
 
 }
 const __out = [];
-for (const __m of ['Reasons', 'Resubmit']) __out.push(await build(__m));
-
-// ===== FIX (continuation run): empty horizontal spacers kept the 100px default height → shrink to 1px, re-fit viewport/scrim, re-centre dialog; widen AUTH-15 'Processing time' column =====
-const __fix = { spacers: 0, refit: [], widened: null };
-for (const fr of sec.children.filter(c => c.type === 'FRAME' && / \/ 1440 \//.test(c.name))) {
-  for (const s of fr.findAll(n => n.type === 'FRAME' && n.name === 'Spacer' && n.children.length === 0 && n.parent && n.parent.layoutMode === 'HORIZONTAL' && n.height > 2)) { s.resize(s.width, 1); s.layoutSizingHorizontal = 'FILL'; __fix.spacers++; }
-  const pt = fr.findOne(n => n.type === 'FRAME' && n.name === 'Processing time'); if (pt && pt.width < 260) { pt.resize(260, pt.height); pt.primaryAxisSizingMode = 'AUTO'; __fix.widened = pt.id; }
-  const d = fr.children.find(n => n.name === 'KYC dialog'); const vp = fr.children.find(n => n.name.startsWith('Viewport')); const sc = fr.children.find(n => n.name === 'Scrim'); const bar = fr.children[0];
-  if (d && vp && sc) { const H = Math.max(1024, Math.ceil(d.height) + 112); if (Math.abs(vp.height - H) > 1) { vp.resize(1440, H); sc.resize(1440, H); } d.y = Math.round(bar.height + (H - d.height) / 2); d.x = Math.round((1440 - d.width) / 2); __fix.refit.push([fr.name.split(' / ')[0] + ' / ' + fr.name.split(' / ')[2], Math.round(fr.height)]); }
-}
-// restack columns (states below defaults) after heights changed
-const __cols = {}; for (const c of sec.children) if (c.type === 'FRAME' && / \/ 1440 \//.test(c.name)) (__cols[Math.round(c.x)] = __cols[Math.round(c.x)] || []).push(c);
-for (const k in __cols) { let y = 440; for (const c of __cols[k].sort((a, b) => a.y - b.y)) { c.y = y; y += c.height + 160; } }
-fitSection(sec);
-const __a11 = sec.children.find(c => c.name === 'AUTH-11 KYC Intro & levels / 1440 / Default'); if (__a11) await __a11.screenshot({ scale: 0.5 });
-__out.push({ fix: __fix });
+for (const __m of ['Pending', 'Approved', 'Rejected', 'Resubmit']) __out.push(await build(__m));
 return __out;
 
 }

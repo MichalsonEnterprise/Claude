@@ -121,7 +121,7 @@ async function dialog(o) {
   await li(ft, 'lock', 'Encrypted in transit and at rest. Used only for identity verification and AML checks.', { ic: 'icon/muted', is: 16, st: 'Caption', c: 'text/tertiary' });
   const lr = box(ft, 'HORIZONTAL', { name: 'Licence & 18+', gap: 8, align: 'CENTER' }, 'HUG'); lr.appendChild(await I('6:159')); lr.appendChild(await I('6:158', { Variant: 'Compact' }));
   const main = AL('VERTICAL', { name: 'Main', w: 740, gap: 24, p: [28, 40, 32, 40] }); d.appendChild(main);
-  const hd = box(main, 'HORIZONTAL', { name: 'Header', gap: 12, align: 'CENTER' }); hd.appendChild(await T('Identity verification', 'Heading/H5', 'text/primary')); hd.appendChild(await I('23:5565', { Status: o.chip[0], Level: o.chip[1] })); box(hd, 'HORIZONTAL', { name: 'Spacer' });
+  const hd = box(main, 'HORIZONTAL', { name: 'Header', gap: 12, align: 'CENTER' }); hd.appendChild(await T('Identity verification', 'Heading/H5', 'text/primary')); hd.appendChild(await I('23:5565', { Status: o.chip[0], Level: o.chip[1] })); box(hd, 'HORIZONTAL', { name: 'Spacer', h: 1 });
   hd.appendChild(await BTN('Ghost', 'Help', { size: 'S', lead: 'help-circle' })); const cl = await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS.x }); cl.name = 'Button/Icon — Close'; hd.appendChild(cl);
   if (o.step != null) await stepper(main, o.step, o.so || {});
   return { d, side, main };
@@ -160,7 +160,7 @@ const tb = box(main, 'VERTICAL', { name: 'Title', gap: 8 });
 await tx(tb, 'Verify your identity to raise your limits', 'Heading/H3', 'text/primary');
 await tx(tb, "You're on Level 1 — Basic. Level 2 takes about 5 minutes: confirm your details, upload one ID document and record a 10-second selfie video.", 'Body/M', 'text/secondary');
 const lt = box(main, 'VERTICAL', { name: 'Levels table', gap: 12 });
-const lh = box(lt, 'HORIZONTAL', { name: 'Table title', gap: 8, align: 'CENTER' }); lh.appendChild(await T('Verification levels and daily limits', 'Heading/H5', 'text/primary')); box(lh, 'HORIZONTAL', { name: 'Spacer' }); lh.appendChild(await DEMO('M'));
+const lh = box(lt, 'HORIZONTAL', { name: 'Table title', gap: 8, align: 'CENTER' }); lh.appendChild(await T('Verification levels and daily limits', 'Heading/H5', 'text/primary')); box(lh, 'HORIZONTAL', { name: 'Spacer', h: 1 }); lh.appendChild(await DEMO('M'));
 const tbl = box(lt, 'HORIZONTAL', { name: 'Table', fill: 'surface/default', stroke: 'border/subtle', r: 14, clip: true });
 const RW = [['', 72], ['You provide', 76], ['Deposits per day', 52], ['Withdrawals per day', 52], ['Review time', 60]];
 const lc = box(tbl, 'VERTICAL', { name: 'Row labels', w: 168 }, 'HUG');

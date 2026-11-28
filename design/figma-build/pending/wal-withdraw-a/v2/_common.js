@@ -57,12 +57,12 @@ async function limitTiles(p, M, o = {}) {
 async function lockNote(p) { const lr = hrow('Lock note', 10, { p: [12, 16, 12, 16], fill: 'surface/raised', r: 10, align: 'MIN' }); add(p, [lr, 'FILL']); lr.appendChild(await IC('lock', 18, 'balance/locked')); await tx(lr, 'When you confirm at step 7, 1,500.00 USDT moves from Available to Locked until the network confirms the transfer. If it fails or is rejected, the full amount returns to Available — no fee is charged.', 'Body/S', 'text/secondary'); return lr; }
 // "You receive" hero block
 async function receiveHero(p, M) {
-  const hero = AL(M ? 'VERTICAL' : 'HORIZONTAL', { name: 'Receive hero', gap: M ? 8 : 16, p: M ? 16 : 20, fill: 'surface/raised', stroke: 'border/subtle', r: 14, align: M ? 'MIN' : 'CENTER' }); add(p, [hero, 'FILL']);
+  const hero = AL('VERTICAL', { name: 'Receive hero', gap: M ? 8 : 16, p: M ? 16 : 20, fill: 'surface/raised', stroke: 'border/subtle', r: 14, align: M ? 'MIN' : 'CENTER' }); add(p, [hero, 'FILL']);
   const hl = AL('VERTICAL', { name: 'You receive', gap: 4 }); add(hero, [hl, 'FILL']);
   await tx(hl, 'YOU RECEIVE', 'Overline', 'text/tertiary');
   const ar = hrow('Amount', 8); add(hl, [ar, 'FILL']); await tx(ar, '1,499.92 USDT', M ? 'Number/L' : 'Number/XL', 'text/primary', { hug: true }); ar.appendChild(await DEMO('S'));
   const dr = hrow('Destination', 8, { wrap: true, cgap: 6 }); add(hl, [dr, 'FILL']); dr.appendChild(await CHAIN('Arbitrum', 16)); await tx(dr, 'Arbitrum One →', 'Body/S', 'text/secondary', { hug: true }); dr.appendChild(await I('9:418', { Size: 'S' }, { Address: AD, 'Show DEMO': true })); dr.appendChild(await B('Approved', 'Whitelisted'));
-  if (!M) { const hr = AL('VERTICAL', { name: 'You send', gap: 4, align: 'MAX' }); hero.appendChild(hr); await tx(hr, 'YOU SEND', 'Overline', 'text/tertiary', { hug: true }); await tx(hr, '1,500.00 USDT', 'Number/M', 'text/secondary', { hug: true }); await tx(hr, 'from your Available balance', 'Caption', 'text/tertiary', { hug: true }); }
+  if (!M) await tx(hl, 'You send 1,500.00 USDT from your Available balance − 0.08 USDT Arbitrum network fee − 0.00 USDT platform fee.', 'Caption', 'text/tertiary', { name: 'You send' });
   return hero;
 }
 const IRREV = ['Withdrawals can\'t be reversed once they\'re sent', 'After the transfer is broadcast on Arbitrum One, GLOBAL POOL can\'t cancel, recall or refund it. If the address is wrong or the wallet doesn\'t accept USDT on Arbitrum One, the funds are lost. You can cancel at any step until it is broadcast.'];

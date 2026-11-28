@@ -39,5 +39,69 @@
  "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Limit reached — separate DEMO scenario (25,000.00 already withdrawn today)": {
   "id": "133:49928",
   "type": "FRAME"
+ },
+ "WAL-14 Withdraw — Step 5 Fees & Summary / 1440 / Default": {
+  "id": "139:49799",
+  "type": "FRAME"
+ },
+ "WAL-10 Withdraw — Step 1 Select Asset / 768 / Default": {
+  "id": "151:116052",
+  "type": "FRAME"
+ },
+ "WAL-11 Withdraw — Step 2 Select Network / 768 / Default": {
+  "id": "151:116354",
+  "type": "FRAME"
+ },
+ "WAL-12 Withdraw — Step 3 Enter Address / 768 / Default": {
+  "id": "151:116643",
+  "type": "FRAME"
+ },
+ "WAL-13 Withdraw — Step 4 Enter Amount / 768 / Default": {
+  "id": "151:116950",
+  "type": "FRAME"
+ },
+ "WAL-14 Withdraw — Step 5 Fees & Summary / 768 / Default": {
+  "id": "151:117260",
+  "type": "FRAME"
+ },
+ "Section/WAL — Mobile C (Withdraw 1–5)": {
+  "id": "152:66270",
+  "type": "SECTION"
+ },
+ "MOB-07 · WAL-10 Withdraw — Step 1 Select Asset / 390 / Default — asset sheet": {
+  "id": "152:66271",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-11 Withdraw — Step 2 Select Network / 390 / Default — network sheet": {
+  "id": "152:66557",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-12 Withdraw — Step 3 Enter Address / 390 / Default": {
+  "id": "152:66808",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-12 Withdraw — Step 3 Enter Address / 390 / Invalid": {
+  "id": "157:68503",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-12 Withdraw — Step 3 Enter Address / 390 / New-address cooldown — sheet": {
+  "id": "157:68755",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-13 Withdraw — Step 4 Enter Amount / 390 / Default": {
+  "id": "157:68981",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-13 Withdraw — Step 4 Enter Amount / 390 / Over balance": {
+  "id": "160:69089",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-13 Withdraw — Step 4 Enter Amount / 390 / Limit reached — separate DEMO scenario (25,000.00 already withdrawn today)": {
+  "id": "160:69318",
+  "type": "FRAME"
+ },
+ "MOB-07 · WAL-14 Withdraw — Step 5 Fees & Summary / 390 / Default — review sheet": {
+  "id": "160:69533",
+  "type": "FRAME"
  }
 }

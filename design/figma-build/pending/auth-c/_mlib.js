@@ -25,7 +25,7 @@ async function mscreen(name, col, o = {}) {
   const tb = await I('23:12908', { State: 'Member' }); f.appendChild(tb); tb.layoutSizingHorizontal = 'FILL';
   const sh = box(f, 'VERTICAL', { name: 'Flow header', gap: 10, p: [8, 16, 14, 8], fill: 'bg/secondary' }); strokeSides(sh, 'border/subtle', { b: 1 });
   const r = box(sh, 'HORIZONTAL', { name: 'Title row', gap: 4, align: 'CENTER' }); const bk = await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] }); bk.name = 'Button/Icon — Back (44)'; r.appendChild(bk);
-  await tx(r, 'Identity verification', 'Label/L', 'text/primary'); r.appendChild(await I('23:5565', { Status: o.chip[0], Level: o.chip[1] }));
+  await tx(r, 'Verification', 'Label/L', 'text/primary'); r.appendChild(await I('23:5565', { Status: o.chip[0], Level: o.chip[1] }));
   if (o.step != null) { const pg = box(sh, 'VERTICAL', { name: 'Step progress (5 steps)', gap: 8, p: [0, 0, 0, 8] }); const pr = box(pg, 'HORIZONTAL', { name: 'Labels', gap: 8 }); await tx(pr, 'Step ' + (o.step + 1) + ' of 5 · ' + LBL[o.step], 'Label/M', 'text/brand'); pr.appendChild(await T(o.step < 4 ? 'Next: ' + LBL[o.step + 1] : 'Last step', 'Caption', 'text/tertiary'));
     const sg = box(pg, 'HORIZONTAL', { name: 'Segments', gap: 4 }); for (let i = 0; i < 5; i++) { const s = rect(10, 4, o.err === i ? 'status/danger' : i <= o.step ? 'brand/primary' : 'border/default', 9999, 'Segment ' + (i + 1) + ' — ' + LBL[i]); sg.appendChild(s); s.layoutSizingHorizontal = 'FILL'; } }
   const body = box(f, 'VERTICAL', { name: 'Content', gap: 20, p: [20, 16, 24, 16] });

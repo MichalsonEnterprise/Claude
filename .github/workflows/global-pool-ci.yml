@@ -1,0 +1,121 @@
+# GLOBAL POOL — CI for the pnpm workspace in global-pool/ (DEMO / testnet only).
+# Runs only when global-pool/** (or this workflow) changes; the Vite landing page at the repo root is untouched.
+name: global-pool-ci
+
+on:
+  push:
+    paths:
+      - 'global-pool/**'
+      - '.github/workflows/global-pool-ci.yml'
+  pull_request:
+    paths:
+      - 'global-pool/**'
+      - '.github/workflows/global-pool-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: global-pool-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: install · typecheck · lint · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: global-pool
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: globalpool_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d globalpool_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+
+    env:
+      CI: 'true'
+      NODE_ENV: test
+      NEXT_TELEMETRY_DISABLED: '1'
+      # Guardrails: CI never enables real money.
+      REAL_MONEY_ENABLED: 'false'
+      DEMO_MODE: 'true'
+      PRIVY_MOCK: 'true'
+      NEXT_PUBLIC_PRIVY_MOCK: 'true'
+      NEXT_PUBLIC_DEMO_MODE: 'true'
+      # Tests run against the CI test database only.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/globalpool_test?schema=public
+      DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/globalpool_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      APP_URL: http://localhost:3000
+      API_URL: http://localhost:4000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      # Throwaway CI-only values (not secrets; real deployments use their own secret store).
+      JWT_ACCESS_SECRET: ci-only-access-secret-not-used-anywhere-else
+      JWT_REFRESH_SECRET: ci-only-refresh-secret-not-used-anywhere-else
+      ADMIN_JWT_ACCESS_SECRET: ci-only-admin-access-secret-not-used-elsewhere
+      ADMIN_JWT_REFRESH_SECRET: ci-only-admin-refresh-secret-not-used-elsewhere
+      PRIVY_MOCK_SIGNING_SECRET: ci-only-privy-mock-secret-not-used-elsewhere
+      TOTP_ENCRYPTION_KEY: Y2ktb25seS10b3RwLWtleS0zMi1ieXRlcy1sb25nISE=
+      RANDOMNESS_PROVIDER: mock
+      MAIL_TRANSPORT: log
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm (version from global-pool/package.json "packageManager")
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: global-pool/package.json
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: global-pool/pnpm-lock.yaml
+
+      - name: Set up Foundry (packages/contracts)
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages (@gp/tokens, @gp/shared — needed by dependents' typecheck)
+        run: pnpm build:packages
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Lint
+        run: pnpm -r lint
+
+      - name: Apply database migrations to the test database (if the API defines them)
+        run: pnpm -r --if-present run db:migrate:deploy
+
+      - name: Test
+        run: pnpm -r test
+
+      - name: Build
+        run: pnpm -r build

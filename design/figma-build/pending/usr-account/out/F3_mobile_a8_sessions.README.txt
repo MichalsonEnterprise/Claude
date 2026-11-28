@@ -1,0 +1,7 @@
+F3 (page 10): reconcile mobile Session Management 154:67468 (default) and 154:67677 (End-all sheet) with desktop A8 (4 active sessions:
+this browser + Safari on iPhone 15 + Edge on Windows PC + "Chrome on MacBook Pro — second window").
+- default: label 'Other active sessions · 2' -> '· 3'; insert card 'Device — Chrome on MacBook Pro — second window' after 'Device — Edge on Windows PC'
+  (icon monitor, caption 'Lisbon · same device as this browser · started 27 Nov 2026', Button/Secondary L 'End session')
+- sheet: label -> '· 3'; title 'End 2 other sessions?' -> 'End 3 other sessions?'; insert row 'Session — Chrome on MacBook Pro — second window'
+  after 'Session — Edge on Windows PC'; Danger button Label -> 'End 3 sessions'; re-anchor sheet y = 844 - height.
+Idempotent: skips inserts when the named node exists. Full code = the last use_figma call of the usr-account agent (28 Nov 2026 ~03:05 UTC).

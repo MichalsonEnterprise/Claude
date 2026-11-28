@@ -1,0 +1,36 @@
+async function ma2() {
+const NAME = '[USR-A2 · MOB-09] Security Settings / 390 / Default';
+const sk = skipIf(sec, NAME); if (sk) return sk;
+const S = await shellM(NAME, { title: 'Security settings', sub: 'Changing a setting asks for your 2FA code. Turning a protection on never does.' });
+const C = S.C;
+const sc = card('Card — Score', { gap: 12, p: 16 }); add(C, [sc, 'FILL']);
+const sh = AL('HORIZONTAL', { name: 'Score', gap: 8, align: 'MAX' }); add(sc, [sh, 'FILL']);
+sh.appendChild(await T('80', 'Number/XL', 'text/primary')); add(sh, [await T('/ 100', 'Body/M', 'text/secondary'), 'FILL']); sh.appendChild(await chip('alert-triangle', 'Needs review', 'warning'));
+add(sc, [meter(IW, 0.8, tk('status/warning', 'brand/primary')), 'FILL']);
+for (const [t, ok] of [['Authenticator 2FA on · +30', true], ['Anti-phishing code set · +15', true], ['Withdrawal whitelist on · +15', true], ['Email verified + strong password · +20', true], ['All devices recognised · 0 of 20', false]]) add(sc, [await check(t, ok, IW, ok ? 'success' : 'warning'), 'FILL']);
+const rv = card('Card — To review', { gap: 12, p: 16, fill: tk('status/warning-tint'), stroke: tk('status/warning', 'border/default') }); add(C, [rv, 'FILL']);
+const rh = AL('HORIZONTAL', { name: 'Header', gap: 12, align: 'CENTER' }); add(rv, [rh, 'FILL']); rh.appendChild(await iconTile('shield-alert', tk('status/warning', 'icon/default'), 40, 'surface/default'));
+const rt = AL('VERTICAL', { name: 'Text', gap: 2 }); add(rh, [rt, 'FILL']); add(rt, [await T('Was this you?', 'Body/M Strong', 'text/primary'), 'FILL']); add(rt, [await T('Windows · Edge · Madrid, Spain · 25 Nov 2026, 22:41 UTC', 'Caption', 'text/secondary', { w: 260 }), 'FILL']);
+rh.appendChild(await DEMO('XS'));
+add(rv, [await BTN('Secondary', 'Yes, it was me', { size: 'L' }), 'FILL']); add(rv, [await BTN('Danger', 'No — secure my account', { size: 'L' }), 'FILL']);
+await groupLabel(C, 'Sign-in & recovery');
+const l1 = list(C, 'List — Sign-in');
+add(l1, [await lrow('lock', 'Password', 'Strong · changed 12 Sep 2026'), 'FILL']);
+add(l1, [await lrow('key', 'Two-factor authentication', 'On · authenticator app', { right: [await chip('check-circle', 'On', 'success')] }), 'FILL']);
+add(l1, [await lrow('file', 'Backup codes', '8 of 10 unused'), 'FILL']);
+add(l1, [await lrow('mail', 'Sign-in alerts', 'Email for every new device', { last: true }), 'FILL']);
+await groupLabel(C, 'Withdrawal protection');
+const l2 = list(C, 'List — Withdrawals');
+add(l2, [await lrow('shield-check', 'Address whitelist', 'On · 0x7c4e…a21D (Arbitrum)', { demo: true }), 'FILL']);
+add(l2, [await lrow('hourglass', 'New-address cooldown', '24 h · always on', { chev: false, right: [await IC('lock', 16, 'icon/muted')] }), 'FILL']);
+add(l2, [await lrow('mail', 'Anti-phishing code', 'AURORA-27 · in every email', { demo: true, last: true }), 'FILL']);
+await groupLabel(C, 'Devices & activity');
+const l3 = list(C, 'List — Devices');
+add(l3, [await lrow('monitor', 'Connected devices', '3 · 1 needs review', { vTone: tk('text/warning', 'text/secondary') }), 'FILL']);
+add(l3, [await lrow('activity', 'Sessions', '3 active · end others in one tap'), 'FILL']);
+add(l3, [await lrow('history', 'Login history', 'Last: 27 Nov 2026, 16:00 UTC · Lisbon', { last: true }), 'FILL']);
+await licM(C);
+await endM(S);
+await placeM(S.f, sec, 2); await shotOf(S.f);
+return { frame: S.f.id, name: NAME, h: Math.round(S.f.height) };
+}

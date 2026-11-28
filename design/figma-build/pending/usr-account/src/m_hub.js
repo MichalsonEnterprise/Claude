@@ -1,0 +1,42 @@
+async function mhub() {
+const NAME = 'MOB-09 · Account & security hub / 390 / Default';
+const sk = skipIf(sec, NAME); if (sk) return sk;
+const S = await shellM(NAME, { back: false, title: 'Account', sub: 'Profile, security and verification in one place.' });
+const C = S.C;
+const pc = card('Card — Profile', { gap: 12, p: 16 }); add(C, [pc, 'FILL']);
+const ph = AL('HORIZONTAL', { name: 'Holder', gap: 12, align: 'CENTER' }); add(pc, [ph, 'FILL']);
+ph.appendChild(await I('9:238', { Size: 'L' }, { Initials: 'NK', 'Show status': false }));
+const pt = AL('VERTICAL', { name: 'Name', gap: 2 }); add(ph, [pt, 'FILL']); pt.appendChild(await T('Nova K.', 'Heading/H5', 'text/primary')); pt.appendChild(await T('@nova.k · GP-48213', 'Caption', 'text/tertiary'));
+ph.appendChild(await DEMO('XS'));
+const pb = AL('HORIZONTAL', { name: 'Badges', gap: 8, align: 'CENTER', wrap: true, cgap: 8 }); add(pc, [pb, 'FILL']);
+const kc = await tryy('kyc chip', () => I('23:5565', { Status: 'Approved', Level: 'L2' })); if (kc) pb.appendChild(kc);
+const vb = await tryy('vip', () => I('6:211', { Tier: 'Gold', Size: 'S' })); if (vb) pb.appendChild(vb);
+// score
+const sc = card('Card — Security score', { gap: 12, p: 16, stroke: tk('status/warning', 'border/default') }); add(C, [sc, 'FILL']);
+const sh = AL('HORIZONTAL', { name: 'Score', gap: 8, align: 'MAX' }); add(sc, [sh, 'FILL']);
+sh.appendChild(await T('80', 'Number/L', 'text/primary')); add(sh, [await T('/ 100 security score', 'Body/S', 'text/secondary'), 'FILL']); sh.appendChild(await chip('alert-triangle', 'Needs review', 'warning'));
+add(sc, [meter(IW, 0.8, tk('status/warning', 'brand/primary')), 'FILL']);
+add(sc, [await T('A new Windows · Edge sign-in from Madrid (25 Nov 2026) hasn’t been reviewed.', 'Body/S', 'text/secondary', { w: IW }), 'FILL']);
+add(sc, [await BTN('Secondary', 'Review now', { size: 'L' }), 'FILL']);
+await groupLabel(C, 'Profile');
+const l1 = list(C, 'List — Profile');
+add(l1, [await lrow('user', 'Personal information', 'Nova K. · Portugal'), 'FILL']);
+add(l1, [await lrow('bell', 'Notification preferences', 'Email, push and in-app', { last: true }), 'FILL']);
+await groupLabel(C, 'Security');
+const l2 = list(C, 'List — Security');
+add(l2, [await lrow('shield-check', 'Security settings', '80 / 100 · 1 thing to review', { vTone: tk('text/warning', 'text/secondary') }), 'FILL']);
+add(l2, [await lrow('key', 'Two-factor authentication', 'On · authenticator app'), 'FILL']);
+add(l2, [await lrow('mail', 'Anti-phishing code', 'AURORA-27', { demo: true }), 'FILL']);
+add(l2, [await lrow('history', 'Login history', '2 flagged attempts this month'), 'FILL']);
+add(l2, [await lrow('monitor', 'Connected devices', '3 devices · 1 needs review', { right: [await chip('alert-triangle', '1', 'warning')] }), 'FILL']);
+add(l2, [await lrow('activity', 'Sessions', '3 active', { last: true }), 'FILL']);
+await groupLabel(C, 'Verification');
+const l3 = list(C, 'List — Verification');
+add(l3, [await lrow('id-card', 'KYC status', 'Level 2 · verified 3 Sep 2026'), 'FILL']);
+add(l3, [await lrow('file', 'Verification documents', '2 approved', { last: true }), 'FILL']);
+add(C, [await BTN('Ghost', 'Log out', { size: 'L', lead: 'logout' }), 'FILL']);
+await licM(C);
+await endM(S);
+await placeM(S.f, sec, 0); await shotOf(S.f);
+return { frame: S.f.id, name: NAME, h: Math.round(S.f.height) };
+}

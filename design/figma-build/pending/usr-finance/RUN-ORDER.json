@@ -1,0 +1,4 @@
+{ "slice": "usr-finance", "rows": ["USR-F1","USR-F2","USR-F3","USR-F4","USR-F5","USR-F6","MOB-10 (part)"],
+  "order": [ {"file": "out/m-a.full.js", "page": "10 — Mobile Experience", "builds": ["MOB-10 · [USR-F2] Withdrawals / 390 / Default", "MOB-10 · [USR-F3] Fees / 390 / Default", "MOB-10 · [USR-F4] Rewards / 390 / Default"], "status": "pending"},
+             {"file": "out/m-b.full.js", "page": "10 — Mobile Experience", "builds": ["MOB-10 · [USR-F5] Refunds / 390 / Default", "MOB-10 · [USR-F6] Complete Transaction History / 390 / Default", "MOB-10 · [USR-F6] Complete Transaction History / 390 / Export (bottom sheet)"], "status": "pending"},
+             {"file": "d-patch.js", "page": "05 — User Dashboard", "patches": ["72:48152", "74:49145", "86:49985", "90:114727", "109:103285", "109:104557"], "status": "pending"} ] }

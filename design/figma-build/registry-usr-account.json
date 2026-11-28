@@ -1,0 +1,151 @@
+{
+ "_note": "Agent usr-account (USR-A1..A10 Account & security + MOB-09 Mobile Account Security). No new library components. Entries are SECTIONS and SCREEN FRAMES for page-index links. Desktop: page '05 — User Dashboard', section 'USR-A1..A10 Account & security' 32:72712 (X=24000). Mobile: page '10 — Mobile Experience', section 'USR — Mobile C' 34:484195 (X=105000). Desktop section re-laid out 28 Nov 2026 into two bands (A1–A5, then A6–A10 from y=10184) so it no longer overlaps USR-F1..F6 at X=36000; section now 7,920 x 13,890. Mobile section 5,220 wide (X 105000–110220), columns A1, A2, A3, A4, A5, A6, A7, A8, A9, A10. Prepared scripts: design/figma-build/pending/usr-account (RUN-ORDER.json).",
+ "Section/USR-A1..A10 Account & security": {
+  "id": "32:72712",
+  "type": "SECTION"
+ },
+ "Section/USR — Mobile C": {
+  "id": "34:484195",
+  "type": "SECTION"
+ },
+ "[USR-A1] Personal Information / 1440 / Edit": {
+  "id": "32:72713",
+  "type": "FRAME"
+ },
+ "[USR-A1] Personal Information / 1440 / Saved": {
+  "id": "32:87503",
+  "type": "FRAME"
+ },
+ "[USR-A2] Security Settings / 1440 / Default": {
+  "id": "32:96754",
+  "type": "FRAME"
+ },
+ "[USR-A3] Two-Factor Authentication / 1440 / Manage (On)": {
+  "id": "33:123752",
+  "type": "FRAME"
+ },
+ "[USR-A3] Two-Factor Authentication / 1440 / Disable — confirm": {
+  "id": "33:151777",
+  "type": "FRAME"
+ },
+ "[USR-A3] Two-Factor Authentication / 1440 / Enable — setup": {
+  "id": "33:170381",
+  "type": "FRAME"
+ },
+ "[USR-A3] Two-Factor Authentication / 1440 / Reset — lost device": {
+  "id": "33:199622",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 1440 / Not started": {
+  "id": "33:221847",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 1440 / Pending": {
+  "id": "33:244072",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 1440 / Approved": {
+  "id": "33:262703",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 1440 / Rejected": {
+  "id": "33:280974",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 1440 / Expired": {
+  "id": "33:302783",
+  "type": "FRAME"
+ },
+ "[USR-A5] Verification Documents / 1440 / Default": {
+  "id": "33:321559",
+  "type": "FRAME"
+ },
+ "[USR-A6] Login History / 1440 / Suspicious flag": {
+  "id": "34:344599",
+  "type": "FRAME"
+ },
+ "[USR-A7] Connected Devices / 1440 / Default": {
+  "id": "34:369746",
+  "type": "FRAME"
+ },
+ "[USR-A7] Connected Devices / 1440 / Revoke — confirm": {
+  "id": "34:384921",
+  "type": "FRAME"
+ },
+ "[USR-A8] Session Management / 1440 / Default": {
+  "id": "34:404144",
+  "type": "FRAME"
+ },
+ "[USR-A8] Session Management / 1440 / End all — confirm": {
+  "id": "34:413465",
+  "type": "FRAME"
+ },
+ "[USR-A9] Notification Preferences / 1440 / Default": {
+  "id": "34:430816",
+  "type": "FRAME"
+ },
+ "[USR-A10] Anti-Phishing Code / 1440 / Default": {
+  "id": "34:451588",
+  "type": "FRAME"
+ },
+ "[USR-A1] Personal Information / 390 / Edit": {
+  "id": "34:484196",
+  "type": "FRAME"
+ },
+ "[USR-A2 · MOB-09] Security Settings / 390 / Default": {
+  "id": "34:495793",
+  "type": "FRAME"
+ },
+ "[USR-A3 · MOB-09] Two-Factor Authentication / 390 / Manage (On)": {
+  "id": "36:510785",
+  "type": "FRAME"
+ },
+ "[USR-A3 · MOB-09] Two-Factor Authentication / 390 / Enable — setup on this phone": {
+  "id": "36:537760",
+  "type": "FRAME"
+ },
+ "[USR-A7 · MOB-09] Connected Devices / 390 / Default": {
+  "id": "154:67001",
+  "type": "FRAME"
+ },
+ "[USR-A7 · MOB-09] Connected Devices / 390 / Revoke — bottom sheet": {
+  "id": "154:67217",
+  "type": "FRAME"
+ },
+ "[USR-A8 · MOB-09] Session Management / 390 / Default": {
+  "id": "154:67468",
+  "type": "FRAME"
+ },
+ "[USR-A8 · MOB-09] Session Management / 390 / End all — bottom sheet": {
+  "id": "154:67677",
+  "type": "FRAME"
+ },
+ "[USR-A3 · MOB-09] Two-Factor Authentication / 390 / Disable — bottom sheet": {
+  "id": "155:87455",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 390 / Approved": {
+  "id": "155:87801",
+  "type": "FRAME"
+ },
+ "[USR-A4] KYC Status / 390 / Rejected": {
+  "id": "155:88000",
+  "type": "FRAME"
+ },
+ "[USR-A5] Verification Documents / 390 / Default": {
+  "id": "155:88224",
+  "type": "FRAME"
+ },
+ "[USR-A6] Login History / 390 / Suspicious flag": {
+  "id": "156:68093",
+  "type": "FRAME"
+ },
+ "[USR-A9] Notification Preferences / 390 / Default": {
+  "id": "156:68346",
+  "type": "FRAME"
+ },
+ "[USR-A10] Anti-Phishing Code / 390 / Default": {
+  "id": "156:68621",
+  "type": "FRAME"
+ }
+}

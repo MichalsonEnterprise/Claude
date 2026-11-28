@@ -170,6 +170,10 @@ async function ffoot(fc, back, next, o = {}) { const r = hrow('Flow footer', 12,
 // ===== END WAL-WA desktop shell =====
 
 // ===== BODY t — Tablet 768 defaults WAL-10..14 (cloned flow + summary cards from the desktop masters) =====
+// --- fix WAL-14 receive hero (139:49799): move "You send" into the left column (no overlap with the XL amount)
+const w14 = await figma.getNodeByIdAsync('139:49799');
+const hero = w14 && w14.findOne(x => x.name === 'Receive hero');
+if (hero) { const ys = hero.children.find(x => x.name === 'You send'); if (ys) ys.remove(); const hl = hero.findOne(x => x.name === 'You receive'); if (!hl.findOne(x => x.name === 'You send')) await tx(hl, 'You send 1,500.00 USDT from your Available balance − 0.08 USDT Arbitrum network fee − 0.00 USDT platform fee.', 'Caption', 'text/tertiary', { name: 'You send' }); }
 function setStepM(s, n, label, next) { const t = k => s.findOne(x => x.type === 'TEXT' && x.name === k); t('Current label').characters = label; t('Progress text').characters = 'Step ' + n + ' of 9'; t('Next step').characters = 'Next: ' + next; const seg = i => s.findOne(x => x.name === 'Segment ' + i); const done = seg(1).fills, todo = seg(9).fills; for (let i = 1; i <= 9; i++) seg(i).fills = i <= n ? done : todo; }
 async function shellT(name, n, x, y, label, next) {
   const f = await screen(name, 768, {}); sec.appendChild(f); f.x = x; f.y = y;
