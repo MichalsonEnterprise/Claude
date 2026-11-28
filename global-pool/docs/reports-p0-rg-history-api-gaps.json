@@ -1,0 +1,248 @@
+[
+  {
+    "key": "rg-history",
+    "report": "rg-history (responsible gaming + player history) is built against the real API. The final checks pass:\n- web typecheck, lint and test (95 tests);\n- the flock'ed production build (`NEXT_DIST_DIR=.next-rg-history`, EXIT=0);\n- 40 Playwright screenshots (20 screens × 1440/390) with no horizontal overflow and no console errors;\n- the new e2e spec `apps/web/e2e/rg-history.spec.ts` (4/4);\n- API typecheck and lint (exit 0) and my API tests (14 new e2e + 9 new unit).\n\nThe full API suite has one failure, in `test/admin.e2e-spec.ts` (\"flagged withdrawals need FOUR EYES\": the admin withdrawal queue does not contain the new withdrawal). It looks unrelated to my changes but I did not confirm the cause.\n\n**API (`apps/api`)**\n- **Responsible gaming** (`src/modules/compliance/responsible-gaming.service.ts` + controller):\n  - Limits: removing one waits 24 h; pending increases or removals can be cancelled; each limit has a `resetsAt`.\n  - Session tracking from heartbeats; a session ends after 15 min without activity (`rg-session.ts`, pure and unit-tested).\n  - Time rules, enforced server-side in `assertCanParticipate`, return 422 `RG_LIMIT_EXCEEDED`:\n    - daily time limit;\n    - session-length limit (raising or removing it waits 24 h);\n    - quiet hours (turning them off waits 24 h).\n  - Reality checks: pause and push toggles; replies are logged as continue / history / break.\n  - `POST /responsible-gaming/cooling-off` (24h/7d/30d).\n  - Self-exclusion: new `5y` option. 6m/1y/5y/permanent need the typed phrase `SELF-EXCLUDE` plus an acknowledgement, and a step-up TOTP code when 2FA is on.\n  - An active break or exclusion can be extended but never shortened (409).\n  - The effective exclusion is the one that ends last.\n  - Limit history comes from the hash-chained audit log.\n  - Breaks and exclusions block entries and deposits (403 `SELF_EXCLUDED` with `kind`). Withdrawals and history stay open.\n- **New `history` module**, `/history/*`:\n  - `summary`, `transactions` (several types at once plus search), `transactions/export` (CSV, with formula-injection protection, audited);\n  - `fees`, `entries` (grouped by round, with odds share), `rounds/active`, `rounds/results`, `winnings` (owed vs settled);\n  - `games` (Global Pool and simulation totals kept separate), `game-rounds` (+ export);\n  - `favourites` (GET/PUT/DELETE).\n- **Prisma:** additive migration `20261128140000_rg_history` (new columns on `rg_settings` and `rg_limits`, new table `user_favourite_games`).\n- **Shared (`@gp/shared`), additive:** `schemas/rg.ts` extended, new `schemas/history.ts`, `5y` plus cooling-off and long-exclusion helpers in `enums.ts`, RG constants in `limits.ts`.\n- **DEMO data:** idempotent script `prisma/seed-history-demo.ts` adds simulation game sessions for @nova.k (seeds verifiable with the Pool Dice scheme) and favourites. It never touches the ledger, and it has been run on the dev DB.\n- **Docs:** `docs/API.md` lists the new endpoints.\n\n**Web (`apps/web`)**\n- `src/lib/api/rg-history.ts`: wrappers and TanStack hooks, all through `apiRequest`.\n- `src/components/rg-history/*`:\n  - page shell with breadcrumb, desktop tabs and mobile pills;\n  - `LimitSetter`, `SessionBar`, `HelpResources` (real help organisations), PGSI self-check;\n  - `RealityCheckHost` and `RealityCheckCard`; `ExportDialog`; desktop table and mobile cards;\n  - RG1–RG7, F1–F6 and G1–G7 screens with loading, empty, error, guest, pending, active and confirm states. Confirmations are a dialog at ≥768 px and a bottom sheet below that.\n- Routes:\n  - `/responsible-gaming/*` and `/history/*`;\n  - `/history` redirects to `/history/transactions`;\n  - added redirects for the sidebar links `/transactions`, `/favourites` and `/recently-played` to my pages (they were 404).\n- **Reality check, app-wide:** `RealityCheckHost` is mounted in `app/(app)/layout.tsx` (additive edit).\n  - Only active with `NEXT_PUBLIC_DATA_SOURCE=api`.\n  - Heartbeats only count real play: a visible tab on `/pool`, `/games`, `/casino` or `/originals` with input in the last 90 s. Idle agent or QA tabs therefore do not build up sessions.\n  - The reminder opens on any page when the server says it is due, at the configured interval.\n  - No close icon, Escape and outside clicks do nothing, and focus lands on the panel so no choice looks pre-selected.\n- Tests and QA: `test/rg-history.test.ts`, `e2e/rg-history.spec.ts`, `scripts/rg-history-qa.mjs`; `docs/WEB_COMPONENTS.md` has a new section.\n- Small shared fixes:\n  - root `eslint.config.mjs` now ignores `**/.next-*/**` (otherwise `eslint .` linted per-agent build output);\n  - `apps/web/tsconfig.json` now includes `e2e/**/*.ts` and `playwright.config.ts` (`web lint` failed without them).\n\n**Ledger status**\n- **Implemented and verified** (1440 + 390 screenshots against the live API, compared with the Figma frames): USR-RG1, RG2, RG3, RG4, RG5, RG6, USR-F1–F6, USR-G1–G7, MOB-10.\n- **USR-RG7: PARTIAL.** The 4 steps work end to end, with two departures from Figma:\n  - Step 3 uses an authenticator code (only when 2FA is on) instead of a password, because Privy players have no password.\n  - Step 2 says open entries stay in their round, where the design says they are refunded.\n- **Shell-level items not done (RG6/RG7):** \"Deposit disabled in the top bar\" and \"sidebar promos hidden\" while excluded. The shared shell has no hook for this. The API still blocks deposits and hides deposit addresses.\n- **Other gaps:**\n  - Figma's G2 per-entry expandable rows: I group by round instead.\n  - F6 \"Your exports\" list (exports are only recorded in the audit log).\n  - Push notifications for reality checks: the toggle is stored but nothing sends them.\n  - Quiet hours are in UTC, not the player's local time.\n\n**Figma:** 6 screenshots saved in `design/reference/rg-history/` (RG1 1440 and 390, RG2 pending, RG7 step 1, F6, G2). Several calls hit the seat rate limit; the rest of the copy came from the build scripts in `design/figma-build/queue/usr-rg` and `pending/usr-finance` / `usr-gaming`.\n\n**Environment notes**\n- I applied the pending, additive `20261128160500_onchain_mirror` migration from api-gaps to the shared dev DB. Without it every round query failed, because the shared Prisma client already expected those columns.\n- All my servers are stopped (API 4103, web 3103) and `.next-rg-history` and `.dev/dist-rg-history` are removed. All my files were already in your WIP commit `43dd670`.\n- Writes during QA (limit changes, breaks, self-exclusions) only touched throwaway users, never @nova.k.\n\n**Memory:** nothing was used beyond the existing GLOBAL POOL Figma note. One thing possibly worth saving (seen this session): sibling subagents share the same scratchpad directory, so file names there can collide (admin-a overwrote one of my log files).",
+    "implemented": [
+      {
+        "id": "USR-RG1",
+        "status": "IMPLEMENTED",
+        "note": "Hub: session bar, 6 tool cards, need-a-pause cards, help resources, limit rules; mobile list + today card. Verified 1440/390 vs Figma 121:54556 / 129:57449."
+      },
+      {
+        "id": "USR-RG2",
+        "status": "IMPLEMENTED",
+        "note": "Limit setter (period, input, usage, pending increase/removal, cancel), pending notice, deposits counted this week, limit history from the audit log. Matches Figma 121:56097."
+      },
+      {
+        "id": "USR-RG3",
+        "status": "IMPLEMENTED",
+        "note": "Participation and loss limits, what-counts card (0.05 USDT fee per entry), today-at-a-glance."
+      },
+      {
+        "id": "USR-RG4",
+        "status": "IMPLEMENTED",
+        "note": "Daily time limit, session-length limit, quiet hours (UTC), all enforced by the API; when-time-is-up card."
+      },
+      {
+        "id": "USR-RG5",
+        "status": "IMPLEMENTED",
+        "note": "Interval chips, pause/push toggles, live preview, recent reminders; reality-check popup mounted app-wide (dialog ≥768, bottom sheet <768), no close icon. Push sending not implemented."
+      },
+      {
+        "id": "USR-RG6",
+        "status": "IMPLEMENTED",
+        "note": "Choose (nothing pre-selected), confirm dialog/sheet, active banner + withdraw card; API cooling-off endpoint; cannot be shortened. Shell top-bar Deposit not disabled (shared shell)."
+      },
+      {
+        "id": "USR-RG7",
+        "status": "PARTIAL",
+        "note": "4 steps + active state work end to end. Departures: step 3 uses step-up TOTP (only when 2FA is on) + typed SELF-EXCLUDE + unchecked acknowledgement instead of a password; open entries stay in their round (design says refunded); shell promo/Deposit hiding not done."
+      },
+      {
+        "id": "USR-F1",
+        "status": "IMPLEMENTED",
+        "note": "Deposits: KPIs, filterable list with confirmations, empty state for a new account."
+      },
+      {
+        "id": "USR-F2",
+        "status": "IMPLEMENTED",
+        "note": "Withdrawals: under-review tracker with fee breakdown (network fee separate, platform fee 0.00), daily-limit meter, list."
+      },
+      {
+        "id": "USR-F3",
+        "status": "IMPLEMENTED",
+        "note": "Fees: entries × 0.05 equation, current round / 30 d KPIs, fee lines (platform vs network), fee schedule."
+      },
+      {
+        "id": "USR-F4",
+        "status": "IMPLEMENTED",
+        "note": "Rewards: owed reward card with claim (POST /wallet/owed/claim), KPIs, list."
+      },
+      {
+        "id": "USR-F5",
+        "status": "IMPLEMENTED",
+        "note": "Refunds: owed refund card with timeline + claim, KPIs, list, how refunds work (states that fees are not refunded under current rules)."
+      },
+      {
+        "id": "USR-F6",
+        "status": "IMPLEMENTED",
+        "note": "Balance + KPIs, search/type/status/period filters, table ≥1024 / cards <1024, expandable details, pagination, CSV export (audited), print. No 'Your exports' list."
+      },
+      {
+        "id": "USR-G1",
+        "status": "IMPLEMENTED",
+        "note": "In-progress round with real countdown + odds, last-30-day KPIs (Global Pool vs simulation kept separate), recently played (DEMO simulation sessions)."
+      },
+      {
+        "id": "USR-G2",
+        "status": "IMPLEMENTED",
+        "note": "KPIs, status filters, sort, entries grouped by round, empty state, what-each-status-means cards. Grouped by round rather than per-entry expandable rows."
+      },
+      {
+        "id": "USR-G3",
+        "status": "IMPLEMENTED",
+        "note": "Active round cards with countdown, entries, share, empty state."
+      },
+      {
+        "id": "USR-G4",
+        "status": "IMPLEMENTED",
+        "note": "Settled/cancelled rounds with result badges and verify links."
+      },
+      {
+        "id": "USR-G5",
+        "status": "IMPLEMENTED",
+        "note": "Owed vs settled prizes, refunds and rewards, claim to Available."
+      },
+      {
+        "id": "USR-G6",
+        "status": "IMPLEMENTED",
+        "note": "Game rounds with commit-reveal seeds (server seed hidden until the session ends), game filter, CSV export; simulation notice."
+      },
+      {
+        "id": "USR-G7",
+        "status": "IMPLEMENTED",
+        "note": "Favourites grid with remove (heart), empty state; API add/remove."
+      },
+      {
+        "id": "MOB-10",
+        "status": "IMPLEMENTED",
+        "note": "390 layouts for every F and G screen: stacked tx cards grouped by day, scrolling pills, bottom-sheet export, 44px targets. Verified by 390 screenshots."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/web typecheck → exit 0",
+      "pnpm --filter @gp/web lint → exit 0 (after adding playwright.config.ts + e2e/** to tsconfig and ignoring .next-* in root eslint config)",
+      "pnpm --filter @gp/web test → 10 files / 95 tests passed (incl. new test/rg-history.test.ts, 8 tests)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-rg-history NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4103 pnpm --filter @gp/web build → EXIT=0 (run twice; final build includes all changes)",
+      "node scripts/rg-history-qa.mjs on the final build (next start :3103, API :4103) → 40/40 ok (20 screens × 1440/390), no overflow, no console/resource errors; PNGs in apps/web/test-results/visual/rg-history/",
+      "Extra state screenshots in apps/web/test-results/visual/rg-history/states/: f1-empty, g2-empty, rg2 unset, rg6 confirm (dialog/sheet), rg7 steps 2/3, rg5 popup (dialog/sheet), rg6 active, rg7 active",
+      "E2E_BASE_URL=http://localhost:3103 E2E_API_URL=http://localhost:4103 npx playwright test e2e/rg-history.spec.ts → 4 passed (limit set/raise/cancel, history + CSV export, app-wide reality check, 24 h break blocks deposits but not withdrawals)",
+      "pnpm --filter @gp/api typecheck → exit 0; pnpm --filter @gp/api lint → exit 0",
+      "npx vitest run (api unit) src/modules/compliance src/modules/history → 12 passed (rg-session 6, csv 3, RG service 3)",
+      "npx vitest run --config vitest.e2e.config.mts test/rg-history.e2e-spec.ts → 14 passed; test/player.e2e-spec.ts + rounds.e2e-spec.ts → 17 passed",
+      "pnpm --filter @gp/api test (full) → unit 14 files / 59 tests passed; e2e 98 passed / 1 failed (see failing)"
+    ],
+    "failing": [
+      "apps/api test/admin.e2e-spec.ts > 'flagged withdrawals need FOUR EYES: two different admins with MFA' fails (TypeError reading 'pendingApproval': the admin withdrawal queue does not contain the new withdrawal). Not in rg-history code; looks related to admin/withdrawal queue changes by other agents, not confirmed."
+    ],
+    "decisions": [
+      "Privy players have no password: long self-exclusion (6m/1y/5y/permanent) is confirmed with the typed phrase SELF-EXCLUDE + an unchecked acknowledgement, plus a step-up TOTP code (purpose security_settings) only when 2FA is on. Without 2FA it is never blocked. Cooling-off (24h/7d/30d) needs a single confirmation. Departure from the Figma password field.",
+      "Open entries are NOT refunded on self-exclusion or cooling-off: they stay in their round (committed on-chain) and any prize is credited and withdrawable. Figma RG7 says 'refunded per round rules'. Business decision for the owner.",
+      "Platform fees on cancelled rounds are not refunded, per the existing ledger model (round_refund). Figma F3/F5 show a 'fee reversal'. The UI shows the actual ledger and states the rule. Owner should confirm.",
+      "Added a 5y self-exclusion duration (shared enum + API) to match Figma; 'Permanent' has no end date (copy: at least 5 years, reopening needs a support review).",
+      "Play time = activity heartbeats from a visible tab on /pool, /games, /casino, /originals with input in the last 90 s; a session ends after 15 min idle. Browsing account/history pages does not count. This also keeps other agents' automated QA tabs from building up sessions.",
+      "The reality-check popup is client-side and blocking (no close, no Escape, focus on the panel). The server does not block entries when a check is overdue; the configured time limits do block.",
+      "Quiet hours are in UTC. While they are on, the times can only change by turning them off (24 h) and on again.",
+      "An active break or self-exclusion can be extended but never shortened (409). Self-exclusion while on a break is allowed because it is longer.",
+      "Global Pool (real ledger) and simulation games are always reported separately; simulation amounts are labelled 'sim' and are not the USDT balance.",
+      "Added DEMO-only simulation game history for @nova.k via an idempotent script (prisma/seed-history-demo.ts) so G1/G6/G7 show API data. It never touches the ledger.",
+      "Added redirects /transactions → /history/transactions, /favourites → /history/games/favourites, /recently-played → /history/games so the existing sidebar links stop returning 404.",
+      "Applied the pending, additive 20261128160500_onchain_mirror migration (api-gaps) to the shared dev DB: the shared Prisma client already expected its columns and round queries were failing.",
+      "Coordination: task #50 records that rg-history owns RG session time; api-gaps updated #24 to match."
+    ],
+    "next": [
+      "Owner decisions: (1) refund open entries on self-exclusion or not; (2) refund the 0.05 platform fee on cancelled rounds; (3) TOTP vs password-equivalent confirmation for self-exclusion.",
+      "Shell: add an optional override (e.g. ShellOverride noDeposit / hidePromos) so RG6/RG7 active states can disable the top-bar Deposit and hide sidebar promos, then wire it from rg-breaks.tsx.",
+      "Deposit watcher: hold over-limit or excluded on-chain deposits in a 'held for withdrawal' state (today they are credited, but play stays blocked).",
+      "Reality-check push notifications (the toggle is stored; there is no sender yet). Also suppress marketing during exclusion when a marketing pipeline exists.",
+      "Quiet hours in the player's local time zone; a per-entry expandable view for G2; a server-side 'Your exports' list for F6.",
+      "Investigate the admin four-eyes e2e failure (admin-a / admin-b / wallet).",
+      "Optional: add the seed-history-demo step to the main DEMO seed / db:reset flow."
+    ]
+  },
+  {
+    "key": "api-gaps",
+    "report": "I closed the backend gaps for api-gaps, except one: RG session time and reality checks. The rg-history agent claimed those in coordination task #50, so I did not build them. Everything else is done and green:\n- API typecheck, lint and build pass.\n- API tests: 14 unit files / 59 tests and 13 e2e files / 99 tests, including the new Anvil chain suite.\n- @gp/contracts and @gp/shared typecheck, lint and test pass.\n\nNothing is committed. Every server I started is stopped (checked by PID).\n\n**1. On-chain round mirroring** (`apps/api/src/modules/onchain-rounds/`).\n- `RoundMirrorService` runs the round on the contract with viem and the `@gp/contracts` ABI:\n  - `openRound` publishes the rules and a hash of the canonical rules document.\n  - `commitEntries` commits a Merkle root over salted entry commitments. Each entry gets a random 32-byte salt, stored encrypted in the append-only `entry_commitments` table.\n  - When the contract says the thresholds are missed, the keeper sends `cancelRound` and the stakes go back to Owed.\n  - Otherwise the keeper sends `requestDraw`.\n  - `ChainlinkVrfProvider` watches for `DrawFulfilled` and waits for confirmations.\n  - Before any prize is credited, the database winners and amounts must equal the contract's `computeWinners()` and `prizeAmounts()`. If they differ, settlement is blocked and an ALERT is logged.\n  - After settlement, `recordSettlement` publishes the payouts root. The payout leaves and proofs are stored in the append-only `round_payouts` table.\n  - A draw unfulfilled for 24 hours is re-requested, never cancelled, and audited.\n- Every step is idempotent: the contract's state decides whether a step is already done.\n- New read-only endpoints: `GET /pool/rounds/:n/chain`, `/manifest`, `/payouts`, and `/my-proofs` (player only; returns their own salts and proofs).\n- Shared signer (`apps/api/src/modules/blockchain/chain-signer.service.ts`): checks `eth_chainId` before signing (only 421614 or 31337; 31337 is refused in production), simulates the call and decodes custom errors, and manages nonces in the database. Each transaction is signed and stored in a `chain_transactions` outbox before broadcast, re-broadcast byte-for-byte, and tracked as mined, reverted or dropped.\n- Keys come from env and are generated at runtime in tests. I checked that the smoke API log contains no keys.\n- The lifecycle e2e on a fresh Anvil proves DB winners == contract winners and prizes == `prizeAmounts`. Every payout passes `verifyPayout` and the owner's receipts pass `verifyEntry`.\n- A unit test rebuilds the contract fixture's 18,640-entry root and its payouts root exactly.\n\n**2. Deposit watcher** (`deposit-chain-watcher.service.ts`).\n- Scans `Transfer` logs from a mock ERC-20 and credits PENDING → AVAILABLE after N confirmations.\n- Idempotent by `txHash` + `logIndex`.\n- Re-org safe:\n  - Unconfirmed deposits are re-checked through their receipts on every pass.\n  - Each scan re-reads the last N blocks.\n  - A transaction re-included in another block is followed and credited once.\n  - A transaction that stays missing for N more blocks, or that reverted, is reversed with a new `deposit_reversed` posting (PENDING → CHAIN_CLEARING).\n- All of this is e2e-tested with Anvil snapshot/revert.\n\n**3. Withdrawal broadcaster** (`withdrawal-broadcaster.service.ts`).\n- Flow: queued → liquidity check → simulate → sign and store in the outbox, moving the withdrawal to broadcast in the same DB transaction → broadcast → tracker job → confirmed and settled in the ledger.\n- Reverted or dropped → failed, and the funds go back to Available.\n- A transfer whose simulation reverts never gets a nonce. It fails straight from queued, and the funds go back.\n- Missing hot-wallet liquidity, or an RPC that cannot be reached, keeps the withdrawal queued and retries it.\n- e2e tests cover confirmation with the exact net amount on-chain, consecutive nonces under concurrent sends, the simulation revert, and a real on-chain revert.\n\n**4. Email, socket.io and OpenAPI.**\n- Email adapter (`apps/api/src/modules/email/`):\n  - Transports: `log` (dev console), SMTP via nodemailer, or disabled.\n  - Delivery: a BullMQ `emails` worker.\n  - Content: every email carries the DEMO notice and the anti-phishing code.\n  - Preferences: honours the A9 notification preferences; locked security categories always send.\n  - Tests: e2e against the console transport and an in-process fake SMTP server.\n- socket.io Redis adapter (`SOCKET_IO_REDIS_ADAPTER`): an e2e test proves an event raised on replica A reaches a client on replica B.\n- OpenAPI response schemas: 19 main operations now have schemas, and every operation gets a `default` error-envelope response. A contract e2e test parses live responses with the same schemas.\n\n**5. Docker compose.**\n- `docker compose --profile dev`: `api-dev` runs with `NODE_ENV=development`, so the DEV MOCK player login works. It runs migrations and the DEMO seed on start, with jobs and console mail on, plus `web-dev`.\n- `--profile prod` runs production mode, where the DEV MOCK is refused.\n- The Dockerfile now installs OpenSSL for Prisma.\n- `.dockerignore` now excludes nested `.dev` folders. Before this, `apps/api/.dev` (the DEMO admin credentials) would have been copied into the image.\n- `docker compose config` validates both profiles. The images were not built because there is no Docker daemon.\n\nDocs are updated in `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/CONTRACTS.md` and the contracts README.\n\n**Known limits:**\n- The mirror and broadcaster are proven on Anvil only. Nothing is deployed on Arbitrum Sepolia and there is no VRF subscription yet.\n- Signer keys come from env, not a KMS.\n- A stuck withdrawal is only re-broadcast as-is; there is no speed-up or cancel transaction yet.\n- There is no Redis throttler store yet.\n\nMain files are under `/home/user/Claude/global-pool/apps/api/src/modules/{onchain-rounds,blockchain,email}/`, `/home/user/Claude/global-pool/apps/api/src/modules/deposits/deposit-chain-watcher.service.ts`, `/home/user/Claude/global-pool/apps/api/src/modules/withdrawals/withdrawal-broadcaster.service.ts`, `/home/user/Claude/global-pool/apps/api/src/infra/openapi/response-schemas.ts` and `/home/user/Claude/global-pool/apps/api/test/{anvil,chain.e2e-spec,infra.e2e-spec,openapi.e2e-spec,devnet}.ts`.\n\n**Notes from this session the main session may want to save** (learned here; nothing in memory applied to this task):\n- The Chainlink VRF v2.5 mock's subscription id depends on the block hash, so read it from the `SubscriptionCreated` event, not from a simulated call.\n- viem caches `getBlockNumber`, which under-counts confirmations on an on-demand Anvil; use `cacheTime: 0` there.\n- The 18,640-entry tree test needs more than vitest's 5 s default timeout when the suite runs in parallel.\n- `pkill -f` is blocked in this sandbox because it could hit other agents' servers; kill your own processes by PID instead.",
+    "implemented": [
+      {
+        "id": "api-gaps-1 on-chain round mirroring",
+        "status": "IMPLEMENTED",
+        "note": "RoundMirrorService + ChainSignerService (outbox, DB nonce manager, chainId guard); openRound/commitEntries (salted Merkle commitments, encrypted salts)/cancelRound/requestDraw/VRF DrawFulfilled watcher/recordSettlement; lifecycle integration; 24 h re-request; public chain/manifest/payouts + player my-proofs endpoints. Anvil e2e: DB winners == contract winners, prizes == prizeAmounts, verifyPayout/verifyEntry true. Migrations 20261128160500_onchain_mirror + 20261128163000_randomness_request_scope."
+      },
+      {
+        "id": "api-gaps-2 deposit watcher",
+        "status": "IMPLEMENTED",
+        "note": "DepositChainWatcherService: MockUSDT Transfer logs → confirmations → PENDING→AVAILABLE; idempotent by txHash+logIndex; reconcile via receipts every pass, re-org window rescan, re-inclusion followed, reorged-out/reverted → deposit_reversed. Anvil e2e incl. snapshot/revert re-orgs."
+      },
+      {
+        "id": "api-gaps-3 withdrawal broadcaster",
+        "status": "IMPLEMENTED",
+        "note": "WithdrawalBroadcasterService + withdrawal.track job: queued → broadcast → confirmed (ledger settle); revert/dropped → failed, funds to Available; simulation revert fails from queued (new shared transition queued→failed); nonce management tested under concurrency; Anvil e2e for all paths."
+      },
+      {
+        "id": "api-gaps-4a RG session-time + reality-check events",
+        "status": "NOT DONE (owned by rg-history)",
+        "note": "Coordination task #50: rg-history implements RG session tracking / session_time limit / reality checks in compliance; not re-implemented here to avoid conflicting edits."
+      },
+      {
+        "id": "api-gaps-4b email delivery adapter",
+        "status": "IMPLEMENTED",
+        "note": "MAIL_TRANSPORT log|smtp|disabled (names aligned with existing .env.example), nodemailer 10.4.1, BullMQ emails queue + worker, anti-phishing code + DEMO notice, A9 preferences honoured; e2e with console transport and fake SMTP server."
+      },
+      {
+        "id": "api-gaps-4c socket.io Redis adapter",
+        "status": "IMPLEMENTED",
+        "note": "@socket.io/redis-adapter 8.3.0 behind SOCKET_IO_REDIS_ADAPTER; e2e proves cross-replica broadcast with two app instances."
+      },
+      {
+        "id": "api-gaps-4d OpenAPI response schemas",
+        "status": "IMPLEMENTED",
+        "note": "19 main operations get zod-derived response components in /docs-json, plus a default ErrorEnvelope response on every operation; contract e2e parses live responses."
+      },
+      {
+        "id": "api-gaps-5 docker-compose dev profile",
+        "status": "IMPLEMENTED (config validated, image not built)",
+        "note": "--profile dev (api-dev NODE_ENV=development, DEV MOCK, migrate + seed, jobs) / --profile prod; Dockerfile installs openssl; .dockerignore excludes **/.dev. docker compose config OK; no Docker daemon, so the images were not built or run."
+      },
+      {
+        "id": "docs",
+        "status": "IMPLEMENTED",
+        "note": "docs/API.md (on-chain operations, re-org table, broadcaster, email, endpoints, env table, data model), docs/ARCHITECTURE.md, docs/CONTRACTS.md, packages/contracts/README.md, .env.example"
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/api typecheck: exit 0",
+      "pnpm --filter @gp/api lint: exit 0 (no findings)",
+      "pnpm --filter @gp/api build: exit 0",
+      "pnpm --filter @gp/api test: unit 14 files / 59 tests passed; e2e 13 files / 99 tests passed (includes chain, infra, openapi suites)",
+      "test/chain.e2e-spec.ts on a fresh Anvil (anvil 1.9.0): 10/10 passed, re-run 3 times with no stray anvil left afterwards",
+      "test/infra.e2e-spec.ts 5/5 (email log + SMTP, Redis adapter); test/openapi.e2e-spec.ts 2/2",
+      "commitments.spec.ts rebuilds packages/contracts fixture entries root (18,640 entries) and payouts root exactly",
+      "pnpm --filter @gp/contracts typecheck / lint (forge fmt --check + eslint) / test: 67 forge tests + 9 node tests passed (incl. new artifacts freshness test)",
+      "pnpm --filter @gp/shared typecheck, lint, test 60/60 passed (one earlier run showed 1 failure that did not reproduce in three re-runs; likely a concurrent edit or a timeout)",
+      "Built API (dist) booted against a local devnet with mirror + broadcaster + Redis adapter on: /health 200, /docs-json 180 operations with RoundChainStatus etc. components, /pool/rounds/1248/chain OK; no private keys in the log; process stopped by PID",
+      "docker compose --profile dev|prod config resolves the expected services; .env.example parses with the API env schema"
+    ],
+    "failing": [
+      "Not run: Docker image build / compose up (no Docker daemon in the sandbox); only `docker compose config` validated",
+      "Not run: mirroring, VRF and broadcaster against real Arbitrum Sepolia (no deployed GlobalPoolRounds, no VRF subscription, no funded testnet keys); proven on Anvil only",
+      "Not done by design: RG session-time enforcement and reality-check events (owned by rg-history per coordination task #50)",
+      "Not run: Playwright/web checks (api-gaps has no web pages; no Figma ledger rows)"
+    ],
+    "decisions": [
+      "RG session time and reality checks left to rg-history (task #50) to avoid duplicate implementations in compliance",
+      "Salts are generated when the round closes (not at purchase), encrypted with AES-256-GCM; key = ENTRY_SALT_ENCRYPTION_KEY or HKDF(TOTP_ENCRYPTION_KEY, 'gp:entry-salt:v1')",
+      "Merkle proofs for entries are computed on demand from the stored leaves, not stored per entry (avoids ~18 MB per large round); payout proofs (13 rows) are stored",
+      "The contract's thresholdsMet decides cancel vs draw for mirrored rounds, since it is stricter: it also requires entries ≥ number of prizes",
+      "A mirrored round whose draw has been requested is never cancelled on VRF timeout: it is re-requested after the contract's 24 h window, matching the contract rules",
+      "Rounds closing within 60 s, and DEMO rounds unless DEMO_ROUNDS_AUTO_SETTLE, are not mirrored",
+      "Added shared transition queued → failed (additive in @gp/shared WITHDRAWAL_TRANSITIONS) for transfers whose simulation reverts; funds go back to Available",
+      "Missing hot-wallet liquidity or an unreachable RPC keeps a withdrawal queued and retries it (never auto-failed); only an on-chain revert, a dropped tx or a simulation revert fails it",
+      "randomness_requests unique key changed from (provider, request_id) to (round_id, provider, request_id) because each local devnet coordinator restarts request ids at 1",
+      "Email env names follow the existing .env.example (MAIL_TRANSPORT log|smtp|disabled, MAIL_FROM); e2e sets MAIL_TRANSPORT=disabled by default so no email jobs pile up in test Redis",
+      "Compose: api/web moved behind `--profile prod`; new `--profile dev` (api-dev/web-dev). Plain `docker compose up` now starts only postgres + redis (header documents this)",
+      "MockUSDT lives in packages/contracts/test/mocks (test-only); local deploy artifacts exported to packages/contracts/artifacts/local-devnet.json; root build:packages now also runs @gp/contracts build:ts",
+      "New deps: nodemailer 10.4.1, @socket.io/redis-adapter 8.3.0, @types/nodemailer 8.0.2 (dev), @gp/contracts workspace dep in apps/api",
+      "Shared-file edits (additive, re-read before each): app.module, app.setup, queues, notifications.notify (queues email), deposits.service (watch moved to new service; blockHash field), withdrawals processor/module, round-lifecycle, randomness provider/service, ledger posting template, setup-env, schema.prisma"
+    ],
+    "next": [
+      "Deploy GlobalPoolRounds on Arbitrum Sepolia (script/Deploy.s.sol), create and fund the VRF subscription, set POOL_CONTRACT_ADDRESS / POOL_CONTRACT_START_BLOCK / operator, settler and keeper keys, and run one live mirrored round",
+      "Choose or deploy a test-USDT on Arbitrum Sepolia, fund a throwaway hot wallet, enable WITHDRAWAL_BROADCASTER_ENABLED and run the watcher and broadcaster live",
+      "Move signer keys to a KMS/HSM; add speed-up / cancel replacement transactions for stuck withdrawals; add alerting for MirrorMismatchError, hot-wallet liquidity, re-request and coordinatorPinned",
+      "Web: show /pool/rounds/:n/chain (tx links, roots) and a 'Verify my entries' panel using /my-proofs + verifyEntry via viem readContract",
+      "Build the docker images once a daemon is available and smoke-test `--profile dev`",
+      "Add a Redis throttler store for multi-replica deployments; deposit sweep / treasury process",
+      "rg-history: wire reality-check / session-limit notifications into EMAIL_NOTIFICATION_CATEGORY (rg_limit_changes category) if emails are wanted"
+    ]
+  }
+]
