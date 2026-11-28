@@ -2,7 +2,8 @@
   "name": "@gp/web",
   "version": "0.1.0",
   "private": true,
-  "description": "GLOBAL POOL player web app — Next.js 15 App Router, casino shell, design system. DEMO / testnet only.",
+  "packageManager": "pnpm@10.28.0",
+  "description": "GLOBAL POOL player web app \u2014 Next.js 15 App Router, casino shell, design system. DEMO / testnet only.",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
