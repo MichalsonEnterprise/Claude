@@ -113,95 +113,90 @@ function bandY(id) { const b = sec.children.find(n => n.name === 'Band — ' + i
 const SHOT = async (ids, scale = 0.3) => { for (const id of ids) { const n = await figma.getNodeByIdAsync(id); if (n) await n.screenshot({ scale }); } };
 // ===== END ADM-CORE LIB =====
 
-// adm-core #03 — ADM-X1 approver side over a clone of the ADM-00 Approvals inbox (36:522948).
-// Flow (left→right in the X1 band, after Confirm-with-reason at x=120 and Request submitted at x=1680):
-//   x=3240 Re-authenticate (step-up 2FA, K. Osei, 20:30 UTC) → x=4800 Second approver review (Ready) → x=6360 Approved & released.
-//   Below the review: Self-approval blocked (A. Marin opens her own AR-1042).
-// IDEMPOTENT (skips frames that already exist). Requires #02 (X1 band) to have run.
-const bandX = sec.children.find(n => n.name === 'Band — ADM-X1'); if (!bandX) throw new Error('Run 02-x1-requester first (Band — ADM-X1 missing)');
-const Y = bandX.y + 120;
-const SRC = await figma.getNodeByIdAsync('36:522948'); const H2 = SRC.height + 160;
+// adm-core #04 — Laptop 1280 row: ADM-00 Approvals inbox (clone of 36:522948), ADM-01 Sign in (clone, policy grid re-flowed),
+// ADM-02 Overview (rebuilt for a 976 px column: KPI values Number/M, queues 2-up, services/network/audit full width),
+// ADM-X1 Confirm with reason Ready (over ADM-F2's own 1280 detail 34:468177). IDEMPOTENT. Requires #01a, #01b, #02.
+// ===== ADM-02 overview content builder (shared by laptop 1280 and tablet 768) =====
+// bp: 'L' = 976 px content column (1280 with sidebar), 'T' = 704 px content column (768, no sidebar)
+function tw(t, w) { t.resize(w, t.height); t.textAutoResize = 'HEIGHT'; return t; }
+function bpMode(f, name) { const bc = __COLS['Breakpoint']; const m = bc.modes.find(x => x.name === name); if (m) f.setExplicitVariableModeForCollection(bc, m.modeId); }
+async function head2(c, crumbs, title, sub, sw, right = []) { const h = row({ name: 'Page header', align: 'MAX', gap: 16, wrap: true, cgap: 12 }); const l = col({ name: 'Title block', gap: 6 }); const bc = await I('14:1145', { Levels: String(crumbs.length) }); for (let i = 0; i < crumbs.length - 1; i++) await setT(bc, 'Crumb ' + (i + 1), crumbs[i]); await setT(bc, 'Current page', crumbs[crumbs.length - 1]); const tr = row({ name: 'Title row', gap: 12 }); add(tr, await T(title, 'Heading/H3'), await DEMO('M')); add(l, bc, tr, await T(sub, 'Body/S', 'text/secondary', { w: sw })); add(h, l, [sp(), 'FILL'], ...right); add(c, [h, 'FILL']); return h; }
+const KP1 = [['Up', 'Total deposits · 30 d', '12,846,500.00', 'USDT', '+8.4%', 'vs previous 30 d', 'Σ confirmed deposits, all networks'], ['Up', 'Total withdrawals · 30 d', '10,932,140.00', 'USDT', '+6.9%', 'vs previous 30 d', 'Σ executed withdrawals, all networks'], ['Up', 'Gross revenue · 30 d', '811,850.70', 'USDT', '+5.6%', 'vs previous 30 d', 'GGR + platform fees · Revenue reports'], ['Flat', 'Platform fees · 30 d', '60,700.00', 'USDT', '0.0%', 'vs previous 30 d', '1,214,000 entries × 0.05 USDT']];
+const KP2 = [['Up', 'Total users', '184,320', 'accounts', '+3.2%', 'vs previous 30 d', 'All registered player accounts'], ['Down', 'Active users · 30 d', '41,206', 'players', '−2.1%', 'vs previous 30 d', 'Placed ≥ 1 bet or pool entry'], ['Flat', 'Pool liabilities', '238,710.40', 'USDT', 'Live', 'snapshot', '186,400.00 open pool + 52,310.40 owed'], ['Flat', 'Active rounds', '1', 'round', 'Live', 'snapshot', 'Round #1,248 · closes 20:00 UTC']];
+async function kpi(k, small) { const [trend, label, value, unit, delta, ctx, def] = k; const t = await I('23:15270', { Trend: trend }); t.name = 'KPI — ' + label; await setT(t, 'Label', label); const v = await setT(t, 'Value', value); await setT(t, 'Unit', unit); await setT(t, 'Delta value', delta); await setT(t, 'vs previous 30 d', ctx); await setT(t, 'Definition', def); if (small && v) await v.setTextStyleIdAsync(TS['Number/M'].id); return t; }
+async function krow(c, name, items, small) { const r = row({ name, gap: 16, align: 'MIN' }); for (const k of items) { const t = await kpi(k, small); add(r, [t, 'FILL']); const sk = t.findOne(n => n.name === 'Sparkline'); if (sk) { try { sk.layoutSizingHorizontal = 'FILL'; } catch (e) {} } } add(c, [r, 'FILL']); return r; }
+async function ovContent(c, bp) {
+  const seg = await I('20:6978', { Segments: '3' });
+  for (const s of seg.findAll(n => n.type === 'INSTANCE' && n.name.includes('Segment'))) { const tx = s.findOne(n => n.type === 'TEXT'); if (tx) s.setProperties({ State: tx.characters.includes('30') ? 'Active' : 'Default' }); }
+  await head2(c, ['Admin', 'Overview'], 'Overview', 'KPIs for the last 30 days (28 Oct – 26 Nov 2026) and live operations. Data as of 27 Nov 2026, 18:45 UTC · updates live.', bp === 'L' ? 520 : 400, [seg, await BTN('Secondary', bp === 'L' ? 'Export snapshot' : 'Export', { size: 'S', lead: 'download' })]);
+  if (bp === 'L') { await krow(c, 'KPIs — money', KP1, true); await krow(c, 'KPIs — users & liabilities', KP2, true); }
+  else { await krow(c, 'KPIs — deposits & withdrawals', KP1.slice(0, 2)); await krow(c, 'KPIs — revenue & fees', KP1.slice(2)); await krow(c, 'KPIs — users', KP2.slice(0, 2)); await krow(c, 'KPIs — liabilities & rounds', KP2.slice(2)); }
+  const q = row({ name: 'Work queues', gap: 16, align: 'MIN' }); add(q, [await I('23:15571', { Queue: 'Withdrawals', SLA: 'On track' }), 'FILL'], [await I('23:15571', { Queue: 'KYC', SLA: 'On track' }), 'FILL']); add(c, [q, 'FILL']);
+  const ap = panel('Four-eyes approvals', { gap: 10 }); add(ap, [await ph('Four-eyes approvals', { icon: 'user-check', right: [await BADGE('Pending')] }), 'FILL']);
+  for (const [id, t, who, e] of [['AR-1047', 'Pinfall max bet → 500.00 USDT', 'Game config · effective next round', '1 h 45 min'], ['AR-1045', 'Lift sign-in suspension · @juno88', 'R. Duarte · Support', '3 h 10 min'], ['AR-1049', 'Export KYC file · REG-221', 'K. Osei · Compliance', '3 h 20 min'], ['AR-1042', 'Release WD-20931 · 1,500.00 USDT', 'A. Marin · Finance', '3 h 35 min']]) { const r = row({ name: id, gap: 12, p: [8, 0] }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, await T(id, 'Mono/S', 'text/tertiary'), await T(t, 'Body/S', 'text/primary', { w: bp === 'L' ? 300 : 250 })); if (bp === 'L') add(r, await T(who, 'Caption', 'text/tertiary')); add(r, [sp(), 'FILL'], await stat('hourglass', 'icon/muted', 'expires in ' + e, 'text/tertiary', 'Caption')); add(ap, [r, 'FILL']); }
+  add(ap, await BTN('Secondary', 'Open approvals', { size: 'S', trail: 'arrow-right' })); add(c, [ap, 'FILL']);
+  const r4 = row({ name: 'Health & KYC', gap: 16, align: 'MIN' });
+  const g = await I('30:17353', { Status: 'Operational' }); await setT(g, 'Footnote text', 'No outages in 30 days · Ethereum deposits slower today (congestion)'); if (bp === 'L') add(r4, g); else add(r4, [g, 'FILL']);
+  const ky = panel('KYC statistics', { gap: 14 }); add(ky, [await ph('KYC · 30 d', { icon: 'id-card' }), 'FILL']);
+  const kn = row({ gap: 8, align: 'MAX' }); add(kn, await T('6,480', 'Number/L'), await T('submitted', 'Body/S', 'text/tertiary')); add(ky, kn);
+  const bar = row({ name: 'Outcome bar', gap: 2, r: 9999, clip: true }); const ba = rect(10, 8, 'status/success', 0, 'Approved 91.2%'); add(bar, [ba, 'FILL'], rect(16, 8, 'status/danger', 0, 'Rejected 5.5%'), rect(10, 8, 'status/pending', 0, 'Pending 3.3%')); add(ky, [bar, 'FILL']);
+  for (const [ic, cl, lab, v, tc] of [['check-circle', 'status/success', 'Approved', '5,912 · 91.2%', 'text/success'], ['x-circle', 'status/danger', 'Rejected', '354 · 5.5%', 'text/danger'], ['clock', 'status/pending', 'Pending review', '214 · 3.3%', 'text/secondary']]) { const r = row({ gap: 8 }); add(r, await stat(ic, cl, lab, tc), [sp(), 'FILL'], await T(v, 'Number/S', 'text/primary')); add(ky, [r, 'FILL']); }
+  const lv = row({ name: 'By level', gap: 8, p: [10, 0] }); strokeSides(lv, 'border/subtle', { t: 1 });
+  for (const [l, v] of [['L1', '3,920'], ['L2', '2,236'], ['L3', '324']]) { const b = col({ gap: 2, p: [6, 10], fill: 'surface/raised', r: 6 }); add(b, await T(l, 'Overline', 'text/tertiary'), await T(v, 'Number/S')); add(lv, [b, 'FILL']); }
+  add(ky, [lv, 'FILL']); const md = await T('Median review 6 h 40 min · SLA 48 h · 99% within SLA', 'Caption', 'text/tertiary', { w: 280 }); add(ky, [md, 'FILL']);
+  add(r4, [ky, 'FILL']); add(c, [r4, 'FILL']);
+  const sv = panel('Services', { gap: 4 }); add(sv, [await ph('Services', { icon: 'server' }), 'FILL']);
+  for (const [n, m, ic, cl, lab, tc] of [['API gateway', 'p95 42 ms', 'check-circle', 'status/success', 'Operational', 'text/success'], ['Wallet service', 'p95 118 ms', 'check-circle', 'status/success', 'Operational', 'text/success'], ['Chainlink VRF · Arbitrum', 'last fulfilment 37 s ago', 'check-circle', 'status/success', 'Operational', 'text/success'], ['Chain indexer', '2 blocks behind', 'check-circle', 'status/success', 'Operational', 'text/success'], ['Ethereum deposits', 'avg 9 min to credit', 'alert-triangle', 'status/warning', 'Slower', 'text/warning']]) { const r = row({ name: n, gap: 10, p: [9, 0] }); strokeSides(r, 'border/subtle', { t: 1 }); const l = col({ gap: 2 }); add(l, await T(n, 'Label/M'), await T(m, 'Caption', 'text/tertiary')); add(r, l, [sp(), 'FILL'], await stat(ic, cl, lab, tc)); add(sv, [r, 'FILL']); }
+  add(c, [sv, 'FILL']);
+  const r5 = row({ name: 'Pool', gap: 16, align: 'MIN' }); if (bp === 'T') { r5.layoutMode = 'VERTICAL'; }
+  const ch = await I('27:15865', { State: 'Default' }); add(r5, [ch, 'FILL']);
+  const rm = panel('Round #1,248 monitor', { gap: 12 }); add(rm, [await ph('Round #1,248', { icon: 'pool', right: [await BADGE('Live')] }), 'FILL']);
+  const pv = col({ gap: 2 }); add(pv, await T('POOL BALANCE', 'Overline', 'text/tertiary'), await T('186,400.00 USDT', 'Number/L', 'text/gold')); add(rm, pv);
+  for (const [k, v] of [['Participants', '3,412'], ['Qualifying entries', '18,640'], ['Platform fees (not in pool)', '932.00 USDT'], ['Closes', '20:00 UTC · in 01:15:00'], ['Threshold', 'Met · 3,412 ≥ 500'], ['Draw', 'Chainlink VRF · Arbitrum']]) { const r = row({ gap: 8, p: [6, 0] }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, await T(k, 'Body/S', 'text/tertiary'), [sp(), 'FILL'], await T(v, 'Label/M', 'text/primary')); add(rm, [r, 'FILL']); }
+  const ro = row({ name: 'Read-only note', gap: 8, p: [10, 12], fill: 'surface/raised', r: 10, align: 'MIN' }); const rot = await T('Monitoring only. No admin can alter entries, the draw or the payout. Pausing new entries needs two Super Admins.', 'Caption', 'text/secondary', { w: 280 }); add(ro, await IC('lock', 16, 'icon/muted'), [rot, 'FILL']); add(rm, [ro, 'FILL']);
+  if (bp === 'L') { add(r5, rm); rm.resize(340, rm.height); rm.primaryAxisSizingMode = 'AUTO'; } else add(r5, [rm, 'FILL']);
+  add(c, [r5, 'FILL']);
+  const nw = panel('Network health', { gap: 4 }); add(nw, [await ph('Network health', { icon: 'activity' }), 'FILL']);
+  for (const [chn, s, cf, t, qq] of [['BNB Chain', 'Operational', '15 conf.', '≈ 45 s to credit', '3 confirming'], ['Polygon', 'Operational', '64 conf.', '≈ 2 min', '1 confirming'], ['Arbitrum', 'Operational', '20 conf.', '≈ 30 s', '4 confirming'], ['Ethereum', 'Degraded', '12 conf.', '≈ 9 min · congested', '6 confirming · DP-77412 7 / 12'], ['Solana', 'Operational', '32 · finalized', '≈ 15 s', '0 confirming']]) { const r = row({ name: chn, gap: 12, p: [8, 0] }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, await I('9:377', { Chain: chn, Status: s }), [sp(), 'FILL'], await T(cf, 'Caption', 'text/tertiary'), await T(t, 'Label/M', s === 'Degraded' ? 'text/warning' : 'text/primary'), await T(qq, 'Caption', 'text/tertiary')); add(nw, [r, 'FILL']); }
+  add(c, [nw, 'FILL']);
+  const au = panel('Recent sensitive actions', { gap: 4 }); add(au, [await ph('Recent sensitive actions', { icon: 'history' }), 'FILL']);
+  for (const [tm, wh, ac] of [['18:20', 'A. Marin · Finance', 'Requested AR-1042 · release WD-20931'], ['18:05', 'K. Osei · Compliance', 'Requested AR-1049 · KYC export REG-221'], ['17:55', 'R. Duarte · Support', 'Requested AR-1045 · lift suspension @juno88'], ['16:12', 'S. Iyer · Super Admin', 'Approved AR-1041 · refunds round #1,245']]) { const r = row({ name: tm, gap: 10, p: [8, 0], align: 'MIN' }); strokeSides(r, 'border/subtle', { t: 1 }); const l = col({ gap: 2 }); add(l, await T(ac, 'Body/S', 'text/primary'), await T(wh + ' · hash-chain ✓', 'Caption', 'text/tertiary')); add(r, await T(tm, 'Mono/S', 'text/tertiary'), l); add(au, [r, 'FILL']); }
+  add(au, await BTN('Ghost', 'Open audit log', { size: 'S', trail: 'arrow-right' })); add(c, [au, 'FILL']);
+}
+// ===== END overview builder =====
+
+let bandL = sec.children.find(n => n.name === 'Band — Laptop 1280');
+if (!bandL) { bandL = AL('VERTICAL', { name: 'Band — Laptop 1280', gap: 8 }); add(bandL, await T('Laptop 1280 · ADM-00 / ADM-01 / ADM-02 / ADM-X1', 'Heading/H2'), await T('Same shell with a 976 px content column: KPI values step down to Number/M, side-by-side panels re-flow into full-width rows, dialogs keep their desktop size. Wide texts are re-wrapped, never clipped.', 'Body/L', 'text/secondary', { w: 1400 })); sec.appendChild(bandL); bandL.x = 120; bandL.y = nextY(sec); }
+const YL = bandL.y + 120; const XL = i => 120 + i * 1400;
 const made = [];
-async function setTxt(t, v) { for (const fo of (t.fontName === figma.mixed ? t.getRangeAllFontNames(0, t.characters.length) : [t.fontName])) await figma.loadFontAsync(fo); t.characters = v; }
-async function back(name, x, y, as, session) { if (EX(name)) { OUT.skipped.push(name); return null; } const f = SRC.clone(); sec.appendChild(f); f.x = x; f.y = y; f.name = name;
-  const sb = f.findOne(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.id === '22:5501');
-  const tb = f.findOne(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.id === '22:6483');
-  if (as === 'KO') { for (const r of [sb, tb]) if (r) { await setT(r, 'Initials', 'KO'); await setT(r, 'A. Marin', 'K. Osei'); await setT(r, 'Finance Lead', 'Compliance Officer'); } if (sb) await setT(sb, '8 of 10 modules', '7 of 10 modules'); }
-  if (sb && session) for (const t of sb.findAll(n => n.type === 'TEXT' && n.characters.startsWith('2FA session'))) await setTxt(t, session);
-  return f; }
-async function modalShell(w, icon, tile, ic, title, sub) {
-  const m = AL('VERTICAL', { name: 'Modal — ' + title, w, fill: 'surface/overlay', stroke: 'border/subtle', r: 20, clip: true }); await fx(m, 'Elevation/4 — Modal');
-  const h = row({ name: 'Header', gap: 14, p: [20, 20, 20, 24], align: 'MIN' }); strokeSides(h, 'border/subtle', { b: 1 });
-  const tl = AL('HORIZONTAL', { name: 'Icon tile', w: 40, h: 40, fill: tile, r: 10, align: 'CENTER', justify: 'CENTER' }); add(tl, await IC(icon, 20, ic));
-  const tx = col({ name: 'Title', gap: 4 }); add(tx, await T(title, 'Heading/H4', 'text/primary', { w: w - 190 }), await T(sub, 'Body/S', 'text/secondary', { w: w - 190 }));
-  add(h, tl, [tx, 'FILL'], await DEMO('S'), await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS.x }));
-  add(m, [h, 'FILL']); return m; }
-async function footer(m, cap, btns) { const fr = row({ name: 'Footer', gap: 8, p: [16, 24] }); strokeSides(fr, 'border/subtle', { t: 1 }); const c = await T(cap, 'Caption', 'text/tertiary', { w: 300 }); add(fr, [c, 'FILL'], ...btns); add(m, [fr, 'FILL']); return fr; }
-async function line(icon, ic, text, w, tc = 'text/secondary', st = 'Body/S') { const r = row({ name: 'Line — ' + text.slice(0, 24), gap: 10, align: 'MIN' }); add(r, await IC(icon, 16, ic), await T(text, st, tc, { w: w - 26 })); return r; }
-async function callout(tint, icon, ic, title, body, w) { const c = row({ name: 'Callout — ' + title.slice(0, 24), gap: 10, p: [12, 14], fill: tint, r: 10, align: 'MIN' }); const tx = col({ gap: 4 }); add(tx, await T(title, 'Label/L', 'text/primary', { w: w - 56 }), await T(body, 'Body/S', 'text/secondary', { w: w - 56 })); add(c, await IC(icon, 18, ic), tx); return c; }
-async function arCard(state) { const c = await I('23:24500', { State: state }); c.name = 'Admin/Approval Request Card';
-  // the card's own action row is hidden: the dialog footer owns the decision buttons
-  const isBtn = k => k.type === 'INSTANCE' && k.mainComponent && k.mainComponent.parent && /^Button\//.test(k.mainComponent.parent.name);
-  const rows = new Set(c.findAll(isBtn).map(b => b.parent));
-  for (const r of rows) if (r && r !== c && r.children.every(k => isBtn(k) || k.name === 'Spacer')) r.visible = false;
-  return c; }
-const RW = 428; // right column width inside the 960 review modal (960 − 2×24 padding − 460 card − 24 gap)
-async function review(kind) {
-  const cfg = { review: ['user-check', 'brand/tint', 'icon/brand', 'Review AR-1042 · release flagged withdrawal', 'Requested by A. Marin (Finance Lead) on 27 Nov 2026, 18:20 UTC · expires 22:20 UTC (in 1 h 49 min)', 'Pending'],
-    self: ['ban', 'status/danger-tint', 'status/danger', "AR-1042 · you can't approve your own request", 'Requested by you on 27 Nov 2026, 18:20 UTC · waiting for a second approver · expires 22:20 UTC', 'Pending'],
-    approved: ['check-circle', 'status/success-tint', 'status/success', 'AR-1042 approved · WD-20931 released', 'Approved by K. Osei (Compliance Officer) on 27 Nov 2026, 20:31 UTC · decision is final', 'Approved'] }[kind];
-  const m = await modalShell(960, cfg[0], cfg[1], cfg[2], cfg[3], cfg[4]);
-  const b = row({ name: 'Body', gap: 24, p: 24, align: 'MIN' }); add(m, [b, 'FILL']);
-  add(b, await arCard(cfg[5]));
-  const r = col({ name: 'Decision', gap: 16, w: RW }); add(b, r);
-  if (kind === 'review') {
-    add(r, await T('YOUR DECISION · SECOND APPROVER', 'Overline', 'text/brand'));
-    const vf = row({ name: '2FA verified', gap: 8, p: [8, 12], fill: 'status/success-tint', r: 10 }); add(vf, await IC('shield-check', 16, 'status/success'), await T('2FA verified 20:30 UTC · valid for this decision until 20:35 UTC', 'Label/M', 'text/success', { w: RW - 48 })); add(r, [vf, 'FILL']);
-    add(r, [await I('13:565', { State: 'Default' }, { Label: 'Reason category', Value: 'AML — independent review completed', 'Show helper': false, 'Show leading icon': false }), 'FILL']);
-    const ta = await I('16:3858', { State: 'Focus' }, { Label: "Your reason — stored next to the requester's", 'Show counter': true }); add(r, [ta, 'FILL']);
-    await setT(ta, 'Value text', 'Reviewed AML-3317 evidence and the signed ownership proof for 0x7c4e…a21D. The velocity hit is explained by the 14 Oct 2026 whitelisting. Agree to release under FIN-2.3.'); await setT(ta, 'Counter', '171 / 500');
-    const wh = col({ name: 'What happens', gap: 8, p: 16, fill: 'surface/raised', r: 10 }); add(wh, await T('WHAT HAPPENS WHEN YOU APPROVE', 'Overline', 'text/tertiary'));
-    for (const [ic, t] of [['arrow-up-right', '1,500.00 USDT leaves Locked and joins the next Arbitrum batch (every 10 min). The player receives 1,499.92 USDT after the 0.08 USDT network fee.'], ['mail', 'The player sees "Approved — sending" and gets an email. No reason codes are shown to them.'], ['history', 'One audit entry stores both admins, both reasons, IPs and 2FA checks — hash-chained.']]) add(wh, [await line(ic, 'icon/muted', t, RW - 32), 'FILL']);
-    add(r, [wh, 'FILL']);
-    add(r, [await line('lock', 'icon/muted', "You can't edit the amount, destination or network here. To change anything, reject and ask A. Marin for a new request.", RW, 'text/tertiary', 'Caption'), 'FILL']);
-    await footer(m, 'Requester ≠ approver (SYS-1.1) · Reject and Approve both need a reason', [await BTN('Secondary', 'Cancel', { size: 'M' }), await BTN('Danger', 'Reject request', { size: 'M', lead: 'x-circle' }), await BTN('Primary', 'Approve & release', { size: 'M', lead: 'shield-check' })]);
-  } else if (kind === 'self') {
-    add(r, [await callout('status/danger-tint', 'ban', 'status/danger', "You can't approve your own request", 'You (A. Marin, Finance Lead) requested AR-1042 at 18:20 UTC. Policy SYS-1.1 requires a different admin with Compliance or Super Admin rights to approve or reject it.', RW), 'FILL']);
-    add(r, await T('ELIGIBLE APPROVERS', 'Overline', 'text/tertiary'));
-    for (const [ini, nm, role, st, ic, cl] of [['KO', 'K. Osei', 'Compliance', 'Online · last active 18:46 UTC', 'check-circle', 'status/success'], ['SI', 'S. Iyer', 'Super Admin', 'Away · back at 21:00 UTC', 'clock', 'icon/muted']]) { const p = row({ name: 'Approver — ' + nm, gap: 10, p: [10, 12], fill: 'surface/raised', r: 10 }); const tx = col({ gap: 2 }); add(tx, await T(nm, 'Label/L'), await stat(ic, cl, st, 'text/tertiary', 'Caption')); add(p, await I('9:238', { Size: 'S' }, { Initials: ini }), tx, [sp(), 'FILL'], await I('23:18440', { Role: role, Size: 'S' })); add(r, [p, 'FILL']); }
-    add(r, [await line('lock', 'icon/muted', 'Nothing moves until a second admin decides: WD-20931 stays in Locked and the player keeps seeing "Under review". If nobody decides by 22:20 UTC the request expires and changes nothing.', RW), 'FILL']);
-    add(r, [await line('eye', 'icon/muted', 'Opening this request was logged. No decision was recorded.', RW, 'text/tertiary', 'Caption'), 'FILL']);
-    await footer(m, 'Withdrawing your request returns WD-20931 to the review queue', [await BTN('Ghost', 'Withdraw my request', { size: 'M' }), await BTN('Secondary', 'Remind approvers', { size: 'M', lead: 'bell' }), await BTN('Primary', 'Approve & release', { size: 'M', state: 'Disabled', lead: 'lock' })]);
-  } else {
-    add(r, [await callout('status/success-tint', 'check-circle', 'status/success', 'Released to the next Arbitrum batch', 'You approved AR-1042 at 20:31 UTC. WD-20931 (1,500.00 USDT → 0x7c4e…a21D) is sent at 20:32 UTC; the player receives 1,499.92 USDT.', RW), 'FILL']);
-    add(r, await T('DECISION TRAIL', 'Overline', 'text/tertiary'));
-    for (const [ic, cl, t, s] of [['check-circle', 'status/success', '18:20 UTC · Requested by A. Marin (Finance)', 'AML — screening cleared · 2FA ✓ · audit #88,190'], ['check-circle', 'status/success', '20:31 UTC · Approved by K. Osei (Compliance)', 'AML — independent review completed · 2FA ✓ · audit #88,391'], ['clock', 'status/pending', '20:32 UTC · Broadcast in Arbitrum batch', 'Then 20 confirmations (≈ 30 s). Shown live in Finance → Withdrawals.']]) { const st = row({ name: 'Step — ' + t.slice(0, 20), gap: 10, p: [10, 0], align: 'MIN' }); strokeSides(st, 'border/subtle', { t: 1 }); const tx = col({ gap: 2 }); add(tx, await T(t, 'Label/M', 'text/primary', { w: RW - 30 }), await T(s, 'Caption', 'text/tertiary', { w: RW - 30 })); add(st, await IC(ic, 18, cl), tx); add(r, [st, 'FILL']); }
-    add(r, [await line('info', 'icon/muted', "Decisions are final. On-chain transfers can't be reversed — if something is wrong, open an incident and contact the player; never adjust balances by hand.", RW, 'text/tertiary', 'Caption'), 'FILL']);
-    await footer(m, 'Hash-chained in the audit log · both reasons stored', [await BTN('Secondary', 'View audit entry', { size: 'M', lead: 'history' }), await BTN('Primary', 'Done', { size: 'M' })]);
-  }
-  return m; }
-// ---- 1. Re-authenticate (step-up 2FA) ----
-{ const f = await back('[ADM-X1] Re-authenticate — Fresh 2FA before approving / 1440 / Default', 3240, Y, 'KO', '2FA session · ended 20:15 UTC'); if (f) {
-  const m = await modalShell(480, 'fingerprint', 'brand/tint', 'icon/brand', "Confirm it's you", 'Your 2FA session ended at 20:15 UTC. Approving AR-1042 needs a fresh code — open dialogs never submit on their own.');
-  const b = col({ name: 'Body', gap: 16, p: 24 }); add(m, [b, 'FILL']);
-  const otp = await I('16:3761', { State: 'Filling' }, { Label: 'Authenticator code', Description: 'Enter the 6-digit code from your authenticator app.' }); add(b, otp); await setT(otp, 'Resend timer', 'Current code refreshes in 0:12');
-  add(b, await BTN('Ghost', 'Use a security key instead', { size: 'S', lead: 'key' }));
-  add(b, [await line('info', 'icon/muted', 'A fresh code covers one sensitive decision for 5 minutes. 5 wrong codes pause your approvals for 15 minutes and alert IT security.', 432, 'text/tertiary', 'Caption'), 'FILL']);
-  await footer(m, 'Logged with IP, device and time', [await BTN('Secondary', 'Cancel', { size: 'M' }), await BTN('Primary', 'Verify', { size: 'M', state: 'Disabled' })]);
-  overlay(f, m); made.push(f); } }
-// ---- 2. Second approver review ----
-{ const f = await back('[ADM-X1] Four-eyes — Second approver review / 1440 / Ready to approve', 4800, Y, 'KO', '2FA session · renewed 20:30 UTC'); if (f) { const m = await review('review'); overlay(f, m); made.push(f); } }
-// ---- 3. Approved ----
-{ const f = await back('[ADM-X1] Four-eyes — Approved / 1440 / Released', 6360, Y, 'KO', '2FA session · renewed 20:30 UTC'); if (f) { const m = await review('approved'); overlay(f, m); made.push(f); } }
-// ---- 4. Self-approval blocked (A. Marin) ----
-{ const f = await back('[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request', 4800, Y + H2, 'AM', null); if (f) { const m = await review('self'); overlay(f, m); made.push(f); } }
+function prep(src, name, i) { const f = src.clone(); sec.appendChild(f); f.x = XL(i); f.y = YL; f.name = name; f.resize(1280, f.height); f.primaryAxisSizingMode = 'AUTO'; bpMode(f, 'Laptop 1280'); return f; }
+// 1. ADM-00 inbox
+{ const nm = '[ADM-00] Admin shell — Approvals inbox / 1280 / Default'; if (EX(nm)) OUT.skipped.push(nm); else {
+  const f = prep(await figma.getNodeByIdAsync('36:522948'), nm, 0); const c = f.findOne(n => n.name === 'Content');
+  for (const t of c.findAll(n => n.type === 'TEXT' && n.textAutoResize === 'HEIGHT' && n.width > 520)) tw(t, 520);
+  made.push(f); } }
+// 2. ADM-01 sign in
+{ const nm = '[ADM-01] Admin login — Sign in / 1280 / Default'; if (EX(nm)) OUT.skipped.push(nm); else {
+  const f = prep(EX('[ADM-01] Admin login — Sign in / 1440 / Default'), nm, 1);
+  const Rp = f.findOne(n => n.name === 'Policy panel'); pad(Rp, 48, 48, 48, 48);
+  const hl = Rp.findOne(n => n.name === 'Headline'); for (const t of hl.findAll(n => n.type === 'TEXT' && n.textAutoResize === 'HEIGHT')) tw(t, 600);
+  const grid = Rp.findOne(n => n.name === 'Policies'); grid.resize(608, grid.height); grid.counterAxisSizingMode = 'AUTO';
+  for (const cd of grid.children) { cd.resize(296, cd.height); cd.primaryAxisSizingMode = 'AUTO'; for (const t of cd.findAll(n => n.type === 'TEXT' && n.textAutoResize === 'HEIGHT')) tw(t, 256); }
+  made.push(f); } }
+// 3. ADM-02 overview (rebuilt)
+{ const nm = '[ADM-02] Overview / 1280 / Default'; if (EX(nm)) OUT.skipped.push(nm); else {
+  const { f, sb, tb, c } = await shell(nm, 1280, XL(2), YL);
+  for (const it of sb.findAll(n => n.type === 'INSTANCE' && /^(Group|Item) — /.test(n.name))) { const lbl = it.name.split(' — ')[1]; if (it.name.startsWith('Item')) { it.visible = false; continue; } it.setProperties({ State: lbl === 'Overview' ? 'Active' : 'Default' }); if (lbl === 'Overview') { const ch = it.findOne(n => n.name === 'Chevron'); if (ch) ch.visible = false; } }
+  await who(sb, tb, 'SI', 'S. Iyer', 'Super Admin', '10 of 10 modules');
+  await ovContent(c, 'L'); made.push(f); } }
+// 4. ADM-X1 confirm with reason (Ready) over the 1280 withdrawal detail
+{ const nm = '[ADM-X1] Four-eyes — Confirm with reason / 1280 / Ready'; if (EX(nm)) OUT.skipped.push(nm); else {
+  const src = await figma.getNodeByIdAsync('34:468177'); const f = src.clone(); sec.appendChild(f); f.x = XL(3); f.y = YL; f.name = nm;
+  const d = await I('25:16172', { State: 'Ready' }); d.name = 'Admin/Confirm With Reason Dialog'; await rep(d, 'Reject flagged withdrawal', 'Release flagged withdrawal'); await swapBtn(d, 'Submit for approval', 'Primary');
+  await setT(d, 'Value', 'AML — screening cleared'); await setT(d, 'Value text', 'AML-3317 closed as a false positive on the velocity rule. Destination 0x7c4e…a21D is whitelisted since 14 Oct 2026 and ownership was proven by signature. Release per FIN-2.3.'); await setT(d, 'Counter', '186 / 500');
+  overlay(f, d); made.push(f); } }
 fitSection(sec);
-for (const f of made) await f.screenshot({ scale: 0.32 });
-// reference read of the 1440 inbox (for the tablet/mobile approvals scripts)
-const tbl = SRC.findOne(n => n.name === 'Approvals table'); const btm = SRC.findOne(n => n.name === 'Bottom row'); const tabs = SRC.findOne(n => n.name === 'Tabs');
-const ref = { rows: tbl ? tbl.children.slice(0, 2).map(r => [r.name, Math.round(r.width), r.children.map(c => c.name + ':' + Math.round(c.width) + ':' + c.layoutSizingHorizontal).join('|')]) : null,
-  text: tbl ? tbl.findAll(n => n.type === 'TEXT').map(t => t.characters).filter(s => s.trim()).slice(0, 90) : null,
-  bottom: btm ? btm.findAll(n => n.type === 'TEXT').map(t => t.characters).slice(0, 30) : null, tabs: tabs ? tabs.findAll(n => n.type === 'TEXT').map(t => t.characters) : null };
-return { made: made.map(f => [f.name, f.id, f.x, f.y, f.height]), skipped: OUT.skipped, ref };
+for (const f of made) await f.screenshot({ scale: 0.3 });
+return { made: made.map(f => [f.name, f.id, f.x, f.y, f.height]), skipped: OUT.skipped };
 
 }
