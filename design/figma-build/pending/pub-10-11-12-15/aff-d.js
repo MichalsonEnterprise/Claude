@@ -3,7 +3,7 @@ const S = await shell(NAME, 1680, 120, 'Affiliates'); const C = S.content;
 const { hero, copy } = await crumbHero(C, 'Affiliates', 'Hero — Affiliate program');
 const ov = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(ov, await IC('users', 16, 'icon/brand'), await T('AFFILIATE PROGRAM · FOR PARTNERS', 'Overline', 'text/brand')); add(copy, ov);
 add(copy, [await T('Earn 20% of the platform fees your players pay', 'Heading/H1', 'text/primary', { w: 560 }), 'FILL']);
-add(copy, [await T('Share your link. When players you refer buy Global Pool entries, you earn 20% of the 0.05 USDT platform fee on every qualifying entry — paid in USDT every Monday.', 'Body/L', 'text/secondary', { w: 560 }), 'FILL']);
+add(copy, [await T('Share your link. When players you refer buy Global Pool entries, you earn 20% of the 0.05 USDT platform fee on every qualifying entry for 12 months — paid to your balance in USDT.', 'Body/L', 'text/secondary', { w: 560 }), 'FILL']);
 const pm = AL('HORIZONTAL', { name: 'Promise', gap: 8, align: 'CENTER', fill: 'brand/tint-subtle', r: 9999, p: [6, 12, 6, 10] }); add(pm, await IC('shield-check', 16, 'icon/brand'), await T('Never a share of player losses, deposits or stakes.', 'Body/S Strong', 'text/primary')); add(copy, pm);
 const acts = AL('HORIZONTAL', { name: 'Actions', gap: 12, align: 'CENTER' }); add(acts, await BTN('Primary', 'Apply as a partner', { size: 'L' }), await BTN('Ghost', 'Read partner terms', { size: 'L', trail: 'arrow-right' })); add(copy, acts);
 const tr = AL('HORIZONTAL', { name: 'Terms', gap: 8, align: 'CENTER' }); add(tr, await T('Partners must be 18+ and based in a permitted jurisdiction · Terms apply', 'Caption', 'text/tertiary'), await I('6:159'), await DEMO('S')); add(copy, tr);
@@ -15,7 +15,7 @@ const dh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(dh, [await T('Part
 const lnk = AL('HORIZONTAL', { name: 'Referral link', fill: 'surface/raised', r: 10, p: [10, 12, 10, 12], gap: 8, align: 'CENTER' }); add(lnk, await IC('link', 16, 'icon/muted'), [await T('globalpool.example/r/PARTNER-0427', 'Mono/S', 'text/primary'), 'FILL'], await IC('copy', 16, 'icon/brand')); add(dash, [lnk, 'FILL']);
 const st = AL('HORIZONTAL', { name: 'Stats', gap: 10, wrap: true, cgap: 10 }); add(dash, [st, 'FILL']);
 for (const [k, v, c] of [['Referred players', '40', 'text/primary'], ['Qualifying entries', '4,800', 'text/primary'], ['Platform fees paid', '240.00 USDT', 'text/primary'], ['Your commission · 20%', '48.00 USDT', 'text/brand']]) { const s = AL('VERTICAL', { fill: 'surface/raised', r: 10, p: 12, gap: 4, w: 175 }); add(s, await T(k, 'Caption', 'text/tertiary'), await T(v, 'Number/M', c)); add(st, s); }
-const np = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(np, await IC('calendar', 16, 'icon/muted'), await T('Next payout Mon 30 Nov 2026, 10:00 UTC', 'Caption', 'text/secondary')); add(dash, np);
+const np = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(np, await IC('calendar', 16, 'icon/muted'), await T('Next payout run Mon 30 Nov 2026, 10:00 UTC', 'Caption', 'text/secondary')); add(dash, np);
 abs(hero, dash, 680, 48); await fx(dash, 'Elevation/3 — Popover');
 
 // ---- commission model ----
@@ -61,28 +61,28 @@ const disc = AL('HORIZONTAL', { gap: 8, fill: 'status/info-tint', r: 10, p: 12 }
 add(res, [await BTN('Primary', 'Apply as a partner', { size: 'L' }), 'FILL']);
 
 // ---- payouts ----
-add(C, [await head('PAYOUTS', 'Paid every Monday, in USDT', 'Commission builds up as rounds settle and is paid to your GLOBAL POOL balance once a week. Withdraw it like any other balance.'), 'FILL']);
+add(C, [await head('PAYOUTS', 'Paid in the Monday run, in USDT', 'Commission is added round by round after each draw settles. Request a payout once you have 20.00 USDT or more — it is paid in the next Monday run, straight to your Available balance.'), 'FILL']);
 const pay = AL('HORIZONTAL', { name: 'Payout schedule', gap: 16 }); add(C, [pay, 'FILL']);
 const tl = box('Weekly cycle', { gap: 0, p: 24 }); add(pay, [tl, 'FILL']);
-const cyc = [['activity', 'Accrues as rounds settle', 'Added after each daily round settles (draw at 20:00 UTC), itemised by round ID.', 'Daily'], ['receipt', 'Weekly statement', 'Covers Monday 00:00 to Sunday 23:59 UTC. Download it as CSV from the partner dashboard.', 'Mon 00:00 UTC'], ['wallet', 'Paid to your balance', 'Credited to Available in USDT. Amounts under 10.00 USDT roll over to the next week.', 'Mon 10:00 UTC'], ['withdraw', 'Withdraw any time', 'Normal withdrawal rules: 2FA, whitelisted address, network fee shown before you confirm (e.g. Arbitrum 0.08 USDT).', 'Your choice']];
+const cyc = [['activity', 'Accrues round by round', 'Added after each daily round draws and settles (draw 20:00 UTC). Entries refunded from cancelled rounds earn nothing.', 'Daily'], ['receipt', 'Weekly statement', 'Mon 00:00 – Sun 23:59 UTC, itemised by round ID. Download it as CSV from the partner dashboard.', 'Mon 00:00 UTC'], ['wallet', 'Request a payout', 'From 20.00 USDT, with KYC Level 2 and 2FA. Smaller amounts simply roll over — commission never expires.', 'Any time'], ['check-circle', 'Paid to Available', 'Requests made by Sunday 23:59 UTC are paid in USDT in Monday’s run. Payout fee 0.00 USDT. Withdraw it like any balance — network fee shown before you confirm (e.g. Arbitrum 0.08 USDT).', 'Mon 10:00 UTC']];
 for (let i = 0; i < cyc.length; i++) { const [ic, t, d, when] = cyc[i];
-  const r = AL('HORIZONTAL', { gap: 16, p: [14, 0, 14, 0] }); if (i < 3) strokeSides(r, 'border/subtle', { b: 1 });
+  const r = AL('HORIZONTAL', { gap: 16, p: [14, 0, 14, 0] }); if (i < cyc.length - 1) strokeSides(r, 'border/subtle', { b: 1 });
   const ib = AL('HORIZONTAL', { fill: 'brand/tint', r: 10, p: 8 }); add(ib, await IC(ic, 20, 'icon/brand'));
   const tx = AL('VERTICAL', { gap: 4 }); add(tx, await T(t, 'Body/M Strong', 'text/primary'), [await T(d, 'Body/S', 'text/secondary', { w: 420 }), 'FILL']);
   add(r, ib, [tx, 'FILL'], await T(when, 'Label/M', 'text/tertiary')); add(tl, [r, 'FILL']); }
 const nx = AL('VERTICAL', { name: 'Next payout + history', gap: 16, w: 400 }); add(pay, [nx, 'FILLH']);
 const npc = box('Next payout', { gap: 8, fill: 'brand/tint-subtle', stroke: 'border/brand' }); add(nx, [npc, 'FILL']);
-const nh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(nh, [await T('NEXT PAYOUT', 'Overline', 'text/brand'), 'FILL'], await DEMO('XS')); add(npc, [nh, 'FILL']);
-add(npc, await T('Mon 30 Nov 2026, 10:00 UTC', 'Heading/H4', 'text/primary'), await T('Covers Mon 23 – Sun 29 Nov 2026', 'Body/S', 'text/secondary'));
+const nh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(nh, [await T('NEXT PAYOUT RUN', 'Overline', 'text/brand'), 'FILL'], await DEMO('XS')); add(npc, [nh, 'FILL']);
+add(npc, await T('Mon 30 Nov 2026, 10:00 UTC', 'Heading/H4', 'text/primary'), await T('For payout requests made by Sun 29 Nov 2026, 23:59 UTC', 'Body/S', 'text/secondary'));
 const hist = box('Recent payouts', { gap: 0 }); add(nx, [hist, 'FILL_BOTH']);
 const hh = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [0, 0, 8, 0] }); add(hh, [await T('Recent payouts — example partner', 'Label/L', 'text/primary'), 'FILL'], await DEMO('XS')); add(hist, [hh, 'FILL']);
-for (const [d, a] of [['Mon 23 Nov 2026', '46.20 USDT'], ['Mon 16 Nov 2026', '44.85 USDT'], ['Mon 9 Nov 2026', '39.10 USDT']]) { const r = AL('HORIZONTAL', { gap: 12, p: [10, 0, 10, 0], align: 'CENTER' }); strokeSides(r, 'border/subtle', { t: 1 }); const b = await BADGE('Confirmed', 'S'); const bt = b.findOne(n => n.type === 'TEXT'); if (bt) bt.characters = 'Paid'; add(r, [await T(d, 'Body/S', 'text/secondary'), 'FILL'], await T(a, 'Number/S', 'text/primary'), b); add(hist, [r, 'FILL']); }
+for (const [d, a] of [['Mon 23 Nov 2026', '24.60 USDT'], ['Mon 9 Nov 2026', '23.10 USDT'], ['Mon 26 Oct 2026', '22.40 USDT']]) { const r = AL('HORIZONTAL', { gap: 12, p: [10, 0, 10, 0], align: 'CENTER' }); strokeSides(r, 'border/subtle', { t: 1 }); const b = await BADGE('Confirmed', 'S'); const bt = b.findOne(n => n.type === 'TEXT'); if (bt) bt.characters = 'Paid'; add(r, [await T(d, 'Body/S', 'text/secondary'), 'FILL'], await T(a, 'Number/S', 'text/primary'), b); add(hist, [r, 'FILL']); }
 
 // ---- terms ----
 add(C, [await head('PARTNER TERMS', 'Key terms in plain language', 'This summary is part of the partner agreement. Read the full terms before you apply.', await BTN('Secondary', 'Full partner terms', { trail: 'external-link' })), 'FILL']);
 const tg = AL('HORIZONTAL', { name: 'Terms grid', gap: 16, wrap: true, cgap: 16 }); add(C, [tg, 'FILL']);
 for (const [ic, t, d] of [
-  ['id-card', 'Eligibility', '18+, based in a permitted jurisdiction and KYC Level 2 verified before your first payout.'],
+  ['id-card', 'Eligibility', '18+, based in a permitted jurisdiction, KYC Level 2 and 2FA on before your first payout.'],
   ['calendar', 'Commission period', '12 months from each referred player’s sign-up. Any rate change gets 30 days’ email notice.'],
   ['megaphone', 'Responsible marketing', 'Show 18+ and responsible-gaming links. No “guaranteed win”, “risk-free” or get-rich claims.'],
   ['ban', 'Restricted regions', 'Never promote in restricted countries or suggest VPNs or other ways around geo-blocks.'],

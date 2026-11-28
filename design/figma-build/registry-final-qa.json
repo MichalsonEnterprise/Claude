@@ -1,0 +1,59 @@
+{
+ "_note": "Agent final-qa (28 Nov 2026): MOB-06 deposit sheets completed on page 10, ADM-P6 QA on page 09, library QA fixes on page 02, round #1,245 canonical values on pages 05/10, page 00 bookkeeping. See decisions.md #62.",
+ "Badge/DEMO Tone=On gold": {
+  "id": "6:130",
+  "variants": {
+   "Size": [
+    "XS",
+    "S",
+    "M"
+   ],
+   "Tone": [
+    "Default",
+    "On gold"
+   ]
+  },
+  "variantIds": {
+   "XS": "316:19501",
+   "S": "316:19503",
+   "M": "316:19505"
+  },
+  "note": "Dark outline + text/on-gold label, no fill. Use on gold/jackpot fills only."
+ },
+ "frames": {
+  "WAL-05 Deposit — Step 3 Deposit Address / 390 / Wrong-network warning — MOB-06 bottom sheet": "321:112563",
+  "WAL-05 Deposit — Step 3 Deposit Address / 390 / Below minimum deposit — MOB-06 bottom sheet": "321:113000",
+  "section WAL — Mobile B (Deposit), page 10": "105:49686"
+ },
+ "edited": {
+  "Shell/Sidebar Expanded Guest/Member gold tile DEMO (page 02)": [
+   "23:5661",
+   "23:6014"
+  ],
+  "Banner/Promo set (DEMO moved into Overline row, page 02)": "29:18042",
+  "Chart/Timeline Cancelled (page 02)": "30:23220",
+  "MOB-06 step 1 Default/Empty, step 5 Confirming/Delayed, step 7 Successful (page 10)": [
+   "105:49687",
+   "245:344376",
+   "111:52133",
+   "111:52536",
+   "112:53217"
+  ],
+  "PROMO-04 390 Live hero card (page 10)": "71:47465",
+  "USR-F5 Refunds 1440 (page 05) / 390 (page 10)": [
+   "88:50964",
+   "164:70168"
+  ],
+  "ADM-P6 Prize Distribution 1440 / 1280 (page 09)": [
+   "80:59955",
+   "80:61181"
+  ],
+  "Page 00: Decisions log frame / Ledger summary / Ledger section / Overview / Resume": [
+   "22:5712",
+   "17:3926",
+   "14:2064",
+   "15:3619",
+   "22:6171"
+  ]
+ }
+}

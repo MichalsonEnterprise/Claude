@@ -1,0 +1,39 @@
+{
+ "_note": "Agent mob-08 (MOB-08 Mobile games umbrella), 28 Nov 2026. Page '10 — Mobile Experience', section 'MOB-08 Mobile games' (315:111229) at X=300000, Y=0. No new library components. One annotation frame built from crops (clones) of existing 390 frames + inline annotation layer (status/info callout discs 24 px, status/info-tint thumb-zone band with dashed top line, dashed secondary-zone outline) + one inline top sheet composed from Menu/Section Label, Menu/Item (resized to 48 px) and Menu/Divider instances (component gap: no Sheet/Top). The 390 lobby and the five originals' default/result frames already existed in their own sections and are listed in 'coverage'.",
+ "sections": {
+  "MOB-08 Mobile games (10 — Mobile Experience)": "315:111229"
+ },
+ "frames": {
+  "MOB-08 Thumb-reach controls / 390 / Annotation — Pool Dice · Pool Roulette · Orbit Rush": "315:111233"
+ },
+ "blocks": {
+  "Doc header": "315:111240",
+  "Rules": "315:111265",
+  "Block 01 — Pool Dice": "315:111317",
+  "Block 02 — Pool Roulette": "317:111470",
+  "Block 03 — Orbit Rush": "317:111680",
+  "Block 04 — Bottom sheets": "322:113050",
+  "Block 05 — Secondary actions": "323:114260",
+  "Top sheet — Game menu (inline)": "323:114420",
+  "Block 06 — Target-size audit": "323:114519",
+  "Block 07 — Coverage": "323:114562",
+  "Dev notes": "323:114681"
+ },
+ "coverage": {
+  "[PUB-03] Games Lobby / 390 / All games (default)": "36:531732",
+  "[GM-02] Game catalogue / 390 / Default": "34:497645",
+  "DI-01 Pool Dice — Interface / 390 / Default": "33:288624",
+  "DI-04 Pool Dice — Result / 390 / Win (73.21)": "33:315363",
+  "DI-04 Pool Dice — Result / 390 / Lose (27.65)": "33:315810",
+  "[CF-01] Bet interface — Heads/Tails / 390 / Default — Heads selected": "104:48933",
+  "[CF-03] Result / 390 / Win — landed Heads (+9.60 USDT)": "104:49572",
+  "[CF-03] Result / 390 / Lose — landed Tails (−10.00 USDT)": "104:49901",
+  "RL-01 Table — Felt, chips & bet slip / 390 / Bets placed": "34:413030",
+  "RL-05 Result — 19 Red / 390 / Win": "34:485123",
+  "RL-05 Result — 19 Red / 390 / Lose": "34:485646",
+  "[CR-01] Orbit Rush — Pre-round betting / 390 / Bets open": "34:386552",
+  "[CR-04] Orbit Rush — Crashed / 390 / Result · you cashed out at 2.00×": "34:420839",
+  "[BJ-01] Table + betting / 390 / Bet placed — ready to deal": "34:362883",
+  "[BJ-05] Result / 390 / Win — 20 beats 18": "34:389351"
+ }
+}

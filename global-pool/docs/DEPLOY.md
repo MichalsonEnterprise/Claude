@@ -1,0 +1,7 @@
+# Preview deployment (Vercel)
+
+- **URL:** https://global-pool.vercel.app (public, `X-Robots-Tag: noindex`). Vercel project `global-pool` in the owner's Hobby team, linked to `MichalsonEnterprise/Claude`, root directory `global-pool/apps/web`.
+- **Continuous:** every push to `claude/keen-wozniak-q8eb3p` (the project's production branch) builds and replaces the production URL. Pushes that don't touch `apps/web`, `packages/`, `pnpm-lock.yaml` or `package.json` are skipped (`ignoreCommand` in `apps/web/vercel.json`). Per-commit deployment URLs (`global-pool-<hash>-…vercel.app`) are behind Vercel Authentication (owner login).
+- **Build:** `apps/web/vercel.json` — pnpm 10.28.0 via `npx` (Vercel only reads `packageManager` from the repo-root package.json, which belongs to the unrelated landing page), git SSH → HTTPS rewrite for the public `@zksync/contracts` git dependency of `@chainlink/contracts`, packages built before `next build`. `next.config.ts` traces output files from the git repo root when `VERCEL` is set.
+- **Mode:** web only, `NEXT_PUBLIC_DATA_SOURCE=mock`, DEMO mode, no API. Works: public pages, homepage, Global Pool hub, games lobby + game screens (guest view), provably-fair explainer, legal/RG pages, design system, age gate. Does NOT work without a hosted API: sign-in (DEV MOCK exchanges a token with the API), member dashboard, wallet, entries, game play, admin console.
+- **Not deployed:** NestJS API, Postgres, Redis, contracts. Hosting for these is an open owner decision (see PROJECT_STATUS.md §4).

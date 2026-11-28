@@ -30,9 +30,21 @@
     "XS",
     "S",
     "M"
+   ],
+   "Tone": [
+    "Default",
+    "On gold"
    ]
   },
-  "note": "XS inline in table cells, S beside values/cards, M (DEMO DATA) in section headers"
+  "note": "XS inline in table cells, S beside values/cards, M (DEMO DATA) in section headers. Tone=On gold (added 28 Nov 2026, final QA): no fill, dark outline + text/on-gold label for DEMO tags on gold/jackpot fills (e.g. Shell/Sidebar Global Pool tile). DEMO(size) still returns Tone=Default; use I('6:130', {Size:'XS', Tone:'On gold'}) on gold.",
+  "variantIds": {
+   "Size=XS, Tone=Default": "6:120",
+   "Size=S, Tone=Default": "6:122",
+   "Size=M, Tone=Default": "6:124",
+   "Size=XS, Tone=On gold": "316:19501",
+   "Size=S, Tone=On gold": "316:19503",
+   "Size=M, Tone=On gold": "316:19505"
+  }
  },
  "Notice/Licence": {
   "id": "6:158",

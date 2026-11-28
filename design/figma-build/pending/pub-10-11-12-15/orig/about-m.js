@@ -1,0 +1,37 @@
+const S = await mshell('[PUB-12] About Us / 390 / Default', 1140, 120); const C = S.C;
+const hd = AL('VERTICAL', { name: 'Page header', gap: 12 }); add(C, [hd, 'FILL']);
+add(hd, await T('ABOUT GLOBAL POOL', 'Overline', 'text/brand'), [await T('A global jackpot anyone can check', 'Heading/H2', 'text/primary', { w: 358 }), 'FILL'], [await T('One shared prize pool drawn every day, plus original games. Every draw is decided by Chainlink VRF, every fee is shown on its own line, every limit you set is honoured.', 'Body/M', 'text/secondary', { w: 358 }), 'FILL']);
+const art = artFrame('Hero art — draw countdown preview (cropped)', 280); add(C, [art, 'FILL']);
+abs(art, rect(340, 640, 'accent/gold-tint', 0, 'Angled colour block — gold tint'), 150, -150, 14);
+abs(art, rect(40, 640, 'brand/primary', 0, 'Angled colour block — mint stripe'), 96, -150, 14);
+const tk = await I('23:8534', { State: 'Active' }); tk.name = 'Object — entry ticket (cropped)'; abs(art, tk, 190, 170, 12);
+const dc = await I('24:13861', { State: 'Open' }); dc.name = 'Preview — Card/Draw Countdown (cropped)'; abs(art, dc, 24, 20); dc.rescale(0.85); await fx(dc, 'Elevation/3 — Popover');
+const cta = AL('VERTICAL', { name: 'Actions', gap: 12 }); add(C, [cta, 'FILL']);
+add(cta, [await BTN('Primary', 'See today’s round', { size: 'L' }), 'FILL'], [await BTN('Ghost', 'How it works', { size: 'L', trail: 'arrow-right' }), 'FILL']);
+const mis = box('Mission', { gap: 10, p: 20, fill: 'bg/secondary' }); add(C, [mis, 'FILL']);
+add(mis, await T('OUR MISSION', 'Overline', 'text/brand'), [await T('Make every draw, fee and payout verifiable by the people who play.', 'Heading/H3', 'text/primary', { w: 318 }), 'FILL'], [await T('We publish the pool, the entries, the randomness request and the settlement transaction for every round — from round #1 on 29 Jun 2023 to round #1,248 closing tonight at 20:00 UTC.', 'Body/S', 'text/secondary', { w: 318 }), 'FILL']);
+add(C, [await mhead('WHAT WE STAND FOR', 'Three principles we don’t trade off', null), 'FILL']);
+const pr = AL('VERTICAL', { name: 'Principles', gap: 12 }); add(C, [pr, 'FILL']);
+for (const [ic, t, b, l] of [['shield-check', 'Verifiable', 'Global Pool winners are picked by Chainlink VRF and settled on-chain; Originals use a committed seed you can check. Staff cannot choose winners or edit results.', 'Verify a draw'], ['receipt', 'Transparent fees', '0.05 USDT platform fee per qualifying entry, always on its own line. Network fees shown before you confirm. House edge on every game.', 'See all fees'], ['heart', 'Responsible by default', 'Limits, reality checks, cooling-off and self-exclusion are one tap away — never harder than the deposit button.', 'Responsible gaming']]) {
+  const c = await I('23:16859', { State: 'Default' }, { Title: t, Body: b, Link: l, 'Show link': true, Icon: ICONS[ic] }); c.name = 'Card/Feature — ' + t; tint(c.findOne(n => n.name === 'Icon'), 'icon/brand'); add(pr, [c, 'FILL']); }
+const nv = box('What we will never do', { gap: 0, p: [12, 16, 12, 16] }); add(C, [nv, 'FILL']);
+add(nv, await T('What we will never do', 'Heading/H5', 'text/primary'));
+for (const t of ['Pre-tick consent or marketing boxes', 'Run countdowns not tied to a real close time', 'Hide odds, fees or limits', 'Make withdrawals or self-exclusion harder than deposits', 'Let anyone — staff included — pick winners', 'Suggest VPNs or ways around regional restrictions']) { const r = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [8, 0, 8, 0] }); add(r, await IC('x-circle', 16, 'text/danger'), [await T(t, 'Body/S', 'text/secondary', { w: 290 }), 'FILL']); add(nv, [r, 'FILL']); }
+add(C, [await mhead('BY THE NUMBERS', 'Three years of daily draws', null, await DEMO('S')), 'FILL']);
+const nb = AL('HORIZONTAL', { name: 'Numbers', gap: 12, wrap: true, cgap: 12 }); add(C, [nb, 'FILL']);
+for (const [v, l] of [['1,248', 'daily rounds since 29 Jun 2023'], ['184,320', 'registered players'], ['0.05 USDT', 'fee per entry, unchanged'], ['5', 'networks for USDT']]) { const b = AL('VERTICAL', { name: 'Number — ' + l, fill: 'surface/default', stroke: 'border/subtle', r: 14, p: 16, gap: 4, w: 173 }); const h = AL('HORIZONTAL', { gap: 6, align: 'CENTER', justify: 'SPACE_BETWEEN' }); add(h, await T(v, 'Number/M', 'text/primary'), await DEMO('XS')); add(b, [h, 'FILL'], [await T(l, 'Caption', 'text/secondary', { w: 141 }), 'FILL']); add(nb, b); }
+add(C, [await mhead('OUR STORY', 'How we got here', null, await DEMO('S')), 'FILL']);
+const tl = box('Timeline', { gap: 0, p: [8, 16, 8, 16] }); add(C, [tl, 'FILL']);
+const ms = [['29 Jun 2023', 'Round #1', 'First daily round drawn with Chainlink VRF on Arbitrum.'], ['2024', 'Originals', 'Orbit Rush, Pool Dice and Double Side launch.'], ['2025', 'Contract v1.3.0', '48 h timelock and 3-of-5 multisig.'], ['2026', 'Five networks', 'USDT on 5 chains; RG tools in every game.'], ['27 Nov 2026', 'Round #1,248', 'Open now — closes 20:00 UTC.']];
+for (let i = 0; i < ms.length; i++) { const [d, t, b] = ms[i]; const last = i === ms.length - 1; const r = AL('HORIZONTAL', { name: 'Milestone — ' + t, gap: 12, p: [10, 0, 10, 0] }); const rail = AL('VERTICAL', { gap: 4, align: 'CENTER', p: [4, 0, 0, 0] }); add(rail, ellipse(12, 12, last ? 'brand/primary' : 'border/strong', 'Dot')); add(r, rail); const tx = AL('VERTICAL', { gap: 2 }); add(tx, await T(d, 'Label/S', last ? 'text/brand' : 'text/tertiary'), await T(t, 'Body/M Strong', 'text/primary'), [await T(b, 'Body/S', 'text/secondary', { w: 280 }), 'FILL']); add(r, [tx, 'FILL']); if (!last) strokeSides(r, 'border/subtle', { b: 1 }); add(tl, [r, 'FILL']); }
+add(C, [await mhead('THE TEAM', 'People behind the pool', 'Placeholder profiles — names and roles are fictional for this design.', await DEMO('S')), 'FILL']);
+const tg = AL('HORIZONTAL', { name: 'Team grid', gap: 12, wrap: true, cgap: 12 }); add(C, [tg, 'FILL']);
+for (const [ini, n, r] of [['SI', 'S. Iyer', 'Platform Operations'], ['KO', 'K. Osei', 'Compliance (MLRO)'], ['AM', 'A. Marin', 'Finance Lead'], ['RD', 'R. Duarte', 'Player Support (L2)'], ['ML', 'M. Lindqvist', 'Smart contracts'], ['TO', 'T. Okafor', 'Responsible Gaming']]) { const b = AL('VERTICAL', { name: 'Team — ' + n, fill: 'surface/default', stroke: 'border/subtle', r: 14, p: 16, gap: 8, w: 173 }); add(b, await I('9:238', { Size: 'M' }, { Initials: ini, 'Show status': false })); const nr = AL('HORIZONTAL', { gap: 6, align: 'CENTER' }); add(nr, await T(n, 'Body/S Strong', 'text/primary'), await DEMO('XS')); add(b, nr, [await T(r, 'Caption', 'text/brand', { w: 141 }), 'FILL']); add(tg, b); }
+const co = box('Company details', { gap: 0, p: [12, 16, 12, 16] }); add(C, [co, 'FILL']);
+const coh = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [0, 0, 8, 0] }); add(coh, [await T('Licence & company', 'Heading/H5', 'text/primary'), 'FILL'], await DEMO('XS')); add(co, [coh, 'FILL']);
+for (const [k, v] of [['Operator', '[Operator name] — placeholder'], ['Gaming licence', '[Regulator], licence no. [number] — placeholder'], ['Where we operate', 'Permitted jurisdictions only — see Restricted countries'], ['Press', 'press@globalpool.example (placeholder)']]) { const r = AL('VERTICAL', { gap: 2, p: [10, 0, 10, 0] }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, await T(k, 'Caption', 'text/tertiary'), [await T(v, 'Body/S Strong', 'text/primary', { w: 326 }), 'FILL']); add(co, [r, 'FILL']); }
+await mlic(C);
+await mfinish(S, null);
+fitSection(sec);
+await C.screenshot({ scale: 0.45 });
+return { frame: S.f.id, content: C.id, h: S.f.height };

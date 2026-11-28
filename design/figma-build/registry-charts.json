@@ -71,7 +71,7 @@
   "id": "30:23292",
   "variants": { "Status": ["Open", "Drawing", "Settled", "Cancelled"] },
   "variantIds": { "Open": "30:23015", "Drawing": "30:23079", "Settled": "30:23147", "Cancelled": "30:23220" },
-  "note": "720 wide, 5 equal steps. #1,248: 08:00:00 open → 20:00:00 close → VRF 0x9f2c…e71a 20:00:04 → fulfilled 20:00:41 → settled 20:02:10 UTC. Cancelled = #1,245 (412/500 players, 46,850.00/50,000.00 pool → refunds, 300.00 USDT owed to @nova.k)."
+  "note": "720 wide, 5 equal steps. #1,248: 08:00:00 open → 20:00:00 close → VRF 0x9f2c…e71a 20:00:04 → fulfilled 20:00:41 → settled 20:02:10 UTC. Cancelled = #1,245 (412/500 players, 41,200.00/50,000.00 (4,120 entries) pool → refunds, 300.00 USDT owed to @nova.k)."
  },
  "tokens": {
   "chart/series-1": "VariableID:25:15162 → brand/primary",
