@@ -10,3 +10,6 @@ Run order (each file is the full use_figma code; all are idempotent, removing ol
 3. call3_mob.js: P3 Active Round 390 on page 10, section "ADM — Mobile" (x=217000)
 
 When everything is done, delete the cache node 78:57471.
+
+STATUS 28 Nov 2026: all four scripts were run successfully (call1, call2_tab, call3_mob + fixes, call5_inspect), and the cache node 78:57471 was deleted afterwards.
+Frame IDs are in ../../registry-adm-pool.json. Nothing remains to run.

@@ -1,5 +1,5 @@
 {
- "_note": "Agent adm-pool — ADM-P1..P10 Global Pool management on page '09 — Admin Panel', section 'ADM-P1..P10 Global Pool management' (67:52461) at X=56000, Y=0. No new library components; screens are composed from library instances (Nav/Admin Sidebar 22:5501 with 'Global Pool Management' group active and Finance children hidden, Nav/Admin Topbar 22:6483, Nav/Breadcrumb, Tabs/Underline module sub-nav (10 tabs), Admin/KPI Tile, Table/Header Cell + Table/Cell, Pagination, Jackpot/Round Header, Jackpot/Threshold Bar, Jackpot/VRF Stepper, Jackpot/Participants Counter, Admin/Contract Card, Tx/Hash, Wallet/Address Chip, Badge/Status, Badge/DEMO, Buttons, Input/Search, Menu/Filter Chip). Desktop row y=160 at x=120+i*1560 (P1..P10); laptop 1280 clones row y=12000. Signed-in admin S. Iyer (Super Admin). Snapshot times: P1-P6, P9, P10 = 27 Nov 2026 16:42 UTC (countdown 03:17:42); P7 = 20:01 UTC (post-draw), P8 = 20:03 UTC. Pool accounting aligned with ADM-F4/F7: contract 241,010.40 = pool 186,400.00 + owed prizes 52,310.40 + refunds #1,245 outstanding 2,300.00. TEMPORARY: hidden locked text node 'adm-pool script cache — delete' (78:57471) inside the section holds the helper library used via AsyncFunction to work around MCP rate limits — delete it once all builds are done.",
+ "_note": "Agent adm-pool — ADM-P1..P10 Global Pool management on page '09 — Admin Panel', section 'ADM-P1..P10 Global Pool management' (67:52461) at X=56000, Y=0. No new library components; screens are composed from library instances (Nav/Admin Sidebar 22:5501 with 'Global Pool Management' group active and Finance children hidden, Nav/Admin Topbar 22:6483, Nav/Breadcrumb, Tabs/Underline module sub-nav (10 tabs), Admin/KPI Tile, Table/Header Cell + Table/Cell, Pagination, Jackpot/Round Header, Jackpot/Threshold Bar, Jackpot/VRF Stepper, Jackpot/Participants Counter, Admin/Contract Card, Tx/Hash, Wallet/Address Chip, Badge/Status, Badge/DEMO, Buttons, Input/Search, Menu/Filter Chip). Desktop row y=160 at x=120+i*1560 (P1..P10); laptop 1280 clones row y=12000. Signed-in admin S. Iyer (Super Admin). Snapshot times: P1-P6, P9, P10 = 27 Nov 2026 16:42 UTC (countdown 03:17:42); P7 = 20:01 UTC (post-draw), P8 = 20:03 UTC. Pool accounting aligned with ADM-F4/F7: contract 241,010.40 = pool 186,400.00 + owed prizes 52,310.40 + refunds #1,245 outstanding 2,300.00. Tablet 768 row at y=14847 (P1, P2, P3, P7, P8; inline admin top bar + scrollable sub-nav, no sidebar). P10 states and P7 Delayed are stacked under their 1440 defaults. Mobile: ADM-P3 390 on page '10 — Mobile Experience', section 'ADM — Mobile' (173:71503) at X=217000 (inline admin top bar, sticky countdown bar, Admin Tab Bar with Pool active). The temporary script cache node 78:57471 was deleted on 28 Nov 2026; the continuation scripts in pending/adm-pool need it recreated from lib_code.js if they are ever re-run.",
  "frames": {
   "section": "67:52461",
   "[ADM-P1] Pool Overview / 1440 / Default": "67:52462",
@@ -18,7 +18,6 @@
   "[ADM-P7] VRF Status / 1280 / Fulfilled — round #1,248": "80:63106",
   "[ADM-P8] Settlement Status / 1440 / Crediting — batch 3 of 4": "80:63898",
   "[ADM-P8] Settlement Status / 1280 / Crediting — batch 3 of 4": "80:64936",
-  "script cache (temporary)": "78:57471",
   "[ADM-P9] Refund Status / 1440 / Default": "171:67227",
   "[ADM-P9] Refund Status / 1280 / Default": "171:68123",
   "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Default — entries open": "171:68868",
@@ -26,6 +25,12 @@
   "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Pause request — reason + 2FA + four-eyes": "171:70215",
   "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Second approval — approver view": "171:70991",
   "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / New entries paused — after dual approval": "171:71700",
-  "[ADM-P7] VRF Status / 1440 / Delayed — no fulfilment after 12 min (scenario)": "171:72535"
+  "[ADM-P7] VRF Status / 1440 / Delayed — no fulfilment after 12 min (scenario)": "171:72535",
+  "[ADM-P1] Pool Overview / 768 / Default": "172:71873",
+  "[ADM-P2] Pool Balance / 768 / Default": "172:72701",
+  "[ADM-P3] Active Round / 768 / Open — monitoring": "172:73435",
+  "[ADM-P7] VRF Status / 768 / Fulfilled — round #1,248": "172:74324",
+  "[ADM-P8] Settlement Status / 768 / Crediting — batch 3 of 4": "172:75163",
+  "[ADM-P3] Active Round / 390 / Open — monitoring (page 10, section ADM — Mobile 173:71503)": "173:71504"
  }
 }
