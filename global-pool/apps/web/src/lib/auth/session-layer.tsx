@@ -11,6 +11,7 @@ import { StepUpProvider } from '@/components/auth/step-up';
 import { WalletFlowProvider } from '@/components/auth/wallet-dialogs';
 import { authApi, authKeys, isUnauthenticated, type MeProfile } from '@/lib/api/auth';
 import { setPlayerTokenProvider } from '@/lib/api/client';
+import { clearPlayerData, resetPlayerData } from '@/lib/api/player-cache';
 import { publicEnv } from '@/lib/env';
 
 import { AuthContext, useAuthCore } from './context';
@@ -136,9 +137,11 @@ export function AuthSessionLayer({ children }: { children: React.ReactNode }) {
   );
 
   // ── sign-out helpers ───────────────────────────────────────────────────────────────────────
+  // Player query keys are not scoped by user, so every module's player data goes (wallet, account, RG, history,
+  // pool/me, …) — not only ['auth'] — or the next account in this tab would see this player's data.
   const clearAuthData = React.useCallback(() => {
     synced.current = null;
-    qc.removeQueries({ queryKey: authKeys.all });
+    clearPlayerData(qc);
   }, [qc]);
 
   const signOut = React.useCallback(async () => {
@@ -193,12 +196,20 @@ export function AuthSessionLayer({ children }: { children: React.ReactNode }) {
     };
   }, [qc, expire]);
 
-  // Clear stale API data when the core signs out (e.g. Privy logout in another tab).
+  // Clear stale API data when the core signs out (e.g. Privy logout in another tab) or another account takes over
+  // the session without a sign-out in between.
   const prevStatus = React.useRef(core.status);
+  const prevDid = React.useRef(did);
   React.useEffect(() => {
     if (prevStatus.current === 'member' && core.status === 'guest') clearAuthData();
+    else if (prevDid.current !== null && did !== null && prevDid.current !== did) {
+      // Mounted screens are already querying for the new account: reset (drop + refetch) instead of removing.
+      synced.current = null;
+      void resetPlayerData(qc);
+    }
     prevStatus.current = core.status;
-  }, [core.status, clearAuthData]);
+    if (did !== null || core.status === 'guest') prevDid.current = did;
+  }, [core.status, did, clearAuthData, qc]);
 
   // Onboarding guard: members without consents go to /onboarding before anything else.
   React.useEffect(() => {

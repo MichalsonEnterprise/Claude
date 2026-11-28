@@ -37,6 +37,7 @@ import { Card } from '@/components/ui/card';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { toast } from '@/components/ui/sonner';
 import { newIdempotencyKey } from '@/lib/api/client';
+import { invalidatePlayerFinancials } from '@/lib/api/player-cache';
 import {
   historyApi,
   saveCsv,
@@ -728,7 +729,7 @@ export function Winnings() {
         title: 'Moved to Available',
         description: `${num(r.claimed)} USDT is now available.`,
       });
-      void qc.invalidateQueries({ queryKey: ['history'] });
+      void invalidatePlayerFinancials(qc);
     } catch (e) {
       toast({
         type: 'error',

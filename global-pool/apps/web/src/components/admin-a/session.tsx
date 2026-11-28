@@ -12,7 +12,7 @@
  * submitted on the admin's behalf.
  */
 import type { Permission } from '@gp/shared/enums';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -25,6 +25,20 @@ import {
   type AdminTokens,
 } from '@/lib/api/admin-a';
 import { ApiRequestError, setAdminTokenProvider } from '@/lib/api/client';
+
+/**
+ * Every admin query-key root: admin-a (['admin', …]) and the finance / pool / compliance pages (['admin-b', …],
+ * including the signed-in admin's own /admin/auth/me). None carries the admin id, so all of them go on sign-out /
+ * idle expiry — otherwise the next admin on this workstation acts on the previous admin's profile and data.
+ */
+export const ADMIN_QUERY_ROOTS = [['admin'], ['admin-b']] as const;
+
+export function clearAdminData(qc: QueryClient): void {
+  for (const queryKey of ADMIN_QUERY_ROOTS) {
+    void qc.cancelQueries({ queryKey });
+    qc.removeQueries({ queryKey });
+  }
+}
 
 export const ADMIN_IDLE_MINUTES = 15;
 export const ADMIN_WARNING_SECONDS = 120;
@@ -150,7 +164,7 @@ export function AdminSessionProvider({ children }: { children: React.ReactNode }
     setIdleDeadline(null);
     setWarningOpen(false);
     warningRef.current = false;
-    queryClient.removeQueries({ queryKey: ['admin'] });
+    clearAdminData(queryClient);
   }, [queryClient]);
 
   const endSession = React.useCallback(

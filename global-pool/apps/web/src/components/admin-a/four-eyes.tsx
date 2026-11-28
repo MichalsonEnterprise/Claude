@@ -765,6 +765,8 @@ export function ApprovalReviewDialog({
       qc.invalidateQueries({ queryKey: ['admin', 'audit'] }),
       qc.invalidateQueries({ queryKey: ['admin', 'roles'] }),
       qc.invalidateQueries({ queryKey: ['admin', 'alerts'] }),
+      // admin-b pages that a decision changes (withdrawal detail / queue, circuit breaker, compliance).
+      qc.invalidateQueries({ queryKey: ['admin-b'] }),
     ]);
   };
 

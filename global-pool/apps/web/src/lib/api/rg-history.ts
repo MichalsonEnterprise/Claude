@@ -38,6 +38,7 @@ import {
 import { useAuth } from '@/lib/auth';
 
 import { apiRequest } from './client';
+import { invalidatePlayerFinancials } from './player-cache';
 
 // ── types the API returns that are not shared schemas ─────────────────────────────────────────
 
@@ -211,14 +212,17 @@ export function useRgHistory(kind: 'limits' | 'reality_checks' | 'all', limit = 
   return useMemberQuery(rgKeys.history(kind), () => rgApi.history(kind, limit));
 }
 
-/** Any RG mutation refreshes the RG state + logs; returns the fresh state into the cache when it is one. */
+/**
+ * Any RG mutation refreshes the RG state + logs; returns the fresh state into the cache when it is one. Limits and
+ * exclusions are also cached by the pool modal, wallet, dashboard and account gate, so all of those refresh too.
+ */
 export function useRgMutation<TVars, TResult>(fn: (vars: TVars) => Promise<TResult>) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: fn,
     onSuccess: (data) => {
       if (data && typeof data === 'object' && 'limits' in data) qc.setQueryData(rgKeys.state, data);
-      void qc.invalidateQueries({ queryKey: rgKeys.all });
+      void invalidatePlayerFinancials(qc);
     },
   });
 }

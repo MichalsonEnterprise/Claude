@@ -125,6 +125,19 @@ function safeJson(text: string): unknown {
   }
 }
 
+/**
+ * Was a failed WRITE possibly applied anyway? True when no definite answer came back: the request never got a
+ * response (network drop, CORS / proxy failure, abort → not an `ApiRequestError`), a 5xx / 408 (the server or a
+ * proxy may have committed before failing), or 409 CONFLICT (the same idempotency key is still being processed).
+ * Only a definite 4xx business / validation error means nothing happened. Retry such an intent with the SAME
+ * idempotency key until a definite answer arrives, and never tell the player "nothing was charged" meanwhile.
+ */
+export function isOutcomeUnknown(err: unknown): boolean {
+  if (!(err instanceof ApiRequestError)) return true;
+  if (err.status >= 500 || err.status === 408 || err.status === 0) return true;
+  return err.status === 409 && err.code === 'CONFLICT';
+}
+
 /** One key per user intent (e.g. "confirm 35 entries"); reuse it when retrying the same intent. */
 export function newIdempotencyKey(): string {
   return globalThis.crypto.randomUUID();

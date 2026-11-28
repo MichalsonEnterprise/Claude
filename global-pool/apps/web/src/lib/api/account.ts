@@ -27,6 +27,7 @@ import {
 import { useAuth } from '@/lib/auth';
 
 import { apiRequest, newIdempotencyKey } from './client';
+import { invalidatePlayerFinancials } from './player-cache';
 
 // ── view types (shapes of the API responses) ───────────────────────────────────────────────────
 
@@ -646,6 +647,7 @@ export function useClaimOwed() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => accountApi.claimOwed(newIdempotencyKey()),
-    onSettled: () => qc.invalidateQueries({ queryKey: accountKeys.all }),
+    // Owed → Available changes every module's balances (pool modal, wallet, history), not only the dashboard.
+    onSettled: () => invalidatePlayerFinancials(qc),
   });
 }

@@ -17,6 +17,7 @@ import {
 import { useAuth } from '@/lib/auth';
 
 import { apiRequest } from './client';
+import { invalidatePlayerFinancials } from './player-cache';
 
 export type { WalletStatus, WithdrawalPrecheck };
 
@@ -494,10 +495,13 @@ export function useCurrentRound(enabled = true) {
   });
 }
 
-/** Invalidate every wallet query after a financial write (balances, history, limits…). */
+/**
+ * After a financial write (deposit, withdrawal, cancel, claim, whitelist…): refresh every wallet query AND the other
+ * modules' copies of the same balances / limits / history (pool, account, history, RG) — see `player-cache.ts`.
+ */
 export function useInvalidateWallet() {
   const qc = useQueryClient();
-  return () => qc.invalidateQueries({ queryKey: walletKeys.all });
+  return () => invalidatePlayerFinancials(qc);
 }
 
 export function useClaimOwed() {
