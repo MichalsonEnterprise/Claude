@@ -1,0 +1,18 @@
+node_modules
+dist
+build
+out
+.next
+coverage
+.turbo
+.dev
+test-results
+playwright-report
+pnpm-lock.yaml
+# Figma variable mirror — keep its compact, diff-friendly layout
+packages/tokens/tokens.json
+packages/contracts/lib
+packages/contracts/cache
+packages/contracts/out
+packages/contracts/broadcast
+scripts/workflows

@@ -1,0 +1,57 @@
+# GLOBAL POOL — @gp/contracts (Foundry). DEMO / testnet only.
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+cache_path = "cache"
+libs = ["lib", "node_modules"]
+solc_version = "0.8.28"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 10_000
+via_ir = false
+bytecode_hash = "none"
+cbor_metadata = true
+auto_detect_remappings = false
+# Only the committed Merkle/winner fixture may be read by tests (no FFI, no writes).
+fs_permissions = [{ access = "read", path = "./test/fixtures" }]
+ffi = false
+
+[profile.default.fuzz]
+runs = 1024
+seed = "0x6770"
+
+[profile.default.invariant]
+runs = 64
+depth = 256
+fail_on_revert = false
+
+[profile.ci.fuzz]
+runs = 10_000
+
+[profile.ci.invariant]
+runs = 512
+depth = 128
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = false
+int_types = "long"
+quote_style = "double"
+number_underscore = "thousands"
+sort_imports = true
+
+[rpc_endpoints]
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+
+[etherscan]
+arbitrum_sepolia = { key = "${ARBISCAN_API_KEY}", chain = 421614 }
+
+[lint]
+# Excluded on purpose (see README "Static analysis"):
+# - block-timestamp: round close / 24 h re-request windows are hours long; sequencer timestamp drift is irrelevant.
+# - uninitialized-local: relies on Solidity zero-initialisation (idiomatic `uint256 sum;`).
+# - require-revert-in-loop: input validation of the prize split must revert inside the loop.
+exclude_lints = ["block-timestamp", "uninitialized-local", "require-revert-in-loop"]

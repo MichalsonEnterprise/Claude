@@ -1,0 +1,180 @@
+{
+  "name": "@gp/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GLOBAL POOL shared contracts for web & api: money/fee helpers (decimal.js), testnet chain config, enums, zod schemas, domain types and typed DEMO data.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./money": {
+      "import": {
+        "types": "./dist/money.d.ts",
+        "default": "./dist/money.js"
+      },
+      "require": {
+        "types": "./dist/money.d.cts",
+        "default": "./dist/money.cjs"
+      }
+    },
+    "./fees": {
+      "import": {
+        "types": "./dist/fees.d.ts",
+        "default": "./dist/fees.js"
+      },
+      "require": {
+        "types": "./dist/fees.d.cts",
+        "default": "./dist/fees.cjs"
+      }
+    },
+    "./chains": {
+      "import": {
+        "types": "./dist/chains.d.ts",
+        "default": "./dist/chains.js"
+      },
+      "require": {
+        "types": "./dist/chains.d.cts",
+        "default": "./dist/chains.cjs"
+      }
+    },
+    "./enums": {
+      "import": {
+        "types": "./dist/enums.d.ts",
+        "default": "./dist/enums.js"
+      },
+      "require": {
+        "types": "./dist/enums.d.cts",
+        "default": "./dist/enums.cjs"
+      }
+    },
+    "./pool": {
+      "import": {
+        "types": "./dist/pool.d.ts",
+        "default": "./dist/pool.js"
+      },
+      "require": {
+        "types": "./dist/pool.d.cts",
+        "default": "./dist/pool.cjs"
+      }
+    },
+    "./limits": {
+      "import": {
+        "types": "./dist/limits.d.ts",
+        "default": "./dist/limits.js"
+      },
+      "require": {
+        "types": "./dist/limits.d.cts",
+        "default": "./dist/limits.cjs"
+      }
+    },
+    "./format": {
+      "import": {
+        "types": "./dist/format.d.ts",
+        "default": "./dist/format.js"
+      },
+      "require": {
+        "types": "./dist/format.d.cts",
+        "default": "./dist/format.cjs"
+      }
+    },
+    "./schemas": {
+      "import": {
+        "types": "./dist/schemas.d.ts",
+        "default": "./dist/schemas.js"
+      },
+      "require": {
+        "types": "./dist/schemas.d.cts",
+        "default": "./dist/schemas.cjs"
+      }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.ts",
+        "default": "./dist/types.js"
+      },
+      "require": {
+        "types": "./dist/types.d.cts",
+        "default": "./dist/types.cjs"
+      }
+    },
+    "./demo": {
+      "import": {
+        "types": "./dist/demo.d.ts",
+        "default": "./dist/demo.js"
+      },
+      "require": {
+        "types": "./dist/demo.d.cts",
+        "default": "./dist/demo.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "money": [
+        "./dist/money.d.ts"
+      ],
+      "fees": [
+        "./dist/fees.d.ts"
+      ],
+      "chains": [
+        "./dist/chains.d.ts"
+      ],
+      "enums": [
+        "./dist/enums.d.ts"
+      ],
+      "pool": [
+        "./dist/pool.d.ts"
+      ],
+      "limits": [
+        "./dist/limits.d.ts"
+      ],
+      "format": [
+        "./dist/format.d.ts"
+      ],
+      "schemas": [
+        "./dist/schemas.d.ts"
+      ],
+      "types": [
+        "./dist/types.d.ts"
+      ],
+      "demo": [
+        "./dist/demo.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "decimal.js": "^10.6.0",
+    "viem": "^2.58.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.7",
+    "eslint": "^9.39.5",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.12"
+  }
+}

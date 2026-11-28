@@ -1,0 +1,51 @@
+{
+  "name": "@gp/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GLOBAL POOL player web app — Next.js 15 App Router, casino shell, design system. DEMO / testnet only.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "node --test test/*.test.mjs",
+    "visual": "node scripts/visual-qa.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@gp/shared": "workspace:*",
+    "@gp/tokens": "workspace:*",
+    "@hookform/resolvers": "^5.9.2",
+    "@privy-io/react-auth": "^3.52.1",
+    "@tanstack/react-query": "^5.108.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "geist": "^1.9.2",
+    "lucide-react": "^1.82.0",
+    "next": "^15.5.29",
+    "radix-ui": "^1.8.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-hook-form": "^7.92.0",
+    "sonner": "^2.0.8",
+    "tailwind-merge": "^3.7.1",
+    "viem": "^2.58.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "^15.5.29",
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^22.20.7",
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "postcss": "^8.5.34",
+    "tailwindcss": "^4.3.5",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "~5.9.3"
+  }
+}

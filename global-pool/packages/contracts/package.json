@@ -1,0 +1,78 @@
+{
+  "name": "@gp/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GLOBAL POOL on-chain round registry (Foundry): verifiable Chainlink VRF v2.5 draws for Global Pool rounds under hybrid custody. DEMO / testnet only (Arbitrum Sepolia 421614).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./abi": {
+      "import": {
+        "types": "./dist/abi.d.ts",
+        "default": "./dist/abi.js"
+      },
+      "require": {
+        "types": "./dist/abi.d.cts",
+        "default": "./dist/abi.cjs"
+      }
+    },
+    "./verify": {
+      "import": {
+        "types": "./dist/verify.d.ts",
+        "default": "./dist/verify.js"
+      },
+      "require": {
+        "types": "./dist/verify.d.cts",
+        "default": "./dist/verify.cjs"
+      }
+    },
+    "./abi/GlobalPoolRounds.json": "./abi/GlobalPoolRounds.json",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "abi": [
+        "./dist/abi.d.ts"
+      ],
+      "verify": [
+        "./dist/verify.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "abi",
+    "src"
+  ],
+  "scripts": {
+    "dev": "sh scripts/forge.sh build --watch",
+    "build": "sh scripts/forge.sh build && node scripts/export-abi.ts && tsup",
+    "build:ts": "tsup",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "sh scripts/forge.sh fmt --check && eslint .",
+    "test": "sh scripts/forge.sh test && node --test scripts/test/*.test.ts",
+    "test:sol": "sh scripts/forge.sh test -vv",
+    "test:ts": "node --test scripts/test/*.test.ts",
+    "fmt": "sh scripts/forge.sh fmt",
+    "snapshot": "sh scripts/forge.sh snapshot",
+    "snapshot:check": "sh scripts/forge.sh snapshot --check",
+    "gas-report": "sh scripts/forge.sh test --gas-report --match-contract GlobalPoolRoundsTest",
+    "fixture": "node scripts/build-fixture.ts",
+    "abi": "node scripts/export-abi.ts",
+    "deploy:dry-run": "sh scripts/forge.sh script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia"
+  },
+  "dependencies": {
+    "@openzeppelin/merkle-tree": "1.0.8",
+    "viem": "2.57.19"
+  },
+  "devDependencies": {
+    "@chainlink/contracts": "1.5.0",
+    "@openzeppelin/contracts": "5.6.1",
+    "@openzeppelin/contracts-4.9.6": "npm:@openzeppelin/contracts@4.9.6",
+    "@types/node": "^22.20.7",
+    "eslint": "^9.39.5",
+    "prettier": "^3.10.1",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3"
+  }
+}

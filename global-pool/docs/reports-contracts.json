@@ -1,0 +1,85 @@
+{
+  "summary": "GLOBAL POOL smart contracts (Foundry): verifiable pool round registry + Chainlink VRF v2.5 consumer for Arbitrum Sepolia, tests, ABI export",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "report": "The `packages/contracts` package is built and every check passes. It has no warnings, and all 67 Solidity tests plus 7 TypeScript tests pass. Nothing was committed or broadcast, and I didn't touch `apps/` or the other packages.\n\n**What it does.** `GlobalPoolRounds` is a round registry under hybrid custody: it holds no funds and can't change a result once recorded. It covers the full lifecycle: open round, commit entries after close, threshold check on-chain, cancel if thresholds fail, VRF draw, deterministic winners, and settlement. There is no function that sets a random word, a winner, an entry list or a settlement. Pause only blocks opening rounds and committing entries.\n\n**Two security findings I fixed in the design:**\n- **Owner re-roll path.** Chainlink's `setCoordinator` can't be overridden, so whoever owns the consumer could point it at a fake coordinator and inject random words. Worse, they could break a pending fulfilment after its output became public, then re-request after 24 h, which is a re-roll. The contract now makes itself its own owner (`lockCoordinator()`, called by the deploy script). `requestDraw` refuses to run until that's done, and callbacks are accepted only from the coordinator fixed at deployment.\n- **Re-request rule.** The 24 h re-request you asked for is in, but the first fulfilment of any request for a round is final, so a re-request can't cancel an earlier one. Chainlink's guidance warns that re-requesting can still be a bias vector, so any draw with more than one attempt should be treated as a disclosed incident. Whether to keep this path is listed as an audit item.\n\n**Commands and results:**\n\n| Command | Result |\n|---|---|\n| `forge build --force` | 50 files, solc 0.8.28, 0 warnings |\n| `forge fmt --check` | clean |\n| `forge test -vv` | 67 passed, 0 failed (4 suites) |\n| `forge snapshot --check` | matches `.gas-snapshot` |\n| `pnpm --filter @gp/contracts build / typecheck / lint / test` | all exit 0 |\n| Prettier on my files | clean |\n\n- **Test breakdown:**\n  - main suite: 49;\n  - TypeScript cross-check against the DEMO round #1,248 fixture: 6;\n  - draw maths: 11, including 5 fuzz properties at 1,024 runs each;\n  - invariant suite: 1, at 64 runs × 256 calls. It checks that a word never changes once set, status never goes backwards, and the committed entries root never changes.\n- **Fixture:** matches demo-data.md exactly:\n  - 18,640 entries, 3,412 participants;\n  - pool 186,400.00, fees 932.00;\n  - prizes 93,200 / 37,280 / 18,640 / 10 × 3,728;\n  - @nova.k owns entries 980–1014.\n- **Size:** 16,771 bytes, 7,805 under the 24 KB limit.\n- **Gas (median / max):**\n\n| Function | Median | Max |\n|---|---|---|\n| `openRound` (13 prizes) | 208,894 | |\n| `commitEntries` | 95,142 | 129,318 |\n| `requestDraw` | 218,585 | |\n| VRF callback | 26,383 | 78,627 |\n| `recordSettlement` | 27,191 | 110,509 |\n| `cancelRound` | 30,775 | 53,937 |\n\n  Winner derivation is 24,190 gas for 13 winners from 18,640 entries and about 2.3M for the worst case (100 of 100). The callback measures 79,361 gas against an enforced floor of 150,000.\n- **Deploy dry-runs (no broadcast):**\n  - in-memory with a VRF mock: succeeds;\n  - Arbitrum Sepolia fork with the real coordinator: succeeds, estimated 9.74M gas, about 0.00039 ETH.\n\n**Foundry install.** Foundry is 1.9.0. The standard installer failed: GitHub's attestation endpoint returned 403 and the release-tag lookup was blocked, and its \"stable\" tag points to an old 1.5.1. I downloaded the v1.9.0 release binaries directly and checked each one against Sigstore's public log before installing to `~/.foundry/bin`. v1.10.x exists but is under two weeks old.\n\n**Dependencies:**\n- OpenZeppelin 5.6.1 and Chainlink 1.5.0 come from npm. I skipped Chainlink 2.0.0 because it was published 4 days ago.\n- forge-std v1.17.0 is vendored in `lib/forge-std`, byte-identical to the tag.\n- I didn't use `forge install` submodules because they would add a `.gitmodules` at the repo root, which the conventions forbid modifying.\n\n**VRF on Arbitrum Sepolia.** Values are from the Chainlink docs on 28 Nov 2026 and confirmed with read-only on-chain calls:\n- coordinator `0x5CE8D5A2BC84beb22a398CCA51996F7930313D61`\n- 50 gwei key hash `0x1770bdc7…cfd2be`\n- LINK `0xb1D4538B…1E80E`\n- max callback gas 2,500,000\n\nOne mismatch: the on-chain minimum confirmations is 0, while the docs say 1. The README has a \"verify before use\" checklist, and the deploy script rejects any other coordinator or key hash on 421614 unless explicitly overridden.\n\n**For the API agent.** `@gp/shared` doesn't re-export these; that would make it depend on a Foundry package. The import paths are in `docs/CONTRACTS.md`:\n- `@gp/contracts/abi`: the typed ABI for viem, plus status and reason enums.\n- `@gp/contracts/verify`: the same tree, winner and prize-split code the contract uses, so the API and the contract agree.\n- The plain JSON ABI is at `@gp/contracts/abi/GlobalPoolRounds.json`.\n\n**Not verified:**\n- a real VRF fulfilment on Arbitrum Sepolia (there is no subscription yet and nothing was broadcast);\n- Slither or other static analyzers, and an external audit;\n- use from `apps/`, which don't exist yet;\n- installing Foundry in CI.\n\n**Memory.** I didn't use any stored notes. Possibly worth saving (learned in this session): in this sandbox the standard Foundry installer fails, so Foundry 1.9.0 was installed by hand after checking the binaries against Sigstore. Also, the contracts package vendors forge-std and uses npm for OpenZeppelin and Chainlink.\n\nEverything is in `/home/user/Claude/global-pool/packages/contracts`; open `README.md` first. The integration guide is `/home/user/Claude/global-pool/docs/CONTRACTS.md`.",
+    "verified": [
+      "Foundry 1.9.0 installed; release binaries checked against Sigstore (Rekor log + Fulcio cert for foundry-rs/foundry release.yml@refs/tags/v1.9.0)",
+      "forge build --force: 50 files with solc 0.8.28, 'Compiler run successful!', 0 warnings",
+      "forge fmt --check: exit 0",
+      "forge test -vv: 67 passed, 0 failed across 4 suites (49 main, 6 fixture, 11 draw maths incl. 5 fuzz x1,024 runs, 1 invariant at 64 runs x 256 calls)",
+      "forge snapshot --check: matches .gas-snapshot",
+      "pnpm --filter @gp/contracts build, typecheck, lint, test: all exit 0; node --test 7/7 pass",
+      "Prettier check on packages/contracts and docs/CONTRACTS.md: clean",
+      "Solidity and TypeScript agree on leaf encodings, Merkle roots/proofs (checked with OpenZeppelin MerkleProof), winner derivation (8 vectors incl. edge cases) and prize split",
+      "Fixture matches demo-data.md: 18,640 entries, 3,412 participants, pool 186,400.00, fees 932.00, prizes 93,200/37,280/18,640/10x3,728",
+      "VRF callback measured at 79,361 gas, under the enforced 150,000 floor",
+      "Contract size 16,771 bytes (7,805 under the 24,576 limit)",
+      "Deploy dry-run in memory with a VRF mock: success; Arbitrum Sepolia fork dry-run with the real coordinator: success, about 9.74M gas, no broadcast",
+      "Arbitrum Sepolia VRF values match the Chainlink docs and on-chain reads (coordinator has code, key hash registered, maxGasLimit 2,500,000, LINK address)",
+      "forge-std in lib/ is byte-identical to tag v1.17.0 (commit f3dae6e); no .gitmodules created at the repo root"
+    ],
+    "failing": [
+      "Not verified: a real VRF fulfilment on Arbitrum Sepolia (no subscription yet, nothing broadcast by design)",
+      "Not run: Slither, Aderyn, Halmos or any external audit",
+      "Not verified: use from apps/api or apps/web, which don't exist yet",
+      "Not verified: Foundry install in CI; the standard installer's attestation and tag-lookup endpoints are blocked in this sandbox",
+      "Root build:packages builds only @gp/tokens and @gp/shared, so dist/ for @gp/contracts/abi and /verify is not built by the root scripts; consumers need `pnpm --filter @gp/contracts build:ts` (Node only, no forge)"
+    ],
+    "decisions": [
+      "Dependencies: npm via pnpm for OpenZeppelin 5.6.1, Chainlink 1.5.0 and an OpenZeppelin 4.9.6 alias the Chainlink mock needs; forge-std vendored with `forge install --no-git`. Submodules would modify the repo root, and pnpm's git dependency produced an SSH-only lockfile URL",
+      "Versions at least 2 weeks old: Foundry 1.9.0 (not 1.10.x), Chainlink 1.5.0 (not 2.0.0), viem 2.57.19 (@gp/shared uses ^2.58.8, so two viem versions exist)",
+      "Security fix: the contract makes itself its own Chainlink owner via lockCoordinator(); requestDraw requires the lock, and callbacks are accepted only from the coordinator fixed at deploy. This closes the setCoordinator injection and re-roll path",
+      "Re-request after 24 h only while unfulfilled; the first fulfilment of any request for a round is final, and later callbacks are ignored with an event",
+      "requestDraw is permissionless once thresholds are met, and cancelling a committed round that failed thresholds is permissionless; Open rounds can be cancelled only by the operator; no cancel after a draw request",
+      "BUSINESS ASSUMPTION: totalPaid must equal the pool (prizes are 100% of the pool); rounding dust goes to 1st prize",
+      "BUSINESS ASSUMPTION: the round only draws if entries >= number of prizes; poolAmount must equal entries x entryPrice on-chain",
+      "BUSINESS ASSUMPTION: canonical entry index = ledger purchase order; entryId = ASCII bytes32 or keccak; userCommitment = keccak(abi.encode(keccak(userPublicId), randomSalt))",
+      "Cancel reason codes: 1 THRESHOLDS_NOT_MET, 2 OPERATIONAL, 3 COMPLIANCE, 4 OTHER",
+      "Amounts are uint128 in USDT base units with 6 decimals (accounting only)",
+      "Winner derivation: domain-tagged keccak with roundId, rejection sampling to remove modulo bias, MAX_PRIZES 100",
+      "Merkle leaves are single-hashed as specified (keccak256(abi.encode(index, entryId, userCommitment))), using OpenZeppelin SimpleMerkleTree with leaves kept in index order",
+      "VRF config bounds: callback gas 150k to 2.5M (deploy default 250k), confirmations 1 to 200 (default 3); pause by PAUSER_ROLE, unpause by admin only",
+      "ABI published as dist/ via tsup (ESM + CJS + .d.ts) at @gp/contracts/abi and @gp/contracts/verify; not re-exported from @gp/shared"
+    ],
+    "next": [
+      "Owner: create and fund the VRF v2.5 subscription on Arbitrum Sepolia with test LINK, create a throwaway testnet keystore, run the README 'verify before use' checklist, then broadcast Deploy.s.sol and add the contract as a consumer",
+      "Orchestrator: add `pnpm --filter @gp/contracts build:ts` to root build:packages once apps import @gp/contracts/abi or /verify; install Foundry 1.9.0 in CI using the same Sigstore check",
+      "API agent: follow docs/CONTRACTS.md section 3 (close, commit, cancel/request, settle jobs; random salt per entry; store proofs; watch events; alert when a draw has more than one attempt)",
+      "Web agent: provable-fairness panel calling verifyEntry/verifyPayout through viem readContract, with winners recomputed in the browser",
+      "Audit TODOs: Slither, Aderyn, Halmos; decide whether to keep or gate the re-request path; consider on-chain settlement verification; two-step admin transfer with a delay and multisig role holders"
+    ]
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Contracts"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "dev:contracts",
+      "phaseIndex": 1,
+      "phaseTitle": "Contracts",
+      "agentId": "a646662520a743b8c",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795829468419,
+      "queuedAt": 1795829468413,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "The `packages/contracts` package is built and every check p…",
+      "promptPreview": "You are a senior Solidity/Web3 engineer on GLOBAL POOL. FIRST read /home/user/Claude/global-pool/docs/DEV_CONVENTIONS.md (guardrails + owner decisions: HYBRID custody, MVP Arbitrum Sepolia 421614) and /home/user/Claude/design/figma-build/demo-data.md (round #1,248 numbers, prize split 50/20/10/10×2%). Do not git commit. Do not touch apps/ or other packages except adding exported ABIs as described.…",
+      "promptFramed": true,
+      "lastProgressAt": 1795832019629,
+      "tokens": 390651,
+      "toolCalls": 145,
+      "durationMs": 2551209,
+      "resultPreview": "{\"report\":\"The `packages/contracts` package is built and every check passes. It has no warnings, and all 67 Solidity tests plus 7 TypeScript tests pass. Nothing was committed or broadcast, and I didn't touch `apps/` or the other packages.\\n\\n**What it does.** `GlobalPoolRounds` is a round registry under hybrid custody: it holds no funds and can't change a result once recorded. It covers the full l…"
+    }
+  ],
+  "totalTokens": 390651,
+  "totalToolCalls": 145
+}

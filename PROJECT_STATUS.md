@@ -36,7 +36,7 @@ Ledger (306 rows incl. 12 added for catalogue/promotions): **75 verified · 11 b
 | Web: design system + casino shell | 🟡 | agent dev:web-design-system |
 | Web: Homepage (PUB-01) | ⬜→🟡 | agent dev:web-homepage (after design system) |
 | API: NestJS core, Prisma schema, auth, ledger, wallet, pool, admin, audit | 🟡 | agent dev:api-core |
-| Smart contracts (Foundry, VRF v2.5) | 🟡 | workflow `gp-contracts` (round registry + VRF consumer, Arbitrum Sepolia, tests) |
+| Smart contracts (Foundry, VRF v2.5) | ✅ (testnet-ready, unaudited) | `packages/contracts`: GlobalPoolRounds — verifiable round registry and VRF v2.5 consumer. It holds no funds, cannot re-roll, and admins have no say over results; coordinator locked. 67/67 tests incl. fuzz and invariants (re-run by the orchestrator). Deploy dry-run on an Arbitrum Sepolia fork OK, not broadcast. TODO: VRF subscription, Slither, external audit. |
 | Auth, Dashboard, Wallet, Pool, Admin frontends | ⬜ | next batch after foundation |
 | Games (5) as simulations | ⬜ | P1 |
 
