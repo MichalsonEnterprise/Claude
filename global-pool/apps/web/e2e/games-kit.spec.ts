@@ -60,7 +60,7 @@ test.describe('Games kit — lobby → Pool Dice → roll → verify (DEMO credi
   test('a new player rolls Pool Dice with DEMO credits and verifies the roll in the browser', async ({ page, request }) => {
     const player = await createPlayer(request);
     const headers = { authorization: `Bearer ${player.token}` };
-    const walletBefore = await (await request.get(`${API}/wallet/balances`, { headers })).json();
+    const walletBefore: unknown = await (await request.get(`${API}/wallet/balances`, { headers })).json();
 
     // Server-side guard: a real-money currency is impossible (REAL_MONEY_ENABLED=false).
     const realMoney = await request.post(`${API}/games/pool-dice/bets`, {
@@ -75,7 +75,7 @@ test.describe('Games kit — lobby → Pool Dice → roll → verify (DEMO credi
     // PUB-03 lobby
     await page.goto('/games');
     await expect(page.getByRole('heading', { name: 'Games lobby' })).toBeVisible();
-    await expect(page.getByText('DEMO credits · no cash value').first()).toBeVisible();
+    await expect(page.getByText('DEMO credits · no cash value').locator('visible=true').first()).toBeVisible();
     await expect(page.getByRole('tab', { name: /Originals · \d+/ })).toBeVisible();
     // honest "coming soon" for titles without an engine
     await expect(page.getByRole('link', { name: /Neon Koi .*Coming soon/ })).toBeVisible();
@@ -85,9 +85,10 @@ test.describe('Games kit — lobby → Pool Dice → roll → verify (DEMO credi
     await expect(page).toHaveURL(/\/games\/pool-dice$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Pool Dice' })).toBeVisible();
     await expect(page.getByTestId('demo-credits-balance').locator('visible=true').first()).toContainText('1,000.00');
-    await expect(page.getByText('DEMO credits · no cash value').first()).toBeVisible();
-    await expect(page.getByText('0.00 DEMO').first()).toBeVisible(); // Fees 0.00
-    await expect(page.getByText('You can lose your stake.').first()).toBeVisible();
+    const visible = (text: string) => page.getByText(text).locator('visible=true').first();
+    await expect(visible('DEMO credits · no cash value')).toBeVisible();
+    await expect(visible('0.00 DEMO')).toBeVisible(); // Fees 0.00
+    await expect(visible('You can lose your stake.')).toBeVisible();
     await expect(page.getByRole('region', { name: 'Your session' })).toBeVisible();
     await expect(page.getByRole('slider', { name: /Target — roll over/ })).toHaveAttribute('aria-valuenow', '50.5');
 
@@ -133,12 +134,12 @@ test.describe('Games kit — lobby → Pool Dice → roll → verify (DEMO credi
     );
 
     // USDT wallet untouched by game play
-    const walletAfter = await (await request.get(`${API}/wallet/balances`, { headers })).json();
+    const walletAfter: unknown = await (await request.get(`${API}/wallet/balances`, { headers })).json();
     expect(walletAfter).toEqual(walletBefore);
 
     // DI-05 history
     const history = page.locator('#my-bets');
-    await expect(history.getByText(bet.ref)).toBeVisible();
+    await expect(history.getByRole('cell', { name: bet.ref, exact: true })).toBeVisible();
 
     // DI-06 verify: seed still secret → rotate & reveal → re-derived in the browser
     await history.getByRole('button', { name: `Verify ${bet.ref}` }).click();
@@ -154,6 +155,41 @@ test.describe('Games kit — lobby → Pool Dice → roll → verify (DEMO credi
     await drawer.getByRole('button', { name: `Use the seeds from ${bet.ref}` }).click();
     await expect(drawer.getByText(`Roll ${bet.ref} verified`)).toBeVisible();
     await page.keyboard.press('Escape');
+
+    // DI-07 connection lost: the server settles the roll, the browser loses the response, the kit retries with the
+    // SAME idempotency key → the stored result is replayed (exactly one bet, never charged twice).
+    let dropped = false;
+    await page.route('**/games/pool-dice/bets', async (route) => {
+      if (route.request().method() !== 'POST' || dropped) return route.continue();
+      dropped = true;
+      await route.fetch(); // reaches the server and settles there
+      await route.abort('connectionreset');
+    });
+    await roll.click();
+    await expect(page.getByText('Connection lost — reconnecting')).toBeVisible();
+    await expect(banner).toBeVisible({ timeout: 30_000 });
+    await page.unroute('**/games/pool-dice/bets');
+    const afterReconnect = (await (await request.get(`${API}/games/pool-dice/bets`, { headers })).json()) as {
+      total: number;
+    };
+    expect(afterReconnect.total).toBe(2);
+
+    // Auto-play: 3 rolls, constant stake, stop-loss required, unticked confirmation
+    await page.getByRole('radio', { name: 'auto' }).click();
+    await page.getByRole('textbox', { name: 'Number of rolls' }).fill('3');
+    await page.getByRole('textbox', { name: 'Stop-loss (required)' }).fill('30.00');
+    await expect(page.getByRole('button', { name: 'Start auto-play' })).toBeDisabled();
+    await page.getByRole('checkbox', { name: /I understand auto-play/ }).check();
+    await page.getByRole('button', { name: 'Start auto-play' }).click();
+    await expect(page.getByText(/Auto-play (finished all bets|stopped at your stop-loss)/)).toBeVisible({ timeout: 60_000 });
+    const all = (await (await request.get(`${API}/games/pool-dice/bets`, { headers })).json()) as {
+      total: number;
+      items: { stake: string }[];
+    };
+    expect(all.total).toBeGreaterThanOrEqual(4);
+    expect(all.total).toBeLessThanOrEqual(5);
+    expect(all.items.every((b) => b.stake === '10.00')).toBe(true); // never raised after a loss
+    await page.getByRole('radio', { name: 'manual' }).click();
 
     // PUB-04 details
     await page.goto('/games/pool-dice/details');

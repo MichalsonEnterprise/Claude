@@ -7,7 +7,7 @@ import {
   formatUtcTime,
   maskEmail,
 } from '@/components/auth/format';
-import { safeNext } from '@/components/auth/safe-next';
+import { safeAdminNext, safeNext } from '@/components/auth/safe-next';
 import { ApiRequestError } from '@/lib/api/client';
 import { restrictedRouteFor, routeForGate } from '@/lib/api/auth';
 import { onboardingExempt } from '@/lib/auth/routes';
@@ -28,6 +28,51 @@ describe('auth helpers', () => {
       undefined,
     ]) {
       expect(safeNext(bad)).toBeUndefined();
+    }
+  });
+
+  it('rejects `next` values the URL parser would turn into another origin (R36)', () => {
+    // The WHATWG parser strips TAB / LF / CR and reads `\` as `/`: each of these would leave the site.
+    for (const bad of [
+      '/\t/evil.example/login',
+      '/\n/evil.example',
+      '/\r\n/evil.example',
+      '/\u0000/evil.example',
+      '/ /evil.example',
+      '/\u00a0/evil.example',
+      '/a\\b',
+      '/\\\\evil.example',
+      'javascript:alert(1)',
+      ' /wallet',
+    ]) {
+      expect(safeNext(bad), JSON.stringify(bad)).toBeUndefined();
+    }
+    // Why: this is what the browser does with the old check's survivor.
+    expect(new URL('/\t/evil.example/login', 'http://localhost:3000').origin).toBe(
+      'http://evil.example',
+    );
+    // Same-origin paths survive, normalised (dot segments resolved, query + hash kept).
+    expect(safeNext('/wallet/withdraw?step=amount#fees')).toBe('/wallet/withdraw?step=amount#fees');
+    expect(safeNext('/pool/../wallet')).toBe('/wallet');
+    expect(safeNext('/2fa/challenge?purpose=withdrawal&next=%2Fwallet')).toBe(
+      '/2fa/challenge?purpose=withdrawal&next=%2Fwallet',
+    );
+  });
+
+  it('admin `next` must be a safe /admin path (R20)', () => {
+    expect(safeAdminNext('/admin/finance/withdrawals?x=1')).toBe('/admin/finance/withdrawals?x=1');
+    expect(safeAdminNext('/admin')).toBe('/admin');
+    for (const bad of [
+      'https://evil.example/admin/login',
+      'javascript:alert(document.domain)',
+      '//evil.example/admin',
+      '/\t/evil.example/admin',
+      '/wallet',
+      '/administrator',
+      '/admin/../wallet',
+      null,
+    ]) {
+      expect(safeAdminNext(bad), String(bad)).toBeUndefined();
     }
   });
 

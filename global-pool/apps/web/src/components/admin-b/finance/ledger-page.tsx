@@ -76,7 +76,8 @@ function IntegrityBanner({ i }: { i: LedgerIntegrity }) {
           <span className="text-caption text-text-tertiary">Append-only</span>
           <span className="flex items-center gap-1 text-body-s-strong text-text-primary">
             <Lock aria-hidden className="size-3.5" />
-            {i.appendOnly.triggers.filter((t) => t.present).length}/{i.appendOnly.triggers.length}{' '}
+            {i.appendOnly.triggers.filter((t) => t.present && t.enabled !== false).length}/
+            {i.appendOnly.triggers.length}{' '}
             DB triggers active
           </span>
         </div>

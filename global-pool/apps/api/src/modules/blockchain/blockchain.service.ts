@@ -3,6 +3,7 @@ import { CHAINS, CHAIN_DISPLAY_ORDER, type ChainKey } from '@gp/shared/chains';
 import { createPublicClient, http, type Address, type Chain, type PublicClient } from 'viem';
 
 import { AppConfig } from '../../config/app-config';
+import { ChainUnavailableError, errorSummary } from './chain-errors';
 import { evmChain } from './evm-chain';
 
 /**
@@ -14,6 +15,7 @@ import { evmChain } from './evm-chain';
 export class BlockchainService {
   private readonly logger = new Logger(BlockchainService.name);
   private readonly clients = new Map<ChainKey, PublicClient>();
+  private readonly verified = new Set<ChainKey>();
 
   constructor(private readonly config: AppConfig) {}
 
@@ -32,6 +34,34 @@ export class BlockchainService {
       ...(this.config.env.EVM_CHAIN_ID === 31_337 ? { cacheTime: 0 } : {}),
     }) as PublicClient;
     this.clients.set(network, client);
+    return client;
+  }
+
+  /**
+   * Public client after checking that the RPC really serves EVM_CHAIN_ID (eth_chainId; once per process when it
+   * matches). Every chain READ that can move money or decide a draw (deposit watcher, VRF fulfilment watcher, signer)
+   * uses this: a mainnet RPC URL must never make real funds creditable. Fails closed with ChainUnavailableError (an
+   * ALERT is logged on a mismatch); a mismatch is re-checked on the next call, never cached as verified.
+   */
+  async verifiedClient(network: ChainKey = 'arbitrum'): Promise<PublicClient> {
+    const client = this.client(network);
+    if (!client) throw new ChainUnavailableError(`No RPC configured for ${network}`);
+    if (this.verified.has(network)) return client;
+    let id: number;
+    try {
+      id = await client.getChainId();
+    } catch (err) {
+      throw new ChainUnavailableError(`RPC unavailable: ${errorSummary(err)}`);
+    }
+    if (id !== this.chainId) {
+      this.logger.error(
+        `ALERT ${network} RPC serves chain ${id}, expected ${this.chainId} (EVM_CHAIN_ID) — refusing to use it`,
+      );
+      throw new ChainUnavailableError(
+        `RPC serves chain ${id}, expected ${this.chainId} (EVM_CHAIN_ID) — refusing to use it`,
+      );
+    }
+    this.verified.add(network);
     return client;
   }
 

@@ -44,6 +44,7 @@ import {
 import { Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGameCatalogue, type CatalogueGame } from '@/lib/api/games';
+import { statePreviewEnabled } from '@/lib/home-preview';
 import { useFavourites } from '@/lib/api/rg-history';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -346,7 +347,9 @@ export function GamesLobby({ previewRestricted = false }: { previewRestricted?: 
   const region = useRegionStatus();
   const favs = useFavourites();
   const [sheet, setSheet] = React.useState(false);
-  const restricted = previewRestricted || region.data?.permitted === false;
+  // dev-only preview (next dev / NEXT_PUBLIC_STATE_PREVIEW=true): /games?state=restricted
+  const preview = statePreviewEnabled && sp.get('state') === 'restricted';
+  const restricted = previewRestricted || preview || region.data?.permitted === false;
 
   const f: Filters = {
     tab: (TABS.find((t) => t.id === sp.get('category'))?.id ?? 'all'),

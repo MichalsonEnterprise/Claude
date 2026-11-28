@@ -10,7 +10,7 @@ import {
 import { DemoOnly } from '../../common/demo-only.guard';
 import { CurrentUser, type AuthUser } from '../../common/request';
 import { createZodDto } from '../../common/zod';
-import { DEPOSIT_POLICY, PlayerAuth } from '../auth/guards';
+import { DEPOSIT_POLICY, PlayerAuth, PlayerPolicy } from '../auth/guards';
 import { DemoDepositsService } from './demo-deposits.service';
 import { DepositAddressService } from './deposit-address.service';
 import { DepositsService } from './deposits.service';
@@ -20,8 +20,13 @@ class PaginationDto extends createZodDto(paginationQuerySchema) {}
 class SimulateDepositDto extends createZodDto(demoDepositSimulationSchema) {}
 class AdvanceDepositDto extends createZodDto(demoDepositAdvanceSchema) {}
 
+/**
+ * Only NEW deposits (the address, the DEMO simulation) need the deposit policy (region, not self-excluded, no
+ * `deposits_blocked`). History and tracking of deposits already sent stay available during a break, abroad or under
+ * a deposit block, like withdrawals (API.md: "withdrawals and history stay available").
+ */
 @ApiTags('deposits')
-@PlayerAuth(DEPOSIT_POLICY)
+@PlayerAuth()
 @Controller('deposits')
 export class DepositsController {
   constructor(
@@ -31,6 +36,7 @@ export class DepositsController {
   ) {}
 
   @Get('address')
+  @PlayerPolicy(DEPOSIT_POLICY)
   @ApiOperation({
     summary: 'Your per-user deposit address (HD-derived, Arbitrum Sepolia test-USDT)',
   })
@@ -52,7 +58,7 @@ export class DepositsController {
 }
 
 @DemoOnly()
-@PlayerAuth(DEPOSIT_POLICY)
+@PlayerAuth()
 @Controller('dev/deposits')
 export class DevDepositsController {
   constructor(
@@ -62,6 +68,7 @@ export class DevDepositsController {
 
   @Post('simulate')
   @HttpCode(200)
+  @PlayerPolicy(DEPOSIT_POLICY)
   @ApiOperation({
     summary:
       'DEMO only: simulate a confirmed test-USDT deposit (same ledger postings as a real one; idempotent)',

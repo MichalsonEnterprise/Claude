@@ -467,41 +467,45 @@ describe('user tabs, PII reveal and RBAC on the console reads', () => {
     // a dedicated test role keeps the shared RBAC rows untouched
     const key = `qa_${uid().replace(/[^a-z]/g, 'x')}`;
     const role = await t.prisma.adminRole.create({ data: { key, name: 'QA test role' } });
-    await t
-      .http()
-      .post('/admin/roles/super_admin/change-requests')
-      .set(bearer(t1))
-      .send({
-        revoke: ['audit.read'],
-        reason: 'Trying to change the fixed role',
-        mfaCode: '123456',
-      })
-      .expect(403);
-    const req = await t
-      .http()
-      .post(`/admin/roles/${key}/change-requests`)
-      .set(bearer(t1))
-      .send({
-        grant: ['kyc.read', 'rg.read'],
-        reason: 'New responsibility for QA',
-        mfaCode: await totp(s1.secret, 0),
-      })
-      .expect(202);
-    expect(req.body).toMatchObject({
-      status: 'pending_approval',
-      approval: { action: 'admin.role.permissions.change' },
-    });
-    expect(await t.prisma.adminRolePermission.count({ where: { roleId: role.id } })).toBe(0);
+    try {
+      await t
+        .http()
+        .post('/admin/roles/super_admin/change-requests')
+        .set(bearer(t1))
+        .send({
+          revoke: ['audit.read'],
+          reason: 'Trying to change the fixed role',
+          mfaCode: '123456',
+        })
+        .expect(403);
+      const req = await t
+        .http()
+        .post(`/admin/roles/${key}/change-requests`)
+        .set(bearer(t1))
+        .send({
+          grant: ['kyc.read', 'rg.read'],
+          reason: 'New responsibility for QA',
+          mfaCode: await totp(s1.secret, 0),
+        })
+        .expect(202);
+      expect(req.body).toMatchObject({
+        status: 'pending_approval',
+        approval: { action: 'admin.role.permissions.change' },
+      });
+      expect(await t.prisma.adminRolePermission.count({ where: { roleId: role.id } })).toBe(0);
 
-    const ok = await t
-      .http()
-      .post(`/admin/approvals/${req.body.approval.id}/approve`)
-      .set(bearer(t2))
-      .send({ reason: 'Least privilege reviewed and agreed', mfaCode: await totp(s2.secret, 0) })
-      .expect(200);
-    expect(ok.body.result).toMatchObject({ role: key, granted: ['kyc.read', 'rg.read'] });
-    expect(await t.prisma.adminRolePermission.count({ where: { roleId: role.id } })).toBe(2);
-    await t.prisma.adminRole.delete({ where: { id: role.id } });
+      const ok = await t
+        .http()
+        .post(`/admin/approvals/${req.body.approval.id}/approve`)
+        .set(bearer(t2))
+        .send({ reason: 'Least privilege reviewed and agreed', mfaCode: await totp(s2.secret, 0) })
+        .expect(200);
+      expect(ok.body.result).toMatchObject({ role: key, granted: ['kyc.read', 'rg.read'] });
+      expect(await t.prisma.adminRolePermission.count({ where: { roleId: role.id } })).toBe(2);
+    } finally {
+      // Always remove the test role (its permissions cascade), even when an assertion above failed.
+      await t.prisma.adminRole.deleteMany({ where: { id: role.id } });
+    }
   });
 
   it('system health and live alerts come from real state; acknowledging is audited', async () => {

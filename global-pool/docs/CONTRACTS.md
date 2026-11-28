@@ -29,7 +29,8 @@ Owner decision (28 Nov 2026): **custody is hybrid.**
 | open              | `openRound(roundId, closesAt, entryPrice, feePerEntry, minParticipants, minPool, prizeSplitBps[], rulesHash)`     | `OPERATOR_ROLE`       | `RoundOpened`                                      |
 | freeze entries    | `commitEntries(roundId, entriesMerkleRoot, totalEntries, totalParticipants, poolAmount)` (after `closesAt`, once) | `OPERATOR_ROLE`       | `EntriesCommitted(…, platformFees, thresholdsMet)` |
 | failed thresholds | `cancelRound(roundId, 1)`                                                                                         | anyone                | `RoundCancelled`                                   |
-| draw              | `requestDraw(roundId)` (re-request only if unfulfilled ≥ 24 h)                                                    | anyone (keeper)       | `DrawRequested(…, attempt)`                        |
+| draw              | `requestDraw(roundId)` (exactly once per round — never re-requested)                                              | anyone (keeper)       | `DrawRequested(…, attempt = 1)`                    |
+| VRF timeout       | `cancelRound(roundId, 5)` (VRF_TIMEOUT; only from DrawRequested, ≥ 24 h unfulfilled; late callback ignored)       | anyone (keeper)       | `RoundCancelled`                                   |
 | randomness        | VRF callback                                                                                                      | Chainlink coordinator | `DrawFulfilled(roundId, requestId, randomWord)`    |
 | results           | `computeWinners(roundId)`, `prizeAmounts(roundId)`                                                                | view                  | —                                                  |
 | settle            | `recordSettlement(roundId, payoutsMerkleRoot, totalPaid)` (`totalPaid == pool`)                                   | `SETTLER_ROLE`        | `RoundSettled(…, winningIndices)`                  |
@@ -93,15 +94,16 @@ at the boundary with `@gp/shared/money` (decimal.js); ledger columns are `Decima
    4. Build the payouts tree with `payoutLeaf`, then call `recordSettlement(roundId, root, pool)`.
    5. Persist the proofs so winners can call `verifyPayout`.
 5. **Monitoring and alerts.** Raise an alert on:
-   - `DrawRequested.attempt > 1`: a re-request, handled as a disclosed incident;
+   - `RoundCancelled` with reason `VRF_TIMEOUT` (5): a disclosed incident (stakes refunded);
    - `FulfillmentIgnored`;
    - `coordinatorPinned() == false`;
    - `Paused`;
    - any `RoleGranted` or `RoleRevoked`;
    - a low LINK balance on the VRF subscription.
 
-   If a request is unfulfilled after 24 h, the keeper may call `requestDraw` again; the same committed entries
-   are reused.
+   Randomness is never re-requested (Chainlink VRF guidance: a re-request lets whoever can delay fulfilment choose
+   between two outcomes). If the request is unfulfilled after 24 h, the keeper calls
+   `cancelRound(roundId, CancelReason.VrfTimeout)` and the ledger refunds every stake to Owed.
 
 **Suggested DB fields.**
 

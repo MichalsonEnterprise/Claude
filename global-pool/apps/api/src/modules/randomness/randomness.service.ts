@@ -21,7 +21,8 @@ export class RandomnessService {
   ) {
     if (config.env.RANDOMNESS_PROVIDER === 'chainlink') {
       this.provider = new ChainlinkVrfProvider({
-        client: blockchain.client('arbitrum'),
+        // eth_chainId is verified before every first read (never a mainnet RPC)
+        client: blockchain.client('arbitrum') ? () => blockchain.verifiedClient('arbitrum') : null,
         poolContract: config.env.POOL_CONTRACT_ADDRESS ?? null,
         fromBlock: config.env.POOL_CONTRACT_START_BLOCK,
         requestConfirmations: config.env.VRF_FULFILLMENT_CONFIRMATIONS,
@@ -78,7 +79,7 @@ export class RandomnessService {
     if (!f) return request;
     this.logger.log(`Round #${round.number}: randomness fulfilled (${this.provider.kind})`);
     if (f.requestId && f.requestId !== request.requestId) {
-      // An earlier (re-requested) VRF request of this round was fulfilled first — that word is final.
+      // The contract stored the word of another request of this round (the contract's fulfilledRequestId is final).
       const earlier = await this.prisma.randomnessRequest.findFirst({
         where: { roundId: round.id, requestId: f.requestId },
       });

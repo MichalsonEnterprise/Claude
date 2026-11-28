@@ -376,7 +376,11 @@ export interface LedgerResponse extends Paginated<JournalPosting> {
   journal: { postings: number; headHash: string };
 }
 export interface LedgerIntegrity {
-  appendOnly: { ok: boolean; triggers: { name: string; present: boolean }[] };
+  appendOnly: {
+    ok: boolean;
+    /** `enabled` = the trigger fires (a disabled trigger is still `present`). */
+    triggers: { name: string; table?: string; present: boolean; enabled?: boolean }[];
+  };
   balanced: { ok: boolean; ledgerTotal: string; unbalancedPostings: number };
   journal: { postings: number; headHash: string; algorithm: string };
   auditChain: {

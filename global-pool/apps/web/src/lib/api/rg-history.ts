@@ -182,6 +182,18 @@ export const rgApi = {
     apiRequest<ExclusionResult>('/responsible-gaming/cooling-off', { method: 'POST', body }),
   selfExclude: (body: SelfExclusion) =>
     apiRequest<ExclusionResult>('/responsible-gaming/self-exclusion', { method: 'POST', body }),
+  /** After a 6m / 1y / 5y self-exclusion ended: ask to reopen (starts the 24 h cool-down). */
+  requestReopen: () =>
+    apiRequest<RgStateView>('/responsible-gaming/self-exclusion/reopen', {
+      method: 'POST',
+      body: {},
+    }),
+  /** After the cool-down, with a deposit and a loss limit set: reopen the account. */
+  confirmReopen: () =>
+    apiRequest<RgStateView>('/responsible-gaming/self-exclusion/reopen/confirm', {
+      method: 'POST',
+      body: {},
+    }),
 };
 
 export interface ExclusionResult {

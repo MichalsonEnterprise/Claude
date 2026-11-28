@@ -142,7 +142,8 @@ export async function ensureRbac(prisma: PrismaService) {
     data: ADMIN_ROLES.map((key) => ({ key, name: ADMIN_ROLE_LABEL[key] })),
     skipDuplicates: true,
   });
-  const roles = await prisma.adminRole.findMany();
+  // Only the built-in roles: a test may create its own role (e.g. qa_…) that has no ROLE_PERMISSIONS entry.
+  const roles = await prisma.adminRole.findMany({ where: { key: { in: [...ADMIN_ROLES] } } });
   const perms = await prisma.adminPermission.findMany();
   await prisma.adminRolePermission.createMany({
     data: roles.flatMap((r) =>

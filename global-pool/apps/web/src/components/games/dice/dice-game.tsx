@@ -150,8 +150,9 @@ export function DiceGame() {
   const limits = { min: INFO.minBet, max: INFO.maxBet, balance };
   const sProblem = stakeProblem(stake, limits);
   const stakeOk = parseStake(stake);
-  const payout = valid && stakeOk ? payoutPreview(stakeOk, multiplier) : null;
-  const profit = valid && stakeOk ? profitPreview(stakeOk, multiplier) : null;
+  const stakeValid = stakeOk !== null && (sProblem === null || sProblem.kind === 'insufficient');
+  const payout = valid && stakeValid ? payoutPreview(stakeOk, multiplier) : null;
+  const profit = valid && stakeValid ? profitPreview(stakeOk, multiplier) : null;
 
   // ── bet runner (one idempotency key per roll; network failures retry with the SAME key) ───
   const animateTo = React.useCallback(
@@ -205,11 +206,14 @@ export function DiceGame() {
   const busy = runner.busy || animating;
   const canBet = gate.gate === 'ok' && valid && sProblem === null && !busy;
 
-  const auto = useAutoPlay(async () => {
-    const bet = await runner.run();
-    if (!bet) return null;
-    return { net: bet.net };
-  }, reduced ? 400 : ROLL_MS + 300);
+  const auto = useAutoPlay(
+    async () => {
+      const bet = await runner.run();
+      if (bet) return { net: bet.net };
+      return runner.lastError()?.kind === 'reality_check' ? { stop: 'reality_check' as const } : null;
+    },
+    reduced ? 400 : ROLL_MS + 300,
+  );
 
   const roll = React.useCallback(() => {
     if (!canBet || auto.running) return;
@@ -341,6 +345,18 @@ export function DiceGame() {
     sProblem?.kind === 'insufficient' && gate.gate === 'ok' ? (
       <PanelNotice tone="warning" title="Not enough DEMO credits" actions={resetActions()}>
         {insufficientCopy(balance)}
+      </PanelNotice>
+    ) : sProblem?.kind === 'above_max' ? (
+      <PanelNotice
+        tone="danger"
+        title={`Max bet is ${formatAmount(INFO.maxBet)} DEMO per roll`}
+        actions={
+          <Button variant="secondary" size="s" className="min-h-11 tablet:min-h-8" onClick={() => setStake(money(INFO.maxBet).toFixed(2))}>
+            Set to {formatAmount(INFO.maxBet)} DEMO
+          </Button>
+        }
+      >
+        Your bet is never changed for you — lower it or use the button.
       </PanelNotice>
     ) : null;
 

@@ -39,9 +39,16 @@ export class DepositWatcherProcessor extends WorkerHost implements OnApplication
     if (result.status === 'skipped') {
       if (!this.warned) this.logger.warn(`Deposit watcher skipped: ${result.reason}`);
       this.warned = true;
-    } else if (result.detected || result.credited || result.reorged || result.reversed) {
+    } else if (
+      result.detected ||
+      result.credited ||
+      result.reorged ||
+      result.reversed ||
+      result.reopened ||
+      result.held
+    ) {
       this.logger.log(
-        `Deposit watcher: +${result.detected} detected, ${result.credited} credited, ${result.reorged} re-org pending, ${result.reversed} reversed`,
+        `Deposit watcher: +${result.detected} detected, ${result.credited} credited, ${result.reorged} re-org pending, ${result.reversed} reversed, ${result.reopened ?? 0} reopened, ${result.held ?? 0} on hold`,
       );
     }
     return result;

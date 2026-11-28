@@ -106,7 +106,21 @@ export interface AccountStatus {
     reference: string;
   }[];
   paused: { gaming: boolean; deposits: boolean; withdrawals: boolean };
-  selfExclusion: { active: boolean; startsAt: string | null; endsAt: string | null };
+  selfExclusion: {
+    active: boolean;
+    startsAt: string | null;
+    endsAt: string | null;
+    /** cooling_off = a short break (ends on its date) · self_exclusion = 6m / 1y / 5y / permanent. */
+    kind?: 'cooling_off' | 'self_exclusion' | null;
+    /** Set once a self-exclusion's period is over and the account is still closed (it never reopens by itself). */
+    reopen?: {
+      status: 'awaiting_request' | 'cooling_down' | 'ready';
+      endedAt: string;
+      requestedAt: string | null;
+      availableAt: string | null;
+      missingLimits: ('deposit' | 'loss')[];
+    } | null;
+  };
   region: {
     current: { code: string; name: string | null; permitted: boolean } | null;
     declared: { code: string; name: string | null; permitted: boolean } | null;

@@ -24,6 +24,7 @@ import { DepositChainWatcherService } from '../src/modules/deposits/deposit-chai
 import { RoundMirrorService } from '../src/modules/onchain-rounds/round-mirror.service';
 import { RoundLifecycleService } from '../src/modules/pool/round-lifecycle.service';
 import { RoundsService } from '../src/modules/pool/rounds.service';
+import { RandomnessService } from '../src/modules/randomness/randomness.service';
 import { WithdrawalBroadcasterService } from '../src/modules/withdrawals/withdrawal-broadcaster.service';
 import { ARTIFACTS, anvilBinary, startDevnet, type Devnet } from './anvil';
 import {
@@ -303,6 +304,104 @@ describe.skipIf(!hasAnvil)('on-chain round mirroring (GlobalPoolRounds on Anvil)
     expect(db).toMatchObject({ status: 'cancelled', cancelReason: 'threshold_not_met' });
   });
 
+  it('VRF never answers: no re-request — after 24 h the round is cancelled on-chain (VRF_TIMEOUT) and refunded; a late fulfilment is ignored (R33)', async () => {
+    const dave = await newPlayer(t);
+    const erin = await newPlayer(t);
+    await demoDeposit(t, dave, '300.00');
+    await demoDeposit(t, erin, '300.00');
+    const round = await openMirroredRound({ minParticipants: 2, minPool: '50.00' });
+    await enter(dave, round.id, 10);
+    await enter(erin, round.id, 5);
+    await lifecycle.close(round.id);
+    await passClose(round.closesAt);
+    expect(await lifecycle.startDraw(round.id)).toBe('drawing');
+    const requested = await readRound(round.number);
+    expect(requested.status).toBe(3); // DrawRequested
+
+    // 23 h later (chain and server time): still owed, nothing re-requested, nothing cancelled.
+    await net.test.increaseTime({ seconds: 23 * 3600 });
+    await net.mine(1);
+    expect(await lifecycle.pollAndSettle(round.id, new Date(Date.now() + 23 * 3_600_000))).toBe(
+      'waiting',
+    );
+    // 25 h: the keeper cancels for VRF timeout, then the DB refunds every stake to Owed.
+    await net.test.increaseTime({ seconds: 2 * 3600 });
+    await net.mine(1);
+    expect(await lifecycle.pollAndSettle(round.id, new Date(Date.now() + 25 * 3_600_000))).toBe(
+      'cancelled',
+    );
+    const onchain = await readRound(round.number);
+    expect(onchain.status).toBe(6); // Cancelled
+    expect(onchain.cancelReason).toBe(5); // VRF_TIMEOUT
+    expect(onchain.drawAttempts).toBe(1); // randomness was requested once, never again
+    const db = await t.prisma.round.findUniqueOrThrow({ where: { id: round.id } });
+    expect(db).toMatchObject({ status: 'cancelled', cancelReason: 'vrf_timeout' });
+    expect(await balances(dave)).toMatchObject({ owed: '100.00', locked: '0.00' });
+    expect(await balances(erin)).toMatchObject({ owed: '50.00', locked: '0.00' });
+
+    // The VRF operator answers late: the contract ignores it — no outcome can be chosen after the fact.
+    await net.write(net.accounts.funder, net.coordinator, vrfAbi, 'fulfillRandomWords', [
+      requested.lastRequestId,
+      net.rounds,
+    ]);
+    const after = await readRound(round.number);
+    expect(after.status).toBe(6);
+    expect(after.randomWord).toBe(0n);
+    await expect(
+      net.publicClient.simulateContract({
+        account: net.accounts.funder,
+        address: net.rounds,
+        abi: globalPoolRoundsAbi,
+        functionName: 'requestDraw',
+        args: [BigInt(round.number)],
+      }),
+    ).rejects.toThrow(/InvalidStatus/);
+    const ops = await t.prisma.roundChainOp.findMany({ where: { roundId: round.id } });
+    expect(ops.filter((o) => o.step === 'request_draw')).toHaveLength(1);
+    expect(ops.find((o) => o.step === 'cancel')).toMatchObject({ status: 'confirmed' });
+  });
+
+  it('the VRF word and request id come from contract storage, not from a bounded event scan (R24)', async () => {
+    const vrf = (
+      t.app.get(RandomnessService).provider as unknown as { cfg: { fromBlock?: bigint } }
+    ).cfg;
+    const saved = vrf.fromBlock;
+    const frank = await newPlayer(t);
+    const gina = await newPlayer(t);
+    await demoDeposit(t, frank, '300.00');
+    await demoDeposit(t, gina, '300.00');
+    const round = await openMirroredRound({ minParticipants: 2, minPool: '50.00' });
+    await enter(frank, round.id, 8);
+    await enter(gina, round.id, 7);
+    await lifecycle.close(round.id);
+    await passClose(round.closesAt);
+    try {
+      // The events are outside the scan window (e.g. the worker was down for hours).
+      vrf.fromBlock = (await net.publicClient.getBlockNumber()) + 1_000_000n;
+      expect(await lifecycle.startDraw(round.id)).toBe('drawing');
+      const requested = await readRound(round.number);
+      const req = await t.prisma.randomnessRequest.findFirstOrThrow({
+        where: { roundId: round.id },
+      });
+      expect(req.requestId).toBe(requested.lastRequestId.toString());
+      await net.write(net.accounts.funder, net.coordinator, vrfAbi, 'fulfillRandomWords', [
+        requested.lastRequestId,
+        net.rounds,
+      ]);
+      expect(await lifecycle.pollAndSettle(round.id)).toBe('waiting'); // 1 of 2 confirmations
+      await net.mine(1);
+      expect(await lifecycle.pollAndSettle(round.id)).toBe('settled');
+      const fulfilled = await readRound(round.number);
+      const stored = await t.prisma.randomnessRequest.findFirstOrThrow({
+        where: { roundId: round.id, status: 'fulfilled' },
+      });
+      expect(BigInt(stored.randomWord!)).toBe(fulfilled.randomWord);
+      expect(await t.prisma.winner.count({ where: { roundId: round.id } })).toBe(13);
+    } finally {
+      vrf.fromBlock = saved;
+    }
+  });
+
   it('refuses to mirror a round that closes too soon and never lets anyone pick results', async () => {
     const round = await t.app.get(RoundsService).open({
       opensAt: new Date(Date.now() - 60_000),
@@ -427,6 +526,36 @@ describe.skipIf(!hasAnvil)('withdrawal broadcaster (test USDT on Anvil)', () => 
     expect(nonces).toEqual([before, before + 1]);
     await net.mine(1);
     expect(await broadcaster.trackOne(a.id)).toBe('confirmed');
+    expect(await broadcaster.trackOne(b.id)).toBe('confirmed');
+  });
+
+  it('reserves in-flight transfers: a withdrawal the hot wallet cannot cover yet stays queued instead of reverting (R56)', async () => {
+    const a = await queuedWithdrawal('60.00', randomAddress());
+    const b = await queuedWithdrawal('60.00', randomAddress());
+    // Leave exactly 100 test-USDT in the hot wallet.
+    const hot = net.accounts.hotWallet.address;
+    const held = await tokenBalance(hot);
+    await net.write(net.accounts.hotWallet, net.usdt, usdtAbi, 'transfer', [
+      net.accounts.deployer.address,
+      held - parseUnits('100', 6),
+    ]);
+    await net.test.setAutomine(false);
+    try {
+      // Two workers at once (concurrency 4): both read balance 100 before either transfer is mined.
+      const outcome = await Promise.all([broadcaster.broadcast(a.id), broadcaster.broadcast(b.id)]);
+      expect([...outcome].sort()).toEqual(['broadcast', 'queued']); // 100 − 59.92 in flight < 59.92
+      if (outcome[0] === 'queued') [a.id, b.id] = [b.id, a.id]; // `a` is the one that was sent
+      expect(await t.prisma.chainTransaction.count({ where: { refId: b.id } })).toBe(0);
+      await net.mine(1);
+    } finally {
+      await net.test.setAutomine(true);
+    }
+    await net.mine(1);
+    expect(await broadcaster.trackOne(a.id)).toBe('confirmed');
+    expect(await broadcaster.broadcast(b.id)).toBe('queued'); // 40.08 left on-chain
+    await net.write(net.accounts.deployer, net.usdt, usdtAbi, 'mint', [hot, parseUnits('1000', 6)]);
+    expect(await broadcaster.broadcast(b.id)).toBe('broadcast');
+    await net.mine(1);
     expect(await broadcaster.trackOne(b.id)).toBe('confirmed');
   });
 

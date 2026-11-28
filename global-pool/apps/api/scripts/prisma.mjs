@@ -12,7 +12,12 @@ if (testIdx >= 0) {
   args.splice(testIdx, 1);
   process.env.GP_USE_TEST_DB = '1';
 }
-loadEnvFiles();
+try {
+  loadEnvFiles();
+} catch (err) {
+  console.error(String(err instanceof Error ? err.message : err));
+  process.exit(1);
+}
 
 const require = createRequire(import.meta.url);
 const cli = require.resolve('prisma/build/index.js', { paths: [apiRoot] });

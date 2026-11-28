@@ -139,6 +139,13 @@ export const globalPoolRoundsAbi = [
   },
   {
     type: 'function',
+    name: 'REASON_VRF_TIMEOUT',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint16', internalType: 'uint16' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'SETTLER_ROLE',
     inputs: [],
     outputs: [{ name: '', type: 'bytes32', internalType: 'bytes32' }],
@@ -726,10 +733,10 @@ export const globalPoolRoundsAbi = [
   { type: 'error', name: 'CoordinatorNotLocked', inputs: [] },
   {
     type: 'error',
-    name: 'DrawRequestPending',
+    name: 'DrawNotTimedOut',
     inputs: [
       { name: 'roundId', type: 'uint256', internalType: 'uint256' },
-      { name: 'retryAt', type: 'uint256', internalType: 'uint256' },
+      { name: 'cancellableAt', type: 'uint256', internalType: 'uint256' },
     ],
   },
   { type: 'error', name: 'EnforcedPause', inputs: [] },

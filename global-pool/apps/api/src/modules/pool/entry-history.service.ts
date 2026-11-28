@@ -27,10 +27,10 @@ export interface EntryHistoryItem {
   purchasedAt: string;
   result: {
     kind: EntryResultKind;
-    /** Σ prizes of this player in the round (won only). */
+    /** Σ prizes won by THIS purchase's entries (won only). */
     prize: string | null;
     winningEntryIds: string[];
-    /** Stake refunded to Owed for a cancelled round (platform fees are not refunded — docs/API.md). */
+    /** Stake of THIS purchase refunded to Owed for a cancelled round (platform fees are not refunded — docs/API.md). */
     refund: string | null;
   };
   isDemo: boolean;
@@ -79,15 +79,23 @@ export class EntryHistoryService {
     const [winners, refundEntries] = await Promise.all([
       this.prisma.winner.findMany({
         where: { userId, roundId: { in: roundIds } },
-        include: { entry: { select: { code: true } } },
+        include: { entry: { select: { code: true, transactionId: true } } },
         orderBy: { rank: 'asc' },
       }),
       this.prisma.entry.groupBy({
-        by: ['roundId', 'status'],
+        by: ['roundId', 'transactionId', 'status'],
         where: { userId, roundId: { in: roundIds }, status: { in: ['refund_owed', 'refunded'] } },
         _count: { _all: true },
       }),
     ]);
+    // Results belong to the PURCHASE whose entries they concern (entries carry their purchase transaction id), so a
+    // second purchase in the same round never repeats the first one's refund or prize. Entries without a purchase
+    // link (legacy rows) fall back to the round.
+    const ofPurchase = (
+      t: { id: string; roundId: string | null },
+      txId: string | null | undefined,
+      roundId: string,
+    ) => (txId ? txId === t.id : roundId === t.roundId);
 
     const items: EntryHistoryItem[] = rows.map((t) => {
       const round = t.round!;
@@ -97,10 +105,12 @@ export class EntryHistoryService {
         lastEntryId?: string;
       };
       const entries = Number(meta.entries ?? 0);
-      const mine = winners.filter((w) => w.roundId === round.id);
-      const refunds = refundEntries.filter((g) => g.roundId === round.id);
-      const owed = refunds.find((g) => g.status === 'refund_owed')?._count._all ?? 0;
-      const back = refunds.find((g) => g.status === 'refunded')?._count._all ?? 0;
+      const mine = winners.filter((w) => ofPurchase(t, w.entry?.transactionId, w.roundId));
+      const refunds = refundEntries.filter((g) => ofPurchase(t, g.transactionId, g.roundId));
+      const countOf = (status: 'refund_owed' | 'refunded') =>
+        refunds.filter((g) => g.status === status).reduce((n, g) => n + g._count._all, 0);
+      const owed = countOf('refund_owed');
+      const back = countOf('refunded');
       const price = money(round.entryPrice.toFixed());
       let kind: EntryResultKind;
       if (round.status === 'open' || round.status === 'scheduled') kind = 'in_draw';

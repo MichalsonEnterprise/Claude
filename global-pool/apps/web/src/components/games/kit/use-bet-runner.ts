@@ -28,6 +28,8 @@ export interface BetRunner<B> extends BetRunnerState<B> {
   /** Retry the held bet now (same key — the server never charges twice). */
   retryNow: () => void;
   reset: () => void;
+  /** The refusal of the last `run()` (synchronous, for auto-play loops). */
+  lastError: () => GameError | null;
   busy: boolean;
 }
 
@@ -74,10 +76,12 @@ export function useBetRunner<B>(
   const wake = React.useRef<(() => void) | null>(null);
   const qc = useQueryClient();
   const inFlight = React.useRef(false);
+  const lastErr = React.useRef<GameError | null>(null);
 
   const run = React.useCallback(async (): Promise<B | null> => {
     if (inFlight.current) return null;
     inFlight.current = true;
+    lastErr.current = null;
     const key = newIdempotencyKey();
     const release = holdRealityCheck();
     const sentAt = new Date().toISOString();
@@ -93,6 +97,7 @@ export function useBetRunner<B>(
         } catch (err) {
           const ge = classifyGameError(err);
           if (!RETRYABLE(err) || attempt >= maxAttempts) {
+            lastErr.current = ge;
             setState((s) => ({ ...s, phase: 'failed', error: ge, attempt: 0 }));
             if (ge.kind === 'reality_check') requestRealityCheck();
             optsRef.current.onError?.(ge);
@@ -121,11 +126,13 @@ export function useBetRunner<B>(
     [],
   );
 
+  const lastError = React.useCallback(() => lastErr.current, []);
   return {
     ...state,
     run,
     retryNow,
     reset,
+    lastError,
     busy: state.phase === 'placing' || state.phase === 'reconnecting',
   };
 }

@@ -292,8 +292,11 @@ function InProgressCard({ balances }: { balances: WalletBalances | undefined }) 
   const entries = balances?.breakdown.locked.filter((l) => l.reference.startsWith('round:')) ?? [];
   const owed = balances?.breakdown.owed ?? [];
   const loading = !balances || deposits.isPending || withdrawals.isPending;
+  // A failed list is not "nothing in progress" (e.g. a deposit still confirming must never disappear silently).
+  const failed = deposits.isError ? deposits : withdrawals.isError ? withdrawals : null;
   const nothing =
     !loading &&
+    !failed &&
     pendingDeposits.length === 0 &&
     openWithdrawals.length === 0 &&
     entries.length === 0 &&
@@ -329,6 +332,9 @@ function InProgressCard({ balances }: { balances: WalletBalances | undefined }) 
       >
         In progress
       </SectionTitle>
+      {failed && !loading && (
+        <QueryError error={failed.error} onRetry={() => void failed.refetch()} />
+      )}
       {loading ? (
         <div className="flex flex-col gap-2">
           <Skeleton className="h-16 w-full" />

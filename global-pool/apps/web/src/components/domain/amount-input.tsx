@@ -30,9 +30,24 @@ export interface AmountInputProps {
   className?: string;
 }
 
-/** Keep digits and one decimal point, at most `decimals` fraction digits ("1,5" → "1.5"). Exported for tests. */
+/**
+ * Keep digits and one decimal point, at most `decimals` fraction digits. Exported for tests.
+ * Separators, as the app formats amounts ("9,215.30"):
+ * - both `,` and `.` present → the LAST one is the decimal point, the other is grouping ("9,215.30" / "9.215,30" → "9215.30");
+ * - only `,` in complete thousands groups → grouping ("1,000" / "1,000,000" → "1000" / "1000000");
+ * - any other lone `,` is a decimal point ("1,5" → "1.5"; also "1," while typing — comma-decimal locales'
+ *   `inputMode="decimal"` keypads offer no `.`).
+ */
 export function sanitizeAmount(raw: string, decimals: number): string {
-  const cleaned = raw.replace(/,/g, '.').replace(/[^\d.]/g, '');
+  let cleaned = raw.replace(/[^\d.,]/g, '');
+  if (cleaned.includes(',') && cleaned.includes('.')) {
+    const decimalSep = cleaned.lastIndexOf(',') > cleaned.lastIndexOf('.') ? ',' : '.';
+    cleaned = cleaned.replaceAll(decimalSep === ',' ? '.' : ',', '').replaceAll(',', '.');
+  } else if (/^\d{1,3}(?:,\d{3})+$/.test(cleaned)) {
+    cleaned = cleaned.replaceAll(',', '');
+  } else {
+    cleaned = cleaned.replaceAll(',', '.');
+  }
   const [int = '', ...rest] = cleaned.split('.');
   if (rest.length === 0) return int.replace(/^0+(?=\d)/, '');
   return `${int.replace(/^0+(?=\d)/, '') || '0'}.${rest.join('').slice(0, decimals)}`;

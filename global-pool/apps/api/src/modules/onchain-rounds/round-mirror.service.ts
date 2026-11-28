@@ -43,6 +43,11 @@ export class MirrorMismatchError extends Error {
   override readonly name = 'MirrorMismatchError';
 }
 
+/** A round committed on-chain while the mirror (or the Chainlink provider) is not configured: nothing may proceed. */
+export class MirrorUnavailableError extends Error {
+  override readonly name = 'MirrorUnavailableError';
+}
+
 const COMMIT_CHUNK = 2_000;
 
 /**
@@ -50,7 +55,8 @@ const COMMIT_CHUNK = 2_000;
  *   open    → openRound(rules, rulesHash)                     OPERATOR key
  *   close   → per-entry salts + commitments → entries Merkle root → commitEntries(root, totals, pool)   OPERATOR
  *   failed thresholds → cancelRound(roundId, THRESHOLDS_NOT_MET) KEEPER (permissionless)
- *   draw    → requestDraw(roundId) → Chainlink VRF v2.5 → DrawFulfilled (read by ChainlinkVrfProvider)  KEEPER
+ *   draw    → requestDraw(roundId) ONCE → Chainlink VRF v2.5 → DrawFulfilled (read by ChainlinkVrfProvider)  KEEPER
+ *   no VRF answer for 24 h → cancelRound(roundId, VRF_TIMEOUT) KEEPER (permissionless) → stakes refunded
  *   settle  → DB winners must equal computeWinners() → payouts Merkle root → recordSettlement(root, pool)  SETTLER
  *
  * Every step is idempotent and crash-safe: the CHAIN state decides whether a step is done (a step whose effect is
@@ -162,7 +168,7 @@ export class RoundMirrorService {
       /** Throws MirrorMismatchError when the on-chain effect does not match the database. */
       check?: (s: OnchainRound) => void;
       data: () => Hex;
-      /** Start a new attempt even if an earlier one is confirmed (VRF re-request). */
+      /** Start a new attempt even if an earlier one is confirmed. */
       newAttempt?: boolean;
     },
   ): Promise<StepResult> {
@@ -487,20 +493,16 @@ export class RoundMirrorService {
   }
 
   /**
-   * requestDraw(roundId) → Chainlink VRF v2.5 (permissionless keeper call). A re-request (`knownAttempts` = draw
-   * attempts the database already tracks) is done once the contract counts more attempts, or the draw is fulfilled.
+   * requestDraw(roundId) → Chainlink VRF v2.5 (permissionless keeper call). Sent ONCE per round: the contract never
+   * accepts a second request (a re-request would let whoever can delay fulfilment pick between two outcomes).
    */
-  requestDraw(round: Round, options: { knownAttempts?: number } = {}): Promise<StepResult> {
-    const reRequest = options.knownAttempts !== undefined;
+  requestDraw(round: Round): Promise<StepResult> {
     return this.step(round, 'request_draw', {
       role: 'keeper',
-      newAttempt: reRequest,
       done: (s) =>
+        s.status === OnchainStatus.DrawRequested ||
         s.status === OnchainStatus.Fulfilled ||
-        s.status === OnchainStatus.Settled ||
-        (reRequest
-          ? s.drawAttempts > (options.knownAttempts ?? 0)
-          : s.status === OnchainStatus.DrawRequested),
+        s.status === OnchainStatus.Settled,
       data: () =>
         encodeFunctionData({
           abi: globalPoolRoundsAbi,
@@ -510,13 +512,46 @@ export class RoundMirrorService {
     });
   }
 
-  /** True when the contract allows a VRF re-request (unfulfilled ≥ 24 h, measured in block time). */
-  async canReRequest(round: Round): Promise<boolean> {
+  /**
+   * True when the contract allows cancelling the draw for VRF timeout: still unfulfilled DRAW_REQUEST_TIMEOUT after the
+   * request (block time), or already cancelled for that reason (e.g. by another keeper — the call is permissionless).
+   */
+  async vrfTimedOut(round: Round): Promise<boolean> {
     const state = await this.read(round);
+    if (state.status === OnchainStatus.Cancelled)
+      return state.cancelReason === CancelReason.VrfTimeout;
     if (state.status !== OnchainStatus.DrawRequested) return false;
     const client = await this.signer.client();
-    const block = await client.getBlock();
-    return block.timestamp >= state.lastRequestAt + 24n * 3600n;
+    const [block, timeout] = await Promise.all([
+      client.getBlock(),
+      client.readContract({
+        address: this.contract(),
+        abi: globalPoolRoundsAbi,
+        functionName: 'DRAW_REQUEST_TIMEOUT',
+      }),
+    ]);
+    return block.timestamp >= state.lastRequestAt + timeout;
+  }
+
+  /** cancelRound(roundId, VRF_TIMEOUT) — permissionless once the single VRF request is unfulfilled for 24 h. */
+  cancelForVrfTimeout(round: Round): Promise<StepResult> {
+    return this.step(round, 'cancel', {
+      role: 'keeper',
+      done: (s) => s.status === OnchainStatus.Cancelled,
+      check: (s) => {
+        if (s.cancelReason !== CancelReason.VrfTimeout) {
+          throw new MirrorMismatchError(
+            `On-chain round ${this.onchainId(round)} was cancelled with reason ${s.cancelReason}, not VRF_TIMEOUT`,
+          );
+        }
+      },
+      data: () =>
+        encodeFunctionData({
+          abi: globalPoolRoundsAbi,
+          functionName: 'cancelRound',
+          args: [this.onchainId(round), CancelReason.VrfTimeout],
+        }),
+    });
   }
 
   /**
@@ -656,6 +691,12 @@ export class RoundMirrorService {
     ) {
       const state = await this.read(round);
       if (state.status === OnchainStatus.Committed) await this.cancelForThresholds(round);
+    } else if (
+      round.chainMirror &&
+      round.status === 'cancelled' &&
+      round.cancelReason === 'vrf_timeout'
+    ) {
+      if (await this.vrfTimedOut(round)) await this.cancelForVrfTimeout(round);
     }
   }
 
@@ -680,7 +721,7 @@ export class RoundMirrorService {
           {
             status: 'cancelled',
             chainMirror: true,
-            cancelReason: 'threshold_not_met',
+            cancelReason: { in: ['threshold_not_met', 'vrf_timeout'] },
             chainOps: { none: { step: 'cancel', status: 'confirmed' } },
           },
         ],

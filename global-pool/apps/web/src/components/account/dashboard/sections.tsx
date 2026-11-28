@@ -344,7 +344,7 @@ export function GamesPreview({
               className="flex w-[140px] shrink-0 snap-start flex-col gap-2 tablet:w-auto"
             >
               <GameTile
-                game={g.slug as Parameters<typeof GameTile>[0]['game']}
+                game={g.slug}
                 name={g.name}
                 href={ROUTES.game(g.slug)}
                 edgeLabel={g.edgeLabel}

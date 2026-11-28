@@ -10,12 +10,26 @@ import { cn } from '@/lib/utils';
 
 describe('sanitizeAmount', () => {
   it('keeps digits and one decimal point', () => {
-    expect(sanitizeAmount('1,234.5', 2)).toBe('1.23');
     expect(sanitizeAmount('12a3.456', 2)).toBe('123.45');
     expect(sanitizeAmount('0005', 2)).toBe('5');
     expect(sanitizeAmount('.5', 2)).toBe('0.5');
     expect(sanitizeAmount('1.2.3', 6)).toBe('1.23');
     expect(sanitizeAmount('', 2)).toBe('');
+  });
+  it('reads `,` as thousands grouping in amounts formatted like the app shows them (R59)', () => {
+    expect(sanitizeAmount('9,215.30', 2)).toBe('9215.30');
+    expect(sanitizeAmount('1,234.50', 2)).toBe('1234.50');
+    expect(sanitizeAmount('1,234.5', 2)).toBe('1234.5');
+    expect(sanitizeAmount('1,000', 2)).toBe('1000');
+    expect(sanitizeAmount('25,000', 2)).toBe('25000');
+    expect(sanitizeAmount('1,000,000.00', 2)).toBe('1000000.00');
+    expect(sanitizeAmount('9,215.30 USDT', 2)).toBe('9215.30');
+    // Comma-decimal notation (last separator wins) and a lone decimal comma.
+    expect(sanitizeAmount('9.215,30', 2)).toBe('9215.30');
+    expect(sanitizeAmount('1,5', 2)).toBe('1.5');
+    expect(sanitizeAmount('12,50', 2)).toBe('12.50');
+    expect(sanitizeAmount('1,', 2)).toBe('1.');
+    expect(sanitizeAmount('1234,567', 2)).toBe('1234.56');
   });
 });
 

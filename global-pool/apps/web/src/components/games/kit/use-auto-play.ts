@@ -20,11 +20,12 @@ export interface AutoPlayState {
 
 /**
  * Drives auto-play with the pure rules in ./autoplay.ts. `placeOne(stake)` places ONE ordinary bet and resolves with
- * its signed net (`payout − stake`), or null when the bet was not accepted (limit, balance, reality check, error).
+ * its signed net (`payout − stake`), `{ stop: 'reality_check' }` when a reality check is due, or null when the bet was
+ * not accepted (limit, balance, error).
  * `gapMs` = pause between rounds (lets the result show; 0 under reduced motion is fine).
  */
 export function useAutoPlay(
-  placeOne: (stake: string) => Promise<{ net: string; realityCheck?: boolean } | null>,
+  placeOne: (stake: string) => Promise<{ net: string } | { stop: AutoStopReason } | null>,
   gapMs = 900,
 ) {
   const [state, setState] = React.useState<AutoPlayState>({
@@ -70,9 +71,10 @@ export function useAutoPlay(
         }
         const res = await placeRef.current(d.stake);
         if (stopFlag.current) return;
-        if (!res) {
+        if (!res || 'stop' in res) {
           stopFlag.current = true;
-          setState((s) => ({ ...s, running: false, stopped: 'error', progress }));
+          const reason = res && 'stop' in res ? res.stop : 'error';
+          setState((s) => ({ ...s, running: false, stopped: reason, progress }));
           return;
         }
         progress = {

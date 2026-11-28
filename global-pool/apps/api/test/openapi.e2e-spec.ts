@@ -152,5 +152,13 @@ describe('OpenAPI response schemas', () => {
     RESPONSE_COMPONENTS.ErrorEnvelope.parse(
       (await http().get('/pool/rounds/1999999999').expect(404)).body,
     );
+
+    // Leave no open review / queued withdrawal behind in the shared test database.
+    WithdrawalView.parse(
+      (await http().post(`/withdrawals/${wd.id}/cancel`).set(bearer(p.token)).expect(200)).body,
+    );
+    expect((await t.prisma.withdrawal.findUniqueOrThrow({ where: { id: wd.id } })).status).toBe(
+      'cancelled',
+    );
   });
 });

@@ -168,7 +168,8 @@ export class RoundsService {
       })),
       odds:
         round.entriesCount > 0
-          ? oddsDisclosure(entries.length, round.entriesCount, Math.min(13, round.entriesCount))
+          ? // 6 dp, rounded down: clients round down again for display, never from an already rounded value
+            oddsDisclosure(entries.length, round.entriesCount, Math.min(13, round.entriesCount), 6)
           : null,
     };
   }

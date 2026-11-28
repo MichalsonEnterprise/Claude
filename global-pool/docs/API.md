@@ -28,7 +28,10 @@ pnpm --filter @gp/api start:dev                     # http://localhost:4000 · /
 - **Docker:** `docker compose --profile dev up --build` runs the DEMO stack with `NODE_ENV=development`, so the DEV
   MOCK player login works (migrations + DEMO seed on start; credentials via
   `docker compose exec api-dev cat apps/api/.dev/demo-admins.json`). `--profile prod` runs production mode, where the
-  DEV MOCK is refused and player sign-in needs a Privy app id. `docker compose up -d postgres redis` = services only.
+  DEV MOCK is refused and player sign-in needs a Privy app id (`PRIVY_APP_ID` + `NEXT_PUBLIC_PRIVY_APP_ID`; the prod
+  web is built with the mock off). The prod profile reads secrets from `.env` only — never `.env.example` — and the
+  API refuses to boot in production with any committed placeholder (`dev-only…` / `change-me…`) secret.
+  `docker compose up -d postgres redis` = services only.
 - **Local chain:** `pnpm --filter @gp/api devnet` starts Anvil (31337) with `GlobalPoolRounds`, the VRF v2.5 mock and
   a mock test-USDT deployed from throwaway runtime keys, and writes the env lines to `apps/api/.dev/devnet.env`. Run
   the API with them plus `POOL_ONCHAIN_MIRROR=true RANDOMNESS_PROVIDER=chainlink` (and
@@ -42,7 +45,7 @@ pnpm --filter @gp/api start:dev                     # http://localhost:4000 · /
 | `start:dev` / `start:prod`         | watch mode / `node dist/src/main.js`                                                        |
 | `db:migrate` / `db:migrate:deploy` | create and apply (dev) / apply only (CI, Docker)                                            |
 | `db:seed` / `db:seed:prod`         | DEMO seed with tsx / compiled seed (`dist/prisma/seed.js`)                                  |
-| `db:migrate:test`                  | reset the test database (destructive; e2e itself only runs `migrate deploy`)                |
+| `db:migrate:test`                  | reset the test database (destructive; e2e itself only runs `migrate deploy`). `--test-db` uses `DATABASE_URL_TEST` (default `globalpool_test`), never `DATABASE_URL`, and refuses a database not named `*_test` |
 | `devnet`                           | local Anvil devnet with the contracts deployed (DEV ONLY; env written to `.dev/devnet.env`) |
 
 ## Conventions
@@ -181,8 +184,8 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 
 | Method | Path                | Auth   | Description                                                            |
 | ------ | ------------------- | ------ | ---------------------------------------------------------------------- |
-| GET    | `/deposits`         | player | Your deposits with confirmation progress                               |
-| GET    | `/deposits/address` | player | Your per-user deposit address (HD-derived, Arbitrum Sepolia test-USDT) |
+| GET    | `/deposits`         | player | Your deposits with confirmation progress (stays available during a break / abroad) |
+| GET    | `/deposits/address` | player | Your per-user deposit address (HD-derived, Arbitrum Sepolia test-USDT) — deposit policy: permitted region, not self-excluded, no `deposits_blocked` |
 | GET    | `/deposits/ref/{reference}` | player | One deposit by reference (DP-…) with confirmation progress (polled by the pending step) |
 
 ### withdrawals
@@ -271,12 +274,26 @@ Every change is written to the hash-chained audit log, which also feeds the play
 | POST   | `/responsible-gaming/session/heartbeat`      | player | Activity heartbeat (web: every 60 s while playing) — drives time limits; a session ends after 15 min idle                          |
 | GET    | `/responsible-gaming/history`                | player | `?kind=limits\|reality_checks\|all` — your RG changes and reminder answers (from the audit log)                                     |
 | POST   | `/responsible-gaming/cooling-off`            | player | Break of 24 h / 7 d / 30 d, immediate; cannot be shortened (409 when an equal or longer exclusion is active)                        |
-| POST   | `/responsible-gaming/self-exclusion`         | player | Self-exclude immediately. 6m / 1y / 5y / permanent need `phrase: "SELF-EXCLUDE"` + `acknowledged: true` (+ TOTP when 2FA is on)    |
+| POST   | `/responsible-gaming/self-exclusion`         | player | Self-exclude immediately. 6m / 1y / 5y / permanent need `phrase: "SELF-EXCLUDE"` + `acknowledged: true` (+ `totpCode` when 2FA is on: authenticator **or backup code**) |
+| POST   | `/responsible-gaming/self-exclusion/reopen`  | player | After a 6m / 1y / 5y self-exclusion ended: ask to reopen — starts a 24 h cool-down (idempotent; 409 while it is still running or permanent) |
+| POST   | `/responsible-gaming/self-exclusion/reopen/confirm` | player | After the cool-down and with a deposit limit + a loss limit set: reopen (409 before / 400 `missingLimits`) |
 
 Time rules (`assertCanParticipate`): the daily `session_time` limit, the session-length limit and quiet hours block **new**
 entries / bets with `422 RG_LIMIT_EXCEEDED` (`details.type` = `daily_time_limit` / `session_limit` / `quiet_hours`).
 Breaks and self-exclusion answer `403 SELF_EXCLUDED` (`details.kind` = `cooling_off` / `self_exclusion`) on entries and
-deposits; withdrawals and history stay available.
+deposits; withdrawals and history stay available (incl. `GET /deposits`, `/deposits/ref/…` and the DEMO
+confirmations route — only new deposits are paused).
+
+**Nothing reopens automatically after a self-exclusion.** A break (24 h / 7 d / 30 d) ends on its date. A 6m / 1y / 5y
+self-exclusion stays in force after its end date (`exclusion.reopen` = `awaiting_request`, also on
+`/auth/account-status` → `selfExclusion.reopen`) until the player asks to reopen, waits the 24 h cool-down
+(`cooling_down`), sets a deposit limit and a loss limit (`ready`, `missingLimits`) and confirms. Permanent never
+reopens here. Every step is audited (`user.rg.reopen_requested`, `user.rg.reopened`).
+
+Enforcement details: deposits and entries take a per-player advisory lock before the usage check, so parallel requests
+cannot both pass a limit; refunds only offset stakes bought in the same period (a refund today for yesterday's
+cancelled round does not free today's limit); an entry purchase counts as play activity (like a heartbeat) inside its
+transaction, so the daily time and session-length limits accrue without client heartbeats.
 
 ### history (player financial + gaming history)
 
@@ -364,7 +381,7 @@ SHA-256 and check results in `kyc_records.details` — never the files.
 | ------ | ----------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------- |
 | GET    | `/admin/affiliates`                                   | admin | Affiliates (STUB)                                                                             |
 | GET    | `/admin/aml/alerts`                                   | admin |                                                                                               |
-| POST   | `/admin/aml/alerts/{id}/resolve`                      | admin | Resolve / dismiss / escalate an AML alert (reason + MFA; audited)                             |
+| POST   | `/admin/aml/alerts/{id}/resolve`                      | admin | Resolve / dismiss / escalate an open / under-review (or escalated) alert (reason + MFA; decision + audit in one transaction; a closed alert → 409) |
 | GET    | `/admin/approvals`                                    | admin | Four-eyes approvals awaiting a second admin                                                   |
 | GET    | `/admin/audit-logs`                                   | admin | Hash-chained audit log (newest first)                                                         |
 | GET    | `/admin/audit-logs/verify`                            | admin | Recompute the audit hash chain end-to-end                                                     |
@@ -415,8 +432,8 @@ return `404` (covered by e2e tests). Settlement runs only inside the round lifec
 
 | Method | Path                                    | Auth  | Description                                                                                                       |
 | ------ | --------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------- |
-| GET    | `/admin/approvals/inbox`                | admin | Four-eyes inbox (`?view=open\|waiting_for_me\|created_by_me\|decided_today\|expired`) with counts and your role per request |
-| GET    | `/admin/approvals/{id}`                 | admin | One request: eligible approvers + its audit trail                                                                 |
+| GET    | `/admin/approvals/inbox`                | admin | Four-eyes inbox (`?view=open\|waiting_for_me\|created_by_me\|decided_today\|expired`) with counts and your role per request — only requests of modules you may read (withdrawals → `withdrawals.read`, restrictions → `users.read`, role changes → `system.read`, breaker → `rounds.read`) |
+| GET    | `/admin/approvals/{id}`                 | admin | One request: eligible approvers + its audit trail (`403` without the module's read permission)                    |
 | POST   | `/admin/approvals/{id}/approve`         | admin | Second approver (different admin, own reason + fresh MFA); the requested action runs in the same transaction       |
 | POST   | `/admin/approvals/{id}/reject`          | admin | Reject (reason + MFA): nothing changes (a flagged withdrawal is rejected → funds back to Available)                |
 | POST   | `/admin/approvals/{id}/withdraw`        | admin | Requester withdraws their own pending request (reason; audited)                                                   |
@@ -528,8 +545,20 @@ re-reads the last N blocks (N = required confirmations).
 | receipt missing (block re-orged out)         | `reorg_seen_at_block` set, confirmations 0, "Network re-organisation detected — waiting for re-inclusion" |
 | still missing N blocks after that            | `deposit_reversed` posting (PENDING → CHAIN_CLEARING), status `rejected`, transaction `failed`, notified  |
 | receipt reverted / matching Transfer missing | reversed the same way                                                                                     |
+| a reversed deposit's transfer is back        | the SAME deposit is reopened (`confirming`, `deposit_detected` posted again under a new event key) — never a second deposit |
+| several identical Transfers in one tx        | one deposit per `(txHash, logIndex)`; a re-org that shifts the indices re-indexes all deposits of the tx together |
+| N confirmations, but a hold applies          | stays in Pending (`under_review`, "On hold — …"), player notified (`deposit.held`), re-checked every pass |
 
 Credit happens only from a fresh receipt with ≥ N confirmations. Credited deposits are final (that is what N is for).
+The watcher only reads an RPC whose `eth_chainId` equals `EVM_CHAIN_ID` (else the pass is skipped with an ALERT), and
+one failing transaction never stops the pass for everyone else.
+
+**Holds before Available (on-chain deposits).** On-chain funds cannot be refused, but before a confirmed deposit is
+credited the same server-side rules as the deposit routes apply: `account_suspended` / `deposits_blocked`, an active
+break or self-exclusion, the `deposits.enabled` kill switch and the player's RG deposit limits (counted on deposits
+credited in the period). While one applies the deposit stays in **Pending** (never stakeable) and is credited by the
+normal path once it no longer applies. A deposit that would exceed a limit is held as a whole. DEMO simulations keep
+refusing up front.
 
 ### Enter a round
 
@@ -542,8 +571,8 @@ fees +1.75.
 ### Withdrawal
 
 `POST /withdrawals {network, address, amount, idempotencyKey, totpCode?}`: feature flag → the KYC level must allow
-withdrawals (`DAILY_WITHDRAWAL_LIMIT`, else `403 KYC_REQUIRED`) → step-up → daily limit → new-address cool-down →
-`withdrawal_lock` posting → state machine (`WITHDRAWAL_TRANSITIONS` in `@gp/shared`):
+withdrawals (`DAILY_WITHDRAWAL_LIMIT`, else `403 KYC_REQUIRED`) → step-up → daily limit (read under a per-player
+advisory lock, so concurrent requests cannot together exceed it) → new-address cool-down → `withdrawal_lock` posting → state machine (`WITHDRAWAL_TRANSITIONS` in `@gp/shared`):
 
 ```text
 requested → risk_check → queued ─────────────────→ broadcast → confirmed
@@ -553,14 +582,20 @@ requested → risk_check → queued ──────────────�
 
 AML screening (mock, 6 checks): a sanctioned destination is rejected; a new destination, a large amount or high
 velocity goes to `under_review` with **four eyes** (two different admins, each with reason and MFA); otherwise the
-withdrawal is `queued`.
+withdrawal is `queued`. The first approval expires after `FOUR_EYES_EXPIRY_HOURS` (4) like every four-eyes request: a
+second approval on an expired one expires it (system audit row) and starts a new first approval instead, and a first
+approval withdrawn concurrently is never completed (status-guarded claim, `409`).
 
 **Broadcaster (testnet, `WITHDRAWAL_BROADCASTER_ENABLED=true`, `WithdrawalBroadcasterService`).** For a queued
 withdrawal: hot-wallet test-USDT and gas check (missing liquidity keeps it queued and logs an `ALERT`) →
 `eth_call` simulation of `transfer(to, net)` → sign + store in the outbox (the same DB transaction moves it to
 `broadcast` with its tx hash and nonce) → broadcast. The tracker job (`withdrawal.track`, every
 `WITHDRAWAL_TRACK_POLL_SECONDS`) settles it after `WITHDRAWAL_CONFIRMATIONS` (`withdrawal_settle`: LOCKED →
-CHAIN_CLEARING + network fee). A reverted or dropped transaction → `failed` and the full amount back to Available; a
+CHAIN_CLEARING + network fee). A reverted or dropped transaction → `failed` and the full amount back to Available
+(`dropped` only once the nonce is consumed `WITHDRAWAL_CONFIRMATIONS` blocks deep AND a second receipt lookup still
+finds nothing — a just-mined transfer is never released). The liquidity check subtracts transfers already signed but
+not yet mined (under the signer's nonce lock), so concurrent workers keep a withdrawal queued instead of letting it
+revert on-chain; a
 transfer whose simulation reverts never gets a nonce and fails from `queued` (new edge `queued → failed` in
 `WITHDRAWAL_TRANSITIONS`), funds back. An unreachable RPC keeps it queued and retried. Without the broadcaster queued
 withdrawals wait; DEMO: `POST /dev/withdrawals/:id/simulate-confirm` posts the confirmation.
@@ -570,7 +605,9 @@ withdrawals wait; DEMO: `POST /dev/withdrawals/:id/simulate-confirm` posts the c
 The BullMQ `rounds` queue ticks every 30 s: `scheduled → open` at `opensAt`; `open → closed` at `closesAt`, freezing
 the thresholds (500 participants and a 50,000.00 pool by default, copied into the round when it opens); closed with
 thresholds met → randomness requested → `drawing`; fulfilled → **settle**; thresholds not met or VRF timeout
-(`VRF_TIMEOUT_HOURS`) → **cancel**, with stakes returned to Owed. `ROUND_AUTO_SCHEDULE` opens the next daily round
+(`VRF_TIMEOUT_HOURS`; for on-chain rounds the contract's `cancelRound(VRF_TIMEOUT)` first) → **cancel**, with stakes
+returned to Owed. A round that was never mirrored while the Chainlink provider is active cannot get randomness: it is
+alerted and cancelled with refunds `VRF_TIMEOUT_HOURS` after its close (never left `closed`). `ROUND_AUTO_SCHEDULE` opens the next daily round
 (08:00–20:00 UTC). DEMO rounds are a frozen snapshot: they close at their real time but are drawn only with
 `DEMO_ROUNDS_AUTO_SETTLE=true`.
 
@@ -587,7 +624,7 @@ at `POOL_CONTRACT_ADDRESS`, waiting `VRF_FULFILLMENT_CONFIRMATIONS`).
 ### On-chain operations (testnet only)
 
 `POOL_ONCHAIN_MIRROR=true` (requires `RANDOMNESS_PROVIDER=chainlink`, the RPC, `POOL_CONTRACT_ADDRESS` and
-`POOL_OPERATOR_PRIVATE_KEY`) mirrors every non-DEMO round on `GlobalPoolRounds` (`RoundMirrorService`, driven by the
+`POOL_OPERATOR_PRIVATE_KEY`; conversely `RANDOMNESS_PROVIDER=chainlink` requires the mirror) mirrors every non-DEMO round on `GlobalPoolRounds` (`RoundMirrorService`, driven by the
 round tick; each step is a row in `round_chain_ops`):
 
 | Round event                | On-chain call (signer)                                                              | Database                                                                                                                      |
@@ -598,7 +635,7 @@ round tick; each step is a row in `round_chain_ops`):
 | thresholds met             | `requestDraw(id)` (KEEPER) → Chainlink VRF v2.5                                     | `randomness_requests` from the `DrawRequested` event                                                                          |
 | `DrawFulfilled` (N conf.)  | —                                                                                   | **DB winners must equal `computeWinners()` and `prizeAmounts()`** (else settlement is blocked + `ALERT`), then settle         |
 | settled                    | `recordSettlement(payoutsRoot, pool)` (SETTLER)                                     | `round_payouts` (leaves + proofs) + `payouts_merkle_root`; audited                                                            |
-| unfulfilled for 24 h       | `requestDraw(id)` again (same committed entries; first fulfilment wins; audited)    | old request `timed_out`, new request tracked                                                                                  |
+| unfulfilled for 24 h       | `cancelRound(id, VRF_TIMEOUT)` (KEEPER, permissionless) → then the DB refund — randomness is NEVER re-requested | request `timed_out`, round `cancelled` (`vrf_timeout`), stakes to Owed; a late VRF callback is ignored on-chain |
 
 Every step is idempotent: the contract state decides whether a step is already done (then nothing is sent), and
 frozen data (salts, commitments, payout leaves) is written once — `entry_commitments` and `round_payouts` are
@@ -647,9 +684,14 @@ categories always send.
 ### Admin
 
 `POST /admin/auth/login {email, password, totpCode}` checks the argon2id password and the mandatory TOTP in one step
-(one generic error message) and locks the account for `ADMIN_LOCKOUT_MINUTES` (15) after `ADMIN_LOGIN_MAX_ATTEMPTS`
-(5) failures. It returns an access JWT (`ADMIN_ACCESS_TTL`) and an opaque refresh token; refreshing rotates the token,
-and reusing a rotated token revokes the whole family. RBAC comes from `admin_roles` → `admin_permissions`
+(one generic error message — also when the admin's TOTP factor is locked) and locks the account for
+`ADMIN_LOCKOUT_MINUTES` (15) after `ADMIN_LOGIN_MAX_ATTEMPTS` (5) failures. Attempts are counted under a row lock before
+anything is checked (parallel guesses each count; a lock can never be cleared by a stale request), and an email with
+no active admin gets the same 401 / 403 sequence (counted per email hash in Redis), so responses never reveal which
+emails exist. It returns an access JWT (`ADMIN_ACCESS_TTL`) and an opaque refresh token; refreshing rotates the token,
+and reusing a rotated token revokes the whole family. **Idle timeout server-side:** a session with no admin request
+for `ADMIN_IDLE_TIMEOUT` (15 min) is revoked on its next refresh or request (`401`, `details.reason = idle_timeout`).
+The `admin.login` audit row stores a hashed `sessionRef`, never the family id. RBAC comes from `admin_roles` → `admin_permissions`
 (`ROLE_PERMISSIONS` / `PERMISSION_POLICY` in `@gp/shared`). Sensitive actions need the permission, a written
 `reason` and a fresh `mfaCode` (plus four eyes where flagged), and write a hash-chained audit row in the same
 transaction.
@@ -706,7 +748,7 @@ funds, edits ledger rows or adjusts balances (`PATCH /admin/finance/ledger/:id`,
 | GET | `/admin/finance/fees` | ledger.read | Platform fees (0.05 × qualifying entries) from `fee_ledger`: 30-day series, by round, sub-ledger = fees account |
 | GET | `/admin/finance/pool-accounting` | ledger.read | Liabilities = open-round escrow + owed prizes + refunds outstanding; account balances; round waterfall |
 | GET | `/admin/finance/ledger` | ledger.read | Journals with balanced lines + per-journal chain hash (`prev → hash`, recomputed on read) |
-| GET | `/admin/finance/ledger/integrity` | ledger.read | Append-only triggers present, Σ ledger = 0, unbalanced postings, journal digest, audit hash-chain verification |
+| GET | `/admin/finance/ledger/integrity` | ledger.read | Append-only / no-truncate / balanced-posting triggers present on their table AND enabled (`tgenabled` O/A; incl. `entry_commitments`, `round_payouts`), Σ ledger = 0, unbalanced postings, journal digest, audit hash-chain verification |
 | GET | `/admin/finance/reconciliation` | reconciliation.read | Scopes match / mismatch / pending (ledger total, fee/pool sub-ledgers, owed, locked, round pools, custody, in-flight deposits) |
 | GET | `/admin/finance/refunds` | ledger.read | Cancelled rounds: refunded to Owed, claimed, outstanding (+ withdrawal releases, which are not refunds) |
 | POST | `/admin/finance/refunds/{number}/remind` | notifications.send | In-app reminder to players with an unclaimed refund (reason; audited; max 1 per round per 24 h; never moves money) |
@@ -716,7 +758,7 @@ funds, edits ledger rows or adjusts balances (`PATCH /admin/finance/ledger/:id`,
 | GET | `/admin/pool/rounds/{number}/participants` · `/prizes` | rounds.read | Participants grouped by player; prize split, winners, settlement + claim status |
 | GET | `/admin/pool/circuit-breaker` | rounds.read | NEW-entries breaker state, pending request, history, rules |
 | POST | `/admin/pool/circuit-breaker` | role Super Admin / Finance / Compliance | Request pause / resume of NEW entries (reason + fresh 2FA) — nothing changes yet |
-| POST | `/admin/pool/circuit-breaker/{id}/decision` | role Super Admin / Finance / Compliance | Second approval or decline: a different person with a different role, reason + 2FA, within 30 min; flips `pool.entries.enabled`; audited |
+| POST | `/admin/pool/circuit-breaker/{id}/decision` | role Super Admin / Finance / Compliance | Second approval or decline: a different person with a different role, reason + 2FA, within 30 min (re-checked inside the decision transaction); flips `pool.entries.enabled`; audited. A lapsed request is expired only while still pending, with an `approval.expired` audit row |
 | GET | `/admin/compliance/kyc` · `/kyc/{id}` | kyc.read | KYC queue (SLA 48 h, decisions today, median time to decision, recent decisions) and review detail (PII masked) |
 | POST | `/admin/compliance/kyc/{id}/decision` | kyc.review | approve / reject / request_info with reason + fresh 2FA (stricter than the REASON policy); approve raises the KYC level (limits only); player notified; audited |
 | GET | `/admin/compliance/aml` | aml.read | AML alerts with risk summary and the linked withdrawal / deposit. Resolution: `POST /admin/aml/alerts/{id}/resolve` |

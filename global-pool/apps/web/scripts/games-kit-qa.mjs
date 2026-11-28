@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global document, window -- used inside page.evaluate() / addInitScript callbacks, which run in the browser */
 /**
  * Games kit visual QA (key "kit"): screenshots of the lobby, catalogue, details and Pool Dice states at 1440 / 390
  * against a RUNNING web + API (DEV MOCK auth, fresh DEMO player per run). Fails on horizontal overflow and console
@@ -91,6 +92,14 @@ async function contextFor(browser, width, player) {
       window.localStorage.setItem('gp.devMockSession', JSON.stringify({ did, email: null, wallet: null }));
     }, player.did);
   }
+  if (player?.region)
+    // UI preview of the region gate (the API refuses restricted countries at onboarding, so a real US player can't be made)
+    await ctx.route('**/auth/account-status', async (r) => {
+      const res = await r.fetch();
+      const body = await res.json();
+      const us = { code: 'US', name: 'United States', permitted: false };
+      await r.fulfill({ response: res, json: { ...body, gate: 'region', region: { current: us, declared: body.region?.declared ?? null, permitted: false } } });
+    });
   await ctx.route('**/auth/new-device-alerts', (r) =>
     r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
@@ -129,8 +138,12 @@ const SCREENS = [
     target: '1.50',
     wait: '[data-testid="dice-roll"]',
   },
-  { id: 'DI-07_insufficient', url: '/games/pool-dice', player: 'fresh', stake: '1500.00', wait: '[data-testid="dice-roll"]' },
+  { id: 'DI-07_above-max', url: '/games/pool-dice', player: 'fresh', stake: '1500.00', wait: '[data-testid="dice-roll"]' },
+  { id: 'DI-07_insufficient', url: '/games/pool-dice', player: 'broke', wait: '[data-testid="dice-roll"]' },
   { id: 'DI-07_loss-limit', url: '/games/pool-dice', player: 'loss-limit' },
+  { id: 'DI-07_connection-lost', url: '/games/pool-dice', player: 'fresh', dropBets: true, wait: '[data-testid="dice-roll"]' },
+  { id: 'DI-07_region', url: '/games/pool-dice', player: 'fresh', region: true },
+  { id: 'GM-02_restricted', url: '/games?state=restricted', player: null },
   { id: 'DI-07_self-excluded', url: '/games/pool-dice', player: 'excluded' },
 ];
 
@@ -150,6 +163,13 @@ async function playerFor(kind, lossLimit) {
       }
     }
   }
+  if (kind === 'broke') {
+    // one 1,000.00 bet at a 2 % win chance — DEMO credits only, no cash value
+    for (let i = 0; i < 3; i++) {
+      const [b] = await bets(p.token, 1, '98.00', 'over', '1000.00').catch(() => [null]);
+      if (!b || !b.win) break;
+    }
+  }
   if (kind === 'excluded')
     await api('/responsible-gaming/cooling-off', { method: 'POST', token: p.token, body: { duration: '24h', confirm: true } });
   return p;
@@ -161,15 +181,18 @@ try {
   for (const s of SCREENS) {
     if (only.length && !only.some((o) => s.id.startsWith(o))) continue;
     const player = await playerFor(s.player, s.lossLimit);
+    if (player && s.region) player.region = true;
     for (const width of WIDTHS) {
       const ctx = await contextFor(browser, width, player);
       const page = await ctx.newPage();
       const errors = [];
       page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
       page.on('pageerror', (e) => errors.push(String(e)));
-      await page.goto(`${BASE}${s.url}`, { waitUntil: 'networkidle', timeout: 120_000 });
+      await page.goto(`${BASE}${s.url}`, { waitUntil: 'load', timeout: 120_000 });
+      // not 'networkidle': sidebar prefetches of routes that are not built yet (/vip, /winners) never settle in prod
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => undefined);
       if (s.wait) await page.waitForSelector(s.wait, { timeout: 60_000 }).catch(() => undefined);
-      await page.waitForTimeout(1200);
+      await page.waitForTimeout(2500);
       if (s.target) {
         const t = page.getByTestId('dice-target').locator('visible=true').first();
         await t.fill(s.target);
@@ -178,15 +201,19 @@ try {
         await page.getByRole('textbox', { name: /bet amount in demo credits/i }).first().fill(s.stake);
         await page.keyboard.press('Tab');
       }
+      if (s.dropBets) {
+        await page.route('**/games/pool-dice/bets', (r) => (r.request().method() === 'POST' ? r.abort('connectionreset') : r.continue()));
+        await page.getByTestId('dice-roll').locator('visible=true').first().click();
+        await page.getByText('Connection lost — reconnecting').waitFor({ timeout: 30_000 });
+        await page.waitForTimeout(400);
+      }
       if (s.roll) {
         await page.getByTestId('dice-roll').locator('visible=true').first().click();
         await page.getByTestId('result-banner').waitFor({ timeout: 30_000 });
         await page.waitForTimeout(600);
       }
       if (s.verify) {
-        await page.getByRole('button', { name: /^Verify D-\d+/ }).first().or(page.getByRole('button', { name: /Verify D-/ }).first()).click().catch(async () => {
-          await page.locator('#my-bets button').filter({ hasText: /D-/ }).first().click();
-        });
+        await page.getByRole('button', { name: /Verify D-\d+$/ }).first().click({ timeout: 60_000 });
         await page.getByText(/verified|doesn’t match/).first().waitFor({ timeout: 30_000 });
         await page.waitForTimeout(500);
       }
@@ -200,7 +227,7 @@ try {
       const real = errors.filter((e) => !/Download the React DevTools|favicon|401|Failed to load resource/.test(e));
       if (overflow > 1) problems.push(`${s.id}@${width}: horizontal overflow ${overflow}px`);
       if (real.length) problems.push(`${s.id}@${width}: console errors: ${real.slice(0, 3).join(' | ')}`);
-      console.log(`${s.id}_${width}.png${overflow > 1 ? ` (overflow ${overflow})` : ''}${real.length ? ` (${real.length} errors)` : ''}`);
+      console.info(`${s.id}_${width}.png${overflow > 1 ? ` (overflow ${overflow})` : ''}${real.length ? ` (${real.length} errors: ${real[0].slice(0, 300)})` : ''}`);
       await ctx.close();
     }
   }

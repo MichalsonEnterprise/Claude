@@ -219,7 +219,7 @@ export const DEMO_ODDS_EXAMPLE: OddsExample & DemoFlag = (() => {
     prizes: o.prizes,
     anyPrizeApproxPercent: '2.44',
     anyPrizeExactPercent: o.anyPrizePercent,
-    firstPrizePercent: '0.188',
+    firstPrizePercent: o.firstPrizePercent, // 0.187 (rounded down; exact 0.1877…%)
   });
 })();
 

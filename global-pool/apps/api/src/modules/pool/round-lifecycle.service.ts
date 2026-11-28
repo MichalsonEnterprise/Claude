@@ -12,7 +12,11 @@ import { AuditService } from '../audit/audit.service';
 import { LedgerService } from '../ledger/ledger.service';
 import { prizeAwardLines, roundRefundLines, roundSettlementLines } from '../ledger/posting';
 import { NotificationsService } from '../notifications/notifications.service';
-import { MirrorMismatchError, RoundMirrorService } from '../onchain-rounds/round-mirror.service';
+import {
+  MirrorMismatchError,
+  MirrorUnavailableError,
+  RoundMirrorService,
+} from '../onchain-rounds/round-mirror.service';
 import { RandomnessNotReadyError } from '../randomness/chainlink-vrf.provider';
 import { RandomnessService } from '../randomness/randomness.service';
 import { selectWinners } from '../randomness/selection';
@@ -28,6 +32,9 @@ export interface TickReport {
   scheduled: number | null;
   errors: string[];
 }
+
+/** A persistent "randomness not ready" is logged as an ALERT every this many ticks (30 s each → 5 min). */
+const NOT_READY_ALERT_TICKS = 10;
 
 /** Next daily round window (08:00–20:00 UTC) that has not closed yet. */
 export function nextDailyWindow(now: Date): { opensAt: Date; closesAt: Date } {
@@ -49,6 +56,7 @@ export function nextDailyWindow(now: Date): { opensAt: Date; closesAt: Date } {
 @Injectable()
 export class RoundLifecycleService {
   private readonly logger = new Logger(RoundLifecycleService.name);
+  private readonly notReady = new Map<string, number>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -62,9 +70,23 @@ export class RoundLifecycleService {
     private readonly mirror: RoundMirrorService,
   ) {}
 
-  /** The round is mirrored on GlobalPoolRounds (on-chain commit / VRF draw / settlement record). */
+  /**
+   * The round is mirrored on GlobalPoolRounds (on-chain commit / VRF draw / settlement record). Decided PER ROUND: once
+   * a round is adopted on-chain (`chain_mirror`), the contract is its only draw path, whatever the process-wide flags
+   * say now. If the mirror is switched off or the Chainlink provider is not active, such a round is never drawn,
+   * cancelled or settled off-chain (no DB-only VRF-timeout refund of an owed draw, no mock re-roll): this throws and
+   * the tick raises an ALERT until the configuration is restored.
+   */
   private mirrored(round: Round): boolean {
-    return round.chainMirror && this.mirror.enabled;
+    if (!round.chainMirror) return false;
+    if (!this.mirror.enabled || this.randomness.provider.kind !== 'chainlink_vrf_v2_5') {
+      const msg = `Round ${formatRoundNumber(round.number)} is committed on GlobalPoolRounds but ${
+        this.mirror.enabled ? 'RANDOMNESS_PROVIDER is not chainlink' : 'POOL_ONCHAIN_MIRROR is off'
+      } — refusing to draw, cancel or settle it off-chain`;
+      this.logger.error(`ALERT ${msg}`);
+      throw new MirrorUnavailableError(msg);
+    }
+    return true;
   }
 
   private autoSettle(round: Round): boolean {
@@ -84,9 +106,19 @@ export class RoundLifecycleService {
     const run = async (label: string, fn: () => Promise<void>) => {
       try {
         await fn();
+        this.notReady.delete(label);
       } catch (err) {
-        if (!(err instanceof RandomnessNotReadyError))
+        if (err instanceof RandomnessNotReadyError) {
+          // Expected for a tick or two (VRF in flight); a persistent one is surfaced, not silently retried forever.
+          const ticks = (this.notReady.get(label) ?? 0) + 1;
+          this.notReady.set(label, ticks);
+          if (ticks % NOT_READY_ALERT_TICKS === 0)
+            this.logger.warn(
+              `ALERT ${label}: randomness not ready for ${ticks} ticks — ${err.message}`,
+            );
+        } else if (!(err instanceof MirrorUnavailableError)) {
           this.logger.error(`${label}: ${String(err)}`);
+        }
         report.errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
@@ -119,7 +151,7 @@ export class RoundLifecycleService {
     for (const r of await this.prisma.round.findMany({ where: { status: 'closed' } })) {
       if (!this.autoSettle(r)) continue;
       await run(`draw #${r.number}`, async () => {
-        const status = await this.startDraw(r.id);
+        const status = await this.startDraw(r.id, now);
         if (status !== 'waiting') {
           (status === 'cancelled' ? report.cancelled : report.drawing).push(r.number);
         }
@@ -170,7 +202,7 @@ export class RoundLifecycleService {
    * Mirrored rounds first commit the frozen entry list on-chain; the CONTRACT's threshold check decides, then the
    * keeper sends requestDraw (or cancelRound). 'waiting' = an on-chain transaction is still pending (next tick).
    */
-  async startDraw(roundId: string): Promise<'drawing' | 'cancelled' | 'waiting'> {
+  async startDraw(roundId: string, now = new Date()): Promise<'drawing' | 'cancelled' | 'waiting'> {
     const round = await this.prisma.round.findUniqueOrThrow({ where: { id: roundId } });
     if (round.status !== 'closed')
       throw new AppError('CONFLICT', `Round ${formatRoundNumber(round.number)} is ${round.status}`);
@@ -192,6 +224,25 @@ export class RoundLifecycleService {
     } else if (!round.thresholdsMet || round.entriesCount === 0) {
       await this.cancel(roundId, 'threshold_not_met');
       return 'cancelled';
+    } else if (this.randomness.provider.kind === 'chainlink_vrf_v2_5') {
+      // Chainlink randomness exists only for rounds committed on GlobalPoolRounds. This round was never adopted
+      // (closed before the mirror was on, or its window was too short), so no request can ever exist: alert, and
+      // once VRF_TIMEOUT_HOURS have passed since the close, cancel it with every stake refunded to Owed — stakes are
+      // never locked indefinitely.
+      const deadline = addHours(
+        round.closedAt ?? round.closesAt,
+        this.config.env.VRF_TIMEOUT_HOURS,
+      );
+      if (deadline < now) {
+        this.logger.error(
+          `ALERT round ${formatRoundNumber(round.number)} was never mirrored on-chain and cannot get Chainlink randomness — cancelled with refunds`,
+        );
+        await this.cancel(roundId, 'vrf_timeout');
+        return 'cancelled';
+      }
+      throw new RandomnessNotReadyError(
+        `Round ${formatRoundNumber(round.number)} is not mirrored on-chain, so Chainlink VRF cannot draw it (refund after ${deadline.toISOString()})`,
+      );
     }
     await this.randomness.request(round);
     const res = await this.prisma.round.updateMany({
@@ -207,6 +258,7 @@ export class RoundLifecycleService {
     now = new Date(),
   ): Promise<'settled' | 'waiting' | 'cancelled'> {
     const round = await this.prisma.round.findUniqueOrThrow({ where: { id: roundId } });
+    const mirrored = this.mirrored(round);
     const request = await this.prisma.randomnessRequest.findFirst({
       where: { roundId, status: { in: ['requested', 'fulfilled'] } },
       orderBy: { createdAt: 'desc' },
@@ -217,54 +269,30 @@ export class RoundLifecycleService {
     }
     const polled = await this.randomness.poll(round, request);
     if (polled.status === 'fulfilled') {
-      if (this.mirrored(round)) await this.mirror.verifyDraw(round, polled.randomWord as Hex);
       const settled = await this.settle(roundId);
-      if (this.mirrored(settled)) {
+      if (mirrored) {
         await this.mirror.tryStep(`record settlement #${settled.number}`, () =>
           this.mirror.recordSettlement(settled),
         );
       }
       return 'settled';
     }
-    if (this.mirrored(round)) {
-      // A requested on-chain draw can never be cancelled: after the contract's 24 h timeout the keeper re-requests
-      // (same committed entries; whichever request is fulfilled first is final). Disclosed in the audit log.
-      const known = await this.prisma.randomnessRequest.count({ where: { roundId } });
-      const onchain = await this.mirror.read(round);
-      if (onchain.drawAttempts > known) {
-        // A re-request is on-chain but not tracked yet: follow the newest request from now on.
-        await this.prisma.randomnessRequest.update({
-          where: { id: polled.id },
-          data: { status: 'timed_out' },
-        });
-        await this.randomness.request(round);
-        return 'waiting';
-      }
-      if (
-        addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now &&
-        (await this.mirror.canReRequest(round))
-      ) {
-        const res = await this.mirror.requestDraw(round, { knownAttempts: known });
-        if (res.done && res.changed) {
-          await this.audit.record({
-            actorType: 'system',
-            actorLabel: 'round-lifecycle',
-            action: 'round.draw_rerequested',
-            targetType: 'round',
-            targetId: round.id,
-            reason: 'VRF request unfulfilled for 24 h',
-            metadata: { roundNumber: round.number, previousRequestId: polled.requestId },
-          });
-          await this.prisma.randomnessRequest.update({
-            where: { id: polled.id },
-            data: { status: 'timed_out' },
-          });
-          await this.randomness.request(round);
-        }
-      }
-      return 'waiting';
+    const timedOut = addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now;
+    if (mirrored) {
+      // Randomness is requested once and NEVER re-requested (Chainlink VRF guidance: a re-request would let whoever
+      // can delay fulfilment choose between two outcomes). Unfulfilled for 24 h → the contract's permissionless
+      // cancelRound(VRF_TIMEOUT) first, then the DB refund; a late fulfilment is ignored on-chain.
+      if (!timedOut || !(await this.mirror.vrfTimedOut(round))) return 'waiting';
+      const cancelled = await this.mirror.cancelForVrfTimeout(round);
+      if (!cancelled.done) return 'waiting';
+      await this.prisma.randomnessRequest.update({
+        where: { id: polled.id },
+        data: { status: 'timed_out' },
+      });
+      await this.cancel(roundId, 'vrf_timeout');
+      return 'cancelled';
     }
-    if (addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now) {
+    if (timedOut) {
       await this.prisma.randomnessRequest.update({
         where: { id: polled.id },
         data: { status: 'timed_out' },
@@ -280,6 +308,14 @@ export class RoundLifecycleService {
    * POOL → PRIZE_LIABILITY → each winner's OWED bucket in balanced postings, all in one transaction.
    */
   async settle(roundId: string): Promise<Round> {
+    const before = await this.prisma.round.findUniqueOrThrow({ where: { id: roundId } });
+    if (this.mirrored(before)) {
+      // On-chain rounds: no prize is credited unless the DB winners equal the contract's computeWinners() for the
+      // stored VRF word (throws MirrorMismatchError / MirrorUnavailableError otherwise).
+      const word = await this.randomness.fulfilledFor(roundId);
+      if (!word?.randomWord) throw new AppError('CONFLICT', 'Randomness not fulfilled yet');
+      await this.mirror.verifyDraw(before, word.randomWord as Hex);
+    }
     const settled = await this.prisma.tx(
       async (tx) => {
         const round = await this.lock(tx, roundId);

@@ -22,6 +22,8 @@ export const CancelReason = {
   Operational: 2,
   Compliance: 3,
   Other: 4,
+  /** The single VRF request was not fulfilled within DRAW_REQUEST_TIMEOUT (24 h); stakes are refunded. */
+  VrfTimeout: 5,
 } as const;
 export type CancelReason = (typeof CancelReason)[keyof typeof CancelReason];
 

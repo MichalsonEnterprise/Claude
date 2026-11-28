@@ -16,7 +16,7 @@ export interface RandomnessRequestResult {
 }
 
 export interface RandomnessFulfillment {
-  /** Request that was fulfilled, when it differs from the polled one (a VRF re-request: the first fulfilment wins). */
+  /** Request that was fulfilled, when it differs from the polled one (should not happen: one request per round). */
   requestId?: string;
   randomWord: Hex;
   fulfilledAt: Date;

@@ -19,12 +19,28 @@ type Limit = {
   pendingRemoval?: boolean;
 };
 
+const USER = 'u1';
+
 const dec = (v: string | null | undefined) =>
   v === null || v === undefined ? null : { toFixed: () => v, d: [1] };
 
 /** Minimal in-memory Prisma double for the RG tables + transaction aggregates. */
 function fakePrisma(opts: { spentToday?: string; selfExcludedUntil?: Date | null } = {}) {
   const limits: Limit[] = [];
+  const settings: Record<string, unknown> = {
+    userId: USER,
+    realityCheckMinutes: 60,
+    sessionStartedAt: null,
+    lastActivityAt: null,
+    lastRealityCheckAt: null,
+    playedDay: null,
+    playedTodaySeconds: 0,
+    sessionsToday: 0,
+    sessionLimitMinutes: null,
+    quietHoursEnabled: false,
+    quietStartMinute: 60,
+    quietEndMinute: 420,
+  };
   const db = {
     rgLimit: {
       findMany: ({ where }: { where: { userId: string } }) =>
@@ -87,18 +103,30 @@ function fakePrisma(opts: { spentToday?: string; selfExcludedUntil?: Date | null
             : [],
         ),
     },
-    rgSettings: { findUnique: () => Promise.resolve(null) },
+    rgSettings: {
+      findUnique: () => Promise.resolve(settings),
+      findUniqueOrThrow: () => Promise.resolve(settings),
+      upsert: () => Promise.resolve(settings),
+      update: ({ data }: { data: Record<string, unknown> }) => {
+        Object.assign(settings, data);
+        return Promise.resolve(settings);
+      },
+    },
     transaction: {
       aggregate: ({ where }: { where: { type: string } }) =>
         Promise.resolve({
           _sum: { netAmount: where.type === 'entry_purchase' ? dec(opts.spentToday ?? '0') : null },
         }),
+      groupBy: () => Promise.resolve([]),
+      findMany: () => Promise.resolve([]),
     },
+    // Per-user advisory lock (R29) and the settings row lock (R55): no-ops in memory.
+    $executeRaw: () => Promise.resolve(1),
+    $queryRaw: () => Promise.resolve([]),
   };
   return { db: db as unknown as PrismaService, limits };
 }
 
-const USER = 'u1';
 
 /** Stubs for the security services (2FA off). */
 const stepUp = {

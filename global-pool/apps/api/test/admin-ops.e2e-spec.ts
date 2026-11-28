@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { FeatureFlagsService } from '../src/modules/feature-flags/feature-flags.service';
 import {
@@ -215,9 +215,41 @@ describe('ADM-F9 CSV export (reason, PII permission, SHA-256, audit)', () => {
   });
 });
 
+const ENTRIES_FLAG = 'pool.entries.enabled';
+
+/**
+ * Test-state repair for the SHARED test database (never a product path): put the NEW-entries kill switch back on
+ * with a direct write and drop pending breaker requests, so a run that died mid-test (timeout, kill, failed
+ * resume) cannot leave every later entry purchase answering 503 or block the next pause request with 409.
+ */
+async function forceEntriesOpen() {
+  await t.prisma.featureFlag.upsert({
+    where: { key: ENTRIES_FLAG },
+    create: {
+      key: ENTRIES_FLAG,
+      enabled: true,
+      description: 'Players can buy Global Pool entries',
+    },
+    update: { enabled: true },
+  });
+  await t.prisma.adminApproval.updateMany({
+    where: { targetType: 'feature_flag', targetId: ENTRIES_FLAG, status: 'pending' },
+    data: { status: 'expired' },
+  });
+  t.app.get(FeatureFlagsService).invalidate();
+}
+
 describe('ADM-P10 circuit breaker: NEW entries only, dual approval, reason + MFA, audited', () => {
+  afterEach(async () => {
+    await forceEntriesOpen();
+  });
+
   it('pauses and resumes new entries only after a second, different admin approves', async () => {
     const flags = t.app.get(FeatureFlagsService);
+    // A previous run may have died while entries were paused (or with its request pending): repair first, then
+    // exercise the real workflow.
+    await forceEntriesOpen();
+    expect(await flags.isEnabled(ENTRIES_FLAG)).toBe(true);
     const round = await openRound(t);
     const player = await newPlayer(t);
     await demoDeposit(t, player, '100.00');
@@ -277,57 +309,55 @@ describe('ADM-P10 circuit breaker: NEW entries only, dual approval, reason + MFA
       .send({ decision: 'approve', reason: 'Support approval attempt', mfaCode: '000000' })
       .expect(403);
 
-    try {
-      const ok = await t
-        .http()
-        .post(`/admin/pool/circuit-breaker/${req.body.approvalId}/decision`)
-        .set(bearer(okPause.token))
-        .send({
-          decision: 'approve',
-          reason: 'Confirmed incident, pause sales',
-          mfaCode: await totp(okPause.admin.secret, 1),
-        })
-        .expect(200);
-      expect(ok.body).toMatchObject({ decision: 'approve', entriesEnabled: false });
+    const ok = await t
+      .http()
+      .post(`/admin/pool/circuit-breaker/${req.body.approvalId}/decision`)
+      .set(bearer(okPause.token))
+      .send({
+        decision: 'approve',
+        reason: 'Confirmed incident, pause sales',
+        mfaCode: await totp(okPause.admin.secret, 1),
+      })
+      .expect(200);
+    expect(ok.body).toMatchObject({ decision: 'approve', entriesEnabled: false });
 
-      const blocked = await t
-        .http()
-        .post(`/pool/rounds/${round.id}/entries`)
-        .set(bearer(player.token))
-        .send({ entries: 1, idempotencyKey: `e-${uid()}` })
-        .expect(503);
-      expect(blocked.body.error.code).toBe('SERVICE_UNAVAILABLE');
+    const blocked = await t
+      .http()
+      .post(`/pool/rounds/${round.id}/entries`)
+      .set(bearer(player.token))
+      .send({ entries: 1, idempotencyKey: `e-${uid()}` })
+      .expect(503);
+    expect(blocked.body.error.code).toBe('SERVICE_UNAVAILABLE');
 
-      const state = await t
-        .http()
-        .get('/admin/pool/circuit-breaker')
-        .set(bearer(financeToken))
-        .expect(200);
-      expect(state.body).toMatchObject({ state: 'paused', pending: null });
-      expect(state.body.lastChange.by).toBe('C. Breaker A');
-    } finally {
-      // Resume (same dual approval) so other suites keep selling entries.
-      const resume = await t
-        .http()
-        .post('/admin/pool/circuit-breaker')
-        .set(bearer(reqResume.token))
-        .send({
-          action: 'resume_new_entries',
-          reason: 'Incident closed, resume',
-          mfaCode: await totp(reqResume.admin.secret, 1),
-        })
-        .expect(201);
-      await t
-        .http()
-        .post(`/admin/pool/circuit-breaker/${resume.body.approvalId}/decision`)
-        .set(bearer(okResume.token))
-        .send({
-          decision: 'approve',
-          reason: 'Verified fix, resume sales',
-          mfaCode: await totp(okResume.admin.secret, 1),
-        })
-        .expect(200);
-    }
+    const state = await t
+      .http()
+      .get('/admin/pool/circuit-breaker')
+      .set(bearer(financeToken))
+      .expect(200);
+    expect(state.body).toMatchObject({ state: 'paused', pending: null });
+    expect(state.body.lastChange.by).toBe('C. Breaker A');
+
+    // Resume (same dual approval). A failure anywhere above is NOT masked: afterEach repairs the flag directly.
+    const resume = await t
+      .http()
+      .post('/admin/pool/circuit-breaker')
+      .set(bearer(reqResume.token))
+      .send({
+        action: 'resume_new_entries',
+        reason: 'Incident closed, resume',
+        mfaCode: await totp(reqResume.admin.secret, 1),
+      })
+      .expect(201);
+    await t
+      .http()
+      .post(`/admin/pool/circuit-breaker/${resume.body.approvalId}/decision`)
+      .set(bearer(okResume.token))
+      .send({
+        decision: 'approve',
+        reason: 'Verified fix, resume sales',
+        mfaCode: await totp(okResume.admin.secret, 1),
+      })
+      .expect(200);
     expect(await flags.isEnabled('pool.entries.enabled')).toBe(true);
     const audits = await t.prisma.auditLog.findMany({
       where: { action: { startsWith: 'pool.circuit_breaker' }, targetId: 'pool.entries.enabled' },

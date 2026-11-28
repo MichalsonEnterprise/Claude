@@ -75,6 +75,8 @@ export const envSchema = z.object({
   ADMIN_JWT_REFRESH_SECRET: secret('ADMIN_JWT_REFRESH_SECRET'),
   ADMIN_ACCESS_TTL: duration.default(900),
   ADMIN_SESSION_TTL: duration.default(28_800),
+  /** Server-side admin idle timeout (ADM-01: 15 min without an admin request → refresh / access refused). */
+  ADMIN_IDLE_TIMEOUT: duration.default(900),
   ADMIN_LOGIN_MAX_ATTEMPTS: z.coerce.number().int().min(1).default(5),
   ADMIN_LOCKOUT_MINUTES: z.coerce.number().int().min(1).default(15),
   TOTP_ENCRYPTION_KEY: z.string().refine((v) => Buffer.from(v, 'base64').length === 32, {
@@ -216,11 +218,63 @@ export function parseEnv(source: NodeJS.ProcessEnv = process.env): Env {
   return result.data;
 }
 
+/**
+ * Secrets that sign or encrypt something in production (step-up tokens, admin access tokens, TOTP seeds, entry
+ * salts). PRIVY_MOCK_SIGNING_SECRET is not listed: the DEV MOCK is refused in production, so it never verifies
+ * anything there.
+ */
+export const PRODUCTION_SECRETS = [
+  'JWT_ACCESS_SECRET',
+  'JWT_REFRESH_SECRET',
+  'ADMIN_JWT_ACCESS_SECRET',
+  'ADMIN_JWT_REFRESH_SECRET',
+  'TOTP_ENCRYPTION_KEY',
+  'ENTRY_SALT_ENCRYPTION_KEY',
+] as const;
+
+/**
+ * Public values: everything committed in .env.example / code defaults. Anyone can read them, so a production
+ * process that accepts one lets anyone forge step-up tokens (2FA bypass) or admin access tokens.
+ */
+const KNOWN_PLACEHOLDER_SECRETS = new Set([
+  'dev-only-change-me-access-secret-at-least-32-chars',
+  'dev-only-change-me-refresh-secret-at-least-32-chars',
+  'dev-only-change-me-admin-access-secret-32-chars',
+  'dev-only-change-me-admin-refresh-secret-32-chars',
+  'dev-only-change-me-mock-token-secret-32-chars',
+  'ZGV2LW9ubHktdG90cC1rZXktMzItYnl0ZXMtbG9uZyE=',
+]);
+const PLACEHOLDER_MARKER = /dev[-_ ]?only|change[-_ ]?me|placeholder|example|not[-_ ]?secret/i;
+
+/** True for a committed / obviously placeholder secret (checked raw and, for base64 keys, decoded). */
+export function isPlaceholderSecret(value: string): boolean {
+  if (KNOWN_PLACEHOLDER_SECRETS.has(value) || PLACEHOLDER_MARKER.test(value)) return true;
+  const decoded = Buffer.from(value, 'base64').toString('latin1');
+  return PLACEHOLDER_MARKER.test(decoded);
+}
+
+/** Production refuses the committed placeholder secrets (the value itself is never echoed). */
+export function productionSecretProblems(env: Env): string[] {
+  if (env.NODE_ENV !== 'production') return [];
+  return PRODUCTION_SECRETS.filter((name) => {
+    const value = env[name];
+    return value !== undefined && isPlaceholderSecret(value);
+  }).map(
+    (name) =>
+      `${name}: the committed placeholder (or a 'dev-only' / 'change-me' value) is refused in production — generate a fresh secret (openssl rand -base64 48; keys: openssl rand -base64 32)`,
+  );
+}
+
 /** Rules that span several variables (on-chain features need their RPC, contract and keys). */
 export function crossFieldProblems(env: Env): string[] {
-  const out: string[] = [];
+  const out: string[] = [...productionSecretProblems(env)];
   if (env.NODE_ENV === 'production' && env.EVM_CHAIN_ID === 31_337) {
     out.push('EVM_CHAIN_ID: the local Anvil devnet (31337) is not allowed in production');
+  }
+  // Chainlink randomness exists only for rounds committed on GlobalPoolRounds: without the mirror no draw could ever
+  // be requested and closed rounds would wait forever.
+  if (env.RANDOMNESS_PROVIDER === 'chainlink' && !env.POOL_ONCHAIN_MIRROR) {
+    out.push('RANDOMNESS_PROVIDER=chainlink requires POOL_ONCHAIN_MIRROR=true');
   }
   if (env.POOL_ONCHAIN_MIRROR) {
     if (env.RANDOMNESS_PROVIDER !== 'chainlink')

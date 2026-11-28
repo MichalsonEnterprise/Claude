@@ -15,6 +15,7 @@ import type {
   RgLimitUpdate,
   RgLimitView,
   RgQuietHours,
+  RgReopenView,
   RgSessionView,
   RgSettingsView,
   RgStateView,
@@ -51,6 +52,18 @@ export interface RgLimitChange {
   applied: 'immediately' | 'after_cooldown';
   effectiveAt: string;
 }
+
+/**
+ * Long self-exclusions whose end date passes do NOT reopen by themselves (R06): the player asks, waits the 24 h
+ * cool-down, sets a deposit and a loss limit and confirms. Breaks (24h / 7d / 30d) end on their date; permanent never
+ * ends here.
+ */
+export const REOPEN_REQUIRED_DURATIONS = ['6m', '1y', '5y'] as const;
+export const REOPEN_COOLDOWN_HOURS = 24;
+/** Limit types that must be set before a reopened account can play or deposit again. */
+const REOPEN_REQUIRED_LIMITS = ['deposit', 'loss'] as const;
+/** Advisory-lock class (two-key form) that serialises a player's RG usage checks with their writes. */
+const RG_USER_LOCK_CLASS = 7_262_101;
 
 const DEFAULT_SETTINGS = {
   realityCheckMinutes: REALITY_CHECK_DEFAULT_MINUTES,
@@ -381,50 +394,195 @@ export class ResponsibleGamingService {
     };
   }
 
-  /** Effective exclusion = the active row that ends last (permanent wins). */
+  /**
+   * Effective exclusion = the active row that ends last (permanent wins). A long self-exclusion whose period is over
+   * stays active (with `reopen`) until the player has asked to reopen, waited the cool-down and confirmed.
+   */
   async exclusion(
     userId: string,
     db: Db = this.prisma,
     now = new Date(),
   ): Promise<RgExclusionView> {
     const rows = await db.rgSelfExclusion.findMany({
-      where: { userId, startsAt: { lte: now }, OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+      where: {
+        userId,
+        startsAt: { lte: now },
+        OR: [
+          { endsAt: null },
+          { endsAt: { gt: now } },
+          { duration: { in: [...REOPEN_REQUIRED_DURATIONS] }, reopenedAt: null },
+        ],
+      },
       orderBy: { startsAt: 'asc' },
     });
     if (rows.length === 0) {
-      return { active: false, kind: null, duration: null, startsAt: null, endsAt: null };
+      return {
+        active: false,
+        kind: null,
+        duration: null,
+        startsAt: null,
+        endsAt: null,
+        reopen: null,
+      };
     }
-    const longest = rows.reduce((a, b) =>
-      a.endsAt === null ? a : b.endsAt === null || b.endsAt > a.endsAt ? b : a,
-    );
-    const duration = longest.duration as SelfExclusionDuration;
+    const running = rows.filter((r) => r.endsAt === null || r.endsAt > now);
+    if (running.length > 0) {
+      const longest = running.reduce((a, b) =>
+        a.endsAt === null ? a : b.endsAt === null || b.endsAt > a.endsAt ? b : a,
+      );
+      const duration = longest.duration as SelfExclusionDuration;
+      return {
+        active: true,
+        kind: isCoolingOffDuration(duration) ? 'cooling_off' : 'self_exclusion',
+        duration,
+        startsAt: rows[0]!.startsAt.toISOString(),
+        endsAt: longest.endsAt?.toISOString() ?? null,
+        reopen: null,
+      };
+    }
+    // Every remaining row is a long self-exclusion whose period is over: closed until reopened.
+    const last = rows.reduce((a, b) => (b.endsAt! > a.endsAt! ? b : a));
+    const requestedAt = rows.every((r) => r.reopenRequestedAt)
+      ? rows.reduce((a, r) => (r.reopenRequestedAt! > a ? r.reopenRequestedAt! : a), new Date(0))
+      : null;
+    const availableAt = requestedAt ? addHours(requestedAt, REOPEN_COOLDOWN_HOURS) : null;
+    const reopen: RgReopenView = {
+      status: !availableAt ? 'awaiting_request' : now < availableAt ? 'cooling_down' : 'ready',
+      endedAt: last.endsAt!.toISOString(),
+      requestedAt: requestedAt?.toISOString() ?? null,
+      availableAt: availableAt?.toISOString() ?? null,
+      missingLimits: await this.missingReopenLimits(userId, db, now),
+    };
     return {
       active: true,
-      kind: isCoolingOffDuration(duration) ? 'cooling_off' : 'self_exclusion',
-      duration,
+      kind: 'self_exclusion',
+      duration: last.duration as SelfExclusionDuration,
       startsAt: rows[0]!.startsAt.toISOString(),
-      endsAt: longest.endsAt?.toISOString() ?? null,
+      endsAt: last.endsAt!.toISOString(),
+      reopen,
     };
   }
 
-  async activeSelfExclusion(userId: string, db: Db = this.prisma, now = new Date()) {
-    return db.rgSelfExclusion.findFirst({
-      where: { userId, startsAt: { lte: now }, OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
-      orderBy: { startsAt: 'desc' },
+  /** Ask to reopen after a long self-exclusion ended: starts the 24 h cool-down (idempotent). */
+  async requestReopen(userId: string, now = new Date()): Promise<RgReopenView> {
+    return this.prisma.tx(async (tx) => {
+      await this.lockUser(userId, tx);
+      const ex = await this.exclusion(userId, tx, now);
+      if (!ex.reopen) throw this.nothingToReopen(ex);
+      if (ex.reopen.status === 'awaiting_request') {
+        await tx.rgSelfExclusion.updateMany({
+          where: {
+            userId,
+            duration: { in: [...REOPEN_REQUIRED_DURATIONS] },
+            reopenedAt: null,
+            reopenRequestedAt: null,
+            endsAt: { lte: now },
+          },
+          data: { reopenRequestedAt: now },
+        });
+      }
+      return (await this.exclusion(userId, tx, now)).reopen!;
     });
+  }
+
+  /** Finish reopening: only after the cool-down and with a deposit limit and a loss limit in place. */
+  async confirmReopen(userId: string, now = new Date()): Promise<{ reopenedAt: string }> {
+    return this.prisma.tx(async (tx) => {
+      await this.lockUser(userId, tx);
+      const ex = await this.exclusion(userId, tx, now);
+      const r = ex.reopen;
+      if (!r) throw this.nothingToReopen(ex);
+      if (r.status === 'awaiting_request') {
+        throw conflict('Ask to reopen first — a 24-hour cool-down follows your request', {
+          reopen: r,
+        });
+      }
+      if (r.status === 'cooling_down') {
+        throw conflict('The 24-hour cool-down is still running', {
+          availableAt: r.availableAt,
+          reopen: r,
+        });
+      }
+      if (r.missingLimits.length > 0) {
+        throw new AppError(
+          'VALIDATION_FAILED',
+          'Set a deposit limit and a loss limit before your account reopens',
+          { missingLimits: r.missingLimits, reopen: r },
+        );
+      }
+      await tx.rgSelfExclusion.updateMany({
+        where: {
+          userId,
+          duration: { in: [...REOPEN_REQUIRED_DURATIONS] },
+          reopenedAt: null,
+          reopenRequestedAt: { not: null },
+          endsAt: { lte: now },
+        },
+        data: { reopenedAt: now },
+      });
+      return { reopenedAt: now.toISOString() };
+    });
+  }
+
+  private nothingToReopen(ex: RgExclusionView) {
+    return conflict(
+      ex.active
+        ? ex.endsAt === null
+          ? 'A permanent self-exclusion cannot be reopened here'
+          : 'Your break or self-exclusion is still running — it cannot be ended early'
+        : 'There is no self-exclusion to reopen',
+      { kind: ex.kind, endsAt: ex.endsAt },
+    );
+  }
+
+  private async missingReopenLimits(
+    userId: string,
+    db: Db,
+    now: Date,
+  ): Promise<RgReopenView['missingLimits']> {
+    const limits = await this.effectiveLimits(userId, now, db);
+    return REOPEN_REQUIRED_LIMITS.filter(
+      (type) => !limits.some((l) => l.type === type && l.amount !== null),
+    );
   }
 
   async assertNotSelfExcluded(userId: string, db: Db = this.prisma): Promise<void> {
     const ex = await this.exclusion(userId, db);
     if (ex.active) {
-      throw new AppError(
-        'SELF_EXCLUDED',
-        ex.kind === 'cooling_off'
+      const message = ex.reopen
+        ? ex.reopen.status === 'awaiting_request'
+          ? 'Your self-exclusion period is over, but nothing reopens automatically — ask to reopen first'
+          : ex.reopen.status === 'cooling_down'
+            ? 'Reopening is in its 24-hour cool-down — gaming and deposits stay paused until then'
+            : 'Set a deposit limit and a loss limit, then confirm reopening your account'
+        : ex.kind === 'cooling_off'
           ? 'You are on a break — gaming and deposits are paused until it ends'
-          : 'You are self-excluded — gaming and deposits are paused',
-        { endsAt: ex.endsAt, kind: ex.kind },
-      );
+          : 'You are self-excluded — gaming and deposits are paused';
+      throw new AppError('SELF_EXCLUDED', message, {
+        endsAt: ex.endsAt,
+        kind: ex.kind,
+        ...(ex.reopen ? { reopen: ex.reopen } : {}),
+      });
     }
+  }
+
+  /**
+   * Serialise this player's RG checks inside the caller's transaction (R29): two parallel deposits / purchases can
+   * no longer both read the usage before either commits. Transaction-scoped; a no-op outside a transaction.
+   */
+  async lockUser(userId: string, db: Db): Promise<void> {
+    await db.$executeRaw`SELECT pg_advisory_xact_lock(${RG_USER_LOCK_CLASS}::int, hashtext(${userId}))`;
+  }
+
+  /**
+   * Server-observed play (R55): an entry purchase counts as activity exactly like a heartbeat, in the purchase
+   * transaction, so daily play time and session length accrue even when the client never sends heartbeats.
+   */
+  async recordActivity(userId: string, db: Db, now = new Date()): Promise<void> {
+    await db.rgSettings.upsert({ where: { userId }, create: { userId }, update: {} });
+    await db.$queryRaw`SELECT id FROM responsible_gaming_settings WHERE user_id = ${userId}::uuid FOR UPDATE`;
+    const s = await db.rgSettings.findUniqueOrThrow({ where: { userId } });
+    await db.rgSettings.update({ where: { userId }, data: applyHeartbeat(countersOf(s), now) });
   }
 
   // ── reality checks & sessions (RG5) ───────────────────────────────────────────────────────────
@@ -464,13 +622,7 @@ export class ResponsibleGamingService {
 
   /** Activity heartbeat from the web (every 60 s while the tab is visible and signed in). */
   async heartbeat(userId: string, now = new Date()): Promise<RgSessionView> {
-    await this.prisma.tx(async (tx) => {
-      await tx.rgSettings.upsert({ where: { userId }, create: { userId }, update: {} });
-      await tx.$queryRaw`SELECT id FROM responsible_gaming_settings WHERE user_id = ${userId}::uuid FOR UPDATE`;
-      const s = await tx.rgSettings.findUniqueOrThrow({ where: { userId } });
-      const next = applyHeartbeat(countersOf(s), now);
-      await tx.rgSettings.update({ where: { userId }, data: next });
-    });
+    await this.prisma.tx((tx) => this.recordActivity(userId, tx, now));
     return this.session(userId, now);
   }
 
@@ -497,6 +649,8 @@ export class ResponsibleGamingService {
               'user.rg.reality_check',
               'user.rg.self_excluded',
               'user.rg.cooling_off',
+              'user.rg.reopen_requested',
+              'user.rg.reopened',
             ];
     const rows = await this.prisma.auditLog.findMany({
       where: { actorType: 'user', actorId: userId, action: { in: actions } },
@@ -512,6 +666,7 @@ export class ResponsibleGamingService {
 
   /** Global Pool entries + game stakes: exclusion, money limits and time rules. Call inside the purchase tx. */
   async assertCanParticipate(userId: string, total: MoneyInput, db: Db, now = new Date()) {
+    await this.lockUser(userId, db);
     await this.assertNotSelfExcluded(userId, db);
     const limits = await this.effectiveLimits(userId, now, db);
     for (const l of limits) {
@@ -533,6 +688,8 @@ export class ResponsibleGamingService {
         );
       }
     }
+    // This purchase is play the server observed: count it before the time rules (rolled back if anything fails).
+    await this.recordActivity(userId, db, now);
     await this.assertTimeRules(userId, limits, db, now);
   }
 
@@ -552,6 +709,7 @@ export class ResponsibleGamingService {
   }
 
   async assertCanDeposit(userId: string, amount: MoneyInput, db: Db, now = new Date()) {
+    await this.lockUser(userId, db);
     await this.assertNotSelfExcluded(userId, db);
     const limits = await this.effectiveLimits(userId, now, db);
     for (const l of limits) {
@@ -582,8 +740,10 @@ export class ResponsibleGamingService {
   ): Promise<string> {
     const since = periodStart(period, now);
     if (type === 'deposit') return toUSDTString(await this.sumOf(db, userId, 'deposit', since));
+    // Refunds only offset stakes bought IN this period (R13): a refund today for yesterday's cancelled round must not
+    // free up today's limit.
     const spent = (await this.sumOf(db, userId, 'entry_purchase', since)).minus(
-      await this.sumOf(db, userId, 'refund', since),
+      await this.refundedStakesSince(db, userId, since),
     );
     if (type === 'participation') return toUSDTString(maxZero(spent));
     // loss = stakes − prizes won in the period (never below zero)
@@ -597,6 +757,36 @@ export class ResponsibleGamingService {
     );
     const spent = await this.sumOf(db, userId, 'entry_purchase', since);
     return toUSDTString(won.minus(spent));
+  }
+
+  /** Stake (without fees) of this period's entry purchases whose round has been refunded to the player. */
+  private async refundedStakesSince(db: Db, userId: string, since: Date) {
+    const purchases = await db.transaction.groupBy({
+      by: ['roundId'],
+      where: {
+        userId,
+        type: 'entry_purchase',
+        createdAt: { gte: since },
+        status: { notIn: ['failed', 'rejected', 'cancelled'] },
+        roundId: { not: null },
+      },
+      _sum: { amount: true },
+    });
+    if (purchases.length === 0) return money(0);
+    const refunded = await db.transaction.findMany({
+      where: {
+        userId,
+        type: 'refund',
+        status: { notIn: ['failed', 'rejected', 'cancelled'] },
+        roundId: { in: purchases.map((p) => p.roundId!) },
+      },
+      select: { roundId: true },
+      distinct: ['roundId'],
+    });
+    const rounds = new Set(refunded.map((r) => r.roundId));
+    return purchases
+      .filter((p) => rounds.has(p.roundId))
+      .reduce((acc, p) => acc.plus(money(p._sum.amount?.toFixed() ?? '0')), money(0));
   }
 
   private async sumOf(
@@ -861,6 +1051,20 @@ function historyItem(action: string, m: Record<string, unknown>, at: Date): RgHi
               ? 'Viewed history'
               : 'Continued',
         detail: `${str(m.intervalMinutes ?? '')} min`,
+      };
+    case 'user.rg.reopen_requested':
+      return {
+        at: at.toISOString(),
+        action: 'pending',
+        label: 'Reopening requested',
+        detail: typeof m.availableAt === 'string' ? `Cool-down until ${m.availableAt}` : null,
+      };
+    case 'user.rg.reopened':
+      return {
+        at: at.toISOString(),
+        action: 'applied',
+        label: 'Account reopened after self-exclusion',
+        detail: null,
       };
     default:
       return {

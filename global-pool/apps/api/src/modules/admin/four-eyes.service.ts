@@ -49,6 +49,32 @@ const EXTERNAL_ACTION_LABEL: Record<string, string> = {
 };
 const isOwnAction = (action: string) => action in FOUR_EYES_ACTION_PERMISSION;
 
+/**
+ * Read permission of the module a request belongs to: a request (target, payload, reasons, audit trail) is shown
+ * only to admins who may read that module anyway — the same gate as the module's own list (e.g. GET
+ * /admin/approvals = withdrawals.read). Unknown actions fall back to system.read.
+ */
+const VIEW_PERMISSION_BY_ACTION: Record<string, Permission> = {
+  'withdrawal.approve': 'withdrawals.read',
+  'user.restriction.apply': 'users.read',
+  'admin.role.permissions.change': 'system.read',
+  'pool.entries.pause': 'rounds.read',
+  'pool.entries.resume': 'rounds.read',
+};
+const VIEW_PERMISSION_BY_TARGET: Record<string, Permission> = {
+  withdrawal: 'withdrawals.read',
+  user: 'users.read',
+  admin_role: 'system.read',
+  feature_flag: 'rounds.read',
+};
+export function approvalViewPermission(a: { action: string; targetType: string }): Permission {
+  return (
+    VIEW_PERMISSION_BY_ACTION[a.action] ?? VIEW_PERMISSION_BY_TARGET[a.targetType] ?? 'system.read'
+  );
+}
+const canView = (admin: AuthAdmin, a: { action: string; targetType: string }) =>
+  admin.permissions.includes(approvalViewPermission(a));
+
 /** Human reference for an approval request (AR-XXXXXX, derived from the UUID — display only). */
 export const approvalRef = (id: string) => `AR-${id.replace(/-/g, '').slice(0, 6).toUpperCase()}`;
 
@@ -216,13 +242,15 @@ export class FourEyesService {
         take: 100,
       }),
     ]);
-    const pendingViews = pending.map((a) => this.view(a, admin));
+    const visible = <T extends { action: string; targetType: string }>(rows: T[]) =>
+      rows.filter((a) => canView(admin, a));
+    const pendingViews = visible(pending).map((a) => this.view(a, admin));
     const views = {
       open: pendingViews.filter((a) => a.status === 'pending'),
-      decided_today: decidedToday.map((a) => this.view(a, admin)),
+      decided_today: visible(decidedToday).map((a) => this.view(a, admin)),
       expired: [
         ...pendingViews.filter((a) => a.status === 'expired'),
-        ...expired.map((a) => this.view(a, admin)),
+        ...visible(expired).map((a) => this.view(a, admin)),
       ],
     };
     const waiting = views.open.filter((a) => a.yourRole === 'can_decide');
@@ -256,6 +284,12 @@ export class FourEyesService {
   async detail(admin: AuthAdmin, id: string) {
     await this.prisma.tx((tx) => this.expireStale(tx));
     const a = await this.load(id);
+    const needed = approvalViewPermission(a);
+    if (!admin.permissions.includes(needed)) {
+      throw new AppError('FORBIDDEN', 'Your role does not allow viewing this request', {
+        missingPermissions: [needed],
+      });
+    }
     const eligible = await this.eligibleApprovers(a);
     const auditTrail = await this.prisma.auditLog.findMany({
       where: { metadata: { path: ['approvalId'], equals: a.id } },

@@ -74,8 +74,8 @@ pnpm --filter @gp/contracts artifacts    # artifacts/local-devnet.json: ABI + by
 ```
 
 Fuzz runs: 1,024 per property (`FOUNDRY_PROFILE=ci` → 10,000), fixed seed for a reproducible snapshot.
-The invariant suite runs 64 × 256 random calls (`ci`: 512 × 128) across open, commit, draw, re-request,
-fulfil, duplicate callbacks, settle, cancel, pause and time warps.
+The invariant suite runs 64 × 256 random calls (`ci`: 512 × 128) across open, commit, draw, VRF-timeout
+cancel, fulfil, duplicate callbacks, settle, cancel, pause and time warps.
 
 ## Layout
 
@@ -113,9 +113,9 @@ lib/forge-std                    vendored forge-std v1.17.0
                                           │ thresholds met
                      requestDraw (anyone, coordinator locked & pinned)
                                           ▼
-                                    DrawRequested ◀─┐ requestDraw again only if unfulfilled and
-                                          │         └─ ≥ 24 h after the previous request (same entries)
-                     VRF callback (pinned coordinator only; FIRST fulfilment of any request is final)
+                                    DrawRequested ──still unfulfilled ≥ 24 h after the request: cancelRound
+                                          │          (anyone; VRF_TIMEOUT) ──▶ Cancelled (late callback ignored)
+                     VRF callback (pinned coordinator only; one request per round, never re-requested)
                                           ▼
                                       Fulfilled ── computeWinners / prizeAmounts (views)
                                           │
@@ -134,8 +134,8 @@ be drawn; it cannot be cancelled. Nothing can be cancelled once a draw has been 
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `openRound(roundId, closesAt, entryPrice, feePerEntry, minParticipants, minPool, prizeSplitBps[], rulesHash)` | `OPERATOR_ROLE`                                                    | blocked when paused; `roundId ≠ 0` and unique; `closesAt` in the future; `entryPrice > 0`; 1–100 ranks, each > 0, sum = 10,000 bps                                                                                                                                                  |
 | `commitEntries(roundId, entriesMerkleRoot, totalEntries, totalParticipants, poolAmount)`                      | `OPERATOR_ROLE`                                                    | blocked when paused; only after `closesAt`; once; `poolAmount == totalEntries × entryPrice`; `participants ≤ entries`; root ≠ 0 iff entries > 0                                                                                                                                     |
-| `cancelRound(roundId, reasonCode)`                                                                            | `OPERATOR_ROLE` (Open) / anyone (Committed and failing thresholds) | see lifecycle; never after `requestDraw`                                                                                                                                                                                                                                            |
-| `requestDraw(roundId)`                                                                                        | anyone                                                             | VRF v2.5, `numWords = 1`, `nativePayment = false` (LINK subscription); re-request only when unfulfilled and ≥ `DRAW_REQUEST_TIMEOUT` (24 h) later                                                                                                                                   |
+| `cancelRound(roundId, reasonCode)`                                                                            | `OPERATOR_ROLE` (Open) / anyone (Committed and failing thresholds; DrawRequested ≥ 24 h unfulfilled) | see lifecycle; after `requestDraw` only with `VRF_TIMEOUT` (5) once `DRAW_REQUEST_TIMEOUT` passed; never once fulfilled                                                                                                                                                                 |
+| `requestDraw(roundId)`                                                                                        | anyone                                                             | VRF v2.5, `numWords = 1`, `nativePayment = false` (LINK subscription); exactly once per round (never re-requested)                                                                                                                                   |
 | `fulfillRandomWords` (via `rawFulfillRandomWords`)                                                            | pinned VRF coordinator                                             | stores the word; ignores unknown or late requests (`FulfillmentIgnored`), never reverts for them                                                                                                                                                                                    |
 | `recordSettlement(roundId, payoutsMerkleRoot, totalPaid)`                                                     | `SETTLER_ROLE`                                                     | only when Fulfilled; once; root ≠ 0; `totalPaid == poolAmount`                                                                                                                                                                                                                      |
 | `setVrfConfig(cfg)`                                                                                           | `DEFAULT_ADMIN_ROLE`                                               | future requests only; callback gas 150,000–2,500,000; confirmations 1–200                                                                                                                                                                                                           |
@@ -145,8 +145,8 @@ be drawn; it cannot be cancelled. Nothing can be cancelled once a draw has been 
 
 Why `requestDraw` and the failed-threshold `cancelRound` are permissionless: once entries are committed, the
 next step is fully determined by on-chain data. Letting anyone trigger it means the operator cannot stall a
-due draw or keep a failed round open. Request spam is bounded by the state machine: at most one VRF request
-per round per 24 h.
+due draw or keep a failed round open. Request spam is bounded by the state machine: exactly one VRF request per
+round. The VRF-timeout cancel is permissionless for the same reason: a stalled draw always ends with refunds.
 
 ### Events
 
@@ -235,15 +235,16 @@ Anything below can be done with a block explorer (read contract / events) or wit
 4. **Whole list (auditors).** Download the manifest of leaves. Rebuild the root with `buildTree()` and check it
    equals `entriesMerkleRoot`. Check there are exactly `totalEntries` leaves with indices 0…N−1, each once.
 5. **Randomness.** `DrawFulfilled` gives `requestId` and `randomWord`. On the VRF coordinator, the
-   `RandomWordsFulfilled` event for that `requestId` must exist. `DrawRequested.attempt` should be `1`; a
-   re-request (attempt > 1) is a published incident.
+   `RandomWordsFulfilled` event for that `requestId` must exist. `DrawRequested.attempt` is always `1` (the
+   contract never accepts a second request).
 6. **Winners.** Call `computeWinners(roundId)`, or recompute it off-chain with
    `deriveWinners(roundId, randomWord, totalEntries, prizeSplitBps.length)`. For a winning entry, check
    `verifyWinningEntry(roundId, rank, entryId, userCommitment, proof)`.
 7. **Payouts.** After `RoundSettled`, check `totalPaid == poolAmount`, then run
    `verifyPayout(roundId, rank, entryId, userCommitment, amount, payoutProof)` for each prize.
 8. **Cancelled rounds.** `RoundCancelled.reasonCode`. For `THRESHOLDS_NOT_MET`, `thresholdsMet(roundId)` is
-   `false` from the committed totals; refunds appear in the ledger (Owed → Available).
+   `false` from the committed totals; for `VRF_TIMEOUT`, `cancelledAt ≥ lastRequestAt + 24 h` and `randomWord`
+   is 0. Refunds appear in the ledger (stakes to Owed).
 
 ## Threat model notes
 
@@ -271,19 +272,17 @@ Anything below can be done with a block explorer (read contract / events) or wit
   A Chainlink-side migration can still call `setCoordinator`. Draws then stall with `CoordinatorMismatch` (a
   new version must be deployed), but no words can be injected.
 
-- **Re-request risk (spec requirement).** Chainlink's VRF security guidance warns that re-requesting randomness
-  can let the party who can block a fulfilment bias outcomes. The re-request path therefore:
-  - is allowed only when unfulfilled and at least 24 h after the previous request;
-  - reuses the same committed entries;
-  - treats the **first** fulfilment of any request for the round as final (a re-request cannot invalidate an
-    earlier request);
-  - emits every attempt;
-  - keeps the callback minimal (about 79k gas) under an enforced minimum gas limit of 150k, so it cannot run
-    out of gas.
+- **No re-request (Chainlink VRF security guidance).** Re-requesting randomness would let whoever can delay a
+  fulfilment (e.g. the VRF node operator, who learns request A's output first) withhold A and pick between two
+  outcomes once a request B exists. So randomness is requested exactly **once** per round. If it is still
+  unfulfilled `DRAW_REQUEST_TIMEOUT` (24 h) after the request, anyone may `cancelRound(roundId, VRF_TIMEOUT)`:
+  the round is cancelled with every stake refunded off-chain, and a late callback is ignored. Withholding can
+  therefore at most cancel a round with full refunds — never choose its winners. The callback stays minimal
+  (about 79k gas) under an enforced minimum gas limit of 150k, so it cannot run out of gas.
 
   Residual risk: a fulfilment that reverts inside the coordinator (for example an under-funded subscription)
-  after its proof is public. Operations must keep the subscription funded and treat any attempt > 1 as a
-  disclosed incident (see Audit TODOs).
+  ends in a VRF-timeout cancellation. Operations must keep the subscription funded and treat any VRF-timeout
+  cancellation as a disclosed incident.
 
 - **Timing / MEV.** The VRF output is unpredictable to everyone, including the operator, and
   `requestConfirmations ≥ 1` (default 3) covers reorgs. Arbitrum's sequencer has no public mempool.
@@ -416,8 +415,8 @@ follow the coordinator call because it carries the returned request id.
 ## Audit TODOs
 
 - [ ] External audit + Slither/Aderyn/Halmos runs (not run here); formal spec of `DrawMath.deriveWinners`.
-- [ ] Decide whether to keep the 24 h re-request path. If kept, gate it behind a governance timelock or an
-      on-chain incident flag, and add a monitored "attempt > 1" disclosure flow.
+- [x] 24 h re-request path removed (close-out R33): one request per round; unfulfilled after 24 h → permissionless
+      `cancelRound(VRF_TIMEOUT)` with refunds. Monitor and disclose every VRF-timeout cancellation.
 - [ ] Consider on-chain settlement verification: submit the winners' entry proofs and let the contract build
       the payouts root, instead of trusting the settler's root and checking leaves afterwards.
 - [ ] `AccessControlDefaultAdminRules` (2-step admin transfer with delay) and multisig role holders.

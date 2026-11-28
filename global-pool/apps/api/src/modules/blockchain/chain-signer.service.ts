@@ -61,7 +61,6 @@ const GAS_HEADROOM_DEN = 10n;
 export class ChainSignerService {
   private readonly logger = new Logger(ChainSignerService.name);
   private readonly accounts = new Map<SignerRole, PrivateKeyAccount | null>();
-  private chainVerified = false;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -89,25 +88,11 @@ export class ChainSignerService {
     return this.account(role)?.address ?? null;
   }
 
-  /** Public client after checking the RPC serves the configured testnet (once per process). */
+  /** Public client after checking the RPC serves the configured testnet (BlockchainService.verifiedClient). */
   async client(): Promise<PublicClient> {
-    const client = this.blockchain.client('arbitrum');
-    if (!client) throw new ChainUnavailableError('ARBITRUM_SEPOLIA_RPC_URL is not configured');
-    if (!this.chainVerified) {
-      let id: number;
-      try {
-        id = await client.getChainId();
-      } catch (err) {
-        throw new ChainUnavailableError(`RPC unavailable: ${errorSummary(err)}`);
-      }
-      if (id !== this.blockchain.chainId) {
-        throw new ChainUnavailableError(
-          `RPC serves chain ${id}, expected ${this.blockchain.chainId} (EVM_CHAIN_ID) — refusing to sign`,
-        );
-      }
-      this.chainVerified = true;
-    }
-    return client;
+    if (!this.blockchain.client('arbitrum'))
+      throw new ChainUnavailableError('ARBITRUM_SEPOLIA_RPC_URL is not configured');
+    return this.blockchain.verifiedClient('arbitrum');
   }
 
   /** Simulate, sign, store in the outbox and broadcast. Throws ChainRevertError if the call would revert. */
@@ -198,8 +183,9 @@ export class ChainSignerService {
   }
 
   /**
-   * Resolve one outbox transaction: mined / reverted once it has `confirmations`, dropped if its nonce was consumed
-   * by another transaction, else pending (re-broadcast after CHAIN_REBROADCAST_SECONDS).
+   * Resolve one outbox transaction: mined / reverted once it has `confirmations`, dropped only if its nonce was
+   * consumed `confirmations` blocks deep by another transaction (and a re-check still finds no receipt), else pending
+   * (re-broadcast after CHAIN_REBROADCAST_SECONDS).
    */
   async track(rowOrId: ChainTransaction | string, confirmations: number): Promise<TrackResult> {
     let row =
@@ -215,47 +201,28 @@ export class ChainSignerService {
       };
     }
     const client = await this.client();
-    let receipt: TransactionReceipt | null = null;
-    try {
-      receipt = await client.getTransactionReceipt({ hash: row.txHash as Hex });
-    } catch (err) {
-      if (!(err instanceof TransactionReceiptNotFoundError)) throw err;
-    }
-    if (receipt) {
-      const head = await client.getBlockNumber();
-      const conf = Number(head - receipt.blockNumber + 1n);
-      if (conf < confirmations) {
-        if (row.blockNumber !== receipt.blockNumber) {
-          row = await this.prisma.chainTransaction.update({
-            where: { id: row.id },
-            data: { blockNumber: receipt.blockNumber, blockHash: receipt.blockHash },
-          });
-        }
-        return { state: 'pending', confirmations: conf, receipt, row };
-      }
-      const state = receipt.status === 'success' ? 'mined' : 'reverted';
+    const receipt = await this.receiptOf(client, row.txHash as Hex);
+    if (receipt) return this.fromReceipt(client, row, receipt, confirmations);
+    // No receipt (yet). A used nonce alone is NOT proof that another transaction replaced ours: the transfer may have
+    // been mined right after the receipt lookup, or a load-balanced RPC node answered from behind. 'dropped' is
+    // terminal (a withdrawal's funds are released), so it needs (1) the nonce consumed at least `confirmations`
+    // blocks deep and (2) a second receipt lookup, made AFTER that nonce read, that still finds nothing.
+    const head = await client.getBlockNumber();
+    const depth = BigInt(Math.max(1, confirmations));
+    const deepBlock = head + 1n > depth ? head + 1n - depth : 0n;
+    const deepNonce = await client.getTransactionCount({
+      address: row.fromAddress as Address,
+      blockNumber: deepBlock,
+    });
+    if (deepNonce > row.nonce) {
+      const again = await this.receiptOf(client, row.txHash as Hex);
+      if (again) return this.fromReceipt(client, row, again, confirmations);
       row = await this.prisma.chainTransaction.update({
         where: { id: row.id },
         data: {
-          status: state,
-          blockNumber: receipt.blockNumber,
-          blockHash: receipt.blockHash,
-          gasUsed: receipt.gasUsed.toString(),
-          minedAt: new Date(),
-          error: state === 'reverted' ? 'transaction reverted on-chain' : null,
+          status: 'dropped',
+          error: `nonce ${row.nonce} consumed by another transaction (≥ ${depth} blocks deep at block ${deepBlock})`,
         },
-      });
-      return { state, confirmations: conf, receipt, row };
-    }
-    const latestNonce = await client.getTransactionCount({
-      address: row.fromAddress as Address,
-      blockTag: 'latest',
-    });
-    if (latestNonce > row.nonce) {
-      // Our nonce is used and our hash has no receipt: another transaction replaced it. It can never be mined.
-      row = await this.prisma.chainTransaction.update({
-        where: { id: row.id },
-        data: { status: 'dropped', error: `nonce ${row.nonce} consumed by another transaction` },
       });
       return { state: 'dropped', confirmations: 0, receipt: null, row };
     }
@@ -264,6 +231,48 @@ export class ChainSignerService {
       Date.now() - row.lastBroadcastAt.getTime() > this.config.env.CHAIN_REBROADCAST_SECONDS * 1000;
     if (row.status === 'signed' || stale) row = await this.broadcast(row);
     return { state: 'pending', confirmations: 0, receipt: null, row };
+  }
+
+  private async receiptOf(client: PublicClient, hash: Hex): Promise<TransactionReceipt | null> {
+    try {
+      return await client.getTransactionReceipt({ hash });
+    } catch (err) {
+      if (err instanceof TransactionReceiptNotFoundError) return null;
+      throw err;
+    }
+  }
+
+  /** mined / reverted once the receipt has `confirmations`, else pending (block recorded for re-org tracking). */
+  private async fromReceipt(
+    client: PublicClient,
+    row: ChainTransaction,
+    receipt: TransactionReceipt,
+    confirmations: number,
+  ): Promise<TrackResult> {
+    const head = await client.getBlockNumber();
+    const conf = Number(head - receipt.blockNumber + 1n);
+    if (conf < confirmations) {
+      if (row.blockNumber !== receipt.blockNumber) {
+        row = await this.prisma.chainTransaction.update({
+          where: { id: row.id },
+          data: { blockNumber: receipt.blockNumber, blockHash: receipt.blockHash },
+        });
+      }
+      return { state: 'pending', confirmations: conf, receipt, row };
+    }
+    const state = receipt.status === 'success' ? 'mined' : 'reverted';
+    row = await this.prisma.chainTransaction.update({
+      where: { id: row.id },
+      data: {
+        status: state,
+        blockNumber: receipt.blockNumber,
+        blockHash: receipt.blockHash,
+        gasUsed: receipt.gasUsed.toString(),
+        minedAt: new Date(),
+        error: state === 'reverted' ? 'transaction reverted on-chain' : null,
+      },
+    });
+    return { state, confirmations: conf, receipt, row };
   }
 
   /** Poll track() until the transaction resolves or `timeoutMs` passes (then it stays pending for the next tick). */

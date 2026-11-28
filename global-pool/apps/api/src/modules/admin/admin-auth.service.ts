@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
+import type { Redis } from 'ioredis';
 import { randomUUID } from 'node:crypto';
 
 import { randomToken, sha256Hex } from '../../common/crypto';
@@ -9,6 +10,7 @@ import type { AuthAdmin, RequestMeta } from '../../common/request';
 import { addMinutes } from '../../common/time';
 import { AppConfig } from '../../config/app-config';
 import { PrismaService } from '../../infra/prisma/prisma.service';
+import { InjectRedis } from '../../infra/redis/redis.module';
 import { AuditService } from '../audit/audit.service';
 import { TotpService } from '../security/totp.service';
 
@@ -29,6 +31,12 @@ interface AdminAccessClaims {
 
 export const hashAdminPassword = (password: string) => argon2.hash(password, ARGON2_OPTIONS);
 
+/** Audit-safe reference for a refresh-token family (the raw id is the `sid` of admin access tokens). */
+export const sessionRef = (familyId: string) => `as_${sha256Hex(familyId).slice(0, 16)}`;
+
+/** `sessions.last_seen_at` is written at most once a minute per admin session. */
+const LAST_SEEN_WRITE_MS = 60_000;
+
 /**
  * Admin authentication — fully separate from players (no Privy): email + argon2id password + MANDATORY TOTP in one
  * step, lockout after ADMIN_LOGIN_MAX_ATTEMPTS failures, short-lived access JWT (ADMIN_JWT_ACCESS_SECRET) and an
@@ -44,13 +52,20 @@ export class AdminAuthService {
     private readonly config: AppConfig,
     private readonly totp: TotpService,
     private readonly audit: AuditService,
+    @InjectRedis() private readonly redis: Redis,
   ) {}
 
   async login(input: { email: string; password: string; totpCode: string }, meta: RequestMeta) {
+    const emailHash = sha256Hex(input.email);
     const admin = await this.prisma.adminUser.findUnique({ where: { email: input.email } });
+    const now = new Date();
     if (!admin || admin.status !== 'active') {
+      // Unknown / disabled emails get exactly the responses a real account gets (same lockout after the same
+      // number of attempts, counted per email hash), so neither the 401 nor the 403 reveals which emails exist.
+      const slot = await this.reserveUnknownEmailAttempt(emailHash, now);
       // Equalise timing so responses do not reveal which emails exist.
       await argon2.verify(await this.getDummyHash(), input.password).catch(() => false);
+      if (slot.lockedUntil && !slot.lockedNow) throw this.lockedError(slot.lockedUntil);
       await this.audit.record({
         actorType: 'system',
         action: 'admin.login.failed',
@@ -59,53 +74,40 @@ export class AdminAuthService {
         userAgent: meta.userAgent,
         requestId: meta.requestId,
         outcome: 'failure',
-        metadata: { emailHash: sha256Hex(input.email) },
+        metadata: { emailHash },
       });
-      throw new AppError('UNAUTHENTICATED', INVALID);
+      throw new AppError('UNAUTHENTICATED', INVALID, slot.lockedNow ? { locked: true } : undefined);
     }
-    const now = new Date();
-    if (admin.lockedUntil && admin.lockedUntil > now) {
-      throw new AppError(
-        'FORBIDDEN',
-        'This admin account is temporarily locked after failed sign-ins',
-        {
-          lockedUntil: admin.lockedUntil.toISOString(),
-        },
-      );
+    // Count the attempt BEFORE checking anything (row lock on the fresh row): parallel guesses cannot share one
+    // stale counter, the lock lands on the last allowed attempt and a slow request can never clear it.
+    const slot = await this.reserveAdminAttempt(admin.id, now);
+    if (slot.lockedUntil && !slot.lockedNow) {
+      await argon2.verify(await this.getDummyHash(), input.password).catch(() => false);
+      throw this.lockedError(slot.lockedUntil);
     }
     const passwordOk = await argon2.verify(admin.passwordHash, input.password).catch(() => false);
     let totpOk = false;
     if (passwordOk) {
       const secret = await this.totp.find({ adminUserId: admin.id });
       if (secret?.status === 'active') {
+        // A locked TOTP factor is a plain failure here (generic 401), never a 423 that would confirm the password.
         totpOk = (await this.totp.verifyRow(secret, input.totpCode, { allowBackup: false })).ok;
       }
     }
     if (!passwordOk || !totpOk) {
-      const attempts = admin.failedLoginAttempts + 1;
-      const lock = attempts >= this.config.env.ADMIN_LOGIN_MAX_ATTEMPTS;
-      await this.prisma.adminUser.update({
-        where: { id: admin.id },
-        data: {
-          failedLoginAttempts: lock ? 0 : attempts,
-          lockedUntil: lock
-            ? addMinutes(now, this.config.env.ADMIN_LOCKOUT_MINUTES)
-            : admin.lockedUntil,
-        },
-      });
       await this.audit.record({
         actorType: 'admin',
         actorId: admin.id,
         actorLabel: admin.name,
-        action: lock ? 'admin.login.locked' : 'admin.login.failed',
+        action: slot.lockedNow ? 'admin.login.locked' : 'admin.login.failed',
         reason: passwordOk ? 'invalid_totp' : 'invalid_password',
         outcome: 'failure',
         ip: meta.ip,
         userAgent: meta.userAgent,
         requestId: meta.requestId,
-        metadata: { attempts },
+        metadata: { attempts: slot.attempts },
       });
-      throw new AppError('UNAUTHENTICATED', INVALID, lock ? { locked: true } : undefined);
+      throw new AppError('UNAUTHENTICATED', INVALID, slot.lockedNow ? { locked: true } : undefined);
     }
     await this.prisma.adminUser.update({
       where: { id: admin.id },
@@ -127,9 +129,62 @@ export class AdminAuthService {
       ip: meta.ip,
       userAgent: meta.userAgent,
       requestId: meta.requestId,
-      metadata: { familyId },
+      // Never the raw family id: it is the `sid` of the admin access token (audit readers must not learn it).
+      metadata: { sessionRef: sessionRef(familyId) },
     });
     return { ...tokens, admin: await this.profile(admin.id) };
+  }
+
+  private lockedError(lockedUntil: Date) {
+    return new AppError('FORBIDDEN', 'This admin account is temporarily locked after failed sign-ins', {
+      lockedUntil: lockedUntil.toISOString(),
+    });
+  }
+
+  /** One login attempt against an admin row (see login). The 5th attempt sets the lock and still gets checked. */
+  private reserveAdminAttempt(
+    adminId: string,
+    now: Date,
+  ): Promise<{ attempts: number; lockedUntil: Date | null; lockedNow: boolean }> {
+    const { ADMIN_LOGIN_MAX_ATTEMPTS: max, ADMIN_LOCKOUT_MINUTES: minutes } = this.config.env;
+    return this.prisma.tx(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM admin_users WHERE id = ${adminId}::uuid FOR UPDATE`;
+      const fresh = await tx.adminUser.findUniqueOrThrow({
+        where: { id: adminId },
+        select: { failedLoginAttempts: true, lockedUntil: true },
+      });
+      if (fresh.lockedUntil && fresh.lockedUntil > now) {
+        return { attempts: 0, lockedUntil: fresh.lockedUntil, lockedNow: false };
+      }
+      const attempts = fresh.failedLoginAttempts + 1;
+      const lockedUntil = attempts >= max ? addMinutes(now, minutes) : null;
+      await tx.adminUser.update({
+        where: { id: adminId },
+        data: lockedUntil
+          ? { failedLoginAttempts: 0, lockedUntil }
+          : { failedLoginAttempts: attempts, lockedUntil: null },
+      });
+      return { attempts, lockedUntil, lockedNow: lockedUntil !== null };
+    });
+  }
+
+  /** Same bookkeeping for an email with no active admin, kept in Redis per email hash (atomic INCR). */
+  private async reserveUnknownEmailAttempt(
+    emailHash: string,
+    now: Date,
+  ): Promise<{ lockedUntil: Date | null; lockedNow: boolean }> {
+    const { ADMIN_LOGIN_MAX_ATTEMPTS: max, ADMIN_LOCKOUT_MINUTES: minutes } = this.config.env;
+    const key = `gp:admin-login:unknown:${emailHash}`;
+    const lockKey = `${key}:locked-until`;
+    const locked = await this.redis.get(lockKey);
+    if (locked && new Date(locked) > now) return { lockedUntil: new Date(locked), lockedNow: false };
+    const attempts = await this.redis.incr(key);
+    if (attempts === 1) await this.redis.expire(key, 86_400);
+    if (attempts < max) return { lockedUntil: null, lockedNow: false };
+    const until = addMinutes(now, minutes);
+    await this.redis.set(lockKey, until.toISOString(), 'EX', minutes * 60);
+    await this.redis.del(key);
+    return { lockedUntil: until, lockedNow: true };
   }
 
   /** Rotate the refresh token. Re-using a rotated token revokes the whole family (token theft signal). */
@@ -147,7 +202,7 @@ export class AdminAuthService {
         actorId: row.adminUserId,
         action: 'admin.session.reuse_detected',
         targetType: 'session',
-        targetId: row.familyId,
+        targetId: sessionRef(row.familyId),
         outcome: 'failure',
         ip: meta.ip,
         requestId: meta.requestId,
@@ -157,6 +212,8 @@ export class AdminAuthService {
     if (row.revokedAt || (row.expiresAt && row.expiresAt <= new Date())) {
       throw new AppError('UNAUTHENTICATED', 'Session expired — sign in again');
     }
+    // Server-side idle timeout (ADM-01: 15 min) — a closed / restored tab cannot revive an idle session.
+    await this.assertNotIdle(row.familyId, row.adminUserId, row.lastSeenAt, meta);
     const rotated = await this.prisma.session.updateMany({
       where: { id: row.id, rotatedAt: null },
       data: { rotatedAt: new Date() },
@@ -185,17 +242,26 @@ export class AdminAuthService {
       throw new AppError('UNAUTHENTICATED', 'Admin session expired — sign in again');
     }
     if (claims.typ !== 'admin_access') throw new AppError('UNAUTHENTICATED', 'Invalid admin token');
+    const now = new Date();
     const live = await this.prisma.session.findFirst({
       where: {
         familyId: claims.sid,
         adminUserId: claims.sub,
         revokedAt: null,
         rotatedAt: null,
-        expiresAt: { gt: new Date() },
+        expiresAt: { gt: now },
       },
-      select: { id: true },
+      select: { id: true, lastSeenAt: true },
     });
     if (!live) throw new AppError('UNAUTHENTICATED', 'Admin session revoked — sign in again');
+    await this.assertNotIdle(claims.sid, claims.sub, live.lastSeenAt);
+    // Activity = authenticated admin requests (throttled write). Refresh rotation starts a new row at "now".
+    if (now.getTime() - live.lastSeenAt.getTime() > LAST_SEEN_WRITE_MS) {
+      await this.prisma.session.updateMany({
+        where: { id: live.id, lastSeenAt: { lt: now } },
+        data: { lastSeenAt: now },
+      });
+    }
     const profile = await this.profile(claims.sub);
     if (profile.status !== 'active')
       throw new AppError('UNAUTHENTICATED', 'Admin account disabled');
@@ -273,6 +339,31 @@ export class AdminAuthService {
       expiresIn: ttl,
       sessionExpiresAt: expiresAt.toISOString(),
     };
+  }
+
+  /** Revoke the family and refuse when the session saw no admin request for ADMIN_IDLE_TIMEOUT. */
+  private async assertNotIdle(
+    familyId: string,
+    adminId: string,
+    lastSeenAt: Date,
+    meta?: RequestMeta,
+  ): Promise<void> {
+    const idleMs = this.config.env.ADMIN_IDLE_TIMEOUT * 1000;
+    if (Date.now() - lastSeenAt.getTime() <= idleMs) return;
+    await this.revokeFamily(familyId, 'idle_timeout');
+    await this.audit.record({
+      actorType: 'system',
+      action: 'admin.session.idle_timeout',
+      targetType: 'session',
+      targetId: sessionRef(familyId),
+      outcome: 'failure',
+      ip: meta?.ip ?? null,
+      requestId: meta?.requestId ?? null,
+      metadata: { adminId, lastSeenAt: lastSeenAt.toISOString() },
+    });
+    throw new AppError('UNAUTHENTICATED', 'Admin session ended after inactivity — sign in again', {
+      reason: 'idle_timeout',
+    });
   }
 
   private async revokeFamily(familyId: string, reason: string) {

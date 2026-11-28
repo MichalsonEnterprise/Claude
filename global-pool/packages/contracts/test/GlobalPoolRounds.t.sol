@@ -316,31 +316,31 @@ contract GlobalPoolRoundsTest is RoundsTestBase {
         assertEq(rounds.getRound(ROUND_ID).cancelReason, compliance);
     }
 
-    function test_Cancel_ImpossibleOnceDrawRequestedOrFulfilled() public {
+    function test_Cancel_OnceDrawRequestedOnlyForVrfTimeout_ImpossibleOnceFulfilled() public {
         _toDrawRequested();
         uint16 operational = rounds.REASON_OPERATIONAL();
         uint16 thresholds = rounds.REASON_THRESHOLDS_NOT_MET();
         vm.startPrank(operator);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.DrawRequested
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.InvalidReasonCode.selector, operational));
         rounds.cancelRound(ROUND_ID, operational);
+        vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.InvalidReasonCode.selector, thresholds));
+        rounds.cancelRound(ROUND_ID, thresholds);
         vm.stopPrank();
 
         _fulfil(1);
+        uint16 vrfTimeout = rounds.REASON_VRF_TIMEOUT();
+        vm.warp(uint256(CLOSES_AT) + 30 days);
         vm.prank(operator);
         vm.expectRevert(
             abi.encodeWithSelector(
                 GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.Fulfilled
             )
         );
-        rounds.cancelRound(ROUND_ID, thresholds);
+        rounds.cancelRound(ROUND_ID, vrfTimeout);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    // requestDraw / re-request / fulfilment
+    // requestDraw (once) / VRF timeout / fulfilment
     // -----------------------------------------------------------------------------------------------------------------
 
     function test_RequestDraw_RevertsBeforeCommit() public {
@@ -351,66 +351,86 @@ contract GlobalPoolRoundsTest is RoundsTestBase {
         rounds.requestDraw(ROUND_ID);
     }
 
-    function test_RequestDraw_CannotRequestTwice() public {
+    function test_RequestDraw_NeverReRequested() public {
         _toDrawRequested();
-        uint256 retryAt = uint256(CLOSES_AT) + rounds.DRAW_REQUEST_TIMEOUT();
-        vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.DrawRequestPending.selector, ROUND_ID, retryAt));
-        rounds.requestDraw(ROUND_ID);
-        vm.warp(retryAt - 1);
-        vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.DrawRequestPending.selector, ROUND_ID, retryAt));
-        rounds.requestDraw(ROUND_ID);
-    }
-
-    function test_ReRequest_AfterTimeout_FirstFulfilmentWins() public {
-        uint256 first = _toDrawRequested();
-        vm.warp(uint256(CLOSES_AT) + rounds.DRAW_REQUEST_TIMEOUT());
-        vm.expectEmit(true, true, false, true, address(rounds));
-        emit GlobalPoolRounds.DrawRequested(
-            ROUND_ID,
-            first + 1,
-            2,
-            KEY_HASH,
-            subId,
-            REQUEST_CONFIRMATIONS,
-            CALLBACK_GAS_LIMIT,
-            ENTRIES_ROOT,
-            TOTAL_ENTRIES
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.DrawRequested
+            )
         );
-        uint256 second = rounds.requestDraw(ROUND_ID);
-        assertEq(second, first + 1);
+        rounds.requestDraw(ROUND_ID);
+        // Not even after the timeout: a second request would let a VRF operator pick between two outcomes.
+        vm.warp(uint256(CLOSES_AT) + 30 days);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.DrawRequested
+            )
+        );
+        rounds.requestDraw(ROUND_ID);
+        assertEq(rounds.getRound(ROUND_ID).drawAttempts, 1);
+    }
 
-        GlobalPoolRounds.Round memory r = rounds.getRound(ROUND_ID);
-        assertEq(r.drawAttempts, 2);
-        assertEq(r.lastRequestId, second);
-        assertEq(r.entriesRoot, ENTRIES_ROOT); // same committed entries
-        assertEq(r.totalEntries, TOTAL_ENTRIES);
+    function test_VrfTimeout_AnyoneCancelsOnlyAfterTimeout() public {
+        _toDrawRequested();
+        uint16 vrfTimeout = rounds.REASON_VRF_TIMEOUT();
+        uint256 cancellableAt = uint256(CLOSES_AT) + rounds.DRAW_REQUEST_TIMEOUT();
+        vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.DrawNotTimedOut.selector, ROUND_ID, cancellableAt));
+        rounds.cancelRound(ROUND_ID, vrfTimeout);
+        vm.warp(cancellableAt - 1);
+        vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.DrawNotTimedOut.selector, ROUND_ID, cancellableAt));
+        rounds.cancelRound(ROUND_ID, vrfTimeout);
 
-        // The late original request is still valid and fulfils first ...
-        _fulfilWith(first, 111);
-        assertEq(rounds.getRound(ROUND_ID).randomWord, 111);
-        assertEq(rounds.getRound(ROUND_ID).fulfilledRequestId, first);
-        uint256[] memory winners = rounds.computeWinners(ROUND_ID);
-
-        // ... and the re-request's fulfilment is ignored: no re-roll.
+        vm.warp(cancellableAt);
+        address keeper = makeAddr("anyKeeper");
         vm.expectEmit(true, true, false, true, address(rounds));
-        emit GlobalPoolRounds.FulfillmentIgnored(ROUND_ID, second);
-        _fulfilWith(second, 222);
-        assertEq(rounds.getRound(ROUND_ID).randomWord, 111);
-        assertEq(rounds.computeWinners(ROUND_ID), winners);
-    }
-
-    function test_ReRequest_NewRequestMayFulfilFirst() public {
-        uint256 first = _toDrawRequested();
-        vm.warp(uint256(CLOSES_AT) + 2 days);
-        uint256 second = rounds.requestDraw(ROUND_ID);
-        _fulfilWith(second, 333);
-        _fulfilWith(first, 444);
+        emit GlobalPoolRounds.RoundCancelled(ROUND_ID, vrfTimeout, GlobalPoolRounds.RoundStatus.DrawRequested, keeper);
+        vm.prank(keeper);
+        rounds.cancelRound(ROUND_ID, vrfTimeout);
         GlobalPoolRounds.Round memory r = rounds.getRound(ROUND_ID);
-        assertEq(r.randomWord, 333);
-        assertEq(r.fulfilledRequestId, second);
+        assertEq(uint8(r.status), uint8(GlobalPoolRounds.RoundStatus.Cancelled));
+        assertEq(r.cancelReason, vrfTimeout);
+        assertEq(r.randomWord, 0);
     }
 
-    function test_ReRequest_ImpossibleAfterFulfilment() public {
+    function test_VrfTimeout_LateFulfilmentIsIgnored() public {
+        uint256 requestId = _toDrawRequested();
+        vm.warp(uint256(CLOSES_AT) + rounds.DRAW_REQUEST_TIMEOUT());
+        rounds.cancelRound(ROUND_ID, rounds.REASON_VRF_TIMEOUT());
+        vm.expectEmit(true, true, false, true, address(rounds));
+        emit GlobalPoolRounds.FulfillmentIgnored(ROUND_ID, requestId);
+        _fulfilWith(requestId, 111);
+        GlobalPoolRounds.Round memory r = rounds.getRound(ROUND_ID);
+        assertEq(uint8(r.status), uint8(GlobalPoolRounds.RoundStatus.Cancelled));
+        assertEq(r.randomWord, 0);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.Cancelled
+            )
+        );
+        rounds.computeWinners(ROUND_ID);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.Cancelled
+            )
+        );
+        rounds.requestDraw(ROUND_ID);
+    }
+
+    function test_VrfTimeout_FulfilmentBeforeCancelIsFinal() public {
+        uint256 requestId = _toDrawRequested();
+        vm.warp(uint256(CLOSES_AT) + 2 days);
+        _fulfilWith(requestId, 333); // late, but before anyone cancelled: the draw stands
+        uint16 vrfTimeout = rounds.REASON_VRF_TIMEOUT();
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.Fulfilled
+            )
+        );
+        rounds.cancelRound(ROUND_ID, vrfTimeout);
+        assertEq(rounds.getRound(ROUND_ID).randomWord, 333);
+    }
+
+    function test_RequestDraw_ImpossibleAfterFulfilment() public {
         _toFulfilled();
         uint256 word = rounds.getRound(ROUND_ID).randomWord;
         vm.warp(uint256(CLOSES_AT) + 30 days);
@@ -544,12 +564,16 @@ contract GlobalPoolRoundsTest is RoundsTestBase {
         vm.expectRevert(abi.encodeWithSelector(GlobalPoolRounds.UntrustedCoordinator.selector, migrated));
         rounds.rawFulfillRandomWords(requestId, words);
 
+        // The draw stalls; it can never be re-requested, only cancelled with refunds once it timed out.
         vm.warp(uint256(CLOSES_AT) + 1 days);
         vm.expectRevert(
-            abi.encodeWithSelector(GlobalPoolRounds.CoordinatorMismatch.selector, migrated, address(coordinator))
+            abi.encodeWithSelector(
+                GlobalPoolRounds.InvalidStatus.selector, ROUND_ID, GlobalPoolRounds.RoundStatus.DrawRequested
+            )
         );
         rounds.requestDraw(ROUND_ID);
-        assertEq(uint8(_status(ROUND_ID)), uint8(GlobalPoolRounds.RoundStatus.DrawRequested));
+        rounds.cancelRound(ROUND_ID, rounds.REASON_VRF_TIMEOUT());
+        assertEq(uint8(_status(ROUND_ID)), uint8(GlobalPoolRounds.RoundStatus.Cancelled));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

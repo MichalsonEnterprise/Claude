@@ -128,14 +128,24 @@ describe('pool rules', () => {
     expect(meetsThreshold({ participants: 900, poolBalance: '49999.99' })).toBe(false);
   });
 
-  it('odds for 35 of 18,640 entries: ≈2.44% (sheet upper bound), exact ≈2.41%, 1st 0.188%', () => {
+  it('odds for 35 of 18,640 entries: ≈2.44% (sheet upper bound), exact ≈2.41%, 1st 0.187% (rounded down)', () => {
     const o = oddsDisclosure(35, 18640);
-    expect(o.anyPrizeApproxPercent).toBe('2.441');
-    expect(o.firstPrizePercent).toBe('0.188');
+    // exact 2.440987…% and 0.187768…% — rounded DOWN so the disclosed chance is never overstated
+    expect(o.anyPrizeApproxPercent).toBe('2.44');
+    expect(o.firstPrizePercent).toBe('0.187');
     expect(Number(o.anyPrizePercent)).toBeGreaterThan(2.4);
     expect(Number(o.anyPrizePercent)).toBeLessThan(2.44);
     expect(oddsDisclosure(18640, 18640).anyPrizePercent).toBe('100');
     expect(oddsDisclosure(0, 100).anyPrizePercent).toBe('0');
     expect(() => oddsDisclosure(5, 4)).toThrow(RangeError);
+  });
+
+  it('odds are rounded down, never up (R48)', () => {
+    // exact 66.666…% — half-up would disclose 66.667%
+    expect(oddsDisclosure(2, 3).firstPrizePercent).toBe('66.666');
+    // exact 0.0666…% — half-up would disclose 0.067%
+    expect(oddsDisclosure(1, 1500).firstPrizePercent).toBe('0.066');
+    expect(oddsDisclosure(1, 1500, 13, 6).firstPrizePercent).toBe('0.066666');
+    expect(oddsDisclosure(35, 18640, 13, 6).firstPrizePercent).toBe('0.187768');
   });
 });

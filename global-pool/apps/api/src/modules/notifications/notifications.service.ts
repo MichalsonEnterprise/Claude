@@ -9,6 +9,7 @@ import { EmailService } from '../email/email.service';
 export type NotificationType =
   | 'deposit.detected'
   | 'deposit.credited'
+  | 'deposit.held'
   | 'deposit.reversed'
   | 'withdrawal.requested'
   | 'withdrawal.under_review'

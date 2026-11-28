@@ -103,9 +103,9 @@ export interface OddsDisclosure {
 }
 
 /**
- * Odds disclosure for a player's entries. Assumes each prize is drawn from a distinct entry, uniformly from the
+ * Odds disclosure for a player's entries (percent strings rounded DOWN to `decimals`). Assumes each prize is drawn from a distinct entry, uniformly from the
  * entries remaining (the selection algorithm in apps/api must match this to keep the disclosure honest).
- * @example oddsDisclosure(35, 18640) // anyPrizePercent ≈ '2.41', anyPrizeApproxPercent '2.44', firstPrizePercent '0.188'
+ * @example oddsDisclosure(35, 18640) // anyPrizePercent ≈ '2.41', anyPrizeApproxPercent '2.44', firstPrizePercent '0.187'
  */
 export function oddsDisclosure(
   myEntries: number,
@@ -133,7 +133,10 @@ export function oddsDisclosure(
     }
     pNone = pNone.times(num).div(totalEntries - i);
   }
-  const pct = (x: MoneyInput) => money(x).times(100).toDecimalPlaces(decimals).toFixed();
+  // Rounded DOWN: a disclosed chance is never overstated (owner rule). Callers that round again for display
+  // should ask for more decimals (e.g. 6) so they never round an already rounded value.
+  const pct = (x: MoneyInput) =>
+    money(x).times(100).toDecimalPlaces(decimals, MoneyDecimal.ROUND_DOWN).toFixed();
   const total = totalEntries === 0 ? 1 : totalEntries;
   return {
     myEntries,

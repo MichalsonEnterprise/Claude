@@ -47,7 +47,7 @@ export class AccountStatusController {
         orderBy: { appliedAt: 'asc' },
         select: { id: true, type: true, appliedAt: true },
       }),
-      this.rg.activeSelfExclusion(user.id),
+      this.rg.exclusion(user.id),
       this.geo.checkRequest(req),
     ]);
     const declared = user.country
@@ -68,7 +68,7 @@ export class AccountStatusController {
       ? 'onboarding'
       : types.has('account_suspended')
         ? 'suspended'
-        : exclusion
+        : exclusion.active
           ? 'self_excluded'
           : !regionPermitted
             ? 'region'
@@ -84,23 +84,26 @@ export class AccountStatusController {
         gaming:
           types.has('account_suspended') ||
           types.has('gaming_blocked') ||
-          !!exclusion ||
+          exclusion.active ||
           !regionPermitted,
         deposits:
           types.has('account_suspended') ||
           types.has('deposits_blocked') ||
-          !!exclusion ||
+          exclusion.active ||
           !regionPermitted,
         // Withdrawals stay available while self-excluded or abroad (no obstruction); only AML freezes pause them.
         withdrawals: types.has('withdrawals_frozen'),
       },
-      selfExclusion: exclusion
-        ? {
-            active: true,
-            startsAt: exclusion.startsAt.toISOString(),
-            endsAt: exclusion.endsAt?.toISOString() ?? null,
-          }
-        : { active: false, startsAt: null, endsAt: null },
+      // `kind` tells a short break (cooling_off) from a self-exclusion; `reopen` is set once a long self-exclusion's
+      // period is over but the account has not been reopened yet (nothing reopens automatically).
+      selfExclusion: {
+        active: exclusion.active,
+        kind: exclusion.kind,
+        duration: exclusion.duration,
+        startsAt: exclusion.startsAt,
+        endsAt: exclusion.endsAt,
+        reopen: exclusion.reopen ?? null,
+      },
       region: {
         current: region.country
           ? { code: region.country, name: region.countryName, permitted: region.permitted }

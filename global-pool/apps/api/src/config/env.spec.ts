@@ -35,6 +35,54 @@ describe('config validation', () => {
   });
 });
 
+describe('placeholder secrets (R04)', () => {
+  // The committed .env.example values: public, so anyone could forge step-up / admin tokens with them.
+  const example = {
+    JWT_ACCESS_SECRET: 'dev-only-change-me-access-secret-at-least-32-chars',
+    JWT_REFRESH_SECRET: 'dev-only-change-me-refresh-secret-at-least-32-chars',
+    ADMIN_JWT_ACCESS_SECRET: 'dev-only-change-me-admin-access-secret-32-chars',
+    ADMIN_JWT_REFRESH_SECRET: 'dev-only-change-me-admin-refresh-secret-32-chars',
+    TOTP_ENCRYPTION_KEY: 'ZGV2LW9ubHktdG90cC1rZXktMzItYnl0ZXMtbG9uZyE=',
+  };
+
+  it('accepts the .env.example placeholders in development and test', () => {
+    expect(parseEnv({ ...base, ...example, NODE_ENV: 'development' }).JWT_ACCESS_SECRET).toBe(
+      example.JWT_ACCESS_SECRET,
+    );
+    expect(() => parseEnv({ ...base, ...example, NODE_ENV: 'test' })).not.toThrow();
+  });
+
+  it('refuses to boot in production with any .env.example placeholder secret', () => {
+    for (const [name, value] of Object.entries(example)) {
+      expect(() => parseEnv({ ...base, NODE_ENV: 'production', [name]: value })).toThrow(
+        new RegExp(`${name}: the committed placeholder`),
+      );
+    }
+    // Any other 'dev-only' / 'change-me' value, raw or inside a base64 key, is refused as well.
+    expect(() =>
+      parseEnv({ ...base, NODE_ENV: 'production', JWT_ACCESS_SECRET: 'x'.repeat(24) + 'CHANGE-ME!' }),
+    ).toThrow(/JWT_ACCESS_SECRET/);
+    expect(() =>
+      parseEnv({
+        ...base,
+        NODE_ENV: 'production',
+        ENTRY_SALT_ENCRYPTION_KEY: Buffer.from('dev-only-salt-key-32-bytes-long!').toString('base64'),
+      }),
+    ).toThrow(/ENTRY_SALT_ENCRYPTION_KEY/);
+    // Fresh random secrets boot fine.
+    expect(parseEnv({ ...base, NODE_ENV: 'production' }).NODE_ENV).toBe('production');
+  });
+
+  it('never echoes the refused secret value', () => {
+    try {
+      parseEnv({ ...base, NODE_ENV: 'production', ...example });
+      expect.unreachable();
+    } catch (err) {
+      expect(String(err)).not.toContain(example.ADMIN_JWT_ACCESS_SECRET);
+    }
+  });
+});
+
 describe('on-chain configuration (testnet only)', () => {
   const key = `0x${'ab'.repeat(32)}`;
   const chain = {
@@ -72,6 +120,13 @@ describe('on-chain configuration (testnet only)', () => {
       /WITHDRAWAL_SIGNER_PRIVATE_KEY/,
     );
     expect(() => parseEnv({ ...base, MAIL_TRANSPORT: 'smtp' })).toThrow(/SMTP_HOST/);
+  });
+
+  it('refuses RANDOMNESS_PROVIDER=chainlink without the on-chain mirror (rounds could never be drawn) (R10)', () => {
+    expect(() =>
+      parseEnv({ ...base, ...chain, RANDOMNESS_PROVIDER: 'chainlink', POOL_ONCHAIN_MIRROR: 'false' }),
+    ).toThrow(/RANDOMNESS_PROVIDER=chainlink requires POOL_ONCHAIN_MIRROR=true/);
+    expect(parseEnv({ ...base, RANDOMNESS_PROVIDER: 'mock' }).RANDOMNESS_PROVIDER).toBe('mock');
   });
 });
 

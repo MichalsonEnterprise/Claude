@@ -117,6 +117,83 @@ describe('GET /pool/me/entries', () => {
   });
 });
 
+describe('GET /pool/me/entries — results are scoped to each purchase (R16)', () => {
+  it('two purchases in one cancelled round each show only their own refund', async () => {
+    const p = await newPlayer(t);
+    await demoDeposit(t, p, '500.00');
+    const round = await openRound(t); // default thresholds → cancelled at close
+    await enter(p.token, round.id, 35);
+    await enter(p.token, round.id, 10);
+    await lifecycle.close(round.id);
+    expect(await lifecycle.startDraw(round.id)).toBe('cancelled');
+
+    const res = await t.http().get('/pool/me/entries').set(bearer(p.token)).expect(200);
+    const rows = (res.body.items as HistoryItem[]).filter((i) => i.roundNumber === round.number);
+    expect(rows.map((r) => [r.entries, r.result.kind, r.result.refund]).sort()).toEqual([
+      [10, 'refund_owed', '100.00'],
+      [35, 'refund_owed', '350.00'],
+    ]);
+    expect(res.body.summary.refundOwed).toBe('450.00');
+  });
+
+  it('a win is shown only on the purchase whose entry won', async () => {
+    const p = await newPlayer(t);
+    const other = await newPlayer(t);
+    await demoDeposit(t, p, '500.00');
+    await demoDeposit(t, other, '500.00');
+    const round = await openRound(t, { minParticipants: 2, minPool: '50.00' });
+    await enter(p.token, round.id, 1);
+    await enter(p.token, round.id, 3);
+    await enter(other.token, round.id, 10);
+    await lifecycle.close(round.id);
+    expect(await lifecycle.startDraw(round.id)).toBe('drawing');
+    expect(await lifecycle.pollAndSettle(round.id)).toBe('settled');
+
+    const res = await t.http().get('/pool/me/entries').set(bearer(p.token)).expect(200);
+    const rows = (
+      res.body.items as (HistoryItem & { firstEntryId: string; lastEntryId: string })[]
+    ).filter((i) => i.roundNumber === round.number);
+    expect(rows).toHaveLength(2);
+    const winners = await t.prisma.winner.findMany({
+      where: { roundId: round.id, userId: p.userId },
+      include: { entry: { select: { code: true, transactionId: true } } },
+    });
+    const purchases = await t.prisma.transaction.findMany({
+      where: { roundId: round.id, userId: p.userId, type: 'entry_purchase' },
+    });
+    let prizeSum = 0n;
+    for (const row of rows) {
+      const tx = purchases.find((x) => x.reference === row.reference)!;
+      const own = winners.filter((w) => w.entry?.transactionId === tx.id);
+      expect([...row.result.winningEntryIds].sort()).toEqual(own.map((w) => w.entry!.code).sort());
+      expect(row.result.kind).toBe(own.length > 0 ? 'won' : 'not_selected');
+      if (row.result.prize) prizeSum += BigInt(row.result.prize.replace('.', ''));
+    }
+    // Σ of the per-purchase prizes equals the player's prizes in the round (no row repeats another's prize)
+    const total = winners.reduce((a, w) => a + BigInt(w.amount.toFixed(2).replace('.', '')), 0n);
+    expect(prizeSum).toBe(total);
+  });
+});
+
+describe('GET /pool/rounds/:roundId/my-entries odds (R48)', () => {
+  it('discloses odds rounded DOWN with 6 decimals', async () => {
+    const p = await newPlayer(t);
+    const other = await newPlayer(t);
+    await demoDeposit(t, p, '100.00');
+    await demoDeposit(t, other, '100.00');
+    const round = await openRound(t);
+    await enter(p.token, round.id, 2);
+    await enter(other.token, round.id, 1);
+    const res = await t
+      .http()
+      .get(`/pool/rounds/${round.id}/my-entries`)
+      .set(bearer(p.token))
+      .expect(200);
+    // 2 of 3 entries: exact 66.666…% — half-up would overstate it as 66.667%
+    expect(res.body.odds.firstPrizePercent).toBe('66.666666');
+  });
+});
+
 describe('GET /pool/rounds filters', () => {
   it('filters by status and by round number; rejects unknown statuses', async () => {
     const p = await newPlayer(t);

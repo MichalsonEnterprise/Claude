@@ -141,18 +141,20 @@ export class TotpService {
     return outcome;
   }
 
-  /** Low-level check with replay protection + lockout bookkeeping. Never throws for a wrong code. */
+  /**
+   * Low-level check with replay protection + lockout bookkeeping. Never throws for a wrong code or a locked factor:
+   * a locked factor comes back as `{ ok: false, lockedUntil }` (callers that surface it use `throwInvalid`).
+   */
   async verifyRow(
     row: TotpSecret,
     code: string,
     options: { allowBackup: boolean },
   ): Promise<VerifyOutcome> {
-    const { STEP_UP_MAX_ATTEMPTS: max, STEP_UP_LOCK_MINUTES: lockMinutes } = this.config.env;
+    const { STEP_UP_MAX_ATTEMPTS: max } = this.config.env;
     const now = new Date();
-    if (row.lockedUntil && row.lockedUntil > now) {
-      throw new AppError('STEP_UP_LOCKED', 'Too many incorrect codes — try again later', {
-        lockedUntil: row.lockedUntil.toISOString(),
-      });
+    const slot = await this.reserveAttempt(row.id, now);
+    if (slot.lockedUntil && !slot.lockedNow) {
+      return { ok: false, method: null, attemptsRemaining: 0, lockedUntil: slot.lockedUntil };
     }
     const trimmed = code.trim();
     let method: VerifyOutcome['method'] = null;
@@ -195,18 +197,45 @@ export class TotpService {
     }
     if (method) return { ok: true, method, attemptsRemaining: max, lockedUntil: null };
 
-    const failed = row.failedAttempts + 1;
-    const lockedUntil = failed >= max ? addMinutes(now, lockMinutes) : null;
-    await this.prisma.totpSecret.update({
-      where: { id: row.id },
-      data: { failedAttempts: lockedUntil ? 0 : failed, lockedUntil },
-    });
+    // The failure was already counted by the reservation (and a lock, if this was the last attempt).
     return {
       ok: false,
       method: null,
-      attemptsRemaining: lockedUntil ? 0 : max - failed,
-      lockedUntil,
+      attemptsRemaining: slot.lockedNow ? 0 : Math.max(0, max - slot.attempts),
+      lockedUntil: slot.lockedNow ? slot.lockedUntil : null,
     };
+  }
+
+  /**
+   * Count one attempt BEFORE the code is checked, under a row lock on the fresh row: concurrent guesses each take
+   * their own slot, the lock lands on the STEP_UP_MAX_ATTEMPTS-th slot, nothing is checked while a lock is active,
+   * and a slow request can never clear a lock another request set (no stale read-modify-write). A correct code
+   * resets the counter afterwards.
+   */
+  private reserveAttempt(
+    id: string,
+    now: Date,
+  ): Promise<{ attempts: number; lockedUntil: Date | null; lockedNow: boolean }> {
+    const { STEP_UP_MAX_ATTEMPTS: max, STEP_UP_LOCK_MINUTES: lockMinutes } = this.config.env;
+    return this.prisma.tx(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM totp_secrets WHERE id = ${id}::uuid FOR UPDATE`;
+      const fresh = await tx.totpSecret.findUniqueOrThrow({
+        where: { id },
+        select: { failedAttempts: true, lockedUntil: true },
+      });
+      if (fresh.lockedUntil && fresh.lockedUntil > now) {
+        return { attempts: 0, lockedUntil: fresh.lockedUntil, lockedNow: false };
+      }
+      const attempts = fresh.failedAttempts + 1;
+      const lockedUntil = attempts >= max ? addMinutes(now, lockMinutes) : null;
+      await tx.totpSecret.update({
+        where: { id },
+        data: lockedUntil
+          ? { failedAttempts: 0, lockedUntil }
+          : { failedAttempts: attempts, lockedUntil: null },
+      });
+      return { attempts, lockedUntil, lockedNow: lockedUntil !== null };
+    });
   }
 
   private throwInvalid(outcome: VerifyOutcome): never {

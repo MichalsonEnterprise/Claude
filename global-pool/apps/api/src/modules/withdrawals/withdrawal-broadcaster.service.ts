@@ -21,6 +21,11 @@ const TOKEN_ABI: Abi = [
   ]),
 ];
 
+/** The hot wallet cannot cover a transfer once in-flight transfers are reserved (the withdrawal stays queued). */
+class HotWalletShortError extends Error {
+  override readonly name = 'HotWalletShortError';
+}
+
 export interface TrackSummary {
   confirmed: number;
   failed: number;
@@ -35,7 +40,8 @@ export interface TrackSummary {
  * the withdrawal to `broadcast` with its tx hash) → broadcast → track: mined with WITHDRAWAL_CONFIRMATIONS →
  * `confirmed` (ledger LOCKED → CHAIN_CLEARING + network fee); reverted / dropped → `failed` and the full amount goes
  * back to Available. A transfer whose simulation reverts never gets a nonce and fails from `queued` (funds back).
- * Missing liquidity or an unreachable RPC keeps the withdrawal queued (retried; never silently failed).
+ * Missing liquidity (balance minus the transfers already signed but not mined yet, checked under the signer's nonce
+ * lock) or an unreachable RPC keeps the withdrawal queued (retried; never silently failed).
  * Nonces come from the DB-backed manager in ChainSignerService (safe across processes and restarts).
  */
 @Injectable()
@@ -78,14 +84,19 @@ export class WithdrawalBroadcasterService {
 
     try {
       const client = await this.signer.client();
-      const [balance, gasBalance] = await Promise.all([
+      // Balance and nonce of the hot wallet at ONE block: transfers we signed with a nonce ≥ that block's nonce are
+      // not reflected in that balance yet (still in flight), so they are subtracted under the signer's nonce lock.
+      const block = await client.getBlockNumber();
+      const [balance, gasBalance, minedNonce] = await Promise.all([
         client.readContract({
           address: token,
           abi: erc20Abi,
           functionName: 'balanceOf',
           args: [hot],
+          blockNumber: block,
         }),
-        client.getBalance({ address: hot }),
+        client.getBalance({ address: hot, blockNumber: block }),
+        client.getTransactionCount({ address: hot, blockNumber: block }),
       ]);
       if (balance < units || gasBalance === 0n) {
         this.logger.warn(
@@ -104,9 +115,16 @@ export class WithdrawalBroadcasterService {
         purpose: 'withdrawal',
         refId: w.id,
         abi: TOKEN_ABI,
-        onStored: (tx, row) => this.markBroadcast(tx, w.id, row),
+        onStored: async (tx, row) => {
+          await this.assertLiquidity(tx, w.number, row, balance, minedNonce, units);
+          await this.markBroadcast(tx, w.id, row);
+        },
       });
     } catch (err) {
+      if (err instanceof HotWalletShortError) {
+        this.logger.warn(`ALERT WD-${w.number}: ${err.message} — withdrawal stays queued`);
+        return (await this.prisma.withdrawal.findUniqueOrThrow({ where: { id } })).status;
+      }
       if (err instanceof ChainRevertError) {
         await this.failWithdrawal(w.id, `transfer would revert (${err.message})`);
         return 'failed';
@@ -116,6 +134,46 @@ export class WithdrawalBroadcasterService {
       return (await this.prisma.withdrawal.findUniqueOrThrow({ where: { id } })).status;
     }
     return (await this.prisma.withdrawal.findUniqueOrThrow({ where: { id } })).status;
+  }
+
+  /**
+   * Inside the outbox transaction, i.e. under the signer's nonce row lock (sends from the hot wallet are serialised):
+   * the balance read at `block` minus every withdrawal transfer we signed that is not mined at that block (nonce ≥
+   * `minedNonce`, not dropped / reverted) must still cover this transfer. Otherwise nothing is stored or sent — the
+   * withdrawal stays queued instead of reverting on-chain later (concurrent broadcasts, worker concurrency 4).
+   */
+  private async assertLiquidity(
+    tx: Tx,
+    number: number,
+    row: ChainTransaction,
+    balance: bigint,
+    minedNonce: number,
+    units: bigint,
+  ): Promise<void> {
+    const inFlight = await tx.chainTransaction.findMany({
+      where: {
+        purpose: 'withdrawal',
+        chainId: row.chainId,
+        fromAddress: row.fromAddress,
+        status: { in: ['signed', 'broadcast', 'mined'] },
+        nonce: { gte: minedNonce },
+        id: { not: row.id },
+      },
+      select: { refId: true },
+    });
+    const ids = inFlight.map((r) => r.refId).filter((r): r is string => Boolean(r));
+    const pending = ids.length
+      ? await tx.withdrawal.aggregate({ where: { id: { in: ids } }, _sum: { netAmount: true } })
+      : null;
+    const reserved = toBaseUnits(
+      pending?._sum.netAmount?.toFixed() ?? '0',
+      CHAINS.arbitrum.usdtDecimals,
+    );
+    if (balance - reserved < units) {
+      throw new HotWalletShortError(
+        `hot wallet holds ${balance} base units, ${reserved} already reserved by ${ids.length} unmined withdrawal(s); WD-${number} needs ${units}`,
+      );
+    }
   }
 
   /** Inside the outbox transaction: queued → broadcast with the (deterministic) tx hash. */

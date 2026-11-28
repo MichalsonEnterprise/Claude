@@ -1,0 +1,96 @@
+[
+  {
+    "key": "kit",
+    "report": "KEY kit is finished. The shared games kit, the games lobby and catalogue, the game details page and Pool Dice are built and checked against a running API, using a production build plus my own API instance on port 4212. All of it uses DEMO credits only. They are labelled \"DEMO credits · no cash value\" on every surface, every bet panel shows \"Fees 0.00\" and \"You can lose your stake\", and nothing touches USDT. The e2e test checks that the USDT wallet balances are unchanged after play, and that the server refuses a bet with currency USDT (403 REAL_MONEY_DISABLED).\n\n**What I built**\n- Data layer: `/home/user/Claude/global-pool/apps/web/src/lib/api/games.ts`. Wrappers over `apiRequest()` with TanStack hooks for:\n  - the catalogue and one game;\n  - DEMO credits and reset;\n  - seeds, rotate and change client seed;\n  - placing bets (the caller owns the idempotency key);\n  - bet history and the verify bundle.\n  - It also has `applySettledBet`, `playInfoOf` and `classifyGameError`, which turns any API error into a UI state.\n- Games kit: `/home/user/Claude/global-pool/apps/web/src/components/games/kit/*` (barrel `index.ts`).\n  - `GameLayout` is the whole game screen in the casino style with the collapsed sidebar. It holds the header, the [bet panel | stage] card, the GM-01 session bar, the lower columns, the licence line and the mobile sticky bet bar. Blocking states sit over a dimmed, inert stage.\n  - `useGameGate` mirrors the server's gaming policy: guest, onboarding, region, self-excluded, blocked, time limit, loss limit, offline.\n  - `useBetRunner` uses one idempotency key per intent. After a network or 5xx failure it retries with the same key, so the server replays the stored result instead of charging twice. It holds the reality check while a bet is in flight.\n  - Bet panel parts: `BetPanel` (Manual/Auto), `BetAmountField` (½ · 2× · Min · Max; Max never goes above the balance), `BeforeYouBet` (shows Fees 0.00 DEMO).\n  - Auto-play: `AutoPlayPanel` + `useAutoPlay` with the pure rules in `autoplay.ts`. It needs a stop-loss and an unticked confirmation, keeps the stake constant, and stops at the stop-loss, profit target or count, on an error, on a reality check, or when the tab is hidden.\n  - `DemoCreditsChip` (balance + reset dialog), `GameSessionBar` (normal / approaching / reached; popover on desktop, compact strip + bottom sheet on mobile), `SeedDisplay` + `SeedsDialog`.\n  - `VerifyDrawer` re-derives the bet in the browser with `verifyBet()` from `@gp/shared/fair`. It has \"Rotate seeds & reveal\" for a still-secret seed, editable seeds that show the mismatch state, and HMAC block 0.\n  - Also `BetHistory`, `RecentResults`, `ResultBanner`, `HowItWorksCard`, `MoreGamesRail`, `GameNotice` / `PromptCard` / `PanelNotice` / `GameSkeleton`, `MobileBetBar`, `useReducedMotion`, and `registry.ts` (play screens, routes, motion durations from `@gp/tokens`, fixed copy).\n- Lobby: `components/games/lobby/*`.\n  - `GamesLobby` (PUB-03 + GM-02): banner, category tabs with counts, debounced search, filter chips, sort, Global Pool spotlight with live round data, a DEMO-credits card, sections (grid; on mobile, originals as 2 columns + \"Show all\", other sections as swipe rails), filters bottom sheet, empty state that lists matches in other categories, restricted state with a dev preview at `?state=restricted`.\n  - `GameDetails` (PUB-04): payout tables are computed with `@gp/shared/fair`, not typed by hand.\n  - `tile-art.tsx`: concrete-object art for the 17 titles without existing art.\n- Pool Dice: `components/games/dice/*`.\n  - `dice-math.ts` uses integer hundredths and the server's own multiplier function.\n  - `DiceSlider` is a keyboard slider: arrows ±1.00, Shift ±0.01, PageUp/PageDown ±10.00, Home/End to the limits.\n  - `DiceStage`: the roll marker eases to the real result in 800 ms, and shows it instantly under reduced motion.\n  - `DiceGame`: linked target / win chance / multiplier inputs, Space to roll, auto-play, verify, history, seeds, and every DI-07 state.\n- Routes, all under `apps/web/src/app/(app)/games/`: `page.tsx`, `pool-dice/page.tsx`, `[slug]/page.tsx`, `[slug]/details/page.tsx`.\n- Tests and QA:\n  - `apps/web/test/games-kit.test.ts`: 21 unit tests.\n  - `apps/web/e2e/games-kit.spec.ts`.\n  - `apps/web/scripts/games-kit-qa.mjs`: 19 screens × 1440/390; fails on horizontal overflow or console errors.\n- Docs: a \"Games kit (P1)\" section plus a lobby/details/dice subsection in `/home/user/Claude/global-pool/docs/WEB_COMPONENTS.md`.\n\n**Shared files changed (additive)**\n- `shell/shell-overrides.tsx` + `shell/app-shell.tsx`: a `collapseSidebar` override. The burger expands the sidebar for that visit only; the saved preference is not touched.\n- `rg-history/reality-check.tsx`: `holdRealityCheck()` and `requestRealityCheck()`. The host does not open the reminder while a bet is in flight.\n- `domain/game-tile.tsx`: new props `art`, `gradient` and `comingSoon`, and the `game` type now accepts any slug. This also fixes a latent crash: the account dashboard was passing slugs without art.\n- `account/dashboard/sections.tsx`: I removed the one cast my type change made unnecessary, so lint stays green.\n\n**Checks I ran**\n- `pnpm --filter @gp/shared test`: PASS, 9 files, 138 tests.\n- `pnpm --filter @gp/web typecheck`: PASS.\n- `pnpm --filter @gp/web lint`: PASS.\n- `pnpm --filter @gp/web test`: PASS, 11 files, 118 tests (21 of them mine).\n- API: not touched, so its tests were not run.\n- `flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-kit NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4212 NEXT_PUBLIC_STATE_PREVIEW=true pnpm --filter @gp/web build`: EXIT 0. Route sizes: `/games` 21.4 kB, `/games/pool-dice` 9.55 kB, plus `/games/[slug]` and `/games/[slug]/details`. The `sections.tsx` cast removal came after this build; it is a type-only change.\n- `BASE_URL=http://localhost:3112 API_URL=http://localhost:4212 node scripts/games-kit-qa.mjs` against the production build: 38 screenshots in `apps/web/test-results/visual/games/kit/`, no overflow, no console errors.\n- `E2E_BASE_URL=http://localhost:3112 E2E_API_URL=http://localhost:4212 pnpm --filter @gp/web exec playwright test e2e/games-kit.spec.ts`: passed twice against the production build (8.6 s, 9.1 s) and once against dev. It covers:\n  - lobby → Pool Dice tile;\n  - DEMO label, Fees 0.00, \"You can lose your stake\";\n  - slider keyboard;\n  - auto-play confirmation unticked and Start disabled;\n  - a roll with balance = 1,000.00 ± net, and the USDT wallet unchanged;\n  - My rolls and the verify drawer (secret seed → rotate & reveal → verified in the browser → edited seed shows a mismatch → restore);\n  - a dropped response replayed with the same key, giving exactly one bet;\n  - 3 auto-play rolls, all with stake 10.00;\n  - details page with Play (DEMO credits);\n  - `/games/skyline` showing \"Play screen coming soon\";\n  - 403 REAL_MONEY_DISABLED for a USDT bet.\n- Figma: 3 screenshots (PUB-03 1440, GM-02 1440, PUB-03 390), saved in `/home/user/Claude/design/reference/games/`. I also used the engine agent's GM-03 and GM-05 renders. The DI and PUB-04 frames are not built in Figma, so I followed the prepared scripts in `pending/g-dice` and `pending/pub-04`.\n\n**Deviations from the design**\n1. Games show DEMO credits, not the USDT amounts in the frames (owner instruction).\n2. Game pages use the collapsed sidebar. The DI scripts used the expanded one at 1440; the GM frames use collapsed.\n3. Insufficient balance offers \"Bet X instead\" and \"Reset DEMO credits\" instead of \"Deposit USDT\", because DEMO credits cannot be bought.\n4. Multipliers are truncated, so under 50.50 shows 1.9603× (Figma 1.9604×). Win chance reads 0.01–98% and Twenty-One's minimum bet reads 1.00, following the engine.\n5. Left out because they would be invented data: the lobby's weekly tournament banner (replaced by a DEMO-credits card), the details page's \"last 1,000 rolls\" stats, and DI-05's all-player result histogram. DI-05 also has no CSV export button.\n6. The region notice keeps the design's \"please don't use a VPN or proxy\" line, as the auth module does. It gives no bypass hints.\n7. The details page also lives at `/games/<slug>/details`, because static play routes take priority over `/games/[slug]`.\n8. The kit sends the RG activity heartbeat after a settled bet, at most once a minute, so the session starts with the first bet.\n\n**Things to flag to other owners**\n- The rg-history reality-check card shows the session's net result in USDT from the RG session, not in DEMO credits.\n- `lib/fairness/dice.ts` (homepage and PUB-07 teaser) uses a different dice algorithm from `@gp/shared/fair`.\n- In production, the sidebar prefetches `/vip` and `/winners`, which return 404 and stop Playwright's `networkidle` from settling. My QA script works around it.\n- `apps/api/.dist-kit` was my temporary compiled API. An orchestrator commit picked it up (330 files); I deleted it, so the deletion needs committing, and `.dist-*` should be gitignored.\n\n**Cleanup**\n- Both servers I started (3112, 4212) are stopped.\n- `.next-kit` is removed and the tsconfig include line is reverted.\n- `next-env.d.ts` was changed by another agent (`.next-co-api-b`); I left it.\n\n**Memory**\nI used the stored GLOBAL POOL Figma note only for the file key and the visual direction. No note asked for any action, and nothing new needs saving.",
+    "implemented": [
+      {
+        "id": "PUB-03",
+        "status": "IMPLEMENTED",
+        "note": "/games lobby checked by screenshot at 1440 and 390: default, search with empty result and matches in other categories, Table category, restricted dev preview; the 390 filters bottom sheet is built but not screenshotted. The tournament banner is replaced by a DEMO-credits card, because there is no tournament backend. 1280 and 768 are responsive but not screenshotted."
+      },
+      {
+        "id": "GM-02",
+        "status": "IMPLEMENTED",
+        "note": "Catalogue tiles for all 33 titles in Originals, Table, Slots, Live and Draws & bingo. Only games with an engine and a play screen can be played; the rest show an honest 'Soon' tag, 'Coming soon · Details' on hover and in the accessible name. Default, category view and restricted checked at 1440 and 390."
+      },
+      {
+        "id": "PUB-04",
+        "status": "IMPLEMENTED",
+        "note": "Details page at /games/<slug>/details, and at /games/<slug> for games without a play screen. Screenshotted for pool-dice, Neon Koi (no engine) and Skyline (engine, no play screen). Copy exists for Roulette, Crash, Double Side, Twenty-One and Global Pool, but those pages are not screenshotted; payout tables are computed and unit-tested for dice and roulette."
+      },
+      {
+        "id": "GM-01",
+        "status": "PARTIAL",
+        "note": "Session bar (session time, net in DEMO credits, loss-limit meter, 18+, RG, Take a break, details popover or mobile sheet) and the reached state are verified. The approaching state is not screenshotted. The reality-check hold between bets is wired in, but not exercised end to end, because the shortest reminder interval is 15 minutes."
+      },
+      {
+        "id": "DI-01",
+        "status": "IMPLEMENTED",
+        "note": "Default and guest states at 1440 and 390. 768 not screenshotted."
+      },
+      {
+        "id": "DI-02",
+        "status": "IMPLEMENTED",
+        "note": "Linked target / chance / multiplier inputs, over/under, keyboard slider (tested in e2e), out-of-range state screenshotted. The 'dragging' tooltip state is not screenshotted."
+      },
+      {
+        "id": "DI-03",
+        "status": "PARTIAL",
+        "note": "The rolling phase (stake locked, controls disabled, marker easing to the real result in 800 ms) is built. Screenshots run with reduced motion, so the animation itself is not visually verified; the reconnecting state, which shows the locked stake, is verified."
+      },
+      {
+        "id": "DI-04",
+        "status": "IMPLEMENTED",
+        "note": "Win and lose result banners from the server's settled bet, at 1440 and 390, and checked in e2e."
+      },
+      {
+        "id": "DI-05",
+        "status": "PARTIAL",
+        "note": "KPIs, All/Wins/Losses filter, table at 1440, cards at 390, pagination and Verify per row are verified. Not built: the all-players histogram (no API for it, and showing one would mean invented data) and the CSV export button."
+      },
+      {
+        "id": "DI-06",
+        "status": "IMPLEMENTED",
+        "note": "Verify drawer: verified state and mismatch state, re-derived in the browser with @gp/shared/fair. Covered by e2e and screenshots at 1440 and 390."
+      },
+      {
+        "id": "DI-07",
+        "status": "IMPLEMENTED",
+        "note": "Connection lost / reconnecting, insufficient DEMO credits, bet above max, out of range, loss limit, self-excluded (cooling-off) and region all screenshotted at 1440 and 390. The region state is a UI preview built by mocking the account-status response. The loading skeleton is built but not screenshotted."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/shared test → PASS (9 files, 138 tests)",
+      "pnpm --filter @gp/web typecheck → PASS",
+      "pnpm --filter @gp/web lint → PASS (after dropping the cast in account/dashboard/sections.tsx that the widened GameTile type made unnecessary)",
+      "pnpm --filter @gp/web test → PASS (11 files, 118 tests; test/games-kit.test.ts has 21)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-kit NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4212 NEXT_PUBLIC_STATE_PREVIEW=true pnpm --filter @gp/web build → EXIT 0",
+      "node scripts/games-kit-qa.mjs against the production build → 38 screenshots in apps/web/test-results/visual/games/kit/, no overflow, no console errors",
+      "playwright e2e/games-kit.spec.ts → passed twice against the production build and once against dev: lobby, roll, USDT wallet unchanged, verify drawer with mismatch, replay with the same idempotency key, auto-play with constant stake, details page, 403 REAL_MONEY_DISABLED",
+      "API not touched, so its typecheck, lint and tests were not run"
+    ],
+    "failing": [],
+    "decisions": [
+      "Routes: static play routes (/games/pool-dice and the other game agents' pages) take priority over /games/[slug]. So /games/[slug] is the details page only for games without a play screen, and /games/<slug>/details is the details page for every game. Slugs with a play screen are listed in kit/registry.ts PLAY_SCREENS (pool-dice, double-side, pool-roulette, orbit-rush, twenty-one).",
+      "'Playable' means an engine plus a play screen. Engine games without a play screen (Skyline, Fortune Ring, Keno, Pinfall, Vault Sweeper, High Card) and titles without an engine show an honest 'Coming soon'.",
+      "Game pages use a collapsed sidebar through a new ShellOverride collapseSidebar option. The burger expands it for that visit only.",
+      "DEMO credits everywhere instead of USDT (owner instruction). Insufficient balance offers 'Bet X instead' and 'Reset DEMO credits', never a deposit.",
+      "Network failures are retried with the same idempotency key, so the server replays the stored result and never charges twice. Refusals (limits, balance, self-exclusion) are never retried.",
+      "Auto-play rules: stop-loss required, confirmation unticked, constant stake, and it stops before any bet that could pass the stop-loss.",
+      "Invented data is left out: tournament banner, 'last 1,000 rolls' stats, all-player histogram.",
+      "The roll animation interpolates from the previous value to the real server result; no near-miss stops.",
+      "The kit sends POST /responsible-gaming/session/heartbeat after a settled bet, at most once a minute, so the RG session starts with the first bet.",
+      "The region notice keeps the design's 'please don't use a VPN or proxy' line, as the auth module does; it gives no bypass hint."
+    ],
+    "next": [
+      "Orchestrator: commit the deletion of global-pool/apps/api/.dist-kit (330 files that an earlier commit picked up) and add .dist-* to .gitignore.",
+      "Other game agents (dice-coinflip, roulette, crash, blackjack): build on GameLayout, useGameGate, useBetRunner and the kit parts. Stateful games should call holdRealityCheck() from deal to settle and applySettledBet().",
+      "rg-history owner: the reality-check card shows the session's net result in USDT; consider showing the DEMO net from /games/credits on game routes.",
+      "Home / pool owner: lib/fairness/dice.ts (teaser verifier) uses a different algorithm from @gp/shared/fair; switch it to verifyBet().",
+      "Web close-out (R11/R57): sidebar links to /vip and /winners return 404 in production, which stops networkidle from settling.",
+      "Figma: run pending/g-dice and pending/pub-04 scripts when the seat quota allows, then re-compare DI, GM-01 and PUB-04 visually.",
+      "Add 768/1280 screenshots, a recording of the DI-03 rolling animation without reduced motion, and a reality-check e2e (needs an API test hook, since the shortest interval is 15 minutes).",
+      "Optional: an API aggregate for the DI-05 all-player distribution, and a CSV export button using /history/game-rounds/export."
+    ]
+  }
+]

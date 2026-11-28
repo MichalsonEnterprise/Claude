@@ -1,8 +1,13 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import type { Withdrawal, WithdrawalStatus } from '@prisma/client';
+import type { AdminApproval, Withdrawal, WithdrawalStatus } from '@prisma/client';
 import { CHAINS, type ChainKey } from '@gp/shared/chains';
-import { canTransitionWithdrawal, WITHDRAWAL_STATUS_LABEL, type TxStatus } from '@gp/shared/enums';
+import {
+  canTransitionWithdrawal,
+  FOUR_EYES_EXPIRY_HOURS,
+  WITHDRAWAL_STATUS_LABEL,
+  type TxStatus,
+} from '@gp/shared/enums';
 import { withdrawalQuote } from '@gp/shared/fees';
 import { DAILY_WITHDRAWAL_LIMIT } from '@gp/shared/limits';
 import { money, toUSDTString } from '@gp/shared/money';
@@ -18,7 +23,7 @@ import { randomBytes } from 'node:crypto';
 import { AppError, notFound } from '../../common/errors';
 import { usdt } from '../../common/money';
 import type { AuthAdmin, AuthUser } from '../../common/request';
-import { periodStart } from '../../common/time';
+import { addHours, periodStart } from '../../common/time';
 import { PrismaService, type Tx } from '../../infra/prisma/prisma.service';
 import { JOBS, QUEUES } from '../../infra/queues/queues';
 import { AmlService } from '../aml/aml.service';
@@ -55,6 +60,14 @@ const COUNTS_TOWARDS_LIMIT: WithdrawalStatus[] = [
   'broadcast',
   'confirmed',
 ];
+
+/** Expiry of a four-eyes first approval: payload.expiresAt, else (older rows) createdAt + FOUR_EYES_EXPIRY_HOURS. */
+function approvalExpiresAt(a: AdminApproval): Date {
+  const payload =
+    a.payload && typeof a.payload === 'object' && !Array.isArray(a.payload) ? a.payload : {};
+  const v = (payload as Record<string, unknown>).expiresAt;
+  return typeof v === 'string' ? new Date(v) : addHours(a.createdAt, FOUR_EYES_EXPIRY_HOURS);
+}
 
 /**
  * Withdrawals: request (zod-validated, step-up 2FA, KYC daily limit, balance) moves AVAILABLE → LOCKED, then the
@@ -120,6 +133,10 @@ export class WithdrawalsService {
     const result = await this.idempotency.run(
       { scope: 'withdrawal.request', ownerId: user.id, key: input.idempotencyKey, request },
       async (tx) => {
+        // Serialise this player's withdrawal requests BEFORE reading today's usage: two concurrent requests (different
+        // idempotency keys) must not both see the same "used today" and together exceed the KYC daily limit. The
+        // ledger's own bucket lock comes later (in ledger.post) and only protects the balance.
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`withdrawal-limit:${user.id}`}, 0))`;
         const profile = await tx.userProfile.findUnique({
           where: { userId: user.id },
           select: { kycLevel: true },
@@ -385,7 +402,7 @@ export class WithdrawalsService {
         if (w.status !== 'under_review')
           throw new AppError('CONFLICT', `Withdrawal is ${w.status}, not under review`);
         if (w.requiresFourEyes) {
-          const pending = await tx.adminApproval.findFirst({
+          let pending = await tx.adminApproval.findFirst({
             where: {
               targetType: 'withdrawal',
               targetId: id,
@@ -393,7 +410,34 @@ export class WithdrawalsService {
               status: 'pending',
             },
           });
+          if (pending && approvalExpiresAt(pending) <= new Date()) {
+            // A stale first approval never completes a release (FOUR_EYES_EXPIRY_HOURS, like every four-eyes
+            // request): it expires — with a system audit row — and this approval becomes a NEW first approval.
+            const expired = await tx.adminApproval.updateMany({
+              where: { id: pending.id, status: 'pending' },
+              data: { status: 'expired' },
+            });
+            if (expired.count === 1) {
+              await this.audit.record(
+                {
+                  actorType: 'system',
+                  action: 'approval.expired',
+                  targetType: 'withdrawal',
+                  targetId: id,
+                  metadata: {
+                    approvalId: pending.id,
+                    ref: `AR-${pending.id.replace(/-/g, '').slice(0, 6).toUpperCase()}`,
+                    requestedAction: 'withdrawal.approve',
+                    expired: true,
+                  },
+                },
+                tx,
+              );
+            }
+            pending = null;
+          }
           if (!pending) {
+            const expiresAt = addHours(new Date(), FOUR_EYES_EXPIRY_HOURS);
             const approval = await tx.adminApproval.create({
               data: {
                 action: 'withdrawal.approve',
@@ -401,7 +445,11 @@ export class WithdrawalsService {
                 targetId: id,
                 requestedByAdminId: admin.id,
                 requestReason: reason,
-                payload: { reference: `WD-${w.number}`, amount: w.amount.toFixed() },
+                payload: {
+                  reference: `WD-${w.number}`,
+                  amount: w.amount.toFixed(),
+                  expiresAt: expiresAt.toISOString(),
+                },
               },
             });
             await this.audit.record(
@@ -431,8 +479,10 @@ export class WithdrawalsService {
               'Four-eyes rule: a different admin must give the second approval',
             );
           }
-          await tx.adminApproval.update({
-            where: { id: pending.id },
+          // Claim the first approval with a status guard: if its requester withdrew it (or it was decided / expired)
+          // concurrently, nothing is released — the only standing consent would be this admin's.
+          const claimed = await tx.adminApproval.updateMany({
+            where: { id: pending.id, status: 'pending' },
             data: {
               status: 'approved',
               decidedByAdminId: admin.id,
@@ -440,6 +490,12 @@ export class WithdrawalsService {
               decidedAt: new Date(),
             },
           });
+          if (claimed.count !== 1) {
+            throw new AppError(
+              'CONFLICT',
+              'The first approval was withdrawn or decided meanwhile — nothing was changed',
+            );
+          }
         }
         await this.transition(
           tx,

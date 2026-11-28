@@ -1,18 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import type { Deposit } from '@prisma/client';
 import { CHAINS, type ChainKey } from '@gp/shared/chains';
-import { toUSDTString } from '@gp/shared/money';
+import { money, toUSDTString } from '@gp/shared/money';
 import { paginate, type PaginationQuery } from '@gp/shared/schemas';
 import { randomBytes } from 'node:crypto';
 
+import { AppError } from '../../common/errors';
 import { usdt } from '../../common/money';
+import { periodStart } from '../../common/time';
 import { PrismaService, type Tx } from '../../infra/prisma/prisma.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { ResponsibleGamingService } from '../compliance/responsible-gaming.service';
+import { RestrictionsService } from '../compliance/restrictions.service';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { LedgerService } from '../ledger/ledger.service';
-import { depositCreditedLines, depositDetectedLines } from '../ledger/posting';
+import {
+  depositCreditedLines,
+  depositDetectedLines,
+  depositReversedLines,
+} from '../ledger/posting';
 import { NotificationsService } from '../notifications/notifications.service';
 import { DepositAddressService } from './deposit-address.service';
 
@@ -49,6 +56,7 @@ export class DepositsService {
     private readonly rg: ResponsibleGamingService,
     private readonly idempotency: IdempotencyService,
     private readonly flags: FeatureFlagsService,
+    private readonly restrictions: RestrictionsService,
   ) {}
 
   async list(userId: string, query: PaginationQuery) {
@@ -194,6 +202,205 @@ export class DepositsService {
       isDemo: deposit.isDemo,
     });
     return true;
+  }
+
+  /**
+   * Why a confirmed ON-CHAIN deposit must not become stakeable now (null = credit it). On-chain funds cannot be
+   * refused, but the same server-side rules as the deposit routes apply before they reach Available: account
+   * restrictions (`account_suspended`, `deposits_blocked`), a break / self-exclusion, the `deposits.enabled` kill
+   * switch and the player's RG deposit limits. Deposit limits count deposits CREDITED in the current period (in
+   * credit order, so a deposit held over into a new period counts there). DEMO simulations check before recording.
+   */
+  async creditHold(tx: Tx, deposit: Deposit, now = new Date()): Promise<string | null> {
+    if (deposit.isDemo) return null;
+    const restrictions = await this.restrictions.active(deposit.userId, tx);
+    if (restrictions.includes('account_suspended')) return 'the account is suspended';
+    if (restrictions.includes('deposits_blocked')) return 'deposits are blocked on this account';
+    try {
+      await this.rg.assertNotSelfExcluded(deposit.userId, tx);
+    } catch (err) {
+      if (err instanceof AppError && err.code === 'SELF_EXCLUDED')
+        return 'a break or self-exclusion is active';
+      throw err;
+    }
+    if (!(await this.flags.isEnabled('deposits.enabled')))
+      return 'deposits are paused by the operator';
+    const limits = await tx.rgLimit.findMany({
+      where: { userId: deposit.userId, type: 'deposit' },
+    });
+    for (const l of limits) {
+      // Read-only view of the effective limit: a due increase / removal applies (RG applies it lazily too).
+      const due = l.pendingEffectiveAt !== null && l.pendingEffectiveAt <= now;
+      const limit = due ? (l.pendingRemoval ? null : (l.pendingAmount ?? l.amount)) : l.amount;
+      if (limit === null) continue;
+      const credited = await tx.deposit.aggregate({
+        where: {
+          userId: deposit.userId,
+          status: 'credited',
+          creditedAt: { gte: periodStart(l.period, now) },
+          id: { not: deposit.id },
+        },
+        _sum: { amount: true },
+      });
+      const used = money(credited._sum.amount?.toFixed() ?? '0');
+      if (used.plus(money(deposit.amount.toFixed())).gt(money(limit.toFixed()))) {
+        const label = l.period === 'day' ? 'daily' : `${l.period}ly`;
+        return `it would exceed your ${label} deposit limit of ${usdt(limit)} USDT`;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Keep a confirmed deposit in PENDING (never stakeable) while `reason` applies; re-evaluated on every watcher pass
+   * and credited by the regular path once it no longer applies. The player is notified when a hold starts.
+   * Returns true when the hold is new (or its reason changed).
+   */
+  async markHeld(
+    tx: Tx,
+    deposit: Deposit,
+    confirmations: number,
+    reason: string,
+  ): Promise<boolean> {
+    await tx.deposit.update({ where: { id: deposit.id }, data: { confirmations } });
+    const record = await tx.transaction.findFirst({ where: { depositId: deposit.id } });
+    const meta = (record?.metadata ?? {}) as Record<string, unknown>;
+    const changed = meta.held !== reason;
+    if (record) {
+      await tx.transaction.update({
+        where: { id: record.id },
+        data: {
+          status: 'under_review',
+          metadata: {
+            ...meta,
+            held: reason,
+            statusDetail: `On hold — ${reason}. Not available for play`,
+          },
+        },
+      });
+    }
+    if (changed) {
+      const reference = `DP-${deposit.number}`;
+      await this.notifications.notify(tx, {
+        userId: deposit.userId,
+        type: 'deposit.held',
+        title: 'Deposit on hold',
+        body: `${usdt(deposit.amount)} USDT (${reference}) arrived but is on hold because ${reason}. It is not available for play and stays in Pending until this no longer applies. Contact support with any questions.`,
+        data: { reference },
+      });
+    }
+    return changed;
+  }
+
+  /**
+   * A deposit that was reversed (re-orged out) and whose transfer is back in a canonical block: reopen the SAME row
+   * (one transfer = one deposit, never two credits) — status confirming, confirmations restart, CHAIN_CLEARING →
+   * PENDING posted again under a new event key. The regular confirmation / credit path then runs.
+   */
+  async reopen(
+    tx: Tx,
+    deposit: Deposit,
+    at: { blockNumber: bigint; blockHash: string | null; logIndex: number },
+  ): Promise<boolean> {
+    const claimed = await tx.deposit.updateMany({
+      where: { id: deposit.id, status: 'rejected' },
+      data: {
+        status: 'confirming',
+        confirmations: 0,
+        reorgSeenAtBlock: null,
+        blockNumber: at.blockNumber,
+        blockHash: at.blockHash,
+        logIndex: at.logIndex,
+      },
+    });
+    if (claimed.count === 0) return false;
+    const generation = await this.detectionGeneration(tx, deposit.id);
+    const reference = `DP-${deposit.number}`;
+    const record = await tx.transaction.findFirst({ where: { depositId: deposit.id } });
+    await this.ledger.post(tx, {
+      kind: 'deposit_detected',
+      description: `${reference} re-included on ${CHAINS[deposit.network].testnet.name}`,
+      reference,
+      eventKey: `deposit:${deposit.id}:detected:${generation}`,
+      transactionId: record?.id ?? null,
+      lines: depositDetectedLines(deposit.userId, deposit.network, deposit.amount.toFixed()),
+      isDemo: deposit.isDemo,
+      metadata: { txHash: deposit.txHash, logIndex: at.logIndex, reopened: true },
+    });
+    if (record) {
+      await tx.transaction.update({
+        where: { id: record.id },
+        data: {
+          status: 'confirming',
+          completedAt: null,
+          metadata: {
+            statusDetail: `Back on the chain — 0 / ${deposit.requiredConfirmations} confirmations`,
+          },
+        },
+      });
+    }
+    await this.notifications.notify(tx, {
+      userId: deposit.userId,
+      type: 'deposit.detected',
+      title: 'Deposit detected again',
+      body: `${usdt(deposit.amount)} USDT (${reference}) is back on the chain — waiting for ${deposit.requiredConfirmations} confirmations.`,
+      data: { reference },
+      isDemo: deposit.isDemo,
+    });
+    return true;
+  }
+
+  /** Detected but never credited, and gone from the chain: PENDING → CHAIN_CLEARING, status rejected. */
+  async reverse(tx: Tx, deposit: Deposit, reason: string): Promise<boolean> {
+    const claimed = await tx.deposit.updateMany({
+      where: { id: deposit.id, status: { in: ['detected', 'confirming'] } },
+      data: { status: 'rejected', confirmations: 0 },
+    });
+    if (claimed.count === 0) return false;
+    const reference = `DP-${deposit.number}`;
+    const record = await tx.transaction.findFirst({ where: { depositId: deposit.id } });
+    // Event keys are per detection generation: a reopened deposit can be reversed again (one posting each time).
+    const generation = (await this.detectionGeneration(tx, deposit.id)) - 1;
+    await this.ledger.post(tx, {
+      kind: 'deposit_reversed',
+      description: `${reference} reversed — ${reason}`,
+      reference,
+      eventKey:
+        generation > 0
+          ? `deposit:${deposit.id}:reversed:${generation}`
+          : `deposit:${deposit.id}:reversed`,
+      transactionId: record?.id ?? null,
+      lines: depositReversedLines(deposit.userId, deposit.network, deposit.amount.toFixed()),
+      isDemo: deposit.isDemo,
+      metadata: { txHash: deposit.txHash, logIndex: deposit.logIndex, reason },
+    });
+    await tx.transaction.updateMany({
+      where: { depositId: deposit.id },
+      data: {
+        status: 'failed',
+        completedAt: new Date(),
+        metadata: { statusDetail: `Not credited — ${reason}` },
+      },
+    });
+    await this.notifications.notify(tx, {
+      userId: deposit.userId,
+      type: 'deposit.reversed',
+      title: 'Deposit not credited',
+      body: `${toUSDTString(deposit.amount.toFixed())} USDT (${reference}) is no longer on the chain (${reason}), so it was not credited.`,
+      data: { reference },
+      isDemo: deposit.isDemo,
+    });
+    return true;
+  }
+
+  /** Number of deposit_detected postings of a deposit so far (1 = never reopened). */
+  private async detectionGeneration(tx: Tx, depositId: string): Promise<number> {
+    return tx.ledgerPosting.count({
+      where: {
+        kind: 'deposit_detected',
+        eventKey: { startsWith: `deposit:${depositId}:detected` },
+      },
+    });
   }
 
   /**

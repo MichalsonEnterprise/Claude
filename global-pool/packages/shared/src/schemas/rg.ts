@@ -10,7 +10,7 @@ import {
   type SelfExclusionDuration,
 } from '../enums';
 import { SELF_EXCLUSION_CONFIRM_PHRASE } from '../limits';
-import { totpCodeSchema } from './auth';
+import { backupCodeSchema, totpCodeSchema } from './auth';
 import { positiveUsdtAmountSchema } from './common';
 
 /**
@@ -85,16 +85,20 @@ export type RgQuietHours = z.infer<typeof rgQuietHoursSchema>;
 /**
  * Self-exclusion: always honoured immediately, never obstructed; requires explicit confirmation.
  * Long periods (6m / 1y / 5y / permanent) also need the typed phrase SELF-EXCLUDE and the acknowledgement, plus a
- * step-up TOTP code when the player has 2FA on (Privy players have no password — owner decision #3).
+ * step-up code when the player has 2FA on (Privy players have no password — owner decision #3). The code may be the
+ * authenticator code OR one of the player's single-use backup codes, so a lost phone never blocks self-exclusion.
  */
 export const selfExclusionSchema = z.object({
   duration: z.enum(SELF_EXCLUSION_DURATIONS),
   confirm: z.literal(true, { error: 'Confirm that you want to self-exclude' }),
   phrase: z.string().trim().max(32).optional(),
   acknowledged: z.boolean().optional(),
-  totpCode: totpCodeSchema.optional(),
+  totpCode: z.union([totpCodeSchema, backupCodeSchema]).optional(),
 });
 export type SelfExclusion = z.infer<typeof selfExclusionSchema>;
+
+/** Authenticator code (6 digits) or backup code (ABCD-1234, dash optional) — what RG7 step 3 accepts. */
+export const SELF_EXCLUSION_CODE_PATTERN = /^(\d{6}|[A-Za-z0-9]{4}-?[A-Za-z0-9]{4})$/;
 
 /** Client-side form for RG7 step 3 (the API re-checks every rule). */
 export const selfExclusionConfirmFormSchema = z.object({
@@ -107,7 +111,10 @@ export const selfExclusionConfirmFormSchema = z.object({
   acknowledged: z.literal(true, { error: 'Tick the box to confirm you understand' }),
   totpCode: z
     .string()
-    .regex(/^\d{6}$/, { error: 'Enter the 6-digit code' })
+    .trim()
+    .regex(SELF_EXCLUSION_CODE_PATTERN, {
+      error: 'Enter the 6-digit code or a backup code like ABCD-1234',
+    })
     .optional(),
 });
 export type SelfExclusionConfirmForm = z.infer<typeof selfExclusionConfirmFormSchema>;
@@ -140,13 +147,32 @@ export interface RgLimitView {
 
 export type RgExclusionKind = 'cooling_off' | 'self_exclusion';
 
+/**
+ * Reopening after a long self-exclusion (6m / 1y / 5y): nothing reopens automatically at the end date. The player
+ * asks (`POST /responsible-gaming/self-exclusion/reopen`), waits the 24 h cool-down, sets a deposit limit and a loss
+ * limit, then confirms (`…/reopen/confirm`). Until then the account stays excluded. Permanent never reopens here.
+ */
+export interface RgReopenView {
+  /** awaiting_request: ended, closed until you ask · cooling_down: 24 h after the request · ready: limits + confirm */
+  status: 'awaiting_request' | 'cooling_down' | 'ready';
+  /** When the self-exclusion period ended. */
+  endedAt: string;
+  requestedAt: string | null;
+  /** End of the 24 h cool-down (null until requested). */
+  availableAt: string | null;
+  /** Limits still to set before the confirmation is accepted. */
+  missingLimits: ('deposit' | 'loss')[];
+}
+
 export interface RgExclusionView {
   active: boolean;
   kind: RgExclusionKind | null;
   duration: SelfExclusionDuration | null;
   startsAt: string | null;
-  /** null while active = permanent. */
+  /** null while active = permanent. In the past while `reopen` is set (period over, account still closed). */
   endsAt: string | null;
+  /** Set once a long self-exclusion's period is over but the account has not been reopened yet. */
+  reopen?: RgReopenView | null;
 }
 
 export interface RgSessionView {

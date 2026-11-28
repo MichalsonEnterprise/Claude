@@ -8,7 +8,11 @@ import {
 } from '@gp/shared/enums';
 import { formatDateUTC } from '@gp/shared/format';
 import { SELF_EXCLUSION_CONFIRM_PHRASE } from '@gp/shared/limits';
-import { selfExclusionConfirmFormSchema, type RgStateView } from '@gp/shared/schemas';
+import {
+  SELF_EXCLUSION_CODE_PATTERN,
+  selfExclusionConfirmFormSchema,
+  type RgStateView,
+} from '@gp/shared/schemas';
 import {
   ArrowLeft,
   ArrowUpFromLine,
@@ -159,9 +163,11 @@ function ExclusionBanner({
       title={
         kind === 'cooling_off'
           ? `Your ${breakTitle((e.duration ?? '24h') as CoolingOffDuration)} break is on until ${until}`
-          : until
-            ? `Self-exclusion is active until ${until}`
-            : 'Permanent self-exclusion is active'
+          : e.reopen
+            ? `Self-exclusion ended ${until} — your account stays closed until you reopen it`
+            : until
+              ? `Self-exclusion is active until ${until}`
+              : 'Permanent self-exclusion is active'
       }
       actions={
         <>
@@ -177,7 +183,9 @@ function ExclusionBanner({
     >
       {kind === 'cooling_off'
         ? 'Games, Global Pool entries, deposits and promotions are paused. Withdrawals, history and support stay open. The break cannot be ended early.'
-        : 'Games, the Global Pool, deposits and all marketing are closed for this account. You can still log in to withdraw, view your history and contact support. This cannot be reversed before the end date.'}
+        : e.reopen
+          ? 'Games, the Global Pool, deposits and all marketing stay closed — nothing reopens automatically. You can still withdraw, view your history and contact support.'
+          : 'Games, the Global Pool, deposits and all marketing are closed for this account. You can still log in to withdraw, view your history and contact support. This cannot be reversed before the end date.'}
     </Alert>
   );
 }
@@ -627,7 +635,7 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
   const ready =
     values.phrase.trim() === SELF_EXCLUSION_CONFIRM_PHRASE &&
     values.acknowledged === true &&
-    (!needsCode || /^\d{6}$/.test(values.totpCode ?? ''));
+    (!needsCode || SELF_EXCLUSION_CODE_PATTERN.test((values.totpCode ?? '').trim()));
 
   const submit = form.handleSubmit(async (v) => {
     if (!choice) return;
@@ -637,7 +645,7 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
         confirm: true,
         phrase: v.phrase.trim(),
         acknowledged: true,
-        ...(needsCode && v.totpCode ? { totpCode: v.totpCode } : {}),
+        ...(needsCode && v.totpCode ? { totpCode: v.totpCode.trim() } : {}),
       });
       toast({
         type: 'success',
@@ -645,7 +653,12 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
         description: 'Your balance stays withdrawable.',
       });
     } catch (e) {
-      if (e instanceof ApiRequestError && e.code.startsWith('STEP_UP')) {
+      if (e instanceof ApiRequestError && e.code === 'STEP_UP_LOCKED') {
+        // Never a dead end: a break needs no code and starts at once.
+        form.setError('totpCode', {
+          message: `${e.message}. You can take a cooling-off break right now without a code, or use a backup code later.`,
+        });
+      } else if (e instanceof ApiRequestError && e.code.startsWith('STEP_UP')) {
         form.setError('totpCode', { message: e.message });
       } else {
         form.setError('root', { message: errorText(e) });
@@ -771,15 +784,16 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
           {needsCode ? (
             <Field
               label="Authenticator code"
-              helper="Your account has no password (you sign in with Privy), so we confirm it is you with your 2FA code."
+              helper="Your account has no password (you sign in with Privy), so we confirm it is you with your 2FA code. Lost your phone? One of your backup codes works too."
               error={form.formState.errors.totpCode?.message}
             >
               <Input
                 size="l"
-                inputMode="numeric"
                 autoComplete="one-time-code"
-                maxLength={6}
-                placeholder="6-digit code"
+                autoCapitalize="characters"
+                spellCheck={false}
+                maxLength={9}
+                placeholder="6-digit code or ABCD-1234"
                 {...form.register('totpCode')}
               />
             </Field>
@@ -841,7 +855,8 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
             </Button>
           </div>
           <p className="text-caption text-text-tertiary">
-            The button unlocks when {needsCode ? 'your code is entered, ' : ''}the phrase matches
+            The button unlocks when {needsCode ? 'your code (or a backup code) is entered, ' : ''}the
+            phrase matches
             and the box is ticked. Leaving this page changes nothing.
           </p>
         </form>
@@ -934,6 +949,95 @@ function AltOption({
   );
 }
 
+type Reopen = NonNullable<RgStateView['exclusion']['reopen']>;
+
+const LIMIT_LINK: Record<Reopen['missingLimits'][number], { label: string; href: string }> = {
+  deposit: { label: 'Set a deposit limit', href: `${RG_BASE}/deposit-limits` },
+  loss: { label: 'Set a loss limit', href: `${RG_BASE}/participation-limits` },
+};
+
+/**
+ * The period is over, but nothing reopens automatically (server-enforced): ask → 24 h cool-down → deposit + loss
+ * limits → confirm. Neutral, never a nudge to come back; extending the self-exclusion stays possible at any time.
+ */
+function ReopenCard({ reopen }: { reopen: Reopen }) {
+  const request = useRgMutation(rgApi.requestReopen);
+  const confirm = useRgMutation(rgApi.confirmReopen);
+  const fail = (title: string) => (e: unknown) =>
+    toast({ type: 'error', title, description: errorText(e) });
+  return (
+    <Card padding="l" className="gap-4">
+      <div className="flex items-center gap-3">
+        <IconTile icon={CalendarDays} tone="default" />
+        <h2 className="flex-1 text-h5">Your self-exclusion period has ended</h2>
+      </div>
+      <p className="text-body-s text-text-secondary">
+        It ended {dateTime(reopen.endedAt)}. Your account stays closed to play and deposits until you
+        ask to reopen it — nothing reopens automatically.
+      </p>
+      {reopen.status === 'awaiting_request' && (
+        <>
+          <p className="text-body-s text-text-secondary">
+            If you ask, a 24-hour cool-down follows. Then you set a deposit limit and a loss limit
+            before you can play again. You can also simply leave it closed.
+          </p>
+          <Button
+            variant="secondary"
+            size="l"
+            className="self-start"
+            loading={request.isPending}
+            onClick={() => request.mutate(undefined, { onError: fail('Request not sent') })}
+          >
+            Ask to reopen my account
+          </Button>
+        </>
+      )}
+      {reopen.status === 'cooling_down' && (
+        <NoteBox icon={PauseCircle} tone="info">
+          Reopening requested{reopen.requestedAt ? ` ${dateTime(reopen.requestedAt)}` : ''}. The
+          24-hour cool-down ends {reopen.availableAt ? dateTime(reopen.availableAt) : 'soon'};
+          nothing changes before then.
+        </NoteBox>
+      )}
+      {reopen.status === 'ready' && (
+        <>
+          {reopen.missingLimits.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-body-s text-text-secondary">Limits first — still to set:</p>
+              <div className="flex flex-wrap gap-2">
+                {reopen.missingLimits.map((l) => (
+                  <Button key={l} variant="secondary" size="s" asChild>
+                    <Link href={LIMIT_LINK[l].href}>{LIMIT_LINK[l].label}</Link>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <NoteBox icon={CircleCheck} tone="success">
+              Your deposit and loss limits are set.
+            </NoteBox>
+          )}
+          <Button
+            variant="secondary"
+            size="l"
+            className="self-start"
+            disabled={reopen.missingLimits.length > 0}
+            loading={confirm.isPending}
+            onClick={() =>
+              confirm.mutate(undefined, {
+                onSuccess: () => toast({ type: 'success', title: 'Your account is open again' }),
+                onError: fail('Not reopened'),
+              })
+            }
+          >
+            Reopen my account
+          </Button>
+        </>
+      )}
+    </Card>
+  );
+}
+
 function ActiveSelfExclusion({
   state,
   balances,
@@ -967,6 +1071,7 @@ function ActiveSelfExclusion({
         </Button>
       </Card>
       <div className="flex min-w-0 flex-col gap-6">
+        {e.reopen && <ReopenCard reopen={e.reopen} />}
         <WithdrawCard balances={balances} title="Available to withdraw now" />
         <Card padding="l" className="gap-5">
           <h2 className="text-h5">What happens next</h2>

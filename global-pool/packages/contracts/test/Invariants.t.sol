@@ -112,7 +112,7 @@ contract RoundsHandler is Test {
         } catch {}
     }
 
-    /// Advances one round a single step along the happy path so deep states (fulfilled, settled, re-requested)
+    /// Advances one round a single step along the happy path so deep states (fulfilled, settled, VRF-timeout cancel)
     /// appear in most runs; the other actions interleave arbitrary (often invalid) calls around it.
     function drive(uint256 seed, uint256 word) external {
         uint256 id = _id(seed);
@@ -125,8 +125,14 @@ contract RoundsHandler is Test {
             if (rounds.thresholdsMet(id)) this.requestDraw(seed);
             else this.cancel(seed, 1); // THRESHOLDS_NOT_MET
         } else if (status == GlobalPoolRounds.RoundStatus.DrawRequested) {
-            if (word % 4 == 0) vm.warp(block.timestamp + 1 days); // sometimes force the re-request path
-            if (word % 4 == 0) this.requestDraw(seed);
+            if (word % 4 == 0) {
+                // sometimes the VRF never answers: after the timeout anyone cancels (no re-request exists)
+                vm.warp(block.timestamp + 1 days);
+                this.requestDraw(seed); // must fail: randomness is requested once per round
+                try rounds.cancelRound(id, 5) {
+                    ++cancelled;
+                } catch {}
+            }
             uint256[] memory words = new uint256[](1);
             words[0] = word;
             try coordinator.fulfillRandomWordsWithOverride(rounds.getRound(id).lastRequestId, address(rounds), words) {}
@@ -187,8 +193,9 @@ contract GlobalPoolRoundsInvariantTest is StdInvariant, Test {
         targetContract(address(handler));
     }
 
-    /// Once a round has a random word it never changes (no re-roll), and its winners stay derivable.
-    /// Status never moves backwards; Cancelled and Settled are terminal; committed roots never change.
+    /// Once a round has a random word it never changes (no re-roll), and its winners stay derivable. Randomness is
+    /// requested at most once. Status never moves backwards; Cancelled and Settled are terminal; a requested draw is
+    /// cancelled only for VRF timeout and never after fulfilment; committed roots never change.
     function invariant_NoReRollAndMonotonicLifecycle() public {
         for (uint256 id = 1; id <= 3; ++id) {
             GlobalPoolRounds.Round memory r = rounds.getRound(id);
@@ -199,8 +206,13 @@ contract GlobalPoolRoundsInvariantTest is StdInvariant, Test {
             } else if (s != uint8(GlobalPoolRounds.RoundStatus.Cancelled)) {
                 assertGe(s, prev, "status moved backwards");
             } else {
-                assertLe(prev, uint8(GlobalPoolRounds.RoundStatus.Committed), "cancelled after draw request");
+                assertLe(prev, uint8(GlobalPoolRounds.RoundStatus.DrawRequested), "cancelled after fulfilment");
+                if (prev == uint8(GlobalPoolRounds.RoundStatus.DrawRequested)) {
+                    assertEq(r.cancelReason, 5, "a requested draw is only cancelled for VRF timeout");
+                }
+                assertEq(r.randomWord, 0, "a cancelled round has no random word");
             }
+            assertLe(r.drawAttempts, 1, "randomness requested more than once");
             lastStatus[id] = s;
 
             if (s == uint8(GlobalPoolRounds.RoundStatus.Fulfilled) || s == uint8(GlobalPoolRounds.RoundStatus.Settled))

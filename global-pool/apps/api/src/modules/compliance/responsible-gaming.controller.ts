@@ -158,6 +158,33 @@ export class ResponsibleGamingController {
     return result;
   }
 
+  @Post('self-exclusion/reopen')
+  @HttpCode(200)
+  @ApiOperation({
+    summary:
+      'After a 6m / 1y / 5y self-exclusion ended: ask to reopen (nothing reopens automatically). Starts a 24 h cool-down; idempotent',
+  })
+  async requestReopen(@CurrentUser() user: AuthUser) {
+    const reopen = await this.rg.requestReopen(user.id);
+    await this.record(user, 'user.rg.reopen_requested', {
+      requestedAt: reopen.requestedAt,
+      availableAt: reopen.availableAt,
+    });
+    return this.rg.state(user.id);
+  }
+
+  @Post('self-exclusion/reopen/confirm')
+  @HttpCode(200)
+  @ApiOperation({
+    summary:
+      'Finish reopening after the 24 h cool-down — only with a deposit limit and a loss limit set (400 / 409 otherwise)',
+  })
+  async confirmReopen(@CurrentUser() user: AuthUser) {
+    const result = await this.rg.confirmReopen(user.id);
+    await this.record(user, 'user.rg.reopened', { ...result });
+    return this.rg.state(user.id);
+  }
+
   @Put('reality-check')
   @ApiOperation({ summary: 'Reality-check reminder interval (minutes) + pause / push toggles' })
   async realityCheck(@CurrentUser() user: AuthUser, @Body() body: RealityCheckDto) {

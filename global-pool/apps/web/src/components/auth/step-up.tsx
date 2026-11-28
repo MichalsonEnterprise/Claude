@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 
 import { AuthModal, Callout, ModalHeading, Note, PaneHeader } from './auth-ui';
 import { formatCountdown, formatUtcTime, useNow } from './format';
+import { safeNext } from './safe-next';
 
 export const STEP_UP_PURPOSE_LABEL: Record<StepUpPurpose, string> = {
   withdrawal: 'Withdrawal',
@@ -500,8 +501,10 @@ export function consumeStoredStepUp(purpose: StepUpPurpose): StepUpToken | null 
 
 export function StepUpPage({ purpose, next }: { purpose: StepUpPurpose; next?: string }) {
   const auth = useAuth();
+  const router = useRouter();
   const [verified, setVerified] = React.useState(false);
-  const leave = () => window.location.assign(next ?? '/');
+  // In-app navigation only; `next` is re-checked here so no caller can turn it into an external / script URL.
+  const leave = () => router.replace(safeNext(next) ?? '/');
   const here = `/2fa/challenge?purpose=${purpose}${next ? `&next=${encodeURIComponent(next)}` : ''}`;
   return (
     <AuthModal open onOpenChange={(o) => !o && leave()} title="Confirm it’s you" size="xs">

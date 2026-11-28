@@ -28,16 +28,42 @@ import { WithdrawalsService } from '../withdrawals/withdrawals.service';
 export const WITHDRAWAL_SLA_HOURS = 4;
 /** Four-eyes threshold (policy FIN-2.3): flagged by AML, or at/above this amount. */
 export const FOUR_EYES_AMOUNT = '10000.00';
-/** Append-only triggers that must exist on the money tables (checked on the ledger page). */
-export const APPEND_ONLY_TRIGGERS = [
-  'ledger_postings_append_only',
-  'ledger_entries_append_only',
-  'ledger_entries_balanced',
-  'pool_ledger_append_only',
-  'fee_ledger_append_only',
-  'audit_logs_append_only',
-  'withdrawal_events_append_only',
+/**
+ * Integrity triggers that must exist AND be enabled on their table (checked on the ledger page): append-only
+ * (UPDATE / DELETE), no TRUNCATE, and the deferred balanced-posting check. A disabled trigger keeps its pg_trigger
+ * row, so `tgenabled` is read too ('O' origin / 'A' always fire; 'D' disabled and 'R' replica-only do not).
+ */
+const APPEND_ONLY_TABLES = [
+  'ledger_postings',
+  'ledger_entries',
+  'pool_ledger',
+  'fee_ledger',
+  'audit_logs',
+  'withdrawal_events',
+  'entry_commitments',
+  'round_payouts',
 ] as const;
+export const INTEGRITY_TRIGGERS: readonly { name: string; table: string }[] = [
+  ...APPEND_ONLY_TABLES.flatMap((table) => [
+    { name: `${table}_append_only`, table },
+    { name: `${table}_no_truncate`, table },
+  ]),
+  { name: 'ledger_entries_balanced', table: 'ledger_entries' },
+];
+/** Names of the triggers checked by the integrity panel. */
+export const APPEND_ONLY_TRIGGERS = INTEGRITY_TRIGGERS.map((t) => t.name);
+
+/** Every expected trigger must exist on its own table and fire ('O' / 'A'); a disabled one ('D', 'R') fails. */
+export function checkIntegrityTriggers(
+  rows: readonly { tgname: string; tablename: string; tgenabled: string }[],
+) {
+  const triggers = INTEGRITY_TRIGGERS.map(({ name, table }) => {
+    const row = rows.find((t) => t.tgname === name && t.tablename === table);
+    const enabled = row !== undefined && (row.tgenabled === 'O' || row.tgenabled === 'A');
+    return { name, table, present: row !== undefined, enabled };
+  });
+  return { ok: triggers.every((t) => t.present && t.enabled), triggers };
+}
 
 const OPEN_WITHDRAWAL: WithdrawalStatus[] = [
   'requested',
@@ -844,18 +870,16 @@ export class AdminFinanceService {
   /** Integrity panel for the ledger page: triggers, balance invariants, a digest of the journal, audit chain. */
   async ledgerIntegrity(now = new Date()) {
     const [triggers, reconcile, auditChain, digest] = await Promise.all([
-      this.prisma.$queryRaw<{ tgname: string }[]>`
-        SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = ANY(${[...APPEND_ONLY_TRIGGERS]}::text[])`,
+      this.prisma.$queryRaw<{ tgname: string; tablename: string; tgenabled: string }[]>`
+        SELECT t.tgname, c.relname AS tablename, t.tgenabled::text AS tgenabled
+          FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+         WHERE NOT t.tgisinternal AND t.tgname = ANY(${[...APPEND_ONLY_TRIGGERS]}::text[])`,
       this.ledger.reconcile(),
       this.audit.verify(),
       this.journalDigest(),
     ]);
-    const present = new Set(triggers.map((t) => t.tgname));
     return {
-      appendOnly: {
-        ok: APPEND_ONLY_TRIGGERS.every((t) => present.has(t)),
-        triggers: APPEND_ONLY_TRIGGERS.map((name) => ({ name, present: present.has(name) })),
-      },
+      appendOnly: checkIntegrityTriggers(triggers),
       balanced: {
         ok: reconcile.unbalancedPostings === 0 && m(reconcile.ledgerTotal).isZero(),
         ledgerTotal: reconcile.ledgerTotal,

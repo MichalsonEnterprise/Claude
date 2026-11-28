@@ -309,23 +309,33 @@ function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
         balNote:
           'Anything owed to you (refunds, prizes) settles to Available and can be withdrawn.',
         stepsTitle: 'When your break ends',
-        steps: [
-          {
-            state: 'next',
-            title: 'Nothing switches back on automatically',
-            body: 'Your account stays closed to play.',
-          },
-          {
-            state: 'next',
-            title: 'Ask support to reopen — if you want to',
-            body: 'We’ll talk it through with you first.',
-          },
-          {
-            state: 'next',
-            title: '24-hour cool-down, then limits first',
-            body: 'You’ll set deposit and loss limits before you can play again.',
-          },
-        ],
+        // A cooling-off break (24 h / 7 d / 30 d) ends on its date; a self-exclusion never reopens by itself (API).
+        steps:
+          s.selfExclusion.kind === 'cooling_off'
+            ? [
+                {
+                  state: 'next',
+                  title: 'Play switches back on at the end time',
+                  body: 'Your limits stay exactly as they are.',
+                },
+              ]
+            : [
+                {
+                  state: 'next',
+                  title: 'Nothing switches back on automatically',
+                  body: 'Your account stays closed to play.',
+                },
+                {
+                  state: 'next',
+                  title: 'Ask to reopen — if you want to',
+                  body: 'Under Responsible gaming → Self-exclusion, once the end date has passed.',
+                },
+                {
+                  state: 'next',
+                  title: '24-hour cool-down, then limits first',
+                  body: 'You’ll set deposit and loss limits before you can play again.',
+                },
+              ],
         stepsNote: {
           icon: Info,
           text: 'There is no “end early” or “play now” option anywhere in GLOBAL POOL during your break.',

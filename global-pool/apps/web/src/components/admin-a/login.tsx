@@ -29,6 +29,7 @@ import * as React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
+import { safeAdminNext } from '@/components/auth/safe-next';
 import { Logo } from '@/components/brand/logo';
 import { Button } from '@/components/ui/button';
 import { DemoBadge, DemoBar } from '@/components/ui/demo-badge';
@@ -240,10 +241,11 @@ export function AdminLogin() {
     if (expired && !useOther) form1.setValue('email', expired.email);
   }, [expired, useOther, form1]);
 
-  // Already signed in → straight to the console.
+  // Already signed in → straight to the console. `next` is untrusted (a link can open this page in a signed-in
+  // tab): only same-origin /admin paths are followed, never an external or javascript: URL.
   React.useEffect(() => {
     if (session.status === 'signed_in' && !previewState)
-      router.replace(params.get('next') ?? '/admin');
+      router.replace(safeAdminNext(params.get('next')) ?? '/admin');
   }, [session.status, router, params, previewState]);
 
   const onStep1 = form1.handleSubmit(() => {
@@ -257,8 +259,7 @@ export function AdminLogin() {
     const { email, password } = form1.getValues();
     try {
       await session.login({ email, password, totpCode: code });
-      const next = params.get('next') ?? expired?.returnTo ?? '/admin';
-      router.replace(next.startsWith('/admin') ? next : '/admin');
+      router.replace(safeAdminNext(params.get('next')) ?? safeAdminNext(expired?.returnTo) ?? '/admin');
     } catch (err) {
       form2.reset({ totpCode: '' });
       if (err instanceof ApiRequestError) {

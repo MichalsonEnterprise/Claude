@@ -369,3 +369,22 @@ Reality checks: `holdRealityCheck()` / `requestRealityCheck()` were added (addit
 `components/rg-history/reality-check.tsx` — hold the reminder while a round is in progress (stateful games: hold from deal
 to settle) so it only appears between bets. Reduced motion: the kit's `useReducedMotion()` → show the result instantly
 (no roll / spin / flip animation).
+
+### Lobby, details and Pool Dice (key "kit") — `src/components/games/lobby/*`, `src/components/games/dice/*`
+
+| Route | Component | Notes |
+| --- | --- | --- |
+| `/games` | `GamesLobby` (`lobby/games-lobby.tsx`) | PUB-03 + GM-02: banner (angled block + fanned tile art), category tabs (All · Jackpot · Originals · Table · Slots · Live · Draws & bingo, counts from the catalogue), search (debounced into `?q=`), chips Provably fair · House edge ≤ 1% · Playable now · Favourites (members), sort, Global Pool spotlight (live round from the pool module, gold CTA), DEMO-credits card, sections (≥ 768 grid `minmax(168px,1fr)`; < 768 originals 2-col + "Show all", other sections swipe rails), filters bottom sheet < 768, empty state with matches in other categories, region-restricted tiles (no bypass hints). URL state: `?category=&q=&fair=1&edge=1&playable=1&fav=1&sort=az|edge`. |
+| `/games/<slug>/details` · `/games/<slug>` (no play screen) | `GameDetails` (`lobby/game-details.tsx`) | PUB-04: hero (copy + angled art), at a glance, how to play, **payouts computed with `@gp/shared/fair`** (`game-content.ts`), rules (published `FAIR_GAMES` lines), PF explainer, play / limits rail (Fees 0.00 DEMO), RG card, related rail. "Play (DEMO credits)" only when the game has a play screen; otherwise "Play screen coming soon" / "Coming soon" (disabled). Global Pool links to `/pool` (USDT, 0.05 fee line). |
+| `/games/pool-dice` | `DiceGame` (`dice/dice-game.tsx`) | DI-01…07 on the kit: `DiceStage` (readout, `DiceSlider` role="slider" ←→/↑↓ ±1.00, Shift ±0.01, PageUp/Down ±10, Home/End; roll marker eases to the REAL result in 800 ms, instant under reduced motion), linked Target ↔ Win chance ↔ Multiplier inputs (`dice-math.ts`, integer hundredths + the server's `dice.diceMultiplier`), Roll over/under radios, Space to roll, Manual/Auto, result banner, recent results, My rolls, seeds, verify drawer, states (loading, out of range, above max with "Set to 1,000.00", insufficient DEMO credits with "Bet X instead" / reset, reconnecting, loss limit, time limit, self-excluded, region, guest). |
+
+`GameTile` (domain) gained additive props: `art` + `gradient` for titles without a GameArt key (`lobby/tile-art.tsx` draws
+reels / balls / bingo card / cards / tower / duel curves) and `comingSoon` (tag "Soon", hover "Coming soon · Details", "Coming
+soon" in the accessible name). `ShellOverride` gained `collapseSidebar` (used by `GameLayout`).
+
+QA: `BASE_URL=http://localhost:3112 API_URL=http://localhost:4212 node scripts/games-kit-qa.mjs [screen-prefix…]` (fresh DEV
+MOCK players per run; fails on horizontal overflow / console errors) → `test-results/visual/games/kit/*.png`; e2e:
+`E2E_BASE_URL=http://localhost:3112 E2E_API_URL=http://localhost:4212 pnpm --filter @gp/web test:e2e -- e2e/games-kit.spec.ts`
+(lobby → dice → roll → balance = 1,000.00 ± net, USDT wallet unchanged → verify drawer (rotate & reveal, browser
+re-derivation, mismatch state) → dropped response replayed with the same idempotency key → auto-play (constant stake) →
+details; plus `403 REAL_MONEY_DISABLED` for a non-DEMO currency). Unit tests: `test/games-kit.test.ts`.

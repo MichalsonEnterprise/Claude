@@ -15,7 +15,7 @@ import { usdt } from '../../common/money';
 import type { AuthAdmin, RequestMeta } from '../../common/request';
 import { addHours, addMinutes } from '../../common/time';
 import { AppConfig } from '../../config/app-config';
-import { PrismaService } from '../../infra/prisma/prisma.service';
+import { PrismaService, type Tx } from '../../infra/prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { LedgerService } from '../ledger/ledger.service';
@@ -670,6 +670,32 @@ export class AdminPoolService {
     };
   }
 
+  /**
+   * Mark a lapsed breaker request expired — only while it is still pending (compare-and-set, so a concurrent
+   * approval is never overwritten) — with its system audit row. Returns false when it was no longer pending.
+   */
+  private async expireRequest(
+    tx: Tx,
+    a: { id: string; action: string; targetType: string; targetId: string },
+  ): Promise<boolean> {
+    const res = await tx.adminApproval.updateMany({
+      where: { id: a.id, status: 'pending' },
+      data: { status: 'expired' },
+    });
+    if (res.count !== 1) return false;
+    await this.audit.record(
+      {
+        actorType: 'system',
+        action: 'approval.expired',
+        targetType: a.targetType,
+        targetId: a.targetId,
+        metadata: { approvalId: a.id, requestedAction: a.action, expired: true },
+      },
+      tx,
+    );
+    return true;
+  }
+
   private async verifyMfa(admin: AuthAdmin, code: string) {
     await this.totp.verifyActive({ adminUserId: admin.id }, code, { allowBackup: false });
   }
@@ -700,8 +726,9 @@ export class AdminPoolService {
     }
     await this.verifyMfa(admin, input.mfaCode);
     return this.prisma.tx(async (tx) => {
-      if (existing) {
-        await tx.adminApproval.update({ where: { id: existing.id }, data: { status: 'expired' } });
+      if (existing && !(await this.expireRequest(tx, existing))) {
+        // It was decided (or expired) concurrently: never overwrite that outcome.
+        throw new AppError('CONFLICT', 'The previous circuit-breaker request just changed — reload');
       }
       const approval = await tx.adminApproval.create({
         data: {
@@ -790,17 +817,20 @@ export class AdminPoolService {
       );
     }
     if (expiryOf(approval.createdAt) <= new Date()) {
-      await this.prisma.adminApproval.update({
-        where: { id: approval.id },
-        data: { status: 'expired' },
-      });
+      await this.prisma.tx((tx) => this.expireRequest(tx, approval));
       throw new AppError('CONFLICT', 'This request expired — ask for a new one');
     }
     await this.verifyMfa(admin, input.mfaCode);
     const pause = approval.action === 'pool.entries.pause';
     const result = await this.prisma.tx(async (tx) => {
+      // The claim re-checks the TTL at decision time (the MFA check above takes time): a request created more
+      // than BREAKER_REQUEST_TTL_MINUTES ago can never be approved.
       const updated = await tx.adminApproval.updateMany({
-        where: { id: approval.id, status: 'pending' },
+        where: {
+          id: approval.id,
+          status: 'pending',
+          createdAt: { gt: addMinutes(new Date(), -BREAKER_REQUEST_TTL_MINUTES) },
+        },
         data: {
           status: input.decision === 'approve' ? 'approved' : 'rejected',
           decidedByAdminId: admin.id,
@@ -808,7 +838,18 @@ export class AdminPoolService {
           decidedAt: new Date(),
         },
       });
-      if (updated.count !== 1) throw new AppError('CONFLICT', 'This request was already decided');
+      if (updated.count !== 1) {
+        const now = await tx.adminApproval.findUnique({
+          where: { id: approval.id },
+          select: { status: true },
+        });
+        throw new AppError(
+          'CONFLICT',
+          now?.status === 'pending'
+            ? 'This request expired — ask for a new one'
+            : 'This request was already decided',
+        );
+      }
       if (input.decision === 'approve') {
         await tx.featureFlag.upsert({
           where: { key: ENTRIES_FLAG },

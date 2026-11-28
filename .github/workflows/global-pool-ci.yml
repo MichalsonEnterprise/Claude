@@ -116,6 +116,10 @@ jobs:
 
       - name: Test
         run: pnpm -r test
+        env:
+          # @gp/contracts: the stronger CI fuzzing of the draw / settlement invariants (packages/contracts/foundry.toml
+          # [profile.ci]: 10,000 fuzz runs, 512 invariant runs) instead of the local default (1,024 / 64).
+          FOUNDRY_PROFILE: ci
 
       - name: Build
         run: pnpm -r build

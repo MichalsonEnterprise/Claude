@@ -17,6 +17,10 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 ///         3. Thresholds are evaluated on-chain from the committed numbers: if met anyone may `requestDraw` (Chainlink
 ///            VRF v2.5), otherwise anyone may `cancelRound` with reason THRESHOLDS_NOT_MET (refunds happen off-chain).
 ///         4. `fulfillRandomWords` stores the single VRF word; `computeWinners` derives the distinct winning indices.
+///            Randomness is requested exactly ONCE per round and never re-requested (Chainlink VRF security guidance):
+///            if the request is still unfulfilled after `DRAW_REQUEST_TIMEOUT`, anyone may `cancelRound` with reason
+///            VRF_TIMEOUT (every stake is refunded off-chain) and a late fulfilment is ignored. Withholding a
+///            fulfilment therefore can at most cancel the round with full refunds — never choose between outcomes.
 ///         5. `recordSettlement` records the Merkle root of the payouts credited off-chain (must total the pool).
 ///         There is deliberately NO function that sets or overrides a random word, a winner, an entry list after
 ///         commitment or a settlement; pausing only stops new rounds and new commitments.
@@ -28,7 +32,8 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
     // ---------------------------------------------------------------------------------------------------------------
 
     /// @notice Lifecycle of a round. Transitions are one-way:
-    ///         None → Open → Committed → DrawRequested → Fulfilled → Settled, or Open/Committed → Cancelled.
+    ///         None → Open → Committed → DrawRequested → Fulfilled → Settled, or Open/Committed → Cancelled, or
+    ///         DrawRequested → Cancelled (VRF_TIMEOUT, only after `DRAW_REQUEST_TIMEOUT` without fulfilment).
     enum RoundStatus {
         None,
         Open,
@@ -95,7 +100,8 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
     uint16 public constant BPS_DENOMINATOR = 10_000;
     /// @notice Upper bound on prizes per round (bounds winner derivation gas).
     uint256 public constant MAX_PRIZES = 100;
-    /// @notice Minimum wait before an UNFULFILLED VRF request may be re-requested (same committed entries).
+    /// @notice Time after the draw request after which an UNFULFILLED draw may be cancelled with REASON_VRF_TIMEOUT.
+    ///         Randomness is never re-requested.
     uint256 public constant DRAW_REQUEST_TIMEOUT = 24 hours;
     /// @notice Number of VRF words requested per draw.
     uint32 public constant NUM_WORDS = 1;
@@ -116,6 +122,8 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
     uint16 public constant REASON_COMPLIANCE = 3;
     /// @notice Cancel reason: other, documented off-chain (audit log) before commitment.
     uint16 public constant REASON_OTHER = 4;
+    /// @notice Cancel reason: the VRF request was not fulfilled within `DRAW_REQUEST_TIMEOUT` (only from DrawRequested).
+    uint16 public constant REASON_VRF_TIMEOUT = 5;
 
     /// @notice The VRF coordinator fixed at deployment. Requests go only here and only its callbacks are accepted.
     IVRFCoordinatorV2Plus private immutable i_coordinator;
@@ -162,7 +170,7 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
         uint256 indexed roundId, uint16 indexed reasonCode, RoundStatus previousStatus, address cancelledBy
     );
 
-    /// @notice Randomness was requested from Chainlink VRF v2.5 (attempt > 1 means a timed-out re-request).
+    /// @notice Randomness was requested from Chainlink VRF v2.5 (once per round: `attempt` is always 1).
     event DrawRequested(
         uint256 indexed roundId,
         uint256 indexed requestId,
@@ -178,7 +186,7 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
     /// @notice The VRF word for a round was stored; winners follow deterministically via {computeWinners}.
     event DrawFulfilled(uint256 indexed roundId, uint256 indexed requestId, uint256 randomWord);
 
-    /// @notice A VRF callback was ignored (unknown request, or the round was already fulfilled by an earlier request).
+    /// @notice A VRF callback was ignored (unknown request, round already fulfilled, or cancelled for VRF timeout).
     event FulfillmentIgnored(uint256 indexed roundId, uint256 indexed requestId);
 
     /// @notice Payouts credited off-chain were recorded for a fulfilled round.
@@ -205,7 +213,7 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
     error ThresholdsNotMet(uint256 roundId);
     error ThresholdsMet(uint256 roundId);
     error InvalidReasonCode(uint16 reasonCode);
-    error DrawRequestPending(uint256 roundId, uint256 retryAt);
+    error DrawNotTimedOut(uint256 roundId, uint256 cancellableAt);
     error CoordinatorMismatch(address current, address pinned);
     error CoordinatorNotLocked();
     error UntrustedCoordinator(address caller);
@@ -365,10 +373,12 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
     }
 
     /// @notice Cancels a round. Refunds are handled by the off-chain ledger.
-    /// @dev    Two cases only, and never once a draw has been requested:
+    /// @dev    Three cases only, and never once the random word is stored:
     ///         - `Open` round: OPERATOR_ROLE, reason OPERATIONAL / COMPLIANCE / OTHER (no randomness exists yet).
     ///         - `Committed` round whose committed totals fail the thresholds: ANYONE, reason THRESHOLDS_NOT_MET.
-    ///         A committed round that meets its thresholds cannot be cancelled — it must be drawn.
+    ///         - `DrawRequested` round still unfulfilled `DRAW_REQUEST_TIMEOUT` after the request: ANYONE, reason
+    ///           VRF_TIMEOUT. The pending request is then dead (its late callback is ignored); nobody can re-request.
+    ///         A committed round that meets its thresholds cannot be cancelled before that — it must be drawn.
     /// @param roundId    Round identifier.
     /// @param reasonCode One of the `REASON_*` constants.
     function cancelRound(uint256 roundId, uint16 reasonCode) external {
@@ -382,6 +392,10 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
         } else if (previous == RoundStatus.Committed) {
             if (_thresholdsMet(r)) revert ThresholdsMet(roundId);
             if (reasonCode != REASON_THRESHOLDS_NOT_MET) revert InvalidReasonCode(reasonCode);
+        } else if (previous == RoundStatus.DrawRequested) {
+            if (reasonCode != REASON_VRF_TIMEOUT) revert InvalidReasonCode(reasonCode);
+            uint256 cancellableAt = uint256(r.lastRequestAt) + DRAW_REQUEST_TIMEOUT;
+            if (block.timestamp < cancellableAt) revert DrawNotTimedOut(roundId, cancellableAt);
         } else {
             revert InvalidStatus(roundId, previous);
         }
@@ -394,22 +408,15 @@ contract GlobalPoolRounds is VRFConsumerBaseV2Plus, AccessControl, Pausable {
 
     /// @notice Requests the round's randomness from Chainlink VRF v2.5. Permissionless: once entries are committed and
     ///         thresholds are met the draw is owed, so anyone (normally the platform keeper) may trigger it.
-    /// @dev    One request per round. A re-request is allowed only while the round is still unfulfilled and at least
-    ///         `DRAW_REQUEST_TIMEOUT` after the previous request; it reuses the same committed entries. Whichever
-    ///         outstanding request for the round is fulfilled FIRST is final — a re-request never invalidates an
-    ///         earlier request, and nothing can be re-rolled after fulfilment.
+    /// @dev    Exactly one request per round, never re-requested: a second request would let whoever can delay
+    ///         fulfilment pick between two outcomes. An unfulfilled draw is cancelled after `DRAW_REQUEST_TIMEOUT`
+    ///         instead (`cancelRound` with VRF_TIMEOUT, full refunds off-chain).
     /// @param roundId Round identifier.
     /// @return requestId The VRF request id.
     function requestDraw(uint256 roundId) external returns (uint256 requestId) {
         Round storage r = _rounds[roundId];
-        if (r.status == RoundStatus.Committed) {
-            if (!_thresholdsMet(r)) revert ThresholdsNotMet(roundId);
-        } else if (r.status == RoundStatus.DrawRequested) {
-            uint256 retryAt = uint256(r.lastRequestAt) + DRAW_REQUEST_TIMEOUT;
-            if (block.timestamp < retryAt) revert DrawRequestPending(roundId, retryAt);
-        } else {
-            revert InvalidStatus(roundId, r.status);
-        }
+        if (r.status != RoundStatus.Committed) revert InvalidStatus(roundId, r.status);
+        if (!_thresholdsMet(r)) revert ThresholdsNotMet(roundId);
         if (owner() != address(this)) revert CoordinatorNotLocked();
         if (address(s_vrfCoordinator) != address(i_coordinator)) {
             revert CoordinatorMismatch(address(s_vrfCoordinator), address(i_coordinator));

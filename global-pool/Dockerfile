@@ -47,6 +47,11 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_PRIVY_MOCK=$NEXT_PUBLIC_PRIVY_MOCK \
     NEXT_PUBLIC_CHAIN_ID=$NEXT_PUBLIC_CHAIN_ID \
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+# A web built with the mock off needs a Privy app id (else it would silently fall back to the DEV MOCK provider).
+RUN if [ "$NEXT_PUBLIC_PRIVY_MOCK" = "false" ] && [ -z "$NEXT_PUBLIC_PRIVY_APP_ID" ]; then \
+      echo "NEXT_PUBLIC_PRIVY_MOCK=false needs NEXT_PUBLIC_PRIVY_APP_ID (set it in .env for the prod profile)" >&2; \
+      exit 1; \
+    fi
 RUN pnpm --filter @gp/web build
 
 FROM api-build AS api

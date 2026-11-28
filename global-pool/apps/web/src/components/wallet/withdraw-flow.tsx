@@ -2,7 +2,7 @@
 
 import { CHAIN_DISPLAY_ORDER, CHAINS, type ChainKey } from '@gp/shared/chains';
 import { formatDateTimeUTC, formatTimeUTC } from '@gp/shared/format';
-import { formatUSDT, gt, isUSDTAmount, isZero, lt, money } from '@gp/shared/money';
+import { formatUSDT, gt, isUSDTAmount, isZero, lt, money, roundDown } from '@gp/shared/money';
 import { isSolanaAddress, isValidAddressForChain } from '@gp/shared/schemas';
 import type { PrecheckCheck } from '@gp/shared/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -645,6 +645,14 @@ function useQuote(amount: string, network: ChainKey) {
   });
 }
 
+/**
+ * What the MAX chip fills in: the cap (Available or what is left of today's limit) rounded DOWN to cents, so the
+ * filled amount can never exceed it (100.005 → 100.00; half-up rounding would give 100.01 and fail the check).
+ */
+export function maxFillAmount(max: string): string {
+  return roundDown(max, 2).toFixed(2);
+}
+
 function AmountStep({
   draft,
   onChange,
@@ -730,7 +738,7 @@ function AmountStep({
             variant="ghost"
             size="s"
             className="border border-border-default"
-            onClick={() => onChange(money(max).toFixed(2))}
+            onClick={() => onChange(maxFillAmount(max))}
           >
             MAX · {formatUSDT(max, { symbol: false })}
           </Button>

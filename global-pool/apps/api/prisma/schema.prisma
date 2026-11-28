@@ -628,15 +628,19 @@ model RgLimit {
 }
 
 /// Self-exclusion — honoured immediately and never obstructed. `endsAt` null = permanent.
+/// A long self-exclusion (6m / 1y / 5y) does NOT reopen at `endsAt`: the player must ask (`reopenRequestedAt`), wait
+/// the 24 h cool-down, set deposit + loss limits and confirm (`reopenedAt`). Breaks (24h / 7d / 30d) simply end.
 model RgSelfExclusion {
-  id        String    @id @default(uuid()) @db.Uuid
-  userId    String    @map("user_id") @db.Uuid
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
   /// 24h | 7d | 30d | 6m | 1y | permanent (SelfExclusionDuration in @gp/shared)
-  duration  String
-  startsAt  DateTime  @map("starts_at")
-  endsAt    DateTime? @map("ends_at")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  duration          String
+  startsAt          DateTime  @map("starts_at")
+  endsAt            DateTime? @map("ends_at")
+  reopenRequestedAt DateTime? @map("reopen_requested_at")
+  reopenedAt        DateTime? @map("reopened_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -100,12 +100,18 @@ helmet (CSP, no x-powered-by) → CORS (CORS_ORIGINS) → JSON body ≤ 256 kB �
   `DrawMath.sol` — a unit test rebuilds the contract fixture's 18,640-entry root) → `commitEntries`; the contract's
   threshold check decides `requestDraw` or `cancelRound`; after fulfilment the DB winners are compared with
   `computeWinners()` / `prizeAmounts()` before any credit; settlement → payouts tree → `recordSettlement`. Steps are
-  idempotent (the chain state decides), frozen data is append-only, and a requested draw is never cancelled: after
-  24 h it is re-requested (first fulfilment wins, audited).
+  idempotent (the chain state decides), frozen data is append-only, and randomness is requested exactly once per
+  round (never re-requested): a draw still unfulfilled 24 h after its request is cancelled on-chain
+  (`cancelRound(VRF_TIMEOUT)`, permissionless) and every stake is refunded. A round adopted on-chain
+  (`chain_mirror`) is drawn, cancelled and settled only through the contract; with the mirror switched off it is
+  refused and alerted, never handled off-chain. The VRF word is read from `getRound()` at a block with the
+  required confirmations (events only give tx hashes), so a watcher outage never strands a fulfilled round.
 - **Transactions the API signs** go through `ChainSignerService`: eth_chainId check (421614 / 31337 only), simulation
   with decoded custom errors, DB nonce manager (`chain_signer_nonces`, row lock, `max(stored, pending)`), signed-tx
   outbox (`chain_transactions`, stored before broadcast), re-broadcast of the same bytes, `mined` / `reverted` /
-  `dropped` tracking with confirmations. Roles: OPERATOR (open, commit), KEEPER (requestDraw, cancel — permissionless
+  `dropped` tracking with confirmations (`dropped` only when the nonce was consumed `confirmations` blocks deep and a
+  fresh receipt lookup still finds nothing). Every chain read that moves money or decides a draw (deposit watcher,
+  VRF watcher, signer) goes through `BlockchainService.verifiedClient()` (eth_chainId == EVM_CHAIN_ID). Roles: OPERATOR (open, commit), KEEPER (requestDraw, cancel — permissionless
   calls), SETTLER (recordSettlement), hot wallet (withdrawals); testnet keys from env, production keys belong in a
   KMS/HSM.
 - There is no code path for an admin to set results, pick winners, settle by hand, adjust balances or edit ledger rows.
@@ -122,13 +128,15 @@ helmet (CSP, no x-powered-by) → CORS (CORS_ORIGINS) → JSON body ≤ 256 kB �
   user + session + purpose. Cheap policy checks (KYC level, four-eyes) run before a code is consumed.
 - **Admins** are a separate identity domain: argon2id passwords (m=19 MiB, t=2), mandatory TOTP in the same login step
   (generic error), lockout, short access JWT (`ADMIN_JWT_ACCESS_SECRET`) plus a rotating opaque refresh token stored
-  hashed in `sessions` with family revocation on reuse. RBAC is loaded from the DB on every request, so revocation is
-  immediate. Sensitive actions need permission + reason + fresh MFA (+ four eyes where flagged) and write their
+  hashed in `sessions` with family revocation on reuse, and a server-side 15-minute idle timeout (`last_seen_at`).
+  Lockout counters (admin login, TOTP step-up) are reserved under a row lock before a guess is checked. RBAC is
+  loaded from the DB on every request, so revocation is immediate. Sensitive actions need permission + reason + fresh MFA (+ four eyes where flagged) and write their
   hash-chained audit row inside the same transaction.
 - **Audit log:** `hash = sha256(prev_hash + canonical JSON(row))`, appended under an advisory lock; secrets are
   redacted from metadata; `GET /admin/audit-logs/verify` recomputes the chain.
 - **Configuration** is validated with zod at boot: weak secrets, a wrong-size TOTP key or `REAL_MONEY_ENABLED=true`
-  stop the process. Logs redact `Authorization`, cookies and step-up headers.
+  stop the process; in production so does any committed placeholder secret (`.env.example` values, `dev-only` /
+  `change-me`). Logs redact `Authorization`, cookies and step-up headers.
 
 ### Compliance
 
@@ -136,8 +144,9 @@ Geo-restriction (DB `geo_rules` plus the `RESTRICTED_COUNTRIES` placeholder list
 only with `TRUST_PROXY=true`; fail-closed in production when unknown); 18+ and explicit, never pre-checked consents
 at onboarding; KYC levels (provider interface + mock) driving the daily withdrawal limits; AML screening (provider
 interface + mock, 6 checks) creating `aml_alerts`; responsible gaming enforced server-side (deposit, participation and
-loss limits; 24 h cool-down on increases; immediate self-exclusion that never blocks withdrawals; reality-check
-settings); admin restrictions (`gaming_blocked`, `deposits_blocked`, `withdrawals_frozen`, `account_suspended`) with
+loss limits; 24 h cool-down on increases; immediate self-exclusion that never blocks withdrawals and never reopens
+by itself — request, 24 h cool-down, deposit + loss limits, confirm; per-player lock around usage checks;
+reality-check settings); admin restrictions (`gaming_blocked`, `deposits_blocked`, `withdrawals_frozen`, `account_suspended`) with
 reason + MFA + audit. No VPN or geo-bypass hints anywhere.
 
 ### Background jobs (BullMQ)
@@ -164,8 +173,9 @@ guarded by compare-and-set status updates and unique posting event keys.
   manager keeps signing safe across processes.
 - **Docker:** the image installs OpenSSL (Prisma engine). `docker compose --profile dev` runs `api-dev`
   (`NODE_ENV=development` → DEV MOCK player login, migrations + DEMO seed on start, jobs on, log mail transport) and
-  `web-dev`; `--profile prod` runs production mode (DEV MOCK refused; Privy app id needed). Secrets come from
-  `.env.example` (dev placeholders) overridden by `.env`.
+  `web-dev`; `--profile prod` runs production mode (DEV MOCK refused; Privy app id needed; the web is built with the
+  mock off). The dev profile takes secrets from `.env.example` (dev placeholders) overridden by `.env`; the prod
+  profile reads `.env` only, and production refuses every committed placeholder secret at boot.
 - **Tests:** unit tests for posting rules, fee math, selection determinism (vs the contract vectors), commitments and
   payout trees (vs the contract fixture roots), RG limits, audit chain, crypto, HD derivation, AML and env validation;
   e2e tests (supertest) on `globalpool_test` for auth, onboarding, deposits, entries, idempotency, RG, withdrawals,

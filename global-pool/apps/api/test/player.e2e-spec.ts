@@ -350,6 +350,17 @@ describe('money flows (ledger-backed)', () => {
       status: 'under_review',
       withdrawalStatus: 'under_review',
     });
+
+    // Leave no open review behind in the shared test database (the admin queue lists open withdrawals oldest first).
+    await t
+      .http()
+      .post(`/withdrawals/${res.body.id as string}/cancel`)
+      .set(bearer(p.token))
+      .expect(200);
+    expect(
+      (await t.prisma.withdrawal.findUniqueOrThrow({ where: { id: res.body.id as string } }))
+        .status,
+    ).toBe('cancelled');
   });
 
   it('self-exclusion blocks entries immediately but never withdrawals', async () => {

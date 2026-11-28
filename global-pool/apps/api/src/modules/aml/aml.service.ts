@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { AmlAlertStatus, Prisma } from '@prisma/client';
 import { paginate, type PaginationQuery } from '@gp/shared/schemas';
 
-import { notFound } from '../../common/errors';
+import { conflict, notFound } from '../../common/errors';
 import { PrismaService, type Db } from '../../infra/prisma/prisma.service';
 import {
   MockAmlProvider,
@@ -88,6 +88,11 @@ export class AmlService {
     );
   }
 
+  /**
+   * Decide an open / under-review / escalated alert. Compare-and-set on the status, so an alert that is already
+   * closed (resolved, dismissed, auto-rejected) is never re-decided and two admins cannot both decide it. Pass the
+   * business transaction as `db` so the decision commits together with its audit row.
+   */
   async resolve(
     id: string,
     adminId: string,
@@ -97,8 +102,10 @@ export class AmlService {
   ) {
     const alert = await db.amlAlert.findUnique({ where: { id } });
     if (!alert) throw notFound('AML alert');
-    return db.amlAlert.update({
-      where: { id },
+    const from: AmlAlertStatus[] =
+      resolution === 'escalated' ? ['open', 'under_review'] : ['open', 'under_review', 'escalated'];
+    const claimed = await db.amlAlert.updateMany({
+      where: { id, status: { in: from } },
       data: {
         status: resolution,
         resolution: note,
@@ -106,5 +113,12 @@ export class AmlService {
         resolvedByAdminId: adminId,
       },
     });
+    if (claimed.count !== 1) {
+      const now = (await db.amlAlert.findUnique({ where: { id }, select: { status: true } }))?.status;
+      throw conflict(`This alert is already ${now ?? alert.status} and cannot be ${resolution}`, {
+        status: now ?? alert.status,
+      });
+    }
+    return { ...alert, status: resolution, previousStatus: alert.status };
   }
 }

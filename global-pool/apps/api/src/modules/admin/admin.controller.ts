@@ -24,6 +24,7 @@ import { z } from 'zod';
 
 import { CurrentAdmin, ReqMeta, type AuthAdmin, type RequestMeta } from '../../common/request';
 import { createZodDto } from '../../common/zod';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { AmlService } from '../aml/aml.service';
 import { AffiliatesService } from '../affiliates/affiliates.service';
@@ -129,6 +130,7 @@ export class AdminController {
     private readonly security: AdminSecurityService,
     private readonly flags: FeatureFlagsService,
     private readonly affiliates: AffiliatesService,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Get('dashboard')
@@ -289,18 +291,25 @@ export class AdminController {
     @ReqMeta() meta: RequestMeta,
   ) {
     await this.security.assertSensitive(admin, 'aml.resolve', body);
-    const alert = await this.aml.resolve(id, admin.id, body.resolution, body.reason);
-    await this.audit.record({
-      actorType: 'admin',
-      actorId: admin.id,
-      actorLabel: admin.name,
-      action: 'aml.alert.resolved',
-      targetType: 'aml_alert',
-      targetId: id,
-      reason: body.reason,
-      ip: meta.ip,
-      requestId: meta.requestId,
-      metadata: { resolution: body.resolution },
+    // The decision and its hash-chained audit row commit together (or not at all).
+    const alert = await this.prisma.tx(async (tx) => {
+      const decided = await this.aml.resolve(id, admin.id, body.resolution, body.reason, tx);
+      await this.audit.record(
+        {
+          actorType: 'admin',
+          actorId: admin.id,
+          actorLabel: admin.name,
+          action: 'aml.alert.resolved',
+          targetType: 'aml_alert',
+          targetId: id,
+          reason: body.reason,
+          ip: meta.ip,
+          requestId: meta.requestId,
+          metadata: { resolution: body.resolution, previousStatus: decided.previousStatus },
+        },
+        tx,
+      );
+      return decided;
     });
     return { id: alert.id, status: alert.status };
   }
