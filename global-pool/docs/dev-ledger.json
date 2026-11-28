@@ -1,0 +1,1876 @@
+{
+ "generated": "2026-11-28T05:58Z",
+ "legend": "dev = status reported by the module agent after its own typecheck/lint/test/build/screenshots/e2e; orchestrator integration verification is tracked in PROJECT_STATUS.md",
+ "rows": [
+  {
+   "id": "ADM-00",
+   "name": "Admin shell (sidebar, topbar, command palette, role-based \"no permission\" state)",
+   "pri": "P0",
+   "figma": "IN PROGRESS",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Verified at 1440/1280/768/390. Shell, sidebar, topbar, ⌘K palette, approvals inbox and no-permission (access table by module, lock state on groups). Approval policy and Export CSV buttons omitted (no API). The palette searches pages and players, not transactions or rounds.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-01",
+   "name": "Admin Login + 2FA + session timeout",
+   "pri": "P0",
+   "figma": "IN PROGRESS",
+   "dev": "PARTIAL",
+   "module": "admin-a",
+   "note": "Implemented: two-step sign-in with one login call, a generic error that never says which part failed, locked state (lockout after 5 attempts), session ended after idle/revoked/max length, 15-minute idle timeout with a real countdown, re-authentication. Missing: security-key (WebAuthn) and 'trust this device' (no API support); the 'network not approved' state is a dev preview only because the API has no IP allow-list.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-02",
+   "name": "Overview (all KPIs + system health) (M)",
+   "pri": "P0",
+   "figma": "IN PROGRESS",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Verified 1440/1280/768/390 with real ledger KPIs. Deviations: no deltas or sparklines (the API has no previous-period data); Gross revenue replaced by Customer balances (games are simulations, no GGR); a 'Last 30 days' label instead of a 24h/7d switch; KYC panel shows pending and verified counts only; system health = DB, Redis, queues, randomness, ledger invariants, kill switches. Roles without ledger.read and without withdrawals.approve (e.g. Support) get the money panels left out, not blurred.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-C1",
+   "name": "KYC Queue + review detail (M)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Queue (KPIs, status/level filters, SLA, risk, decision rules, recent decisions) and review (checks, masked player, risk meter, limits, history, approve / reject / request info with reason + 2FA). Playwright e2e passes. Deviations: decision uses buttons plus a dialog instead of inline radios; no document images (the provider keeps them); no case assignment.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-C2",
+   "name": "AML Alerts (M)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "KPIs (open, closed 7 days, no-issue rate 30 days), filters, table, full-width preview (why it fired, risk score, next step: escalate / close / dismiss via the existing resolve endpoint, withdrawal hold links to User Management restrictions), bottom sheet on mobile.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F1",
+   "name": "Deposits",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "/admin/finance/deposits — matches Figma layout: KPIs, network watchers, search/network/status filters, activity table, selected-deposit detail, held-deposits panel, CSV export. Checked at 1440 and 390. Watchers show 'No RPC (DEMO)' because no testnet RPC is configured. No 'Network health' button.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F2",
+   "name": "Withdrawals queue + detail (controlled approve/reject, four-eyes) (M)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Queue and WD detail, close to Figma. Includes queue card, tab views with counts, risk bars, SLA watch, policy FIN-2.3, approve step 1/2 then second approver, reject with reason + 2FA, sticky mobile action bar and bottom sheet. Bulk approve and 'Ask user for info' are deliberately not built. Approve/reject are API e2e-tested (existing admin tests) but not clicked through in the Playwright run.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F3",
+   "name": "Platform Fees",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Fee rule, 30-day bar chart with table toggle, check that the fee sub-ledger matches the fees account, fees by round. Platform fees of cancelled rounds are shown as retained (see decisions).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F4",
+   "name": "Pool Accounting",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Liabilities hero (pool escrow + owed prizes + refunds), ledger check using the custody mirror because no RPC is configured, round waterfall, ledger accounts, rounds ledger, Immutable panel.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F5",
+   "name": "Financial Ledger (append-only)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Integrity banner (7/7 append-only triggers, sum of the ledger = 0, journal digest, audit chain verified), journal table with prev→hash per journal, 'How the hash chain works', Corrections panel. The chain hash is recomputed on read; there is no on-chain anchoring and no correcting-entry workflow.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F6",
+   "name": "Reconciliation (match/mismatch)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "admin-b",
+   "note": "Live scopes (ledger total, posting balance, fee/pool/owed/locked sub-ledgers, round pools, custody, in-flight deposits) with match/mismatch/pending, problems first, Run now, CSV. Missing: stored run history (24 h squares), the investigation (INV) panel and the correcting-entry proposal. They need tables and a workflow that do not exist.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F7",
+   "name": "Refunds",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Cancelled-round panels (threshold bars, claimed vs outstanding, largest unclaimed), remind-players action (reason, audited, 1 per 24 h), 'Issue manual refund' disabled, returns that are not refunds.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F8",
+   "name": "Revenue Reports",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "admin-b",
+   "note": "Gross (platform fees) − rewards = net, period chips, weekly bar chart, product share, statement tied to ledger sources, excluded network fees. No game revenue (games are non-monetary simulations) and no scheduled reports.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-F9",
+   "name": "Export CSV (modal + states)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Export CSV dialog with Configure / Generating / Ready (rows, SHA-256, expiry, audit #) / Error (too many rows) states. Personal-data switch gated by permission, reason counter, watermark. No column selection and no row estimate.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P1",
+   "name": "Pool Overview",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "KPIs, round panel with server-clock countdown, 4-stat strip, required disclaimer (fee line, 'You can lose your stake', 18+), lifecycle, pipeline health, needs attention, recent rounds, Immutable chips.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P10",
+   "name": "\"Immutable by design\" policy panel / circuit-breaker (dual approval)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Contract decides / Admins may / Nobody can; breaker with rules, current state, request / second-approval / decline dialogs, history, governance. Dual control is API e2e-tested (requester, self-block, same-role block, approve, entries return 503, resume). No 'Download policy (PDF)' and no contract card.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P2",
+   "name": "Pool Balance",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Where the money is, hourly pool growth, latest pool movements, ledger vs projection per active round. Contract balance not read (DEMO, no RPC).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P3",
+   "name": "Active Round (monitoring) (M)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Live countdown, thresholds, entries per hour, prize table at the current pool, purchase feed, concentration.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P4",
+   "name": "Historical Rounds",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Paginated history with status filter and settlement/refund progress.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P5",
+   "name": "Participant List",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Round picker (?round=), participants grouped by player (entries, stake, fees, share, entry IDs, KYC, country), search.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P6",
+   "name": "Prize Distribution",
+   "pri": "P1",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Split bars and winners table with claim status; read-only.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P7",
+   "name": "VRF Status",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Provider config, counts, request table, honest empty state (the dev DB has no randomness requests). No LINK subscription balance. The fulfilled and delayed states are data-driven and not visually checked.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P8",
+   "name": "Settlement Status",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "admin-b",
+   "note": "Allocations, settlement steps and postings for settled rounds. No auto-claim batch progress (the backend credits Owed in one transaction). DEMO history rounds have only 1 winner row and no claim rows.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-P9",
+   "name": "Refund Status",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-b",
+   "note": "Reuses the refund panels (RefundOnCancel), filter by ?round=.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-S1",
+   "name": "Admin Roles",
+   "pri": "P1",
+   "figma": "NOT STARTED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Live role cards: permission counts, sensitive permissions, members, pending change requests.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-S2",
+   "name": "Permissions matrix",
+   "pri": "P1",
+   "figma": "NOT STARTED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Live matrix with policy chips. Super Admin can stage changes for one role at a time and submit them as a four-eyes request (reason + 2FA); the Super Admin role itself is fixed. Read-only for everyone else.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-S3",
+   "name": "Audit Logs",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Verified 1440/1280/768/390. Integrity banner (GET /admin/audit-logs/verify), filters, expandable rows. Page-based pagination instead of cursor.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U1",
+   "name": "Users List",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "KPIs, filters (search, status, KYC level, restricted), table with masked email, KYC, status, AML risk, country, ledger balance and last active, pagination, cards below 768. No saved views or CSV export.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U10",
+   "name": "Audit History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Audit table filtered to the player; rows expand to hashes and metadata.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U2",
+   "name": "User Profile (summary)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Header with identity, badges and the read-only 5-column balances strip; 9 tabs (a section picker below 1024); two-column summary. 'Add case note' and 'Export user data' omitted (no API).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U3",
+   "name": "Account Details",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "admin-a",
+   "note": "Implemented: masked email, date of birth and last IP, each revealed one field at a time with a logged reason (shown for 60 s, value not stored in the audit log); account facts, consents (read-only), security, sessions table. Missing: legal name, phone, address and nationality (no data), the support-context panel, and end-session / 2FA-reset actions (no API).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U4",
+   "name": "Wallet Addresses",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Wallets with whitelist, cool-down and removed states, usage counts, deposit addresses, read-only notice. 'Flag for review' omitted (no API).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U5",
+   "name": "KYC Status",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Three-level tracker, records table, limits by level. No documents table or 'Request information' (the mock provider has no documents and there is no API).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U6",
+   "name": "AML Risk",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Rule-based read-only score with bands, factor breakdown and alerts table. No 90-day chart (no score history is stored).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U7",
+   "name": "Transaction History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Lifetime flows, type filter, paginated table with separate platform-fee and network-fee columns, append-only note.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U8",
+   "name": "Account Restrictions (apply/lift with reason + 2FA)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Verified 1440/1280/768/390 plus e2e. Apply dialog per Figma: restriction select, what changes for the user, reason category, internal reason, 2FA, four-eyes notice for holds and suspensions. Lift = reason + 2FA. Pending requests, history, policy panels, what the player sees. No duration option (the API has no timed restrictions).",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-U9",
+   "name": "Responsible Gaming Status",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Limits with meters (decimal maths, never floats), pending increases, self-exclusion and history, 'admins cannot loosen' notice. No play-pattern or harm-marker analytics.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "ADM-X1",
+   "name": "Four-eyes approval modal + confirm-with-reason + re-auth pattern",
+   "pri": "P0",
+   "figma": "IN PROGRESS",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "Confirm-with-reason, request submitted with AR reference and audit entry, second-approver review, self-approval blocked, approved/rejected/withdrawn/expired trail, captured during e2e. Deviation: the fresh 2FA code is entered in the decision dialog and checked with that same call, instead of a separate pre-verified step (codes are single-use and only valid for 30 s). No 'remind approvers'.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "AUTH-01",
+   "name": "Register (email + password)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "auth",
+   "note": "Sign-up runs through Privy (email, then 6-digit code; Google/Apple; wallet). The Figma register fields moved to /onboarding: handle, country, date of birth, and the 2 required consents plus optional marketing, all unchecked. No password: owner decision #3. Screenshots and e2e done.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-02",
+   "name": "Register — wallet-first",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "auth",
+   "note": "Wallet-first sign-up view with the 6 provider rows, seed-phrase notice and 18+ / jurisdiction line. Browser wallet is fully custom (SIWE); WalletConnect / Coinbase / Trust / Phantom / Ledger open Privy's themed modal in real Privy mode. DEV MOCK simulates the connection.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-03",
+   "name": "Login",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "auth",
+   "note": "Sign-in view: Welcome back, email, 'Sign in', Google/Apple, 4 wallet quick-connect tiles, anti-phishing note. No password, 'keep me signed in' or 'forgot password' under Privy; the locked state is Privy's too-many-attempts.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-04",
+   "name": "Email Verification",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "auth",
+   "note": "Code step: Step 2 of 3 bar, 6-box code field, 60 s resend cooldown, sent/expires times, wrong code with attempts left (5), expired / locked, success with next steps leading to onboarding. Screenshots 1440/390 and e2e.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-05",
+   "name": "Forgot Password",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "N/A",
+   "module": "auth",
+   "note": "Password reset does not apply to players under Privy.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-07",
+   "name": "2FA Enrollment",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "auth",
+   "note": "/2fa/setup: scan (QR from the real otpauth URI plus a grouped setup key), confirm against the API, 10 backup codes (download / copy / print, Finish disabled until the box is ticked). e2e enrols with a real TOTP code.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-08",
+   "name": "2FA Challenge (login / withdrawal)",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "PARTIAL",
+   "module": "auth",
+   "note": "useStepUp() / StepUpDialog / /2fa/challenge: anti-phishing code, authenticator or backup code, wrong code with attempts left, 15-minute lock with a countdown to the real unlock time, 'set up 2FA first'. The withdrawal variant matches Figma; the login variant doesn't apply (player login is Privy).",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-09",
+   "name": "Connect Wallet modal",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "auth",
+   "note": "Connect-wallet dialog: list, WalletConnect QR (DEMO), connecting, rejected, wrong network (switch to Arbitrum), success leading to verify. Exposed as useWalletConnect().",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-10",
+   "name": "Wallet Verification (sign message)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "auth",
+   "note": "Verify-ownership dialog: readable message, 'No transaction / No gas · 0.00 / Can't move funds' chips, 10-minute message with live countdown, success record, rejected, expired. Privy uses useLinkWithSiwe; DEV MOCK shows a neutral mock wallet pop-up. Re-syncs the API session afterwards.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-11",
+   "name": "KYC Intro & levels",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "KYC intro and levels: current level, daily limits, the next level's requirements, and Start Level N. Higher levels open only in order.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-12",
+   "name": "KYC Personal Details",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Personal details form with kycDetailsSchema. All errors show at once in an error summary: 18+, per-country postal format, last-name initials, PEP choice, an accuracy checkbox that starts unchecked. Country must match the account and be permitted. Details carry over to later levels.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-13",
+   "name": "KYC Document Upload",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Document upload: choose the type, requirements, front and back. Only metadata and a SHA-256 hash (computed in the browser) are sent. The mock check fails files under 40 KB as too blurry so they can be retaken. Previews, and 'We read these details from your document' with the document number masked.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-14",
+   "name": "KYC Liveness / Selfie",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Mock liveness check: camera via getUserMedia, a 'Camera permission is off' state, and 'Use DEMO capture (no camera)'. Up to 3 attempts, then manual review. Partial: the desktop hand-off to a phone by QR code is not built.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-15",
+   "name": "KYC Pending",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Review and submit (confirmation not pre-checked), then the pending screen: reference number, expected time, and DEMO approve/reject controls for the mock provider. Submitting creates a notification and an audit row.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-16",
+   "name": "KYC Approved",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Approved screen with the new daily limit. Level 1 is approved instantly by the mock provider and offers 'Continue to Level 2'.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-17",
+   "name": "KYC Rejected",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Rejected screen: failed checks with what to fix ('We couldn't verify your ID yet', Fix and resubmit). The resubmit step asks only for the items that failed (liveness is kept), then 'Submit again'.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-18",
+   "name": "Restricted Account",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "auth",
+   "note": "/restricted/{suspended,under-review,self-excluded,region} use live data from the new GET /auth/account-status plus /wallet/balances; loading, error and not-restricted states included. Uses the normal casino shell, not Figma's reduced restricted-mode shell.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-20",
+   "name": "Session expired / re-auth modal",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "auth",
+   "note": "Session-expired modal after 30 min idle or any 401; 'Sign in again' returns to the same page; 'nothing changed' reassurance. The 'sensitive action re-auth' variant is covered by StepUpDialog (no player passwords).",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "AUTH-21",
+   "name": "New-device login alert",
+   "pri": "P2",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "auth",
+   "note": "API flags sign-ins from a device label the player never used; the alert shows on their other sessions with 'Yes, it was me' / 'No, secure my account' (signs out all other sessions, audited). e2e passes across 2 browser contexts.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "CMP-01",
+   "name": "Buttons",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-02",
+   "name": "Inputs & form controls (incl. amount, address, OTP, upload)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-03",
+   "name": "Selects / dropdowns (network, token)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-04",
+   "name": "Cards (stat, balance, jackpot, game, winner, round, VIP, network, notification)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-05",
+   "name": "Tables (all cell types, density, toolbar, skeleton)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-06",
+   "name": "Modals, drawers, bottom sheets",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-07",
+   "name": "Tabs, badges, tooltips",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-08",
+   "name": "Toasts & alerts (incl. regulatory/region/security)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-09",
+   "name": "Navigation (public header variants, dashboard sidebar, mobile tab bar, breadcrumb, stepper, pagination)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-10",
+   "name": "Footer variants",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-12",
+   "name": "Wallet components",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-13",
+   "name": "Transaction components",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-14",
+   "name": "Jackpot components",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "CMP-18",
+   "name": "Responsible-gaming components (limit setter, session bar, reality-check modal)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-01",
+   "name": "Brand / logo / cover",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-02",
+   "name": "Colour primitives + semantic variables (incl. balance colours, chain colours)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-03",
+   "name": "Gradients and effects",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-04",
+   "name": "Typography styles (incl. Number & Mono)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-05",
+   "name": "Spacing, radius, elevation, grids per breakpoint",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-06",
+   "name": "Icon set (nav, status, chain, token, game)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "DS-09",
+   "name": "DEMO badge + compliance notice specs",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "FOUNDATION",
+   "module": "foundation-web",
+   "note": "Tokens (@gp/tokens) + components in apps/web/src/components/{ui,shell,domain,brand} shown on /design-system; not itemised per variant against Figma",
+   "report": ""
+  },
+  {
+   "id": "ERR-01",
+   "name": "Empty-state matrix per module (wallet, transactions, entries, winnings, referrals, notifications, devices, admin tables)",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "PER MODULE",
+   "module": "—",
+   "note": "States built inside each module; no cross-module audit yet",
+   "report": ""
+  },
+  {
+   "id": "ERR-02",
+   "name": "Error matrix: network error, 4xx/5xx, timeout, validation, chain congestion, tx failed/dropped/replaced",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "PER MODULE",
+   "module": "—",
+   "note": "States built inside each module; no cross-module audit yet",
+   "report": ""
+  },
+  {
+   "id": "ERR-03",
+   "name": "Loading matrix: skeletons, spinners, progress, optimistic UI",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "PER MODULE",
+   "module": "—",
+   "note": "States built inside each module; no cross-module audit yet",
+   "report": ""
+  },
+  {
+   "id": "ERR-05",
+   "name": "Regulatory states: restricted region, licence required, self-excluded, age-gate fail",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "NOT STARTED",
+   "module": "—",
+   "note": "P0 compliance gap: geo-block interstitial / age gate + licence modal / regulatory states not built yet",
+   "report": ""
+  },
+  {
+   "id": "ERR-07",
+   "name": "Security warnings library (wrong network, new address, phishing warning, suspicious login)",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "PER MODULE",
+   "module": "—",
+   "note": "States built inside each module; no cross-module audit yet",
+   "report": ""
+  },
+  {
+   "id": "GM-01",
+   "name": "Game session RG bar + reality-check popup (as designed within games)",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "PLANNED",
+   "module": "games",
+   "note": "P1 games workflow (kit agent)",
+   "report": ""
+  },
+  {
+   "id": "GP-01",
+   "name": "Global Pool Hub (pool balance, current round, participants, real countdown, threshold)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Hub with real API data and the live socket. States checked by screenshot: active (1440/768/390, member and guest), new low-pool round (threshold not met), between rounds, restricted, wallet disconnected (= signed out), loading skeleton. Error state is built (QueryError) but not shown in a screenshot. Countdown uses the real closesAt.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-02",
+   "name": "Participation Preview modal (amount, entries, 0.05 USDT fee, network fee, odds disclosure, limit check, licence notice)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Preview modal (1440) and bottom sheet (390). Default and limit-reached checked by screenshot (@nova.k really is over the seeded loss limit). Insufficient funds is unit-tested (342.10 → short by 9.65, reduce to 34) but not screenshot. Wrong network is UI-only via ?state=wrong-network: the auth layer exposes no wallet chain.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-03",
+   "name": "Participation Pending",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Pending step while the single DB transaction runs, with honest steps (no fake confirmation counter or tx hash). The e2e passes through it; it is too short-lived to capture in a screenshot.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-04",
+   "name": "Participation Success (entry receipt)",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Receipt: entry IDs, reference, fee breakdown, locked amount, odds, RG usage, client-side receipt download. Asserted by the e2e (reference, Locked until the draw, 30.15 total) plus API ledger checks.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-05",
+   "name": "Round Drawing (VRF stepper: requested → fulfilled → settled)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Drawing and delayed states at 1440 and 390, screenshot-checked on a real lifecycle round (mock VRF): requested → awaiting/delayed → fulfilled → settled stepper, refund deadline = request + 24 h.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-06",
+   "name": "Round Result — winner view",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "pool",
+   "note": "'Not selected' is checked with the real settlement (nova, 1440/390). The 'won' branch is coded (winning entries ∩ my entries; prize sits in Owed until claimed) but never screenshot because no QA player won.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-07",
+   "name": "Round Result — public view (winner info, prize distribution, PF result)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Public results: banner, top 3, all 13 winners, prize distribution, round facts, provably-fair card. Checked at 1440/390 for guest and member.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-08",
+   "name": "Round History",
+   "pri": "P1",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "History: open round first, status chips, round-number search, Rounds I entered, CSV export, pagination, mobile cards. No date-range filter.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-09",
+   "name": "Round Detail",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Cancelled → refunds (#1,245): threshold not met, your refund, refund timeline, round facts. The settled-round detail is part of the results page.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-10",
+   "name": "Entry History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Entry history from the new GET /pool/me/entries: summary, result filter chips, table/cards, receipt panel, RG limit card, guest empty state.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-11",
+   "name": "Prize Distribution breakdown",
+   "pri": "P1",
+   "figma": "IN PROGRESS",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Pool basis, distribution card, split bar (instead of a donut), tier table with chance per entry, your chances / not part of the pool / if the round doesn't draw, past rounds.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-12",
+   "name": "Provably Fair Result verification",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Fetches /pool/rounds/:n/verify and re-derives winners and prizes in the browser with @gp/contracts/verify. Verified (4/4) and failed (pasted wrong random word) checked at 1440/390. Snapshot-root check is informational only (not published yet). Unit-tested against the Solidity-proven round-1248 fixture.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "GP-13",
+   "name": "Edge states: round closed, round cancelled (refund owed), VRF delayed",
+   "pri": "P1",
+   "figma": "IN PROGRESS",
+   "dev": "PARTIAL",
+   "module": "pool",
+   "note": "VRF delayed and the cancelled-round refund-owed hub banner are checked by screenshot. The 'round closed before your entries were placed' modal (ROUND_NOT_OPEN) is coded but never screenshot.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "MOB-01",
+   "name": "Mobile public header + full-screen menu",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "foundation-web",
+   "note": "Mobile top app bar + full-screen menu in the casino shell (not itemised in a report)",
+   "report": ""
+  },
+  {
+   "id": "MOB-02",
+   "name": "Bottom tab bar (Home, Pool, Games, Wallet, Account) states",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "foundation-web",
+   "note": "Bottom tab bar Lobby/Pool/Games/Wallet/Account (account tab → /dashboard)",
+   "report": ""
+  },
+  {
+   "id": "MOB-03",
+   "name": "Mobile Home — all sections stacked",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "foundation-home",
+   "note": "Mobile home, all sections stacked",
+   "report": ""
+  },
+  {
+   "id": "MOB-04",
+   "name": "Mobile Global Pool hub + sticky participate bar",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "390 hub: compact hero stats, sticky participate bar above the tab bar, bottom-sheet participation.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "MOB-05",
+   "name": "Mobile Wallet overview + quick actions",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "390 layout: breakdown card, Deposit/Withdraw/History tiles, compact withdrawable strip, stacked transaction cards, no sub-tabs; sticky Deposit button on the empty state.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "MOB-06",
+   "name": "Mobile Deposit (bottom-sheet pattern, all steps)",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "All deposit steps run in a bottom sheet over the wallet page: grabber, title + close, compact stepper, scrollable body, sticky CTA.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "MOB-07",
+   "name": "Mobile Withdraw (bottom-sheet pattern, all steps)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Withdraw steps 1-9 in the bottom sheet; nested sheets for the insufficient-funds, add-address and cancel modals.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "MOB-08",
+   "name": "Mobile Games lobby + game screens (thumb-reach controls)",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "PLANNED",
+   "module": "games",
+   "note": "P1 games workflow (kit agent)",
+   "report": ""
+  },
+  {
+   "id": "MOB-09",
+   "name": "Mobile Account Security (2FA, devices, sessions)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Mobile account and security at 390: app bar back link, sections sheet, stacked cards, actions full width, touch targets of 44 px or more. Screenshotted for every route at 390 and compared with Figma (USR-A2_390_MOB-09_default).",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "MOB-10",
+   "name": "Mobile tables→cards patterns (transactions, entries)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "390 layouts for every F and G screen: stacked tx cards grouped by day, scrolling pills, bottom-sheet export, 44px targets. Verified by 390 screenshots.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "MOB-11",
+   "name": "Mobile admin subset: overview, approvals, alerts",
+   "pri": "P1",
+   "figma": "NOT STARTED",
+   "dev": "IMPLEMENTED",
+   "module": "admin-a",
+   "note": "390 px overview (2-column KPI grid), approvals as cards with full-width actions, alerts with acknowledge; admin mobile top bar plus tab bar (Overview, Approvals, KYC, Alerts, More). The review opens as a full-width dialog, not a bottom sheet.",
+   "report": "reports-p0-admin.json"
+  },
+  {
+   "id": "PRO-01",
+   "name": "Homepage → Register → Verification → Dashboard",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "COVERED BY E2E",
+   "module": "qa",
+   "note": "Figma prototypes; code equivalents are the e2e journeys (apps/web/e2e/*, integration QA running)",
+   "report": ""
+  },
+  {
+   "id": "PRO-02",
+   "name": "Dashboard → Connect Wallet",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "COVERED BY E2E",
+   "module": "qa",
+   "note": "Figma prototypes; code equivalents are the e2e journeys (apps/web/e2e/*, integration QA running)",
+   "report": ""
+  },
+  {
+   "id": "PRO-03",
+   "name": "Wallet → Deposit → Confirmation",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "COVERED BY E2E",
+   "module": "qa",
+   "note": "Figma prototypes; code equivalents are the e2e journeys (apps/web/e2e/*, integration QA running)",
+   "report": ""
+  },
+  {
+   "id": "PRO-04",
+   "name": "Wallet → Withdrawal → Confirmation",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "COVERED BY E2E",
+   "module": "qa",
+   "note": "Figma prototypes; code equivalents are the e2e journeys (apps/web/e2e/*, integration QA running)",
+   "report": ""
+  },
+  {
+   "id": "PRO-05",
+   "name": "Global Pool → Participation Preview → Result",
+   "pri": "P0",
+   "figma": "NOT STARTED",
+   "dev": "COVERED BY E2E",
+   "module": "qa",
+   "note": "Figma prototypes; code equivalents are the e2e journeys (apps/web/e2e/*, integration QA running)",
+   "report": ""
+  },
+  {
+   "id": "PUB-01",
+   "name": "HomePage",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "foundation-home",
+   "note": "Homepage H1–H12, 4 states, 1440/390; real clock since the pool agent fix",
+   "report": ""
+  },
+  {
+   "id": "PUB-02",
+   "name": "Global Pool (public)",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Signed-out /pool: 'Sign in to participate', 'Connect your wallet to add entries' card, odds per entry; restricted and no-round states.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "PUB-03",
+   "name": "Games Lobby",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "PLANNED",
+   "module": "games",
+   "note": "P1 games workflow (kit agent)",
+   "report": ""
+  },
+  {
+   "id": "PUB-07",
+   "name": "Provably Fair (explainer + verifier)",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "PARTIAL",
+   "module": "pool",
+   "note": "Explainers first, then the verifier: seeds tab (default, using the existing dice algorithm and a DEMO sample button) and a real VRF tab (round number → verify bundle → in-browser re-derivation). Only the empty state is screenshot-checked at 1440/390; the verified/failed panels of both tabs are coded but not screenshot.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "PUB-21",
+   "name": "Geo-block interstitial",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "NOT STARTED",
+   "module": "—",
+   "note": "P0 compliance gap: geo-block interstitial / age gate + licence modal / regulatory states not built yet",
+   "report": ""
+  },
+  {
+   "id": "PUB-22",
+   "name": "Age gate + licence notice modal",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "NOT STARTED",
+   "module": "—",
+   "note": "P0 compliance gap: geo-block interstitial / age gate + licence modal / regulatory states not built yet",
+   "report": ""
+  },
+  {
+   "id": "USR-00",
+   "name": "Dashboard shell (sidebar expanded/collapsed, topbar)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Dashboard shell in page-shell.tsx. Breadcrumb on tablet and up. Underline dashboard tabs and account sub-nav pills. On mobile, a back link plus an 'All dashboard sections' bottom sheet. Sign-in gate for guests and a loading skeleton. The sidebar and tab bar highlight the account section via nav-config match.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-01",
+   "name": "Dashboard Overview",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "All three states come from real data and were screenshotted. Active: balances, pool with fee split and odds, VIP, games, notifications, activity, RG. New user: setup checklist and zero balances. Restricted: from account-status (region or paused), checked by restarting the API with DEV_COUNTRY_OVERRIDE=US; it also triggers the shell's restricted banner. Partial: tournaments, missions, rakeback and open game bets are not shown because no API exists. The welcome offer is information only; opt-in stays in the deposit flow. 1280 and 768 rely on responsive classes and were not screenshotted separately.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-02",
+   "name": "Notification Center",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Notification centre at /notifications. Filter chips with counts from the API (?category plus counts), Today/Earlier groups, mark one or all read, load older, an email delivery panel and an anti-phishing card. Unread and empty states screenshotted.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A1",
+   "name": "Personal Information",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Personal info form (RHF + profileUpdateSchema): display name, language, time zone. Legal details from KYC are locked and masked. Save bar appears only when there are changes. Partial: no phone number field (no SMS verification exists), no avatar upload, no number-format preference. Data export and close account link to support.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A10",
+   "name": "Anti-Phishing Code",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Anti-phishing code: view (masked), set or change via step-up, and a preview of how emails show it.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A2",
+   "name": "Security Settings (security score)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Security score from GET /me/security: a 0-100 score from six weighted items, a status, devices to review, a next-step hint, sign-in and withdrawal protection, and recent events. The Figma 'Password' row is replaced by 'Sign-in method: passwordless (Privy)', following the owner decision.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A3",
+   "name": "Two-Factor Authentication mgmt",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "2FA manage page. Move to a new phone or reset (step-up, then the auth agent's /2fa/setup enrolment). Turn off (confirm dialog, then step-up). Generate backup codes (step-up; codes shown once with download, copy and an 'I've saved them' checkbox). Uses the auth agent's useStepUp.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A4",
+   "name": "KYC Status",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "KYC status page: a summary for each state, verified details, review timeline, fix card and level cards. The flow opens as a dialog at /account/kyc/verify. Partial: no expired-ID state, because the API does not track document expiry.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A5",
+   "name": "Verification Documents",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Documents list from GET /kyc/documents: items with status counts, older verified records, and an empty state.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A6",
+   "name": "Login History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Login history from GET /me/login-history: All/Successful/Flagged/Ended filters, day range, paging, a table on desktop and cards on mobile, CSV export. The flagged banner uses devicesToReview from /me/security.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A7",
+   "name": "Connected Devices",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Devices page: sessions grouped by device, with revoke, 'sign out other sessions' and show-all. Partial: the device-trust duration select and the '2FA on every sign-in' toggle are left out because the API does not enforce them; an info card stands in their place.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A8",
+   "name": "Session Management",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Sessions page: active sessions and ended ones from the last 90 days, the current browser marked, revoke one or all others. Partial: the inactivity timeout is shown read-only from IDLE_TIMEOUT_MINUTES.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-A9",
+   "name": "Notification Preferences",
+   "pri": "P2",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "account",
+   "note": "Notification preferences: an email/push/in-app grid across 11 categories. Locked categories show 'Required'. Marketing is opt-in only. Reset to recommended and quiet hours. Saved with PUT /me/notification-preferences, stored in UserProfile.preferences.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "USR-F1",
+   "name": "Deposits",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Deposits: KPIs, filterable list with confirmations, empty state for a new account.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-F2",
+   "name": "Withdrawals",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Withdrawals: under-review tracker with fee breakdown (network fee separate, platform fee 0.00), daily-limit meter, list.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-F3",
+   "name": "Fees",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Fees: entries × 0.05 equation, current round / 30 d KPIs, fee lines (platform vs network), fee schedule.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-F4",
+   "name": "Rewards",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Rewards: owed reward card with claim (POST /wallet/owed/claim), KPIs, list.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-F5",
+   "name": "Refunds",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Refunds: owed refund card with timeline + claim, KPIs, list, how refunds work (states that fees are not refunded under current rules).",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-F6",
+   "name": "Complete Transaction History + export",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Balance + KPIs, search/type/status/period filters, table ≥1024 / cards <1024, expandable details, pagination, CSV export (audited), print. No 'Your exports' list.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G1",
+   "name": "My Games",
+   "pri": "P1",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "In-progress round with real countdown + odds, last-30-day KPIs (Global Pool vs simulation kept separate), recently played (DEMO simulation sessions).",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G2",
+   "name": "My Entries",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "KPIs, status filters, sort, entries grouped by round, empty state, what-each-status-means cards. Grouped by round rather than per-entry expandable rows.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G3",
+   "name": "My Active Rounds",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Active round cards with countdown, entries, share, empty state.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G4",
+   "name": "My Results",
+   "pri": "P1",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Settled/cancelled rounds with result badges and verify links.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G5",
+   "name": "My Winnings (claim/settlement)",
+   "pri": "P0",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Owed vs settled prizes, refunds and rewards, claim to Available.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G6",
+   "name": "Game History",
+   "pri": "P1",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Game rounds with commit-reveal seeds (server seed hidden until the session ends), game filter, CSV export; simulation notice.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-G7",
+   "name": "Favorites",
+   "pri": "P2",
+   "figma": "BUILT",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Favourites grid with remove (heart), empty state; API add/remove.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG1",
+   "name": "RG Hub / overview",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Hub: session bar, 6 tool cards, need-a-pause cards, help resources, limit rules; mobile list + today card. Verified 1440/390 vs Figma 121:54556 / 129:57449.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG2",
+   "name": "Deposit Limits",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Limit setter (period, input, usage, pending increase/removal, cancel), pending notice, deposits counted this week, limit history from the audit log. Matches Figma 121:56097.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG3",
+   "name": "Participation Limits",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Participation and loss limits, what-counts card (0.05 USDT fee per entry), today-at-a-glance.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG4",
+   "name": "Time Limits",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Daily time limit, session-length limit, quiet hours (UTC), all enforced by the API; when-time-is-up card.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG5",
+   "name": "Reality Checks (settings + popup)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Interval chips, pause/push toggles, live preview, recent reminders; reality-check popup mounted app-wide (dialog ≥768, bottom sheet <768), no close icon. Push sending not implemented.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG6",
+   "name": "Cooling-Off Period",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "rg-history",
+   "note": "Choose (nothing pre-selected), confirm dialog/sheet, active banner + withdraw card; API cooling-off endpoint; cannot be shortened. Shell top-bar Deposit not disabled (shared shell).",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "USR-RG7",
+   "name": "Self-Exclusion",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "rg-history",
+   "note": "4 steps + active state work end to end. Departures: step 3 uses step-up TOTP (only when 2FA is on) + typed SELF-EXCLUDE + unchecked acknowledgement instead of a password; open entries stay in their round (design says refunded); shell promo/Deposit hiding not done.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "WAL-01",
+   "name": "Wallet Overview (balance breakdown: available/locked/pending/owed)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Overview from GET /wallet/balances: Available/Locked/Pending/Owed with share bar, composition lines and glossary dialog. Withdrawable-now card with daily limit meter (GET /wallet/status), quick actions, in-progress list, recent activity, lifetime totals, networks strip, deposit-limit banners. Loading skeletons and error state. Empty state (zero balance and no transactions) is implemented but was not screenshotted with a real empty account. Screenshots at 1440 (default + glossary) and 390.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-02",
+   "name": "Connected Wallets",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "wallet",
+   "note": "Linked wallets list (primary / verified / whitelisted / cooling-down badges), 'Whitelist for withdrawals' (step-up modal), error, loading and empty states. Missing: set-primary and remove/unlink (no API endpoints; unlinking a Privy wallet is the auth module's area). 'Connect a wallet' calls the auth module's openAuth('wallet') when present, otherwise it is disabled with an explanation.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-03",
+   "name": "Deposit — Step 1 Select Network",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Network step: Arbitrum Sepolia live, BNB/Polygon/Ethereum/Solana 'Coming soon' and disabled; maintenance banner; first-deposit deposit-limit prompt.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-04",
+   "name": "Deposit — Step 2 Select Token",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Token step: test USDT only; other tokens disabled with a warning.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-05",
+   "name": "Deposit — Step 3 Deposit Address",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "wallet",
+   "note": "Address from GET /deposits/address with the client-side QR. Verified: default, wrong-network (real EIP-1193 eth_chainId check plus switch-chain button, and a dev preview), expired session (30-minute client re-check; the HD address itself is permanent). Below-minimum is only a client warning: the API credits any amount, so there is no 'held below minimum' state.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-06",
+   "name": "Deposit — Step 4 QR Code",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Large QR, optional amount reminder with below-minimum error, 'waiting for your transfer' watcher (polls /deposits every 5 s), DEMO simulate control.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-07",
+   "name": "Deposit — Step 5 Transaction Pending (confirmations n/N)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Pending n/20 polled every 4 s from GET /deposits/ref/:ref: ring, segmented bar, timeline, tx hash, pending/available-after rows, DEMO 'Add 5 confirmations' and auto-advance; 'Delayed' state after 10 minutes (and via preview); advances to confirmation automatically once credited.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-08",
+   "name": "Deposit — Step 6 Confirmation",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Credited confirmation with a before/after table (derived from current balances), gold open-round card (real closesAt, separate 0.05 fee line, 'You can lose your stake', 18+).",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-09",
+   "name": "Deposit — Step 7 Successful (receipt)",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "wallet",
+   "note": "Success receipt and failed (deposit status rejected) are done. 'Unrecognised token' cannot happen: the watcher only reads test-USDT Transfer logs.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-10",
+   "name": "Withdraw — Step 1 Select Asset",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "USDT asset with Available balance; empty-balance state. No bonus-funds row (no bonus API).",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-11",
+   "name": "Withdraw — Step 2 Select Network",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Network rows with typical fees and ETA; only Arbitrum Sepolia selectable; network-match warning.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-12",
+   "name": "Withdraw — Step 3 Enter Address",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Whitelisted address rows or a new address with live format checks (0x, 40 hex, EIP-55), Solana-address detection (invalid state), cooldown blocking, and a new-address choice (withdraw now with manual review, or add to whitelist).",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-13",
+   "name": "Withdraw — Step 4 Enter Amount",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "AmountInput, quick chips + MAX, limit tiles from /wallet/status, fee estimate from GET /withdrawals/quote refreshed every 15 s; below-minimum, over-balance (+ insufficient-funds modal) and limit-reached states.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-14",
+   "name": "Withdraw — Step 5 Fees & Summary",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Review: you-receive hero, network fee separate, platform fee 0.00, irreversibility warning, never-pre-checked confirmation box; the idempotency key is created here.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-15",
+   "name": "Withdraw — Step 6 Risk Validation",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Six checks from the new GET /withdrawals/precheck: pass (valid 15 min), manual review (plain reason + where the funds are), KYC required, blocked (sanctions, cooldown, balance, limit, no 2FA) with fix actions.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-16",
+   "name": "Withdraw — Step 7 Two-Factor Confirmation",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "wallet",
+   "note": "Authenticator code (OtpInput) sent as totpCode with POST /withdrawals; anti-phishing code shown; wrong-code (attempts left), locked and 2FA-off states mapped from STEP_UP_* errors; explicit Confirm button. Deviation: no email code (the API has none; the owner decision is TOTP + anti-phishing). Inline step as in Figma rather than the auth module's StepUpDialog.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-17",
+   "name": "Withdraw — Step 8 Pending",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "wallet",
+   "note": "Live polled status view. Manual review verified with WD-20931; processing and queued are code paths (queued needs four-eyes admin approval). Cancel before broadcast with confirmation. DEMO 'Simulate testnet confirmation' for queued withdrawals.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-18",
+   "name": "Withdraw — Step 9 Successful",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Completed view (verified with seeded WD-20877): amount received, tx hash, timeline.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-19",
+   "name": "Withdraw — Step 9 Failed",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Rejected/failed views with the reason, funds returned, no fee, timeline (verified with WD-20850). The network-failure path renders from status=failed; not produced live in DEMO.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-20",
+   "name": "Transaction History",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Table at 1280 and above, day-grouped cards below; 5 lifetime tiles; type chips plus status/network/date filters in the URL (bottom sheet on mobile); empty, no-results, loading and error states; pagination; CSV export of the visible page. No ID/hash search (no API parameter).",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-21",
+   "name": "Transaction Detail drawer",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Detail as right drawer (desktop) or bottom sheet (mobile): pending deposit with confirmations, failed withdrawal with reason, successful receipt; status timeline; tx hash (no explorer link for DEMO hashes); link to the tracker.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-22",
+   "name": "Withdrawal Status tracker",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Tracker /wallet/withdraw/[ref] in the Figma layout: breadcrumb, status + DEMO, compliance hero, ETA card, 5-step tracker, amount & fees, destination, what happens next, activity log, cancel and contact support. No 'notify me' toggle.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-23",
+   "name": "Whitelisted Addresses",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "wallet",
+   "note": "Whitelist list with ready/cooling-down countdown and unlock time; add modal (network, address, label, unchecked ownership box, authenticator code) uses POST /me/wallets/whitelist with a 24 h cooldown; remove with code; cooling-down alert with a remove escape.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "WAL-24",
+   "name": "Insufficient-funds / limit / maintenance banners & modals",
+   "pri": "P0",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "wallet",
+   "note": "Banners in context (maintenance from feature flags, deposit-limit usage and pending increase) and the insufficient-funds modal are verified at 1440 and 390. The deposit-limit modal (RG_LIMIT_EXCEEDED on deposit) and maintenance modal (SERVICE_UNAVAILABLE) are implemented but not screenshotted (they need the limit hit or a flag switched off).",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "06",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "N/A",
+   "module": "auth",
+   "note": "Password reset does not apply to players under Privy.",
+   "report": "reports-p0-auth-account.json"
+  },
+  {
+   "id": "HOMEPAGE-CLOCK",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "pool",
+   "note": "Real clock everywhere. API mode uses the shifted closesAt from the API; mock mode is shifted to the next 20:00 UTC like the seed. Covered by tests.",
+   "report": "reports-p0-wallet-pool.json"
+  },
+  {
+   "id": "api-gaps-1 on-chain round mirroring",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "RoundMirrorService + ChainSignerService (outbox, DB nonce manager, chainId guard); openRound/commitEntries (salted Merkle commitments, encrypted salts)/cancelRound/requestDraw/VRF DrawFulfilled watcher/recordSettlement; lifecycle integration; 24 h re-request; public chain/manifest/payouts + player my-proofs endpoints. Anvil e2e: DB winners == contract winners, prizes == prizeAmounts, verifyPayout/verifyEntry true. Migrations 20261128160500_onchain_mirror + 20261128163000_randomness_request_scope.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-2 deposit watcher",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "DepositChainWatcherService: MockUSDT Transfer logs → confirmations → PENDING→AVAILABLE; idempotent by txHash+logIndex; reconcile via receipts every pass, re-org window rescan, re-inclusion followed, reorged-out/reverted → deposit_reversed. Anvil e2e incl. snapshot/revert re-orgs.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-3 withdrawal broadcaster",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "WithdrawalBroadcasterService + withdrawal.track job: queued → broadcast → confirmed (ledger settle); revert/dropped → failed, funds to Available; simulation revert fails from queued (new shared transition queued→failed); nonce management tested under concurrency; Anvil e2e for all paths.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-4a RG session-time + reality-check events",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "NOT DONE (owned by rg-history)",
+   "module": "api-gaps",
+   "note": "Coordination task #50: rg-history implements RG session tracking / session_time limit / reality checks in compliance; not re-implemented here to avoid conflicting edits.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-4b email delivery adapter",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "MAIL_TRANSPORT log|smtp|disabled (names aligned with existing .env.example), nodemailer 10.4.1, BullMQ emails queue + worker, anti-phishing code + DEMO notice, A9 preferences honoured; e2e with console transport and fake SMTP server.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-4c socket.io Redis adapter",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "@socket.io/redis-adapter 8.3.0 behind SOCKET_IO_REDIS_ADAPTER; e2e proves cross-replica broadcast with two app instances.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-4d OpenAPI response schemas",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "19 main operations get zod-derived response components in /docs-json, plus a default ErrorEnvelope response on every operation; contract e2e parses live responses.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "api-gaps-5 docker-compose dev profile",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED (config validated, image not built)",
+   "module": "api-gaps",
+   "note": "--profile dev (api-dev NODE_ENV=development, DEV MOCK, migrate + seed, jobs) / --profile prod; Dockerfile installs openssl; .dockerignore excludes **/.dev. docker compose config OK; no Docker daemon, so the images were not built or run.",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  },
+  {
+   "id": "docs",
+   "name": "(non-ledger item)",
+   "pri": "",
+   "figma": "",
+   "dev": "IMPLEMENTED",
+   "module": "api-gaps",
+   "note": "docs/API.md (on-chain operations, re-org table, broadcaster, email, endpoints, env table, data model), docs/ARCHITECTURE.md, docs/CONTRACTS.md, packages/contracts/README.md, .env.example",
+   "report": "reports-p0-rg-history-api-gaps.json"
+  }
+ ]
+}
