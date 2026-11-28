@@ -101,7 +101,9 @@ async function modalShell(W, title, sub, icon, iconColor, tile, sheet) {
   const hd = AL('HORIZONTAL', { name: 'Header', p: [sheet ? 8 : 24, P, 20, P], gap: 16, align: 'MIN' }); strokeSides(hd, 'border/subtle', { b: 1 }); add(m, [hd, 'FILL']);
   const tl = AL('HORIZONTAL', { name: 'Icon tile', fill: tile, r: 10, w: 44, h: 44, align: 'CENTER', justify: 'CENTER' }); add(tl, await IC(icon, 22, iconColor)); add(hd, tl);
   const tg = AL('VERTICAL', { name: 'Title group', gap: 4 }); add(hd, [tg, 'FILL']);
-  add(tg, row([await T(title, 'Heading/H4', 'text/primary', { name: 'Title' }), await DEMO('S')], { gap: 8 })); await wrapT(tg, sub, 'Body/S', 'text/secondary', W - 2 * P - 120, 'Subtitle');
+  if (sheet) { const tr = AL('HORIZONTAL', { name: 'Title row', gap: 8, align: 'MIN' }); add(tg, [tr, 'FILL']); const tt = await T(title, 'Heading/H5', 'text/primary', { w: 160, name: 'Title' }); add(tr, [tt, 'FILL']); add(tr, await DEMO('S')); }
+  else add(tg, row([await T(title, 'Heading/H4', 'text/primary', { name: 'Title' }), await DEMO('S')], { gap: 8 }));
+  await wrapT(tg, sub, 'Body/S', 'text/secondary', W - 2 * P - 120, 'Subtitle');
   add(hd, await I('7:774', { Type: 'Ghost', Size: sheet ? 'M' : 'S', State: 'Default' }, { Icon: ICONS.x }));
   const body = AL('VERTICAL', { name: 'Body', p: [20, P, 20, P], gap: 16 }); add(m, [body, 'FILL']);
   const ft = AL('VERTICAL', { name: 'Footer', p: [16, P, sheet ? 34 : 24, P], gap: 12 }); strokeSides(ft, 'border/subtle', { t: 1 }); add(m, [ft, 'FILL']);

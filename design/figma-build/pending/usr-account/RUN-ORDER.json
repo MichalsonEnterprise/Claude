@@ -4,17 +4,8 @@
  "how": "Pass the FULL content of each out/<file> as use_figma code (fileKey QHF8iRUMFgGMcEn3bD25jl, sessionId 55ee4abe-3cf3-4b8a-9391-56f6bca3e3ce, skillNames 'figma-use,figma-generate-design'). Idempotent: frames whose exact name exists are skipped.",
  "order": [
   {
-   "file": "out/F3_mobile_a8_sessions.README.txt",
-   "page": "10 — Mobile Experience",
-   "note": "pending only if the agent report says F3 not applied"
-  },
-  {
    "file": "out/V1_V3_verify.js",
-   "note": "run with the V3 ids"
-  },
-  {
-   "file": "out/V1_V3_verify.js",
-   "note": "run with ids 34:484196, 34:495793, 36:510785, 36:537760 (mobile, earlier run)"
+   "note": "optional: run with IDS = ['36:510785']"
   }
  ],
  "not_needed": [
@@ -28,5 +19,6 @@
   "out/P0_probe.js"
  ],
  "status_28nov_0240": "DONE: M1, M2, M3 (11 mobile frames, ids in registry-usr-account.json), R1 (desktop re-band, section 7,920 x 13,890). Verified by screenshot: all 15 mobile frames' new ones + desktop A1 Edit/Saved, A2, A3 Manage/Disable/Enable/Reset, A4 Not started/Pending/Approved. Remaining (read-only/minor): out/V1_V3_verify.js with the V2 and V3 id lists (A4 Rejected/Expired, A5, A6, A7 x2, A8 x2, A9, A10), and out/F1_mobile_otp_icon.js (hide a leftover timer icon under the OTP in 155:87455 + screenshot the earlier run's 4 mobile frames).",
- "status_28nov_0300": "F2 done: mobile A5 now lists 4 documents like desktop A5 (passport, selfie, utility bill, rejected national ID), OTP timer row hidden in the 2FA disable sheet. Remaining read-only: V3 ids (A7 Revoke, A8 x2, A9, A10 desktop) and a screenshot pass over the earlier run's 4 mobile frames (34:484196, 34:495793, 36:510785, 36:537760)."
+ "status_28nov_0300": "F2 done: mobile A5 now lists 4 documents like desktop A5 (passport, selfie, utility bill, rejected national ID), OTP timer row hidden in the 2FA disable sheet. Remaining read-only: V3 ids (A7 Revoke, A8 x2, A9, A10 desktop) and a screenshot pass over the earlier run's 4 mobile frames (34:484196, 34:495793, 36:510785, 36:537760).",
+ "status_final_28nov_0310": "COMPLETE. 20 desktop + 15 mobile frames exist; R1 re-band, F2 (A5 docs, OTP row), F3 (A8 3 sessions) and the 19:06 UTC / wrap fixes are applied. Only open item: a full-height screenshot of the earlier run's mobile frame 36:510785 '[USR-A3 · MOB-09] Two-Factor Authentication / 390 / Manage (On)' (its top viewport was seen as the base of the Disable sheet clone)."
 }

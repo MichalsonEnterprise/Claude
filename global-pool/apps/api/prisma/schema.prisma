@@ -1,0 +1,1329 @@
+// GLOBAL POOL — PostgreSQL schema (Prisma 6). DEMO / testnet only.
+//
+// Conventions
+// - UUID primary keys, snake_case tables/columns (@@map / @map), createdAt/updatedAt everywhere.
+// - Money is NEVER a float: USDT ledger amounts are Decimal(20, 6); raw on-chain amounts are Decimal(38, 18).
+// - Enum values are lowercase snake_case and identical to @gp/shared (packages/shared/src/enums.ts).
+// - The ledger (ledger_postings + ledger_entries), pool_ledger, fee_ledger and audit_logs are APPEND-ONLY:
+//   database triggers (see migrations) reject UPDATE / DELETE, and a deferred constraint trigger rejects any
+//   posting whose entries do not sum to exactly zero.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums (mirror @gp/shared) ──────────────────────────────────────────────────────────────────
+
+enum ChainKey {
+  arbitrum
+  bnb
+  polygon
+  ethereum
+  solana
+}
+
+enum UserStatus {
+  active
+  suspended
+  closed
+}
+
+enum KycLevel {
+  none
+  level_1
+  level_2
+  level_3
+}
+
+enum KycStatus {
+  not_started
+  pending
+  in_review
+  verified
+  rejected
+  resubmission_required
+}
+
+enum AmlRiskLevel {
+  low
+  medium
+  high
+  critical
+}
+
+enum AmlAlertStatus {
+  open
+  under_review
+  resolved
+  dismissed
+  escalated
+}
+
+enum LedgerAccountType {
+  user_available
+  user_locked
+  user_pending
+  user_owed
+  pool
+  fees
+  prize_liability
+  refunds
+  operator_revenue
+  chain_clearing
+}
+
+/// What a ledger posting represents (one business event = one balanced posting).
+enum LedgerPostingKind {
+  deposit_detected
+  deposit_credited
+  withdrawal_lock
+  withdrawal_release
+  withdrawal_settle
+  entry_purchase
+  round_settlement
+  prize_award
+  round_refund
+  owed_claim
+  reward
+  demo_opening_balance
+}
+
+enum TxType {
+  deposit
+  withdrawal
+  entry_purchase
+  platform_fee
+  prize
+  refund
+  reward
+  rakeback
+  cashback
+  referral_commission
+}
+
+enum TxStatus {
+  pending
+  confirming
+  under_review
+  processing
+  completed
+  failed
+  rejected
+  cancelled
+}
+
+enum DepositStatus {
+  detected
+  confirming
+  credited
+  rejected
+}
+
+enum WithdrawalStatus {
+  requested
+  risk_check
+  under_review
+  queued
+  broadcast
+  confirmed
+  failed
+  rejected
+  cancelled
+}
+
+enum RoundStatus {
+  scheduled
+  open
+  closed
+  drawing
+  settled
+  cancelled
+}
+
+enum EntryStatus {
+  active
+  won
+  not_won
+  refund_owed
+  refunded
+}
+
+enum PrizeTier {
+  first
+  second
+  third
+  runner_up
+}
+
+enum PrizeClaimStatus {
+  owed
+  claimed
+}
+
+enum RandomnessProviderKind {
+  chainlink_vrf_v2_5
+  mock
+}
+
+enum RandomnessStatus {
+  requested
+  fulfilled
+  failed
+  timed_out
+}
+
+enum RgLimitType {
+  deposit
+  participation
+  loss
+  session_time
+}
+
+enum RgPeriod {
+  day
+  week
+  month
+}
+
+enum StepUpPurpose {
+  withdrawal
+  whitelist_change
+  security_settings
+}
+
+enum GameCategory {
+  jackpot
+  originals
+  table
+  slots
+  live
+  draws
+  bingo
+}
+
+enum VipTier {
+  bronze
+  silver
+  gold
+  platinum
+  diamond
+}
+
+enum AdminUserStatus {
+  active
+  disabled
+}
+
+enum SessionSubject {
+  user
+  admin
+}
+
+enum AuditActorType {
+  admin
+  user
+  system
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+  cancelled
+  expired
+}
+
+enum RestrictionType {
+  account_suspended
+  gaming_blocked
+  deposits_blocked
+  withdrawals_frozen
+}
+
+enum TotpStatus {
+  pending
+  active
+}
+
+enum WalletSource {
+  privy_linked
+  privy_embedded
+  manual
+}
+
+enum GeoRuleStatus {
+  blocked
+  allowed
+}
+
+enum GameSessionStatus {
+  active
+  finished
+}
+
+// ─── Players ────────────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String     @id @default(uuid()) @db.Uuid
+  /// Privy DID (did:privy:…) — unique; players have no passwords.
+  privyUserId   String?    @unique @map("privy_user_id")
+  /// Public id shown in the UI, e.g. GP-48213.
+  publicId      String     @unique @map("public_id")
+  /// Public handle without '@' (set during onboarding).
+  handle        String?    @unique
+  email         String?
+  emailVerified Boolean    @default(false) @map("email_verified")
+  status        UserStatus @default(active)
+  onboardedAt   DateTime?  @map("onboarded_at")
+  lastLoginAt   DateTime?  @map("last_login_at")
+  isDemo        Boolean    @default(false) @map("is_demo")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  profile            UserProfile?
+  wallets            UserWallet[]
+  depositAddresses   DepositAddress[]
+  sessions           Session[]
+  totpSecret         TotpSecret?
+  kycRecords         KycRecord[]
+  amlAlerts          AmlAlert[]
+  deposits           Deposit[]
+  withdrawals        Withdrawal[]
+  transactions       Transaction[]
+  ledgerAccounts     LedgerAccount[]
+  entries            Entry[]
+  winners            Winner[]
+  prizeClaims        PrizeClaim[]
+  gameSessions       GameSession[]
+  notifications      Notification[]
+  rgLimits           RgLimit[]
+  selfExclusions     RgSelfExclusion[]
+  rgSettings         RgSettings?
+  restrictions       UserRestriction[]
+  referralsMade      Referral[]          @relation("referrer")
+  referredBy         Referral?           @relation("referred")
+  emailVerifications EmailVerification[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model UserProfile {
+  id                      String    @id @default(uuid()) @db.Uuid
+  userId                  String    @unique @map("user_id") @db.Uuid
+  displayName             String?   @map("display_name")
+  /// ISO 3166-1 alpha-2 declared during onboarding.
+  country                 String?   @db.Char(2)
+  dateOfBirth             DateTime? @map("date_of_birth") @db.Date
+  ageConfirmedAt          DateTime? @map("age_confirmed_at")
+  jurisdictionConfirmedAt DateTime? @map("jurisdiction_confirmed_at")
+  termsAcceptedAt         DateTime? @map("terms_accepted_at")
+  termsVersion            String?   @map("terms_version")
+  privacyAcceptedAt       DateTime? @map("privacy_accepted_at")
+  privacyVersion          String?   @map("privacy_version")
+  marketingOptIn          Boolean   @default(false) @map("marketing_opt_in")
+  marketingOptInAt        DateTime? @map("marketing_opt_in_at")
+  antiPhishingCode        String?   @map("anti_phishing_code")
+  kycLevel                KycLevel  @default(none) @map("kyc_level")
+  vipTier                 VipTier   @default(bronze) @map("vip_tier")
+  vipLevel                Int       @default(1) @map("vip_level")
+  vipPoints               Int       @default(0) @map("vip_points")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([country])
+  @@map("user_profiles")
+}
+
+/// Wallets linked through Privy (login / embedded) and withdrawal destinations the player whitelisted.
+model UserWallet {
+  id                   String       @id @default(uuid()) @db.Uuid
+  userId               String       @map("user_id") @db.Uuid
+  network              ChainKey
+  address              String
+  source               WalletSource
+  walletClient         String?      @map("wallet_client")
+  label                String?
+  isPrimary            Boolean      @default(false) @map("is_primary")
+  verifiedAt           DateTime?    @map("verified_at")
+  whitelistedAt        DateTime?    @map("whitelisted_at")
+  /// End of the new-address cool-down (NEW_ADDRESS_COOLDOWN_HOURS) — not usable for withdrawals before this.
+  whitelistAvailableAt DateTime?    @map("whitelist_available_at")
+  removedAt            DateTime?    @map("removed_at")
+  isDemo               Boolean      @default(false) @map("is_demo")
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, network, address])
+  @@index([address])
+  @@map("user_wallets")
+}
+
+/// Per-user deposit address derived from the testnet DEPOSIT_XPUB (BIP-32, non-hardened m/0/<index>).
+model DepositAddress {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  network         ChainKey
+  /// Lower-case 0x address for EVM (comparison key); see addressChecksum for display.
+  address         String   @unique
+  addressChecksum String   @map("address_checksum")
+  derivationIndex Int      @map("derivation_index")
+  derivationPath  String   @map("derivation_path")
+  xpubFingerprint String   @map("xpub_fingerprint")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, network])
+  @@unique([network, xpubFingerprint, derivationIndex])
+  @@map("deposit_addresses")
+}
+
+/// Sessions: player Privy sessions (device tracking + revocation) and admin refresh-token families (rotation +
+/// reuse detection: presenting an already-rotated token revokes the whole family).
+model Session {
+  id               String         @id @default(uuid()) @db.Uuid
+  subject          SessionSubject
+  userId           String?        @map("user_id") @db.Uuid
+  adminUserId      String?        @map("admin_user_id") @db.Uuid
+  /// Privy session id (`sid` claim) for players.
+  privySessionId   String?        @map("privy_session_id")
+  /// Refresh-token family (admins). All rotated tokens of one login share it.
+  familyId         String?        @map("family_id") @db.Uuid
+  refreshTokenHash String?        @unique @map("refresh_token_hash")
+  parentId         String?        @map("parent_id") @db.Uuid
+  rotatedAt        DateTime?      @map("rotated_at")
+  expiresAt        DateTime?      @map("expires_at")
+  deviceLabel      String?        @map("device_label")
+  userAgent        String?        @map("user_agent")
+  ip               String?
+  location         String?
+  flagged          Boolean        @default(false)
+  flaggedReason    String?        @map("flagged_reason")
+  lastSeenAt       DateTime       @default(now()) @map("last_seen_at")
+  revokedAt        DateTime?      @map("revoked_at")
+  revokedReason    String?        @map("revoked_reason")
+  isDemo           Boolean        @default(false) @map("is_demo")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, privySessionId])
+  @@index([familyId])
+  @@index([adminUserId])
+  @@map("sessions")
+}
+
+/// One-time email codes (admin invites / contact-email changes). Player email OTP itself is handled by Privy.
+model EmailVerification {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String?   @map("user_id") @db.Uuid
+  adminUserId String?   @map("admin_user_id") @db.Uuid
+  email       String
+  purpose     String
+  codeHash    String    @map("code_hash")
+  attempts    Int       @default(0)
+  expiresAt   DateTime  @map("expires_at")
+  consumedAt  DateTime? @map("consumed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([email, purpose])
+  @@map("email_verifications")
+}
+
+/// TOTP secrets for player step-up 2FA and mandatory admin MFA. `secretEnc` is AES-256-GCM encrypted
+/// (TOTP_ENCRYPTION_KEY); `lastUsedStep` blocks code replay.
+model TotpSecret {
+  id             String     @id @default(uuid()) @db.Uuid
+  userId         String?    @unique @map("user_id") @db.Uuid
+  adminUserId    String?    @unique @map("admin_user_id") @db.Uuid
+  secretEnc      String     @map("secret_enc")
+  status         TotpStatus @default(pending)
+  confirmedAt    DateTime?  @map("confirmed_at")
+  lastUsedStep   Int?       @map("last_used_step")
+  failedAttempts Int        @default(0) @map("failed_attempts")
+  lockedUntil    DateTime?  @map("locked_until")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminUser   AdminUser?   @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  backupCodes BackupCode[]
+
+  @@map("totp_secrets")
+}
+
+model BackupCode {
+  id           String    @id @default(uuid()) @db.Uuid
+  totpSecretId String    @map("totp_secret_id") @db.Uuid
+  codeHash     String    @map("code_hash")
+  usedAt       DateTime? @map("used_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  totpSecret TotpSecret @relation(fields: [totpSecretId], references: [id], onDelete: Cascade)
+
+  @@unique([totpSecretId, codeHash])
+  @@map("totp_backup_codes")
+}
+
+model UserRestriction {
+  id               String          @id @default(uuid()) @db.Uuid
+  userId           String          @map("user_id") @db.Uuid
+  type             RestrictionType
+  reason           String
+  appliedByAdminId String          @map("applied_by_admin_id") @db.Uuid
+  appliedAt        DateTime        @default(now()) @map("applied_at")
+  liftedAt         DateTime?       @map("lifted_at")
+  liftedByAdminId  String?         @map("lifted_by_admin_id") @db.Uuid
+  liftReason       String?         @map("lift_reason")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appliedBy AdminUser  @relation("restrictionAppliedBy", fields: [appliedByAdminId], references: [id])
+  liftedBy  AdminUser? @relation("restrictionLiftedBy", fields: [liftedByAdminId], references: [id])
+
+  @@index([userId, liftedAt])
+  @@map("user_restrictions")
+}
+
+// ─── Compliance ─────────────────────────────────────────────────────────────────────────────────
+
+model KycRecord {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  level           KycLevel
+  status          KycStatus
+  provider        String
+  providerRef     String?   @map("provider_ref")
+  submittedAt     DateTime? @map("submitted_at")
+  reviewedAt      DateTime? @map("reviewed_at")
+  reviewerAdminId String?   @map("reviewer_admin_id") @db.Uuid
+  rejectionReason String?   @map("rejection_reason")
+  isDemo          Boolean   @default(false) @map("is_demo")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("kyc_records")
+}
+
+model AmlAlert {
+  id                String         @id @default(uuid()) @db.Uuid
+  userId            String?        @map("user_id") @db.Uuid
+  withdrawalId      String?        @map("withdrawal_id") @db.Uuid
+  depositId         String?        @map("deposit_id") @db.Uuid
+  riskLevel         AmlRiskLevel   @map("risk_level")
+  rule              String
+  status            AmlAlertStatus @default(open)
+  details           Json           @default("{}")
+  resolvedAt        DateTime?      @map("resolved_at")
+  resolvedByAdminId String?        @map("resolved_by_admin_id") @db.Uuid
+  resolution        String?
+  isDemo            Boolean        @default(false) @map("is_demo")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  withdrawal Withdrawal? @relation(fields: [withdrawalId], references: [id], onDelete: SetNull)
+  deposit    Deposit?    @relation(fields: [depositId], references: [id], onDelete: SetNull)
+
+  @@index([status, riskLevel])
+  @@index([userId])
+  @@map("aml_alerts")
+}
+
+model GeoRule {
+  id          String        @id @default(uuid()) @db.Uuid
+  countryCode String        @unique @map("country_code") @db.Char(2)
+  status      GeoRuleStatus
+  reason      String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("geo_rules")
+}
+
+/// Responsible-gaming limits. Decreases apply immediately; increases are stored as pending and take effect at
+/// `pendingEffectiveAt` (24 h cool-down).
+model RgLimit {
+  id                 String      @id @default(uuid()) @db.Uuid
+  userId             String      @map("user_id") @db.Uuid
+  type               RgLimitType
+  period             RgPeriod
+  amount             Decimal?    @db.Decimal(20, 6)
+  minutes            Int?
+  pendingAmount      Decimal?    @map("pending_amount") @db.Decimal(20, 6)
+  pendingMinutes     Int?        @map("pending_minutes")
+  pendingEffectiveAt DateTime?   @map("pending_effective_at")
+  isDemo             Boolean     @default(false) @map("is_demo")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, period])
+  @@map("responsible_gaming_limits")
+}
+
+/// Self-exclusion — honoured immediately and never obstructed. `endsAt` null = permanent.
+model RgSelfExclusion {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  /// 24h | 7d | 30d | 6m | 1y | permanent (SelfExclusionDuration in @gp/shared)
+  duration  String
+  startsAt  DateTime  @map("starts_at")
+  endsAt    DateTime? @map("ends_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, endsAt])
+  @@map("responsible_gaming_self_exclusions")
+}
+
+/// Reality-check reminders and session tracking.
+model RgSettings {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String    @unique @map("user_id") @db.Uuid
+  realityCheckMinutes Int       @default(60) @map("reality_check_minutes")
+  lastRealityCheckAt  DateTime? @map("last_reality_check_at")
+  sessionStartedAt    DateTime? @map("session_started_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("responsible_gaming_settings")
+}
+
+// ─── Money movements ────────────────────────────────────────────────────────────────────────────
+
+model Deposit {
+  id                    String        @id @default(uuid()) @db.Uuid
+  /// Public reference DP-<number>.
+  number                Int           @unique @default(autoincrement())
+  userId                String        @map("user_id") @db.Uuid
+  network               ChainKey
+  tokenAddress          String?       @map("token_address")
+  txHash                String        @map("tx_hash")
+  logIndex              Int           @default(0) @map("log_index")
+  blockNumber           BigInt?       @map("block_number")
+  fromAddress           String?       @map("from_address")
+  toAddress             String        @map("to_address")
+  amount                Decimal       @db.Decimal(20, 6)
+  /// Raw token amount in token units (exact on-chain value).
+  amountOnchain         Decimal       @map("amount_onchain") @db.Decimal(38, 18)
+  confirmations         Int           @default(0)
+  requiredConfirmations Int           @map("required_confirmations")
+  status                DepositStatus
+  detectedAt            DateTime      @default(now()) @map("detected_at")
+  creditedAt            DateTime?     @map("credited_at")
+  isDemo                Boolean       @default(false) @map("is_demo")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  amlAlerts    AmlAlert[]
+  transactions Transaction[]
+
+  @@unique([network, txHash, logIndex])
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("deposits")
+}
+
+/// Withdrawal state machine: requested → risk_check → under_review | queued → broadcast → confirmed | failed;
+/// rejected / cancelled (see WITHDRAWAL_TRANSITIONS in @gp/shared). Funds move AVAILABLE → LOCKED on request.
+model Withdrawal {
+  id               String           @id @default(uuid()) @db.Uuid
+  /// Public reference WD-<number>.
+  number           Int              @unique @default(autoincrement())
+  userId           String           @map("user_id") @db.Uuid
+  network          ChainKey
+  toAddress        String           @map("to_address")
+  amount           Decimal          @db.Decimal(20, 6)
+  networkFee       Decimal          @map("network_fee") @db.Decimal(20, 6)
+  platformFee      Decimal          @map("platform_fee") @db.Decimal(20, 6)
+  netAmount        Decimal          @map("net_amount") @db.Decimal(20, 6)
+  status           WithdrawalStatus
+  riskLevel        AmlRiskLevel?    @map("risk_level")
+  riskFlags        Json             @default("[]") @map("risk_flags")
+  flagged          Boolean          @default(false)
+  requiresFourEyes Boolean          @default(false) @map("requires_four_eyes")
+  idempotencyKey   String           @map("idempotency_key")
+  txHash           String?          @map("tx_hash")
+  broadcastAt      DateTime?        @map("broadcast_at")
+  confirmedAt      DateTime?        @map("confirmed_at")
+  failedAt         DateTime?        @map("failed_at")
+  failureReason    String?          @map("failure_reason")
+  rejectedAt       DateTime?        @map("rejected_at")
+  rejectionReason  String?          @map("rejection_reason")
+  cancelledAt      DateTime?        @map("cancelled_at")
+  isDemo           Boolean          @default(false) @map("is_demo")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  user         User              @relation(fields: [userId], references: [id])
+  events       WithdrawalEvent[]
+  amlAlerts    AmlAlert[]
+  transactions Transaction[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@map("withdrawals")
+}
+
+/// Append-only status history of a withdrawal (timeline in the UI, evidence for reviews).
+model WithdrawalEvent {
+  id           String            @id @default(uuid()) @db.Uuid
+  withdrawalId String            @map("withdrawal_id") @db.Uuid
+  fromStatus   WithdrawalStatus? @map("from_status")
+  toStatus     WithdrawalStatus  @map("to_status")
+  actorType    AuditActorType    @map("actor_type")
+  actorId      String?           @map("actor_id")
+  note         String?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  withdrawal Withdrawal @relation(fields: [withdrawalId], references: [id], onDelete: Cascade)
+
+  @@index([withdrawalId, createdAt])
+  @@map("withdrawal_events")
+}
+
+/// User-facing activity history (deposits, withdrawals, entry purchases, refunds, prizes, rewards).
+/// Balances are NEVER derived from this table — only from the ledger.
+model Transaction {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  type         TxType
+  status       TxStatus
+  /// Public reference: DP-…, WD-…, E-1248-00981-01015, RF-…, PZ-…
+  reference    String    @unique
+  amount       Decimal   @db.Decimal(20, 6)
+  networkFee   Decimal?  @map("network_fee") @db.Decimal(20, 6)
+  platformFee  Decimal   @default(0) @map("platform_fee") @db.Decimal(20, 6)
+  netAmount    Decimal   @map("net_amount") @db.Decimal(20, 6)
+  direction    String
+  network      ChainKey?
+  txHash       String?   @map("tx_hash")
+  description  String
+  depositId    String?   @map("deposit_id") @db.Uuid
+  withdrawalId String?   @map("withdrawal_id") @db.Uuid
+  roundId      String?   @map("round_id") @db.Uuid
+  metadata     Json      @default("{}")
+  isDemo       Boolean   @default(false) @map("is_demo")
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user       User            @relation(fields: [userId], references: [id])
+  deposit    Deposit?        @relation(fields: [depositId], references: [id])
+  withdrawal Withdrawal?     @relation(fields: [withdrawalId], references: [id])
+  round      Round?          @relation(fields: [roundId], references: [id])
+  postings   LedgerPosting[]
+  entries    Entry[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, type, status])
+  @@map("transactions")
+}
+
+// ─── Double-entry ledger (append-only) ──────────────────────────────────────────────────────────
+
+/// Accounts. Per-user buckets (user_available/locked/pending/owed) and system accounts (pool per round, fees,
+/// prize_liability, refunds, operator_revenue, chain_clearing per network). Balance = Σ ledger_entries.amount.
+model LedgerAccount {
+  id        String            @id @default(uuid()) @db.Uuid
+  /// Stable code, e.g. user:<uuid>:available, pool:<round uuid>, fees, chain_clearing:arbitrum
+  code      String            @unique
+  type      LedgerAccountType
+  userId    String?           @map("user_id") @db.Uuid
+  roundId   String?           @map("round_id") @db.Uuid
+  network   ChainKey?
+  currency  String            @default("USDT")
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  user    User?         @relation(fields: [userId], references: [id])
+  round   Round?        @relation(fields: [roundId], references: [id])
+  entries LedgerEntry[]
+
+  @@unique([type, userId])
+  @@unique([type, roundId])
+  @@index([type])
+  @@map("ledger_accounts")
+}
+
+/// One balanced journal posting (Σ entries.amount = 0, enforced by a deferred constraint trigger).
+model LedgerPosting {
+  id            String            @id @default(uuid()) @db.Uuid
+  kind          LedgerPostingKind
+  description   String
+  /// Business reference (WD-20931, DP-77412, round:1248 …).
+  reference     String?
+  /// Unique per business event so the same event can never be posted twice.
+  eventKey      String?           @unique @map("event_key")
+  transactionId String?           @map("transaction_id") @db.Uuid
+  roundId       String?           @map("round_id") @db.Uuid
+  metadata      Json              @default("{}")
+  isDemo        Boolean           @default(false) @map("is_demo")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @default(now()) @map("updated_at")
+
+  transaction Transaction?  @relation(fields: [transactionId], references: [id])
+  round       Round?        @relation(fields: [roundId], references: [id])
+  entries     LedgerEntry[]
+  poolLedger  PoolLedger[]
+  feeLedger   FeeLedger[]
+
+  @@index([kind, createdAt])
+  @@index([reference])
+  @@map("ledger_postings")
+}
+
+/// One line of a posting. Signed amount: positive = value into the account, negative = value out.
+model LedgerEntry {
+  id        String   @id @default(uuid()) @db.Uuid
+  postingId String   @map("posting_id") @db.Uuid
+  accountId String   @map("account_id") @db.Uuid
+  amount    Decimal  @db.Decimal(20, 6)
+  /// Beneficial owner of the line (set on user lines and on pool lines, so a player's stake in an
+  /// unsettled round is attributable from the ledger).
+  userId    String?  @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  posting LedgerPosting @relation(fields: [postingId], references: [id])
+  account LedgerAccount @relation(fields: [accountId], references: [id])
+
+  @@index([accountId, createdAt])
+  @@index([postingId])
+  @@index([userId])
+  @@map("ledger_entries")
+}
+
+/// Pool sub-ledger (append-only): every movement into / out of a round pool, with entry counts.
+model PoolLedger {
+  id         String   @id @default(uuid()) @db.Uuid
+  roundId    String   @map("round_id") @db.Uuid
+  postingId  String   @map("posting_id") @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  /// entry | settlement | refund
+  kind       String
+  entryCount Int      @default(0) @map("entry_count")
+  amount     Decimal  @db.Decimal(20, 6)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  round   Round         @relation(fields: [roundId], references: [id])
+  posting LedgerPosting @relation(fields: [postingId], references: [id])
+
+  @@index([roundId, createdAt])
+  @@map("pool_ledger")
+}
+
+/// Platform-fee sub-ledger (append-only): 0.05 USDT per qualifying entry — never part of any pool.
+model FeeLedger {
+  id         String   @id @default(uuid()) @db.Uuid
+  postingId  String   @map("posting_id") @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  roundId    String?  @map("round_id") @db.Uuid
+  /// platform_entry_fee
+  kind       String
+  entryCount Int      @default(0) @map("entry_count")
+  amount     Decimal  @db.Decimal(20, 6)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  posting LedgerPosting @relation(fields: [postingId], references: [id])
+
+  @@index([roundId])
+  @@index([createdAt])
+  @@map("fee_ledger")
+}
+
+// ─── Global Pool ────────────────────────────────────────────────────────────────────────────────
+
+/// A Global Pool round. Rules (price, fee, thresholds, prize split) are copied at open and immutable.
+/// Live counters are projections updated in the same DB transaction as each entry purchase; the ledger pool
+/// account stays the authority (reconciliation compares both).
+model Round {
+  id                  String      @id @default(uuid()) @db.Uuid
+  number              Int         @unique
+  status              RoundStatus
+  opensAt             DateTime    @map("opens_at")
+  closesAt            DateTime    @map("closes_at")
+  openedAt            DateTime?   @map("opened_at")
+  closedAt            DateTime?   @map("closed_at")
+  entryPrice          Decimal     @map("entry_price") @db.Decimal(20, 6)
+  platformFeePerEntry Decimal     @map("platform_fee_per_entry") @db.Decimal(20, 6)
+  minParticipants     Int         @map("min_participants")
+  minPool             Decimal     @map("min_pool") @db.Decimal(20, 6)
+  /// Prize split in basis points ordered by rank (1st, 2nd, 3rd, 10 × runner-up).
+  prizeSplitBps       Int[]       @map("prize_split_bps")
+  entriesCount        Int         @default(0) @map("entries_count")
+  participantsCount   Int         @default(0) @map("participants_count")
+  poolAmount          Decimal     @default(0) @map("pool_amount") @db.Decimal(20, 6)
+  platformFees        Decimal     @default(0) @map("platform_fees") @db.Decimal(20, 6)
+  thresholdsMet       Boolean?    @map("thresholds_met")
+  entriesMerkleRoot   String?     @map("entries_merkle_root")
+  cancelledAt         DateTime?   @map("cancelled_at")
+  cancelReason        String?     @map("cancel_reason")
+  settledAt           DateTime?   @map("settled_at")
+  /// Round id used by the GlobalPoolRounds contract (= round number).
+  onchainRoundId      BigInt?     @map("onchain_round_id")
+  isDemo              Boolean     @default(false) @map("is_demo")
+  createdAt           DateTime    @default(now()) @map("created_at")
+  updatedAt           DateTime    @updatedAt @map("updated_at")
+
+  entries            Entry[]
+  winners            Winner[]
+  randomnessRequests RandomnessRequest[]
+  ledgerAccounts     LedgerAccount[]
+  postings           LedgerPosting[]
+  poolLedger         PoolLedger[]
+  transactions       Transaction[]
+
+  @@index([status, closesAt])
+  @@map("rounds")
+}
+
+/// One entry ticket. `seq` is its 1-based position in the round's canonical entry list (winner index + 1).
+model Entry {
+  id            String      @id @default(uuid()) @db.Uuid
+  roundId       String      @map("round_id") @db.Uuid
+  userId        String      @map("user_id") @db.Uuid
+  seq           Int
+  /// Public id, e.g. E-1248-00981
+  code          String      @unique
+  status        EntryStatus @default(active)
+  transactionId String?     @map("transaction_id") @db.Uuid
+  isDemo        Boolean     @default(false) @map("is_demo")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  round       Round        @relation(fields: [roundId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
+  transaction Transaction? @relation(fields: [transactionId], references: [id])
+  winner      Winner?
+
+  @@unique([roundId, seq])
+  @@index([roundId, userId])
+  @@index([userId, createdAt])
+  @@map("entries")
+}
+
+/// Winners derived ONLY from the round's fulfilled randomness (no API can create or edit them).
+model Winner {
+  id             String    @id @default(uuid()) @db.Uuid
+  roundId        String    @map("round_id") @db.Uuid
+  /// 1 = 1st prize … 13 = 10th runner-up
+  rank           Int
+  tier           PrizeTier
+  entryId        String?   @unique @map("entry_id") @db.Uuid
+  entrySeq       Int?      @map("entry_seq")
+  userId         String?   @map("user_id") @db.Uuid
+  /// Handle at settlement time (also used by DEMO history rows without materialised entries).
+  handleSnapshot String?   @map("handle_snapshot")
+  amount         Decimal   @db.Decimal(20, 6)
+  isDemo         Boolean   @default(false) @map("is_demo")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  round      Round       @relation(fields: [roundId], references: [id])
+  entry      Entry?      @relation(fields: [entryId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
+  prizeClaim PrizeClaim?
+
+  @@unique([roundId, rank])
+  @@map("winners")
+}
+
+/// Prize owed to a winner (credited to Owed at settlement; claim moves it to Available).
+model PrizeClaim {
+  id        String           @id @default(uuid()) @db.Uuid
+  winnerId  String           @unique @map("winner_id") @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  amount    Decimal          @db.Decimal(20, 6)
+  status    PrizeClaimStatus @default(owed)
+  claimedAt DateTime?        @map("claimed_at")
+  isDemo    Boolean          @default(false) @map("is_demo")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  winner Winner @relation(fields: [winnerId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@map("prize_claims")
+}
+
+/// Verifiable randomness requests (Chainlink VRF v2.5 on Arbitrum Sepolia; mock provider in dev).
+model RandomnessRequest {
+  id            String                 @id @default(uuid()) @db.Uuid
+  roundId       String                 @map("round_id") @db.Uuid
+  provider      RandomnessProviderKind
+  status        RandomnessStatus
+  /// VRF request id (uint256 as decimal string) or mock request id.
+  requestId     String                 @map("request_id")
+  attempt       Int                    @default(1)
+  network       ChainKey?
+  requestTxHash String?                @map("request_tx_hash")
+  fulfillTxHash String?                @map("fulfill_tx_hash")
+  blockNumber   BigInt?                @map("block_number")
+  confirmations Int?
+  /// uint256 random word as 0x-prefixed 32-byte hex.
+  randomWord    String?                @map("random_word")
+  requestedAt   DateTime               @map("requested_at")
+  fulfilledAt   DateTime?              @map("fulfilled_at")
+  failureReason String?                @map("failure_reason")
+  metadata      Json                   @default("{}")
+  isDemo        Boolean                @default(false) @map("is_demo")
+  createdAt     DateTime               @default(now()) @map("created_at")
+  updatedAt     DateTime               @updatedAt @map("updated_at")
+
+  round Round @relation(fields: [roundId], references: [id])
+
+  @@unique([provider, requestId])
+  @@index([roundId, status])
+  @@map("randomness_requests")
+}
+
+// ─── Games (non-monetary simulations until separately approved) ─────────────────────────────────
+
+model Game {
+  id               String       @id @default(uuid()) @db.Uuid
+  slug             String       @unique
+  name             String
+  category         GameCategory
+  mechanic         String
+  houseEdgePercent Decimal?     @map("house_edge_percent") @db.Decimal(6, 3)
+  edgeLabel        String       @map("edge_label")
+  icon             String
+  playersDemo      Int?         @map("players_demo")
+  details          String[]
+  /// simulation | real_money (real money is disabled by REAL_MONEY_ENABLED=false)
+  mode             String       @default("simulation")
+  enabled          Boolean      @default(true)
+  sortOrder        Int          @default(0) @map("sort_order")
+  isDemo           Boolean      @default(false) @map("is_demo")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  sessions GameSession[]
+
+  @@index([category, sortOrder])
+  @@map("games")
+}
+
+/// Commit–reveal game session: serverSeedHash is shown before play, serverSeed revealed at the end.
+model GameSession {
+  id             String            @id @default(uuid()) @db.Uuid
+  userId         String            @map("user_id") @db.Uuid
+  gameId         String            @map("game_id") @db.Uuid
+  status         GameSessionStatus @default(active)
+  serverSeedHash String            @map("server_seed_hash")
+  serverSeed     String?           @map("server_seed")
+  clientSeed     String            @map("client_seed")
+  nonce          Int               @default(0)
+  isSimulation   Boolean           @default(true) @map("is_simulation")
+  startedAt      DateTime          @default(now()) @map("started_at")
+  endedAt        DateTime?         @map("ended_at")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  user    User         @relation(fields: [userId], references: [id])
+  game    Game         @relation(fields: [gameId], references: [id])
+  results GameResult[]
+
+  @@index([userId, startedAt])
+  @@map("game_sessions")
+}
+
+model GameResult {
+  id        String   @id @default(uuid()) @db.Uuid
+  sessionId String   @map("session_id") @db.Uuid
+  nonce     Int
+  outcome   Json
+  /// Simulation stake / payout (0 for non-monetary play).
+  stake     Decimal  @default(0) @db.Decimal(20, 6)
+  payout    Decimal  @default(0) @db.Decimal(20, 6)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, nonce])
+  @@map("game_results")
+}
+
+// ─── Growth ─────────────────────────────────────────────────────────────────────────────────────
+
+model Referral {
+  id             String    @id @default(uuid()) @db.Uuid
+  referrerUserId String    @map("referrer_user_id") @db.Uuid
+  referredUserId String    @unique @map("referred_user_id") @db.Uuid
+  code           String
+  qualifiedAt    DateTime? @map("qualified_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  referrer User @relation("referrer", fields: [referrerUserId], references: [id])
+  referred User @relation("referred", fields: [referredUserId], references: [id])
+
+  @@index([referrerUserId])
+  @@map("referrals")
+}
+
+model Affiliate {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  name      String
+  /// revenue_share | cpa | hybrid
+  plan      String
+  status    String   @default("active")
+  isDemo    Boolean  @default(false) @map("is_demo")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("affiliates")
+}
+
+model VipLevel {
+  id            String   @id @default(uuid()) @db.Uuid
+  level         Int      @unique
+  tier          VipTier
+  label         String
+  minPoints     Int      @map("min_points")
+  levelUpReward Decimal? @map("level_up_reward") @db.Decimal(20, 6)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("vip_levels")
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  type      String
+  title     String
+  body      String
+  data      Json      @default("{}")
+  readAt    DateTime? @map("read_at")
+  isDemo    Boolean   @default(false) @map("is_demo")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+// ─── Admin ──────────────────────────────────────────────────────────────────────────────────────
+
+model AdminUser {
+  id                  String          @id @default(uuid()) @db.Uuid
+  email               String          @unique
+  name                String
+  title               String?
+  /// argon2id
+  passwordHash        String          @map("password_hash")
+  status              AdminUserStatus @default(active)
+  failedLoginAttempts Int             @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?       @map("locked_until")
+  lastLoginAt         DateTime?       @map("last_login_at")
+  isDemo              Boolean         @default(false) @map("is_demo")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+
+  roles               AdminUserRole[]
+  totpSecret          TotpSecret?
+  sessions            Session[]
+  emailVerifications  EmailVerification[]
+  approvalsRequested  AdminApproval[]     @relation("approvalRequestedBy")
+  approvalsDecided    AdminApproval[]     @relation("approvalDecidedBy")
+  restrictionsApplied UserRestriction[]   @relation("restrictionAppliedBy")
+  restrictionsLifted  UserRestriction[]   @relation("restrictionLiftedBy")
+
+  @@map("admin_users")
+}
+
+model AdminRole {
+  id          String   @id @default(uuid()) @db.Uuid
+  /// super_admin | finance | compliance | support | marketing | read_only
+  key         String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  permissions AdminRolePermission[]
+  users       AdminUserRole[]
+
+  @@map("admin_roles")
+}
+
+model AdminPermission {
+  id             String   @id @default(uuid()) @db.Uuid
+  /// e.g. withdrawals.approve (Permission in @gp/shared)
+  key            String   @unique
+  description    String?
+  requiresReason Boolean  @default(false) @map("requires_reason")
+  requiresMfa    Boolean  @default(false) @map("requires_mfa")
+  /// always | flagged | never
+  fourEyes       String   @default("never") @map("four_eyes")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  roles AdminRolePermission[]
+
+  @@map("admin_permissions")
+}
+
+model AdminRolePermission {
+  roleId       String   @map("role_id") @db.Uuid
+  permissionId String   @map("permission_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  role       AdminRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission AdminPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("admin_role_permissions")
+}
+
+model AdminUserRole {
+  adminUserId String   @map("admin_user_id") @db.Uuid
+  roleId      String   @map("role_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  adminUser AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  role      AdminRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([adminUserId, roleId])
+  @@map("admin_user_roles")
+}
+
+/// Four-eyes approvals: a second, different admin must approve before the action executes.
+model AdminApproval {
+  id                 String         @id @default(uuid()) @db.Uuid
+  /// e.g. withdrawal.approve
+  action             String
+  targetType         String         @map("target_type")
+  targetId           String         @map("target_id")
+  status             ApprovalStatus @default(pending)
+  requestedByAdminId String         @map("requested_by_admin_id") @db.Uuid
+  requestReason      String         @map("request_reason")
+  decidedByAdminId   String?        @map("decided_by_admin_id") @db.Uuid
+  decisionReason     String?        @map("decision_reason")
+  decidedAt          DateTime?      @map("decided_at")
+  payload            Json           @default("{}")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  requestedBy AdminUser  @relation("approvalRequestedBy", fields: [requestedByAdminId], references: [id])
+  decidedBy   AdminUser? @relation("approvalDecidedBy", fields: [decidedByAdminId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+  @@map("admin_approvals")
+}
+
+/// Hash-chained, append-only audit log: hash = sha256(prevHash + canonical JSON of the row).
+model AuditLog {
+  id         String         @id @default(uuid()) @db.Uuid
+  seq        BigInt         @unique @default(autoincrement())
+  actorType  AuditActorType @map("actor_type")
+  actorId    String?        @map("actor_id")
+  actorLabel String?        @map("actor_label")
+  action     String
+  targetType String?        @map("target_type")
+  targetId   String?        @map("target_id")
+  reason     String?
+  outcome    String         @default("success")
+  ip         String?
+  userAgent  String?        @map("user_agent")
+  requestId  String?        @map("request_id")
+  metadata   Json           @default("{}")
+  prevHash   String         @map("prev_hash")
+  hash       String         @unique
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @default(now()) @map("updated_at")
+
+  @@index([action, createdAt])
+  @@index([actorType, actorId])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
+}
+
+// ─── Platform ───────────────────────────────────────────────────────────────────────────────────
+
+/// Idempotency keys for financial writes: the first request's response is stored and replayed.
+model IdempotencyKey {
+  id          String    @id @default(uuid()) @db.Uuid
+  scope       String
+  /// user id / admin id / 'system'
+  ownerId     String    @map("owner_id")
+  key         String
+  requestHash String    @map("request_hash")
+  statusCode  Int?      @map("status_code")
+  response    Json?
+  completedAt DateTime? @map("completed_at")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([scope, ownerId, key])
+  @@map("idempotency_keys")
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  enabled     Boolean  @default(false)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("feature_flags")
+}
+
+/// Block cursors for chain watchers (deposit watcher per network/token).
+model ChainCursor {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  lastBlock BigInt   @map("last_block")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("chain_cursors")
+}

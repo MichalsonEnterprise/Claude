@@ -151,7 +151,7 @@ async function verifyCard() {
 async function winCard() { const w = await I('23:16334', { State: 'Public winner' }); for (const t of w.findAll(n => n.type === 'TEXT' && n.characters.includes('@lumen.eth'))) { await lf(t); t.characters = t.characters.replace(/@lumen\.eth/g, '@orbit_77'); } return w; }
 async function common(f) {
   const gp = fnd(f, 'Item/Global Pool'); const lb = gp && gp.findOne(n => n.name === 'Badge'); if (lb) lb.visible = false;
-  const title = fnd(f, 'Title'); const badge = title && title.findOne(n => n.type === 'INSTANCE' && n.name === 'Badge/Status'); if (badge) { badge.setProperties({ Status: 'Neutral' }); await st(badge, 'Label', 'Between rounds'); }
+  const ph = fnd(f, 'Page header'); const title = ph && fnd(ph, 'Title'); const badge = title && title.findOne(n => n.type === 'INSTANCE' && n.name === 'Badge/Status'); if (badge) { try { badge.setProperties({ Status: 'Neutral' }); } catch (e) { out.log.push('badge: ' + e.message); } await st(badge, 'Label', 'Between rounds'); }
   const me = fnd(f, 'My entries');
   if (me) { await st(me, 'ME sub', 'entries · not selected'); await st(me, 'ME locked', '0.00 USDT locked — released'); await st(me, 'ME fees', '351.75 USDT spent (350.00 + 1.75 fees)'); }
 }
@@ -167,7 +167,7 @@ for (const BP of ['L', 'T']) {
   const feed = fnd(content, 'Recent entries feed'); if (feed) feed.remove();
   const log = { BP };
   if (BP === 'L') {
-    const rh = content.children.find(n => n.type === 'INSTANCE' && n.name === 'Jackpot/Round Header'); if (rh) rh.setProperties({ Status: 'Settled' }); log.rh = !!rh;
+    const rh = content.children.find(n => n.type === 'INSTANCE' && n.name === 'Jackpot/Round Header') || content.children.find(n => n.type === 'INSTANCE' && n.variantProperties && n.variantProperties.Status === 'Open'); if (rh) { try { rh.setProperties({ Status: 'Settled' }); } catch (e) { out.log.push('rh: ' + e.message); } } log.rh = !!rh;
     const r1 = fnd(content, 'My entries & threshold');
     if (r1) { r1.name = 'My entries & result'; const th = r1.children.find(n => n.type === 'INSTANCE'); if (th) th.remove(); const w = await winCard(); add(r1, w); log.r1 = true; }
     const r2 = fnd(content, 'Prizes & VRF');
@@ -177,7 +177,7 @@ for (const BP of ['L', 'T']) {
     const vrf = await I('23:11967', { Step: 'Settled' }); add(pr, vrf); const vc = await verifyCard(); add(pr, [vc, 'FILL']); vc.layoutSizingVertical = 'FILL'; log.odds = !!od;
   } else {
     const r1 = fnd(content, 'Round & my entries');
-    if (r1) { const rc = r1.children.find(n => n.type === 'INSTANCE'); if (rc) { rc.setProperties({ Status: 'Settled' }); for (const [k, v] of [['Round', 'Round #1,248'], ['Handle', '@orbit_77'], ['Prize', '93,200.00 USDT']]) await st(rc, k, v); await st(rc, 'Value', '186,400.00', 0); await st(rc, 'Value', '3,412', 1); await st(rc, 'Value', '18,640', 2); await st(rc, 'Value', '27 Nov 2026, 20:02 UTC', 3); } log.r1 = !!rc; }
+    if (r1) { const rc = r1.children.find(n => n.type === 'INSTANCE'); if (rc) { try { rc.setProperties({ Status: 'Settled' }); } catch (e) { out.log.push('rc: ' + e.message); } for (const [k, v] of [['Round', 'Round #1,248'], ['Handle', '@orbit_77'], ['Prize', '93,200.00 USDT']]) await st(rc, k, v); await st(rc, 'Value', '186,400.00', 0); await st(rc, 'Value', '3,412', 1); await st(rc, 'Value', '18,640', 2); await st(rc, 'Value', '27 Nov 2026, 20:02 UTC', 3); } log.r1 = !!rc; }
     const r2 = fnd(content, 'Threshold & odds');
     if (r2) { r2.name = 'Result & proof'; for (const c of [...r2.children]) c.remove(); const w = await winCard(); add(r2, w); const vc = await verifyCard(); add(r2, [vc, 'FILL']); vc.layoutSizingVertical = 'FILL'; log.r2 = true; }
     const vx = fnd(content, 'VRF explainer — How the winner is drawn'); const vi = vx ? content.children.indexOf(vx) : -1; if (vx) vx.remove();
@@ -193,4 +193,5 @@ if (N1440) for (const t of N1440.findAll(n => n.type === 'TEXT' && n.characters.
 fitSection(sec);
 out.frames = sec.children.map(c => ({ id: c.id, name: c.name, x: Math.round(c.x), y: Math.round(c.y), w: Math.round(c.width), h: Math.round(c.height) }));
 for (const [f, h] of shots) { await h.screenshot({ scale: 0.6 }); await f.screenshot({ scale: 0.3 }); }
+{ const lr = await figma.getNodeByIdAsync('34:325577'); const m = lr && lr.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Modal/Participation Preview')); if (m) await m.screenshot({ scale: 0.6 }); }
 return out;

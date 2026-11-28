@@ -9,9 +9,14 @@ import { cn } from '@/lib/utils';
  */
 export function DemoBadge({
   size = 's',
+  label,
   className,
   ...props
-}: Omit<React.ComponentProps<'span'>, 'children'> & { size?: 'xs' | 's' | 'm' }) {
+}: Omit<React.ComponentProps<'span'>, 'children'> & {
+  size?: 'xs' | 's' | 'm';
+  /** Override the text (e.g. "Dev mock"). */
+  label?: string;
+}) {
   return (
     <span
       data-slot="demo-badge"
@@ -26,7 +31,7 @@ export function DemoBadge({
       {...props}
     >
       {size === 'm' && <Info aria-hidden />}
-      {size === 'm' ? 'Demo data' : 'Demo'}
+      {label ?? (size === 'm' ? 'Demo data' : 'Demo')}
     </span>
   );
 }

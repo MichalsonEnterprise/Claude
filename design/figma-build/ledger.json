@@ -624,7 +624,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440: Request, Sent, Error (too many requests, with an absolute retry time of 16:46 UTC). 390: Request and Sent as bottom sheets. The error is an inline alert in the same layout, so it has no separate mobile frame (decision #16). The same confirmation is shown whether or not an account exists. Screenshots checked; the error-state button label was fixed and re-checked.",
+  "by": "auth-d"
  },
  {
   "id": "AUTH-06",
@@ -634,7 +636,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 and 390: Strength (Input/Password Fair, strength meter and requirements shown, Save disabled until valid), Expired link (sent 16:31, expired 17:01 UTC) and Success (other devices signed out, 24 h withdrawal hold until 28 Nov 16:40 UTC). Art-card overflow fixed and screenshot-checked.",
+  "by": "auth-d"
  },
  {
   "id": "AUTH-07",
@@ -776,7 +780,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "4 distinct full pages at 1440 and 390 in a reduced restricted-mode shell with no Deposit button. Suspended: overdue source-of-funds check, case SUS-3107, appeal possible. Under review: routine review REV-2291, decision by 30 Nov 18:00 UTC. Self-excluded: ends 27 Nov 2027 16:45 UTC, cannot be shortened; games and promotions are hidden with no re-entry shortcut; RG/Help Resources and RG/Self-Exclusion Step Active included. Geo-restricted: Nav/Region Banner, residence Portugal vs current location United States, no-VPN line. Every state shows what happened, what still works (withdraw the Available balance where lawful), what is paused, next steps and support, plus the 18+ and licence notice. Screenshots checked; sidebar licence overflow and location-card overflow fixed.",
+  "by": "auth-d"
  },
  {
   "id": "AUTH-19",
@@ -786,7 +792,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Steps 1–5 at 1440 (two-pane dialog over the dimmed guest lobby) and 390 (focused pages with sticky CTA): Start (no radio pre-selected, Continue disabled), Verify identity (ID upload plus liveness against KYC L2, case REC-6620), Wallet recovery (free signature with a readable message, skip allowed), Cooling-off notice (mandatory 48 h hold 27 Nov 17:12 → 29 Nov 2026 17:12 UTC, acknowledged with an unchecked box), Success. Targeted fixes applied and re-screenshotted; short mobile frames given a minimum height of 844.",
+  "by": "auth-d"
  },
  {
   "id": "AUTH-20",
@@ -796,7 +804,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440: Session expired (30 min idle, last activity 18:12 UTC, password re-entry plus wallet option, 'nothing changed' reassurance) and Re-auth for a sensitive action (adding withdrawal address 0x3f9a…c47E needs password plus authenticator code, 24 h cooldown shown). 390: Session expired bottom sheet. Screenshots checked.",
+  "by": "auth-d"
  },
  {
   "id": "AUTH-21",
@@ -806,7 +816,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440: two-pane alert with the email we send (anti-phishing code AURORA-27) and the new device (Windows · Edge, Madrid, 25 Nov 2026 21:14 UTC, IP masked plus DEMO), 'Secure my account' explained, and equal-weight 'Yes, it was me' / 'No, secure my account'. 390: bottom sheet. Screenshots checked.",
+  "by": "auth-d"
  },
  {
   "id": "USR-00",
@@ -852,7 +864,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Desktop 1440 Default existed (34:411209). This run added the missing 390 Default (149:124836): RG session strip, In progress (round #1,248 with real countdown to 20:00:00 UTC + Orbit Rush Sprint #14), Continue playing carousel (Tile/Game Generic), 30-day totals (11,000.00 wagered, net −71.80) + house-edge note, stacked game rows. Screenshot passed after a spacer fix. Not VERIFIED only because the desktop frame was not re-screenshotted this run (MCP limit).",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-G2",
@@ -862,7 +876,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Desktop Default/Empty/Filters and 390 Default/Empty existed. This run added 390 Filters (152:64961): bottom sheet with Status Won + Refunded, rounds #1,240–#1,248, sort, 'Show 31 entries' (1 won in #1,244 + 30 refunded from #1,245, matches desktop Filters). Screenshot passed. Desktop frames not re-screenshotted.",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-G3",
@@ -872,7 +888,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All required frames existed from the first run (1440 Live/Empty, 390 Live/Empty), hug height. Not re-screenshotted this run.",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-G4",
@@ -882,7 +900,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 Default + 390 Default existed from the first run. Not re-screenshotted this run.",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-G5",
@@ -892,7 +912,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 Owed/Settled + 390 Owed/Settled existed from the first run (owed 415.20 = refund 300.00 #1,245 + VIP 115.20, automatic settlement timeline). Not re-screenshotted this run.",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-G6",
@@ -902,7 +924,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 Default/Filters/Export + 390 Default existed. This run added 390 Export (152:65321): bottom sheet, 7 days (20–27 Nov 2026 UTC), CSV/PDF, seeds + nonce, file game-history_2026-11-20_2026-11-27.csv (486 bets · 8 games · ≈62 KB), background-export note. Cosmetic issue: the filename wraps after 'game-'; fix script out/04 not applied (MCP limit). 390 Filters not built: the mobile filter-sheet pattern is shown by G2 390 Filters.",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-G7",
@@ -912,7 +936,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 Default/Empty existed. This run added 390 Default (151:63647): pinned Global Pool card, 6 favourites in a 2-column Tile/Game Generic grid with heart buttons, reminders off by default (never auto-enter), suggestions carousel. Also added 390 Empty (151:64719): empty state with cropped real tile art and an angled block, Browse the lobby CTA, Recently played quick-add rows. Both screenshots passed. Desktop not re-screenshotted.",
+  "by": "usr-gaming"
  },
  {
   "id": "USR-A1",
@@ -922,7 +948,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop Edit + Saved and mobile Edit all exist and passed screenshot review.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A2",
@@ -932,7 +960,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop Default and mobile MOB-09 Default passed.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A3",
@@ -942,7 +972,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop Manage (On), Disable, Enable and Reset passed; mobile Enable and the new Disable sheet passed. Mobile Manage (On) 36:510785 was seen only in its top viewport, as the base of the Disable clone. A full-height screenshot was blocked by the MCP limit.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A4",
@@ -952,7 +984,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "All 5 desktop statuses (Not started, Pending, Approved, Rejected, Expired) plus mobile Approved and Rejected passed.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A5",
@@ -962,7 +996,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop passed. Mobile was built, then reconciled to the desktop's 4 documents and re-verified.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A6",
@@ -972,7 +1008,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop (suspicious flag) and mobile passed. The mobile flagged time was aligned to 19:06 UTC.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A7",
@@ -982,7 +1020,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop Default and Revoke, plus mobile Default and Revoke sheet, passed.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A8",
@@ -992,7 +1032,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop Default and End all, plus mobile Default and End-all sheet, passed. Mobile was reconciled to 3 other sessions.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A9",
@@ -1002,7 +1044,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop and mobile passed. Marketing is opt-in and off by default; security, transaction and RG messages are locked on.",
+  "by": "usr-account"
  },
  {
   "id": "USR-A10",
@@ -1012,7 +1056,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Account",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop and mobile passed.",
+  "by": "usr-account"
  },
  {
   "id": "USR-F1",
@@ -1022,7 +1068,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Default 56:44839, Filters 62:45877, Empty 69:104709. M: Default 115:53804, Empty 115:54210, Filters bottom sheet 115:54471. The mobile DEMO bars now use the short message from decision #29. Screenshots of all six frames checked in this run.",
+  "by": "usr-finance"
  },
  {
   "id": "USR-F2",
@@ -1032,7 +1080,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 72:48152 (patched: WD-20931 18:44 → decision by 22:44 UTC, new-destination AML reason, WD-20702/WD-20511 moved to the BNB primary address, network fees 0.98). M 161:69577 (tracker card with fee breakdown and 5-step status, stacked Tx cards, sticky Withdraw, tab bar). The KPI unit overflow on mobile was fixed and checked again.",
+  "by": "usr-finance"
  },
  {
   "id": "USR-F3",
@@ -1042,7 +1092,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 74:49145 (WD-20931 fee row moved to 18:44 and re-sorted; network fees 0.98). M 161:70006 (64.20 = 1,284 × 0.05 equation hero, fee cards, fee schedule).",
+  "by": "usr-finance"
  },
  {
   "id": "USR-F4",
@@ -1052,7 +1104,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 86:49985 (weekly reward now 16–22 Nov with auto-settle Mon 30 Nov 10:00 UTC; 108.40 for 9–15 Nov auto-settled 23 Nov; Gold III level-up 5.00 on 25 Nov 19:32; rakeback 2.96 on 24 Nov 09:12; rows re-sorted by date). M 161:70387 (claim card with Terms apply, Widget/Rakeback, 9 reward cards).",
+  "by": "usr-finance"
  },
  {
   "id": "USR-F5",
@@ -1062,7 +1116,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Financial History",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 88:50964. M 164:70168 (RF-1245-0042 300.00 Owed, batch 2 of 3 timeline, How refunds work).",
+  "by": "usr-finance"
  },
  {
   "id": "USR-F6",
@@ -1072,7 +1128,9 @@
   "sizes": "D·T·M",
   "page": "05",
   "group": "Financial History",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D Default 90:114727 + Export 109:103285, T 768 109:104557 (all patched: WD-20931 18:44 sorted first; weekly-reward row replaced by the Gold III level-up so page 1 stays in date order). M Default 164:70509 (balance KPIs reconcile 12,480.50 = 9,215.30 + 3,265.20, search/filters/export, 10 cards grouped by day, sticky Export CSV) + Export bottom sheet 164:70954 (212 rows, This year, format chips, hash toggle).",
+  "by": "usr-finance"
  },
  {
   "id": "USR-V1",
@@ -1172,7 +1230,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440 + mobile 390 built and checked in screenshots. Desktop: session bar, 6 tool cards (deposit increase pending, participation 351.75/500.00, loss −24.60/200.00, time 1 h 12 min/2 h, reality checks every 60 min, self-check), break/self-exclusion cards, RG/Help Resources and a limit-rules card. The deposit card overflow was fixed (spacer removed, card set to hug). Mobile: the deposit row's Pending chip was moved onto the title line so it no longer covers the value.",
+  "by": "usr-rg"
  },
  {
   "id": "USR-RG2",
@@ -1182,7 +1242,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Default + Pending increase (24 h cool-down), each at 1440 and 390. RG/Limit Setter was overridden to demo data: Weekly period, 5,000.00 USDT/week, 3,500.00 used, bar at 70%; pending increase to 7,500.00 starts 28 Nov 2026 16:42 UTC with Cancel increase / Keep pending. Also shows deposits this week (DP-77380, DP-77412), limit history and a How-it-works card. The duplicate Cancel button in the pending notice was removed.",
+  "by": "usr-rg"
  },
  {
   "id": "USR-RG3",
@@ -1192,7 +1254,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 390. Limit setter overridden to 500.00/day with 351.75 used (bar at 70.35%). Daily loss limit card (200.00 / −24.60 / 175.40; values changed to Number/S so they fit). What-counts card names the 0.05 USDT platform fee per qualifying entry. Today-at-a-glance card and help resources.",
+  "by": "usr-rg"
  },
  {
   "id": "USR-RG4",
@@ -1202,7 +1266,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 390. Time limit 2 h/day with 1 h 12 min played (bar at 60%), session length 1 h 30 min, quiet hours toggle off (turning it off waits 24 h), when-time-is-up rules, today card.",
+  "by": "usr-rg"
  },
  {
   "id": "USR-RG5",
@@ -1212,7 +1278,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Settings + Popup at 1440 and 390. Interval chips with 60 min selected, next reminder 17:00 UTC, toggles, preview of RG/Reality Check. Desktop popup is a modal over a dimmed lobby; the duplicate carousel headers were removed. Mobile popup is a bottom sheet with three equal Secondary actions; the frame was fixed to 844 high.",
+  "by": "usr-rg"
  },
  {
   "id": "USR-RG6",
@@ -1222,7 +1290,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Default / Confirm / Active at 1440 and 390. Desktop Confirm is a modal and mobile Confirm is a bottom sheet: starts now, ends 4 Dec 2026 16:42 UTC, cannot be shortened. Active: info banner, Deposit disabled in the top bar, 9,215.30 USDT withdrawable with a Withdraw CTA, open entries in round #1,248 stay in the draw.",
+  "by": "usr-rg"
  },
  {
   "id": "USR-RG7",
@@ -1232,7 +1302,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Responsible Gaming",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "4 steps at 1440 and 390. (1) Choose period: 6 months / 1 year / 5 years / Permanent, none preselected, Continue disabled, shorter alternatives offered. (2) Consequences: entries refunded per round rules, balance withdrawable (total 12,480.50), marketing stops, no reversal. (3) Confirm: built inline with password + typed SELF-EXCLUDE + unchecked acknowledgement, Danger button disabled; the input placeholders and helper text were fixed. (4) Active until 27 Nov 2027 16:45 UTC: 9,980.50 withdrawable, Deposit disabled, sidebar promos hidden. On the mobile Active frame the clipped 'days left' line was shortened.",
+  "by": "usr-rg"
  },
  {
   "id": "WAL-01",
@@ -2974,7 +3046,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Mobile Account Security set: A2, A3 (Manage / Enable / Disable sheet), A7 (+ Revoke sheet) and A8 (+ End-all sheet), all in 'USR — Mobile C'. The same A3 Manage full-height caveat applies.",
+  "by": "usr-account"
  },
  {
   "id": "MOB-10",
@@ -2984,7 +3058,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "The financial-history (transactions) part is complete: 9 USR-F mobile frames turn tables into stacked Tx cards. The entries/rounds part belongs to the usr-gaming slice and was not checked here.",
+  "by": "usr-finance"
  },
  {
   "id": "MOB-11",

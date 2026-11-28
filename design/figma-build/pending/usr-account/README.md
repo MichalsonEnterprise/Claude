@@ -1,6 +1,6 @@
 # usr-account — USR-A1..A10 Account & security (+ MOB-09 Mobile Account Security)
 
-Prepared, idempotent use_figma scripts. STATUS 28 Nov 2026 ~02:40 UTC: all frames built (20 desktop + 15 mobile); R1 re-band done; see RUN-ORDER.json for the remaining read-only checks.
+Prepared, idempotent use_figma scripts. STATUS 28 Nov 2026 ~03:10 UTC: COMPLETE — 20 desktop + 15 mobile frames, all screenshot-checked except the full height of mobile 36:510785 (see RUN-ORDER.json). D1–D7 / M-scripts are kept for reference only.
 Earlier status (~02:15 UTC): the probe showed that the interrupted earlier run had already built **all 20 desktop frames**
 (section 32:72712) and 4 mobile frames (A1 Edit, A2, A3 Manage (On), A3 Enable). Its desktop layout used 10 columns, so the
 section is 15,720 wide and overlaps `USR-F1..F6` at X=36000 — `out/R1_desktop_layout_fix.js` moves A6–A10 into a second band.

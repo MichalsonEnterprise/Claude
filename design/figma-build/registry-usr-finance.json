@@ -1,5 +1,5 @@
 {
- "_note": "USR-F1..F6 Financial history (agent key: usr-finance). No new library components were created: every screen is composed from existing instances (Shell/Sidebar Expanded/Member with 'Transactions' active, Shell/Topbar Desktop Member, Nav/Breadcrumb, Tabs/Underline, Card/Balance, Card/Stat (sparkline + delta chip hidden, used as a KPI tile), Table/Toolbar, Table/Header Cell, Table/Cell, Table/Empty State, Pagination, Tx/Hash, Wallet/Confirmations Progress, Nav/Step Item, Alert/Banner, Banner/Promo, Strip/Networks, Widget/Rakeback, Widget/Cashback, Card/Mission, Card/Round, Chart/Timeline, Menu/Filter, Notice/Licence, Badge/18+). Entries below are SCREEN FRAMES (type FRAME). Desktop: page '05 — User Dashboard', section 'USR-F1..F6 Financial history' (56:44838) at X=36000, Y=0 — flow columns F1..F6 at x = 120 + i*1560, states stacked below. Mobile: page '10 — Mobile Experience', section 'USR — Mobile D' at X=112000, Y=0.",
+ "_note": "USR-F1..F6 Financial history (agent key: usr-finance). No new library components were created: every screen is composed from existing instances (Shell/Sidebar Expanded/Member with 'Transactions' active, Shell/Topbar Desktop Member, Nav/Breadcrumb, Tabs/Underline, Card/Balance, Card/Stat (sparkline + delta chip hidden, used as a KPI tile), Table/Toolbar, Table/Header Cell, Table/Cell, Table/Empty State, Pagination, Tx/Hash, Wallet/Confirmations Progress, Nav/Step Item, Alert/Banner, Banner/Promo, Strip/Networks, Widget/Rakeback, Widget/Cashback, Card/Mission, Card/Round, Chart/Timeline, Menu/Filter, Notice/Licence, Badge/18+). Entries below are SCREEN FRAMES (type FRAME). Desktop: page '05 — User Dashboard', section 'USR-F1..F6 Financial history' (56:44838) at X=36000, Y=0 — flow columns F1..F6 at x = 120 + i*1560, states stacked below. Mobile: page '10 — Mobile Experience', section 'USR — Mobile D' at X=112000, Y=0. Continuation 28 Nov 2026: mobile F2–F6 (+ F6 Export bottom sheet) added in 'USR — Mobile D' columns x = 120 + i*510 (F1 col 0 … F6 col 5); F1 mobile DEMO bars switched to the short message; desktop F2/F3/F4/F6 + F6 768/Export text-patched to the WD-20931 18:44→22:44 timeline, VIP weekly 16–22 Nov auto-settle cycle, Gold III level-up and rakeback 2.96 (see pending/usr-finance/d-patch.js).",
  "Section/USR-F1..F6 Financial history": {
   "id": "56:44838",
   "type": "SECTION"
@@ -58,6 +58,30 @@
  },
  "MOB-10 · [USR-F1] Deposits / 390 / Filters (bottom sheet)": {
   "id": "115:54471",
+  "type": "FRAME"
+ },
+ "MOB-10 · [USR-F2] Withdrawals / 390 / Default": {
+  "id": "161:69577",
+  "type": "FRAME"
+ },
+ "MOB-10 · [USR-F3] Fees / 390 / Default": {
+  "id": "161:70006",
+  "type": "FRAME"
+ },
+ "MOB-10 · [USR-F4] Rewards / 390 / Default": {
+  "id": "161:70387",
+  "type": "FRAME"
+ },
+ "MOB-10 · [USR-F5] Refunds / 390 / Default": {
+  "id": "164:70168",
+  "type": "FRAME"
+ },
+ "MOB-10 · [USR-F6] Complete Transaction History / 390 / Default": {
+  "id": "164:70509",
+  "type": "FRAME"
+ },
+ "MOB-10 · [USR-F6] Complete Transaction History / 390 / Export (bottom sheet)": {
+  "id": "164:70954",
   "type": "FRAME"
  }
 }

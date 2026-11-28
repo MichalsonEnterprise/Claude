@@ -10,9 +10,23 @@
 
 @custom-variant hocus (&:hover, &:focus-visible);
 
+/* Sidebar rail: `rail:` styles apply when the sidebar (or an ancestor) is collapsed to the 72px rail —
+ * forced (data-sidebar-state=collapsed) or automatically between 1024 and 1279px (data-sidebar-state=auto). */
+@custom-variant rail {
+  &:where([data-sidebar-state='collapsed'], [data-sidebar-state='collapsed'] *) {
+    @slot;
+  }
+  @media (width < 80rem) {
+    &:where([data-sidebar-state='auto'], [data-sidebar-state='auto'] *) {
+      @slot;
+    }
+  }
+}
+
 @theme {
   --animate-shimmer: gp-shimmer 1.6s linear infinite;
   --animate-live-pulse: gp-live-pulse 1.8s ease-in-out infinite;
+  --animate-shake: gp-shake 0.36s ease-in-out;
 
   @keyframes gp-shimmer {
     from {
@@ -20,6 +34,20 @@
     }
     to {
       background-position: -200% 0;
+    }
+  }
+  @keyframes gp-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-6px);
+    }
+    40%,
+    80% {
+      transform: translateX(6px);
     }
   }
   @keyframes gp-live-pulse {

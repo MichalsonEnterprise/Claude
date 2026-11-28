@@ -143,6 +143,8 @@ async function KROW(c, a, b) { const kr = AL('HORIZONTAL', { name: 'KPIs', gap: 
 async function TABBAR(f, active = 'Wallet') { add(f, [await I('22:5413', { Active: active }), 'FILL']); }
 async function STICKY(f, btns) { const cta = AL('HORIZONTAL', { name: 'Sticky CTA', p: [12, 16, 12, 16], fill: 'bg/secondary', gap: 12 }); strokeSides(cta, 'border/subtle', { t: 1 }); add(f, [cta, 'FILL']); for (const b of btns) add(cta, [b, 'FILL']); return cta; }
 // ===== END FIN helpers =====
+// fix from m-a review: F2 'Daily limit used' KPI unit overflowed its card
+{ const f2 = await figma.getNodeByIdAsync('161:69577'); const k = f2 && f2.findOne(n => n.type === 'FRAME' && n.name === 'KPI — Daily limit used'); if (k) { for (const t of k.findAll(n => n.type === 'TEXT')) { if (t.characters === '/ 25,000.00') t.characters = 'USDT'; else if (t.characters === 'KYC Level 2 · resets 00:00 UTC') t.characters = 'of 25,000.00 · KYC L2 · resets 00:00 UTC'; } OUT.push({ fixedKpi: k.id }); } else ISSUES.push('F2 KPI not found'); }
 // m-b: build F5, F6 default, F6 export (bottom sheet) mobile (MOB-10)
 {
 let R; try {

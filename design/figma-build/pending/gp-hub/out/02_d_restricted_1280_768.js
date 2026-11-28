@@ -147,7 +147,7 @@ for (const BP of ['L', 'T']) {
   // 3) hero CTAs: participate disabled + where-it-is-available + withdraw (no bypass hints)
   const hero = fnd(content, 'Hero — Jackpot banner'); const H0 = hero.height;
   const cta = fnd(hero, 'Hero CTA row'); for (const c of [...cta.children]) c.remove();
-  if (ctaSrc && ctaSrc.children.length) { for (const c of ctaSrc.children) cta.appendChild(c.clone()); }
+  if (ctaSrc && ctaSrc.children.length) { for (const c of [...ctaSrc.children]) cta.appendChild(c.clone()); }
   else add(cta, await BTN('Gold', 'Not available in your region', { size: 'L', state: 'Disabled', lead: 'lock' }), await BTN('Secondary', 'Restricted countries', { size: 'L', lead: 'globe' }), await BTN('Ghost', 'Withdraw funds', { size: 'L', lead: 'withdraw' }));
   cta.resize(BP === 'T' ? 400 : 560, cta.height); cta.primaryAxisSizingMode = 'FIXED'; cta.layoutWrap = 'WRAP'; bnum(cta, 'counterAxisSpacing', 12); cta.counterAxisSizingMode = 'AUTO';
   // 4) risk line copy

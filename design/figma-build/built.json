@@ -3087,5 +3087,679 @@
    "Figma MCP seat rate limit was hit 4 times (never 3 in a row). Each time I prepared the next script and then retried. The use_figma runtime skips invisible instance children: touching a node after hiding it throws 'node does not exist'. This is documented in pending/wal-withdraw-b/README.md.",
    "Files written: /home/user/Claude/design/figma-build/registry-wal-withdraw-b.json, /home/user/Claude/design/figma-build/pending/wal-withdraw-b/ (build.py, _common.js, _desk.js, _mob.js, builders, bodies, README.md), appended sections to demo-data.md and decisions.md (#28). ledger.json was not edited; it is left for the orchestrator to merge. No memory notes were used or bear on this task."
   ]
+ },
+ "usr-rg": {
+  "section": "121:54555 (page 05 — User Dashboard, \"USR-RG1..RG7 Responsible gaming\" at 60000,0); mobile section 129:56039 (page 10 — Mobile Experience, \"USR — Mobile F\" at 126000,0)",
+  "created": [
+   {
+    "name": "SECTION USR-RG1..RG7 Responsible gaming",
+    "id": "121:54555"
+   },
+   {
+    "name": "SECTION USR — Mobile F",
+    "id": "129:56039"
+   },
+   {
+    "name": "[USR-RG1] Responsible Gaming Hub / 1440 / Default",
+    "id": "121:54556"
+   },
+   {
+    "name": "[USR-RG2] Deposit Limits / 1440 / Default",
+    "id": "121:55387"
+   },
+   {
+    "name": "[USR-RG2] Deposit Limits / 1440 / Pending increase — 24 h cool-down",
+    "id": "121:56097"
+   },
+   {
+    "name": "[USR-RG3] Participation Limits / 1440 / Default",
+    "id": "123:110526"
+   },
+   {
+    "name": "[USR-RG4] Time Limits / 1440 / Default",
+    "id": "123:111241"
+   },
+   {
+    "name": "[USR-RG5] Reality Checks / 1440 / Settings",
+    "id": "123:111945"
+   },
+   {
+    "name": "[USR-RG5] Reality Checks / 1440 / Popup — 60 minutes reached",
+    "id": "123:112656"
+   },
+   {
+    "name": "[USR-RG6] Cooling-Off Period / 1440 / Default — choose a break",
+    "id": "126:59455"
+   },
+   {
+    "name": "[USR-RG6] Cooling-Off Period / 1440 / Confirm — 7 days",
+    "id": "126:60154"
+   },
+   {
+    "name": "[USR-RG6] Cooling-Off Period / 1440 / Active — ends 4 Dec 2026, 16:42 UTC",
+    "id": "126:60937"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 1440 / Step 1 — Choose period",
+    "id": "126:61615"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 1440 / Step 2 — Consequences (1 year)",
+    "id": "126:62275"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 1440 / Step 3 — Confirm with password",
+    "id": "126:62954"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 1440 / Active — until 27 Nov 2027, 16:45 UTC",
+    "id": "126:63670"
+   },
+   {
+    "name": "[USR-RG1] Responsible Gaming Hub / 390 / Default",
+    "id": "129:57449"
+   },
+   {
+    "name": "[USR-RG2] Deposit Limits / 390 / Default",
+    "id": "129:57819"
+   },
+   {
+    "name": "[USR-RG2] Deposit Limits / 390 / Pending increase — 24 h cool-down",
+    "id": "129:58178"
+   },
+   {
+    "name": "[USR-RG3] Participation Limits / 390 / Default",
+    "id": "131:57536"
+   },
+   {
+    "name": "[USR-RG4] Time Limits / 390 / Default",
+    "id": "131:57906"
+   },
+   {
+    "name": "[USR-RG5] Reality Checks / 390 / Settings",
+    "id": "131:58240"
+   },
+   {
+    "name": "[USR-RG5] Reality Checks / 390 / Popup — bottom sheet, 60 minutes reached",
+    "id": "132:135641"
+   },
+   {
+    "name": "[USR-RG6] Cooling-Off Period / 390 / Default — choose a break",
+    "id": "132:135914"
+   },
+   {
+    "name": "[USR-RG6] Cooling-Off Period / 390 / Confirm — bottom sheet, 7 days",
+    "id": "132:136263"
+   },
+   {
+    "name": "[USR-RG6] Cooling-Off Period / 390 / Active — ends 4 Dec 2026, 16:42 UTC",
+    "id": "132:136667"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 390 / Step 1 — Choose period",
+    "id": "132:137005"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 390 / Step 2 — Consequences (1 year)",
+    "id": "134:58825"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 390 / Step 3 — Confirm with password",
+    "id": "134:59174"
+   },
+   {
+    "name": "[USR-RG7] Self-Exclusion / 390 / Active — until 27 Nov 2027, 16:45 UTC",
+    "id": "134:59537"
+   }
+  ],
+  "issues": [
+   "Component gap: RG/Limit Setter (23:21988) has built-in daily example values (deposit 2,500.00/day, participation 200.00/day, time 42 min) and a fixed-width 'Used' bar that cannot be resized on an instance. All 8 RG instances were overridden to demo-data text. For the bar, the Track fill was overridden with a hard-stop linear gradient whose stops are bound to brand/primary and surface/raised, and 'Used' was hidden. Recommend adding a Usage % property or variants to the component.",
+   "Component gap: the RG/Self-Exclusion Step (25:14013) 'Confirm' variant uses an OTP, while the brief asks for password + typed confirmation, so step 3 is built inline from tokens, Input/Password, Input/Text and Checkbox instances. The component's 'Indefinite' label is overridden to 'Permanent'.",
+   "Mobile fit: RG/Self-Exclusion Step and RG/Cooling-Off Card are 520/440-wide designs. At 358 the Active self-exclusion card's title sits tight against its DEMO badge and its 'Get support' ghost button reaches the card edge (no text is clipped after the fix). A mobile variant is recommended.",
+   "Notice/Demo Data overflows at 390. All 14 RG mobile frames use the short Message 'DEMO DATA — illustrative values only', consistent with decision #29.",
+   "Minor redundancy: RG/Cooling-Off Card contains its own 'During your break' list and a 'Need longer? Self-exclusion' link, so it partly repeats the adjacent cards on RG6.",
+   "Process: prepared queue scripts were re-batched (2–7 frames per call) with data fixes added. The executed scripts are saved in /home/user/Claude/design/figma-build/queue/usr-rg/out/. Decision #30 was appended to /home/user/Claude/design/figma-build/decisions.md. ledger.json was not edited and is left for the orchestrator. No components were created, so there is no registry-usr-rg.json.",
+   "Memory: read note project_global_pool_figma.md (file key, casino direction, build kit location). It is consistent with the work done and has nothing new to save."
+  ]
+ },
+ "auth-d": {
+  "section": "Desktop: page '04 — Authentication', section 'AUTH-05/06/18..21 Recovery & restrictions' (128:57101, X=36000 Y=0). Mobile: page '10 — Mobile Experience', section 'AUTH — Mobile D' (140:158091, X=84000 Y=0). Scripts, kit and run order are in /home/user/Claude/design/figma-build/pending/auth-d/ (build.py, RUN-ORDER.json, bodies/, out/). Frame ids are in /home/user/Claude/design/figma-build/registry-auth-d.json, and decision #29 is appended to /home/user/Claude/design/figma-build/decisions.md.",
+  "created": [
+   {
+    "name": "Section/AUTH-05/06/18..21 Recovery & restrictions",
+    "id": "128:57101"
+   },
+   {
+    "name": "Section/AUTH — Mobile D",
+    "id": "140:158091"
+   },
+   {
+    "name": "Notes — AUTH-05/06/18..21 decisions & dev notes",
+    "id": "128:57102"
+   },
+   {
+    "name": "[AUTH-05] Forgot Password / 1440 / Request (default)",
+    "id": "128:57148"
+   },
+   {
+    "name": "[AUTH-05] Forgot Password / 1440 / Sent",
+    "id": "128:59149"
+   },
+   {
+    "name": "[AUTH-05] Forgot Password / 1440 / Error — too many requests",
+    "id": "128:61145"
+   },
+   {
+    "name": "[AUTH-06] Reset Password / 1440 / Strength (default)",
+    "id": "130:62620"
+   },
+   {
+    "name": "[AUTH-06] Reset Password / 1440 / Expired link",
+    "id": "130:64689"
+   },
+   {
+    "name": "[AUTH-06] Reset Password / 1440 / Success",
+    "id": "130:66682"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 1440 / Suspended",
+    "id": "133:128066"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 1440 / Under review",
+    "id": "133:128753"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 1440 / Self-excluded",
+    "id": "135:137889"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 1440 / Geo-restricted",
+    "id": "135:138580"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 1 Start / 1440 / Default",
+    "id": "137:80489"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 2 Verify identity / 1440 / Default",
+    "id": "137:82508"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 3 Wallet recovery / 1440 / Default",
+    "id": "137:84541"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 4 Cooling-off notice / 1440 / Default",
+    "id": "137:86543"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 5 Success / 1440 / Default",
+    "id": "137:88548"
+   },
+   {
+    "name": "[AUTH-20] Session Expired / Re-auth Modal / 1440 / Session expired (default)",
+    "id": "139:141689"
+   },
+   {
+    "name": "[AUTH-20] Session Expired / Re-auth Modal / 1440 / Re-auth — sensitive action",
+    "id": "139:143624"
+   },
+   {
+    "name": "[AUTH-21] New-device Login Alert / 1440 / Default",
+    "id": "139:144309"
+   },
+   {
+    "name": "[AUTH-05] Forgot Password / 390 / Request (default)",
+    "id": "140:158092"
+   },
+   {
+    "name": "[AUTH-05] Forgot Password / 390 / Sent",
+    "id": "140:158288"
+   },
+   {
+    "name": "[AUTH-06] Reset Password / 390 / Strength (default)",
+    "id": "140:158481"
+   },
+   {
+    "name": "[AUTH-06] Reset Password / 390 / Expired link",
+    "id": "140:158721"
+   },
+   {
+    "name": "[AUTH-06] Reset Password / 390 / Success",
+    "id": "140:158905"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 390 / Suspended",
+    "id": "141:61380"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 390 / Under review",
+    "id": "141:61666"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 390 / Self-excluded",
+    "id": "141:61946"
+   },
+   {
+    "name": "[AUTH-18] Restricted Account / 390 / Geo-restricted",
+    "id": "141:62273"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 1 Start / 390 / Default",
+    "id": "142:62490"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 2 Verify identity / 390 / Default",
+    "id": "142:62600"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 3 Wallet recovery / 390 / Default",
+    "id": "142:62737"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 4 Cooling-off notice / 390 / Default",
+    "id": "142:62830"
+   },
+   {
+    "name": "[AUTH-19] Account Recovery — Step 5 Success / 390 / Default",
+    "id": "142:62940"
+   },
+   {
+    "name": "[AUTH-20] Session Expired / Re-auth Modal / 390 / Session expired (default)",
+    "id": "140:159087"
+   },
+   {
+    "name": "[AUTH-21] New-device Login Alert / 390 / Default",
+    "id": "140:159327"
+   }
+  ],
+  "issues": [
+   "Some needed pieces don't exist in the library, so they were built inline from tokens using existing instances: the restricted-mode shell (reduced sidebar from Shell/Sidebar Item instances, a top bar with no Deposit button, and a mobile top bar), the status hero with angled-block art, the two-pane dialog and bottom sheet (same pattern as auth-b), and the illustration cards (email, ID document, withdrawal-hold card, device list, password strength, wallet signature, new device, document request, review timeline, break calendar, location check). They are good candidates to become library components.",
+   "In the mobile self-excluded frame (141:61946), the RG/Help Resources instance is stretched to 326 px. The caption of its built-in 'Take a 2-minute self-assessment' row is slightly clipped at the right edge. This comes from the component's internal layout, which has no responsive wrap.",
+   "The 4 AUTH-18 states are alternative DEMO scenarios for @nova.k. New DEMO values introduced: case refs SUS-3107, REV-2291, LOC-8841 and recovery case REC-6620; reset link times 16:31–17:01 UTC; password-reset hold until 28 Nov 16:40 UTC; recovery approved 17:12 UTC with withdrawals unlocking 29 Nov 2026, 17:12 UTC; masked IPs 85.48.•••.12 (Madrid) and 72.229.•••.18 (New York). In every state, entries already placed in round #1,248 stay in the draw, so balances still reconcile with demo-data.md. These values have not been added to demo-data.md yet; the orchestrator should merge them.",
+   "New policy rules shown in the designs are logged in decision #29 for orchestrator or product review: a 24 h withdrawal hold after a password reset; re-authentication for security changes after 15 min; a 30 min idle session timeout; reset links limited to 3 per 15 min, single use, valid 30 min; on mobile, restricted pages and the recovery flow drop the tab bar (focused flow, same rule as PUB-21).",
+   "No laptop or tablet frames: the AUTH ledger rows only require D·M.",
+   "The Figma MCP rate limit blocked 4 calls during the run. Each time the next script was prepared offline and the call retried once; every retry succeeded, so nothing remains."
+  ]
+ },
+ "usr-account": {
+  "section": "Desktop: page '05 — User Dashboard', section 'USR-A1..A10 Account & security' id 32:72712 (X=24000, Y=0; re-banded to 7,920 x 13,890). Mobile: page '10 — Mobile Experience', section 'USR — Mobile C' id 34:484195 (X=105000, 5,220 wide)",
+  "created": [
+   {
+    "name": "[USR-A7 · MOB-09] Connected Devices / 390 / Default",
+    "id": "154:67001"
+   },
+   {
+    "name": "[USR-A7 · MOB-09] Connected Devices / 390 / Revoke — bottom sheet",
+    "id": "154:67217"
+   },
+   {
+    "name": "[USR-A8 · MOB-09] Session Management / 390 / Default",
+    "id": "154:67468"
+   },
+   {
+    "name": "[USR-A8 · MOB-09] Session Management / 390 / End all — bottom sheet",
+    "id": "154:67677"
+   },
+   {
+    "name": "[USR-A3 · MOB-09] Two-Factor Authentication / 390 / Disable — bottom sheet",
+    "id": "155:87455"
+   },
+   {
+    "name": "[USR-A4] KYC Status / 390 / Approved",
+    "id": "155:87801"
+   },
+   {
+    "name": "[USR-A4] KYC Status / 390 / Rejected",
+    "id": "155:88000"
+   },
+   {
+    "name": "[USR-A5] Verification Documents / 390 / Default",
+    "id": "155:88224"
+   },
+   {
+    "name": "[USR-A6] Login History / 390 / Suspicious flag",
+    "id": "156:68093"
+   },
+   {
+    "name": "[USR-A9] Notification Preferences / 390 / Default",
+    "id": "156:68346"
+   },
+   {
+    "name": "[USR-A10] Anti-Phishing Code / 390 / Default",
+    "id": "156:68621"
+   },
+   {
+    "name": "(existing, earlier run, kept) [USR-A1] Personal Information / 1440 / Edit",
+    "id": "32:72713"
+   },
+   {
+    "name": "(existing) [USR-A1] Personal Information / 1440 / Saved",
+    "id": "32:87503"
+   },
+   {
+    "name": "(existing) [USR-A2] Security Settings / 1440 / Default",
+    "id": "32:96754"
+   },
+   {
+    "name": "(existing) [USR-A3] Two-Factor Authentication / 1440 / Manage (On)",
+    "id": "33:123752"
+   },
+   {
+    "name": "(existing) [USR-A3] Two-Factor Authentication / 1440 / Disable — confirm",
+    "id": "33:151777"
+   },
+   {
+    "name": "(existing) [USR-A3] Two-Factor Authentication / 1440 / Enable — setup",
+    "id": "33:170381"
+   },
+   {
+    "name": "(existing) [USR-A3] Two-Factor Authentication / 1440 / Reset — lost device",
+    "id": "33:199622"
+   },
+   {
+    "name": "(existing) [USR-A4] KYC Status / 1440 / Not started",
+    "id": "33:221847"
+   },
+   {
+    "name": "(existing) [USR-A4] KYC Status / 1440 / Pending",
+    "id": "33:244072"
+   },
+   {
+    "name": "(existing) [USR-A4] KYC Status / 1440 / Approved",
+    "id": "33:262703"
+   },
+   {
+    "name": "(existing) [USR-A4] KYC Status / 1440 / Rejected",
+    "id": "33:280974"
+   },
+   {
+    "name": "(existing) [USR-A4] KYC Status / 1440 / Expired",
+    "id": "33:302783"
+   },
+   {
+    "name": "(existing) [USR-A5] Verification Documents / 1440 / Default",
+    "id": "33:321559"
+   },
+   {
+    "name": "(existing, moved to band 2) [USR-A6] Login History / 1440 / Suspicious flag",
+    "id": "34:344599"
+   },
+   {
+    "name": "(existing, moved) [USR-A7] Connected Devices / 1440 / Default",
+    "id": "34:369746"
+   },
+   {
+    "name": "(existing, moved) [USR-A7] Connected Devices / 1440 / Revoke — confirm",
+    "id": "34:384921"
+   },
+   {
+    "name": "(existing, moved) [USR-A8] Session Management / 1440 / Default",
+    "id": "34:404144"
+   },
+   {
+    "name": "(existing, moved) [USR-A8] Session Management / 1440 / End all — confirm",
+    "id": "34:413465"
+   },
+   {
+    "name": "(existing, moved) [USR-A9] Notification Preferences / 1440 / Default",
+    "id": "34:430816"
+   },
+   {
+    "name": "(existing, moved) [USR-A10] Anti-Phishing Code / 1440 / Default",
+    "id": "34:451588"
+   },
+   {
+    "name": "(existing) [USR-A1] Personal Information / 390 / Edit",
+    "id": "34:484196"
+   },
+   {
+    "name": "(existing) [USR-A2 · MOB-09] Security Settings / 390 / Default",
+    "id": "34:495793"
+   },
+   {
+    "name": "(existing) [USR-A3 · MOB-09] Two-Factor Authentication / 390 / Manage (On)",
+    "id": "36:510785"
+   },
+   {
+    "name": "(existing) [USR-A3 · MOB-09] Two-Factor Authentication / 390 / Enable — setup on this phone",
+    "id": "36:537760"
+   }
+  ],
+  "issues": [
+   "Continuation finding: the interrupted earlier run had already built all 20 desktop frames and 4 mobile frames, so I kept them and treated them as done after screenshot review. Its state names differ from the brief's wording, e.g. 'Manage (On)', 'Enable — setup' and 'Reset — lost device'.",
+   "Layout defect fixed: the earlier 10-column layout made the desktop section 15,720 wide, overlapping 'USR-F1..F6 Financial history' at X=36000. I moved A6–A10 into a second band under A1–A5 (from y=10184). The section is now 7,920 x 13,890 (X 24000–31920). Ten columns can't fit at X=24000 without this.",
+   "Figma MCP seat limit: about 14 'tool call limit' errors during the run, never 3 in a row. Every planned frame was built. The only open item is an optional full-height screenshot of mobile 36:510785 (A3 Manage (On)). It's queued in pending/usr-account/RUN-ORDER.json.",
+   "No library component has a 390 variant for User/Device Row, User/Session Row, Card/Security Score or the login-history table. Mobile uses stacked cards built inline from tokens instead. I suggest adding Mobile variants.",
+   "Notice/Demo Data's default message clips at 390 (decision #29). I changed it to the short message on all 15 frames in 'USR — Mobile C', including the earlier run's 4. A wrapping Mobile variant is still recommended.",
+   "Input/OTP shows a 'Resend code' timer line, which is wrong for authenticator (TOTP) codes. I hid that row on the mobile 2FA Disable sheet and on mobile Anti-phishing. I suggest an 'authenticator' variant without it.",
+   "Mobile A5: the two extra documents (utility bill, rejected national ID card) use explicit copy because the desktop table rows couldn't be read by script. The national ID card date '10 Jan 2026' was read off a low-resolution screenshot of the desktop frame and may not match it exactly.",
+   "Content inconsistency in the earlier desktop frames, not changed: A5 labels the utility bill 'Address · Level 1', while A4 levels list proof of address under Level 3.",
+   "Bottom-sheet states (2FA Disable, Revoke device, End all sessions) are fixed 844 px phone viewports, cloned from their default frames so the page under the scrim matches exactly.",
+   "Files written: registry-usr-account.json (37 frame and section IDs) and decision #31 appended to decisions.md. Prepared and run scripts are in design/figma-build/pending/usr-account/ (README.md, RUN-ORDER.json, src/, out/). Do NOT run its D1–D7 scripts: the frames already exist under different state names, so they would create duplicates."
+  ]
+ },
+ "usr-gaming": {
+  "section": "32:97624 (page '05 — User Dashboard', section 'USR-G1..G7 Gaming', X=12000 Y=0) + 34:432314 (page '10 — Mobile Experience', section 'USR — Mobile B', X=98000 Y=0, now 3690x5337)",
+  "created": [
+   {
+    "name": "[USR-G1] My Games / 390 / Default (NEW this run)",
+    "id": "149:124836"
+   },
+   {
+    "name": "[USR-G7] Favourites / 390 / Default (NEW this run)",
+    "id": "151:63647"
+   },
+   {
+    "name": "[USR-G7] Favourites / 390 / Empty (NEW this run)",
+    "id": "151:64719"
+   },
+   {
+    "name": "[USR-G2] My Entries / 390 / Filters (NEW this run, bottom sheet)",
+    "id": "152:64961"
+   },
+   {
+    "name": "[USR-G6] Game History / 390 / Export (NEW this run, bottom sheet)",
+    "id": "152:65321"
+   },
+   {
+    "name": "[USR-G1] My Games / 1440 / Default (existing, first run)",
+    "id": "34:411209"
+   },
+   {
+    "name": "[USR-G2] My Entries / 1440 / Default (existing)",
+    "id": "32:97641"
+   },
+   {
+    "name": "[USR-G2] My Entries / 1440 / Empty (existing)",
+    "id": "32:116296"
+   },
+   {
+    "name": "[USR-G2] My Entries / 1440 / Filters (existing)",
+    "id": "33:146972"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 1440 / Live (existing)",
+    "id": "33:175611"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 1440 / Empty (existing)",
+    "id": "33:198857"
+   },
+   {
+    "name": "[USR-G4] My Results / 1440 / Default (existing)",
+    "id": "33:222628"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 1440 / Owed (existing)",
+    "id": "33:253282"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 1440 / Settled (existing)",
+    "id": "33:277301"
+   },
+   {
+    "name": "[USR-G6] Game History / 1440 / Default (existing)",
+    "id": "33:308312"
+   },
+   {
+    "name": "[USR-G6] Game History / 1440 / Filters (existing)",
+    "id": "34:327461"
+   },
+   {
+    "name": "[USR-G6] Game History / 1440 / Export (existing)",
+    "id": "34:342896"
+   },
+   {
+    "name": "[USR-G7] Favourites / 1440 / Default (existing)",
+    "id": "34:370504"
+   },
+   {
+    "name": "[USR-G7] Favourites / 1440 / Empty (existing)",
+    "id": "34:389924"
+   },
+   {
+    "name": "[USR-G2] My Entries / 390 / Default (existing)",
+    "id": "34:432315"
+   },
+   {
+    "name": "[USR-G2] My Entries / 390 / Empty (existing)",
+    "id": "34:448425"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 390 / Live (existing)",
+    "id": "34:475816"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 390 / Empty (existing)",
+    "id": "34:486169"
+   },
+   {
+    "name": "[USR-G4] My Results / 390 / Default (existing)",
+    "id": "34:503168"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 390 / Owed (existing)",
+    "id": "36:514932"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 390 / Settled (existing)",
+    "id": "36:524169"
+   },
+   {
+    "name": "[USR-G6] Game History / 390 / Default (existing)",
+    "id": "36:535016"
+   }
+  ],
+  "issues": [
+   "FIGMA MCP LIMIT: the last 3 use_figma calls in a row hit the seat tool-call limit, so I stopped (conventions §10). All required frames exist. The only thing left is an optional cosmetic fix: pending/usr-gaming/out/04_fix_g6_export_filename.js. It moves the DEMO badge in 152:65321 so the Mono filename stops wrapping after 'game-'. The script is idempotent; run it once the limit resets.",
+   "Continuation scope: the first run had already built all 14 desktop frames and 8 mobile frames. A read-only listing showed none was incomplete: all hug height, none stuck at 800. They were kept and not re-screenshotted this run, so the rows are reported BUILT, not VERIFIED.",
+   "Not built (judged not materially different on mobile): [USR-G6] Game History / 390 / Filters. Mobile filters use the bottom-sheet pattern shown in [USR-G2] My Entries / 390 / Filters. The count shown in the desktop G6 Filters state was not read, so a mobile version would need that number first.",
+   "Built inline from tokens because no library component exists: the Gaming sub-nav, which scrolls horizontally via a clipped Tabs/Pill row; the mobile RG session strip; the countdown boxes; stacked game rows with art thumbnails; the favourites heart control (Button/Icon with the heart icon); the empty-state illustration; and the mobile bottom sheets. Sheet/Bottom has fixed body content, so it could not hold these forms.",
+   "Rule deviation: Tile/Game Art instances are rescaled to 0.3 (48x64) for list thumbnails and to 0.58 in the empty-state illustration. The catalogue note says art should be placed through Tile/Game Generic; full tiles still are. The favourites grid uses Tile/Game Generic rescaled to 171/160 to fit two columns in 358 px, so its text sizes are about 12.8 px instead of 12 px.",
+   "Player counts that are not in demo-data.md were added as DEMO-badged tile values: Double Side 48, Twenty-One 92, Pool Roulette 128, Neon Koi 57. They are logged in decisions.md #31.",
+   "Self-inflicted and fixed: a spacer fix in G1 390 also overrode 'Spacer' layers inside the Topbar instance and 5 tile instances. Those instances were reset (resetOverrides) and their props re-applied, and the re-screenshot passed.",
+   "Files written: pending/usr-gaming/ (README.md, src/kit.js + src/m_*.js + src/build.py, out/01–04). registry-usr-gaming.json now lists the 5 new frames. decisions.md gained entry #31 (mobile Gaming patterns)."
+  ]
+ },
+ "usr-finance": {
+  "section": "56:44838 (page '05 — User Dashboard', 'USR-F1..F6 Financial history' at 36000,0) + 115:53803 (page '10 — Mobile Experience', 'USR — Mobile D' at 112000,0)",
+  "created": [
+   {
+    "name": "Section/USR-F1..F6 Financial history (earlier run)",
+    "id": "56:44838"
+   },
+   {
+    "name": "[USR-F1] Deposits / 1440 / Default (earlier run)",
+    "id": "56:44839"
+   },
+   {
+    "name": "[USR-F1] Deposits / 1440 / Filters (earlier run)",
+    "id": "62:45877"
+   },
+   {
+    "name": "[USR-F1] Deposits / 1440 / Empty — new DEMO account (no deposits) (earlier run)",
+    "id": "69:104709"
+   },
+   {
+    "name": "[USR-F2] Withdrawals / 1440 / Default (earlier run, data-patched this run)",
+    "id": "72:48152"
+   },
+   {
+    "name": "[USR-F3] Fees / 1440 / Default (earlier run, data-patched this run)",
+    "id": "74:49145"
+   },
+   {
+    "name": "[USR-F4] Rewards / 1440 / Default (earlier run, data-patched this run)",
+    "id": "86:49985"
+   },
+   {
+    "name": "[USR-F5] Refunds / 1440 / Default (earlier run)",
+    "id": "88:50964"
+   },
+   {
+    "name": "[USR-F6] Complete Transaction History / 1440 / Default (earlier run, data-patched this run)",
+    "id": "90:114727"
+   },
+   {
+    "name": "[USR-F6] Complete Transaction History / 1440 / Export (earlier run, data-patched this run)",
+    "id": "109:103285"
+   },
+   {
+    "name": "[USR-F6] Complete Transaction History / 768 / Default (earlier run, data-patched this run)",
+    "id": "109:104557"
+   },
+   {
+    "name": "Section/USR — Mobile D (earlier run)",
+    "id": "115:53803"
+   },
+   {
+    "name": "MOB-10 · [USR-F1] Deposits / 390 / Default (earlier run; DEMO bar patched)",
+    "id": "115:53804"
+   },
+   {
+    "name": "MOB-10 · [USR-F1] Deposits / 390 / Empty — new DEMO account (earlier run; DEMO bar patched)",
+    "id": "115:54210"
+   },
+   {
+    "name": "MOB-10 · [USR-F1] Deposits / 390 / Filters (bottom sheet) (earlier run; DEMO bar patched)",
+    "id": "115:54471"
+   },
+   {
+    "name": "MOB-10 · [USR-F2] Withdrawals / 390 / Default (NEW)",
+    "id": "161:69577"
+   },
+   {
+    "name": "MOB-10 · [USR-F3] Fees / 390 / Default (NEW)",
+    "id": "161:70006"
+   },
+   {
+    "name": "MOB-10 · [USR-F4] Rewards / 390 / Default (NEW)",
+    "id": "161:70387"
+   },
+   {
+    "name": "MOB-10 · [USR-F5] Refunds / 390 / Default (NEW)",
+    "id": "164:70168"
+   },
+   {
+    "name": "MOB-10 · [USR-F6] Complete Transaction History / 390 / Default (NEW)",
+    "id": "164:70509"
+   },
+   {
+    "name": "MOB-10 · [USR-F6] Complete Transaction History / 390 / Export (bottom sheet) (NEW)",
+    "id": "164:70954"
+   }
+  ],
+  "issues": [
+   "Data was re-aligned after the fact. The desktop and tablet USR-F frames from the first run used values that demo-data.md later superseded: WD-20931 at 17:58 with a 21:58 ETA and an AML reason of 'above 1,000 USDT'; VIP weekly reward 'Week 23–29 Nov' dated 27 Nov and 'claimable for 30 days'; level-up 'Gold level 14' at +25.00 on 12 Nov; rakeback 2.86. These were text-patched in place (pending/usr-finance/d-patch.js) and the new mobile frames follow demo-data. Other slices may still show the old values (e.g. Dashboard overview recent activity, wallet transaction history/drawer) — the orchestrator should check them.",
+   "To keep the wal-withdraw-b claim that WD-20931 is the first withdrawal to 0x7c4e…a21D (whitelisted 14 Oct 2026), the earlier withdrawals WD-20702 (4 Nov) and WD-20511 (11 Oct) were moved to the primary BNB address 0x12ab…9f3C (now receiving 1,249.88 and 999.88), and network fees paid changed from 0.86 to 0.98 USDT on F2 and F3. This is logged in decisions.md #32 and in a new 'Financial history extras' block in demo-data.md.",
+   "Possible cross-slice conflict, not changed: the admin audit entry #88,213 (18:42:07, A. Marin withdrawal.reject WD-20850) gives no date. The user history shows WD-20850 rejected on 18 Nov 2026, 15:02 UTC. If the admin audit is meant to be 27 Nov, one side needs updating.",
+   "No mobile transaction-card component exists in the library. Tx/Row 20:6222 is a 1000-wide desktop row, so the mobile Tx cards were built inline from tokens and instances (Badge/Status, Badge/DEMO, chain marks, icons), as the F1 mobile frames already were. Suggest adding a 'Tx/Card Mobile' component.",
+   "On the 390 frames Notice/Demo Data uses the short message 'DEMO DATA — illustrative values only' because the default message clips (decision #29). The 3 existing F1 mobile frames were patched to match.",
+   "Mobile tab rows are a full-bleed clipped viewport with the pill row shifted so the active pill (Rewards/Refunds) is visible. This simulates horizontal scroll; it is not a component state.",
+   "The Figma MCP tool-call limit was hit 4 times in this run: twice in a row at the start (recovered after a wait) and twice later (each recovered on one retry after waiting). No frames remain unbuilt.",
+   "Prepared, assembled scripts for this slice are in /home/user/Claude/design/figma-build/pending/usr-finance/ (README.md, RUN-ORDER.json with status 'done', _tail.js, m-a.js, m-b.js, d-patch.js, out/m-a.full.js, out/m-b.full.js). The registry is updated in /home/user/Claude/design/figma-build/registry-usr-finance.json. Nothing from user memory was used: the memory index was seen, but no note was read or needed."
+  ]
  }
 }

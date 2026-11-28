@@ -1,90 +1,76 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
-import { Tabs as TabsPrimitive } from "radix-ui"
+import { Tabs as TabsPrimitive } from 'radix-ui';
+import * as React from 'react';
 
-function Tabs({
-  className,
-  orientation = "horizontal",
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
-  return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      data-orientation={orientation}
-      orientation={orientation}
-      className={cn(
-        "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
-        className
-      )}
-      {...props}
-    />
-  )
+import { cn } from '@/lib/utils';
+
+/**
+ * Tabs (Figma Tabs/Underline · Tabs/Pill · Tabs/Segmented). Set `variant` on <TabsList>; triggers inherit it.
+ * Keyboard: arrow keys move between tabs (Radix roving focus).
+ */
+type TabsVariant = 'underline' | 'pill' | 'segmented';
+const VariantContext = React.createContext<TabsVariant>('underline');
+
+export function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  return <TabsPrimitive.Root data-slot="tabs" className={cn('flex flex-col gap-4', className)} {...props} />;
 }
 
-const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none",
-  {
-    variants: {
-      variant: {
-        default: "bg-muted",
-        line: "gap-1 bg-transparent",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-function TabsList({
+export function TabsList({
   className,
-  variant = "default",
+  variant = 'underline',
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List> &
-  VariantProps<typeof tabsListVariants>) {
+}: React.ComponentProps<typeof TabsPrimitive.List> & { variant?: TabsVariant }) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
-      {...props}
-    />
-  )
+    <VariantContext.Provider value={variant}>
+      <TabsPrimitive.List
+        data-slot="tabs-list"
+        data-variant={variant}
+        className={cn(
+          'no-scrollbar flex max-w-full items-center overflow-x-auto',
+          variant === 'underline' && 'gap-6 border-b border-border-subtle',
+          variant === 'pill' && 'gap-2',
+          variant === 'segmented' && 'inline-flex w-fit gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1',
+          className,
+        )}
+        {...props}
+      />
+    </VariantContext.Provider>
+  );
 }
 
-function TabsTrigger({
+export function TabsTrigger({
   className,
+  children,
+  count,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+}: React.ComponentProps<typeof TabsPrimitive.Trigger> & { count?: number }) {
+  const variant = React.useContext(VariantContext);
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
-        "data-[state=active]:bg-background data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground",
-        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
-        className
+        'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap text-label-m transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:text-text-disabled [&_svg]:size-4',
+        variant === 'underline' &&
+          'relative -mb-px h-11 border-b-2 border-transparent px-0.5 text-text-secondary hover:text-text-primary data-[state=active]:border-brand data-[state=active]:text-text-primary',
+        variant === 'pill' &&
+          'h-9 rounded-full border border-border-default bg-surface-default px-4 text-text-secondary hover:border-border-strong hover:text-text-primary data-[state=active]:border-border-brand data-[state=active]:bg-brand-tint data-[state=active]:text-text-brand',
+        variant === 'segmented' &&
+          'h-8 rounded-sm px-3 text-text-secondary hover:text-text-primary data-[state=active]:bg-surface-raised data-[state=active]:text-text-primary data-[state=active]:shadow-elevation-1',
+        className,
       )}
       {...props}
-    />
-  )
+    >
+      {children}
+      {count !== undefined && (
+        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-surface-pressed px-1.5 text-[11px] font-semibold text-text-secondary tabular-nums">
+          {count}
+        </span>
+      )}
+    </TabsPrimitive.Trigger>
+  );
 }
 
-function TabsContent({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>) {
-  return (
-    <TabsPrimitive.Content
-      data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
-      {...props}
-    />
-  )
+export function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  return <TabsPrimitive.Content data-slot="tabs-content" className={cn('outline-none', className)} {...props} />;
 }
-
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }

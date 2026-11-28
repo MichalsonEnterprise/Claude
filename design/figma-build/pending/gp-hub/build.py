@@ -6,6 +6,7 @@ jobs = {
   '01_mob_gp03_gp04.js': ['modals.js', 'msheet.js', 'mob_0304.js'],
   '02_d_restricted_1280_768.js': ['dlib.js', 'd_restricted.js'],
   '03_d_noround_1280_768.js': ['dlib.js', 'd_noround.js'],
+  '04_mob_fix.js': ['mob_fix.js'],
 }
 for out, parts in jobs.items():
   code = H + '\n' + '\n'.join(S(p) for p in parts if (root / 'src' / p).exists())
