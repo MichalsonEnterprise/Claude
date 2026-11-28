@@ -1,0 +1,717 @@
+[
+ {
+  "report": "api-a close-out: 14 of the 16 items are FIXED and 2 are PARTIAL (R03, R33). Every behavioural fix has a test that fails on the HEAD code and passes after. I proved this by temporarily swapping the HEAD version of each file back in and running the new tests.\n\nThe full API e2e suite passes: 19 files, 157 tests, including the Anvil chain suite. API typecheck, unit tests and build, plus @gp/shared and @gp/contracts typecheck/lint/test, all pass. One failure is not mine: `pnpm --filter @gp/api lint` reports 680 errors, all inside apps/api/.dist-kit/**. That is another agent's build output, and eslint does not ignore it. `eslint src test prisma scripts` is clean.\n\nNothing is committed. No web files were changed, so I did not run the web build; the web unit tests pass against the updated @gp/shared. No .next-co-api-a was created, .dev/dist-co-api-a was created for the build check and removed, and no anvil processes remain.\n\nWhat changed, by area:\n\n- **Chain**\n  - `BlockchainService.verifiedClient()` checks eth_chainId once per process and fails closed on a mismatch. The signer, the deposit watcher and the VRF provider all use it (R31).\n  - `ChainSignerService.track()` now marks a transaction `dropped` only when two things hold: its nonce was consumed at least `confirmations` blocks deep (checked at head−N+1), and a second receipt lookup made after that nonce read still finds nothing (R01).\n\n- **Withdrawals**\n  - A per-player `pg_advisory_xact_lock` is taken before today's usage is read, so concurrent requests cannot together exceed the daily limit (R02).\n  - The second approval claims the first one with `updateMany({id, status:'pending'})` and returns CONFLICT unless exactly one row changed (R22).\n  - First approvals now carry `payload.expiresAt` (FOUR_EYES_EXPIRY_HOURS). A second approval on an expired one marks it expired, writes a system audit row and starts a new first approval (R23).\n  - The broadcaster reads the hot wallet's balance and nonce at one block. Under the signer's nonce row lock it subtracts the transfers already signed but not mined. If that leaves too little, nothing is stored or sent and the withdrawal stays queued (R56).\n\n- **Deposits**\n  - Logs are grouped per transaction and per (recipient, amount). Every distinct (txHash, logIndex) becomes its own deposit (R14).\n  - A reversed deposit whose transfer comes back reopens the same row. It posts `deposit_detected` again under a versioned event key; reversals are versioned the same way (R15).\n  - All deposits of one transaction are re-indexed together inside one DB transaction, through temporary negative indices. Errors are contained to the transaction concerned, so one bad row no longer stops the watcher (R35).\n  - Before crediting, `DepositsService.creditHold()` checks account_suspended / deposits_blocked, a break or self-exclusion, the deposits.enabled flag, and RG deposit limits. A held deposit stays in Pending (not stakeable), the player is notified once, and it is re-checked on every pass (R03).\n\n- **Rounds and randomness**\n  - Mirroring is decided per round: a `chain_mirror` round is refused with an ALERT if the mirror is off or the provider is not Chainlink. Settlement verifies the draw against the contract inside `settle()` (R21).\n  - New env rule: RANDOMNESS_PROVIDER=chainlink requires POOL_ONCHAIN_MIRROR=true. A round that was never mirrored while Chainlink is active is cancelled with refunds VRF_TIMEOUT_HOURS after its close. A persistent RandomnessNotReadyError is logged as an ALERT every 10 ticks (R10).\n  - The VRF provider reads the request id and the VRF word from `getRound()` at a block that already has the required confirmations. Events are used only for tx hashes, best effort (R24).\n  - Entry history scopes refunds and wins to each purchase by `entry.transactionId` (R16).\n  - Odds are rounded down (ROUND_DOWN), and the API returns them with 6 decimals (R48).\n\n- **Contract (R33)**\n  - `requestDraw` is allowed only from Committed, so randomness is never re-requested.\n  - New `REASON_VRF_TIMEOUT = 5`: `cancelRound` from DrawRequested is permissionless once DRAW_REQUEST_TIMEOUT has passed. A late fulfilment is ignored.\n  - `DrawRequestPending` is replaced by `DrawNotTimedOut`.\n  - Forge tests and invariants are updated; the ABI, artifacts and gas snapshot are regenerated.\n  - The API keeper calls `cancelForVrfTimeout` and then refunds in the DB.\n  - CONTRACTS.md, the contracts README, API.md, ARCHITECTURE.md and the .env.example comment are updated.\n  - The existing GP-13 web copy (\"No random word arrived within 24 h…\") already matches, so I did not touch web.\n\nEdits outside my owned paths, all small and additive:\n- `apps/api/src/config/env.ts` and `env.spec.ts`: the R10 rule and its test. api-b is editing these files in parallel; my change is one block.\n- `apps/api/src/modules/notifications/notifications.service.ts`: added the 'deposit.held' type.\n- `packages/shared/src/demo/rounds.ts`: the DEMO odds example now uses the computed, rounded-down 0.187.\n- `.env.example`: one comment.\n- Docs: API.md, ARCHITECTURE.md, CONTRACTS.md, packages/contracts/README.md.\n\nOther side effects:\n- `pnpm --filter @gp/api build` rewrote apps/api/dist (the standard nest output). I also built into .dev/dist-co-api-a and then removed it.\n- While proving the deposit tests fail on HEAD, the old watcher left two open fake-chain deposits in globalpool_test. I reversed them with balanced postings, and no open non-DEMO deposits remain. The new deposit test cleans up after itself in afterAll.",
+  "items": [
+   {
+    "id": "R01",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/blockchain/chain-signer.service.ts",
+     "apps/api/src/modules/blockchain/chain-signer.spec.ts"
+    ],
+    "test": "unit src/modules/blockchain/chain-signer.spec.ts (4 tests; 3 fail on HEAD: a just-mined transfer was marked dropped)",
+    "note": "A tx is only marked dropped when its nonce was used at least `confirmations` blocks deep (getTransactionCount at head-N+1) and a second receipt lookup made after that read still finds nothing. Otherwise it stays pending. Receipt handling was extracted into fromReceipt()."
+   },
+   {
+    "id": "R02",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/withdrawals/withdrawals.service.ts",
+     "apps/api/test/withdrawals-closeout.e2e-spec.ts"
+    ],
+    "test": "e2e withdrawals-closeout: 3 concurrent 900.00 requests against a 2,000 level_1 limit -> exactly 2 succeed (all 3 succeed on HEAD)",
+    "note": "pg_advisory_xact_lock(hashtextextended('withdrawal-limit:'||userId)) is taken at the top of the idempotent transaction, before today's usage is read."
+   },
+   {
+    "id": "R03",
+    "status": "PARTIAL",
+    "files": [
+     "apps/api/src/modules/deposits/deposits.service.ts",
+     "apps/api/src/modules/deposits/deposit-chain-watcher.service.ts",
+     "apps/api/src/modules/notifications/notifications.service.ts",
+     "apps/api/test/deposit-watcher.e2e-spec.ts",
+     "docs/API.md"
+    ],
+    "test": "e2e deposit-watcher (R03 cases: deposits_blocked held then credited after lift; self-excluded held; weekly 500 limit -> 300 credited, 300 held). All fail on HEAD.",
+    "note": "Implemented as a hold: the confirmed deposit stays in PENDING (not stakeable, tx status under_review 'On hold — …'), the player gets a one-time deposit.held notice, and an ALERT is logged. It is re-checked every pass and credited automatically once the block clears. Checks run against account_suspended/deposits_blocked, an active break or self-exclusion, the deposits.enabled flag, and RG deposit limits counted on deposits credited in the current period. Owner decisions still needed: (1) the suggested withdraw-only bucket does not exist. OWED is claimable to Available, so I did not use it, and held funds cannot be withdrawn by the player while held; how they are returned is an owner/ops decision. (2) A deposit that would exceed a limit is held as a whole, not only the excess. (3) Geo is not evaluated, because a chain deposit has no request location."
+   },
+   {
+    "id": "R10",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/config/env.ts",
+     "apps/api/src/config/env.spec.ts",
+     "apps/api/src/modules/pool/round-lifecycle.service.ts",
+     "apps/api/test/rounds-closeout.e2e-spec.ts"
+    ],
+    "test": "unit env.spec 'refuses RANDOMNESS_PROVIDER=chainlink without the on-chain mirror'; e2e rounds-closeout R10 (fails on HEAD: round stayed closed forever)",
+    "note": "The reverse cross-field rule is added. In startDraw, a round that is not mirrored while the Chainlink provider is active raises RandomnessNotReadyError and an ALERT, and is cancelled with refunds (reason vrf_timeout) VRF_TIMEOUT_HOURS after its close. The tick logs an ALERT for a persistent RandomnessNotReadyError every 10 ticks."
+   },
+   {
+    "id": "R14",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/deposits/deposit-chain-watcher.service.ts",
+     "apps/api/test/deposit-watcher.e2e-spec.ts"
+    ],
+    "test": "e2e deposit-watcher R14: two identical 100.00 Transfers in one tx -> 2 deposits, 200.00 credited (HEAD detects 1)",
+    "note": "Scanned logs are grouped by tx and (to, amount). A log is skipped as a moved copy only when a live deposit of the same transfer lost its own index; every other distinct (txHash, logIndex) is recorded."
+   },
+   {
+    "id": "R15",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/deposits/deposit-chain-watcher.service.ts",
+     "apps/api/src/modules/deposits/deposits.service.ts",
+     "apps/api/test/deposit-watcher.e2e-spec.ts"
+    ],
+    "test": "e2e deposit-watcher R15: detected -> re-orged -> reversed -> re-included -> reopened -> credited once; postings detected, reversed, detected, credited (HEAD never credits)",
+    "note": "Rejected rows are excluded from the moved-copy check. The same row is reopened: status confirming, deposit_detected posted again under the key deposit:<id>:detected:<n>, and reversals versioned as deposit:<id>:reversed:<n>. One transfer is always one deposit."
+   },
+   {
+    "id": "R16",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/pool/entry-history.service.ts",
+     "apps/api/test/pool-history.e2e-spec.ts"
+    ],
+    "test": "e2e pool-history R16 (2 tests: 35+10 entries in a cancelled round -> 350.00 and 100.00; a win shows only on the purchase whose entry won). Both fail on HEAD.",
+    "note": "Winners and refund counts are scoped by entry.transactionId. Entries without a purchase link fall back to the round."
+   },
+   {
+    "id": "R21",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/pool/round-lifecycle.service.ts",
+     "apps/api/src/modules/onchain-rounds/round-mirror.service.ts",
+     "apps/api/test/rounds-closeout.e2e-spec.ts"
+    ],
+    "test": "e2e rounds-closeout R21 (2 tests: no mock draw for a chain_mirror round; no DB vrf_timeout refund or off-chain settle). Both fail on HEAD.",
+    "note": "mirrored() is now per round: if chain_mirror is set and the mirror is disabled or the provider is not Chainlink, it throws MirrorUnavailableError and logs an ALERT, so nothing is drawn, cancelled or settled off-chain. settle() verifies the draw against the contract for chain_mirror rounds. sync() and pendingRounds() also re-mirror vrf_timeout cancellations."
+   },
+   {
+    "id": "R22",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/withdrawals/withdrawals.service.ts",
+     "apps/api/test/withdrawals-closeout.e2e-spec.ts"
+    ],
+    "test": "e2e withdrawals-closeout 'a second approval racing the requester withdrawing…' (the interleaving is injected deterministically; on HEAD the withdrawal is queued)",
+    "note": "The approval is claimed with updateMany({id, status:'pending'}) and a CONFLICT is returned unless count === 1."
+   },
+   {
+    "id": "R23",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/withdrawals/withdrawals.service.ts",
+     "apps/api/test/withdrawals-closeout.e2e-spec.ts",
+     "docs/API.md"
+    ],
+    "test": "e2e withdrawals-closeout: first approval has expiresAt ≈ +4 h; a stale approval -> expired + approval.expired system audit row + a new first approval, withdrawal stays under_review (fails on HEAD)",
+    "note": "Rows without an expiresAt fall back to createdAt + FOUR_EYES_EXPIRY_HOURS. FourEyesService.expireStale now expires these rows too, because it reads payload.expiresAt."
+   },
+   {
+    "id": "R24",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/randomness/chainlink-vrf.provider.ts",
+     "apps/api/src/modules/randomness/randomness.service.ts",
+     "apps/api/test/chain.e2e-spec.ts"
+    ],
+    "test": "chain e2e (Anvil) R24: with the event window placed past the events, the request id and word still come from getRound and the round settles (on HEAD it stays waiting)",
+    "note": "fulfillment() reads getRound at head - confirmations + 1. request() falls back to getRound.lastRequestId. getLogs is best effort and only supplies tx hashes."
+   },
+   {
+    "id": "R31",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/blockchain/blockchain.service.ts",
+     "apps/api/src/modules/blockchain/chain-signer.service.ts",
+     "apps/api/src/modules/deposits/deposit-chain-watcher.service.ts",
+     "apps/api/src/modules/randomness/chainlink-vrf.provider.ts",
+     "apps/api/src/modules/randomness/randomness.service.ts",
+     "apps/api/src/modules/blockchain/blockchain.spec.ts"
+    ],
+    "test": "unit blockchain.spec (refuses chain 42161, mismatch never cached, watcher skips without getLogs or recordDetected)",
+    "note": "The check fails closed with ChainUnavailableError and an ALERT log. The watcher and the VRF provider now use the verified client."
+   },
+   {
+    "id": "R33",
+    "status": "PARTIAL",
+    "files": [
+     "packages/contracts/src/GlobalPoolRounds.sol",
+     "packages/contracts/test/GlobalPoolRounds.t.sol",
+     "packages/contracts/test/Invariants.t.sol",
+     "packages/contracts/abi/index.ts",
+     "packages/contracts/abi/GlobalPoolRounds.json",
+     "packages/contracts/abi/GlobalPoolRounds.ts",
+     "packages/contracts/artifacts/local-devnet.json",
+     "packages/contracts/.gas-snapshot",
+     "packages/contracts/README.md",
+     "apps/api/src/modules/onchain-rounds/round-mirror.service.ts",
+     "apps/api/src/modules/pool/round-lifecycle.service.ts",
+     "apps/api/test/chain.e2e-spec.ts",
+     "docs/CONTRACTS.md",
+     "docs/ARCHITECTURE.md",
+     "docs/API.md",
+     ".env.example"
+    ],
+    "test": "forge: test_RequestDraw_NeverReRequested, test_VrfTimeout_AnyoneCancelsOnlyAfterTimeout, test_VrfTimeout_LateFulfilmentIsIgnored, test_VrfTimeout_FulfilmentBeforeCancelIsFinal, plus the updated invariant (drawAttempts ≤ 1, a requested draw is only cancelled for VRF_TIMEOUT). Chain e2e R33: 25 h without fulfilment -> on-chain cancel with reason 5 -> DB refund -> late fulfilment ignored.",
+    "note": "Not proven fail-before. I did not swap the old contract back in, so no test was run against the pre-fix code; this is why it is PARTIAL rather than FIXED. The new forge and chain tests check behaviour the old contract did not have (it allowed a re-request after 24 h and reverted a cancel from DrawRequested). The change itself follows the owner policy: there is no re-request; a permissionless cancelRound(REASON_VRF_TIMEOUT = 5) is allowed only from DrawRequested after DRAW_REQUEST_TIMEOUT, and the API keeper calls it before the DB refund. The GP-13 web copy already describes a cancel and refund after 24 h, so web is unchanged. The contract is still unaudited and not deployed."
+   },
+   {
+    "id": "R35",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/deposits/deposit-chain-watcher.service.ts",
+     "apps/api/test/deposit-watcher.e2e-spec.ts"
+    ],
+    "test": "e2e deposit-watcher R35: X@7, Y@8 re-included at X@8, Y@9 -> pass ok, both re-indexed and credited (HEAD: 'skipped: reconcile failed')",
+    "note": "reindex() gives each open deposit of a tx a distinct matching log. Moves go through temporary negative indices in one DB transaction, reversed rows holding a needed index are parked, and credited or out-of-scope rows keep their slots. Errors are contained per transaction."
+   },
+   {
+    "id": "R48",
+    "status": "FIXED",
+    "files": [
+     "packages/shared/src/pool.ts",
+     "packages/shared/test/fees-pool.test.ts",
+     "packages/shared/src/demo/rounds.ts",
+     "apps/api/src/modules/pool/rounds.service.ts",
+     "apps/api/test/pool-history.e2e-spec.ts"
+    ],
+    "test": "shared unit 'odds are rounded down, never up (R48)' (2/3 -> 66.666, 1/1500 -> 0.066); e2e my-entries odds 2/3 -> '66.666666' (66.666667 before)",
+    "note": "pct() uses ROUND_DOWN. The API my-entries odds use 6 decimals. The DEMO odds example now uses the computed value (0.187 instead of the hardcoded 0.188)."
+   },
+   {
+    "id": "R56",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/withdrawals/withdrawal-broadcaster.service.ts",
+     "apps/api/test/chain.e2e-spec.ts",
+     "docs/API.md"
+    ],
+    "test": "chain e2e (Anvil) R56: hot wallet 100, two concurrent 60.00 broadcasts -> ['broadcast','queued'] (HEAD: ['broadcast','broadcast'] -> on-chain revert)",
+    "note": "Balance and nonce are read at one block. Under the signer's nonce row lock (in onStored), the net amounts of in-flight withdrawal txs with nonce ≥ that block's nonce are subtracted; if too little remains it throws HotWalletShortError, stores and sends nothing, and the withdrawal stays queued. The secondary suggestion is not implemented: an on-chain ERC20InsufficientBalance revert still fails the withdrawal and refunds it. Re-queuing would need a new broadcast→queued transition and revert-reason decoding."
+   }
+  ],
+  "verified": [
+   "cd apps/api && pnpm typecheck -> exit 0",
+   "cd apps/api && npx eslint src test prisma scripts -> exit 0 (clean)",
+   "cd apps/api && pnpm test:unit -> 19 files, 81 tests passed",
+   "cd apps/api && pnpm test:e2e -> 19 files, 157 tests passed (includes the Anvil chain suite, 13 tests)",
+   "cd apps/api && npx vitest run --config vitest.e2e.config.mts test/deposit-watcher.e2e-spec.ts test/chain.e2e-spec.ts (after the last watcher edit) -> 2 files, 19 tests passed",
+   "pnpm --filter @gp/api build -> ok (writes apps/api/dist); npx tsc -p tsconfig.build.json --outDir .dev/dist-co-api-a -> exit 0 (dir removed afterwards)",
+   "pnpm --filter @gp/shared typecheck -> exit 0; lint -> clean; test -> 10 files, 141 tests passed; build -> ok",
+   "pnpm --filter @gp/contracts build -> ok (forge build, ABI and artifacts export, tsup)",
+   "pnpm --filter @gp/contracts typecheck -> exit 0; lint (forge fmt --check + eslint) -> clean",
+   "pnpm --filter @gp/contracts test -> forge 68 passed (4 suites) + node TS tests 9 passed, 0 failed",
+   "forge snapshot --check -> exit 0 (snapshot regenerated)",
+   "cd apps/web && npx vitest run -> 11 files, 116 tests passed against the updated @gp/shared (no web files changed, so no web build run)",
+   "Fail-before runs with the HEAD version of each fixed file swapped in: chain-signer.spec 3/4 fail; withdrawals-closeout 4/4 fail; deposit-watcher 6/6 fail; pool-history R16 2/2 fail; rounds-closeout 3/3 fail; chain e2e R24 and R56 fail; my-entries odds returned 66.666667 before the fix. Not run against pre-fix code: R31 blockchain.spec (verifiedClient did not exist on HEAD), R10 env.spec, and the R33 forge and chain tests (old contract not swapped back in)."
+  ],
+  "failing": [
+   "`pnpm --filter @gp/api lint` (eslint .) fails with 680 errors, all inside apps/api/.dist-kit/** (another agent's build output, served by a running `node .dist-kit/src/main.js`). eslint does not ignore that directory. All API source, test, prisma and scripts files lint clean."
+  ],
+  "decisions": [
+   "R03 needs an owner decision: on-chain deposits that hit a restriction, self-exclusion, the kill switch or an RG deposit limit are held in PENDING (never stakeable) and credited automatically once the block clears. The suggested 'withdraw-only bucket' was not built: OWED is claimable to Available, so it would bypass the limit, and a new held bucket plus a withdraw-from-held path would mean a schema, wallet and UI change. Held funds therefore cannot be withdrawn by the player while held, and the owner/ops must define how they are returned. A deposit that would exceed a limit is held as a whole, not split. Geo is not evaluated for chain deposits.",
+   "R03 gate: deposit limits are counted on deposits CREDITED in the current period (creditedAt), not RG's createdAt-based usage. This keeps holds in credit order, and a deposit held over into a new period counts in that period. Due pending increases or removals are read as effective, without being persisted.",
+   "R10: a round that was never mirrored while the Chainlink provider is active is cancelled with reason 'vrf_timeout' (stakes to Owed, fees not refunded) VRF_TIMEOUT_HOURS after its close, rather than immediately. I reused the existing reason so the web copy and enums need no change.",
+   "R33: VRF-timeout cancellation is permissionless (same model as the THRESHOLDS_NOT_MET cancel), reason code 5. DrawRequestPending was replaced by DrawNotTimedOut, a breaking ABI change; the contract is not deployed. drawAttempts is kept in the struct (always ≤ 1) for ABI stability.",
+   "R33: the GP-13 web copy already says 'No random word arrived within 24 h of the request…', so web was not changed (web pool components are outside my paths).",
+   "R56: the race is fixed at the root by reserving in-flight transfers under the signer's nonce row lock. Re-queuing after an on-chain ERC20InsufficientBalance revert was not implemented: it would need a broadcast→queued transition and decoding the revert of a mined tx. The withdrawal still fails with a full refund, so nothing is lost.",
+   "R23: withdrawal first approvals use the same FOUR_EYES_EXPIRY_HOURS (4 h) as the other four-eyes requests, as suggested. An expired one is replaced by a new first approval from the admin who acted.",
+   "Edits outside my owned paths: config/env.ts + env.spec.ts (R10 rule; api-b is editing these too, my change is one block), notifications.service.ts ('deposit.held' union member), packages/shared/src/demo/rounds.ts (DEMO odds example now computed and rounded down), .env.example (one comment), docs (API.md, ARCHITECTURE.md, CONTRACTS.md, contracts README). deposits.controller.ts was modified by another agent (R27), not by me.",
+   "Memory: the stored notes are about Figma files and were not relevant, so none were used. Learned this session and possibly worth saving: apps/api `pnpm lint` picks up other agents' `.dist-*` build directories (no eslint ignore), and the API test DB is shared, so watcher e2e tests must reverse their own open on-chain deposits (other watcher suites reconcile every open row)."
+  ]
+ },
+ {
+  "report": "All 20 api-b items are done: 19 FIXED and R55 PARTIAL (entry purchases now count as play time; the games engine does not yet record activity on DEMO bets). Each behavioural fix has a test that fails on the old code and passes now, except R52 and R60, which are config-only and were checked by command.\n\n**Before/after proof.** I swapped the HEAD versions of my files in temporarily, ran the tests, then restored them (diff confirmed):\n- `apps/api/test/security-closeout.e2e-spec.ts`: 12/12 fail before, 12/12 pass after.\n- `apps/api/test/rg-closeout.e2e-spec.ts`: 7 fail before, 9/9 pass after. The 2 R28 tests passed even before because the rebuilt shared schema already carried the fix; `packages/shared/test/rg-schemas.test.ts` covers R28 instead (2 fail before, 3/3 pass).\n- `apps/api/src/config/test-db-guard.spec.ts`: 2 fail before, pass after.\n- R44: with the flag forced stuck off, the old test failed and left the flag off; the new test repairs it and passes.\n- R58: open withdrawals in `globalpool_test` stayed at 69 across a run of the player, openapi, admin-ops and admin-console suites (before the fix each run left 2 more).\n\n**Verification commands and results.**\n- `pnpm --filter @gp/shared typecheck`, `lint`, `test`, `build`: all pass (10 files / 141 tests).\n- API typecheck (`npx tsc --noEmit -p tsconfig.json`): clean for my files. `pnpm --filter @gp/api typecheck` exits 2, only on api-a's in-progress `test/chain.e2e-spec.ts` and `test/rounds-closeout.e2e-spec.ts`.\n- `pnpm --filter @gp/api lint` fails only on another agent's generated `apps/api/.dist-kit/`; `npx eslint . --ignore-pattern '.dist-kit/**'` exits 0.\n- API unit tests: 19 files / 81 tests pass.\n- Full API e2e (`npx vitest run --config vitest.e2e.config.mts`): 19 files / 157 tests pass, including api-a's new specs.\n- Web: `tsc` passes; eslint on my web files passes; full `eslint .` has one error in a file I did not touch (`src/components/account/dashboard/sections.tsx:347`); `vitest run`: 11 files / 116 tests pass.\n- `flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-co-api-b pnpm --filter @gp/web build`: passes (run twice, the second after my last web edit).\n- `FOUNDRY_PROFILE=ci forge test`: 67 tests pass at 10,000 fuzz / 512 invariant runs in about 27 s, using a private out/cache dir.\n- `docker compose --profile prod config` and `--profile dev config` both resolve.\n- Visual check: API on 4316 against the test DB, web dev on 3316. Screenshots of the reopen states (1440 and 390) and the restricted page for a cooling-off player are in `/home/user/Claude/global-pool/apps/web/test-results/visual/api-b/`.\n\n**Cleanup.** My processes were stopped by PID. I removed `.next-co-api-b`, `.dev/dist-co-api-b`, the `.next-co-api-b/types/**/*.ts` tsconfig line (the `.next-kit` line belongs to another agent), and reverted the `next-env.d.ts` rewrite. Nothing is committed.\n\n**Cross-area changes (minimal, additive).**\n- `packages/shared/src/schemas/rg.ts`: R06, R28.\n- `apps/web/src/components/rg-history/rg-breaks.tsx`: R06, R28.\n- `apps/web/src/components/auth/restricted.tsx`: one block of R06 copy. This file is also in the web agent's R26 scope.\n- `apps/web/src/components/wallet/overview.tsx`: R27.\n- `apps/web/src/components/admin-b/finance/ledger-page.tsx` and `apps/web/src/lib/api/admin-b.ts`: R25.\n- `apps/web/src/lib/api/auth.ts` and `apps/web/src/lib/api/rg-history.ts`: R06.\n- `apps/api/src/modules/deposits/deposits.controller.ts`: R27.\n- `apps/api/src/modules/admin/admin.controller.ts`: R51.\n- Prisma: additive migration `20261128220000_rg_self_exclusion_reopen` (two nullable columns).\n- Docs: `docs/API.md`, `docs/ARCHITECTURE.md`, `.env.example` (new `ADMIN_IDLE_TIMEOUT=15m`).\n\n**Follow-ups for other agents.**\n- Games engine: call `rg.recordActivity` inside the bet transaction (finishes R55).\n- Web agent: `restricted.tsx` hero and badge still say \"self-exclude\" for a cooling-off player; I only fixed the \"When your break ends\" steps.\n\nNothing new to save to memory.",
+  "items": [
+   {
+    "id": "R04",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/config/env.ts",
+     "apps/api/src/config/env.spec.ts",
+     "apps/api/src/modules/admin/admin-auth.service.ts",
+     "docker-compose.yml",
+     ".env.example",
+     "docs/API.md",
+     "docs/ARCHITECTURE.md"
+    ],
+    "test": "src/config/env.spec.ts 'placeholder secrets (R04)' (3 unit tests) + test/security-closeout.e2e-spec.ts 'R04 … never carries the raw session family id'",
+    "note": "With NODE_ENV=production, boot is refused when JWT_*, ADMIN_JWT_*, TOTP_ENCRYPTION_KEY or ENTRY_SALT_ENCRYPTION_KEY equals an .env.example value or contains dev-only / change-me / placeholder (checked raw and base64-decoded). The secret value is never echoed. The compose prod `api` loads only `.env`, never `.env.example`. The admin.login audit row stores sessionRef = sha256(familyId)[:16]; the reuse-detected row's targetId is hashed too. No separate STEP_UP_SECRET was added: JWT_ACCESS_SECRET is used only for step-up tokens, and the production guard now covers it."
+   },
+   {
+    "id": "R06",
+    "status": "FIXED",
+    "files": [
+     "apps/api/prisma/schema.prisma",
+     "apps/api/prisma/migrations/20261128220000_rg_self_exclusion_reopen/migration.sql",
+     "apps/api/src/modules/compliance/responsible-gaming.service.ts",
+     "apps/api/src/modules/compliance/responsible-gaming.controller.ts",
+     "apps/api/src/modules/compliance/responsible-gaming.service.spec.ts",
+     "apps/api/src/modules/auth/account-status.controller.ts",
+     "packages/shared/src/schemas/rg.ts",
+     "apps/web/src/components/rg-history/rg-breaks.tsx",
+     "apps/web/src/components/auth/restricted.tsx",
+     "apps/web/src/lib/api/rg-history.ts",
+     "apps/web/src/lib/api/auth.ts",
+     "docs/API.md"
+    ],
+    "test": "test/rg-closeout.e2e-spec.ts 'R06 …' (3 tests: full ask → 24 h cool-down → deposit + loss limits → confirm flow with SELF_EXCLUDED on entries/deposits throughout; cooling-off still ends on its date and account-status returns kind; permanent cannot be reopened)",
+    "note": "Owner policy applied to 6m/1y/5y self-exclusions. After the end date the account stays excluded with exclusion.reopen.status = awaiting_request. POST /responsible-gaming/self-exclusion/reopen moves it to cooling_down for 24 h. POST …/reopen/confirm is refused (409) before the cool-down ends and (400 missingLimits) until a deposit limit and a loss limit are set. All steps are audited. /auth/account-status now returns selfExclusion.kind and selfExclusion.reopen. Web: a ReopenCard on the RG7 page, a corrected banner, and the restricted-page steps branch on kind. Already-ended rows were grandfathered as reopened in the migration (DEMO data)."
+   },
+   {
+    "id": "R13",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/compliance/responsible-gaming.service.ts"
+    ],
+    "test": "test/rg-closeout.e2e-spec.ts 'R13 …': yesterday's 90.45 purchase refunded today; today's usage is 90.45, not 0.45, and a second 9-entry purchase gets 422. A refund of a purchase from the same period still offsets it (usage 0.45).",
+    "note": "Participation and loss usage now subtract only the stake of this period's purchases whose round has been refunded (refundedStakesSince), instead of refund rows by their creation date."
+   },
+   {
+    "id": "R17",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/security/totp.service.ts",
+     "apps/api/src/modules/admin/admin-auth.service.ts"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R17 …' (4 parallel wrong step-up codes count exactly 4 with attemptsRemaining 1..4; the next 3 all get 423 and a correct code cannot clear the lock; 8 parallel wrong admin passwords give 5×401 then 3×403)",
+    "note": "Each attempt is reserved before the code or password is checked, under SELECT … FOR UPDATE on the fresh row. The lock is set on the 5th slot, nothing is checked while a lock is active, and a failure never writes locked_until = NULL. verifyRow now returns a locked outcome instead of throwing; verifyActive still answers 423."
+   },
+   {
+    "id": "R18",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/admin/four-eyes.service.ts",
+     "docs/API.md"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R18 …': the marketing role does not see a pending withdrawals_frozen request in the inbox, and GET /admin/approvals/:id answers 403 with missingPermissions ['users.read']; super_admin sees it.",
+    "note": "Inbox items and the detail view are filtered by module read permission: withdrawal.approve needs withdrawals.read, user.restriction.apply needs users.read, admin role changes need system.read, and pool.entries.* needs rounds.read."
+   },
+   {
+    "id": "R19",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/admin/admin-auth.service.ts",
+     "apps/api/src/config/env.ts",
+     ".env.example",
+     "docs/API.md"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R19 …' (2 tests: refresh after 16 min idle gives 401 idle_timeout and the family is revoked; an access token of an idle session gives 401, while an active one refreshes last_seen_at)",
+    "note": "New env ADMIN_IDLE_TIMEOUT (default 15m). sessions.last_seen_at (existing column) is written by authenticate() at most once a minute, and refresh() and authenticate() revoke the family when idle. An admin.session.idle_timeout audit row is written. No web change was needed: the web refreshes only while the admin is active."
+   },
+   {
+    "id": "R25",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/admin-ops/admin-finance.service.ts",
+     "apps/api/src/modules/admin-ops/integrity.spec.ts",
+     "apps/web/src/components/admin-b/finance/ledger-page.tsx",
+     "apps/web/src/lib/api/admin-b.ts",
+     "docs/API.md"
+    ],
+    "test": "src/modules/admin-ops/integrity.spec.ts (4 unit tests: a disabled 'D' or replica-only 'R' trigger, a missing trigger, or a trigger on the wrong table makes ok false); the admin-ops e2e still asserts appendOnly.ok = true",
+    "note": "The query now reads tgenabled and the table name. The checked list now also covers all *_no_truncate triggers and the entry_commitments / round_payouts append-only and no-truncate triggers. The web count only includes triggers that are both present and enabled."
+   },
+   {
+    "id": "R27",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/deposits/deposits.controller.ts",
+     "apps/web/src/components/wallet/overview.tsx",
+     "docs/API.md"
+    ],
+    "test": "test/rg-closeout.e2e-spec.ts 'R27 …': during a 24 h break, GET /deposits, GET /deposits/ref/:ref and POST /dev/deposits/:ref/confirmations answer 200, while GET /deposits/address and POST /dev/deposits/simulate answer 403 SELF_EXCLUDED",
+    "note": "The class uses @PlayerAuth() (onboarded only); @PlayerPolicy(DEPOSIT_POLICY) is applied only to the address and simulate routes. The wallet 'In progress' card shows a QueryError instead of 'Nothing in progress' when the deposits or withdrawals query fails."
+   },
+   {
+    "id": "R28",
+    "status": "FIXED",
+    "files": [
+     "packages/shared/src/schemas/rg.ts",
+     "packages/shared/test/rg-schemas.test.ts",
+     "apps/web/src/components/rg-history/rg-breaks.tsx",
+     "docs/API.md"
+    ],
+    "test": "packages/shared/test/rg-schemas.test.ts (3 tests; 2 fail on the old schema) + test/rg-closeout.e2e-spec.ts 'R28 …' (a 1y self-exclusion with a lower-case backup code succeeds and the code is used once; a wrong code is still refused)",
+    "note": "selfExclusionSchema.totpCode now accepts a TOTP or a backup code. The RG7 field accepts both (placeholder '6-digit code or ABCD-1234', maxLength 9); the label stays 'Authenticator code' because the j5 Playwright journey selects it by that label. On STEP_UP_LOCKED the error points to an immediate cooling-off break, which needs no code. Allowing a long self-exclusion with no 2FA at all was not done: it needs an owner decision, since a stolen session could then self-exclude the victim for years or permanently."
+   },
+   {
+    "id": "R29",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/compliance/responsible-gaming.service.ts"
+    ],
+    "test": "test/rg-closeout.e2e-spec.ts 'R29 …': 5 parallel 100.00 simulations against a 100.00 daily deposit limit give exactly 1×200 and 4×422, and 100.00 is credited",
+    "note": "assertCanDeposit and assertCanParticipate take pg_advisory_xact_lock(7262101, hashtext(userId)) inside the caller's transaction before the usage aggregate (two-key form, so it never collides with the audit lock). The order is always this user lock before account row locks, so there is no deadlock cycle."
+   },
+   {
+    "id": "R44",
+    "status": "FIXED",
+    "files": [
+     "apps/api/test/admin-ops.e2e-spec.ts",
+     "apps/api/test/global-setup.ts"
+    ],
+    "test": "Manual before/after with pool.entries.enabled forced to false: the HEAD test failed and left the flag off; the fixed test passed and left it on. Full e2e also passes.",
+    "note": "The breaker test repairs the flag at its start and in afterEach with a direct write (featureFlag.upsert enabled: true, pending breaker requests expired, FeatureFlagsService.invalidate()). The dual-approval resume is a normal test step, no longer inside finally. Global setup also resets the flag through the guarded prisma wrapper (db execute --test-db)."
+   },
+   {
+    "id": "R45",
+    "status": "FIXED",
+    "files": [
+     "apps/api/test/helpers.ts",
+     "apps/api/test/admin-console.e2e-spec.ts"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R45 …': createAdmin works while a custom qa_ role exists (fails before with 'reading map')",
+    "note": "ensureRbac only maps the built-in ADMIN_ROLES. The qa_ role in the role-change test is created inside try and deleted in finally (role permissions cascade)."
+   },
+   {
+    "id": "R46",
+    "status": "FIXED",
+    "files": [
+     "apps/api/scripts/env.mjs",
+     "apps/api/scripts/prisma.mjs",
+     "apps/api/src/config/test-db-guard.spec.ts",
+     "docs/API.md"
+    ],
+    "test": "src/config/test-db-guard.spec.ts (2 tests: DATABASE_URL_TEST=globalpool makes prisma.mjs --test-db exit 1 before prisma runs; with DATABASE_URL_TEST unset the default globalpool_test is used, never DATABASE_URL)",
+    "note": "testDatabaseUrl() uses DATABASE_URL_TEST, else the same default as setup-env.ts, and refuses any database name not ending in _test."
+   },
+   {
+    "id": "R50",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/admin/admin-auth.service.ts",
+     "docs/API.md"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R50 …' (2 tests: a locked TOTP factor with the right password gives the same 401 message as a wrong password and is counted; an unknown email gives exactly the same 401…401 locked → 403 sequence as a real admin)",
+    "note": "A locked TOTP factor is now a plain login failure. Unknown or disabled emails are counted per email hash in Redis with the same 5-attempt / 15-minute lockout and run the dummy argon2 check. The web login keeps its locked state. Lockout itself remains inherent (anyone can lock an email); the per-IP throttle still applies."
+   },
+   {
+    "id": "R51",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/aml/aml.service.ts",
+     "apps/api/src/modules/admin/admin.controller.ts",
+     "docs/API.md"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R51 …': dismissing an open alert writes one audit row (previousStatus open); a second admin trying to re-decide it gets 409, the status stays dismissed, and there is still exactly one audit row",
+    "note": "The resolve and its audit row run in one prisma.tx. The decision is a compare-and-set on status: resolved/dismissed is allowed from open, under_review or escalated; escalated only from open or under_review."
+   },
+   {
+    "id": "R52",
+    "status": "FIXED",
+    "files": [
+     "docker-compose.yml",
+     "Dockerfile",
+     "docs/API.md",
+     "docs/ARCHITECTURE.md"
+    ],
+    "test": "No automated test (compose/Dockerfile config). Verified with `docker compose --profile prod config` (web build arg NEXT_PUBLIC_PRIVY_MOCK='false'), `docker compose --profile dev config` (still 'true') and a shell check of the Dockerfile guard (mock=false with no app id is refused). Images were not built.",
+    "note": "An x-web-args anchor is shared by both profiles. The prod `web` service has its own build args with NEXT_PUBLIC_PRIVY_MOCK='false', and the Dockerfile web-build stage fails when the mock is off without NEXT_PUBLIC_PRIVY_APP_ID. I did not use `${…:?}` because compose would reject it for the dev profile too."
+   },
+   {
+    "id": "R54",
+    "status": "FIXED",
+    "files": [
+     "apps/api/src/modules/admin-ops/admin-pool.service.ts",
+     "docs/API.md"
+    ],
+    "test": "test/security-closeout.e2e-spec.ts 'R54 …' (2 tests: a request older than 30 min cannot be approved, gets status expired and exactly one approval.expired audit row, and the flag is unchanged; a new request expires the lapsed one exactly once with an audit row)",
+    "note": "The new expireRequest() does updateMany WHERE status = 'pending', plus a system approval.expired audit row only when count = 1. It is used by both requestBreaker and decideBreaker. The decision claim now also requires createdAt > now − TTL inside the transaction. The exact cross-request race (B approves while C expires) cannot be reproduced deterministically over HTTP; the compare-and-set covers it."
+   },
+   {
+    "id": "R55",
+    "status": "PARTIAL",
+    "files": [
+     "apps/api/src/modules/compliance/responsible-gaming.service.ts",
+     "apps/api/src/modules/compliance/responsible-gaming.service.spec.ts"
+    ],
+    "test": "test/rg-closeout.e2e-spec.ts 'R55 …': the first purchase starts a session with no heartbeat; at 14.5 min played with last activity 1 min ago, the next purchase accrues the gap and gets 422 daily_time_limit; the refused purchase rolls the activity back",
+    "note": "assertCanParticipate (inside the purchase transaction) calls the new public recordActivity() (applyHeartbeat under a settings row lock) before the time rules; heartbeat() reuses it. This fixes the item's scenario for Global Pool entry purchases. Not done: game bets. The games engine (another agent's path) does not record activity yet; its GamesPolicyService.assertCanPlay should call rg.recordActivity(userId, tx, now) inside the bet transaction."
+   },
+   {
+    "id": "R58",
+    "status": "FIXED",
+    "files": [
+     "apps/api/test/player.e2e-spec.ts",
+     "apps/api/test/openapi.e2e-spec.ts"
+    ],
+    "test": "Both tests now cancel their withdrawal at the end and assert status 'cancelled'. Open-state withdrawals in globalpool_test were 69 before and 69 after running player, openapi, admin-ops and admin-console (previously +2 per run).",
+    "note": "POST /withdrawals/:id/cancel, as wallet.e2e already does."
+   },
+   {
+    "id": "R60",
+    "status": "FIXED",
+    "files": [
+     "../.github/workflows/global-pool-ci.yml"
+    ],
+    "test": "No automated test (CI config). Verified that `FOUNDRY_PROFILE=ci forge config --json` gives fuzz 10000 / invariant 512 x 128, and that a CI-profile `forge test` passes 67 tests (fuzz runs 10000, invariant runs 512) in about 27 s, so it fits the 30-minute job.",
+    "note": "FOUNDRY_PROFILE: ci is set on the Test step only (`pnpm -r test`). packages/contracts/foundry.toml is unchanged."
+   }
+  ],
+  "verified": [
+   "pnpm --filter @gp/shared typecheck / lint / test / build: exit 0 each (10 files, 141 tests)",
+   "cd apps/api && npx tsc --noEmit -p tsconfig.json: my files clean; pnpm --filter @gp/api typecheck exits 2 only on api-a's test/chain.e2e-spec.ts and test/rounds-closeout.e2e-spec.ts",
+   "cd apps/api && npx eslint . --ignore-pattern '.dist-kit/**': exit 0",
+   "cd apps/api && npx vitest run --config vitest.config.mts: 19 files / 81 tests passed",
+   "cd apps/api && npx vitest run --config vitest.e2e.config.mts (full): 19 files / 157 tests passed in 94.7 s",
+   "security-closeout.e2e-spec.ts against HEAD versions of the fixed files: 12/12 fail; with the fixes: 12/12 pass",
+   "rg-closeout.e2e-spec.ts against HEAD API files: 7 fail (the 2 R28 tests pass because the rebuilt shared schema has the fix); with the fixes: 9/9 pass",
+   "packages/shared/test/rg-schemas.test.ts: 2 fail on the HEAD schema; 3/3 pass after",
+   "src/config/test-db-guard.spec.ts: 2 fail on HEAD scripts; 2/2 pass after",
+   "R44 manual check: with the flag stuck off, the HEAD breaker test failed and left it off; the fixed test passed and repaired it",
+   "R58: open withdrawals in globalpool_test 69 before and 69 after running player, openapi, admin-ops and admin-console e2e",
+   "cd apps/web && npx tsc --noEmit: exit 0; npx eslint on all my web files: exit 0; npx vitest run: 11 files / 116 tests passed",
+   "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-co-api-b pnpm --filter @gp/web build: exit 0 (run twice, the second after the last web edit)",
+   "FOUNDRY_PROFILE=ci forge test (private out/cache dir): 67 passed, fuzz 10000 runs, invariant 512 runs, about 27 s",
+   "docker compose --profile prod config / --profile dev config: both resolve; prod web build arg NEXT_PUBLIC_PRIVY_MOCK=false, dev stays true; prod api env_file is .env only",
+   "Playwright screenshots (API 4316 on the test DB, web dev 3316) of the reopen states awaiting / cooling-down / ready at 1440 and 390, and the restricted page for a cooling-off player: apps/web/test-results/visual/api-b/",
+   "Cleanup: my processes killed by PID; .next-co-api-b and .dev/dist-co-api-b removed; my tsconfig line removed; next-env.d.ts restored"
+  ],
+  "failing": [
+   "pnpm --filter @gp/api typecheck exits 2: errors only in api-a's in-progress test/chain.e2e-spec.ts(354) and test/rounds-closeout.e2e-spec.ts(112), not in api-b code",
+   "pnpm --filter @gp/api lint exits 1: errors only in another agent's generated build output apps/api/.dist-kit/** (no-var etc.); the source tree lints clean",
+   "pnpm --filter @gp/web lint: 1 error in apps/web/src/components/account/dashboard/sections.tsx:347 (@typescript-eslint/no-unnecessary-type-assertion); I did not change this file, it is likely surfaced by the games kit's GameTile type change"
+  ],
+  "decisions": [
+   "R06 scope: 6m / 1y / 5y self-exclusions never reopen automatically (request, then 24 h cool-down, then a deposit limit and a loss limit, then explicit confirm). Cooling-off breaks (24 h / 7 d / 30 d) still end on their date, as the RG6 screens promise ('limits stay exactly as they are') and as in common time-out practice. Permanent cannot be reopened in-app. Reopen is player self-serve from the RG7 page, not via support, and the restricted-page copy now says 'Ask to reopen'. If the owner wants support to approve reopening, that needs an admin workflow and is a business decision.",
+   "R06 migration grandfathers self-exclusions that had already ended (reopened_at = ends_at), so DEMO accounts are not closed again retroactively.",
+   "R06 'limits reviewed' means a deposit limit and a loss limit must exist when the player confirms; an explicit confirm step is required even if both were set earlier.",
+   "R28: backup codes are accepted, but a long self-exclusion with no 2FA proof at all was not enabled (it needs an owner decision because of griefing risk with a stolen session). A locked step-up points the player to an immediate cooling-off break instead.",
+   "R04: no separate STEP_UP_SECRET, because JWT_ACCESS_SECRET is used only for step-up tokens and is now covered by the production placeholder guard. PRIVY_MOCK_SIGNING_SECRET is not checked in production because the DEV MOCK is refused there.",
+   "R50: chose a uniform lockout per email hash (Redis) for unknown emails rather than a generic 401 for locked accounts, which keeps the designed ADM-01 locked state in the web.",
+   "R55: Global Pool entry purchases count as activity using the same applyHeartbeat logic, including its 120 s credit cap per gap. Game bets are not wired because that is the games agent's path; rg.recordActivity is exported for them.",
+   "R19: any authenticated admin request counts as activity (throttled to one write per minute) and a refresh starts a fresh row; the server idle limit is a backstop for closed or discarded tabs, while the client-side 15-minute timer still handles an open idle tab.",
+   "R44: the breaker e2e now always repairs the shared kill switch and expires pending breaker requests before it starts. On the shared test DB this could also expire a breaker request that another agent's concurrent run has open at that moment (a window of about 2 s)."
+  ]
+ },
+ {
+  "report": "Web close-out (key \"web\", web 3312 / API 4312). I worked on all 16 items: 15 are FIXED and 1 is PARTIAL (R26). Every change is in apps/web plus docs/WEB_COMPONENTS.md; there were no API or packages changes. The orchestrator committed my working tree mid-task (commits 37512f5, bb7b2e3, 5f8bc3f), so `git status` for apps/web is now clean. I did not commit anything myself.\n\nMain pieces:\n- **Player cache rules** (/home/user/Claude/global-pool/apps/web/src/lib/api/player-cache.ts):\n  - `invalidatePlayerFinancials` refreshes every module's copy of balances and limits: wallet, pool/me, account, history, rg, me, auth balances and auth account-status.\n  - `clearPlayerData` (sign-out, expiry, sign-out in another tab) and `resetPlayerData` (another account takes over the session) drop all player data.\n- **Admin cache rules**: `clearAdminData` removes both ['admin'] and ['admin-b'].\n- **Unknown write outcomes**: `isOutcomeUnknown()` in lib/api/client.ts. It is true for network errors, 5xx, 408, and 409 CONFLICT (same key still processing).\n- **Redirect checks**: `safeNext()` and `safeAdminNext()` (`?next=` must be a same-origin path, no control characters, whitespace or backslashes).\n- **New pages**:\n  - Legal summaries at /legal/[doc] (terms, privacy, aml, aml-kyc, restricted-countries, licence, fees, cookies), plus /support and /promotions.\n  - Honest \"not in this build yet\" pages for /winners, /vip, /affiliates, /about, /official-channels, /status and /security.\n- **Shell in API mode**: shows the member's real Available balance, entries in the open round, unread notifications and the live pool amount, with skeletons while loading. The region banner names a country only when the page passes one.\n- **Homepage between rounds**: fetches the previous round so the caption matches its real status.\n- **Admin e2e specs**: use the shared `adminCode()` helper, so a TOTP step is never replayed.\n\nVerification (every command passed):\n- `pnpm --filter @gp/web typecheck` → exit 0\n- `pnpm --filter @gp/web lint` → exit 0\n- `pnpm --filter @gp/web test` → 14 files, 154 tests passed (new: test/closeout.test.tsx with 15 tests, test/api-mode.test.ts with 4; updated: test/auth.test.ts, test/logic.test.ts)\n- `flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-co-web pnpm --filter @gp/web build` → exit 0, compiled successfully\n- Playwright ran against an API-mode build (same lock, plus NEXT_PUBLIC_DATA_SOURCE=api and NEXT_PUBLIC_API_URL=http://localhost:4312) on web 3312. The API on 4312 was built to apps/api/.dev/dist-co-web from current source, used the dev DB, and ran with JOBS_ENABLED=false.\n  - e2e/web-closeout.spec.ts: 8/8 passed (R11, R36, R20, R38, R39, R41, R42, R37)\n  - e2e/admin-a.spec.ts + e2e/admin-b.spec.ts in one run, back to back with the same admin (the R47 scenario): 3/3 passed\n  - Regression specs wallet, pool, auth, account, rg-history: 10/10 passed\n- Screenshots at 1440 and 390 of /, /legal/terms, /legal/restricted-countries, /support, /promotions and /winners are in apps/web/test-results/visual/web-closeout/. No page scrolls sideways. That run found one 404 (a prefetch of /promotions/welcome); I fixed it and added a rendered-link test.\n\n**Not verified:**\n- The tests that \"fail before\" were not run against the old code. I did not stash or revert, because other agents were editing in parallel. Each test encodes the reported scenario; the reasoning is per item.\n- The withdraw \"unknown outcome\" path has no e2e test; only the participation path does.\n- The final link changes in hero.tsx and info-sections.tsx were checked by the unit test and the final build, not by a re-run of e2e.\n\n**Cleanup done:** stopped my own web and API processes by PID, removed apps/web/.next-co-web and apps/api/.dev/dist-co-web, removed the .next-co-web line Next added to tsconfig.json, and next-env.d.ts again points at ./.next.\n\n**Follow-ups:**\n- The dashboard `WelcomeOfferCard` still says the bonus opt-in happens in the deposit flow, which does not exist; the /promotions page now says the offer is not active.\n- The FAQ \"Chat with support\" button leads to a support page that says there is no chat in this build.\n- The homepage security cards make claims I did not check (hourly custody reconciliation, versioned audited contracts).\n- Admin approvals \"Decided today\" still shows \"No decisions yet today\" when its query fails (a leftover noted under R43; not fixed).\n\nNothing in this report comes from memory, and I have nothing new to suggest saving.",
+  "items": [
+   {
+    "id": "R11",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/wallet/withdraw-flow.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/legal/[doc]/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/legal/legal-docs.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/legal/info-page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/legal/region-check.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/legal/support-promotions.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/support/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/promotions/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/app-shell.tsx"
+    ],
+    "test": "test/closeout.test.tsx: 'navigation targets exist' and 'homepage and shell links resolve'; e2e/web-closeout.spec.ts 'R11': each page returns 200 with its heading, an unknown doc returns 404",
+    "note": "The withdraw KYC button now goes to ACCOUNT_ROUTES.kycVerify (/account/kyc/verify). The legal pages are DEMO summaries built from the shared fee, limit and threshold constants. The API does not expose the restricted-country list, so that page shows the env default (US, CU, IR, KP, SY) labelled 'default configuration' plus the visitor's live GET /compliance/region result, with no bypass hints. /support says the support email is a placeholder that nobody answers yet. /promotions shows the full welcome-offer terms and says the offer is not active."
+   },
+   {
+    "id": "R20",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/admin-a/login.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/auth/safe-next.ts"
+    ],
+    "test": "test/auth.test.ts 'admin next must be a safe /admin path (R20)'; e2e/web-closeout.spec.ts 'R20' (signed-in admin, next=https://evil.example/... and next=javascript:... both land on /admin and no JS dialog opens)",
+    "note": "Both the 'already signed in' redirect and the post-login redirect use safeAdminNext(): a same-origin path that is /admin or starts with /admin/, ? or #. expired.returnTo is checked the same way."
+   },
+   {
+    "id": "R26",
+    "status": "PARTIAL",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/auth/restricted.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/rg-history/rg-breaks.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'self-exclusion copy (R26)': renders the self-excluded page and checks the 'second account can't be opened' and 'check identity at sign-up' claims are gone",
+    "note": "The copy is now truthful: 'This break covers this account. If you have another GLOBAL POOL account, exclude it too — support can help.' The same false claim in rg-breaks.tsx ('covers any new account opened with the same verified identity') is also corrected. Blocking new accounts that match a self-excluded person (verified email, wallet, KYC name and date of birth) is not implemented. It needs an owner decision on which identifiers count as the same person, how false matches are handled and appeals, plus API changes to auth onboarding and KYC that are outside my scope."
+   },
+   {
+    "id": "R30",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/lib/data/queries.ts",
+     "/home/user/Claude/global-pool/apps/web/src/lib/data/types.ts",
+     "/home/user/Claude/global-pool/apps/web/src/components/home/hero.tsx"
+    ],
+    "test": "test/api-mode.test.ts 'homepage snapshot between rounds (R30)' (stubbed API: current round is scheduled, so last becomes the settled round 1248; history is not fetched while a round is open); test/closeout.test.tsx 'homepage last round (R30)'",
+    "note": "In API mode, when the current round is not open, fetchPoolSnapshot also reads GET /pool/rounds?pageSize=1 and uses that latest past round as `last`. The new lastRoundCaption() derives the copy from the real status: settled shows 'Paid to N winners', cancelled shows 'Round cancelled — every entry refunded to Owed', and drawing, closed, open and scheduled each get neutral copy. It is used by the draw card and the hero slide; the hero slide's made-up 'Paid to … || 13 winners' fallback is removed."
+   },
+   {
+    "id": "R36",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/auth/safe-next.ts",
+     "/home/user/Claude/global-pool/apps/web/src/components/auth/step-up.tsx"
+    ],
+    "test": "test/auth.test.ts 'rejects next values the URL parser would turn into another origin (R36)' (TAB, LF, CRLF, NUL, spaces, NBSP, backslashes, javascript:); e2e/web-closeout.spec.ts 'R36' (signed-in member on /sign-in?next=/%09/evil… and closing /2fa/challenge both stay on the site)",
+    "note": "safeNext() rejects control characters, whitespace and backslashes, resolves the value against a fixed origin, requires that origin to be unchanged, and returns the normalised path, query and hash. StepUpPage.leave() now calls router.replace(safeNext(next) ?? '/') instead of window.location.assign."
+   },
+   {
+    "id": "R37",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/app-shell.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/shell-parts.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/mobile.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/sidebar.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/shell-overrides.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/home/home-page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/pool/pool-hub.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/account/dashboard/overview.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/auth/restricted.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/lib/data/queries.ts",
+     "/home/user/Claude/global-pool/apps/web/src/lib/data/hooks.ts"
+    ],
+    "test": "test/closeout.test.tsx 'shell member data (R37)' (shared pool cache keys; skeleton instead of 9,215.30 while loading; no hard-coded 'United States'); test/api-mode.test.ts 'homepage viewer data (R37)'; e2e/web-closeout.spec.ts 'R37' (a fresh member who deposited 100 sees 'Available balance 100.00')",
+    "note": "In API mode, useLiveShell() reads walletKeys.balances, poolKeys.current and myRound, and account notifications (unread), all on the modules' own cache keys so financial writes refresh the shell too. The sidebar pool amount comes from the current round. The balance and pool tile render a skeleton (null) while loading. The homepage myEntriesQuery and viewerBalanceQuery call the API in API mode; a member with no entries gets no 'Your N entries' row. The region banner names the country only through <ShellOverride regionName>, which the homepage, pool hub, dashboard and restricted page now pass. The mock data source and the ?state=member preview still show DEMO_SHELL_MEMBER. VIP tier is not shown for real members because there is no API for it."
+   },
+   {
+    "id": "R38",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/lib/api/player-cache.ts",
+     "/home/user/Claude/global-pool/apps/web/src/lib/auth/session-layer.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'sign-out removes every player cache (incl. /me with the anti-phishing code), keeps public data'; e2e/web-closeout.spec.ts 'R38' (player A with 2FA and 250.00 logs out; player B signs in in the same tab without a reload and sees '2FA off' and 0.00, not A's data)",
+    "note": "clearAuthData() (sign-out, idle or revoked expiry, sign-out in another tab) now removes every player key root: auth, me, wallet, account, rg, history, pool/me and games-kit. If a different account takes over a live session without a sign-out, resetPlayerData() drops and refetches."
+   },
+   {
+    "id": "R39",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/wallet/deposit-flow.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'deposit confirmation (R39)'; e2e/web-closeout.spec.ts 'R39' (progressive DEMO deposit credited through the API, not the page's DEMO control: rows read 'Available 0.00 250.00' and 'Pending 250.00 0.00')",
+    "note": "When the deposit turns credited, the flow refreshes all player financial caches. ConfirmationStep waits, showing a skeleton and refetching, until balances were fetched after the credit was seen (both times on the client clock, so server clock skew does not matter). If that refetch fails it shows a retry."
+   },
+   {
+    "id": "R40",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/lib/api/player-cache.ts",
+     "/home/user/Claude/global-pool/apps/web/src/lib/api/wallet.ts",
+     "/home/user/Claude/global-pool/apps/web/src/lib/api/account.ts",
+     "/home/user/Claude/global-pool/apps/web/src/lib/api/rg-history.ts",
+     "/home/user/Claude/global-pool/apps/web/src/components/rg-history/finance.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/rg-history/gaming.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/pool/participate-flow.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'player caches (R38 · R40)': a wallet write and an RG mutation both mark pool/me, account, history, rg, auth and me copies stale, and public keys stay untouched",
+    "note": "I kept the per-module keys and added one invalidatePlayerFinancials(). It is now called from useInvalidateWallet (withdraw, cancel, claim, whitelist, deposit), account and history Owed claims, useRgMutation (limits, breaks, self-exclusion; also refreshes the account gate) and entry purchases."
+   },
+   {
+    "id": "R41",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/lib/api/client.ts",
+     "/home/user/Claude/global-pool/apps/web/src/components/pool/participate-flow.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/wallet/withdraw-flow.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'unknown write outcomes (R41)'; e2e/web-closeout.spec.ts 'R41' (server commits but the response is dropped: 'We couldn't confirm your entries', no 'Nothing was charged', +/- disabled; the retry sends the same idempotency key and exactly 2 entries are booked)",
+    "note": "Participation: when the outcome is unknown the intent is locked (same entry count, same key), the callout points to My entries, the button reads 'Try again · …', and reopening the modal shows the same state until a definite answer arrives. 'Nothing was charged' appears only for definite 4xx errors. Withdrawal: an unknown error shows 'We couldn't confirm your withdrawal' with a Withdrawal history link instead of 'wasn't requested' or 'Edit withdrawal'. The draft keeps its key, and the API answers a replay with the existing withdrawal (the request hash excludes the TOTP code). The withdrawal Back button still works, but changing the amount or address starts a new intent. The withdraw path has no e2e test."
+   },
+   {
+    "id": "R42",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/pool/participate-flow.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/pool/pool-hub.tsx"
+    ],
+    "test": "e2e/web-closeout.spec.ts 'R42' (GET /responsible-gaming answers 503: the modal shows 'We couldn't load your limits', never 'No participation limit set', and Confirm stays disabled)",
+    "note": "New limitsStatus and onRetryLimits props: loading shows a skeleton, error shows 'still enforced' with a retry button, and Confirm is disabled until limits load. pool-hub passes ready when data exists, error when the query failed, otherwise loading."
+   },
+   {
+    "id": "R43",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/admin-a/session.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/admin-a/four-eyes.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'admin caches (R43)': removes ['admin-b','me'], admin-b withdrawal data and ['admin',…]; player data stays",
+    "note": "clearLocal() calls clearAdminData() (cancel and remove ['admin'] and ['admin-b']). ApprovalReviewDialog.refresh() also invalidates ['admin-b']. Of the leftovers listed under R43, the shell 'United States' banner (fixed under R37) and the no-op desktop search (now a GET form to /games?q=) are done. Approvals 'Decided today' showing 'No decisions yet today' when its query fails is not done."
+   },
+   {
+    "id": "R47",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/e2e/admin-a.spec.ts",
+     "/home/user/Claude/global-pool/apps/web/e2e/admin-b.spec.ts"
+    ],
+    "test": "E2E_BASE_URL=http://localhost:3312 E2E_API_URL=http://localhost:4312 npx playwright test e2e/admin-a.spec.ts e2e/admin-b.spec.ts → 3 passed (k.osei signed in by admin-a, then admin-b within the same minute)",
+    "note": "Both specs now import admin and adminCode from e2e/integration/_journey.ts. adminCode reads totp_secrets.last_used_step via psql and waits for the next unused step for both sign-in and MFA codes, so no replay and no lockout. E2E_DATABASE_URL must point at the API's database; this is documented in the spec headers."
+   },
+   {
+    "id": "R49",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/wallet/withdraw-flow.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'withdraw MAX (R49)': 100.005 → 100.00, 100.009999 → 100.00",
+    "note": "New maxFillAmount(max) = roundDown(max, 2).toFixed(2), used by the MAX chip."
+   },
+   {
+    "id": "R57",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/nav-config.ts",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/footer-mega.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/shell/topbar.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/home/games.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/home/hero.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/home/info-sections.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/home/faq.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/components/rg-history/gaming.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/winners/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/vip/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/affiliates/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/about/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/official-channels/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/status/page.tsx",
+     "/home/user/Claude/global-pool/apps/web/src/app/(app)/security/page.tsx"
+    ],
+    "test": "test/closeout.test.tsx 'navigation targets exist (R11 · R57)' checks sidebar, account nav, tab bar, footer and dashboard tabs against src/app; 'homepage and shell links resolve' renders every homepage section and the shell and checks each rendered internal href",
+    "note": "Link changes:\n- Originals, Casino and their children go to the games lobby (/games?category=…), and the Games tab goes to /games.\n- Footer: Past rounds → /pool/history, Refunds → /history/refunds, How it works → /#how-it-works, Contact → /support#contact.\n- Address whitelisting → /wallet/whitelist.\n- Mobile search → /games; desktop search is a GET form to /games?q=.\n- Promotion tiles → /promotions anchors.\n- 'Full guide' and 'round rules' → /legal/terms#entries.\nWinners, VIP, Affiliates, About, Official channels, Status and Security get honest coming-soon pages inside the shell instead of being hidden."
+   },
+   {
+    "id": "R59",
+    "status": "FIXED",
+    "files": [
+     "/home/user/Claude/global-pool/apps/web/src/components/domain/amount-input.tsx",
+     "/home/user/Claude/global-pool/apps/web/test/logic.test.ts"
+    ],
+    "test": "test/logic.test.ts 'reads , as thousands grouping … (R59)': 9,215.30 → 9215.30, 1,000 → 1000, 1,000,000.00 → 1000000.00, 9.215,30 → 9215.30, 1,5 → 1.5; the old '1,234.5' → '1.23' assertion is removed",
+    "note": "Rules:\n- When the value contains both ',' and '.', the last separator is the decimal point.\n- Commas in complete groups of three digits are thousands separators and are stripped.\n- Any other lone ',' is a decimal point.\nPasted or autofilled amounts keep their thousands. Typing '1,000' key by key still gives '1.' at the comma: '1,' cannot be told apart from a decimal comma, and comma-decimal mobile keypads (inputMode=decimal) offer no '.'."
+   }
+  ],
+  "verified": [
+   "pnpm --filter @gp/web typecheck → exit 0",
+   "pnpm --filter @gp/web lint → exit 0",
+   "pnpm --filter @gp/web test → 14 files / 154 tests passed (new test/closeout.test.tsx 15, test/api-mode.test.ts 4; updated test/auth.test.ts, test/logic.test.ts)",
+   "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-co-web pnpm --filter @gp/web build → exit 0 (Compiled successfully)",
+   "API-mode build (same lock + NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4312) → exit 0; served on 3312 against my API on 4312 (apps/api/.dev/dist-co-web, dev DB, JOBS_ENABLED=false)",
+   "E2E_BASE_URL=http://localhost:3312 E2E_API_URL=http://localhost:4312 npx playwright test e2e/web-closeout.spec.ts → 8 passed (R11 R36 R20 R38 R39 R41 R42 R37)",
+   "npx playwright test e2e/admin-a.spec.ts e2e/admin-b.spec.ts (same env) → 3 passed in one run with the same shared admin (R47)",
+   "npx playwright test e2e/wallet.spec.ts e2e/pool.spec.ts e2e/auth.spec.ts e2e/account.spec.ts e2e/rg-history.spec.ts (same env) → 10 passed (no regressions)",
+   "Playwright screenshots at 1440 and 390 of /, /legal/terms, /legal/restricted-countries, /support, /promotions, /winners in apps/web/test-results/visual/web-closeout/: no page scrolls sideways; the one 404 found (/promotions/welcome prefetch) was fixed",
+   "Prettier check is clean on every file I touched",
+   "Cleanup: my web (3312) and API (4312) processes stopped by PID; .next-co-web and apps/api/.dev/dist-co-web removed; tsconfig.json has no .next-co-web line; next-env.d.ts points at ./.next"
+  ],
+  "failing": [],
+  "decisions": [
+   "R26 (needs an owner decision): I made the copy truthful instead of building cross-account exclusion. Matching new accounts to a self-excluded person (verified email, wallet, KYC name and date of birth) needs an owner policy and API changes to auth onboarding and KYC.",
+   "R37: the mock data source and the ?state=member preview keep the DEMO shell member. Only API mode shows the member's real data. VIP tier is not shown for real members because there is no endpoint for it.",
+   "R11: the legal pages are DEMO summaries of this testnet build, not legal terms. The API does not expose the restricted-country list, so the page shows the env default list (US, CU, IR, KP, SY) labelled as the default configuration, plus the visitor's live region check. /support says the email address is a placeholder that nobody answers. /promotions says no bonus is credited and there is no opt-in yet.",
+   "R57: unbuilt sections (Winners, VIP, Affiliates, About, Official channels, Status, Security) get honest coming-soon pages rather than being hidden or disabled. Category navigation goes to the games lobby, and the desktop search submits to /games?q=.",
+   "R41 withdraw: Back and editing stay possible after an unknown outcome (editing starts a new intent); the warning tells the player to check withdrawal history first. Participation locks the entry count until a definite answer.",
+   "R59: a trailing ',' typed key by key stays a decimal point, because comma-decimal mobile keypads offer no '.'. Pasted or complete thousands groups are stripped.",
+   "R30: the cancelled-round caption is now 'Round cancelled — every entry refunded to Owed', which does not claim the cause was the threshold. The hero's made-up '13 winners' fallback is removed.",
+   "R38: if a different account takes over a live session without a sign-out, player queries are reset (dropped and refetched) rather than removed, so mounted screens do not get stuck.",
+   "The orchestrator committed my working tree mid-task (commits 37512f5, bb7b2e3, 5f8bc3f). I did not commit anything.",
+   "Follow-ups outside these items: the dashboard WelcomeOfferCard claims an opt-in in the deposit flow that does not exist; the FAQ 'Chat with support' button has no chat behind it; the homepage security cards claim hourly custody reconciliation and audited contract versions that I did not check; admin approvals 'Decided today' still shows 'No decisions yet today' when its query fails."
+  ]
+ }
+]

@@ -5499,5 +5499,181 @@
    "Data aligned to demo-data/decisions inside the prepared scripts: WD-20931 18:44 (decision by 22:44 UTC), DP-77412 18:39, #1,248 entries 18:05, DP-77380 09:12, refund #1,245 20:00 with 1.50 fees reversed, 212 transaction rows (not 1,284), and player counts per decision #34. Decisions entry 36 appended to /home/user/Claude/design/figma-build/decisions.md; frame ids written to /home/user/Claude/design/figma-build/registry-mob-patterns.json.",
    "Spec board MOB-10 (196:77250), cosmetic: annotation pins 1, 3 and 4 slightly overlap the icon, chain mark and status badge on the example mobile card."
   ]
+ },
+ "undefined": {
+  "section": "34:432756 (page \"06 — Wallet & Transactions\", section \"WAL-03..09 Deposit flow\" at X=16000,Y=0; now 26 frames) + 105:49686 (page \"10 — Mobile Experience\", section \"WAL — Mobile B (Deposit)\" at X=140000,Y=0; now 12 frames)",
+  "created": [
+   {
+    "name": "NEW — WAL-03 Deposit — Step 1 Select Network / 768 / Empty — no deposits yet (new DEMO account, balance 0.00)",
+    "id": "243:52054"
+   },
+   {
+    "name": "NEW — WAL-05 Deposit — Step 3 Deposit Address / 768 / Expired address session (edge state)",
+    "id": "243:52507"
+   },
+   {
+    "name": "NEW — WAL-07 Deposit — Step 5 Transaction Pending / 768 / Delayed — Ethereum congested (7 of 12)",
+    "id": "244:344901"
+   },
+   {
+    "name": "NEW — WAL-09 Deposit — Step 7 Successful / 768 / Unrecognised token — not credited",
+    "id": "244:345414"
+   },
+   {
+    "name": "NEW — WAL-03 Deposit — Step 1 Select Network / 390 / Empty — no deposits yet (new DEMO account, balance 0.00) — MOB-06 bottom sheet",
+    "id": "245:344376"
+   },
+   {
+    "name": "NEW — WAL-09 Deposit — Step 7 Successful / 390 / Unrecognised token — not credited — MOB-06 bottom sheet",
+    "id": "245:344673"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 1440 / Default",
+    "id": "34:432757"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 1440 / Empty — no deposits yet (new DEMO account, balance 0.00)",
+    "id": "103:40514"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 1440 / Default",
+    "id": "34:465213"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Default",
+    "id": "34:496874"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Wrong-network warning",
+    "id": "36:515243"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Below minimum deposit",
+    "id": "91:30409"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Expired address session (edge state)",
+    "id": "36:536299"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 1440 / Default",
+    "id": "91:31216"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 1440 / Confirming 7 of 12",
+    "id": "97:33583"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 1440 / Delayed — Ethereum congested (7 of 12)",
+    "id": "97:34460"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 1440 / Credited (12 of 12)",
+    "id": "99:34694"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Successful — receipt",
+    "id": "99:35635"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Failed — transfer reverted",
+    "id": "101:36554"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Unrecognised token — not credited",
+    "id": "101:37387"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 768 / Default",
+    "id": "103:41289"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 768 / Default",
+    "id": "103:41779"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 768 / Default",
+    "id": "103:42250"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 768 / Default",
+    "id": "91:32157"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 768 / Confirming 7 of 12",
+    "id": "97:35284"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 768 / Credited (12 of 12)",
+    "id": "99:36518"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 768 / Successful — receipt",
+    "id": "101:38134"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 768 / Failed — transfer reverted",
+    "id": "101:38576"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:49687"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:50056"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:50420"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Expired address session (edge state) — MOB-06 bottom sheet",
+    "id": "105:50851"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 390 / Default — MOB-06 bottom sheet",
+    "id": "111:51709"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 390 / Confirming 7 of 12 — MOB-06 bottom sheet",
+    "id": "111:52133"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 390 / Delayed — Ethereum congested (7 of 12) — MOB-06 bottom sheet",
+    "id": "111:52536"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 390 / Credited (12 of 12) — MOB-06 bottom sheet",
+    "id": "112:52888"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 390 / Successful — receipt — MOB-06 bottom sheet",
+    "id": "112:53217"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 390 / Failed — transfer reverted — MOB-06 bottom sheet",
+    "id": "112:53630"
+   },
+   {
+    "name": "SECTION WAL-03..09 Deposit flow (page 06)",
+    "id": "34:432756"
+   },
+   {
+    "name": "SECTION WAL — Mobile B (Deposit) (page 10)",
+    "id": "105:49686"
+   }
+  ],
+  "issues": [
+   "Continuation result: all 32 frames from the interrupted run were already on the canvas, complete and in AUTO height on page 06. On page 10 the bottom-sheet viewports are FIXED height, sized to the sheet. None were rebuilt. I added 6 frames so that every edge or error state that changes the layout exists at 768 and 390, not only at 1440: T Empty, T Expired, T Delayed, T Unrecognised, M Empty, M Unrecognised. Logged as decisions.md #53.",
+   "Fix applied: the existing 10 mobile frames in 'WAL — Mobile B (Deposit)' showed the long Notice/Demo Data message, which clips at 390. They now use the short message, per decision #29 (105:49687, 105:50056, 105:50420, 105:50851, 111:51709, 111:52133, 111:52536, 112:52888, 112:53217, 112:53630).",
+   "Library gaps carried over from the earlier run, still open: Tx/Hash (367), Tx/Status Timeline (420), Wallet/Deposit Address Block (600) and Tx/Receipt Card (480) are too wide for 358 px, so they need compact variants. The mobile Unrecognised frame shows the hash as Mono/S text with a DEMO badge instead of using Tx/Hash.",
+   "There are still no library components for: the QR code art, the persistent 'Send only USDT on Ethereum (ERC-20)…' alert, the welcome-offer opt-in card, the unrecognised-deposit recovery card, and the balance before/after table. All are built inline with tokens.",
+   "Copy mismatch inside the library, unchanged: Wallet/Deposit Address Block labels Ethereum 'Degraded', while Select/Network and the screens say 'Congested' / 'Slower than usual'. It is visible again in the new 768 Expired frame.",
+   "Demo-data note carried over: the deposit timeline runs 18:38–18:51 UTC, so round cards say 'closes 20:00 UTC · in 1 h 16 min' rather than the shared 03:17:42 countdown.",
+   "Rerunnable, idempotent scripts for the 6 new frames are saved in /home/user/Claude/design/figma-build/pending/wal-deposit/out (A.js, B.js, M.js) with RUN-ORDER.json. They skip any frame whose name already exists.",
+   "Figma MCP usage this run: 7 use_figma calls (2 read-only listings, 3 builds, 2 read-only audits). No limit errors. No get_screenshot or get_metadata calls.",
+   "Memory: no stored memory notes were read or used for this task. Nothing new to save."
+  ]
  }
 }

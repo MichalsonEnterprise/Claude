@@ -1,0 +1,1365 @@
+[
+ {
+  "section": "Desktop: page '04 — Authentication', section 'AUTH-07/08/09/10 2FA & wallet connect' id 78:77287 (X=12000 Y=0, 11040×7720). Mobile: page '10 — Mobile Experience', section 'AUTH — Mobile B' id 123:54293 (X=70000 Y=0, 4200×2324). Continuation run: the first read-only listing per page found all 30 frames already built, all hug-height. Nothing was missing, so nothing new was built. This run screenshot-checked the 12 AUTH-08/09 desktop frames the earlier run left unchecked, made 2 targeted fixes and re-checked them. No Figma MCP limit errors this run (5 use_figma calls).",
+  "created": [
+   {
+    "name": "Section/AUTH-07/08/09/10 2FA & wallet connect (page 04)",
+    "id": "78:77287"
+   },
+   {
+    "name": "Notes — AUTH-07…10",
+    "id": "78:77288"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 1 Scan / 1440 / Default",
+    "id": "78:77291"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 2 Confirm / 1440 / Default",
+    "id": "81:24488"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 3 Backup codes / 1440 / Default",
+    "id": "81:26567"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Login / 1440 / Default",
+    "id": "115:81957"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Login / 1440 / Wrong code",
+    "id": "115:83997"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Login / 1440 / Locked",
+    "id": "115:86045"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Withdrawal / 1440 / Default",
+    "id": "116:34081"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Withdrawal / 1440 / Wrong code",
+    "id": "116:35027"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Withdrawal / 1440 / Locked",
+    "id": "116:35830"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 1440 / List",
+    "id": "116:36629"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 1440 / WalletConnect QR",
+    "id": "117:38530"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 1440 / Connecting",
+    "id": "117:40434"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 1440 / Rejected",
+    "id": "117:42355"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 1440 / Wrong network",
+    "id": "117:44238"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 1440 / Success",
+    "id": "117:46336"
+   },
+   {
+    "name": "AUTH-10 Wallet Verification / 1440 / Request",
+    "id": "120:144957"
+   },
+   {
+    "name": "AUTH-10 Wallet Verification / 1440 / Success",
+    "id": "120:146919"
+   },
+   {
+    "name": "AUTH-10 Wallet Verification / 1440 / Rejected",
+    "id": "120:148852"
+   },
+   {
+    "name": "AUTH-10 Wallet Verification / 1440 / Expired nonce",
+    "id": "120:150769"
+   },
+   {
+    "name": "Section/AUTH — Mobile B (page 10)",
+    "id": "123:54293"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 1 Set up / 390 / Default",
+    "id": "123:54294"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 2 Confirm / 390 / Default",
+    "id": "123:54457"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 3 Backup codes / 390 / Default",
+    "id": "123:54615"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Login / 390 / Default",
+    "id": "123:54797"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Login / 390 / Locked",
+    "id": "123:55010"
+   },
+   {
+    "name": "AUTH-08 2FA Challenge — Withdrawal / 390 / Default",
+    "id": "123:55236"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 390 / List",
+    "id": "124:155578"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 390 / Wrong network",
+    "id": "124:155811"
+   },
+   {
+    "name": "AUTH-09 Connect Wallet / 390 / WalletConnect deep link",
+    "id": "124:156062"
+   },
+   {
+    "name": "AUTH-10 Wallet Verification / 390 / Request",
+    "id": "124:156284"
+   },
+   {
+    "name": "AUTH-10 Wallet Verification / 390 / Expired nonce",
+    "id": "124:156503"
+   },
+   {
+    "name": "Toast — WD-20931 on hold (moved, inside 116:35830)",
+    "id": "116:36620"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "AUTH-07",
+    "status": "VERIFIED",
+    "note": "Unchanged this run; checked in earlier runs. Desktop 1440: Scan, Confirm, Backup codes. Mobile 390: Set up (authenticator deep link plus copyable setup key, no QR), Confirm, Backup codes. Backup codes are 10 mono codes with a DEMO badge and Download / Copy all; the 'I've saved my backup codes' checkbox starts unchecked and Finish stays disabled."
+   },
+   {
+    "id": "AUTH-08",
+    "status": "VERIFIED",
+    "note": "All 9 frames exist and passed screenshots. This run checked the 6 desktop frames. Login Default/Wrong code/Locked (115:81957/115:83997/115:86045): two-pane dialog over the dimmed lobby, anti-phishing code AURORA-27, no Resend line (TOTP), wrong code shows '4 attempts left' plus a phone-clock tip, locked pauses 15 min with an absolute unlock time 16:59 UTC and a 14:52 countdown. Withdrawal Default/Wrong code/Locked (116:34081/116:35027/116:35830): Modal/2FA over withdraw step 7 for WD-20931; figures match demo-data (1,500.00, network fee 0.08, platform fee 0.00, receive 1,499.92); locked until 18:58 UTC. Fix this run: the 'WD-20931 is on hold, not cancelled' toast (116:36620) covered the stepper and review card; it now sits bottom-right and was re-checked. Mobile 390: Login Default, Login Locked, Withdrawal Default (wrong code is an inline error, no separate mobile frame)."
+   },
+   {
+    "id": "AUTH-09",
+    "status": "VERIFIED",
+    "note": "All 6 desktop Modal/Connect Wallet states passed screenshots this run: List 116:36629 (letter-mark providers, seed-phrase warning, 18+/jurisdiction line), WalletConnect QR 117:38530 (expires 04:52, Copy link / Refresh code), Connecting 117:40434 (wallet-extension pop-up mock listing what is and is not shared), Rejected 117:42355, Wrong network 117:44238 (chain ID 10 unsupported, switch to Arbitrum, supported networks), Success 117:46336 (ownership Pending, then Verify ownership). Copy fix this run: the Success toast action 'View receipt →' is now 'Manage wallets →', re-checked. The only clipped texts are lobby hero/promo labels behind the scrim, cropped by their banners on purpose. Mobile 390: List, Wrong network, WalletConnect deep link, checked earlier."
+   },
+   {
+    "id": "AUTH-10",
+    "status": "VERIFIED",
+    "note": "Unchanged this run; checked in earlier runs. Desktop: Request, Success, Rejected, Expired nonce. Mobile: Request, Expired nonce. The required sign-in message appears word for word in the dialog and in a neutral wallet pop-up mock: nonce issued 16:42 UTC, expires 16:52 UTC, chips say 'No transaction' and 'No gas · 0.00'."
+   }
+  ],
+  "issues": [
+   "Tool behaviour worth sharing with other agents: one use_figma call returns at most 5 inline node.screenshot() images. A 6th screenshot in the same script is silently dropped, so verify scripts should batch 5 frames per call.",
+   "Targeted fixes this run, both re-checked and patched into the source so rebuilds keep them: (1) 116:35830 AUTH-08 Withdrawal Locked: the on-hold toast 116:36620 moved from (316,248), where it covered the stepper and 'Review withdrawal' header, to the bottom-right toast slot (1116,882); source pending/auth-b/bodies/d08_wd.js. (2) 117:46336 AUTH-09 Success: toast action text 'View receipt' changed to 'Manage wallets'; source bodies/d09.js. out/c3.js, k4.js and k5.js were rebuilt; node --check and mock passed.",
+   "Clipping audit: in the lobby-backdrop frames, 5 texts per frame are cropped by their own banners ('20:00 UTC', 'In draw', 'Draw at' in the hero; '100' in the welcome promo). This is intended background cropping behind the scrim, not a defect.",
+   "Naming: frame names have no [ScreenID] brackets (same as auth-a and auth-c, while auth-d uses brackets). Prototype agents (proto-a/b), which look up '[AUTH-09]' etc., should match names with and without brackets. They were not renamed, to stay consistent with the neighbouring auth slices and existing references in built.json and the results files.",
+   "Mobile coverage per the states/sizes rule in decisions.md: AUTH-08 mobile Wrong code, AUTH-09 mobile Connecting/Rejected/Success and AUTH-10 mobile Success/Rejected have no separate 390 frames, because their layout does not change materially (inline error or status swap in the same bottom sheet).",
+   "Library gaps carried over from earlier runs, still open: Notice/Demo Data (6:131) needs a wrapping Mobile variant (390 frames use the short message 'DEMO DATA — illustrative values only'); Input/OTP (16:3761) has no boolean to hide 'Resend code' for TOTP (hidden per instance) and its Disabled helper text is overridden; there is no library component for the sign-message dialog or the third-party wallet pop-up, so AUTH-10 is built inline from tokens and library parts.",
+   "Files updated: /home/user/Claude/design/figma-build/pending/auth-b/README.md (marked done, nothing remains), /home/user/Claude/design/figma-build/registry-auth-b.json (_note: all 30 frames verified), /home/user/Claude/design/figma-build/pending/auth-b/bodies/d08_wd.js, bodies/d09.js, out/c3.js, out/k4.js, out/k5.js. ledger.json and built.json were not edited by hand; the orchestrator merges them from this report.",
+   "Possibly worth remembering (learned from this run's tool output, not from memory): use_figma inline screenshots are capped at 5 per call. Memory was not used for this task."
+  ]
+ },
+ {
+  "section": "32:32304",
+  "created": [
+   {
+    "name": "Section — GP-01..04 Hub & participation (page 07)",
+    "id": "32:32304"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / Active",
+    "id": "32:79976"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / Restricted region",
+    "id": "33:140539"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / Wallet disconnected",
+    "id": "33:160310"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / No active round",
+    "id": "33:194034"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1280 / Active",
+    "id": "33:223663"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 768 / Active",
+    "id": "33:266964"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1280 / Restricted region",
+    "id": "164:154566"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 768 / Restricted region",
+    "id": "164:155369"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1280 / No active round",
+    "id": "165:94856"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 768 / No active round",
+    "id": "165:96938"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Default",
+    "id": "33:299290"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Insufficient funds",
+    "id": "33:310193"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Limit reached",
+    "id": "34:325577"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Wrong network",
+    "id": "34:333053"
+   },
+   {
+    "name": "[GP-03] Participation Pending / 1440",
+    "id": "34:365199"
+   },
+   {
+    "name": "[GP-04] Participation Success — Entry receipt / 1440",
+    "id": "34:383862"
+   },
+   {
+    "name": "Modal — You’re in round #1,248 (inside GP-04 1440)",
+    "id": "34:383687"
+   },
+   {
+    "name": "Section — GP — Mobile A (page 10)",
+    "id": "34:434742"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Active",
+    "id": "34:434743"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Restricted region",
+    "id": "34:473267"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Wallet disconnected",
+    "id": "34:482737"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / No active round",
+    "id": "34:492964"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Default — bottom sheet",
+    "id": "36:503945"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Insufficient funds — bottom sheet",
+    "id": "36:521852"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Limit reached — bottom sheet",
+    "id": "36:529928"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Wrong network — bottom sheet",
+    "id": "36:538096"
+   },
+   {
+    "name": "[GP-03] Participation Pending / 390 / Bottom sheet",
+    "id": "164:73073"
+   },
+   {
+    "name": "[GP-04] Participation Success — Entry receipt / 390 / Bottom sheet",
+    "id": "164:73786"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "GP-01",
+    "status": "VERIFIED",
+    "note": "All required frames exist and passed screenshot checks in earlier runs. 1440 has Active, Restricted region, Wallet disconnected and No active round. 1280 and 768 have Active, Restricted region and No active round; Wallet disconnected is not built there because only the CTA changes, so it is not a material layout change (decision #16). 390 has all 4 states (MOB-04). A read-only check this run confirmed all frames use hug height (AUTO) with no 800 px clipping and no overlaps in section 32:32304."
+   },
+   {
+    "id": "GP-02",
+    "status": "VERIFIED",
+    "note": "Default, Insufficient funds, Limit reached and Wrong network exist at 1440 (Modal/Participation Preview over the dimmed hub) and at 390 (bottom sheets). All were screenshot-checked in earlier runs. The frames are unchanged and hug their height."
+   },
+   {
+    "id": "GP-03",
+    "status": "VERIFIED",
+    "note": "The 1440 pending modal (34:365199) and the 390 bottom sheet (164:73073) both exist and were screenshot-checked in earlier runs."
+   },
+   {
+    "id": "GP-04",
+    "status": "VERIFIED",
+    "note": "The remaining caveat is closed. This run ran out/06_final_p07.js and screenshotted the 1440 receipt modal (34:383687 in 34:383862). It passed: Entry Ticket E-1248-00981 ×35; receipt rows with draw time 27 Nov 2026 20:00:00 UTC and Chainlink VRF · Arbitrum; fee breakdown 350.00 + 1.75 platform fee + 0.00 network fee = 351.75 with 'You can lose your stake'; locked 350.00; Tx/Hash 0x3a7c…9e02 + DEMO; 'PDF receipt' label fully visible; odds ≈2.44% / ≈0.188%; RG bar 351.75 / 500.00; Back / View my entries. The 390 sheet (164:73786) passed in the previous run."
+   },
+   {
+    "id": "MOB-04",
+    "status": "VERIFIED",
+    "note": "390 hub with the sticky participate bar above Nav/Mobile Tab Bar exists in all 4 states (34:434743, 34:473267, 34:482737, 34:492964). The sticky bars were re-screenshotted and passed in the previous run. A read-only check this run confirmed all frames hug their height and are in section 34:434742."
+   }
+  ],
+  "issues": [
+   "Nothing left to build in this slice. The read-only listing found all 16 frames on page 07 (section 32:32304, 6360 × 36516) and all 10 on page 10 (section 34:434742, 2160 × 21931). Every frame hugs its height and none overlap. The only remaining script, pending/gp-hub/out/06_final_p07.js, ran this time: the section fit was already correct (no size change) and the GP-04 1440 modal screenshot passed. I added the run status to pending/gp-hub/README.md.",
+   "Cross-module data question, not changed: the GP-04 receipt says '35 entries confirmed at 16:42:41 UTC'. That matches the hub countdown 03:17:42 to the 20:00 UTC close. But demo-data.md line 146 and MOB-10 list the round #1,248 entries at 18:05 UTC. This is the same open 'now' question as decisions #44 and #50 (16:42 vs 18:42–18:44 UTC). If one global time is chosen, update the receipt timestamp or the history rows.",
+   "Carried over from earlier runs (component-level, for the orchestrator): the Jackpot/Winner Reveal Card 'Public winner' default (@lumen.eth) is overridden per instance to @orbit_77, so the component default should be updated. helpers.js screen() leaves the primary axis FIXED at 800 px; this slice set primaryAxisSizingMode='AUTO', so other slices' frames may still be clipped. Jackpot/Threshold Bar and Prize Distribution cannot stretch beyond their 520 px native width.",
+   "Memory: I used the stored GLOBAL POOL project note (file key, casino direction, build kit location) only as context. Nothing new needs saving."
+  ]
+ },
+ {
+  "section": "36:522944 (page '09 — Admin Panel', 'ADM-00/01/02/X1 Shell, login, overview, approvals', X=0 Y=0, now 8520 wide) + 173:71503 (page '10 — Mobile Experience', 'ADM — Mobile', X=217000; MOB-11 row at y 4164)",
+  "created": [
+   {
+    "name": "[ADM-00] Admin shell — Approvals inbox / 1440 / Default (earlier run)",
+    "id": "36:522948"
+   },
+   {
+    "name": "[ADM-00] Admin shell — Command palette / 1440 / Results (earlier run)",
+    "id": "36:537070"
+   },
+   {
+    "name": "[ADM-00] Admin shell — Command palette / 1440 / No results (earlier run)",
+    "id": "36:540097"
+   },
+   {
+    "name": "[ADM-00] Admin shell — No permission / 1440 / Support role opens Finance link (earlier run)",
+    "id": "39:50316"
+   },
+   {
+    "name": "[ADM-00] Admin shell — Approvals inbox / 1280 / Default",
+    "id": "222:125633"
+   },
+   {
+    "name": "[ADM-00] Admin shell — No permission / 1280 / Support role opens Finance link",
+    "id": "229:161520"
+   },
+   {
+    "name": "[ADM-00] Admin shell — Navigation drawer / 768 / Open",
+    "id": "224:159273"
+   },
+   {
+    "name": "[ADM-00] Admin shell — Command palette / 768 / Results",
+    "id": "224:159747"
+   },
+   {
+    "name": "[ADM-00] Admin shell — No permission / 768 / Support role opens Finance link",
+    "id": "224:160161"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1440 / Default (earlier run)",
+    "id": "170:66492"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1440 / Error — wrong password (earlier run)",
+    "id": "170:66727"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1440 / Blocked — network not approved (earlier run)",
+    "id": "170:67010"
+   },
+   {
+    "name": "[ADM-01] Admin login — 2FA / 1440 / Default (earlier run)",
+    "id": "170:67206"
+   },
+   {
+    "name": "[ADM-01] Admin login — 2FA / 1440 / Locked — too many codes (earlier run)",
+    "id": "170:67433"
+   },
+   {
+    "name": "[ADM-01] Session expired — Re-authenticate / 1440 / Default (earlier run)",
+    "id": "170:67648"
+   },
+   {
+    "name": "[ADM-01] Session timeout — Warning / 1440 / 01:42 left",
+    "id": "221:191799"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 1280 / Default",
+    "id": "222:126124"
+   },
+   {
+    "name": "[ADM-01] Admin login — Sign in / 768 / Default",
+    "id": "224:96327"
+   },
+   {
+    "name": "[ADM-02] Overview / 1440 / Default (earlier run)",
+    "id": "171:73506"
+   },
+   {
+    "name": "[ADM-02] Overview / 1440 / Restricted role — Support L2",
+    "id": "221:192192"
+   },
+   {
+    "name": "[ADM-02] Overview / 1280 / Default",
+    "id": "222:126310"
+   },
+   {
+    "name": "[ADM-02] Overview / 1280 / Restricted role — Support L2",
+    "id": "229:160132"
+   },
+   {
+    "name": "[ADM-02] Overview / 768 / Default",
+    "id": "224:95574"
+   },
+   {
+    "name": "[ADM-02] Overview / 768 / Restricted role — Support L2",
+    "id": "229:160932"
+   },
+   {
+    "name": "[ADM-02 · MOB-11] Overview / 390 / Default (page 10)",
+    "id": "226:80653"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Default (empty) (earlier run)",
+    "id": "178:99766"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Ready (earlier run)",
+    "id": "178:100079"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1440 / Error (earlier run)",
+    "id": "178:100360"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Request submitted / 1440 / Awaiting 2nd approver (earlier run)",
+    "id": "178:100654"
+   },
+   {
+    "name": "[ADM-X1] Re-authenticate — Fresh 2FA before approving / 1440 / Default (earlier run)",
+    "id": "180:143765"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Second approver review / 1440 / Ready to approve (earlier run)",
+    "id": "180:144187"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Approved / 1440 / Released (earlier run)",
+    "id": "180:144734"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request (earlier run)",
+    "id": "180:145242"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 1280 / Ready",
+    "id": "222:127249"
+   },
+   {
+    "name": "[ADM-X1] Four-eyes — Confirm with reason / 768 / Ready",
+    "id": "224:96513"
+   },
+   {
+    "name": "[ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet (page 10)",
+    "id": "227:143053"
+   },
+   {
+    "name": "[MOB-11] Alerts / 390 / Operations (page 10)",
+    "id": "226:81089"
+   },
+   {
+    "name": "[MOB-11] Approvals queue / 390 / Open (page 10)",
+    "id": "227:142765"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "ADM-00",
+    "status": "VERIFIED",
+    "note": "Admin shell at D·L·T, every frame checked in a screenshot. 1440: Approvals inbox, Command palette Results and No results, No permission (Support L2 opens a Finance link). 1280: inbox 222:125633 (wrapped cells fixed to FILL) and No permission 229:161520 (access matrix and grantor panel stacked). 768: navigation drawer open 224:159273, command palette 224:159747 (scope label 'Super Admin'), No permission 224:160161 (stacked; no off-canvas panel)."
+   },
+   {
+    "id": "ADM-01",
+    "status": "VERIFIED",
+    "note": "1440: Sign in, Error (wrong password), Blocked (network not approved), 2FA, 2FA locked, Session expired (now checked in a screenshot) and the new Session timeout warning 221:191799 (01:42 left, sign-out at 19:02 UTC, no new code needed to stay, nothing auto-submitted). Sign in also at 1280 (222:126124) and 768 (224:96327, stacked card + policies). The 'Trust this device' checkbox is set to 288 px in every sign-in frame so 'Can't sign in?' stays inside the 432 px form."
+   },
+   {
+    "id": "ADM-02",
+    "status": "VERIFIED",
+    "note": "Overview with every brief KPI from demo-data plus system health, at D·L·T·M. 1440 Default + Restricted role (Support L2: money KPIs, liabilities, queues, pool chart and audit feed left out, not blurred; four-eyes list shows only AR-1045 with a role note). 1280 Default 222:126310 + Restricted 229:160132. 768 Default 224:95574 + Restricted 229:160932. 390 on page 10 226:80653 (2×4 KPI grid, queues, approvals, health, read-only round monitor, tab bar). All checked in screenshots, with no overflow."
+   },
+   {
+    "id": "ADM-X1",
+    "status": "VERIFIED",
+    "note": "Four-eyes pattern: 8 frames at 1440 (confirm-with-reason Default/Ready/Error, request submitted, step-up 2FA re-auth, second-approver review, approved & released 20:31 UTC, self-approval blocked; identities and times aligned in this run). 1280 confirm Ready 222:127249 and 768 confirm Ready 224:96513 over ADM-F2's own WD-20931 detail. Mobile AR-1042 review bottom sheet 227:143053 (reason, fresh 2FA, Reject / Approve & release). All checked in screenshots."
+   },
+   {
+    "id": "MOB-11",
+    "status": "VERIFIED",
+    "note": "Page 10, 'ADM — Mobile', second row at y 4164: Overview 226:80653, Alerts / Operations 226:81089 (severity chips, acknowledge is logged and never changes balances or results), Approvals queue 227:142765 (K. Osei; self-request and Super-Admin-only cards cannot be decided), Review AR-1042 bottom sheet 227:143053. Same inline admin top bar and Admin Tab Bar as the adm-bc/adm-finance mobile frames. Checked in screenshots after the clipping fixes."
+   }
+  ],
+  "issues": [
+   "Library: Control/Checkbox instances are 360 px wide (Hug still gives 360) and pushed 'Can't sign in?' out of the 432 px ADM-01 form. Worked around by resizing each instance to 288 px; suggest making the component hug its label.",
+   "Library: Admin/Queue Card at 358 px clips 'Needs 2nd approver' and crowds the timestamp next to 'Open queue'. Overridden per mobile instance ('2nd approver', 'Updated 18:42 UTC'); suggest a compact or mobile variant.",
+   "Library: Input/Textarea's Field has a fixed 128 px height that per-instance resize ignores. On the mobile review sheet the separate audit note was folded into the 2FA description so the sheet leaves scrim visible (sheet y = 84 in an 844 viewport).",
+   "Library: Nav/Command Palette ships the footer text 'Scoped to role: Finance Lead'. It was overridden to 'Super Admin' on the 768 palette (signed in as S. Iyer); 1440 frames already read 'Compliance Officer'.",
+   "Library: Input/OTP's description is a single line that clips long text; kept to 'Needed for every decision · hash-chain logged'.",
+   "Background content not owned by this slice: in the cloned ADM-F2 1280 withdrawal detail behind the ADM-X1 1280 dialog, the 'Title row' overflows its 'Titles' frame by about 187 px. It sits under the scrim; it also exists in adm-finance's source frame 34:468177.",
+   "Restricted Overview frames still show the topbar 'Approvals 4' count, which is the component's global count, while the in-page four-eyes list shows only the 1 request visible to Support L2.",
+   "Beyond the prepared scripts I added three restricted-layout frames (ADM-02 1280 and 768 Restricted, ADM-00 No permission 1280). The laptop row now runs to x 8400 and the section is 8,520 px wide; the next section starts at X=14000, so nothing overlaps. Band labels ADM-02 and ADM-X1 were moved up 40 px because they overlapped their first frames by 12 px.",
+   "Files updated: registry-adm-core.json (all frame ids), pending/adm-core/RUN-ORDER.json (all scripts marked done), decisions.md entry 51. ledger.json left for merge-ledger.cjs."
+  ]
+ },
+ {
+  "section": "32:97624 (page '05 — User Dashboard', section 'USR-G1..G7 Gaming' at X=12000,Y=0; 14 desktop frames) + 34:432314 (page '10 — Mobile Experience', section 'USR — Mobile B' at X=98000,Y=0; 15 mobile frames)",
+  "created": [
+   {
+    "name": "[USR-G1] My Games / 1440 / Default",
+    "id": "34:411209"
+   },
+   {
+    "name": "[USR-G2] My Entries / 1440 / Default",
+    "id": "32:97641"
+   },
+   {
+    "name": "[USR-G2] My Entries / 1440 / Empty",
+    "id": "32:116296"
+   },
+   {
+    "name": "[USR-G2] My Entries / 1440 / Filters",
+    "id": "33:146972"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 1440 / Live",
+    "id": "33:175611"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 1440 / Empty",
+    "id": "33:198857"
+   },
+   {
+    "name": "[USR-G4] My Results / 1440 / Default",
+    "id": "33:222628"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 1440 / Owed",
+    "id": "33:253282"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 1440 / Settled",
+    "id": "33:277301"
+   },
+   {
+    "name": "[USR-G6] Game History / 1440 / Default",
+    "id": "33:308312"
+   },
+   {
+    "name": "[USR-G6] Game History / 1440 / Filters",
+    "id": "34:327461"
+   },
+   {
+    "name": "[USR-G6] Game History / 1440 / Export",
+    "id": "34:342896"
+   },
+   {
+    "name": "[USR-G7] Favourites / 1440 / Default",
+    "id": "34:370504"
+   },
+   {
+    "name": "[USR-G7] Favourites / 1440 / Empty",
+    "id": "34:389924"
+   },
+   {
+    "name": "[USR-G1] My Games / 390 / Default",
+    "id": "149:124836"
+   },
+   {
+    "name": "[USR-G2] My Entries / 390 / Default",
+    "id": "34:432315"
+   },
+   {
+    "name": "[USR-G2] My Entries / 390 / Empty",
+    "id": "34:448425"
+   },
+   {
+    "name": "[USR-G2] My Entries / 390 / Filters",
+    "id": "152:64961"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 390 / Live",
+    "id": "34:475816"
+   },
+   {
+    "name": "[USR-G3] My Active Rounds / 390 / Empty",
+    "id": "34:486169"
+   },
+   {
+    "name": "[USR-G4] My Results / 390 / Default",
+    "id": "34:503168"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 390 / Owed",
+    "id": "36:514932"
+   },
+   {
+    "name": "[USR-G5] My Winnings / 390 / Settled",
+    "id": "36:524169"
+   },
+   {
+    "name": "[USR-G6] Game History / 390 / Default",
+    "id": "36:535016"
+   },
+   {
+    "name": "[USR-G6] Game History / 390 / Export",
+    "id": "152:65321"
+   },
+   {
+    "name": "[USR-G6] Game History / 390 / Filters (NEW this run)",
+    "id": "229:241469"
+   },
+   {
+    "name": "[USR-G7] Favourites / 390 / Default",
+    "id": "151:63647"
+   },
+   {
+    "name": "[USR-G7] Favourites / 390 / Empty",
+    "id": "151:64719"
+   },
+   {
+    "name": "Section/USR-G1..G7 Gaming",
+    "id": "32:97624"
+   },
+   {
+    "name": "Section/USR — Mobile B",
+    "id": "34:432314"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "USR-G1",
+    "status": "VERIFIED",
+    "note": "1440 Default (34:411209) checked this run: screenshot plus audit (0 clipped, off-canvas or placeholder text; 20 DEMO badges). 390 Default (149:124836) passed its screenshot in the previous continuation run."
+   },
+   {
+    "id": "USR-G2",
+    "status": "VERIFIED",
+    "note": "1440 Default/Empty/Filters and 390 Default/Empty/Filters all exist and passed screenshots. Reconciled with demo-data: round #1,247 = 40 entries / 402.00, #1,246 = 24 / 241.20; #1,245 entries bought 24 Nov 14:22 UTC (desktop rows). The 390 Default was re-checked after the edit."
+   },
+   {
+    "id": "USR-G3",
+    "status": "VERIFIED",
+    "note": "1440 Live/Empty and 390 Live/Empty passed screenshots and the audit. Empty states now show round #1,247 as 40 entries / 402.00 USDT."
+   },
+   {
+    "id": "USR-G4",
+    "status": "VERIFIED",
+    "note": "1440 and 390 Default re-checked after edits: #1,247 = 40 / 402.00, #1,246 = 24 / 241.20. Shortened the truncated desktop proof cell for cancelled round #1,245 to 'No draw · refunded / Settles 27 Nov, 21:00 UTC'."
+   },
+   {
+    "id": "USR-G5",
+    "status": "VERIFIED",
+    "note": "1440 and 390 Owed/Settled re-checked after edits. Owed 415.20 = refund 300.00 (#1,245, settles in the 21:00 UTC run) + VIP 115.20 (calculated 23 Nov 10:00 UTC, settles automatically Mon 30 Nov 10:00 UTC; optional early claim in VIP Club, 'you never have to'). Timeline Owed → Settling → Available; adds the 1.50 USDT fee reversal (now wraps clear of Refund details). Settled = snapshot after both settled, with the receipt for the 27 Nov refund run. Mobile timeline label shortened so the time is no longer off-canvas."
+   },
+   {
+    "id": "USR-G6",
+    "status": "VERIFIED",
+    "note": "1440 Default/Filters/Export passed. 390 Default passed (session strip now wraps 'Take a break' inside the card). 390 Export: fix 04 applied, filename on one line. NEW 390 Filters (229:241469): bottom sheet matching desktop Filters (Orbit Rush · Wins · 7 days, 0.10 min stake → 'Show 38 results', 38 of 486 bets), compacted to 731 px; Result uses Tabs/Segmented."
+   },
+   {
+    "id": "USR-G7",
+    "status": "VERIFIED",
+    "note": "1440 Default/Empty passed screenshots and the audit this run. 390 Default/Empty passed in the previous continuation run."
+   }
+  ],
+  "issues": [
+   "Demo-data snapshot conflict, not changed: player screens use the 16:42 UTC snapshot (countdown 03:17:42), so round #1,248 entries show 'purchased 09:14 UTC'. The financial-history extras list them at 18:05, and the admin snapshot is 18:44. The G5 Total balance card also says 'Updated 18:42 UTC'. Suggest the orchestrator pick one canonical player 'now'.",
+   "USR-G5 Settled is now a Mon 30 Nov 2026 10:00 UTC snapshot, because the VIP reward auto-settles then per the VIP extras. Its shell instances (top bar Available 9,215.30, sidebar pool 186,400) still show the 27 Nov values. Left as is: these are shell instance values.",
+   "USR-G5 'Settled in Nov' figures are 3,825.80 (Owed) and 4,241.00 (Settled). The Nov items listed sum to 3,826.60 (3,620.60 + 108.40 + 97.60), so 0.80 is unexplained. Left unchanged.",
+   "Pieces still built inline from tokens because no library component exists: export dialog body, filter popovers and bottom sheets, settlement timeline, settlement receipt card, mobile bet/game rows, mobile session strip.",
+   "Not re-runnable: out/05 and out/07 in pending/usr-gaming swap two 'Recently settled' rows in G5 Settled, so re-running would swap them back. The README marks them as applied.",
+   "Files written this run: /home/user/Claude/design/figma-build/registry-usr-gaming.json (added 229:241469), /home/user/Claude/design/figma-build/decisions.md (new paragraph on the reconciliation), /home/user/Claude/design/figma-build/pending/usr-gaming/README.md (state COMPLETE) plus out/05–09 and src/*.js."
+  ]
+ },
+ {
+  "section": "33:269480 (page '03 — Public Website', 'PUB-02/03 Global Pool & Games Lobby', X=20000, Y=0) + 34:502361 (page '10 — Mobile Experience', 'PUB-02/03 — Mobile', X=7000, Y=0)",
+  "created": [
+   {
+    "name": "Section/PUB-02/03 Global Pool & Games Lobby",
+    "id": "33:269480"
+   },
+   {
+    "name": "Section/PUB-02/03 — Mobile",
+    "id": "34:502361"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1440 / Live — round open",
+    "id": "33:269481"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1440 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "33:306879"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1440 / Restricted region (United States)",
+    "id": "33:320290"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1280 / Live — round open",
+    "id": "34:391142"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1280 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "34:391801"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 1280 / Restricted region (United States)",
+    "id": "34:392475"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 768 / Live — round open",
+    "id": "34:425123"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 768 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "34:426263"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 768 / Restricted region (United States)",
+    "id": "34:427559"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 390 / Live — round open",
+    "id": "34:502362"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 390 / No round — next opens 28 Nov 08:00 UTC",
+    "id": "36:520009"
+   },
+   {
+    "name": "[PUB-02] Global Pool / 390 / Restricted region (United States)",
+    "id": "36:520860"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / All games (default)",
+    "id": "34:347033"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Filters — Instant · provably fair · house edge ≤ 1%",
+    "id": "34:366258"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Search — “orbit”",
+    "id": "34:367751"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Restricted games — United States",
+    "id": "34:373416"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1440 / Empty — no Instant games match “baccarat”",
+    "id": "34:378370"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1280 / All games (default)",
+    "id": "34:436379"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1280 / Restricted games — United States",
+    "id": "34:439296"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 1280 / Empty — no Instant games match “baccarat”",
+    "id": "34:442219"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 768 / All games (default)",
+    "id": "34:454533"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 768 / Restricted games — United States",
+    "id": "34:457441"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 768 / Empty — no Instant games match “baccarat”",
+    "id": "34:460367"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / All games (default)",
+    "id": "36:531732"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / Filters — bottom sheet open",
+    "id": "36:542037"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / Restricted games — United States",
+    "id": "36:542276"
+   },
+   {
+    "name": "[PUB-03] Games Lobby / 390 / Empty — no Instant games match “baccarat”",
+    "id": "36:545533"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "PUB-02",
+    "status": "VERIFIED",
+    "note": "Continuation run. All 12 frames already existed (live, no round and restricted at 1440, 1280, 768 and 390), all with hug height, so nothing new had to be built. The 3 frames not checked in the earlier run (1280 no round 34:391801, 1280 restricted 34:392475, 768 restricted 34:427559) now have screenshot checks. 1 visual bug fixed in all 6 desktop and laptop frames: the mint caption under the jackpot counter ('Final pool · round #1,248 · settled 20:02:10 UTC' / 'Entry #18,640 joined · pool updated') sat on the mint angled stripe, so its first letter disappeared. The Jackpot/Pool Visual instance is moved 22 px right and the caption now reads in full. 1 overflow fixed in the no-round state at 1440 and 1280: the close-time row (538 px) ran past the 500 px hero text column. The row now fills the column, the text wraps, and the copy is shortened to 'Opens 28 Nov 2026, 08:00:00 UTC · in 11 h 57 m 50 s' (also at 768) so it fits on one line. Screenshots after the fix pass."
+   },
+   {
+    "id": "PUB-03",
+    "status": "VERIFIED",
+    "note": "Continuation run. All 15 frames already existed (1440: default, filters, search, restricted games, empty; 1280 and 768: default, restricted, empty; 390: default, filters bottom sheet, restricted, empty). The one frame not checked earlier, 1280 empty (34:442219), now passes a screenshot check: 'No games match “baccarat”' card with recovery actions and the 2 matches in other categories, licence and provably-fair chips, Strip/Trust and footer. The script check found no off-canvas content, clipped or collapsed text, placeholder text or missing fonts."
+   }
+  ],
+  "issues": [
+   "Nothing was missing: a read-only listing found all 20 page-03 frames and all 7 mobile frames. All have hug height except '390 / Filters — bottom sheet open', which is a fixed 844 viewport by design. No pending/queue scripts existed for this slice.",
+   "Fixes in this run (nodes this slice created): Jackpot/Pool Visual instances moved +22 px x in heroes 33:269853, 33:306895, 33:320306, 34:391158, 34:391817, 34:392491; Close time row set to FILL with wrapping text in 33:306914/33:306916 and 34:391836/34:391838; copy shortened in 33:306916, 34:391838, 34:426300.",
+   "Small leftovers, accepted: in the recent-rounds tables (1280 and 768) the round id + DEMO badge text runs about 10 px past its cell, but nothing overlaps visibly. At 768 the Jackpot/Prize Distribution and Threshold bars run 2 px past their rows, the known fixed-472 px bar issue. In footer Link 'Draw verification (VRF)' runs 15 px past its column in the 1040 px-wide footer (Shell/Footer Mega component), again with no visible overlap.",
+   "Still open from the first run: Card/Game is not used because its Global Jackpot variant has the banned orbit/glow look and old game names, so Tile/Game Generic with catalogue art is used instead. The empty state is scoped to the Instant category because the catalogue has Baccarat Lounge. The fixed 472 px Threshold/Prize bars need auto-layout. Player counts are DEMO additions that should go into demo-data.md. Shell/Footer Mega has no tablet variant. The section at X=20000 overlaps the PUB-01 section background by 40 px.",
+   "Verification tip for other agents: a node.screenshot() of a child frame with no fill renders on transparency, so white headings look missing. Judge those from the full-frame screenshot."
+  ]
+ },
+ {
+  "section": "32:91058 (page 08 — Games, \"DI Dice & GM-01\", X=32000 Y=0) + 33:288623 (page 10 — Mobile Experience, \"Games — Mobile Dice\", X=196000 Y=0)",
+  "created": [
+   {
+    "name": "[NEW] DI-02 Pool Dice — Number selection / 1440 / Roll under 50.50 (50.50% · 1.9604×)",
+    "id": "232:173548"
+   },
+   {
+    "name": "[NEW] DI-07 Pool Dice — Error / 1440 / Bet above table max (1,500.00 > 1,000.00 USDT)",
+    "id": "232:174329"
+   },
+   {
+    "name": "[NEW] DI-07 Pool Dice — Error / 1440 / Loading game",
+    "id": "232:175311"
+   },
+   {
+    "name": "[NEW] GM-01 Game session RG — Dev notes / Spec card",
+    "id": "235:71605"
+   },
+   {
+    "name": "[NEW] DI-07 Pool Dice — Error / 390 / Connection lost (reconnecting)",
+    "id": "234:216106"
+   },
+   {
+    "name": "[NEW] DI-07 Pool Dice — Error / 390 / Insufficient balance (DEMO account 4.20 USDT)",
+    "id": "234:216542"
+   },
+   {
+    "name": "[NEW] GM-01 Game session RG — Session strip in Pool Dice / 390 / Approaching daily loss limit (session sheet)",
+    "id": "234:216910"
+   },
+   {
+    "name": "DI-01 Pool Dice — Interface / 1440 / Default",
+    "id": "32:91059"
+   },
+   {
+    "name": "DI-01 Pool Dice — Interface / 768 / Default",
+    "id": "33:264436"
+   },
+   {
+    "name": "DI-01 Pool Dice — Interface / 390 / Default",
+    "id": "33:288624"
+   },
+   {
+    "name": "DI-02 Pool Dice — Number selection / 1440 / Dragging target (live odds)",
+    "id": "32:107670"
+   },
+   {
+    "name": "DI-02 Pool Dice — Number selection / 1440 / Out of range (98.50% > max)",
+    "id": "32:108704"
+   },
+   {
+    "name": "DI-02 Pool Dice — Number selection / 390 / Dragging target (live odds)",
+    "id": "33:314618"
+   },
+   {
+    "name": "DI-03 Pool Dice — Rolling / 1440 / Rolling (stake locked)",
+    "id": "33:135979"
+   },
+   {
+    "name": "DI-03 Pool Dice — Rolling / 390 / Rolling (stake locked)",
+    "id": "33:314924"
+   },
+   {
+    "name": "DI-04 Pool Dice — Result / 1440 / Win (73.21)",
+    "id": "33:137030"
+   },
+   {
+    "name": "DI-04 Pool Dice — Result / 1440 / Lose (27.65)",
+    "id": "33:138071"
+   },
+   {
+    "name": "DI-04 Pool Dice — Result / 390 / Win (73.21)",
+    "id": "33:315363"
+   },
+   {
+    "name": "DI-04 Pool Dice — Result / 390 / Lose (27.65)",
+    "id": "33:315810"
+   },
+   {
+    "name": "DI-05 Pool Dice — History / 1440 / My bets (today, roll selected)",
+    "id": "33:234002"
+   },
+   {
+    "name": "DI-05 Pool Dice — History / 390 / My bets + roll detail sheet",
+    "id": "34:335682"
+   },
+   {
+    "name": "DI-06 Pool Dice — Provably fair / 1440 / Verified (D-88213)",
+    "id": "33:235174"
+   },
+   {
+    "name": "DI-06 Pool Dice — Provably fair / 1440 / Verification failed (action relabelled this run)",
+    "id": "33:236070"
+   },
+   {
+    "name": "DI-06 Pool Dice — Provably fair / 390 / Verified (D-88213)",
+    "id": "34:336102"
+   },
+   {
+    "name": "DI-07 Pool Dice — Error / 1440 / Insufficient balance (DEMO account 4.20 USDT)",
+    "id": "33:171221"
+   },
+   {
+    "name": "DI-07 Pool Dice — Error / 1440 / Daily loss limit reached",
+    "id": "33:172235"
+   },
+   {
+    "name": "DI-07 Pool Dice — Error / 1440 / Region restricted (United States)",
+    "id": "33:173350"
+   },
+   {
+    "name": "DI-07 Pool Dice — Error / 1440 / Connection lost (reconnecting)",
+    "id": "33:174533"
+   },
+   {
+    "name": "DI-07 Pool Dice — Error / 390 / Region restricted (United States)",
+    "id": "34:359378"
+   },
+   {
+    "name": "DI-07 Pool Dice — Error / 390 / Daily loss limit reached",
+    "id": "34:359699"
+   },
+   {
+    "name": "GM-01 Game session RG — Reality check popup in Pool Dice / 1440 / Reality check (60 min)",
+    "id": "33:207090"
+   },
+   {
+    "name": "GM-01 Game session RG — Session bar in Pool Dice / 1440 / Approaching daily loss limit",
+    "id": "33:207875"
+   },
+   {
+    "name": "GM-01 Game session RG — Reality check in Pool Dice / 390 / Reality check sheet (60 min)",
+    "id": "34:360187"
+   },
+   {
+    "name": "Section DI Dice & GM-01 (page 08)",
+    "id": "32:91058"
+   },
+   {
+    "name": "Section Games — Mobile Dice (page 10)",
+    "id": "33:288623"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "DI-01",
+    "status": "VERIFIED",
+    "note": "1440 32:91059, 768 33:264436 and 390 33:288624 exist from the earlier run. All three passed screenshot and clip-audit checks this run (the only 'truncation' flags are intended ellipsis settings on sidebar items)."
+   },
+   {
+    "id": "DI-02",
+    "status": "VERIFIED",
+    "note": "1440: Dragging target 32:107670, Out of range 32:108704, and NEW Roll under 50.50 232:173548 (Under segment active, win zone moved to the left, 50.50% · 1.9604× · 19.60 payout, profit +9.60). 390: Dragging 33:314618. All passed screenshots."
+   },
+   {
+    "id": "DI-03",
+    "status": "VERIFIED",
+    "note": "1440 33:135979 and 390 33:314924 (stake locked) passed screenshots."
+   },
+   {
+    "id": "DI-04",
+    "status": "VERIFIED",
+    "note": "Win 73.21 and Lose 27.65 at 1440 (33:137030, 33:138071) and at 390 (33:315363, 33:315810) passed screenshots."
+   },
+   {
+    "id": "DI-05",
+    "status": "VERIFIED",
+    "note": "1440 33:234002 (today's rolls with detail panel) and 390 34:335682 (roll detail bottom sheet) passed screenshots."
+   },
+   {
+    "id": "DI-06",
+    "status": "VERIFIED",
+    "note": "1440 Verified 33:235174 and Verification failed 33:236070, plus 390 Verified 34:336102, passed screenshots. Fixed this run: the mismatch alert's off-topic 'Switch network' action now reads 'Copy values from roll D-88213'."
+   },
+   {
+    "id": "DI-07",
+    "status": "VERIFIED",
+    "note": "All brief states exist at 1440: loading (NEW 232:175311, skeletons + 'Loading game…'), connection lost 33:174533, insufficient balance 33:171221, daily loss limit 33:172235, region restricted 33:173350, plus NEW bet above table max 232:174329. At 390: region 34:359378, daily loss 34:359699, NEW connection lost 234:216106 (bottom sheet) and NEW insufficient balance 234:216542. All passed screenshots, and the clip audit is clean. Loading and bet-above-max were not built at 390 because they are inline states whose layout doesn't change materially."
+   },
+   {
+    "id": "GM-01",
+    "status": "VERIFIED",
+    "note": "1440: reality-check modal 33:207090 and approaching-limit session bar 33:207875, plus NEW dev-notes spec card 235:71605 (states, API-shaped fields, WebSocket events, a11y). 390: reality-check sheet 34:360187 and NEW approaching-limit session sheet 234:216910 (warning strip at 86% used, 27.60 USDT left). The normal session bar appears in every dice frame. All passed screenshots."
+   }
+  ],
+  "issues": [
+   "Continuation finding: an earlier run had already built 26 frames in both sections, using the casino shell and library components. The prepared pending/g-dice/out scripts use a different layout kit and '[DI-xx] …' names, so running them would have added duplicate, inconsistent frames. I did not run them. The missing states were built by cloning the existing frames and editing them with tokens. pending/g-dice/STATUS.md now marks the scripts retired; decision 34a is appended to decisions.md.",
+   "Frame names follow the earlier run's in-section style 'DI-0x Pool Dice — Name / bp / state' without the [ID] brackets from conventions §6. I kept that style for consistency and did not rename the existing frames.",
+   "Demo data: the existing frames use 27.65 as the losing roll D-88214, which supersedes the 31.07 planned in decision #34. Minor inconsistency: the mobile result frames' 'My bets' list still shows D-88212..D-88210 rather than the newest roll.",
+   "Component gaps (built inline, no library component): dice slider (well, zone bars, thumb, roll marker), recent-roll pills, mobile compact RG session strip, mobile odds tiles, mobile roll cards, bottom sheets with scrim, stage overlay cards, loading skeleton blocks.",
+   "Data gap carried over from the earlier g-dice agent: demo-data's daily participation limit (500.00, 351.75 used = entries only) has no game stakes, while the RG session bar shows game play. The dice screens don't show the participation limit.",
+   "Cosmetic: the three blocks in the GM-01 spec card have unequal heights.",
+   "Tool observation (this session, for memory): only the first 5 node.screenshot() images per use_figma call came back, so I verified in batches of 5 or fewer. No Figma MCP limit errors in this run (9 use_figma calls).",
+   "registry-g-dice.json now lists every frame id in both sections. No new library components were created."
+  ]
+ },
+ {
+  "section": "34:353932 (page '03 — Public Website', 'PUB-07/21/22 Provably Fair & gating' at 31000,0; now 4800 x 24443) + 36:518991 (page '10 — Mobile Experience', 'PUB-07/21/22 — Mobile' at 14000,0; now 1650 x 18770)",
+  "created": [
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Verified — Global Pool draw (VRF request ID) (NEW, this run)",
+    "id": "239:106172"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Verified — Global Pool draw (VRF request ID) (NEW, this run)",
+    "id": "242:82136"
+   },
+   {
+    "name": "Inline VRF verifier card in 1440 VRF frame (NEW)",
+    "id": "239:106974"
+   },
+   {
+    "name": "Inline VRF verifier card in 390 VRF frame (NEW)",
+    "id": "242:82521"
+   },
+   {
+    "name": "Section/PUB-07/21/22 Provably Fair & gating (page 03)",
+    "id": "34:353932"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Empty (default — no values entered)",
+    "id": "34:353933"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Verified",
+    "id": "34:406015"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 1440 / Failed — hash mismatch",
+    "id": "34:415038"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 768 / Empty (default — no values entered)",
+    "id": "34:494365"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 768 / Verified",
+    "id": "34:500470"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 768 / Failed — hash mismatch (copy fix applied this run)",
+    "id": "34:501111"
+   },
+   {
+    "name": "[PUB-21] Geo-block interstitial / 1440 / United States (restricted)",
+    "id": "34:428847"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 1440 / Default — nothing selected",
+    "id": "34:453500"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 1440 / Failure — You must be 18+",
+    "id": "34:474089"
+   },
+   {
+    "name": "Section/PUB-07/21/22 — Mobile (page 10)",
+    "id": "36:518991"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Empty (default — no values entered)",
+    "id": "36:518992"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Verified",
+    "id": "36:525940"
+   },
+   {
+    "name": "[PUB-07] Provably Fair / 390 / Failed — hash mismatch",
+    "id": "36:526470"
+   },
+   {
+    "name": "[PUB-21] Geo-block interstitial / 390 / United States (restricted)",
+    "id": "36:539703"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 390 / Default — nothing selected (bottom sheet)",
+    "id": "51:146357"
+   },
+   {
+    "name": "[PUB-22] Age gate + licence notice / 390 / Failure — You must be 18+",
+    "id": "51:146780"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "PUB-07",
+    "status": "VERIFIED",
+    "note": "All 9 required frames exist: Empty, Verified and Failed at 1440, 768 and 390. Today I closed the two gaps the earlier run left open. (1) The 768 Failed copy fix is applied: text 34:501759 now reads 'Use Report this round in the verifier above…'; a screenshot passed. (2) A VRF-request-ID verifier now exists. New frames: '[PUB-07] Provably Fair / 1440 / Verified — Global Pool draw (VRF request ID)' (239:106172) and the 390 version (242:82136). In both, the Tabs/Segmented control has 'Global Pool draw · VRF' active. The verifier has inputs for Game, Round, VRF request ID 0x9f2c41d7a3e0…5b03e71a (Success state) and an optional Entry ID E-1248-00981. A read-only 'Fetched from Arbitrum' block shows random word 0x3e8a…b51f, fulfilment tx 0x71c3…5e28 and snapshot root 0x8c41…d9e3 as Tx/Hash instances with DEMO, plus a callout (icon + label) saying the proof is valid. Buttons: 'Verify draw' and 'Reset to on-chain values'. The report shows 'All 5 checks passed' and draw details: E-1248-00981 not selected. The offline replay code lines are rewritten for VRF. Every value matches GP-12 and demo-data. Screenshots passed after targeted fixes: the 1440 subtitle now wraps and the code lines fit the box; on 390 the check titles wrap and no longer overlap 'Pass'. On 390, nothing in the verifier section crosses the 16 px gutter."
+   },
+   {
+    "id": "PUB-21",
+    "status": "VERIFIED",
+    "note": "Unchanged this run. Desktop 1440 (34:428847) and Mobile 390 (36:539703) exist; the earlier run checked both with screenshots. Content: full-screen interstitial; detected region United States (DEMO); the licensing reason; 'Log in to withdraw', 'Contact support' and the Restricted countries link; an explicit don't-use-a-VPN line with no bypass hint; on mobile a sticky CTA and no tab bar."
+   },
+   {
+    "id": "PUB-22",
+    "status": "VERIFIED",
+    "note": "Unchanged this run. Desktop default (34:453500) and failure (34:474089), plus mobile default bottom sheet (51:146357) and failure (51:146780), exist; the earlier run checked all four with screenshots. Content: a modal over the blurred home with a scrim; 'Are you 18 or older?' with Yes/No radios, neither selected; jurisdiction checkbox unchecked; licence notice; links; Leave and Enter, with Enter disabled until both are answered; failure state 'You must be 18+' with help organisations."
+   }
+  ],
+  "issues": [
+   "Continuation run. No pending/queue folder existed for this slice. Before building, one read-only use_figma call per page confirmed that all 15 frames from the earlier run were present and complete: every frame was set to hug height, and none was stuck at 800. So I built only the two missing pieces: the 768 copy fix and the VRF-mode verifier state.",
+   "Layout change in my own section: on page 03 the 768 row (34:494365, 34:500470, 34:501111) moved from y=13975 to y=18863. The new 1440 VRF frame sits in the PUB-07 desktop column at (120, 13975), and the row is 160 px below it. On page 10 the new 390 VRF frame is at (120, 13580), under the 390 Failed frame. I ran fitSection on both sections.",
+   "Library gap, still open: Game/Provably Fair Verifier (23:24790) only covers seed commit–reveal. Both VRF frames therefore build the verifier inline (cards 239:106974 and 242:82521). They copy the component's fills, strokes and effects and use only library instances: Select/Field, Input/Text Success/Filled, Tx/Hash, Badge/DEMO, Button and icons. Add a Mode=VRF variant to the component (inputs Game, Round, VRF request ID, Entry ID; read-only random word, fulfilment tx, snapshot root), then swap these cards for it.",
+   "Interpretation: the VRF mode has no 768 frame. Tablet keeps the Empty, Verified and Failed seeds-mode states, because the VRF state uses the same stacked verifier→report layout as 768 Verified. This is recorded in decisions.md #52.",
+   "Component defects reported by the earlier run, still not fixed at source: Card/FAQ Item question text clips at 358 px; its Expanded variant has a hard-coded fee example; the Verifier's Empty variant shows 'Recorded for D-88213'; Modal/Base's body is a placeholder slot, so the age-gate modal and sheets are built inline.",
+   "Figma MCP usage this run: 9 use_figma calls (6 read-only, 2 builds, 3 targeted fixes). No tool-call limit errors, and get_metadata/get_screenshot were not used.",
+   "Files updated: /home/user/Claude/design/figma-build/registry-pub-07-21-22.json (2 new frame IDs + a continuation note) and /home/user/Claude/design/figma-build/decisions.md (#52). Build scripts: /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/pub07/vrf-desktop.js, vrf-mobile.js and fix1-body.js in the same folder.",
+   "Memory: the stored note project_global_pool_figma.md (GLOBAL POOL Figma, BC.GAME-style direction) matched this task. I only saw its index line and did not open it; it contained no instructions, and nothing new needs saving."
+  ]
+ },
+ {
+  "section": "34:432756 (page \"06 — Wallet & Transactions\", section \"WAL-03..09 Deposit flow\" at X=16000,Y=0; now 26 frames) + 105:49686 (page \"10 — Mobile Experience\", section \"WAL — Mobile B (Deposit)\" at X=140000,Y=0; now 12 frames)",
+  "created": [
+   {
+    "name": "NEW — WAL-03 Deposit — Step 1 Select Network / 768 / Empty — no deposits yet (new DEMO account, balance 0.00)",
+    "id": "243:52054"
+   },
+   {
+    "name": "NEW — WAL-05 Deposit — Step 3 Deposit Address / 768 / Expired address session (edge state)",
+    "id": "243:52507"
+   },
+   {
+    "name": "NEW — WAL-07 Deposit — Step 5 Transaction Pending / 768 / Delayed — Ethereum congested (7 of 12)",
+    "id": "244:344901"
+   },
+   {
+    "name": "NEW — WAL-09 Deposit — Step 7 Successful / 768 / Unrecognised token — not credited",
+    "id": "244:345414"
+   },
+   {
+    "name": "NEW — WAL-03 Deposit — Step 1 Select Network / 390 / Empty — no deposits yet (new DEMO account, balance 0.00) — MOB-06 bottom sheet",
+    "id": "245:344376"
+   },
+   {
+    "name": "NEW — WAL-09 Deposit — Step 7 Successful / 390 / Unrecognised token — not credited — MOB-06 bottom sheet",
+    "id": "245:344673"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 1440 / Default",
+    "id": "34:432757"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 1440 / Empty — no deposits yet (new DEMO account, balance 0.00)",
+    "id": "103:40514"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 1440 / Default",
+    "id": "34:465213"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Default",
+    "id": "34:496874"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Wrong-network warning",
+    "id": "36:515243"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Below minimum deposit",
+    "id": "91:30409"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Expired address session (edge state)",
+    "id": "36:536299"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 1440 / Default",
+    "id": "91:31216"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 1440 / Confirming 7 of 12",
+    "id": "97:33583"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 1440 / Delayed — Ethereum congested (7 of 12)",
+    "id": "97:34460"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 1440 / Credited (12 of 12)",
+    "id": "99:34694"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Successful — receipt",
+    "id": "99:35635"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Failed — transfer reverted",
+    "id": "101:36554"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Unrecognised token — not credited",
+    "id": "101:37387"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 768 / Default",
+    "id": "103:41289"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 768 / Default",
+    "id": "103:41779"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 768 / Default",
+    "id": "103:42250"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 768 / Default",
+    "id": "91:32157"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 768 / Confirming 7 of 12",
+    "id": "97:35284"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 768 / Credited (12 of 12)",
+    "id": "99:36518"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 768 / Successful — receipt",
+    "id": "101:38134"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 768 / Failed — transfer reverted",
+    "id": "101:38576"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:49687"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:50056"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:50420"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Expired address session (edge state) — MOB-06 bottom sheet",
+    "id": "105:50851"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 390 / Default — MOB-06 bottom sheet",
+    "id": "111:51709"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 390 / Confirming 7 of 12 — MOB-06 bottom sheet",
+    "id": "111:52133"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 390 / Delayed — Ethereum congested (7 of 12) — MOB-06 bottom sheet",
+    "id": "111:52536"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 390 / Credited (12 of 12) — MOB-06 bottom sheet",
+    "id": "112:52888"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 390 / Successful — receipt — MOB-06 bottom sheet",
+    "id": "112:53217"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 390 / Failed — transfer reverted — MOB-06 bottom sheet",
+    "id": "112:53630"
+   },
+   {
+    "name": "SECTION WAL-03..09 Deposit flow (page 06)",
+    "id": "34:432756"
+   },
+   {
+    "name": "SECTION WAL — Mobile B (Deposit) (page 10)",
+    "id": "105:49686"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "WAL-03",
+    "status": "VERIFIED",
+    "note": "1440 Default + Empty (no deposits yet), 768 Default + Empty (NEW 243:52054), 390 Default + Empty (NEW 245:344376). In Empty, the top-bar balance shows 0.00, no network is selected and the CTA is disabled. The welcome-offer opt-in is unchecked and shows its key terms, and there is a 'Set a deposit limit' RG card. On 390 the wallet page behind the sheet shows 0.00 with Withdraw disabled. The new frames passed a screenshot check and a text-clipping audit with 0 flags."
+   },
+   {
+    "id": "WAL-04",
+    "status": "VERIFIED",
+    "note": "1440, 768 and 390 Default frames from the earlier run, kept unchanged. This step has no extra states."
+   },
+   {
+    "id": "WAL-05",
+    "status": "VERIFIED",
+    "note": "1440: Default, Wrong network, Below minimum and Expired. 768: Default + Expired (NEW 243:52507). 390: Default + Expired. Wrong-network and below-minimum are inline alerts that don't change the layout, so they exist at 1440 only. The new frame passed a screenshot check and a clipping audit with 0 flags."
+   },
+   {
+    "id": "WAL-06",
+    "status": "VERIFIED",
+    "note": "1440, 768 and 390 Default frames from the earlier run, kept unchanged."
+   },
+   {
+    "id": "WAL-07",
+    "status": "VERIFIED",
+    "note": "1440 Confirming 7/12 + Delayed. 768 Confirming + Delayed (NEW 244:344901: est. 9 min (congested), 'Not credited by 19:40 UTC?' support alert, Delayed badge). 390 Confirming + Delayed. The new frame passed a screenshot check and a clipping audit with 0 flags."
+   },
+   {
+    "id": "WAL-08",
+    "status": "VERIFIED",
+    "note": "1440, 768 and 390 Credited 12/12 frames from the earlier run, kept unchanged."
+   },
+   {
+    "id": "WAL-09",
+    "status": "VERIFIED",
+    "note": "1440 Successful, Failed and Unrecognised. 768 Successful, Failed and Unrecognised (NEW 244:345414). 390 Successful, Failed and Unrecognised (NEW 245:344673). Unrecognised shows UR-1093, 250.00 USDC, tx 0x9b07…e4d1, detected 18:51 UTC. Recovery stays disabled until an unchecked 'wallet I control' box is ticked, and the return fee of about 2.40 USD is disclosed. The stepper's step 7 is marked 'Not credited' in red. New frames passed a screenshot check and a clipping audit with 0 flags."
+   },
+   {
+    "id": "MOB-06",
+    "status": "BUILT",
+    "note": "The deposit part is complete: bottom-sheet frames for all 7 deposit steps, plus Empty, Expired, Delayed, Failed and Unrecognised, in section 105:49686 (12 frames). All 12 now use the short DEMO notice 'DEMO DATA — illustrative values only' (decision #29). Left as BUILT because other slices may own the rest of MOB-06."
+   }
+  ],
+  "issues": [
+   "Continuation result: all 32 frames from the interrupted run were already on the canvas, complete and in AUTO height on page 06. On page 10 the bottom-sheet viewports are FIXED height, sized to the sheet. None were rebuilt. I added 6 frames so that every edge or error state that changes the layout exists at 768 and 390, not only at 1440: T Empty, T Expired, T Delayed, T Unrecognised, M Empty, M Unrecognised. Logged as decisions.md #53.",
+   "Fix applied: the existing 10 mobile frames in 'WAL — Mobile B (Deposit)' showed the long Notice/Demo Data message, which clips at 390. They now use the short message, per decision #29 (105:49687, 105:50056, 105:50420, 105:50851, 111:51709, 111:52133, 111:52536, 112:52888, 112:53217, 112:53630).",
+   "Library gaps carried over from the earlier run, still open: Tx/Hash (367), Tx/Status Timeline (420), Wallet/Deposit Address Block (600) and Tx/Receipt Card (480) are too wide for 358 px, so they need compact variants. The mobile Unrecognised frame shows the hash as Mono/S text with a DEMO badge instead of using Tx/Hash.",
+   "There are still no library components for: the QR code art, the persistent 'Send only USDT on Ethereum (ERC-20)…' alert, the welcome-offer opt-in card, the unrecognised-deposit recovery card, and the balance before/after table. All are built inline with tokens.",
+   "Copy mismatch inside the library, unchanged: Wallet/Deposit Address Block labels Ethereum 'Degraded', while Select/Network and the screens say 'Congested' / 'Slower than usual'. It is visible again in the new 768 Expired frame.",
+   "Demo-data note carried over: the deposit timeline runs 18:38–18:51 UTC, so round cards say 'closes 20:00 UTC · in 1 h 16 min' rather than the shared 03:17:42 countdown.",
+   "Rerunnable, idempotent scripts for the 6 new frames are saved in /home/user/Claude/design/figma-build/pending/wal-deposit/out (A.js, B.js, M.js) with RUN-ORDER.json. They skip any frame whose name already exists.",
+   "Figma MCP usage this run: 7 use_figma calls (2 read-only listings, 3 builds, 2 read-only audits). No limit errors. No get_screenshot or get_metadata calls.",
+   "Memory: no stored memory notes were read or used for this task. Nothing new to save."
+  ]
+ }
+]

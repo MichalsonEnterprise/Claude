@@ -316,9 +316,8 @@
   "sizes": "D·L·T·M",
   "page": "03",
   "group": "",
-  "status": "BUILT",
-  "note": "All 12 frames exist: live, no round and restricted at 1440, 1280, 768 and 390. 9 passed a screenshot check: all desktop frames, all mobile frames, 1280 live, 768 live and 768 no round. Three frames were made with the same clone-and-resize steps as checked frames but were not screenshotted because the Figma MCP tool-call limit was reached: 1280 no round (34:391801), 1280 restricted (34:392475) and 768 restricted (34:427559). Hero uses no orbs, glows or particles: a charcoal banner with angled gold and mint blocks and the Jackpot/Pool Visual cropped by the banner edge (coin stacks, entry tickets, number display). Hero CTA 'Sign in to participate' (participation needs login). Also on the page: Jackpot/Round Header, Prize Distribution, Threshold Bar, odds per entry, a 4-step VRF explainer, recent rounds (table on desktop, stacked cards on mobile), licence and RG. No round state swaps in VRF Stepper Settled, the 1st-prize winner card (@lumen.eth) and a Remind me action that is off by default. Restricted state uses the Restricted topbar banner plus Alert/Banner Regional restriction, with no VPN hint and withdrawals still available. Mobile adds a sticky participate bar and the tab bar (Pool).",
-  "by": "pub-pool-lobby"
+  "status": "VERIFIED",
+  "note": "Continuation run. All 12 frames already existed (live, no round and restricted at 1440, 1280, 768 and 390), all with hug height, so nothing new had to be built. The 3 frames not checked in the earlier run (1280 no round 34:391801, 1280 restricted 34:392475, 768 restricted 34:427559) now have screenshot checks. 1 visual bug fixed in all 6 desktop and laptop frames: the mint caption under the jackpot counter ('Final pool · round #1,248 · settled 20:02:10 UTC' / 'Entry #18,640 joined · pool updated') sat on the mint angled stripe, so its first letter disappeared. The Jackpot/Pool Visual instance is moved 22 px right and the caption now reads in full. 1 overflow fixed in the no-round state at 1440 and 1280: the close-time row (538 px) ran past the 500 px hero text column. The row now fills the column, the text wraps, and the copy is shortened to 'Opens 28 Nov 2026, 08:00:00 UTC · in 11 h 57 m 50 s' (also at 768) so it fits on one line. Screenshots after the fix pass."
  },
  {
   "id": "PUB-03",
@@ -328,9 +327,8 @@
   "sizes": "D·L·T·M",
   "page": "03",
   "group": "",
-  "status": "BUILT",
-  "note": "All 15 frames exist: 1440 default, filters, search, restricted games and empty; 1280 and 768 default, restricted and empty; 390 default, filters bottom sheet, restricted and empty. 14 passed a screenshot check. 1280 empty (34:442219) was not screenshotted because the Figma MCP tool-call limit was reached. Layout: lobby banner with real tile art cropped by the edge, category tabs (All 33 · Jackpot · Instant · Table · Slots · Live · Draws & bingo), search, filter chips, sort, Global Pool jackpot spotlight with a Gold Participate button and fee line, Banner/Promo Tournament with key terms, and category grids of Tile/Game Generic using catalogue art for all 33 original titles. Also included: provably-fair and licence chips, Strip/Trust and Notice/Licence. Restricted state: every tile is in the Restricted variant ('Not available in your region · Why is this restricted?'), Participate is disabled, promo is hidden and a 'You can still' list is shown. Empty state: Instant + 'baccarat' shows 'No games match “baccarat”' with recovery actions and the 2 matches from other categories.",
-  "by": "pub-pool-lobby"
+  "status": "VERIFIED",
+  "note": "Continuation run. All 15 frames already existed (1440: default, filters, search, restricted games, empty; 1280 and 768: default, restricted, empty; 390: default, filters bottom sheet, restricted, empty). The one frame not checked earlier, 1280 empty (34:442219), now passes a screenshot check: 'No games match “baccarat”' card with recovery actions and the 2 matches in other categories, licence and provably-fair chips, Strip/Trust and footer. The script check found no off-canvas content, clipped or collapsed text, placeholder text or missing fonts."
  },
  {
   "id": "PUB-04",
@@ -376,9 +374,8 @@
   "sizes": "D·T·M",
   "page": "03",
   "group": "",
-  "status": "BUILT",
-  "note": "All 9 required frames exist (Empty / Verified / Failed at 1440, 768 and 390). I checked each one with screenshots and fixed what they showed. Page layout: casino shell (Shell/Sidebar with Provably Fair active, Topbar, Footer Mega; tablet uses Topbar + Footer Tablet; mobile uses Topbar Mobile + Mobile Tab Bar on Games). Content: hero with concrete dice, a playing card and product-UI previews (a VRF receipt card and a seed-check card) on angled solid blocks. There are two explainer diagrams: Chainlink VRF (round closes at 20:00:00 → request 0x9f2c…e71a → proof at 20:00:41 → settled 20:02:10) and seed commit–reveal (8f3c1e…e813 → nova-k-7f2a91 · 417 → c71d0a…5c27b14 → Roll 73.21), plus the code algorithm. Verifier: the Game/Provably Fair Verifier instance switches variant per state. Per-state panels: Empty = where to find values + recent draws #1,247/#1,246/#1,245 cancelled/#1,244; Verified = 3-check report + bet details + offline code; Failed = expected vs computed hash, 63/64 characters, likely causes, report/support. Also a FAQ (including 'you can lose your stake'), licence notice, 18+ and an RG link. Not VERIFIED for 2 reasons: (1) one copy fix on 768 Failed (34:501111) is not applied because of the Figma rate limit; (2) the 'Global Pool draw · VRF' segment is shown only as an inactive tab — there is no screen with a VRF-request-ID input.",
-  "by": "pub-gates-pf"
+  "status": "VERIFIED",
+  "note": "All 9 required frames exist: Empty, Verified and Failed at 1440, 768 and 390. Today I closed the two gaps the earlier run left open. (1) The 768 Failed copy fix is applied: text 34:501759 now reads 'Use Report this round in the verifier above…'; a screenshot passed. (2) A VRF-request-ID verifier now exists. New frames: '[PUB-07] Provably Fair / 1440 / Verified — Global Pool draw (VRF request ID)' (239:106172) and the 390 version (242:82136). In both, the Tabs/Segmented control has 'Global Pool draw · VRF' active. The verifier has inputs for Game, Round, VRF request ID 0x9f2c41d7a3e0…5b03e71a (Success state) and an optional Entry ID E-1248-00981. A read-only 'Fetched from Arbitrum' block shows random word 0x3e8a…b51f, fulfilment tx 0x71c3…5e28 and snapshot root 0x8c41…d9e3 as Tx/Hash instances with DEMO, plus a callout (icon + label) saying the proof is valid. Buttons: 'Verify draw' and 'Reset to on-chain values'. The report shows 'All 5 checks passed' and draw details: E-1248-00981 not selected. The offline replay code lines are rewritten for VRF. Every value matches GP-12 and demo-data. Screenshots passed after targeted fixes: the 1440 subtitle now wraps and the code lines fit the box; on 390 the check titles wrap and no longer overlap 'Pass'. On 390, nothing in the verifier section crosses the 16 px gutter."
  },
  {
   "id": "PUB-08",
@@ -531,8 +528,7 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "Desktop 1440 (34:428847) and Mobile 390 (36:539703) both checked with screenshots. Full-screen interstitial 'GLOBAL POOL isn't available in your region' with: Topbar in Restricted region state (Sign up disabled) + region banner; detected region United States (DEMO) with time and a 'Wrong location? Tell support' path; licensing explanation. What you can still do: log in to withdraw, contact support, Restricted countries. A travel note says not to use a VPN or proxy (no bypass hint). Preview of locked game tiles (Tile/Game Generic in Restricted state) on angled mint/charcoal blocks; licence bar with 18+. Mobile adds a sticky 'Log in to withdraw' CTA; there is no tab bar because navigation is blocked.",
-  "by": "pub-gates-pf"
+  "note": "Unchanged this run. Desktop 1440 (34:428847) and Mobile 390 (36:539703) exist; the earlier run checked both with screenshots. Content: full-screen interstitial; detected region United States (DEMO); the licensing reason; 'Log in to withdraw', 'Contact support' and the Restricted countries link; an explicit don't-use-a-VPN line with no bypass hint; on mobile a sticky CTA and no tab bar."
  },
  {
   "id": "PUB-22",
@@ -543,8 +539,7 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "Desktop: default (34:453500) and failure (34:474089). Mobile: default (51:146357) and failure (51:146780). All checked with screenshots. A modal (desktop) or bottom sheet (mobile) sits over the blurred casino home, using scrim/strong + Blur/Glass. Content: 'Are you 18 or older?' with Yes/No radios, neither selected; country select Portugal with a detected-and-permitted status (DEMO); unchecked jurisdiction checkbox; licence notice; links to Terms, Privacy, RG and Restricted Countries. Buttons: Leave, and Enter (disabled until both are answered). Failure state 'You must be 18+': help organisations, a note for parents and carers, and 'Leave GLOBAL POOL'.",
-  "by": "pub-gates-pf"
+  "note": "Unchanged this run. Desktop default (34:453500) and failure (34:474089), plus mobile default bottom sheet (51:146357) and failure (51:146780), exist; the earlier run checked all four with screenshots. Content: a modal over the blurred home with a scrim; 'Are you 18 or older?' with Yes/No radios, neither selected; jurisdiction checkbox unchecked; licence notice; links; Leave and Enter, with Enter disabled until both are answered; failure state 'You must be 18+' with help organisations."
  },
  {
   "id": "PUB-23",
@@ -675,8 +670,7 @@
   "page": "04",
   "group": "",
   "status": "VERIFIED",
-  "note": "Desktop 1440 Scan, Confirm and Backup codes were built and their screenshots passed in an earlier run. The Step 2 (81:24488) 'Resend code' fix is confirmed applied: a read-back found no visible resend text. Mobile 390 Set up (authenticator deep link plus copyable setup key, no QR on the same phone), Confirm and Backup codes were built and their screenshots passed. Backup codes are 10 mono codes with a DEMO badge and Download / Copy all. The 'I've saved my backup codes' checkbox starts unchecked and Finish setup stays disabled.",
-  "by": "auth-b"
+  "note": "Unchanged this run; checked in earlier runs. Desktop 1440: Scan, Confirm, Backup codes. Mobile 390: Set up (authenticator deep link plus copyable setup key, no QR), Confirm, Backup codes. Backup codes are 10 mono codes with a DEMO badge and Download / Copy all; the 'I've saved my backup codes' checkbox starts unchecked and Finish stays disabled."
  },
  {
   "id": "AUTH-08",
@@ -686,9 +680,8 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "BUILT",
-  "note": "All 9 frames exist. Mobile Login Default, Login Locked and Withdrawal Default were built and their screenshots passed. The locked OTP helper text now reads 'Locked after 5 incorrect codes · unlocks 16:59 UTC'. The 6 desktop frames (Login Default/Wrong code/Locked 115:81957/115:83997/115:86045; Withdrawal Default/Wrong code/Locked 116:34081/116:35027/116:35830) were built by the earlier interrupted run. Their heights (1060/1177, hug) look normal, but their screenshots were not checked: three Figma limit errors in a row stopped the check (pending/auth-b/verify/v1.js, v2.js).",
-  "by": "auth-b"
+  "status": "VERIFIED",
+  "note": "All 9 frames exist and passed screenshots. This run checked the 6 desktop frames. Login Default/Wrong code/Locked (115:81957/115:83997/115:86045): two-pane dialog over the dimmed lobby, anti-phishing code AURORA-27, no Resend line (TOTP), wrong code shows '4 attempts left' plus a phone-clock tip, locked pauses 15 min with an absolute unlock time 16:59 UTC and a 14:52 countdown. Withdrawal Default/Wrong code/Locked (116:34081/116:35027/116:35830): Modal/2FA over withdraw step 7 for WD-20931; figures match demo-data (1,500.00, network fee 0.08, platform fee 0.00, receive 1,499.92); locked until 18:58 UTC. Fix this run: the 'WD-20931 is on hold, not cancelled' toast (116:36620) covered the stepper and review card; it now sits bottom-right and was re-checked. Mobile 390: Login Default, Login Locked, Withdrawal Default (wrong code is an inline error, no separate mobile frame)."
  },
  {
   "id": "AUTH-09",
@@ -698,9 +691,8 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "BUILT",
-  "note": "Mobile List (Provider Rows; Browser wallet disabled on mobile; 18+ / jurisdiction line), Wrong network (switch to Arbitrum, supported networks) and WalletConnect deep link were built and their screenshots passed. The 6 desktop Modal/Connect Wallet states (116:36629, 117:38530, 117:40434, 117:42355, 117:44238, 117:46336) exist from the earlier run, but their screenshots were not checked because of the Figma limit (pending/auth-b/verify/v2.js, v3.js).",
-  "by": "auth-b"
+  "status": "VERIFIED",
+  "note": "All 6 desktop Modal/Connect Wallet states passed screenshots this run: List 116:36629 (letter-mark providers, seed-phrase warning, 18+/jurisdiction line), WalletConnect QR 117:38530 (expires 04:52, Copy link / Refresh code), Connecting 117:40434 (wallet-extension pop-up mock listing what is and is not shared), Rejected 117:42355, Wrong network 117:44238 (chain ID 10 unsupported, switch to Arbitrum, supported networks), Success 117:46336 (ownership Pending, then Verify ownership). Copy fix this run: the Success toast action 'View receipt →' is now 'Manage wallets →', re-checked. The only clipped texts are lobby hero/promo labels behind the scrim, cropped by their banners on purpose. Mobile 390: List, Wrong network, WalletConnect deep link, checked earlier."
  },
  {
   "id": "AUTH-10",
@@ -711,8 +703,7 @@
   "page": "04",
   "group": "",
   "status": "VERIFIED",
-  "note": "Desktop Request, Success, Rejected and Expired nonce were built and their screenshots passed. The required human-readable message appears word for word in the dialog and in a neutral wallet-extension pop-up mock. The nonce was issued at 16:42 UTC and expires at 16:52 UTC; chips say 'No transaction' and 'No gas · 0.00'. Mobile Request and Expired nonce were built and their screenshots passed. A targeted fix stacked the network pill under the address and shortened the message header so nothing overflows; a read-back found no text overflowing the frame.",
-  "by": "auth-b"
+  "note": "Unchanged this run; checked in earlier runs. Desktop: Request, Success, Rejected, Expired nonce. Mobile: Request, Expired nonce. The required sign-in message appears word for word in the dialog and in a neutral wallet pop-up mock: nonce issued 16:42 UTC, expires 16:52 UTC, chips say 'No transaction' and 'No gas · 0.00'."
  },
  {
   "id": "AUTH-11",
@@ -890,9 +881,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "Desktop 1440 Default existed (34:411209). This run added the missing 390 Default (149:124836): RG session strip, In progress (round #1,248 with real countdown to 20:00:00 UTC + Orbit Rush Sprint #14), Continue playing carousel (Tile/Game Generic), 30-day totals (11,000.00 wagered, net −71.80) + house-edge note, stacked game rows. Screenshot passed after a spacer fix. Not VERIFIED only because the desktop frame was not re-screenshotted this run (MCP limit).",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 Default (34:411209) checked this run: screenshot plus audit (0 clipped, off-canvas or placeholder text; 20 DEMO badges). 390 Default (149:124836) passed its screenshot in the previous continuation run."
  },
  {
   "id": "USR-G2",
@@ -902,9 +892,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "Desktop Default/Empty/Filters and 390 Default/Empty existed. This run added 390 Filters (152:64961): bottom sheet with Status Won + Refunded, rounds #1,240–#1,248, sort, 'Show 31 entries' (1 won in #1,244 + 30 refunded from #1,245, matches desktop Filters). Screenshot passed. Desktop frames not re-screenshotted.",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 Default/Empty/Filters and 390 Default/Empty/Filters all exist and passed screenshots. Reconciled with demo-data: round #1,247 = 40 entries / 402.00, #1,246 = 24 / 241.20; #1,245 entries bought 24 Nov 14:22 UTC (desktop rows). The 390 Default was re-checked after the edit."
  },
  {
   "id": "USR-G3",
@@ -914,9 +903,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "All required frames existed from the first run (1440 Live/Empty, 390 Live/Empty), hug height. Not re-screenshotted this run.",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 Live/Empty and 390 Live/Empty passed screenshots and the audit. Empty states now show round #1,247 as 40 entries / 402.00 USDT."
  },
  {
   "id": "USR-G4",
@@ -926,9 +914,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "1440 Default + 390 Default existed from the first run. Not re-screenshotted this run.",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 and 390 Default re-checked after edits: #1,247 = 40 / 402.00, #1,246 = 24 / 241.20. Shortened the truncated desktop proof cell for cancelled round #1,245 to 'No draw · refunded / Settles 27 Nov, 21:00 UTC'."
  },
  {
   "id": "USR-G5",
@@ -938,9 +925,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "1440 Owed/Settled + 390 Owed/Settled existed from the first run (owed 415.20 = refund 300.00 #1,245 + VIP 115.20, automatic settlement timeline). Not re-screenshotted this run.",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 and 390 Owed/Settled re-checked after edits. Owed 415.20 = refund 300.00 (#1,245, settles in the 21:00 UTC run) + VIP 115.20 (calculated 23 Nov 10:00 UTC, settles automatically Mon 30 Nov 10:00 UTC; optional early claim in VIP Club, 'you never have to'). Timeline Owed → Settling → Available; adds the 1.50 USDT fee reversal (now wraps clear of Refund details). Settled = snapshot after both settled, with the receipt for the 27 Nov refund run. Mobile timeline label shortened so the time is no longer off-canvas."
  },
  {
   "id": "USR-G6",
@@ -950,9 +936,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "1440 Default/Filters/Export + 390 Default existed. This run added 390 Export (152:65321): bottom sheet, 7 days (20–27 Nov 2026 UTC), CSV/PDF, seeds + nonce, file game-history_2026-11-20_2026-11-27.csv (486 bets · 8 games · ≈62 KB), background-export note. Cosmetic issue: the filename wraps after 'game-'; fix script out/04 not applied (MCP limit). 390 Filters not built: the mobile filter-sheet pattern is shown by G2 390 Filters.",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 Default/Filters/Export passed. 390 Default passed (session strip now wraps 'Take a break' inside the card). 390 Export: fix 04 applied, filename on one line. NEW 390 Filters (229:241469): bottom sheet matching desktop Filters (Orbit Rush · Wins · 7 days, 0.10 min stake → 'Show 38 results', 38 of 486 bets), compacted to 731 px; Result uses Tabs/Segmented."
  },
  {
   "id": "USR-G7",
@@ -962,9 +947,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Gaming",
-  "status": "BUILT",
-  "note": "1440 Default/Empty existed. This run added 390 Default (151:63647): pinned Global Pool card, 6 favourites in a 2-column Tile/Game Generic grid with heart buttons, reminders off by default (never auto-enter), suggestions carousel. Also added 390 Empty (151:64719): empty state with cropped real tile art and an angled block, Browse the lobby CTA, Recently played quick-add rows. Both screenshots passed. Desktop not re-screenshotted.",
-  "by": "usr-gaming"
+  "status": "VERIFIED",
+  "note": "1440 Default/Empty passed screenshots and the audit this run. 390 Default/Empty passed in the previous continuation run."
  },
  {
   "id": "USR-A1",
@@ -1365,8 +1349,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D Default + D Empty (no deposits yet, separate DEMO account at 0.00 with an unchecked welcome-offer opt-in and key terms, a 'set a deposit limit' RG card, and the CTA disabled until a network is chosen), T, M sheet. 5 Select/Network Option instances, Ethereum selected and flagged Congested. Screenshots checked.",
-  "by": "wal-deposit"
+  "note": "1440 Default + Empty (no deposits yet), 768 Default + Empty (NEW 243:52054), 390 Default + Empty (NEW 245:344376). In Empty, the top-bar balance shows 0.00, no network is selected and the CTA is disabled. The welcome-offer opt-in is unchecked and shows its key terms, and there is a 'Set a deposit limit' RG card. On 390 the wallet page behind the sheet shows 0.00 with Withdraw disabled. The new frames passed a screenshot check and a text-clipping audit with 0 flags."
  },
  {
   "id": "WAL-04",
@@ -1377,8 +1360,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D/T/M. Select/Token Open re-pointed to Ethereum (ERC-20) with the chain mark swapped; DEMO contract placeholder. Overlapping caption fixed in D and T. Screenshots checked.",
-  "by": "wal-deposit"
+  "note": "1440, 768 and 390 Default frames from the earlier run, kept unchanged. This step has no extra states."
  },
  {
   "id": "WAL-05",
@@ -1389,8 +1371,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D Default, Wrong-network warning (topbar 'Member wrong network' plus a danger alert with Switch wallet and Deposit on BNB Chain instead), Below minimum (6.50 of 10.00 USDT held; top up 3.50), Expired session edge state (Deposit Address Block Expired). T Default. M Default + Expired. The wrong-network and min-deposit alerts are inline and do not change the layout, so they are desktop-only. Screenshots checked.",
-  "by": "wal-deposit"
+  "note": "1440: Default, Wrong network, Below minimum and Expired. 768: Default + Expired (NEW 243:52507). 390: Default + Expired. Wrong-network and below-minimum are inline alerts that don't change the layout, so they exist at 1440 only. The new frame passed a screenshot check and a clipping audit with 0 flags."
  },
  {
   "id": "WAL-06",
@@ -1401,8 +1382,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D/T/M. Original illustrative QR art built inline and marked DEMO, optional amount-request Input/Text, address card with copy and session timer, 'waiting for your transfer' row. Tablet summary grid squeezed its text; switched it to a stacked layout and re-checked.",
-  "by": "wal-deposit"
+  "note": "1440, 768 and 390 Default frames from the earlier run, kept unchanged."
  },
  {
   "id": "WAL-07",
@@ -1413,8 +1393,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D Confirming 7/12 + Delayed (congested, est. 9 min, contact support after 19:40 UTC), T Confirming, M Confirming + Delayed. Uses Wallet/Confirmations Progress, Tx/Status Timeline and Tx/Hash. On mobile the Tx/Hash explorer link is hidden so it fits 358 px. Screenshots checked.",
-  "by": "wal-deposit"
+  "note": "1440 Confirming 7/12 + Delayed. 768 Confirming + Delayed (NEW 244:344901: est. 9 min (congested), 'Not credited by 19:40 UTC?' support alert, Delayed badge). 390 Confirming + Delayed. The new frame passed a screenshot check and a clipping audit with 0 flags."
  },
  {
   "id": "WAL-08",
@@ -1425,8 +1404,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D/T/M. Balance before/after: Available 9,215.30→10,215.30, Pending 1,000.00→0.00, Total 12,480.50 unchanged. Topbar shows 10,215.30 after the credit. Gold Global Pool round card with the real 20:00 UTC close (in 1 h 16 min), the 0.05 USDT fee line and 'You can lose your stake'. Screenshots checked.",
-  "by": "wal-deposit"
+  "note": "1440, 768 and 390 Credited 12/12 frames from the earlier run, kept unchanged."
  },
  {
   "id": "WAL-09",
@@ -1437,8 +1415,7 @@
   "page": "06",
   "group": "",
   "status": "VERIFIED",
-  "note": "D Successful receipt (Tx/Receipt Card re-pointed to DP-77412: 1,000.00 USDT, Ethereum, 0x5e1f…c0a8, 12/12, platform fee 0.00), D Failed (reverted; stepper step 7 set to Error), D Unrecognised token (250.00 USDC, UR-1093, recovery request disabled until an unchecked confirmation is ticked, fee disclosed), T Successful + Failed, M Successful + Failed. Screenshots checked.",
-  "by": "wal-deposit"
+  "note": "1440 Successful, Failed and Unrecognised. 768 Successful, Failed and Unrecognised (NEW 244:345414). 390 Successful, Failed and Unrecognised (NEW 245:344673). Unrecognised shows UR-1093, 250.00 USDC, tx 0x9b07…e4d1, detected 18:51 UTC. Recovery stays disabled until an unchecked 'wallet I control' box is ticked, and the return fee of about 2.40 USD is disclosed. The stepper's step 7 is marked 'Not credited' in red. New frames passed a screenshot check and a clipping audit with 0 flags."
  },
  {
   "id": "WAL-10",
@@ -1629,8 +1606,7 @@
   "page": "07",
   "group": "",
   "status": "VERIFIED",
-  "note": "All 4 states exist at 1440 (screenshot-checked in the earlier run). 1280 and 768 now have Active, Restricted region and No active round. Wallet disconnected is not built at L/T on purpose: per decision #16 it is not a material layout change (only the CTA swaps). The four new L/T frames passed screenshot checks of the hero and the full frame. Restricted mirrors the 1440 frame: frame-level Nav/Region Banner, Member top bar, cloned Alert/Banner 'Regional restriction', disabled Gold 'Not available in your region' plus 'Restricted countries' and 'Withdraw funds' in a wrapping CTA row, and the 1440 risk line. No-round has: a 'Next round opens 28 Nov 2026, 08:00 UTC' banner with Card/Draw Countdown (Next round) and angled blocks; Round Header / Card/Round set to Settled and overridden to #1,248 (186,400.00, 3,412 participants, 18,640 entries, 20:02 UTC); My entries showing 'not selected', 0.00 locked, 351.75 spent; Jackpot/Winner Reveal Card 'Public winner' set to @orbit_77; VRF Stepper Settled (1280); a 'Check this draw yourself' verify card; a 'What happens next' card; the live feed removed. 390: all 4 states exist. The sticky participate bar on Restricted, Wallet disconnected and No active round had its text running under the button. The overlapping texts now wrap, the bars were re-screenshotted and pass, and they sit in flow directly above Nav/Mobile Tab Bar.",
-  "by": "gp-hub"
+  "note": "All required frames exist and passed screenshot checks in earlier runs. 1440 has Active, Restricted region, Wallet disconnected and No active round. 1280 and 768 have Active, Restricted region and No active round; Wallet disconnected is not built there because only the CTA changes, so it is not a material layout change (decision #16). 390 has all 4 states (MOB-04). A read-only check this run confirmed all frames use hug height (AUTO) with no 800 px clipping and no overlaps in section 32:32304."
  },
  {
   "id": "GP-02",
@@ -1641,8 +1617,7 @@
   "page": "07",
   "group": "",
   "status": "VERIFIED",
-  "note": "Default, Insufficient funds, Limit reached and Wrong network exist at 1440 and 390. Screenshots this run of the two 1440 modals that had not been checked passed. Insufficient funds: 342.10 example balance, 'Short by 9.65 USDT', Deposit / Reduce to 34. Limit reached: 210.00 + 351.75 = 561.75 of 500.00, reduce to 28 entries, resets 28 Nov 00:00 UTC. Both have an unchecked consent box and a disabled Confirm. The other frames were screenshot-checked in the earlier run.",
-  "by": "gp-hub"
+  "note": "Default, Insufficient funds, Limit reached and Wrong network exist at 1440 (Modal/Participation Preview over the dimmed hub) and at 390 (bottom sheets). All were screenshot-checked in earlier runs. The frames are unchanged and hug their height."
  },
  {
   "id": "GP-03",
@@ -1653,8 +1628,7 @@
   "page": "07",
   "group": "",
   "status": "VERIFIED",
-  "note": "1440 was screenshot-checked in the earlier run. The 390 bottom sheet over the pre-purchase hub is new (164:73073). Its title and subtitle are read from the desktop modal. It shows: You pay 351.75 = 350.00 + 1.75 platform fee + 0.00 network fee; 3 progress steps; a full-width 'Batch transaction · Arbitrum One' Tx/Hash row with explorer link and DEMO (moved out of the 318 px step column, where it clipped); a progress bar; an absolute-close callout; a Gold Loading button; 'Close — we'll notify you'; 18+ with 'You can lose your stake'. The sheet was re-anchored after it grew and the final screenshot passed.",
-  "by": "gp-hub"
+  "note": "The 1440 pending modal (34:365199) and the 390 bottom sheet (164:73073) both exist and were screenshot-checked in earlier runs."
  },
  {
   "id": "GP-04",
@@ -1664,9 +1638,8 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "BUILT",
-  "note": "The 390 receipt sheet over the post-purchase hub is new (164:73786) and its screenshot passed. It shows: Entry Ticket, receipt rows, Tx/Fee Breakdown Entry with 'You can lose your stake', 350.00 locked, Tx/Hash + DEMO, odds callout, RG limit 351.75 / 500.00, and View my entries / Back to Global Pool / Download receipt. Not VERIFIED only because of the earlier run's 1440 caveat: its final label change was checked by measured widths, not a screenshot. The re-check screenshot (out/06_final_p07.js) was refused by the Figma limit.",
-  "by": "gp-hub"
+  "status": "VERIFIED",
+  "note": "The remaining caveat is closed. This run ran out/06_final_p07.js and screenshotted the 1440 receipt modal (34:383687 in 34:383862). It passed: Entry Ticket E-1248-00981 ×35; receipt rows with draw time 27 Nov 2026 20:00:00 UTC and Chainlink VRF · Arbitrum; fee breakdown 350.00 + 1.75 platform fee + 0.00 network fee = 351.75 with 'You can lose your stake'; locked 350.00; Tx/Hash 0x3a7c…9e02 + DEMO; 'PDF receipt' label fully visible; odds ≈2.44% / ≈0.188%; RG bar 351.75 / 500.00; Back / View my entries. The 390 sheet (164:73786) passed in the previous run."
  },
  {
   "id": "GP-05",
@@ -1988,9 +1961,8 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "Scripts ready, nothing run: out/01_d_di01_master.js (1440 master), out/09_t_di01_768.js (768, run last on page 08), out/10_m_di01_di02_di03.js (390). Still to build: '[DI-01] Dice interface / 1440 / Default — roll over 50.50', '/ 768 / Default — roll over 50.50', '/ 390 / Default — roll over 50.50'.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "1440 32:91059, 768 33:264436 and 390 33:288624 exist from the earlier run. All three passed screenshot and clip-audit checks this run (the only 'truncation' flags are intended ellipsis settings on sidebar items)."
  },
  {
   "id": "DI-02",
@@ -2000,9 +1972,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "out/02_d_di02_states.js builds 3 desktop frames: 'Dragging target to 34.00 — odds update live', 'Roll under 50.50 — 50.50% · 1.9604×', 'Out of range — win chance above 98.00%'. out/10 builds the 390 frame 'Dragging target to 34.00 — odds update live'.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "1440: Dragging target 32:107670, Out of range 32:108704, and NEW Roll under 50.50 232:173548 (Under segment active, win zone moved to the left, 50.50% · 1.9604× · 19.60 payout, profit +9.60). 390: Dragging 33:314618. All passed screenshots."
  },
  {
   "id": "DI-03",
@@ -2012,9 +1983,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "out/03_d_di03_di04.js builds '[DI-03] Rolling / 1440 / Rolling — stake locked'. out/10 builds the 390 version.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "1440 33:135979 and 390 33:314924 (stake locked) passed screenshots."
  },
  {
   "id": "DI-04",
@@ -2024,9 +1994,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "out/03 builds 1440 'Win — rolled 73.21 (+10.00 USDT)' and 'Lose — rolled 31.07 (−10.00 USDT)'. out/11_m_di04_gm01.js builds both at 390.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "Win 73.21 and Lose 27.65 at 1440 (33:137030, 33:138071) and at 390 (33:315363, 33:315810) passed screenshots."
  },
  {
   "id": "DI-05",
@@ -2036,9 +2005,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "out/04_d_di05_history.js builds '[DI-05] History / 1440 / My rolls — today'. out/12_m_di05_di06.js builds the 390 version.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "1440 33:234002 (today's rolls with detail panel) and 390 34:335682 (roll detail bottom sheet) passed screenshots."
  },
  {
   "id": "DI-06",
@@ -2048,9 +2016,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "out/05_d_di06_pf.js builds 1440 'Roll D-88213 verified' and 'Mismatch — server seed from another pair'. out/12 builds 390 'Roll D-88213 verified'.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "1440 Verified 33:235174 and Verification failed 33:236070, plus 390 Verified 34:336102, passed screenshots. Fixed this run: the mismatch alert's off-topic 'Switch network' action now reads 'Copy values from roll D-88213'."
  },
  {
   "id": "DI-07",
@@ -2060,9 +2027,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED",
-  "note": "out/06_d_di07_a.js builds 1440 Loading game, Connection lost, and Insufficient balance (DEMO account · Available 4.20 USDT). out/07_d_di07_b.js builds 1440 Bet above table max, Daily loss limit reached (DEMO scenario), and Region restricted (United States). out/13_m_di07.js builds 390 Connection lost, Insufficient balance, Daily loss limit reached, and Region restricted.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "All brief states exist at 1440: loading (NEW 232:175311, skeletons + 'Loading game…'), connection lost 33:174533, insufficient balance 33:171221, daily loss limit 33:172235, region restricted 33:173350, plus NEW bet above table max 232:174329. At 390: region 34:359378, daily loss 34:359699, NEW connection lost 234:216106 (bottom sheet) and NEW insufficient balance 234:216542. All passed screenshots, and the clip audit is clean. Loading and bet-above-max were not built at 390 because they are inline states whose layout doesn't change materially."
  },
  {
   "id": "CF-01",
@@ -2252,9 +2218,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Shared",
-  "status": "NOT STARTED",
-  "note": "out/08_d_gm01_overlays.js builds 1440 '60-minute reminder over Pool Dice' and 'Approaching daily loss limit — session details open (DEMO scenario)'. out/08b_d_gm01_spec.js builds the spec board. out/11 builds 390 reality-check bottom sheet and approaching-limit session sheet.",
-  "by": "g-dice"
+  "status": "VERIFIED",
+  "note": "1440: reality-check modal 33:207090 and approaching-limit session bar 33:207875, plus NEW dev-notes spec card 235:71605 (states, API-shaped fields, WebSocket events, a11y). 390: reality-check sheet 34:360187 and NEW approaching-limit session sheet 234:216910 (warning strip at 86% used, 27.60 USDT left). The normal session bar appears in every dice frame. All passed screenshots."
  },
  {
   "id": "ADM-00",
@@ -2264,9 +2229,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "All four 1440 frames from the earlier run are kept. This run hid the locked Compliance count, changed the audit ref to #88216 and made the admin name auto-width. Still to build: the 1280 inbox (out/04-laptop.js) and three 768 frames — navigation drawer open, command palette, no permission (out/06-tablet-shell.js, which needs 05 first).",
-  "by": "adm-core"
+  "status": "VERIFIED",
+  "note": "Admin shell at D·L·T, every frame checked in a screenshot. 1440: Approvals inbox, Command palette Results and No results, No permission (Support L2 opens a Finance link). 1280: inbox 222:125633 (wrapped cells fixed to FILL) and No permission 229:161520 (access matrix and grantor panel stacked). 768: navigation drawer open 224:159273, command palette 224:159747 (scope label 'Super Admin'), No permission 224:160161 (stacked; no off-canvas panel)."
  },
  {
   "id": "ADM-01",
@@ -2276,9 +2240,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "Six 1440 frames built: Sign in, Error (wrong password), Blocked (network not approved, no workaround), 2FA, 2FA locked (absolute unlock 18:57 UTC), Session expired. Five were checked in screenshots; the Session expired one was not shown. Still to build: Session timeout warning 1440 (01:42 left, sign-out at 19:02 UTC; out/07-states.js), Sign in 1280 (out/04) and Sign in 768 (out/05).",
-  "by": "adm-core"
+  "status": "VERIFIED",
+  "note": "1440: Sign in, Error (wrong password), Blocked (network not approved), 2FA, 2FA locked, Session expired (now checked in a screenshot) and the new Session timeout warning 221:191799 (01:42 left, sign-out at 19:02 UTC, no new code needed to stay, nothing auto-submitted). Sign in also at 1280 (222:126124) and 768 (224:96327, stacked card + policies). The 'Trust this device' checkbox is set to 288 px in every sign-in frame so 'Can't sign in?' stays inside the 432 px form."
  },
  {
   "id": "ADM-02",
@@ -2288,9 +2251,8 @@
   "sizes": "D·L·T·M",
   "page": "09",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "1440 Default built and checked in a screenshot, Super Admin S. Iyer. Shows every brief KPI using demo-data figures (deposits 12,846,500.00, withdrawals 10,932,140.00, fees 60,700.00 = 1,214,000 × 0.05, users 184,320 / 41,206, liabilities 186,400.00 + 52,310.40 = 238,710.40, 1 active round, 37 pending withdrawals, KYC 214). Also: queue cards, four-eyes list, health gauge 99.97%, services, KYC statistics, round #1,248 monitor (read-only), network health and audit feed. The header overflow was fixed. Still to build: Restricted role (Support L2) 1440 (out/07), 1280 (out/04), 768 (out/05) and 390 (out/m-01-overview-alerts.js).",
-  "by": "adm-core"
+  "status": "VERIFIED",
+  "note": "Overview with every brief KPI from demo-data plus system health, at D·L·T·M. 1440 Default + Restricted role (Support L2: money KPIs, liabilities, queues, pool chart and audit feed left out, not blurred; four-eyes list shows only AR-1045 with a role note). 1280 Default 222:126310 + Restricted 229:160132. 768 Default 224:95574 + Restricted 229:160932. 390 on page 10 226:80653 (2×4 KPI grid, queues, approvals, health, read-only round monitor, tab bar). All checked in screenshots, with no overflow."
  },
  {
   "id": "ADM-U1",
@@ -3082,9 +3044,8 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "System",
-  "status": "IN PROGRESS",
-  "note": "Eight 1440 frames built and checked in screenshots. Requester side: Admin/Confirm With Reason Dialog in Default, Ready and Error over a clone of the WD-20931 detail, plus Request submitted (AR-1042, audit #88,190). Approver side: step-up 2FA re-authentication; second-approver review modal (Approval Request Card + reason + what-happens + Reject/Approve); Approved & released at 20:31 UTC, matching the demo-data success path; Self-approval blocked, with eligible approvers listed. Still to build: 1280 Ready (out/04), 768 Ready (out/05), and consistency touch-ups on 180:144187, 180:144734 and 180:145242 (included in out/04).",
-  "by": "adm-core"
+  "status": "VERIFIED",
+  "note": "Four-eyes pattern: 8 frames at 1440 (confirm-with-reason Default/Ready/Error, request submitted, step-up 2FA re-auth, second-approver review, approved & released 20:31 UTC, self-approval blocked; identities and times aligned in this run). 1280 confirm Ready 222:127249 and 768 confirm Ready 224:96513 over ADM-F2's own WD-20931 detail. Mobile AR-1042 review bottom sheet 227:143053 (reason, fresh 2FA, Reject / Approve & release). All checked in screenshots."
  },
  {
   "id": "MOB-01",
@@ -3131,8 +3092,7 @@
   "page": "10",
   "group": "",
   "status": "VERIFIED",
-  "note": "390 hub with the sticky participate bar above Nav/Mobile Tab Bar (Active=Pool) in all 4 states. The sticky bars were fixed and re-screenshotted this run. Active had no overlap. Restricted, Wallet disconnected and No active round needed text wrapping and now pass.",
-  "by": "gp-hub"
+  "note": "390 hub with the sticky participate bar above Nav/Mobile Tab Bar exists in all 4 states (34:434743, 34:473267, 34:482737, 34:492964). The sticky bars were re-screenshotted and passed in the previous run. A read-only check this run confirmed all frames hug their height and are in section 34:434742."
  },
  {
   "id": "MOB-05",
@@ -3155,8 +3115,7 @@
   "page": "10",
   "group": "",
   "status": "BUILT",
-  "note": "Bottom-sheet pattern for all 7 deposit steps plus the expired, delayed and failed states in section 105:49686: scrim over the wallet page, grabber, title + close, Nav/Stepper Mobile, sticky L CTA, home-indicator padding. Other agents may own the rest of this row.",
-  "by": "wal-deposit"
+  "note": "The deposit part is complete: bottom-sheet frames for all 7 deposit steps, plus Empty, Expired, Delayed, Failed and Unrecognised, in section 105:49686 (12 frames). All 12 now use the short DEMO notice 'DEMO DATA — illustrative values only' (decision #29). Left as BUILT because other slices may own the rest of MOB-06."
  },
  {
   "id": "MOB-07",
@@ -3212,9 +3171,8 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED",
-  "note": "Scripts ready and syntax-checked. out/m-01-overview-alerts.js builds Overview / 390 and Alerts / 390 / Operations; out/m-02-approvals.js builds Approvals queue / 390 / Open and the AR-1042 review bottom sheet. They use the same inline mobile admin top bar and tab bar as the adm-bc slice.",
-  "by": "adm-core"
+  "status": "VERIFIED",
+  "note": "Page 10, 'ADM — Mobile', second row at y 4164: Overview 226:80653, Alerts / Operations 226:81089 (severity chips, acknowledge is logged and never changes balances or results), Approvals queue 227:142765 (K. Osei; self-request and Super-Admin-only cards cannot be decided), Review AR-1042 bottom sheet 227:143053. Same inline admin top bar and Admin Tab Bar as the adm-bc/adm-finance mobile frames. Checked in screenshots after the clipping fixes."
  },
  {
   "id": "MOB-12",
