@@ -1748,7 +1748,9 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the Figma MCP limit. Scripts ready: out/01_d_rl01_master.js (1440, 'Bets placed — ready to spin'; also inventories the section and returns component text dumps), out/09_t_rl01_768.js (768), out/10_m_rl01_rl02_rl03.js (390).",
+  "by": "g-roulette"
  },
  {
   "id": "RL-02",
@@ -1758,7 +1760,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/02_d_rl02_rl03.js (1440, 'Placing a split on 17 | 20', with hover outline, chip on the line and tooltip) and out/10_m… (390, 'Tapped 19 — choose the bet type' bottom sheet).",
+  "by": "g-roulette"
  },
  {
   "id": "RL-03",
@@ -1768,7 +1772,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/02… (1440, 'Adding the 2nd column (2:1)', covered numbers highlighted) and out/10_m… (390, 'Outside bets' view).",
+  "by": "g-roulette"
  },
  {
   "id": "RL-04",
@@ -1778,7 +1784,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/03_d_rl04_rl05.js (1440) and out/11_m_rl04_rl05.js (390): 'No more bets — stake locked'.",
+  "by": "g-roulette"
  },
  {
   "id": "RL-05",
@@ -1788,7 +1796,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/03… and out/11_m…: Win '19 Red (+195.00 USDT)' and Lose (19 Red with alternative bets, −20.00 USDT), each at 1440 and 390.",
+  "by": "g-roulette"
  },
  {
   "id": "RL-06",
@@ -1798,7 +1808,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/06_d_rl06_history.js (1440) and out/12_m_rl06_rl07_rl08.js (390): 'My spins — today'.",
+  "by": "g-roulette"
  },
  {
   "id": "RL-07",
@@ -1808,7 +1820,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/07_d_rl07_rules.js (1440) and out/12_m… (390): 'Rules & payouts / Default'.",
+  "by": "g-roulette"
  },
  {
   "id": "RL-08",
@@ -1818,7 +1832,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/08_d_rl08_pf.js (1440) and out/12_m… (390): 'Spin RL-88191 verified'.",
+  "by": "g-roulette"
  },
  {
   "id": "RL-09",
@@ -1828,7 +1844,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the limit. out/04_d_rl09_a.js and out/05_d_rl09_b.js (1440 × 5 states: connection lost, insufficient balance on a DEMO account with 4.20 USDT, bet above spot max, daily loss limit reached, region restricted US). out/13_m_rl09.js (390 × 4 states).",
+  "by": "g-roulette"
  },
  {
   "id": "CR-01",
@@ -1838,7 +1856,9 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 and 390 passed screenshots. 768 (34:350701) exists with hug height but could not be screenshot-checked before the MCP limit stopped the run (out/06).",
+  "by": "g-crash"
  },
  {
   "id": "CR-02",
@@ -1848,7 +1868,9 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "1440 and 390 passed screenshots. 768 (34:351583) exists with hug height but is not yet screenshot-checked (out/06).",
+  "by": "g-crash"
  },
  {
   "id": "CR-03",
@@ -1858,7 +1880,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 33:156588 and 390 34:420337 passed screenshots.",
+  "by": "g-crash"
  },
  {
   "id": "CR-04",
@@ -1868,7 +1892,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 Result: cashed out at 2.00× (33:191216). 1440 Stake lost, 5.00× target not reached (33:209124). 390 cashed out (34:420839). All passed. The stake-lost state has the same layout, so it is not needed at 390.",
+  "by": "g-crash"
  },
  {
   "id": "CR-05",
@@ -1878,7 +1904,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 33:284530 and 390 34:446321 passed screenshots.",
+  "by": "g-crash"
  },
  {
   "id": "CR-06",
@@ -1888,7 +1916,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 dialog 33:311252 and 390 bottom sheet 34:480272 passed. Consent box unticked, stop-loss required, bet size fixed.",
+  "by": "g-crash"
  },
  {
   "id": "CR-07",
@@ -1898,7 +1928,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 34:331972 and 390 34:492427 (round CR-55102 verified) passed screenshots.",
+  "by": "g-crash"
  },
  {
   "id": "CR-08",
@@ -1908,7 +1940,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All 4 states at 1440 passed: connection lost, insufficient balance, daily loss limit, region. At 390, connection lost, daily loss limit and insufficient balance passed; insufficient balance (198:77380) was built and fixed this run. 390 Region (36:511527) still clips the 'Licence details' link at the right edge of the Notice/Licence instance row. The prepared fix out/06 hides the duplicate 'Restricted countries' link and has not been applied because of the limit.",
+  "by": "g-crash"
  },
  {
   "id": "DI-01",
@@ -1918,7 +1952,9 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Scripts ready, nothing run: out/01_d_di01_master.js (1440 master), out/09_t_di01_768.js (768, run last on page 08), out/10_m_di01_di02_di03.js (390). Still to build: '[DI-01] Dice interface / 1440 / Default — roll over 50.50', '/ 768 / Default — roll over 50.50', '/ 390 / Default — roll over 50.50'.",
+  "by": "g-dice"
  },
  {
   "id": "DI-02",
@@ -1928,7 +1964,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/02_d_di02_states.js builds 3 desktop frames: 'Dragging target to 34.00 — odds update live', 'Roll under 50.50 — 50.50% · 1.9604×', 'Out of range — win chance above 98.00%'. out/10 builds the 390 frame 'Dragging target to 34.00 — odds update live'.",
+  "by": "g-dice"
  },
  {
   "id": "DI-03",
@@ -1938,7 +1976,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/03_d_di03_di04.js builds '[DI-03] Rolling / 1440 / Rolling — stake locked'. out/10 builds the 390 version.",
+  "by": "g-dice"
  },
  {
   "id": "DI-04",
@@ -1948,7 +1988,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/03 builds 1440 'Win — rolled 73.21 (+10.00 USDT)' and 'Lose — rolled 31.07 (−10.00 USDT)'. out/11_m_di04_gm01.js builds both at 390.",
+  "by": "g-dice"
  },
  {
   "id": "DI-05",
@@ -1958,7 +2000,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/04_d_di05_history.js builds '[DI-05] History / 1440 / My rolls — today'. out/12_m_di05_di06.js builds the 390 version.",
+  "by": "g-dice"
  },
  {
   "id": "DI-06",
@@ -1968,7 +2012,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/05_d_di06_pf.js builds 1440 'Roll D-88213 verified' and 'Mismatch — server seed from another pair'. out/12 builds 390 'Roll D-88213 verified'.",
+  "by": "g-dice"
  },
  {
   "id": "DI-07",
@@ -1978,7 +2024,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Dice",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/06_d_di07_a.js builds 1440 Loading game, Connection lost, and Insufficient balance (DEMO account · Available 4.20 USDT). out/07_d_di07_b.js builds 1440 Bet above table max, Daily loss limit reached (DEMO scenario), and Region restricted (United States). out/13_m_di07.js builds 390 Connection lost, Insufficient balance, Daily loss limit reached, and Region restricted.",
+  "by": "g-dice"
  },
  {
   "id": "CF-01",
@@ -1988,7 +2036,9 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Desktop 1440 (36:535477) and tablet 768 (95:68989) exist, both hug height. The mobile 390 frame (104:48933) is probably there, because script 09 references it, but I could not check it this run. No screenshot was taken this run, so not VERIFIED.",
+  "by": "g-coinflip"
  },
  {
   "id": "CF-02",
@@ -1998,7 +2048,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Desktop 1440 exists (90:62010). Mobile 390 is probably there (script 09 clones it as its connection-lost base) but I could not check it. No screenshot taken this run.",
+  "by": "g-coinflip"
  },
  {
   "id": "CF-03",
@@ -2008,7 +2060,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Desktop Win (90:62838) and Lose (90:63652) exist. Mobile Win/Lose 390 are probably there (104:49572 / 104:49901 referenced by script 09) but I could not check them. No screenshot taken this run.",
+  "by": "g-coinflip"
  },
  {
   "id": "CF-04",
@@ -2018,7 +2072,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 exists (94:67170). Mobile 390 '[CF-04] History / 390 / My flips — today (CF-52107 expanded)' was not confirmed and may be missing.",
+  "by": "g-coinflip"
  },
  {
   "id": "CF-05",
@@ -2028,7 +2084,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop Verified (94:68249) and Failed (94:69000) exist. Mobile 390 'Verified — CF-52107 (Heads)' was not confirmed and may be missing.",
+  "by": "g-coinflip"
  },
  {
   "id": "CF-06",
@@ -2038,7 +2096,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "All 5 desktop states exist (92:63915, 92:64713, 92:65610, 92:66530, 92:67339). The 4 mobile 390 states (Insufficient balance sheet, Daily loss limit reached, Region restricted (United States), Connection lost) were not confirmed and may be missing.",
+  "by": "g-coinflip"
  },
  {
   "id": "BJ-01",
@@ -2048,7 +2108,9 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 32:93469, tablet 33:313734 and mobile 34:362883 all exist and passed screenshots. Tablet RG/Session Bar overflow was fixed this run and re-checked: 704x60, all items visible.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-02",
@@ -2058,7 +2120,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 33:132557 + M 34:387956 passed screenshots. Hole card is face-down and the in-flight card is cropped by the felt edge on purpose.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-03",
@@ -2068,7 +2132,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Your move 33:133278, Insurance 33:157616, Split hand 1 of 2 33:158401. M: Your move 34:388278, Insurance bottom sheet 34:388630. All passed screenshots. Insurance math checks out: 5.00 stake returns 15.00 at 2:1, with a 7.4% house-edge note.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-04",
@@ -2078,7 +2144,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 33:159183 + M 34:389017 passed screenshots (dealer draws on 16, S17).",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-05",
@@ -2088,7 +2156,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "5 desktop frames (Win 33:177551, Lose 33:178442, Push 33:179332, Blackjack 33:180225, Bust 33:181115) + M Win 34:389351 passed screenshots. Balances reconcile with 9,215.30: win 9,225.30, blackjack +15.00 to 9,230.30, push 9,215.30. Gold is used only on the 3:2 blackjack banner.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-06",
@@ -2098,7 +2168,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 33:274454 + M 34:422477. Desktop Proof column overflow (Verify buttons 6px past the table edge) fixed this run and re-checked. The mobile filter chips scroll sideways on purpose.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-07",
@@ -2108,7 +2180,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 33:275983 + M 34:422986 passed screenshots: 6 decks, S17, 3:2, payouts table, basic-strategy chart, RG limits card.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-08",
@@ -2118,7 +2192,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D 33:295080 + M 34:423480 passed screenshots: hand BJ-40517, revealed seed vs committed hash, shoe order, how the shoe is built.",
+  "by": "g-blackjack"
  },
  {
   "id": "BJ-09",
@@ -2128,7 +2204,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All 9 frames exist and pass the text and container audit, with DEMO badges present. Desktop Connection lost, Reconnected, Insufficient balance, Daily loss limit and Region restricted passed screenshots. Not yet screenshot-checked because the MCP limit blocked 3 calls in a row: desktop Loading table 33:211529 and mobile Connection lost 34:404947, Insufficient balance 34:405313, Region restricted 34:405639.",
+  "by": "g-blackjack"
  },
  {
   "id": "GM-01",
@@ -2138,7 +2216,9 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Shared",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "out/08_d_gm01_overlays.js builds 1440 '60-minute reminder over Pool Dice' and 'Approaching daily loss limit — session details open (DEMO scenario)'. out/08b_d_gm01_spec.js builds the spec board. out/11 builds 390 reality-check bottom sheet and approaching-limit session sheet.",
+  "by": "g-dice"
  },
  {
   "id": "ADM-00",

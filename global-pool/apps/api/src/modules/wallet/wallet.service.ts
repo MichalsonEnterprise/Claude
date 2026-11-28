@@ -1,15 +1,28 @@
 import { Injectable } from '@nestjs/common';
+import { PLATFORM_WITHDRAWAL_FEE } from '@gp/shared/fees';
 import { formatRoundNumber } from '@gp/shared/format';
-import { MoneyDecimal, money, toUSDTString } from '@gp/shared/money';
+import {
+  DAILY_WITHDRAWAL_LIMIT,
+  MIN_DEPOSIT,
+  MIN_WITHDRAWAL,
+  NEW_ADDRESS_COOLDOWN_HOURS,
+} from '@gp/shared/limits';
+import { MoneyDecimal, max, money, toUSDTString } from '@gp/shared/money';
+import type { WalletStatus } from '@gp/shared/types';
 
 import { AppError } from '../../common/errors';
 import { usdt } from '../../common/money';
+import { addDays, periodStart } from '../../common/time';
+import { AppConfig } from '../../config/app-config';
 import { PrismaService } from '../../infra/prisma/prisma.service';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { LedgerService } from '../ledger/ledger.service';
 import { owedClaimLines } from '../ledger/posting';
 
 const OPEN_WITHDRAWAL = ['requested', 'risk_check', 'under_review', 'queued', 'broadcast'] as const;
+/** Same statuses the withdrawal service counts towards the daily limit. */
+const COUNTS_TOWARDS_LIMIT = [...OPEN_WITHDRAWAL, 'confirmed'] as const;
 
 @Injectable()
 export class WalletService {
@@ -17,7 +30,44 @@ export class WalletService {
     private readonly prisma: PrismaService,
     private readonly ledger: LedgerService,
     private readonly idempotency: IdempotencyService,
+    private readonly flags: FeatureFlagsService,
+    private readonly config: AppConfig,
   ) {}
+
+  /** Operational switches + withdrawal limits for the wallet screens (banners, limit meters). Read-only. */
+  async status(userId: string): Promise<WalletStatus> {
+    const now = new Date();
+    const dayStart = periodStart('day', now);
+    const [depositsEnabled, withdrawalsEnabled, profile, today] = await Promise.all([
+      this.flags.isEnabled('deposits.enabled'),
+      this.flags.isEnabled('withdrawals.enabled'),
+      this.prisma.userProfile.findUnique({ where: { userId }, select: { kycLevel: true } }),
+      this.prisma.withdrawal.aggregate({
+        where: { userId, createdAt: { gte: dayStart }, status: { in: [...COUNTS_TOWARDS_LIMIT] } },
+        _sum: { amount: true },
+      }),
+    ]);
+    const kycLevel = profile?.kycLevel ?? 'none';
+    const dailyLimit = DAILY_WITHDRAWAL_LIMIT[kycLevel];
+    const used = money(today._sum.amount?.toFixed() ?? '0');
+    return {
+      depositsEnabled,
+      withdrawalsEnabled,
+      kycLevel,
+      withdrawal: {
+        dailyLimit,
+        usedToday: toUSDTString(used),
+        remainingToday: toUSDTString(max(money(dailyLimit).minus(used), 0)),
+        resetsAt: addDays(dayStart, 1).toISOString(),
+        minWithdrawal: MIN_WITHDRAWAL,
+        platformFee: PLATFORM_WITHDRAWAL_FEE,
+      },
+      minDeposit: MIN_DEPOSIT,
+      newAddressCooldownHours: NEW_ADDRESS_COOLDOWN_HOURS,
+      depositConfirmations: this.config.env.DEPOSIT_CONFIRMATIONS_ARBITRUM,
+      serverTime: now.toISOString(),
+    };
+  }
 
   /** Balances from the ledger + human-readable breakdown of Locked / Pending / Owed. */
   async balances(userId: string) {

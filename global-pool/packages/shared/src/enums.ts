@@ -216,10 +216,34 @@ export const SelfExclusionDuration = {
   D30: '30d',
   M6: '6m',
   Y1: '1y',
+  Y5: '5y',
   PERMANENT: 'permanent',
 } as const;
 export type SelfExclusionDuration = ValuesOf<typeof SelfExclusionDuration>;
 export const SELF_EXCLUSION_DURATIONS = valuesOf(SelfExclusionDuration);
+/** Short breaks (RG6 cooling-off): honoured at once with a single confirmation. */
+export const COOLING_OFF_DURATIONS = ['24h', '7d', '30d'] as const satisfies readonly SelfExclusionDuration[];
+export type CoolingOffDuration = (typeof COOLING_OFF_DURATIONS)[number];
+/** Long self-exclusion periods (RG7): typed confirmation + acknowledgement (+ step-up TOTP when 2FA is on). */
+export const LONG_SELF_EXCLUSION_DURATIONS = [
+  '6m',
+  '1y',
+  '5y',
+  'permanent',
+] as const satisfies readonly SelfExclusionDuration[];
+export type LongSelfExclusionDuration = (typeof LONG_SELF_EXCLUSION_DURATIONS)[number];
+export const SELF_EXCLUSION_DURATION_LABEL: Readonly<Record<SelfExclusionDuration, string>> = {
+  '24h': '24 hours',
+  '7d': '7 days',
+  '30d': '30 days',
+  '6m': '6 months',
+  '1y': '1 year',
+  '5y': '5 years',
+  permanent: 'Permanent',
+};
+export function isCoolingOffDuration(d: string): d is CoolingOffDuration {
+  return (COOLING_OFF_DURATIONS as readonly string[]).includes(d);
+}
 
 /** Actions protected by step-up 2FA (own TOTP + anti-phishing code). */
 export const StepUpPurpose = {

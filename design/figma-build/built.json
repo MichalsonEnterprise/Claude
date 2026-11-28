@@ -4123,5 +4123,392 @@
    "The Figma MCP tool-call limit was hit 4 times in this run: twice in a row at the start (recovered after a wait) and twice later (each recovered on one retry after waiting). No frames remain unbuilt.",
    "Prepared, assembled scripts for this slice are in /home/user/Claude/design/figma-build/pending/usr-finance/ (README.md, RUN-ORDER.json with status 'done', _tail.js, m-a.js, m-b.js, d-patch.js, out/m-a.full.js, out/m-b.full.js). The registry is updated in /home/user/Claude/design/figma-build/registry-usr-finance.json. Nothing from user memory was used: the memory index was seen, but no note was read or needed."
   ]
+ },
+ "g-dice": {
+  "section": "NOT CREATED: Figma MCP seat limit hit 3 times in a row, so I never got to read or create section 'DI Dice & GM-01' (page 08, X=32000,Y=0) or 'Games — Mobile Dice' (page 10, X=196000,Y=0). Ready-to-run scripts are in /home/user/Claude/design/figma-build/pending/g-dice/ (see README.md and RUN-ORDER.json).",
+  "created": [],
+  "issues": [
+   "BLOCKED: every Figma MCP call this run failed with the seat tool-call limit. That was 3 attempts in a row, counting the parallel read-only inventory pair as one, then two single read-only retries. Per conventions §10 I stopped. Nothing was read, built or screenshot-verified. All 33 frames remain: 19 desktop, 1 tablet, 13 mobile. RUN-ORDER.json lists every frame name.",
+   "I could not read the canvas, so I don't know whether the interrupted earlier run left frames in either section. The next agent should run out/00a_inventory_p08.js and out/00b_inventory_p10.js first, which are read-only. Every build script removes a same-named frame before rebuilding, so none of them creates duplicates.",
+   "Prepared work in /home/user/Claude/design/figma-build/pending/g-dice/: build.py, mock.cjs (adapted from pending/auth-b), README.md, RUN-ORDER.json, src/ (kit-base, kit-play, kit-pages, kit-m, bodies/) and 15 runnable out/*.js scripts. All are under 50k characters and contain helpers.js verbatim. All pass node --check and a mock dry run that checks token, style and FILL/HUG use.",
+   "Not verified until a real run: some library layer names. Each script reports what it finds in OUT.frames[...].notes, and README.md says how to fix each case. Topbar balance text 'Balance value' falls back to swapping the text '9,215.30'. Sidebar item 'Item/Pool Dice' is reported as sidebarItem. RG/Session Bar texts are swapped by matching their text (Timer 00:42:18, net −24.60). Game/Result Banner layers Headline/Detail are reported as resMiss. Game/History Strip (Dice) pill values are returned as hsTexts so the result frames can show 73.21 / 31.07 as the newest roll.",
+   "Pieces built inline because no library component exists (component gaps): dice slider (track zones, thumb in default/focus/locked states, roll marker); bet panel with linked Target / Win chance / Multiplier inputs; floating prompt cards for connection lost, loss limit and region; mobile RG session strip; mobile odds tiles; mobile result card; mobile roll cards; mobile bottom sheets.",
+   "Data gap for the orchestrator: demo-data's daily participation limit says it covers 'Global Pool entries + game stakes' (500.00, used 351.75). 351.75 is exactly the 35-entry purchase, so it contains no game stakes, yet the RG session bar shows game play today (net −24.60). The dice screens therefore never show the participation limit. The history KPIs (36 rolls, 360.00 wagered) would push the participation total over 500.00 if counted.",
+   "Values I introduced that are not in demo-data, all DEMO-badged: roll IDs D-88205…D-88215 and nonces 416–419; results 61.08, 73.21 and 31.07; daily KPIs 36 rolls / 360.00 wagered / 335.40 paid out; live-feed rows for @mira.sol, @kestrel, @juno88 and @pixelfox; PF mismatch case PF-3318 and wrong hash 41b7…09ac; approaching-limit scenario with net −172.40. 73.21, nonce 417, D-88213 and the seeds come from CMP-15.",
+   "Win rule I chose to keep demo-data's 49.50% on the 0.00–99.99 range: roll over T wins on results from T to 99.99. Bet panel shows 'Fees 0.00 USDT' because the 0.05 USDT platform fee applies only to Global Pool entries. Logged as decision #34 in decisions.md.",
+   "Also written: registry-g-dice.json, which holds no ids — only the planned frame list and a status note — plus decision #34 appended to decisions.md.",
+   "Memory: I used the user memory index only for context — the project_global_pool_figma note title confirms the file and visual direction. No memory note asked for any action. Nothing new to save."
+  ]
+ },
+ "g-coinflip": {
+  "section": "36:535476",
+  "created": [
+   {
+    "name": "Section — CF Coinflip (page 08 — Games, X=48000 Y=0, 9480 × 11055)",
+    "id": "36:535476"
+   },
+   {
+    "name": "[CF-01] Bet interface — Heads/Tails / 1440 / Default — Heads selected",
+    "id": "36:535477"
+   },
+   {
+    "name": "[CF-02] Flipping state / 1440 / Flipping — stake locked",
+    "id": "90:62010"
+   },
+   {
+    "name": "[CF-03] Result / 1440 / Win — landed Heads (+9.60 USDT)",
+    "id": "90:62838"
+   },
+   {
+    "name": "[CF-03] Result / 1440 / Lose — landed Tails (−10.00 USDT)",
+    "id": "90:63652"
+   },
+   {
+    "name": "[CF-04] History / 1440 / My flips — today (CF-52107 expanded)",
+    "id": "94:67170"
+   },
+   {
+    "name": "[CF-05] Provably-fair verification / 1440 / Verified — CF-52107 (Heads)",
+    "id": "94:68249"
+   },
+   {
+    "name": "[CF-05] Provably-fair verification / 1440 / Verification failed — seed truncated",
+    "id": "94:69000"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "92:63915"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 1440 / Daily loss limit reached",
+    "id": "92:64713"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 1440 / Region restricted (United States)",
+    "id": "92:65610"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 1440 / Connection lost — flip held on server",
+    "id": "92:66530"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 1440 / Bet above table maximum (1,500.00 > 1,000.00)",
+    "id": "92:67339"
+   },
+   {
+    "name": "[CF-01] Bet interface — Heads/Tails / 768 / Default — Heads selected",
+    "id": "95:68989"
+   }
+  ],
+  "issues": [
+   "STOPPED because of the Figma MCP limit: 3 'tool call limit for your Full seat' errors in a row (conventions §10). The first call worked: the read-only listing of page 08. The page 10 listing failed twice. The third attempt also failed: a guarded script that first lists the page and then builds only the missing frames. Nothing was changed on either page in this run.",
+   "Frames that may remain, on page '10 — Mobile Experience', section 'Games — Mobile Coinflip' (X=203000, Y=0), not checked: [CF-04] History / 390 / My flips — today (CF-52107 expanded); [CF-05] Provably-fair verification / 390 / Verified — CF-52107 (Heads); [CF-06] Error & limit states / 390 / Insufficient balance (sheet) — DEMO account · Available 4.20 USDT; [CF-06] … / 390 / Daily loss limit reached; [CF-06] … / 390 / Region restricted (United States); [CF-06] … / 390 / Connection lost — flip held on server. The mobile CF-01/CF-02/CF-03 Win/Lose frames (IDs 104:48933, 104:49252, 104:49572, 104:49901, referenced by the earlier script 09) are probably there but also not checked.",
+   "To finish: run /home/user/Claude/design/figma-build/pending-g-coinflip/10_GUARDED_mobile_cf06-cf04-cf05.js as a single use_figma call. It contains helpers.js verbatim and passed a syntax check. It lists the mobile section first and returns counts. If the CF-01/CF-02 390 base frames are missing it stops (run 06_mobile_cf01-cf03.js first). Otherwise it builds only the missing CF-06 ×4 and/or CF-04 + CF-05 frames and ends with node.screenshot() for each. It replaces scripts 07, 08 and 09. Run order is in /home/user/Claude/design/figma-build/pending-g-coinflip/README.md.",
+   "Desktop and tablet frames were not screenshotted in this run, so no row is VERIFIED. /home/user/Claude/design/figma-build/pending-g-coinflip/11_verify_desktop_readonly.js is a read-only script. It screenshots all 13 frames in section 36:535476 and counts placeholder text and DEMO badges. Run it before marking any row VERIFIED.",
+   "Ledger choice: rows CF-01..CF-03 are BUILT, not PARTIAL. Every required desktop and tablet frame exists, and the earlier run's script 09 references their mobile frame IDs. CF-04..CF-06 are PARTIAL because their mobile frames were never confirmed.",
+   "No memory notes bore on this slice beyond the project index entry for the GLOBAL POOL Figma file. No new facts worth saving."
+  ]
+ },
+ "g-blackjack": {
+  "section": "32:93468 (page '08 — Games', section 'BJ Blackjack' at 64000,0) + 34:362882 (page '10 — Mobile Experience', section 'Games — Mobile Blackjack' at 210000,0)",
+  "created": [
+   {
+    "name": "Section/BJ Blackjack (page 08)",
+    "id": "32:93468"
+   },
+   {
+    "name": "Section/Games — Mobile Blackjack (page 10)",
+    "id": "34:362882"
+   },
+   {
+    "name": "[BJ-01] Table + betting / 1440 / Bet placed — ready to deal",
+    "id": "32:93469"
+   },
+   {
+    "name": "[BJ-01] Table + betting / 768 / Bet placed — ready to deal",
+    "id": "33:313734"
+   },
+   {
+    "name": "[BJ-01] Table + betting / 390 / Bet placed — ready to deal",
+    "id": "34:362883"
+   },
+   {
+    "name": "[BJ-02] Dealing / 1440 / Dealing — cards in play",
+    "id": "33:132557"
+   },
+   {
+    "name": "[BJ-02] Dealing / 390 / Dealing — cards in play",
+    "id": "34:387956"
+   },
+   {
+    "name": "[BJ-03] Player decision / 1440 / Your move — Hit, Stand, Double, Split",
+    "id": "33:133278"
+   },
+   {
+    "name": "[BJ-03] Player decision / 1440 / Insurance offered — dealer shows an Ace",
+    "id": "33:157616"
+   },
+   {
+    "name": "[BJ-03] Player decision / 1440 / Split — playing hand 1 of 2",
+    "id": "33:158401"
+   },
+   {
+    "name": "[BJ-03] Player decision / 390 / Your move — Hit, Stand, Double, Split",
+    "id": "34:388278"
+   },
+   {
+    "name": "[BJ-03] Player decision / 390 / Insurance offered — bottom sheet",
+    "id": "34:388630"
+   },
+   {
+    "name": "[BJ-04] Dealer turn / 1440 / Dealer draws on 16",
+    "id": "33:159183"
+   },
+   {
+    "name": "[BJ-04] Dealer turn / 390 / Dealer draws on 16",
+    "id": "34:389017"
+   },
+   {
+    "name": "[BJ-05] Result / 1440 / Win — 20 beats 18",
+    "id": "33:177551"
+   },
+   {
+    "name": "[BJ-05] Result / 1440 / Lose — dealer 20 beats 18",
+    "id": "33:178442"
+   },
+   {
+    "name": "[BJ-05] Result / 1440 / Push — 19 each",
+    "id": "33:179332"
+   },
+   {
+    "name": "[BJ-05] Result / 1440 / Blackjack — paid 3:2",
+    "id": "33:180225"
+   },
+   {
+    "name": "[BJ-05] Result / 1440 / Bust — 25",
+    "id": "33:181115"
+   },
+   {
+    "name": "[BJ-05] Result / 390 / Win — 20 beats 18",
+    "id": "34:389351"
+   },
+   {
+    "name": "[BJ-06] History / 1440 / My hands — today",
+    "id": "33:274454"
+   },
+   {
+    "name": "[BJ-06] History / 390 / My hands — today",
+    "id": "34:422477"
+   },
+   {
+    "name": "[BJ-07] Rules / 1440 / Rules & payouts",
+    "id": "33:275983"
+   },
+   {
+    "name": "[BJ-07] Rules / 390 / Rules & payouts",
+    "id": "34:422986"
+   },
+   {
+    "name": "[BJ-08] Provably-fair verification / 1440 / Hand BJ-40517 verified",
+    "id": "33:295080"
+   },
+   {
+    "name": "[BJ-08] Provably-fair verification / 390 / Hand BJ-40517 verified",
+    "id": "34:423480"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 1440 / Connection lost — hand held on server",
+    "id": "33:210010"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 1440 / Reconnected — hand restored",
+    "id": "33:210793"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 1440 / Loading table",
+    "id": "33:211529"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "33:212197"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 1440 / Daily loss limit reached",
+    "id": "33:213009"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 1440 / Region restricted (United States)",
+    "id": "33:213876"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 390 / Connection lost — hand held on server",
+    "id": "34:404947"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "34:405313"
+   },
+   {
+    "name": "[BJ-09] Recovery & errors / 390 / Region restricted (United States)",
+    "id": "34:405639"
+   }
+  ],
+  "issues": [
+   "Continuation run: every required frame from the earlier run was already in Figma: 21 frames on page 08 (20 desktop + tablet) and 12 mobile frames on page 10. No pending/queue folder existed for g-blackjack and no frame was missing, so nothing was rebuilt. All frames hug their height (primaryAxisSizingMode AUTO).",
+   "FIXED this run: [BJ-01] 768 RG/Session Bar instance 33:313866. The library bar is designed at 1360 wide and its content overflowed the 704px slot by about 46px, pushing 'Take a break' past the frame edge. I hid the third divider (I33:313866;23:24828) and the empty FILL 'Message' spacer (I33:313866;23:24829), and set gap space/3, SPACE_BETWEEN and hug height. It is now 704x60 with Session, Net, Daily loss limit + meter, DEMO and Take a break all visible. Library follow-up: RG/Session Bar needs a compact or wrapping variant for tablet.",
+   "FIXED this run: [BJ-06] 1440 Hands table 33:275432. The 8 fixed cells summed to 1136px in a 1134px row, and the 'Verify' ghost buttons ran 6px past the table edge. I set the last Cell of all 10 rows to 74px with padding space/1, so the Verify labels now align with the PROOF header. Re-checked: buttons sit 6px inside the edge.",
+   "NOT SCREENSHOT-VERIFIED (Figma MCP limit hit 3 times in a row, conventions §10): 33:211529 ([BJ-09] 1440 Loading table), 34:404947, 34:405313, 34:405639 ([BJ-09] 390 Connection lost / Insufficient balance / Region restricted). All four passed the structural audit (no clipped text, placeholders, missing fonts or container overflow; DEMO badges present). Ready-to-run read-only check: screenshot those 4 IDs in one use_figma call.",
+   "Overflows left on purpose: mobile 'Card B — in flight' is cropped 6px by the felt edge as it leaves the shoe (BJ-02/BJ-04 390), and the mobile BJ-06 filter chips are a horizontal scroller.",
+   "Pieces built inline by the earlier run because no library component exists: felt table (Dealer zone / Felt print / Player hands / Felt status), bet panel, card shoe + table-limits placard, mini card chips, result chips, prompt cards (insurance / connection lost / limit / region), mobile RG session strip, mobile insurance bottom sheet, mobile result card, basic-strategy chart. These are candidates for library components.",
+   "DEMO values introduced by the earlier run (not in demo-data.md, all DEMO-badged): hand IDs BJ-40508…BJ-40518, limits 1.00–1,000.00 USDT per hand, insufficient-balance demo account with Available 4.20 USDT, client seed nova-k-7f2a91, nonce 417/418.",
+   "Updated /home/user/Claude/design/figma-build/registry-g-blackjack.json with a '_continuation_28nov' note describing both fixes. Audit scripts are saved in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/bj/ (audit.js, overflow.js, fix-08.js).",
+   "Learned this session (worth remembering for other slices): a use_figma call returns at most 5 node.screenshot() images, however many are requested. Under the current limit only about one use_figma call per 5–10 minutes succeeded. Also, an audit based on absoluteRenderBounds misses text clipped completely out of view; check absoluteBoundingBox against the clipping ancestor instead. No memory notes were used for this task."
+  ]
+ },
+ "g-roulette": {
+  "section": "NOT CREATED — 'RL Roulette' (page '08 — Games', X=0,Y=0) and 'Games — Mobile Roulette' (page '10 — Mobile Experience', X=182000,Y=0) were never reached. The Figma MCP seat limit refused all 3 use_figma calls of this run in a row: the read-only inventory, then the idempotent RL-01 master script twice. Per conventions §10 I stopped. No Figma node was created or changed. Prepared, ready-to-run scripts are in /home/user/Claude/design/figma-build/pending/g-roulette/ (README.md, RUN-ORDER.json, out/01..13).",
+  "created": [],
+  "issues": [
+   "Figma MCP seat limit ('tool call limit for your Full seat on the Professional plan') refused 3 calls in a row: the inventory, then the RL-01 master twice. Nothing was built or verified. All 28 frames still need building: desktop 1440 (14), RL-01 tablet 768 (1), mobile 390 (13). Exact frame names are in /home/user/Claude/design/figma-build/pending/g-roulette/RUN-ORDER.json and /home/user/Claude/design/figma-build/registry-g-roulette.json.",
+   "Next run: execute /home/user/Claude/design/figma-build/pending/g-roulette/out/01_d_rl01_master.js first. It lists any frames already in 'RL Roulette' and skips a complete frame (height > 900). It returns text dumps of Game/Bet Slip, Game/History Strip (Roulette), Shell/Topbar Desktop, Game/Roulette Wheel Result, Result Banner, Seed Display, Provably Fair Verifier, RG/Session Bar and Bet Slip Over limit. Check its notes (balance, sidebarItem, slipN, rgN, resMiss) before running scripts 02–13. Edit src/ and rebuild with `python3 build.py`. README.md lists what each note means.",
+   "All 13 scripts pass node --check and a mock dry run, but none has run against the real file yet. Layer-name guesses may need one targeted fix after the first real run: 'Balance value' in the topbar, 'Item/Pool Roulette' in the sidebar, 'Number' in the roulette cell, the Bet Slip CTA, the RG bar value formats and the Verifier's Pool Dice texts.",
+   "Component gap: Game/Roulette Wheel has no result-number property, and its Result variant always shows 19 Red. So the Lose frame uses the same spin with alternative DEMO bets on Black, 1st 12 and 26 instead of a different pocket.",
+   "Component gap: the Game/History Strip (Roulette) sequence is fixed with 19 first. It may not match the history rows and the mobile last-results row (19, 26, 14, 0, 32, 17, 8, 23). It needs an override or a property.",
+   "Built inline because no component exists: outside-bet boxes and the felt grid wrapper, chip tray, outcome preview card, settlement card, mobile vertical felt, mobile outside-bets panel, mobile verifier (Game/Provably Fair Verifier is 520 wide), bet-type bottom sheet content, mobile sticky chip tray + Spin bar.",
+   "These demo values are not in demo-data.md and are all DEMO-badged: spin IDs RL-88182…RL-88191; nonce 417 for spin RL-88191; float 0.528137 → pocket 19; today's Pool Roulette history (10 spins, staked 136.00, returned 323.00, net +187.00); Win balance 9,410.30 with session net +170.40; alternative-bets Lose balance 9,195.30 with net −44.60; locked-stake balance 9,195.30. Add them to demo-data.md if other screens reuse them. Decisions are logged as #35 in decisions.md."
+  ]
+ },
+ "g-crash": {
+  "section": "CR Crash (page 08 — Games) 32:90237 at X=16000,Y=0 · mobile: 'Games — Mobile Crash' (page 10 — Mobile Experience) at X=189000,Y=0. Continuation run: an earlier interrupted run had already built 14 desktop/tablet frames and 10 of 11 mobile frames. This run checked both sections without changing them, added the one missing mobile state (198:77380), checked 25 of 27 frames by screenshot and fixed one defect. It stopped after 3 Figma MCP limit errors in a row (conventions §10).",
+  "created": [
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 390 / Insufficient balance (DEMO account · Available 4.20 USDT) — NEW this run",
+    "id": "198:77380"
+   },
+   {
+    "name": "[CR-01] Orbit Rush — Pre-round betting / 1440 / Bets open",
+    "id": "32:90238"
+   },
+   {
+    "name": "[CR-02] Orbit Rush — Active run / 1440 / Running 1.64× · bet live",
+    "id": "33:124526"
+   },
+   {
+    "name": "[CR-03] Orbit Rush — Cashed out / 1440 / Auto cash-out at 2.00× · round still running",
+    "id": "33:156588"
+   },
+   {
+    "name": "[CR-04] Orbit Rush — Crashed / 1440 / Result · you cashed out at 2.00×",
+    "id": "33:191216"
+   },
+   {
+    "name": "[CR-04] Orbit Rush — Crashed / 1440 / Result · stake lost (target 5.00× not reached)",
+    "id": "33:209124"
+   },
+   {
+    "name": "[CR-05] Orbit Rush — Round history & statistics / 1440 / Default",
+    "id": "33:284530"
+   },
+   {
+    "name": "[CR-06] Orbit Rush — Auto cash-out & auto-play settings / 1440 / Dialog open · consent unticked",
+    "id": "33:311252"
+   },
+   {
+    "name": "[CR-07] Orbit Rush — Provably-fair verification / 1440 / Verified · round CR-55102",
+    "id": "34:331972"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 1440 / Connection lost · bet protected",
+    "id": "33:227442"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "33:239177"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 1440 / Daily loss limit reached",
+    "id": "33:258312"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 1440 / Region restricted (DEMO · United States)",
+    "id": "33:259170"
+   },
+   {
+    "name": "[CR-01] Orbit Rush — Pre-round betting / 768 / Bets open",
+    "id": "34:350701"
+   },
+   {
+    "name": "[CR-02] Orbit Rush — Active run / 768 / Running 1.64× · bet live",
+    "id": "34:351583"
+   },
+   {
+    "name": "Dev notes — Orbit Rush",
+    "id": "36:527187"
+   },
+   {
+    "name": "CR Crash section title",
+    "id": "36:527185"
+   },
+   {
+    "name": "CR Crash section subtitle",
+    "id": "36:527186"
+   },
+   {
+    "name": "[CR-01] Orbit Rush — Pre-round betting / 390 / Bets open",
+    "id": "34:386552"
+   },
+   {
+    "name": "[CR-02] Orbit Rush — Active run / 390 / Running 1.64× · bet live",
+    "id": "34:410457"
+   },
+   {
+    "name": "[CR-03] Orbit Rush — Cashed out / 390 / Auto cash-out at 2.00×",
+    "id": "34:420337"
+   },
+   {
+    "name": "[CR-04] Orbit Rush — Crashed / 390 / Result · you cashed out at 2.00×",
+    "id": "34:420839"
+   },
+   {
+    "name": "[CR-05] Orbit Rush — Round history & statistics / 390 / Default",
+    "id": "34:446321"
+   },
+   {
+    "name": "[CR-06] Orbit Rush — Auto cash-out & auto-play / 390 / Bottom sheet · consent unticked (full sheet shown, scrolls in product)",
+    "id": "34:480272"
+   },
+   {
+    "name": "[CR-07] Orbit Rush — Provably-fair verification / 390 / Verified · round CR-55102",
+    "id": "34:492427"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 390 / Connection lost · bet protected",
+    "id": "36:511112"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 390 / Region restricted (DEMO · United States)",
+    "id": "36:511527"
+   },
+   {
+    "name": "[CR-08] Orbit Rush — Error states / 390 / Daily loss limit reached",
+    "id": "36:519473"
+   },
+   {
+    "name": "Mobile Crash section title",
+    "id": "36:527216"
+   },
+   {
+    "name": "Mobile Crash section subtitle",
+    "id": "36:527217"
+   }
+  ],
+  "issues": [
+   "FIGMA MCP LIMIT: the run stopped after 3 limit errors in a row (conventions §10). Two things are left. (1) Run /home/user/Claude/design/figma-build/pending/g-crash/out/06_m_region_links_fix_verify_tablet.js: it fixes the clipped link row in [CR-08] 390 Region (36:511527) and screenshot-checks tablet CR-01 768 (34:350701), tablet CR-02 768 (34:351583) and the dev notes (36:527187). If those pass, CR-01, CR-02 and CR-08 can move to VERIFIED. (2) No other frame is missing.",
+   "An earlier attempt of that fix failed with 'node 203:58796 does not exist' after it set visible=false on an instance sublayer. I could not check whether the hide was saved before the error. out/06 looks the nodes up again after the change and is safe to re-run.",
+   "Component gap: the link row inside Notice/Licence (the 'Links' row, 352 px) does not wrap. At 390 it is wider than its card, so 'Licence details' clips. The library component should wrap that row or stack it on mobile.",
+   "Component gaps (built inline in the CR frames): crash bet panel (Manual/Auto tabs, amount field, quick amounts, auto cash-out toggle and target, odds summary), live-bets list, mobile sticky bet bar, round-history table and cards with crash-point pills, crash-point distribution bars, auto-play settings dialog and sheet, crash verifier rows, connection-lost overlay, insufficient-balance alert. The new 390 insufficient-balance alert is an inline status/warning-tint card because no 358-wide Alert/Banner exists.",
+   "Data consistency: screens use round CR-55102, crash point 3.82×, a 10.00 USDT bet with auto cash-out at 2.00× (49.50%, 20.00 payout, +10.00) and a 5.00× stake-lost alternative. Several library defaults disagree and should be aligned: Game/Multiplier Readout Rising (auto 3.00×) and Cashed out (2.10× / 21.00 / +11.00); Game/Crash Curve Running/Crashed (3.00×, 2.10×); Chart/Multiplier Curve (round #88,214, 2.47× / 3.12×); and the built.json note 'Crash win 248.00 USDT, round #C-88214'.",
+   "No dedicated pending folder existed for this slice. I created /home/user/Claude/design/figma-build/pending/g-crash/ (README.md, out/00–06, src_01, src_03). I also wrote /home/user/Claude/design/figma-build/registry-g-crash.json (frame ids, no new components) and appended decision #42 to /home/user/Claude/design/figma-build/decisions.md. These tooling facts were observed in this session and are not in memory: use_figma returned at most 5 inline screenshots per call, and node.screenshot() works on frames of another page."
+  ]
  }
 }

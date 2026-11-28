@@ -31,6 +31,15 @@ export const RG_LIMIT_INCREASE_COOLDOWN_HOURS = 24;
 /** Default reality-check reminder interval. */
 export const REALITY_CHECK_DEFAULT_MINUTES = 60;
 
+/** Reality-check interval choices offered in RG5 (minutes). */
+export const REALITY_CHECK_INTERVALS = [15, 30, 45, 60, 90, 120] as const;
+
+/** A play session ends after this many minutes without activity (RG4 session length / reality checks). */
+export const RG_SESSION_IDLE_MINUTES = 15;
+
+/** Phrase a player types to confirm a long self-exclusion (RG7 step 3). */
+export const SELF_EXCLUSION_CONFIRM_PHRASE = 'SELF-EXCLUDE';
+
 /** Wrong step-up codes before withdrawals are paused, and for how long. */
 export const STEP_UP_MAX_ATTEMPTS = 5;
 export const STEP_UP_LOCK_MINUTES = 15;

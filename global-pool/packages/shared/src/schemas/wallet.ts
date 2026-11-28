@@ -79,17 +79,38 @@ export const depositAddressRequestSchema = z.object({
   network: enabledChainKeySchema,
 });
 
-/** DEMO-only dev endpoint: simulate a confirmed test-USDT deposit (never available with REAL_MONEY_ENABLED). */
+/**
+ * DEMO-only dev endpoint: simulate a test-USDT deposit (never available with REAL_MONEY_ENABLED).
+ * `mode: 'instant'` (default) credits at once; `'progressive'` records it as detected with 0 confirmations so the
+ * pending → confirmation flow can be exercised (advance it with POST /dev/deposits/:reference/confirmations).
+ */
 export const demoDepositSimulationSchema = z
   .object({
     network: enabledChainKeySchema,
     amount: positiveUsdtAmountSchema,
     idempotencyKey: idempotencyKeySchema,
+    mode: z.enum(['instant', 'progressive']).optional(),
   })
   .refine((v) => meetsMinimum(v.network, v.amount, 'minDeposit'), {
     error: `Minimum deposit is ${getChain('arbitrum').minDeposit} USDT`,
     path: ['amount'],
   });
+
+/** DEMO-only: add simulated block confirmations to a progressive DEMO deposit (credited once N are reached). */
+export const demoDepositAdvanceSchema = z.object({
+  confirmations: z.coerce.number().int().min(1).max(100).optional(),
+});
+
+/**
+ * GET /withdrawals/precheck — read-only risk validation (WAL-15) before step-up 2FA. The address is checked by the
+ * service (an invalid address is reported as a failed check, not a 400).
+ */
+export const withdrawalPrecheckQuerySchema = z.object({
+  network: enabledChainKeySchema,
+  address: z.string().trim().min(1, { error: 'Enter a destination address' }).max(128),
+  amount: positiveUsdtAmountSchema,
+});
+export type WithdrawalPrecheckQuery = z.infer<typeof withdrawalPrecheckQuerySchema>;
 
 /** GET /transactions filters (+ pagination). */
 export const transactionsQuerySchema = paginationQuerySchema.extend({

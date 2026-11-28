@@ -308,3 +308,71 @@ export interface AdminUser {
   role: AdminRole;
   email: string;
 }
+
+// ── wallet module views (GET /wallet/status, GET /withdrawals/precheck) ─────────────────────────
+
+/** Operational status + withdrawal limits for the wallet screens (banners, limit meters). */
+export interface WalletStatus {
+  depositsEnabled: boolean;
+  withdrawalsEnabled: boolean;
+  kycLevel: KycLevel;
+  withdrawal: {
+    dailyLimit: USDTAmount;
+    usedToday: USDTAmount;
+    remainingToday: USDTAmount;
+    /** Next UTC midnight. */
+    resetsAt: ISODateTime;
+    minWithdrawal: USDTAmount;
+    platformFee: USDTAmount;
+  };
+  minDeposit: USDTAmount;
+  newAddressCooldownHours: number;
+  depositConfirmations: number;
+  serverTime: ISODateTime;
+}
+
+export type PrecheckCheckKey =
+  | 'kyc'
+  | 'limits'
+  | 'account_security'
+  | 'aml'
+  | 'address_risk'
+  | 'network';
+export type PrecheckCheckStatus = 'pass' | 'fail' | 'review' | 'skipped';
+
+export interface PrecheckCheck {
+  key: PrecheckCheckKey;
+  label: string;
+  status: PrecheckCheckStatus;
+  detail: string;
+}
+
+/**
+ * Read-only risk validation before step-up 2FA (WAL-15). `pass` → continue to 2FA; `review` → continue, the request
+ * goes to a manual AML review after 2FA; `kyc_required` / `blocked` → the withdrawal cannot be requested.
+ */
+export interface WithdrawalPrecheck {
+  outcome: 'pass' | 'review' | 'kyc_required' | 'blocked';
+  /** Plain-language reason for review / blocked outcomes. */
+  reason: string | null;
+  /** Machine code for blocked outcomes (e.g. 'LIMIT_EXCEEDED', 'INSUFFICIENT_FUNDS', 'ADDRESS_COOLDOWN'). */
+  code: string | null;
+  checks: PrecheckCheck[];
+  checkedAt: ISODateTime;
+  /** The result is valid for 15 minutes. */
+  validUntil: ISODateTime;
+  quote: {
+    amount: USDTAmount;
+    networkFee: USDTAmount;
+    platformFee: USDTAmount;
+    youReceive: USDTAmount;
+  };
+  address: {
+    valid: boolean;
+    whitelisted: boolean;
+    inCooldown: boolean;
+    usableFrom: ISODateTime | null;
+    label: string | null;
+  };
+  twoFactorEnabled: boolean;
+}

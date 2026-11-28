@@ -9,6 +9,11 @@ import { PrivyService, type PrivyLinkedAccounts, type VerifiedPrivyToken } from 
 
 const LAST_SEEN_RESOLUTION_MS = 5 * 60_000;
 
+/** Session flag for AUTH-21: a sign-in from a device label this player has never used before. */
+export const NEW_DEVICE_REASON = 'new_device';
+/** New-device alerts are shown on the player's other devices for this many days. */
+export const NEW_DEVICE_ALERT_WINDOW_DAYS = 14;
+
 /**
  * Maps a verified Privy token to our user + session rows: upsert by `privy_user_id` (Privy DID), sync linked email
  * and wallets, track the Privy session (`sid`) as a device session that the player can revoke.
@@ -135,6 +140,13 @@ export class PlayerIdentityService {
       }
       return existing;
     }
+    const label = deviceLabel(meta.userAgent);
+    // AUTH-21: flag a sign-in from a device this player has never used (not their very first session).
+    const [sessionCount, sameDevice] = await Promise.all([
+      this.prisma.session.count({ where: { userId, subject: 'user' } }),
+      this.prisma.session.count({ where: { userId, subject: 'user', deviceLabel: label } }),
+    ]);
+    const newDevice = sessionCount > 0 && sameDevice === 0;
     try {
       return await this.prisma.session.create({
         data: {
@@ -142,9 +154,10 @@ export class PlayerIdentityService {
           userId,
           privySessionId: verified.sessionId,
           expiresAt: verified.expiresAt,
-          deviceLabel: deviceLabel(meta.userAgent),
+          deviceLabel: label,
           userAgent: meta.userAgent?.slice(0, 512) ?? null,
           ip: meta.ip,
+          ...(newDevice ? { flagged: true, flaggedReason: NEW_DEVICE_REASON } : {}),
         },
       });
     } catch (err) {

@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
 import { UsersModule } from '../users/users.module';
+import { AccountStatusController } from './account-status.controller';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PlayerPolicyGuard, PrivyAuthGuard } from './guards';
@@ -12,7 +13,7 @@ import { PrivyService } from './privy.service';
 @Global()
 @Module({
   imports: [JwtModule.register({}), UsersModule],
-  controllers: [AuthController],
+  controllers: [AuthController, AccountStatusController],
   providers: [PrivyService, PlayerIdentityService, AuthService, PrivyAuthGuard, PlayerPolicyGuard],
   exports: [PrivyService, PlayerIdentityService, PrivyAuthGuard, PlayerPolicyGuard],
 })

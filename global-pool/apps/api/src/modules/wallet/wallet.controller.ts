@@ -25,6 +25,15 @@ export class WalletController {
     return this.wallet.balances(user.id);
   }
 
+  @Get('status')
+  @ApiOperation({
+    summary:
+      'Deposits / withdrawals operational status + daily withdrawal limit usage (wallet banners and limit meters)',
+  })
+  status(@CurrentUser() user: AuthUser) {
+    return this.wallet.status(user.id);
+  }
+
   @Get('lifetime')
   @ApiOperation({ summary: 'Lifetime deposits, withdrawals, entries, platform fees paid, rewards' })
   lifetime(@CurrentUser() user: AuthUser) {

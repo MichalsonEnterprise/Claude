@@ -21,6 +21,11 @@ export class AmlService {
     return this.provider.name;
   }
 
+  /** Read-only screening preview (withdrawal pre-check before 2FA): no alert is written. */
+  previewWithdrawal(input: AmlScreeningInput): Promise<AmlScreeningResult> {
+    return this.provider.screenWithdrawal(input);
+  }
+
   async screenWithdrawal(
     db: Db,
     input: AmlScreeningInput & { withdrawalId: string },
