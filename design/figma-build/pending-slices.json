@@ -45,5 +45,71 @@
   "adm-chain-comp",
   "mob-patterns",
   "adm-finance"
- ]
+ ],
+ "lost_in_container_restart_28nov_0050": [
+  "usr-gaming",
+  "usr-account",
+  "usr-finance",
+  "usr-rg",
+  "g-dice",
+  "g-blackjack",
+  "adm-core",
+  "g-coinflip",
+  "wal-withdraw-a",
+  "auth-b",
+  "auth-c",
+  "gp-draw",
+  "gp-hub",
+  "auth-d",
+  "adm-pool",
+  "adm-chain-comp",
+  "mob-patterns",
+  "adm-finance"
+ ],
+ "resume_plan": {
+  "P0": [
+   "wal-withdraw-a",
+   "auth-b",
+   "auth-c",
+   "gp-draw",
+   "gp-hub",
+   "auth-d",
+   "usr-rg",
+   "usr-account",
+   "usr-gaming",
+   "usr-finance",
+   "adm-core",
+   "adm-pool",
+   "adm-chain-comp",
+   "mob-patterns",
+   "adm-finance"
+  ],
+  "P1": [
+   "g-dice",
+   "g-coinflip",
+   "g-blackjack",
+   "g-roulette",
+   "g-crash",
+   "gp-history",
+   "pub-game-details",
+   "pub-p1a",
+   "pub-p1b",
+   "pub-p1c",
+   "promos",
+   "catalog-screens",
+   "adm-games"
+  ],
+  "P2": [
+   "usr-vip-ref",
+   "adm-growth-sys",
+   "pub-p2",
+   "pub-legal"
+  ],
+  "final": [
+   "proto-a",
+   "proto-b",
+   "err-a",
+   "err-b"
+  ]
+ }
 }
