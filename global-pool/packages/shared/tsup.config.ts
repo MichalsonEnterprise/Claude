@@ -8,6 +8,7 @@ export default defineConfig({
     index: 'src/index.ts',
     schemas: 'src/schemas/index.ts',
     demo: 'src/demo/index.ts',
+    fair: 'src/fair/index.ts',
     ...Object.fromEntries(entries.map((e) => [e, `src/${e}.ts`])),
   },
   format: ['esm', 'cjs'],
@@ -19,5 +20,5 @@ export default defineConfig({
   treeshake: true,
   target: 'es2022',
   platform: 'neutral',
-  external: ['decimal.js', 'viem', 'zod'],
+  external: ['decimal.js', 'viem', 'zod', /^@noble\/hashes/],
 });

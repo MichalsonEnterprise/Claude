@@ -2,7 +2,7 @@
   "name": "@gp/shared",
   "version": "0.1.0",
   "private": true,
-  "description": "GLOBAL POOL shared contracts for web & api: money/fee helpers (decimal.js), testnet chain config, enums, zod schemas, domain types and typed DEMO data.",
+  "description": "GLOBAL POOL shared contracts for web & api: money/fee helpers (decimal.js), testnet chain config, enums, zod schemas, domain types, typed DEMO data and the provably-fair game engine (@gp/shared/fair).",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -119,6 +119,16 @@
         "default": "./dist/demo.cjs"
       }
     },
+    "./fair": {
+      "import": {
+        "types": "./dist/fair.d.ts",
+        "default": "./dist/fair.js"
+      },
+      "require": {
+        "types": "./dist/fair.d.cts",
+        "default": "./dist/fair.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -152,6 +162,9 @@
       ],
       "demo": [
         "./dist/demo.d.ts"
+      ],
+      "fair": [
+        "./dist/fair.d.ts"
       ]
     }
   },
