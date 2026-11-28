@@ -166,6 +166,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@noble/hashes": "1.8.0",
     "decimal.js": "^10.6.0",
     "viem": "^2.58.8",
     "zod": "^4.6.7"

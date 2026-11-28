@@ -97,7 +97,9 @@ for (const width of WIDTHS) {
   for (const p of PAGES) {
     errors.length = 0;
     await page.goto(`${BASE}${p}`, { waitUntil: 'load', timeout: 180_000 });
-    await page.waitForSelector('#main', { timeout: 60_000 }).catch(() => undefined);
+    await page
+      .waitForSelector(process.env.READY_SELECTOR ?? '#main', { timeout: 60_000 })
+      .catch(() => undefined);
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined);
     await page.waitForTimeout(Number(process.env.SETTLE_MS ?? 1500));
     if (process.env.PALETTE_QUERY) {

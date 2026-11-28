@@ -1,0 +1,280 @@
+[
+  {
+    "key": "admin-a",
+    "report": "admin-a is done: the separate admin app under /admin, plus the API additions it needed. All checks pass. Every screen loads real API data and was screenshotted against my own API (port 4106) and web build (port 3106). Both servers are stopped. Nothing was committed.\n\nWHAT WAS BUILT\nWeb routes (apps/web/src/app/admin/):\n- /admin/login: ADM-01, no shell.\n- The (console) group: session guard plus shell, covering /admin (ADM-02), /admin/approvals (ADM-00 inbox, ADM-X1), /admin/alerts (MOB-11), /admin/users (U1), and /admin/users/[id] with 9 tab routes (summary, account, wallets, kyc, aml, transactions, restrictions, responsible-gaming, audit = U2–U10).\n- /admin/audit (S3), /admin/roles (S1), /admin/permissions (S2), /admin/no-access (ADM-00 no-permission).\n- A [...slug] catch-all shows an honest \"not in this build\" state. admin-b's static /admin/finance|pool|compliance routes take precedence and render inside my shell.\n\nWeb components (apps/web/src/components/admin-a/):\n- session.tsx: AdminSessionProvider / useAdminSession. Calls setAdminTokenProvider. Access JWT is kept in memory and the rotating refresh token in sessionStorage. Single-flight refresh, a 15-minute idle timeout with a 2-minute \"Still there?\" warning (only \"Stay signed in\" extends it), and a 401 means the session is over.\n- shell.tsx: sidebar 248 px with the 10 groups, lock / no-access state, live counts and signed-in card. Topbar with environment badge, ⌘K trigger, approvals count and alerts count. Drawer below 1280 px. Mobile top bar plus Admin Tab Bar below 768 px. Session timeout dialog.\n- command-palette.tsx (pages, player search, user action shortcuts), nav-config.ts (admin-b added its children to it), login.tsx, overview.tsx, approvals.tsx, alerts.tsx, users-list.tsx, user-detail.tsx, user-tabs.tsx, user-restrictions.tsx, audit.tsx, roles.tsx, no-access.tsx.\n- four-eyes.tsx:\n  - ConfirmWithReasonDialog: reason category, reason and a fresh 2FA code. Default/ready/error/submitted states, AR reference shown.\n  - ApprovalReviewDialog: second approver, self-approval blocked, decision trail, and \"external\" requests from other modules.\n- primitives.tsx and hooks.ts.\n- API wrappers: apps/web/src/lib/api/admin-a.ts, all using apiRequest with auth 'admin'.\n- Tests and tooling: test/admin-a.test.tsx (10 unit tests), e2e/admin-a.spec.ts, scripts/admin-a-qa.mjs (screenshot QA).\n\nAPI (apps/api/src/modules/admin/):\n- New: four-eyes.service.ts, admin-console.service.ts, admin-console.controller.ts, admin-console.spec.ts.\n- Additive edits: admin.module.ts, admin.service.ts (user filters, ledger balance and AML risk per row, four-eyes restriction branch), admin.controller.ts (shared DTOs).\n- New endpoints:\n  - Four-eyes: GET /admin/approvals/inbox and /admin/approvals/:id; POST /admin/approvals/:id/approve, /reject and /withdraw.\n  - Users: GET /admin/user-stats; GET /admin/users/:id/account, /wallets, /kyc, /aml, /transactions and /responsible-gaming; POST /admin/users/:id/pii/reveal.\n  - Roles and system: GET /admin/roles and /admin/permissions; POST /admin/roles/:key/change-requests; GET /admin/system/health; GET /admin/alerts; POST /admin/alerts/:key/ack.\n- Extended GET /admin/users with status, kycLevel and restricted filters.\n- Tests: test/admin-console.e2e-spec.ts (9 e2e tests).\n- Shared package: enums.ts additive (restriction types and labels, RESTRICTION_REQUIRES_FOUR_EYES, FOUR_EYES_EXPIRY_HOURS, approval statuses, FOUR_EYES_ACTION_PERMISSION, PERMISSION_LABEL), new schemas/admin-console.ts, one export line in schemas/index.ts.\n- Docs: admin console section added to docs/API.md and docs/WEB_COMPONENTS.md.\n- No result, winner, payout, ledger-edit or balance-adjust path exists. Restrictions never touch balances. Requests owned by other modules (admin-b's pool.entries.pause/resume breaker) are listed with a link to their own page; the approve/reject endpoints here refuse them with a 400 (handled admin-b's note #56).\n\nVERIFICATION (exact results)\n- Web: typecheck exit 0, lint exit 0, test 10 files / 95 tests passed.\n- Web build: `flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-admin-a NEXT_PUBLIC_API_URL=http://localhost:4106 NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_STATE_PREVIEW=true pnpm --filter @gp/web build` exited 0 on the final source.\n- Web e2e: e2e/admin-a.spec.ts 2/2 passed. Flow: K. Osei signs in through the UI (password then TOTP) → Overview → Users search → player → Restrictions → \"Withdrawals on hold\" with reason and 2FA → AR request created, nothing applied yet → self-approval blocked → S. Iyer signs in → Approvals → approves with own reason and 2FA → restriction active → audit chain intact. The second test checks that a signed-out visitor is redirected to sign-in.\n- API: typecheck exit 0, lint exit 0. Full `pnpm --filter @gp/api test`: unit 14 files / 59 tests, e2e 13 files / 100 tests, all passed.\n  - That includes admin-console.e2e 9/9 (four-eyes request, self-approval, wrong role, approve/reject/withdraw/expiry, protective restriction applies immediately, PII reveal audited without storing the value, tab permissions, role change needs two Super Admins, health and alerts with acknowledgement, external breaker requests).\n  - One pre-existing test in admin.e2e-spec.ts failed on the first run: it assumed its new withdrawal was on page 1 of 20 in the shared test DB, which now holds 37 open withdrawals. I changed it to read the first and last page; it passes now.\n- Shared package: build and typecheck OK.\n- Screenshots in apps/web/test-results/visual/admin-a/: no horizontal overflow and no console errors in the QA runs.\n  - S. Iyer: 1440 and 390 for all 16 pages; 1280 and 768 for overview, approvals, users, user summary, restrictions and audit.\n  - Login: default, error, 2FA, locked, session-ended and blocked at 1440, 768 and 390.\n  - Command palette; timeout warning at 1440 and 390.\n  - R. Duarte (Support): overview with financial KPIs hidden, roles page, AML tab and no-access page.\n  - e2e_X1_* captures of the apply, submitted, self-blocked, review and approved states.\n- Figma: I fetched 10 frames, saved in design/reference/admin-a/: ADM-00 approvals inbox, command palette and no-permission; ADM-01 sign-in; ADM-02 overview; U1; U2; U3; U8 apply; X1 second-approver review. The seat hit its rate limit several times; I retried later. I compared the 1440 renders with these. Layout, copy and structure match closely; the deviations are listed per ledger row.",
+    "implemented": [
+      {
+        "id": "ADM-00",
+        "status": "IMPLEMENTED",
+        "note": "Verified at 1440/1280/768/390. Shell, sidebar, topbar, ⌘K palette, approvals inbox and no-permission (access table by module, lock state on groups). Approval policy and Export CSV buttons omitted (no API). The palette searches pages and players, not transactions or rounds."
+      },
+      {
+        "id": "ADM-01",
+        "status": "PARTIAL",
+        "note": "Implemented: two-step sign-in with one login call, a generic error that never says which part failed, locked state (lockout after 5 attempts), session ended after idle/revoked/max length, 15-minute idle timeout with a real countdown, re-authentication. Missing: security-key (WebAuthn) and 'trust this device' (no API support); the 'network not approved' state is a dev preview only because the API has no IP allow-list."
+      },
+      {
+        "id": "ADM-02",
+        "status": "IMPLEMENTED",
+        "note": "Verified 1440/1280/768/390 with real ledger KPIs. Deviations: no deltas or sparklines (the API has no previous-period data); Gross revenue replaced by Customer balances (games are simulations, no GGR); a 'Last 30 days' label instead of a 24h/7d switch; KYC panel shows pending and verified counts only; system health = DB, Redis, queues, randomness, ledger invariants, kill switches. Roles without ledger.read and without withdrawals.approve (e.g. Support) get the money panels left out, not blurred."
+      },
+      {
+        "id": "ADM-U1",
+        "status": "IMPLEMENTED",
+        "note": "KPIs, filters (search, status, KYC level, restricted), table with masked email, KYC, status, AML risk, country, ledger balance and last active, pagination, cards below 768. No saved views or CSV export."
+      },
+      {
+        "id": "ADM-U2",
+        "status": "IMPLEMENTED",
+        "note": "Header with identity, badges and the read-only 5-column balances strip; 9 tabs (a section picker below 1024); two-column summary. 'Add case note' and 'Export user data' omitted (no API)."
+      },
+      {
+        "id": "ADM-U3",
+        "status": "PARTIAL",
+        "note": "Implemented: masked email, date of birth and last IP, each revealed one field at a time with a logged reason (shown for 60 s, value not stored in the audit log); account facts, consents (read-only), security, sessions table. Missing: legal name, phone, address and nationality (no data), the support-context panel, and end-session / 2FA-reset actions (no API)."
+      },
+      {
+        "id": "ADM-U4",
+        "status": "IMPLEMENTED",
+        "note": "Wallets with whitelist, cool-down and removed states, usage counts, deposit addresses, read-only notice. 'Flag for review' omitted (no API)."
+      },
+      {
+        "id": "ADM-U5",
+        "status": "IMPLEMENTED",
+        "note": "Three-level tracker, records table, limits by level. No documents table or 'Request information' (the mock provider has no documents and there is no API)."
+      },
+      {
+        "id": "ADM-U6",
+        "status": "IMPLEMENTED",
+        "note": "Rule-based read-only score with bands, factor breakdown and alerts table. No 90-day chart (no score history is stored)."
+      },
+      {
+        "id": "ADM-U7",
+        "status": "IMPLEMENTED",
+        "note": "Lifetime flows, type filter, paginated table with separate platform-fee and network-fee columns, append-only note."
+      },
+      {
+        "id": "ADM-U8",
+        "status": "IMPLEMENTED",
+        "note": "Verified 1440/1280/768/390 plus e2e. Apply dialog per Figma: restriction select, what changes for the user, reason category, internal reason, 2FA, four-eyes notice for holds and suspensions. Lift = reason + 2FA. Pending requests, history, policy panels, what the player sees. No duration option (the API has no timed restrictions)."
+      },
+      {
+        "id": "ADM-U9",
+        "status": "IMPLEMENTED",
+        "note": "Limits with meters (decimal maths, never floats), pending increases, self-exclusion and history, 'admins cannot loosen' notice. No play-pattern or harm-marker analytics."
+      },
+      {
+        "id": "ADM-U10",
+        "status": "IMPLEMENTED",
+        "note": "Audit table filtered to the player; rows expand to hashes and metadata."
+      },
+      {
+        "id": "ADM-S1",
+        "status": "IMPLEMENTED",
+        "note": "Live role cards: permission counts, sensitive permissions, members, pending change requests."
+      },
+      {
+        "id": "ADM-S2",
+        "status": "IMPLEMENTED",
+        "note": "Live matrix with policy chips. Super Admin can stage changes for one role at a time and submit them as a four-eyes request (reason + 2FA); the Super Admin role itself is fixed. Read-only for everyone else."
+      },
+      {
+        "id": "ADM-S3",
+        "status": "IMPLEMENTED",
+        "note": "Verified 1440/1280/768/390. Integrity banner (GET /admin/audit-logs/verify), filters, expandable rows. Page-based pagination instead of cursor."
+      },
+      {
+        "id": "ADM-X1",
+        "status": "IMPLEMENTED",
+        "note": "Confirm-with-reason, request submitted with AR reference and audit entry, second-approver review, self-approval blocked, approved/rejected/withdrawn/expired trail, captured during e2e. Deviation: the fresh 2FA code is entered in the decision dialog and checked with that same call, instead of a separate pre-verified step (codes are single-use and only valid for 30 s). No 'remind approvers'."
+      },
+      {
+        "id": "MOB-11",
+        "status": "IMPLEMENTED",
+        "note": "390 px overview (2-column KPI grid), approvals as cards with full-width actions, alerts with acknowledge; admin mobile top bar plus tab bar (Overview, Approvals, KYC, Alerts, More). The review opens as a full-width dialog, not a bottom sheet."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/web typecheck: exit 0",
+      "pnpm --filter @gp/web lint: exit 0",
+      "pnpm --filter @gp/web test: 10 files / 95 tests passed (incl. test/admin-a.test.tsx 10/10)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-admin-a NEXT_PUBLIC_API_URL=http://localhost:4106 NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_STATE_PREVIEW=true pnpm --filter @gp/web build: exit 0 (final source)",
+      "E2E_BASE_URL=http://localhost:3106 E2E_API_URL=http://localhost:4106 pnpm --filter @gp/web exec playwright test e2e/admin-a.spec.ts --output test-results/e2e-admin-a: 2 passed",
+      "pnpm --filter @gp/api typecheck: exit 0; pnpm --filter @gp/api lint: exit 0",
+      "pnpm --filter @gp/api test: unit 14 files / 59 tests passed, e2e 13 files / 100 tests passed (incl. admin-console.e2e 9/9, admin-console.spec 5/5)",
+      "pnpm --filter @gp/shared build + typecheck: OK",
+      "Screenshots in apps/web/test-results/visual/admin-a/: no horizontal overflow and no console errors in the QA runs; all 16 pages at 1440 and 390, P0 pages at 1280/768, login states, palette, timeout warning, Support-role views, X1 dialog states",
+      "Figma references saved in design/reference/admin-a/ (10 frames) and compared at 1440"
+    ],
+    "failing": [
+      "None of the admin-a checks fail.",
+      "Fixed: one assertion in the shared apps/api/test/admin.e2e-spec.ts ('flagged withdrawals need FOUR EYES') failed once because it only read page 1 of 20 while the shared test DB now holds 37 open withdrawals. It now reads the first and last page; the full API suite passes."
+    ],
+    "decisions": [
+      "Business rule I chose: withdrawals_frozen and account_suspended need four eyes (RESTRICTION_REQUIRES_FOUR_EYES). POST /admin/users/:id/restrictions then answers 201 {status:'pending_approval', approval} and nothing changes until a different admin with users.restrict approves. gaming_blocked and deposits_blocked still apply immediately (now with status:'active'). Lifting never needs a second approver. Please confirm.",
+      "Four-eyes requests expire after 4 h (FOUR_EYES_EXPIRY_HOURS). Expiry happens when the inbox or a request is next read and writes a system audit row. Requests owned by other modules are never expired or executed here.",
+      "Approval references are 'AR-' plus the first 6 hex characters of the UUID; display only, the API has no sequence number.",
+      "AML risk score is a rule-based model I defined (open alert weights: low 5, medium 15, high 30, critical 50; closed alerts in 90 days; KYC level; account age; active restrictions; capped at 100; bands 30/60/85). It is read-only and shown with its breakdown. Please confirm or replace with the real provider score.",
+      "PII reveal: one field at a time (email, date of birth, last sign-in IP), needs users.pii.read and a reason, is audit-logged without the value, and is shown for 60 s.",
+      "Role-permission changes are requests only (admins.manage, reason + MFA), one role per request because 2FA codes are single-use. The Super Admin role cannot be changed. With only one seeded Super Admin, a second Super Admin must exist before any change can be approved.",
+      "Alerts are computed from real state (ledger reconciliation, services, queues, kill switches, pending VRF requests, failed withdrawals, AML, reviews, KYC) and filtered by role. Acknowledging writes an audit row and changes nothing else.",
+      "Admin token storage: access JWT in memory, rotating refresh token in sessionStorage (tab-scoped). An httpOnly cookie would be safer for production.",
+      "Login is a two-step UI but makes one /admin/auth/login call with a single generic error, so it never reveals which part was wrong. Security key and 'trust device' are omitted rather than shown as fake buttons.",
+      "Overview hides financial panels for roles without ledger.read and without withdrawals.approve (e.g. Support, Marketing), as in the Figma restricted-role state.",
+      "Admin player-ID routes read the id with useParams on the client. Typed layout params broke typecheck through other agents' stale generated .next-*/types folders."
+    ],
+    "next": [
+      "Product decisions for the owner: confirm which restriction types need four eyes and how long requests stay open; confirm or replace the AML risk score model.",
+      "Missing API endpoints so the remaining Figma details can be built: case notes, user data export, admin end-session / 2FA reset requests, KYC documents, timed restriction durations, AML score history (for the 90-day chart), 'remind approvers', previous-period KPI deltas (for overview trend lines), richer palette search (transactions, rounds).",
+      "Admin WebAuthn security keys and a network IP allow-list (would make the 'blocked network' state real); refresh token in an httpOnly cookie.",
+      "Seed a second Super Admin so role-change requests can actually be approved in DEMO.",
+      "Run the pending Figma scripts in design/figma-build/pending/adm-core (laptop, tablet and mobile frames for ADM-00/01/02/X1 and MOB-11 were never built); my 1280/768/390 layouts follow the build notes, not finished frames.",
+      "Optional for MOB-11: show the approval review as a bottom sheet below 768 px.",
+      "Memory candidates (learned this session): Figma MCP get_screenshot hits the seat limit often and needs minutes between bursts; with about 7 parallel agents, `next dev` gets OOM-killed, so serve flock'ed `next start` builds for QA; the API listens on API_PORT, not PORT; DEMO admin TOTP codes are replay-protected per time step, so agents logging in as the same DEMO admin can collide."
+    ]
+  },
+  {
+    "key": "admin-b",
+    "report": "admin-b is built and verified: Finance (ADM-F1…F9), Global Pool monitoring (ADM-P1…P10) and Compliance KYC/AML (ADM-C1, ADM-C2). The pages run inside admin-a's console shell, against the real API.\n\nAPI — new module apps/api/src/modules/admin-ops/:\n- Controllers: admin/finance, admin/pool, admin/compliance (21 new operations).\n- Services: finance, pool, compliance, exports, plus csv.ts with csv.spec.ts.\n- Shared contracts: packages/shared/src/schemas/admin-ops.ts, exported from schemas/index.ts.\n- Read endpoints are aggregates of the append-only ledger and its sub-ledgers.\n- The only writes are reviewed and audited (written reason; fresh 2FA except CSV exports and refund reminders, which take a reason only; hash-chained audit row):\n  - CSV export (reason; personal data needs users.pii.read; 500,000-row limit; SHA-256; watermark line).\n  - Refund reminder: an in-app notice only, at most 1 per round per 24 h.\n  - NEW-entries circuit breaker: request, then a second approver of a different role, then the `pool.entries.enabled` flag flips. Requests expire after 30 min.\n  - KYC decision: approve / reject / request info, with reason and fresh 2FA; the player is notified.\n- Withdrawal approve/reject and AML resolve reuse the existing endpoints.\n- Calls such as `PATCH /admin/finance/ledger/:id`, `POST /admin/pool/rounds/:n/winners` and a manual refund return 404, covered by e2e.\n\nWeb:\n- apps/web/src/lib/api/admin-b.ts: types, TanStack Query hooks and mutations over apiRequest (auth: 'admin').\n- apps/web/src/components/admin-b/: primitives (header with module sub-nav, KPI tile, panel, data table with phone card mode, pagination, filter chips, risk meter, bar chart, Immutable panel), reason dialog (Dialog on tablet+, bottom Sheet on phone; RHF + shared zod), export dialog, and finance/, pool/, compliance/ pages.\n- 25 routes under apps/web/src/app/admin/(console)/: finance/*, pool/*, compliance/*.\n- Children added to admin-a's nav-config.ts (additive).\n\nTests and reference material:\n- API e2e: apps/api/test/admin-ops.e2e-spec.ts (8 tests).\n- Web unit: apps/web/test/admin-b.test.tsx (8 tests).\n- Playwright: apps/web/e2e/admin-b.spec.ts.\n- DEMO fixture script: apps/api/prisma/seed-admin-ops.ts.\n- Documentation: new admin-ops section in docs/API.md.\n- 17 Figma screenshots saved to /home/user/Claude/design/reference/admin-b/. The Figma tool was rate-limited at first.\n\nVerification:\n- API typecheck and lint: pass.\n- API unit tests: 14 files / 59 tests pass. The first full run had one timeout in api-gaps' onchain-rounds/commitments.spec.ts, which passed on rerun.\n- API e2e: 13 files / 100 tests pass.\n- Web typecheck and lint: pass. Web tests: 95/95 (10 files).\n- The flock'ed production build: EXIT 0.\n- Playwright e2e/admin-b.spec.ts: 1 passed against my API on 4107 and web on 3107. Flow: a fresh player starts KYC; K. Osei signs in, finds the case, approves it with reason + 2FA; status shows Approved with the audit entry; the read-only pages respect RBAC (Compliance sees the honest no-permission state on the Ledger).\n- Screenshots at 1440 and 390 of every page: apps/web/test-results/visual/admin-b/. No horizontal overflow and no unexpected console errors.\n- I compared them against the Figma frames and fixed the differences: sub-nav under the header, deposits / withdrawals / ledger / P10 / KYC / AML / F4 layouts, a duplicated \"UTC\", and mobile wrapping.\n\nLedger status:\n- IMPLEMENTED: F1, F2, F3, F4, F5, F7, F9, P1–P7, P9, P10, C1, C2.\n- PARTIAL: F6, F8, P8 (reasons in `implemented`).\n\nAll my servers (API 4107, web 3107) are stopped.\n\nMemory: nothing new about the user to save. The existing Figma memory note matched the work.",
+    "implemented": [
+      {
+        "id": "ADM-F1",
+        "status": "IMPLEMENTED",
+        "note": "/admin/finance/deposits — matches Figma layout: KPIs, network watchers, search/network/status filters, activity table, selected-deposit detail, held-deposits panel, CSV export. Checked at 1440 and 390. Watchers show 'No RPC (DEMO)' because no testnet RPC is configured. No 'Network health' button."
+      },
+      {
+        "id": "ADM-F2",
+        "status": "IMPLEMENTED",
+        "note": "Queue and WD detail, close to Figma. Includes queue card, tab views with counts, risk bars, SLA watch, policy FIN-2.3, approve step 1/2 then second approver, reject with reason + 2FA, sticky mobile action bar and bottom sheet. Bulk approve and 'Ask user for info' are deliberately not built. Approve/reject are API e2e-tested (existing admin tests) but not clicked through in the Playwright run."
+      },
+      {
+        "id": "ADM-F3",
+        "status": "IMPLEMENTED",
+        "note": "Fee rule, 30-day bar chart with table toggle, check that the fee sub-ledger matches the fees account, fees by round. Platform fees of cancelled rounds are shown as retained (see decisions)."
+      },
+      {
+        "id": "ADM-F4",
+        "status": "IMPLEMENTED",
+        "note": "Liabilities hero (pool escrow + owed prizes + refunds), ledger check using the custody mirror because no RPC is configured, round waterfall, ledger accounts, rounds ledger, Immutable panel."
+      },
+      {
+        "id": "ADM-F5",
+        "status": "IMPLEMENTED",
+        "note": "Integrity banner (7/7 append-only triggers, sum of the ledger = 0, journal digest, audit chain verified), journal table with prev→hash per journal, 'How the hash chain works', Corrections panel. The chain hash is recomputed on read; there is no on-chain anchoring and no correcting-entry workflow."
+      },
+      {
+        "id": "ADM-F6",
+        "status": "PARTIAL",
+        "note": "Live scopes (ledger total, posting balance, fee/pool/owed/locked sub-ledgers, round pools, custody, in-flight deposits) with match/mismatch/pending, problems first, Run now, CSV. Missing: stored run history (24 h squares), the investigation (INV) panel and the correcting-entry proposal. They need tables and a workflow that do not exist."
+      },
+      {
+        "id": "ADM-F7",
+        "status": "IMPLEMENTED",
+        "note": "Cancelled-round panels (threshold bars, claimed vs outstanding, largest unclaimed), remind-players action (reason, audited, 1 per 24 h), 'Issue manual refund' disabled, returns that are not refunds."
+      },
+      {
+        "id": "ADM-F8",
+        "status": "PARTIAL",
+        "note": "Gross (platform fees) − rewards = net, period chips, weekly bar chart, product share, statement tied to ledger sources, excluded network fees. No game revenue (games are non-monetary simulations) and no scheduled reports."
+      },
+      {
+        "id": "ADM-F9",
+        "status": "IMPLEMENTED",
+        "note": "Export CSV dialog with Configure / Generating / Ready (rows, SHA-256, expiry, audit #) / Error (too many rows) states. Personal-data switch gated by permission, reason counter, watermark. No column selection and no row estimate."
+      },
+      {
+        "id": "ADM-P1",
+        "status": "IMPLEMENTED",
+        "note": "KPIs, round panel with server-clock countdown, 4-stat strip, required disclaimer (fee line, 'You can lose your stake', 18+), lifecycle, pipeline health, needs attention, recent rounds, Immutable chips."
+      },
+      {
+        "id": "ADM-P2",
+        "status": "IMPLEMENTED",
+        "note": "Where the money is, hourly pool growth, latest pool movements, ledger vs projection per active round. Contract balance not read (DEMO, no RPC)."
+      },
+      {
+        "id": "ADM-P3",
+        "status": "IMPLEMENTED",
+        "note": "Live countdown, thresholds, entries per hour, prize table at the current pool, purchase feed, concentration."
+      },
+      {
+        "id": "ADM-P4",
+        "status": "IMPLEMENTED",
+        "note": "Paginated history with status filter and settlement/refund progress."
+      },
+      {
+        "id": "ADM-P5",
+        "status": "IMPLEMENTED",
+        "note": "Round picker (?round=), participants grouped by player (entries, stake, fees, share, entry IDs, KYC, country), search."
+      },
+      {
+        "id": "ADM-P6",
+        "status": "IMPLEMENTED",
+        "note": "Split bars and winners table with claim status; read-only."
+      },
+      {
+        "id": "ADM-P7",
+        "status": "IMPLEMENTED",
+        "note": "Provider config, counts, request table, honest empty state (the dev DB has no randomness requests). No LINK subscription balance. The fulfilled and delayed states are data-driven and not visually checked."
+      },
+      {
+        "id": "ADM-P8",
+        "status": "PARTIAL",
+        "note": "Allocations, settlement steps and postings for settled rounds. No auto-claim batch progress (the backend credits Owed in one transaction). DEMO history rounds have only 1 winner row and no claim rows."
+      },
+      {
+        "id": "ADM-P9",
+        "status": "IMPLEMENTED",
+        "note": "Reuses the refund panels (RefundOnCancel), filter by ?round=."
+      },
+      {
+        "id": "ADM-P10",
+        "status": "IMPLEMENTED",
+        "note": "Contract decides / Admins may / Nobody can; breaker with rules, current state, request / second-approval / decline dialogs, history, governance. Dual control is API e2e-tested (requester, self-block, same-role block, approve, entries return 503, resume). No 'Download policy (PDF)' and no contract card."
+      },
+      {
+        "id": "ADM-C1",
+        "status": "IMPLEMENTED",
+        "note": "Queue (KPIs, status/level filters, SLA, risk, decision rules, recent decisions) and review (checks, masked player, risk meter, limits, history, approve / reject / request info with reason + 2FA). Playwright e2e passes. Deviations: decision uses buttons plus a dialog instead of inline radios; no document images (the provider keeps them); no case assignment."
+      },
+      {
+        "id": "ADM-C2",
+        "status": "IMPLEMENTED",
+        "note": "KPIs (open, closed 7 days, no-issue rate 30 days), filters, table, full-width preview (why it fired, risk score, next step: escalate / close / dismiss via the existing resolve endpoint, withdrawal hold links to User Management restrictions), bottom sheet on mobile."
+      }
+    ],
+    "verified": [
+      "API: pnpm --filter @gp/api typecheck → exit 0",
+      "API: pnpm --filter @gp/api lint → exit 0 (one console warning in seed-admin-ops.ts fixed)",
+      "API unit: vitest run --config vitest.config.mts → 14 files / 59 tests passed. The first full `pnpm test` had 1 timeout in api-gaps' onchain-rounds/commitments.spec.ts, which passed on rerun",
+      "API e2e: flock /tmp/gp-api-test.lock pnpm test:e2e → 13 files / 100 tests passed, including test/admin-ops.e2e-spec.ts (8 tests: finance aggregates, RBAC, no-edit 404s, CSV export reason/PII/SHA-256/audit, breaker dual control with entries 503, pool views, KYC decision + 409, AML)",
+      "Web: pnpm --filter @gp/web typecheck → exit 0; pnpm --filter @gp/web lint → exit 0; pnpm --filter @gp/web test → 10 files / 95 tests passed (test/admin-b.test.tsx 8/8)",
+      "Web build: flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-admin-b NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4107 pnpm --filter @gp/web build → EXIT 0 (final build includes all changes; all 25 admin-b routes built)",
+      "Playwright: E2E_BASE_URL=http://localhost:3107 E2E_API_URL=http://localhost:4107 pnpm exec playwright test e2e/admin-b.spec.ts → 1 passed",
+      "Screenshots at 1440 and 390 of every admin-b page (finance ×9 incl. WD detail, pool ×10, compliance ×3 incl. KYC review) in apps/web/test-results/visual/admin-b/; no horizontal overflow and no unexpected console errors; compared with Figma frames in design/reference/admin-b/ and differences fixed"
+    ],
+    "failing": [
+      "None in my scope. Earlier transient failures, both outside my module: (1) api-gaps unit test onchain-rounds/commitments.spec.ts timed out at 67 s under machine load and passed on rerun; (2) admin-a's admin.e2e-spec four-eyes queue lookup failed while the test DB had accumulated 37 open withdrawals, and admin-a has since fixed it — the full e2e run now passes 100/100.",
+      "Not implemented: F6 run history, investigation panel and correcting-entry workflow; F8 scheduled reports and game revenue; P8 batch auto-claim progress; F2 bulk approve and 'Ask user for info'; F9 column selection and row estimate; P10 policy PDF and contract card; C1 inline-radio decision form and document images."
+    ],
+    "decisions": [
+      "Circuit breaker (ADM-P10), per the Figma spec: Super Admin, Finance or Compliance may request; the second approver must be a different person holding a different one of those roles; 2FA for both; requests expire after 30 min; resume uses the same flow. It is role-based (checks AuthAdmin.roles), not permission-based, because RBAC is DB-driven and no single permission maps to it. Approval rows use action pool.entries.pause/resume, targetType feature_flag. Task note #56 asks admin-a to link these from their inbox rather than offer approve/reject there.",
+      "Platform fees of cancelled rounds are shown as retained in the fees account (stakes are refunded in full), as the existing ledger posting rules define. The Figma copy says 'fee released'. Owner decision needed.",
+      "KYC decisions require a fresh 2FA code, which is stricter than the REASON-only policy for kyc.review.",
+      "CSV exports: reason required; personal data masked unless users.pii.read (Finance cannot include it); CSV returned inline and downloaded client-side, with no file storage, so 'link expires' is nominal; audit action report.exported carries the SHA-256.",
+      "Refund reminders need notifications.send (Super Admin, Marketing). The Figma implies Finance can remind. Owner decision needed.",
+      "The ledger hash chain is computed on read (sha256 over all postings in commit order), not stored per entry and not anchored on-chain. The audit log keeps its own stored chain.",
+      "Bulk withdrawal approval is deliberately not offered; every request is decided on its own detail page.",
+      "Shared-file changes, all additive: admin.module.ts exports AdminAuthService, AdminSecurityService and the guards; FeatureFlagsService.invalidate(); app.module.ts registers AdminOpsModule; shared schemas/admin-ops.ts plus its export line; admin-a nav-config.ts gets Finance/Pool/Compliance children; docs/API.md gets an admin-ops section. Prettier also ran over the whole app/admin/(console) folder, which includes admin-a's files; this should only be formatting.",
+      "Dev DB: ran `pnpm --filter @gp/api db:migrate:deploy` (non-destructive), which applied api-gaps' finished migration 20261128163000_randomness_request_scope so the API could run. Added DEMO, non-ledger compliance cases with prisma/seed-admin-ops.ts (10 KYC cases, 5 AML alerts, idempotent).",
+      "Seeded DEMO times (18:40 UTC on 28 Nov) are ahead of the real clock, so some SLA and age values read oddly (e.g. 17 h left, 'just now'). These are data artefacts, not UI bugs."
+    ],
+    "next": [
+      "Owner decisions: (a) whether platform fees of cancelled rounds are refunded or retained; (b) whether Finance may send refund reminders; (c) confirm the breaker roles and the 30-minute expiry.",
+      "F6: persist reconciliation runs (history plus INV-style investigations) and a correcting-entry proposal with four-eyes. P8: show per-batch claim progress once on-chain settlement batches exist. F5: anchor the journal digest on-chain.",
+      "Read real contract and hot-wallet balances (watchers / RPC) to replace the ledger-mirror custody check in F4 and P2.",
+      "admin-a: route pool.entries.* approvals from the four-eyes inbox to /admin/pool/policy (task #56).",
+      "Optional: column selection and row estimate in the F9 export; build the remaining tablet (768) layouts against the Figma frames."
+    ]
+  }
+]

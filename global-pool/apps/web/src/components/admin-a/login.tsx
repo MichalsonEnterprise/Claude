@@ -298,7 +298,7 @@ export function AdminLogin() {
   return (
     <div className="flex min-h-dvh flex-col bg-bg-base">
       <DemoBar />
-      <div className="flex flex-1">
+      <main id="main" className="flex flex-1">
         <section
           aria-labelledby="admin-login-title"
           className="flex w-full flex-col justify-between gap-10 border-r border-border-subtle bg-bg-secondary px-6 py-10 tablet:px-16 tablet:py-12 laptop:w-[560px] laptop:shrink-0"
@@ -568,7 +568,7 @@ export function AdminLogin() {
           </div>
         </section>
         <PolicyPanel />
-      </div>
+      </main>
     </div>
   );
 }
