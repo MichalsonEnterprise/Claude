@@ -1,0 +1,17 @@
+{
+  "name": "global-pool",
+  "private": true,
+  "version": "0.1.0",
+  "description": "GLOBAL POOL — Web3 global jackpot & crypto gaming platform (monorepo: web, api, contracts, shared). DEMO / testnet only — real-money operation disabled.",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev:services": "bash scripts/dev-services.sh start",
+    "dev:web": "pnpm --filter @gp/web dev",
+    "dev:api": "pnpm --filter @gp/api start:dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "engines": { "node": ">=22" }
+}
