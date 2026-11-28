@@ -76,7 +76,13 @@ type PreviewForm = z.infer<typeof previewSchema>;
 type Phase =
   | { kind: 'preview' }
   | { kind: 'pending'; entries: number }
-  | { kind: 'success'; result: EntryPurchaseResult }
+  | {
+      kind: 'success';
+      result: EntryPurchaseResult;
+      /** Snapshot at submit time (queries refetch after the purchase). */
+      myEntriesBefore: number;
+      limitsBefore: RgLimitView[] | null;
+    }
   | { kind: 'closed'; entries: number }
   | { kind: 'error'; entries: number; error: unknown };
 
@@ -113,10 +119,11 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
     if (!intent.current || intent.current.entries !== entries)
       intent.current = { entries, key: newIdempotencyKey() };
     setPhase({ kind: 'pending', entries });
+    const before = { myEntriesBefore: props.myEntries, limitsBefore: props.limits };
     try {
       const result = await enterRound(round.id, entries, intent.current.key);
       intent.current = null;
-      setPhase({ kind: 'success', result });
+      setPhase({ kind: 'success', result, ...before });
       void qc.invalidateQueries({ queryKey: ['pool'] });
       // other modules' views of the same balances / history
       void qc.invalidateQueries({ queryKey: ['wallet'] });
@@ -171,8 +178,8 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
         <SuccessStep
           round={round}
           result={phase.result}
-          myEntriesBefore={props.myEntries}
-          limits={props.limits}
+          myEntriesBefore={phase.myEntriesBefore}
+          limits={phase.limitsBefore}
           onClose={() => onOpenChange(false)}
           desktop={desktop}
         />

@@ -175,9 +175,11 @@ export class RoundMirrorService {
 
     let state = await this.read(round);
     await this.recordStatus(round, state);
-    if (spec.done(state) && !spec.newAttempt) {
+    if (spec.done(state)) {
       spec.check?.(state);
-      return { done: true, op: await this.confirmOp(round, step, latest), changed: true };
+      const existing = spec.newAttempt && latest?.status === 'confirmed' ? null : latest;
+      const next = (latest?.attempt ?? 0) + 1;
+      return { done: true, op: await this.confirmOp(round, step, existing, next), changed: true };
     }
 
     let op: (RoundChainOp & { chainTx?: unknown }) | null = latest;
@@ -474,17 +476,21 @@ export class RoundMirrorService {
     });
   }
 
-  /** requestDraw(roundId) → Chainlink VRF v2.5 (permissionless keeper call). */
-  requestDraw(round: Round, options: { reRequest?: boolean } = {}): Promise<StepResult> {
+  /**
+   * requestDraw(roundId) → Chainlink VRF v2.5 (permissionless keeper call). A re-request (`knownAttempts` = draw
+   * attempts the database already tracks) is done once the contract counts more attempts, or the draw is fulfilled.
+   */
+  requestDraw(round: Round, options: { knownAttempts?: number } = {}): Promise<StepResult> {
+    const reRequest = options.knownAttempts !== undefined;
     return this.step(round, 'request_draw', {
       role: 'keeper',
-      newAttempt: options.reRequest,
+      newAttempt: reRequest,
       done: (s) =>
-        options.reRequest
-          ? s.status === OnchainStatus.Fulfilled || s.status === OnchainStatus.Settled
-          : s.status === OnchainStatus.DrawRequested ||
-            s.status === OnchainStatus.Fulfilled ||
-            s.status === OnchainStatus.Settled,
+        s.status === OnchainStatus.Fulfilled ||
+        s.status === OnchainStatus.Settled ||
+        (reRequest
+          ? s.drawAttempts > (options.knownAttempts ?? 0)
+          : s.status === OnchainStatus.DrawRequested),
       data: () =>
         encodeFunctionData({
           abi: globalPoolRoundsAbi,

@@ -229,16 +229,23 @@ export class RoundLifecycleService {
     if (this.mirrored(round)) {
       // A requested on-chain draw can never be cancelled: after the contract's 24 h timeout the keeper re-requests
       // (same committed entries; whichever request is fulfilled first is final). Disclosed in the audit log.
+      const known = await this.prisma.randomnessRequest.count({ where: { roundId } });
+      const onchain = await this.mirror.read(round);
+      if (onchain.drawAttempts > known) {
+        // A re-request is on-chain but not tracked yet: follow the newest request from now on.
+        await this.prisma.randomnessRequest.update({
+          where: { id: polled.id },
+          data: { status: 'timed_out' },
+        });
+        await this.randomness.request(round);
+        return 'waiting';
+      }
       if (
         addHours(polled.requestedAt, this.config.env.VRF_TIMEOUT_HOURS) < now &&
         (await this.mirror.canReRequest(round))
       ) {
-        const res = await this.mirror.requestDraw(round, { reRequest: true });
-        if (res.done || res.op?.status === 'sent') {
-          await this.prisma.randomnessRequest.update({
-            where: { id: polled.id },
-            data: { status: 'timed_out' },
-          });
+        const res = await this.mirror.requestDraw(round, { knownAttempts: known });
+        if (res.done && res.changed) {
           await this.audit.record({
             actorType: 'system',
             actorLabel: 'round-lifecycle',
@@ -248,7 +255,11 @@ export class RoundLifecycleService {
             reason: 'VRF request unfulfilled for 24 h',
             metadata: { roundNumber: round.number, previousRequestId: polled.requestId },
           });
-          if (res.done) await this.randomness.request(round);
+          await this.prisma.randomnessRequest.update({
+            where: { id: polled.id },
+            data: { status: 'timed_out' },
+          });
+          await this.randomness.request(round);
         }
       }
       return 'waiting';
