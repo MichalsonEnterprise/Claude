@@ -1,4 +1,5 @@
 // ===== PUB-04 LIB (agent pub-04 game details) =====
+figma.skipInvisibleInstanceChildren = false; // REQUIRED: the MCP runtime skips hidden instance children by default, so layers hidden in the main (art groups, gold CTAs, rule 7, payout DEMO) could not be found/un-hidden
 const MISS = [];
 async function fnt(t) { const L = t.characters.length; if (L) { for (const f of t.getRangeAllFontNames(0, L)) await figma.loadFontAsync(f); } else if (t.fontName !== figma.mixed) await figma.loadFontAsync(t.fontName); }
 // O(node, {layerName: text}) -> overrides the first TEXT layer with that exact name (logs misses)

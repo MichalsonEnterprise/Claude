@@ -124,7 +124,8 @@ export function ErrorState({
         )}
       >
         <Icon aria-hidden className="size-5 shrink-0 text-text-danger" />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        {/* min width: on phones the actions wrap under the text instead of squeezing it into a narrow column */}
+        <div className="flex min-w-[12rem] flex-1 flex-col gap-0.5">
           <p className="text-label-m text-text-primary">{title ?? d.title}</p>
           <p className="text-body-s text-text-secondary">
             {description ?? d.description}

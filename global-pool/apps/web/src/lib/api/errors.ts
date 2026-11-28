@@ -72,7 +72,8 @@ export function describeError(err: unknown, what = 'this'): ErrorDescription {
       kind: 'network',
       title: 'You seem to be offline',
       description:
-        'We couldn’t reach GLOBAL POOL. Check your internet connection and try again — your balance is safe.',
+        // module wrappers add their own reassurance note ("Your balance is safe.") — not repeated here
+        'We couldn’t reach GLOBAL POOL. Check your internet connection and try again.',
       retryable: true,
     };
   }

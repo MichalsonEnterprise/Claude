@@ -1,0 +1,133 @@
+{
+ "_note": "Agent adm-growth-sys — ADM-A1..A5 Affiliate management, ADM-M1..M6 Marketing, ADM-S1..S6 System on page '09 — Admin Panel', section 'ADM-A/M Affiliates & marketing, ADM-S System' (33:192221) at X=86000, Y=0 (26,640 x 13,333). NO new library components; these are SCREEN FRAME ids for page-index links and prototypes. Layout (section-local): 1440 masters in one row at y=200, x = 120 + i*1560 (A1..A5, M1..M6, S1..S6), extra states stacked under their default (M2 Changes requested y 1882, M6 Compliance review step y 1621, S3 Export — filtered y 2223, S3 Integrity alert y 4260); Laptop 1280 row at y=6440 under each master (same x), with M2/M6/S3 state clones stacked below; S3 Tablet 768 at y=10758 under the S3 column. The 21 desktop frames come from an earlier interrupted run (kept; renamed to the '[ID] Name / BP / State' convention on 28 Nov); the 20 laptop frames and the tablet frame were built in the 28 Nov continuation. Admin role chip has no 'Marketing' variant: Marketing chips are clones of the desktop instance (label override). No admin 390 frames are required for these rows (ledger sizes D·L, S3 D·L·T). Scripts: pending/adm-growth-sys.",
+ "[ADM-A1] Affiliates / 1440 / Default": {
+  "id": "33:192225"
+ },
+ "[ADM-A1] Affiliates / 1280 / Default": {
+  "id": "285:266479"
+ },
+ "[ADM-A2] Referral Statistics / 1440 / Default": {
+  "id": "33:230940"
+ },
+ "[ADM-A2] Referral Statistics / 1280 / Default": {
+  "id": "285:267373"
+ },
+ "[ADM-A3] Commissions / 1440 / Default": {
+  "id": "33:265034"
+ },
+ "[ADM-A3] Commissions / 1280 / Default": {
+  "id": "285:268097"
+ },
+ "[ADM-A4] Payouts / 1440 / Default": {
+  "id": "33:294350"
+ },
+ "[ADM-A4] Payouts / 1280 / Default": {
+  "id": "285:268766"
+ },
+ "[ADM-A5] Fraud Detection / 1440 / Default": {
+  "id": "33:322372"
+ },
+ "[ADM-A5] Fraud Detection / 1280 / Default": {
+  "id": "285:269410"
+ },
+ "[ADM-M1] Banners / 1440 / Default": {
+  "id": "34:355822"
+ },
+ "[ADM-M1] Banners / 1280 / Default": {
+  "id": "287:101365"
+ },
+ "[ADM-M2] Promotions / 1440 / Default": {
+  "id": "34:381855"
+ },
+ "[ADM-M2] Promotions / 1440 / Compliance review — Changes requested": {
+  "id": "34:403572"
+ },
+ "[ADM-M2] Promotions / 1280 / Default": {
+  "id": "287:102004"
+ },
+ "[ADM-M2] Promotions / 1280 / Compliance review — Changes requested": {
+  "id": "292:107815"
+ },
+ "[ADM-M3] Announcements / 1440 / Default": {
+  "id": "34:419221"
+ },
+ "[ADM-M3] Announcements / 1280 / Default": {
+  "id": "287:102595"
+ },
+ "[ADM-M4] Notifications / 1440 / Default": {
+  "id": "34:447541"
+ },
+ "[ADM-M4] Notifications / 1280 / Default": {
+  "id": "287:103118"
+ },
+ "[ADM-M5] Referral Campaigns / 1440 / Default": {
+  "id": "34:475127"
+ },
+ "[ADM-M5] Referral Campaigns / 1280 / Default": {
+  "id": "288:103009"
+ },
+ "[ADM-M6] CMS / 1440 / Editor — Draft": {
+  "id": "34:495176"
+ },
+ "[ADM-M6] CMS / 1440 / Compliance review step": {
+  "id": "36:528110"
+ },
+ "[ADM-M6] CMS / 1280 / Editor — Draft": {
+  "id": "288:103574"
+ },
+ "[ADM-M6] CMS / 1280 / Compliance review step": {
+  "id": "288:104081"
+ },
+ "[ADM-S1] Admin Roles / 1440 / Default": {
+  "id": "36:540626"
+ },
+ "[ADM-S1] Admin Roles / 1280 / Default": {
+  "id": "288:104534"
+ },
+ "[ADM-S2] Permissions Matrix / 1440 / Default": {
+  "id": "50:50682"
+ },
+ "[ADM-S2] Permissions Matrix / 1280 / Default": {
+  "id": "290:104469"
+ },
+ "[ADM-S3] Audit Logs / 1440 / Default": {
+  "id": "66:51328"
+ },
+ "[ADM-S3] Audit Logs / 1440 / Export — filtered": {
+  "id": "80:66941"
+ },
+ "[ADM-S3] Audit Logs / 1440 / Integrity alert": {
+  "id": "80:67571"
+ },
+ "[ADM-S3] Audit Logs / 1280 / Default": {
+  "id": "290:105350"
+ },
+ "[ADM-S3] Audit Logs / 1280 / Integrity alert": {
+  "id": "292:106908"
+ },
+ "[ADM-S3] Audit Logs / 768 / Default": {
+  "id": "293:207494"
+ },
+ "[ADM-S4] API Settings / 1440 / Default": {
+  "id": "66:52353"
+ },
+ "[ADM-S4] API Settings / 1280 / Default": {
+  "id": "290:106239"
+ },
+ "[ADM-S5] Security / 1440 / Default": {
+  "id": "80:65828"
+ },
+ "[ADM-S5] Security / 1280 / Default": {
+  "id": "291:106243"
+ },
+ "[ADM-S6] System Configuration / 1440 / Default": {
+  "id": "80:66459"
+ },
+ "[ADM-S6] System Configuration / 1280 / Default": {
+  "id": "291:106784"
+ },
+ "Section/ADM-A/M Affiliates & marketing, ADM-S System": {
+  "id": "33:192221",
+  "type": "SECTION"
+ }
+}

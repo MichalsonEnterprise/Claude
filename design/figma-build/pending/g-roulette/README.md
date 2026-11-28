@@ -1,3 +1,10 @@
+# pending/g-roulette — SUPERSEDED (28 Nov 2026) — DO NOT RUN
+
+All RL-01…RL-09 frames already exist in Figma (sections 'RL Roulette' 32:77136 on page 08 and
+'Games — Mobile Roulette' 34:413029 on page 10), built by an earlier run under DIFFERENT frame names.
+These scripts match frames by name, so running them now would create duplicates. Frame ids:
+/home/user/Claude/design/figma-build/registry-g-roulette.json. Kept only as reference.
+
 # pending/g-roulette — Pool Roulette (RL-01 … RL-09)
 
 Status 28 Nov 2026 (continuation run): the Figma MCP seat limit refused every call of this run, including the

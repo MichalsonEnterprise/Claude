@@ -8,6 +8,6 @@ DONE (continuation run 28 Nov 2026, scripts in out/): mob-01 … mob-07
   MOB-02: 190:74734 190:75438 190:75598 192:144096 192:144357 board 192:144563
   MOB-10: 193:144654 193:145037 194:77008 194:77291 board 196:77250
   MOB-12: board 199:77678 (part A: header + Navigation + Grids)
-STOPPED 28 Nov 2026 after 3 consecutive Figma MCP limit errors on mob-08.
-REMAINING: mob-08 (board part B: Tables, Modals, breakpoint strip), mob-09 (768 Navigation drawer closed/open), mob-10 (768 Tables pinned column, 768 centred modal).
-Next agent: run mob-08.js, then mob-09.js (needs nothing else), then mob-10.js (its centred-modal frame clones the 'Drawer closed (lobby)' frame from mob-09). All three already carry the data patches above.
+DONE (2nd continuation 28 Nov 2026): mob-08 (board part B), mob-09 (768 drawer closed 296:100315 / open 296:101496), mob-10 (768 table pinned column 298:102586 — rows re-ordered to history page 1, '1–8 of 212'; 768 centred modal 298:103186).
+Post-run fix (inline, not in the scripts): modal capped at 976 px with Body FILL + clip + scroll thumb; 48 px edge gutter behind the table's 'More columns' chevron.
+NOTHING REMAINING for MOB-01/02/10/12.

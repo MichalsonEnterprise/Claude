@@ -45,14 +45,14 @@ async function mobFrame(set, g, X, Y) {
   const name = `[PUB-04] Game Details · ${g.name} (${g.genre}) / 390 / Default — logged out`;
   for (const o of sec.children.filter(c => c.name === name)) o.remove();
   const f = await screen(name, 390, {}); sec.appendChild(f); f.x = X; f.y = Y;
-  add(f, [await DEMOBAR(), 'FILL']);
+  add(f, [await DEMOBAR('DEMO — every figure on this page is illustrative'), 'FILL']); // default message overflows 390
   add(f, [await I('23:12908', { State: 'Guest' }), 'FILL']);
   const main = AL('VERTICAL', { name: 'Content', p: [16, 16, 24, 16], gap: 24 }); add(f, [main, 'FILL']);
   const t = await tplInst(set, 'Mobile'); t.name = 'Template/Game Details — ' + g.name; add(main, [t, 'FILL']); await apply(t, g, true);
   const bar = AL('HORIZONTAL', { name: 'Sticky CTA bar (fixed above tab bar)', gap: 12, p: [12, 16, 12, 16], fill: 'bg/secondary', align: 'CENTER' }); strokeSides(bar, 'border/subtle', { t: 1 });
   const info = col('Bar info', { gap: 2 }); const ir = row('Bar info top', { gap: 6 }); add(ir, await T(g.barK, 'Caption', 'text/tertiary'), await DEMO('XS')); add(info, ir, await T(g.barV, 'Label/M', 'text/primary'));
   const b = g.gold ? await BTN('Gold', 'Participate', { size: 'L', lead: 'ticket' }) : await BTN('Primary', 'Play now', { size: 'L', lead: 'play' });
-  add(bar, info, [b, 'FILL']); add(f, [bar, 'FILL']);
+  add(bar, [info, 'FILL'], b); add(f, [bar, 'FILL']); ir.layoutSizingHorizontal = 'FILL'; for (const x of [ir.children[0], info.children[1]]) { x.layoutSizingHorizontal = 'FILL'; x.textAutoResize = 'HEIGHT'; } // (28 Nov) info fills + wraps, button hugs — FILL button was clipped at 390
   add(f, [await I('22:5413', { Active: g.tab }), 'FILL']);
   return { f, t };
 }

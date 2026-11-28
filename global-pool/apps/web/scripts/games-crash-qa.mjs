@@ -120,6 +120,16 @@ async function contextFor(browser, width, player, s) {
     });
     await ctx.routeWebSocket(/\/socket\.io\//, () => undefined); // never answers → no live snapshot yet
   }
+  if (s.offline) {
+    // proxy the live socket so the test can really drop it later (Chromium's offline mode keeps open WebSockets)
+    ctx.qaSockets = [];
+    ctx.qaDropped = false;
+    await ctx.routeWebSocket(/\/socket\.io\//, (ws) => {
+      if (ctx.qaDropped) return ws.close({ code: 4000, reason: 'qa: connection lost' });
+      ws.connectToServer();
+      ctx.qaSockets.push(ws);
+    });
+  }
   await ctx.route('**/auth/new-device-alerts', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
   return ctx;
 }
@@ -146,7 +156,6 @@ const SCREENS = [
 ];
 
 const visible = (page, sel) => page.locator(sel).locator('visible=true').first();
-const phaseOf = (page) => page.locator('[data-testid="crash-game"]').getAttribute('data-phase');
 
 /** Wait for a betting window with at least `minS` seconds left (real server rounds). */
 async function bettingWindow(page, minS = 3) {
@@ -247,8 +256,10 @@ try {
         }
         if (s.bet) await reach(page, s);
         if (s.offline) {
+          ctx.qaDropped = true;
           await ctx.setOffline(true);
-          await page.getByTestId('connection-banner').waitFor({ timeout: 30_000 });
+          for (const ws of ctx.qaSockets) await ws.close({ code: 4000, reason: 'qa: connection lost' }).catch(() => undefined);
+          await page.getByTestId('crash-connection-banner').waitFor({ timeout: 30_000 });
           await page.waitForTimeout(2500);
         }
         if (s.autoplay) {

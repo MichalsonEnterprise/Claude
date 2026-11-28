@@ -9,6 +9,7 @@ import {
   isFairGameSlug,
   playInstant,
   verifyBet,
+  type BetOutcomeFilter,
   type FairGameSlug,
   type GameBetsQuery,
   type PlaceBetInput,
@@ -27,6 +28,7 @@ import { GamesPolicyService } from './policy.service';
 import { SeedsService } from './seeds.service';
 
 type BetRow = GameResult & { session: GameSession & { game: Pick<Game, 'slug' | 'name'> } };
+type HistoryFilters = Pick<GameBetsQuery, 'from' | 'to' | 'result' | 'pick' | 'outcome' | 'search'>;
 
 /** Instant games (Pool Dice, Double Side, Pool Roulette, Skyline, Fortune Ring, Pool Keno, Pinfall) + bet views. */
 @Injectable()
@@ -128,14 +130,15 @@ export class BetsService {
 
   /**
    * GET /games/:slug/bets — my bets for one game, newest first. Optional filters (period, win / lose, Double Side
-   * pick, reference or nonce search) apply to the page AND the summary, so KPIs always describe the listed bets.
+   * pick, net outcome / Twenty-One hand results, reference or nonce search) apply to the page AND the summary, so
+   * KPIs always describe the listed bets.
    */
   async history(
     userId: string,
     slug: string,
     page: number,
     pageSize: number,
-    filters: Pick<GameBetsQuery, 'from' | 'to' | 'result' | 'pick' | 'search'> = {},
+    filters: HistoryFilters = {},
   ) {
     const game = await this.seeds.gameRow(this.prisma, slug);
     const where = this.historyWhere(userId, game.id, filters);
@@ -150,7 +153,8 @@ export class BetsService {
       this.prisma.gameResult.count({ where }),
     ]);
     const settledWhere: Prisma.GameResultWhereInput = { AND: [where, { status: 'settled' }] };
-    const [settled, wins, landedHeads, landedTails] = await Promise.all([
+    const stakeCol = this.prisma.gameResult.fields.stake;
+    const [settled, wins, landedHeads, landedTails, netWins, netLosses] = await Promise.all([
       this.prisma.gameResult.aggregate({
         where: settledWhere,
         _sum: { stake: true, payout: true },
@@ -168,6 +172,9 @@ export class BetsService {
             where: { AND: [settledWhere, { outcome: { path: ['side'], equals: 'tails' } }] },
           })
         : Promise.resolve(null),
+      // by NET (payout vs stake): a Twenty-One push or an insurance-only return is not a win
+      this.prisma.gameResult.count({ where: { AND: [settledWhere, { payout: { gt: stakeCol } }] } }),
+      this.prisma.gameResult.count({ where: { AND: [settledWhere, { payout: { lt: stakeCol } }] } }),
     ]);
     const wagered = credits(settled._sum.stake);
     const returned = credits(settled._sum.payout);
@@ -187,6 +194,8 @@ export class BetsService {
         ...(landedHeads !== null && landedTails !== null
           ? { landed: { heads: landedHeads, tails: landedTails } }
           : {}),
+        /** Settled bets by net result: won more than staked · lost money · got exactly the stake back. */
+        outcomes: { win: netWins, lose: netLosses, push: settled._count - netWins - netLosses },
       },
       currency: DEMO.currency,
       isDemo: true,
@@ -196,7 +205,7 @@ export class BetsService {
   private historyWhere(
     userId: string,
     gameId: string,
-    f: Pick<GameBetsQuery, 'from' | 'to' | 'result' | 'pick' | 'search'>,
+    f: HistoryFilters,
   ): Prisma.GameResultWhereInput {
     const and: Prisma.GameResultWhereInput[] = [{ userId, gameId }];
     if (f.from || f.to) {
@@ -207,6 +216,7 @@ export class BetsService {
     if (f.result === 'win') and.push({ status: 'settled', payout: { gt: 0 } });
     if (f.result === 'lose') and.push({ status: 'settled', payout: { lte: 0 } });
     if (f.pick) and.push({ params: { path: ['pick'], equals: f.pick } });
+    if (f.outcome) and.push({ status: 'settled', ...this.outcomeWhere(f.outcome) });
     if (f.search) {
       const digits = /(\d{1,9})$/.exec(f.search)?.[1];
       const n = digits ? Number(digits) : NaN;
@@ -216,6 +226,31 @@ export class BetsService {
       }
     }
     return { AND: and };
+  }
+
+  /**
+   * `outcome` filter: net result (payout vs stake, compared column to column) or — Twenty-One — a hand result in the
+   * settled outcome (`hands[]` holds every hand of the bet, JSONB containment matches any of them).
+   */
+  private outcomeWhere(o: BetOutcomeFilter): Prisma.GameResultWhereInput {
+    const stakeCol = this.prisma.gameResult.fields.stake;
+    const anyHand = (hand: Prisma.InputJsonObject): Prisma.GameResultWhereInput => ({
+      outcome: { path: ['hands'], array_contains: [hand] },
+    });
+    switch (o) {
+      case 'win':
+        return { payout: { gt: stakeCol } };
+      case 'lose':
+        return { payout: { lt: stakeCol } };
+      case 'push':
+        return { payout: { equals: stakeCol } };
+      case 'blackjack':
+        return anyHand({ result: 'blackjack' });
+      case 'bust':
+        return anyHand({ result: 'bust' });
+      case 'split_double':
+        return { OR: [anyHand({ fromSplit: true }), anyHand({ doubled: true })] };
+    }
   }
 
   async byId(userId: string, id: string): Promise<BetRow> {

@@ -88,6 +88,7 @@ async function BADGE(status, size = 'S') { return await I('6:119', { Status: sta
 function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n => n.type === 'SECTION' && n.name === name); if (!s) { s = figma.createSection(); s.name = name; s.x = x; s.y = y; s.fills = [paint('bg/secondary')]; } return s; }
 // ===== END GP HELPERS =====
 // ===== PUB-04 LIB (agent pub-04 game details) =====
+figma.skipInvisibleInstanceChildren = false; // REQUIRED: the MCP runtime skips hidden instance children by default, so layers hidden in the main (art groups, gold CTAs, rule 7, payout DEMO) could not be found/un-hidden
 const MISS = [];
 async function fnt(t) { const L = t.characters.length; if (L) { for (const f of t.getRangeAllFontNames(0, L)) await figma.loadFontAsync(f); } else if (t.fontName !== figma.mixed) await figma.loadFontAsync(t.fontName); }
 // O(node, {layerName: text}) -> overrides the first TEXT layer with that exact name (logs misses)
@@ -131,7 +132,7 @@ async function apply(inst, g, M) {
   setP(nest(inst, 'Related header'), { Title: g.relT }, 'relh');
   g.rel.forEach((r, i) => setP(nest(inst, 'Related ' + (i + 1)), { Art: ART[r[0]], Players: r[1], 'House edge': r[2] }, 'rel' + i));
 }
-function tplSet() { const id = '__TPL__'; return id.startsWith('__') ? null : id; }
+function tplSet() { const id = '297:109867'; return id.startsWith('__') ? null : id; }
 async function getTpl() { const id = tplSet(); if (id) { const n = await figma.getNodeByIdAsync(id); if (n) return n; } const n = figma.currentPage.findOne(x => x.type === 'COMPONENT_SET' && x.name === TPL_NAME); if (!n) throw new Error('Template/Game Details not found — run t1 first and put its id in tpl_id.txt'); return n; }
 async function tplInst(set, bp) { const v = set.children.find(c => c.name === 'Breakpoint=' + bp) || set.defaultVariant; return v.createInstance(); }
 async function deskFrame(set, g, X, Y) {
@@ -153,14 +154,14 @@ async function mobFrame(set, g, X, Y) {
   const name = `[PUB-04] Game Details · ${g.name} (${g.genre}) / 390 / Default — logged out`;
   for (const o of sec.children.filter(c => c.name === name)) o.remove();
   const f = await screen(name, 390, {}); sec.appendChild(f); f.x = X; f.y = Y;
-  add(f, [await DEMOBAR(), 'FILL']);
+  add(f, [await DEMOBAR('DEMO — every figure on this page is illustrative'), 'FILL']); // default message overflows 390
   add(f, [await I('23:12908', { State: 'Guest' }), 'FILL']);
   const main = AL('VERTICAL', { name: 'Content', p: [16, 16, 24, 16], gap: 24 }); add(f, [main, 'FILL']);
   const t = await tplInst(set, 'Mobile'); t.name = 'Template/Game Details — ' + g.name; add(main, [t, 'FILL']); await apply(t, g, true);
   const bar = AL('HORIZONTAL', { name: 'Sticky CTA bar (fixed above tab bar)', gap: 12, p: [12, 16, 12, 16], fill: 'bg/secondary', align: 'CENTER' }); strokeSides(bar, 'border/subtle', { t: 1 });
   const info = col('Bar info', { gap: 2 }); const ir = row('Bar info top', { gap: 6 }); add(ir, await T(g.barK, 'Caption', 'text/tertiary'), await DEMO('XS')); add(info, ir, await T(g.barV, 'Label/M', 'text/primary'));
   const b = g.gold ? await BTN('Gold', 'Participate', { size: 'L', lead: 'ticket' }) : await BTN('Primary', 'Play now', { size: 'L', lead: 'play' });
-  add(bar, info, [b, 'FILL']); add(f, [bar, 'FILL']);
+  add(bar, [info, 'FILL'], b); add(f, [bar, 'FILL']); ir.layoutSizingHorizontal = 'FILL'; for (const x of [ir.children[0], info.children[1]]) { x.layoutSizingHorizontal = 'FILL'; x.textAutoResize = 'HEIGHT'; } // (28 Nov) info fills + wraps, button hugs — FILL button was clipped at 390
   add(f, [await I('22:5413', { Active: g.tab }), 'FILL']);
   return { f, t };
 }
@@ -268,6 +269,6 @@ const set = await getTpl();
 let hd = sec.findOne(x => x.name === 'Doc/PUB-04 mobile header');
 if (!hd) { hd = col('Doc/PUB-04 mobile header', { gap: 8 }); sec.appendChild(hd); hd.x = 120; hd.y = 60; add(hd, await T('PUB-04 Game Details — Mobile 390', 'Heading/H3', 'text/primary'), await T('Instances of Template/Game Details (Breakpoint=Mobile) · Shell/Topbar Mobile · sticky CTA bar · Nav/Mobile Tab Bar. Payouts become stacked rows; related games scroll horizontally.', 'Body/S', 'text/secondary', { w: 3000 })); }
 const R = [];
-for (const k of ["dice", "coin", "bj"]) { const i = ['gp', 'roulette', 'crash', 'dice', 'coin', 'bj'].indexOf(k); const g = GD[k]; const { f, t } = await mobFrame(set, g, 120 + i * 510, 220); fitSection(sec); R.push({ k, id: f.id, name: f.name, h: Math.round(f.height), tpl: t.id }); }
-for (const r of R) { const f = await figma.getNodeByIdAsync(r.id); await f.screenshot({ scale: 0.5 }); }
+for (const k of ["dice", "coin", "bj"]) { const i = ['gp', 'roulette', 'crash', 'dice', 'coin', 'bj'].indexOf(k); const g = GD[k]; const { f, t } = await mobFrame(set, g, 120 + i * 510, 220); fitSection(sec); R.push({ k, id: f.id, h: Math.round(f.height), tpl: t.id, objs: t.findAll(n => n.name.startsWith('Objects — ') && n.visible).map(n => n.name.slice(10)), ctas: t.findAll(n => n.type === 'INSTANCE' && /^Play CTA/.test(n.name) && n.visible).map(n => n.name), rules: t.findAll(n => n.name.startsWith('Rule row ') && n.visible).length, pays: t.findAll(n => n.name.startsWith('Payout row ') && n.visible).length }); }
+// screenshots are taken in a separate call (60 s tool timeout)
 return { sec: sec.id, header: hd.id, nb, R, MISS: MISS.slice(0, 60) };

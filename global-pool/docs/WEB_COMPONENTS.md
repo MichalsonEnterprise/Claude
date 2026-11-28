@@ -555,3 +555,29 @@ QA: `BASE_URL=http://localhost:3115 API_URL=http://localhost:4215 node scripts/g
 API with `CRASH_LOOP_ENABLED=true` (real rounds; fresh DEV MOCK players) → `test-results/visual/games/crash/*.png`;
 e2e: `E2E_BASE_URL=http://localhost:3115 E2E_API_URL=http://localhost:4215 pnpm --filter @gp/web exec playwright test e2e/games-crash.spec.ts`.
 Unit tests: `test/games-crash.test.ts`.
+
+### Twenty-One (key "blackjack") — `src/components/games/blackjack/*`
+
+Blackjack against the dealer on the kit, DEMO credits only ("DEMO credits · no cash value"), Fees 0.00, house edge ≈ 0.50 %
+with basic strategy. The hand lives on the server (`POST /games/twenty-one/hands`, `…/hands/:id/action`,
+`GET …/hands/current`): every deal and every decision is ONE request with ONE idempotency key (kit `useBetRunner`,
+retried with the same key after a dropped connection), only the server's `allowedActions` are enabled, the dealer's
+hole card stays `null` until the server settles the hand, and every result shown is the server's. Totals, the shoe and
+the verifier use `blackjack` / `verifyBet()` from `@gp/shared/fair` (no duplicated maths). API wrappers + hooks:
+**`src/lib/api/twenty-one.ts`** (`twentyOneApi`, `twentyOneKeys`, `useBjCurrent`, `useBjHands` — history keys live
+under `gameKeys.bets('twenty-one')` so `applySettledBet` refreshes them).
+
+| Route | Component | Notes |
+| --- | --- | --- |
+| `/games/twenty-one` | `TwentyOneGame` (`bj-game.tsx`) | BJ-01 … BJ-05, BJ-09. `BjHeader` (art, breadcrumb, chips, Play · My hands · Rules · Fairness tabs, favourite) · [340 px panel \| felt] ≥ 1024. Panel: `DemoCreditsChip`, kit `BetAmountField`, `ChipTray` (1 · 5 · 10 · 25 · 100, roving arrows) + "tap the bet spot to add", Undo / Clear / Rebet, Deal · Hit / Stand / Double · +x / Split · +x ("Split again" disabled after a split) · Rebet & deal / Change bet / Verify hand, "If you win this hand" (decimal.js `payoutTable`), Fees 0.00, `StakeRiskNote`, keyboard Space · H · S · D · P. `BjTable` (`bj-table.tsx`): table-limits placard, shoe, dealer zone, "Blackjack pays 3 to 2" print, hands with totals (gold only for a paid 3:2), bet pills, status line, overlay. Cards (`cards.tsx`, `PlayingCard` / `CardBack` / `MiniCard`) land one per beat in shoe order (`revealPlan` — card-deal 350 ms + fast 150 ms; hole card turns over before the dealer draws); reduced motion = instant. Balance, session bar and history only move when the last card is down (frozen credits snapshot while a request / reveal is in flight). Overlays: insurance card (≥ 768) / bottom sheet (< 768) with stake, 2:1 return and the ≈ 7.4 % insurance edge; result card (`ResultCard`, real settled hand, ref + time + Verify); connection lost ("your hand is safe", attempt n of 5, Retry now); gate notices (guest, onboarding, region, self-excluded, blocked, limits, offline) only when NO hand is open — an open hand can always be finished (self-exclusion pauses Double / Split / Insurance only). Recovery: an open hand from `GET …/hands/current` is restored with a "Reconnected — hand BJ-x restored" banner; a hand finished in another tab is loaded as settled. Reality checks are held from deal to the last card. Mobile: sticky bar above the tab bar (Deal / 2 × 2 actions / Rebet & deal), result card under the felt, `GameSessionBar`, bet card. Lower row: `RecentHands`, `TableRulesCard`, kit `SeedDisplay`. |
+| `/games/twenty-one/my-hands` | `MyHandsPage` (`bj-pages.tsx`) | BJ-06: KPIs (hands, wagered incl. doubles/splits/insurance, net, W · L · P by net), result chips → server `outcome` filter (All · Wins · Losses · Pushes · Blackjacks · Busts · Splits & doubles), period (Today / 7 / 30 days / All, UTC), search (hand ID or nonce), table ≥ 1024 (hand, bet, your hand, dealer, decisions, result, net, Verify) / cards below, expandable "What happened" (`handTimeline`) + seed pair + Verify / Copy hand data, pagination, Export CSV. |
+| `/games/twenty-one/rules` | `BjRulesPage` | BJ-07: how to play, table rules, payouts (computed for a 10.00 bet), basic strategy hard-totals chart (6 decks, S17, DAS), "Play within your limits". Public. |
+| `/games/twenty-one/fairness` | `BjFairnessPage` (`bj-fairness.tsx`) | BJ-08: load a hand (`?bet=<id>` or hand ID / nonce), rotate & reveal while secret, editable seeds re-derived with kit `verifyInBrowser()` (commitment, computed vs recorded result; edited seed = failed), shoe order (first dealt cards + 2 not dealt, labelled You / Dealer up / Dealer hole / hits / dealer draws via `shoeSlots`), how the shoe is built, download hand data (JSON). |
+
+API addition (additive, engine module): `GET /games/:slug/bets` accepts `outcome=win|lose|push|blackjack|bust|split_double`
+and its summary adds `outcomes { win, lose, push }` (by net) — `apps/api/test/games-twenty-one-history.e2e-spec.ts`.
+
+QA: `BASE_URL=http://localhost:3116 API_URL=http://localhost:4216 node scripts/games-blackjack-qa.mjs [BJ-0x…]` (real hands;
+result variants are played from the UI until each comes up) → `test-results/visual/games/blackjack/*.png`; e2e:
+`E2E_BASE_URL=http://localhost:3116 E2E_API_URL=http://localhost:4216 pnpm --filter @gp/web exec playwright test e2e/games-blackjack.spec.ts`.
+Unit tests: `test/games-blackjack.test.ts`.

@@ -1,117 +1,38 @@
 {
- "_note": "Agent g-roulette (RL-01..RL-09). NOTHING BUILT OR VERIFIED in Figma by the 28 Nov 2026 continuation run: all 3 attempts (the first was the read-only inventory, then 2x the idempotent RL-01 master that also inventories the section) hit the Figma MCP seat limit. No section/frame ids exist from this run. Ready-to-run idempotent scripts (helpers.js verbatim, <50k chars, node --check + mock dry run OK): pending/g-roulette/out/01..13 (see RUN-ORDER.json, README.md). Script 01 first: it lists the existing 'RL Roulette' section (page 08, X=0,Y=0) and returns component text dumps used to tune later scripts. No new library components; inline pieces (felt outside-bet boxes, chip tray, outcome preview, settlement card, mobile vertical felt, mobile outside-bets panel, mobile verifier, bet-type bottom sheet, mobile sticky chip tray + Spin bar) are component gaps.",
- "frames_planned": [
-  {
-   "frame": "[RL-01] Table / 1440 / Bets placed — ready to spin",
-   "script": "out/01_d_rl01_master.js"
-  },
-  {
-   "frame": "[RL-02] Inside bets / 1440 / Placing a split on 17 | 20",
-   "script": "out/02_d_rl02_rl03.js"
-  },
-  {
-   "frame": "[RL-03] Outside bets / 1440 / Adding the 2nd column (2:1)",
-   "script": "out/02_d_rl02_rl03.js"
-  },
-  {
-   "frame": "[RL-04] Spinning / 1440 / No more bets — stake locked",
-   "script": "out/03_d_rl04_rl05.js"
-  },
-  {
-   "frame": "[RL-05] Result / 1440 / Win — 19 Red (+195.00 USDT)",
-   "script": "out/03_d_rl04_rl05.js"
-  },
-  {
-   "frame": "[RL-05] Result / 1440 / Lose — 19 Red, alternative bets on Black · 1st 12 · 26 (−20.00 USDT)",
-   "script": "out/03_d_rl04_rl05.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 1440 / Connection lost — spin settles on the server",
-   "script": "out/04_d_rl09_a.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
-   "script": "out/04_d_rl09_a.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 1440 / Bet above spot max (Straight 19 · 1,200.00 > 1,000.00 USDT)",
-   "script": "out/04_d_rl09_a.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 1440 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)",
-   "script": "out/05_d_rl09_b.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 1440 / Region restricted (United States)",
-   "script": "out/05_d_rl09_b.js"
-  },
-  {
-   "frame": "[RL-06] Bet history / 1440 / My spins — today",
-   "script": "out/06_d_rl06_history.js"
-  },
-  {
-   "frame": "[RL-07] Rules & payouts / 1440 / Default",
-   "script": "out/07_d_rl07_rules.js"
-  },
-  {
-   "frame": "[RL-08] Provably-fair verification / 1440 / Spin RL-88191 verified",
-   "script": "out/08_d_rl08_pf.js"
-  },
-  {
-   "frame": "[RL-01] Table / 768 / Bets placed — ready to spin",
-   "script": "out/09_t_rl01_768.js"
-  },
-  {
-   "frame": "[RL-01] Table / 390 / Bets placed — ready to spin",
-   "script": "out/10_m_rl01_rl02_rl03.js"
-  },
-  {
-   "frame": "[RL-02] Inside bets / 390 / Tapped 19 — choose the bet type (bottom sheet)",
-   "script": "out/10_m_rl01_rl02_rl03.js"
-  },
-  {
-   "frame": "[RL-03] Outside bets / 390 / Outside view — adding the 2nd column",
-   "script": "out/10_m_rl01_rl02_rl03.js"
-  },
-  {
-   "frame": "[RL-04] Spinning / 390 / No more bets — stake locked",
-   "script": "out/11_m_rl04_rl05.js"
-  },
-  {
-   "frame": "[RL-05] Result / 390 / Win — 19 Red (+195.00 USDT)",
-   "script": "out/11_m_rl04_rl05.js"
-  },
-  {
-   "frame": "[RL-05] Result / 390 / Lose — 19 Red, alternative bets (−20.00 USDT)",
-   "script": "out/11_m_rl04_rl05.js"
-  },
-  {
-   "frame": "[RL-06] Bet history / 390 / My spins — today",
-   "script": "out/12_m_rl06_rl07_rl08.js"
-  },
-  {
-   "frame": "[RL-07] Rules & payouts / 390 / Default",
-   "script": "out/12_m_rl06_rl07_rl08.js"
-  },
-  {
-   "frame": "[RL-08] Provably-fair verification / 390 / Spin RL-88191 verified",
-   "script": "out/12_m_rl06_rl07_rl08.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 390 / Connection lost — spin settles on the server",
-   "script": "out/13_m_rl09.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)",
-   "script": "out/13_m_rl09.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 390 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)",
-   "script": "out/13_m_rl09.js"
-  },
-  {
-   "frame": "[RL-09] Errors & limits / 390 / Region restricted (United States)",
-   "script": "out/13_m_rl09.js"
-  }
- ]
+ "_note": "Agent g-roulette (RL-01..RL-09). 28 Nov 2026 continuation: all 29 frames exist in Figma (built by an earlier interrupted run whose report was lost; frame names differ from pending/g-roulette scripts). This run inventoried, screenshot-verified every frame and applied targeted fixes. Do NOT run pending/g-roulette/out/* scripts: their frame names differ, so they would create duplicates. Section 'RL Roulette' 32:77136 (page '08 — Games', X=0,Y=0); section 'Games — Mobile Roulette' 34:413029 (page '10 — Mobile Experience', X=182000,Y=0). No new library components.",
+ "sections": {
+  "RL Roulette": "32:77136",
+  "Games — Mobile Roulette": "34:413029"
+ },
+ "frames": {
+  "RL-01 Table — Felt, chips & bet slip / 1440 / Bets placed": "32:77137",
+  "RL-01 Table — Felt, chips & bet slip / 1440 / Empty table": "33:125557",
+  "RL-02 Inside bets — Number selection / 1440 / Corner preview": "33:126472",
+  "RL-03 Outside bets — Red/Black, Odd/Even, dozens, columns / 1440 / Dozen preview": "33:127360",
+  "RL-04 Spinning — Wheel in motion / 1440 / No more bets": "33:202885",
+  "RL-05 Result — 19 Red / 1440 / Win": "33:203859",
+  "RL-05 Result — 19 Red / 1440 / Lose": "33:204841",
+  "RL-06 Bet history — My bets / 1440 / Today": "33:236919",
+  "RL-07 Rules & payouts / 1440 / Default": "33:265868",
+  "RL-08 Provably fair — Verify a spin / 1440 / Verified": "33:290308",
+  "RL-09 Error & limit states / 1440 / Connection lost": "34:337937",
+  "RL-09 Error & limit states / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)": "34:338888",
+  "RL-09 Error & limit states / 1440 / Table limit exceeded": "34:339796",
+  "RL-09 Error & limit states / 1440 / Daily loss limit reached": "34:340764",
+  "RL-09 Error & limit states / 1440 / Region restricted": "34:341753",
+  "RL-01 Table — Felt, chips & bet slip / 768 / Bets placed": "34:382585",
+  "RL-01 Table — Felt, chips & bet slip / 390 / Bets placed": "34:413030",
+  "RL-02 Inside bets — Number selection / 390 / Bets around 19 (sheet)": "34:452338",
+  "RL-03 Outside bets — Quick-bet sheet / 390 / Red, Odd, 2nd dozen": "34:452805",
+  "RL-04 Spinning — Wheel in motion / 390 / No more bets": "34:484576",
+  "RL-05 Result — 19 Red / 390 / Win": "34:485123",
+  "RL-05 Result — 19 Red / 390 / Lose": "34:485646",
+  "RL-06 Bet history — My bets / 390 / Today": "36:529031",
+  "RL-07 Rules & payouts / 390 / Default": "36:541568",
+  "RL-08 Provably fair — Verify a spin / 390 / Verified": "36:541811",
+  "RL-09 Error & limit states / 390 / Connection lost": "36:508774",
+  "RL-09 Error & limit states / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)": "36:509304",
+  "RL-09 Error & limit states / 390 / Daily loss limit reached": "36:509810",
+  "RL-09 Error & limit states / 390 / Region restricted": "36:510320"
+ }
 }

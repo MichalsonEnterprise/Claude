@@ -1,27 +1,54 @@
 {
-  "slice": "pub-04 (PUB-04 Game Details, template + 6 desktop + 6 mobile)",
-  "status_28nov_0320": "Not run in Figma yet. Three use_figma calls in a row hit the Figma MCP tool-call limit (the last one after a 7-minute wait), so the slice stopped before any canvas read or write. All 5 assembled scripts dry-run cleanly in _mock-run.cjs (m1/m2 fail in the mock only because tpl_id.txt is not set yet).",
-  "pre_step": "One read-only use_figma per page: '03 — Public Website' (section 'PUB-04 Game Details' at 40000,0) and '10 — Mobile Experience' (section 'PUB-04 — Mobile' at 21000,0). List frame names, ids and sizes, and skip any frame that already exists.",
-  "order": [
-    { "step": 1, "file": "out/t1-template.js", "page": "03 — Public Website", "does": "Creates section 'PUB-04 Game Details' plus the component set 'Template/Game Details' (Breakpoint=Desktop 1136, Breakpoint=Mobile 358) and the doc header. Idempotent: reuses the set if it exists.", "after": "Write the returned 'set' id into tpl_id.txt (just the id, e.g. 1234:5678), then run: python3 build.py (it rebuilds out/d*.js and out/m*.js with the id baked in)." },
-    { "step": 2, "file": "out/d1-gp-roulette-crash.js", "page": "03 — Public Website", "does": "Three 1440 frames: Global Pool, Pool Roulette, Orbit Rush. Each is the casino shell (Sidebar Expanded Guest + Topbar Guest + Footer Mega) with a Template/Game Details instance and its overrides. Any frame with the same name is replaced." },
-    { "step": 3, "file": "out/d2-dice-coin-bj.js", "page": "03 — Public Website", "does": "Three 1440 frames: Pool Dice, Double Side, Twenty-One." },
-    { "step": 4, "file": "out/m1-gp-roulette-crash.js", "page": "10 — Mobile Experience", "does": "Section 'PUB-04 — Mobile' at 21000,0 with three 390 frames (Topbar Mobile + Template Mobile instance + sticky CTA bar + Nav/Mobile Tab Bar). REQUIRES tpl_id.txt + build.py first, because the template lives on page 03." },
-    { "step": 5, "file": "out/m2-dice-coin-bj.js", "page": "10 — Mobile Experience", "does": "Three 390 frames: Pool Dice, Double Side, Twenty-One. REQUIRES tpl_id.txt + build.py first." }
-  ],
-  "verify": "Every script ends with node.screenshot(). Check for clipped text, the correct 'Objects — <game>' art group, Gold Participate on Global Pool only, the payout row count, and that the returned MISS array is empty.",
-  "frame_names": [
-    "[PUB-04] Game Details · Global Pool (Global Jackpot) / 1440 / Default — logged out",
-    "[PUB-04] Game Details · Pool Roulette (Roulette) / 1440 / Default — logged out",
-    "[PUB-04] Game Details · Orbit Rush (Crash) / 1440 / Default — logged out",
-    "[PUB-04] Game Details · Pool Dice (Dice) / 1440 / Default — logged out",
-    "[PUB-04] Game Details · Double Side (Coinflip) / 1440 / Default — logged out",
-    "[PUB-04] Game Details · Twenty-One (Blackjack) / 1440 / Default — logged out",
-    "[PUB-04] Game Details · Global Pool (Global Jackpot) / 390 / Default — logged out",
-    "[PUB-04] Game Details · Pool Roulette (Roulette) / 390 / Default — logged out",
-    "[PUB-04] Game Details · Orbit Rush (Crash) / 390 / Default — logged out",
-    "[PUB-04] Game Details · Pool Dice (Dice) / 390 / Default — logged out",
-    "[PUB-04] Game Details · Double Side (Coinflip) / 390 / Default — logged out",
-    "[PUB-04] Game Details · Twenty-One (Blackjack) / 390 / Default — logged out"
-  ]
+ "slice": "pub-04 (PUB-04 Game Details, template + 6 desktop + 6 mobile)",
+ "status_28nov_0320": "Not run in Figma yet. Three use_figma calls in a row hit the Figma MCP tool-call limit (the last one after a 7-minute wait), so the slice stopped before any canvas read or write. All 5 assembled scripts dry-run cleanly in _mock-run.cjs (m1/m2 fail in the mock only because tpl_id.txt is not set yet).",
+ "pre_step": "One read-only use_figma per page: '03 — Public Website' (section 'PUB-04 Game Details' at 40000,0) and '10 — Mobile Experience' (section 'PUB-04 — Mobile' at 21000,0). List frame names, ids and sizes, and skip any frame that already exists.",
+ "order": [
+  {
+   "step": 1,
+   "file": "out/t1-template.js",
+   "page": "03 — Public Website",
+   "does": "Creates section 'PUB-04 Game Details' plus the component set 'Template/Game Details' (Breakpoint=Desktop 1136, Breakpoint=Mobile 358) and the doc header. Idempotent: reuses the set if it exists.",
+   "after": "Write the returned 'set' id into tpl_id.txt (just the id, e.g. 1234:5678), then run: python3 build.py (it rebuilds out/d*.js and out/m*.js with the id baked in)."
+  },
+  {
+   "step": 2,
+   "file": "out/d1-gp-roulette-crash.js",
+   "page": "03 — Public Website",
+   "does": "Three 1440 frames: Global Pool, Pool Roulette, Orbit Rush. Each is the casino shell (Sidebar Expanded Guest + Topbar Guest + Footer Mega) with a Template/Game Details instance and its overrides. Any frame with the same name is replaced."
+  },
+  {
+   "step": 3,
+   "file": "out/d2-dice-coin-bj.js",
+   "page": "03 — Public Website",
+   "does": "Three 1440 frames: Pool Dice, Double Side, Twenty-One."
+  },
+  {
+   "step": 4,
+   "file": "out/m1-gp-roulette-crash.js",
+   "page": "10 — Mobile Experience",
+   "does": "Section 'PUB-04 — Mobile' at 21000,0 with three 390 frames (Topbar Mobile + Template Mobile instance + sticky CTA bar + Nav/Mobile Tab Bar). REQUIRES tpl_id.txt + build.py first, because the template lives on page 03."
+  },
+  {
+   "step": 5,
+   "file": "out/m2-dice-coin-bj.js",
+   "page": "10 — Mobile Experience",
+   "does": "Three 390 frames: Pool Dice, Double Side, Twenty-One. REQUIRES tpl_id.txt + build.py first."
+  }
+ ],
+ "verify": "Every script ends with node.screenshot(). Check for clipped text, the correct 'Objects — <game>' art group, Gold Participate on Global Pool only, the payout row count, and that the returned MISS array is empty.",
+ "frame_names": [
+  "[PUB-04] Game Details · Global Pool (Global Jackpot) / 1440 / Default — logged out",
+  "[PUB-04] Game Details · Pool Roulette (Roulette) / 1440 / Default — logged out",
+  "[PUB-04] Game Details · Orbit Rush (Crash) / 1440 / Default — logged out",
+  "[PUB-04] Game Details · Pool Dice (Dice) / 1440 / Default — logged out",
+  "[PUB-04] Game Details · Double Side (Coinflip) / 1440 / Default — logged out",
+  "[PUB-04] Game Details · Twenty-One (Blackjack) / 1440 / Default — logged out",
+  "[PUB-04] Game Details · Global Pool (Global Jackpot) / 390 / Default — logged out",
+  "[PUB-04] Game Details · Pool Roulette (Roulette) / 390 / Default — logged out",
+  "[PUB-04] Game Details · Orbit Rush (Crash) / 390 / Default — logged out",
+  "[PUB-04] Game Details · Pool Dice (Dice) / 390 / Default — logged out",
+  "[PUB-04] Game Details · Double Side (Coinflip) / 390 / Default — logged out",
+  "[PUB-04] Game Details · Twenty-One (Blackjack) / 390 / Default — logged out"
+ ],
+ "status_28nov_run2": "DONE 28 Nov: t1 built Template/Game Details set 297:109867 (Desktop 297:107084, Mobile 297:108516) in section 297:107083 on page 03; desktop frames placed in a row BELOW the template (x 120..9360 local) so the section ends at x=49480, before PUB-05 at 50000. 6 desktop + 6 mobile frames built and verified. Lessons: (1) set figma.skipInvisibleInstanceChildren = false (now in lib.js) or layers hidden in the main can't be found/un-hidden in instances; (2) 3 frames per call exceed the 60 s MCP timeout (calls finish anyway) — screenshot in a separate call; (3) mobile DEMOBAR default message overflows 390 and the sticky-bar FILL button clipped — both fixed in frames.js."
 }

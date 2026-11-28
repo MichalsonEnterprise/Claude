@@ -1,3 +1,14 @@
+# pending/pub-14-18-20-23 — STATUS 28 Nov 2026 (continuation run 2): COMPLETE — do not run m1–m4
+
+All 16 frames exist and passed screenshot verification (composed temporary-viewport screenshots, viewport removed afterwards).
+- Desktop (page `03 — Public Website`, section 33:205847): FAQ Default 33:205848 · FAQ Search “withdraw” 33:242174 · FAQ No results “bonus code” 36:534066 ·
+  RG Default 33:279676 · Restricted Default 33:323120 · Restricted Search “united” 34:356600 · Cookie Banner 34:396216 · Cookie Preferences modal 34:409284.
+- Mobile (page `10 — Mobile Experience`, section `PUB-14/18/20/23 — Mobile` 34:435743): FAQ Default 34:435744 · FAQ Search “withdraw” 302:109456 ·
+  FAQ No results “bonus code” 302:109738 · RG Default 34:472716 · Restricted Default “search & regions” 34:491926 · Restricted Search “united” 303:113051 ·
+  Cookie Banner (bottom sheet) 36:503505 · Cookie Preferences (bottom sheet) 36:518622.
+- The 3 new mobile states were cloned from the existing mobile Defaults (scripts in `done-28nov/`: helpers.js + common.js + faq.js / restricted.js / fix2.js).
+  `m1-faq.js` … `m4-cookie.js` below are the OLD plan with different frame names — running them now would create duplicates.
+
 # pending/pub-14-18-20-23 — PUB-14 / 18 / 20 / 23 mobile (390) frames
 
 State on 28 Nov 2026 (continuation run, agent slice `pub-p1b`):

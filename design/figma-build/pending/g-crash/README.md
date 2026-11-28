@@ -41,3 +41,10 @@ FINAL (28 Nov 2026, this run stopped after 3 consecutive Figma MCP limit errors)
   'node 203:58796 does not exist' after hiding the link — it is unknown whether that hide persisted; 06 re-queries
   after the mutation and only hides when still visible).
 Tooling notes: use_figma returned at most 5 inline screenshots per call; node.screenshot() works on frames of another page.
+
+CLOSED (28 Nov 2026, 2nd continuation run): read-only inventory confirmed all 26 frames (15 nodes on page 08 section
+32:90237 incl. dev notes; 11 mobile frames on page 10 section 'Games — Mobile Crash' 34:386551). out/06 ran successfully:
+the 'Restricted countries' link in the Notice/Licence row of CR-08 390 Region (36:511527) is hidden (row now
+'Responsible gaming · Licence details', 219 px, no clipping). Tablet CR-01 768 (34:350701) and CR-02 768 (34:351583)
+passed a 0.75× screenshot plus a clipped-text audit (0 clipped texts); dev notes 36:527187 passed. All CR-01…CR-08 VERIFIED.
+Nothing left to run in this folder.

@@ -13,3 +13,8 @@ Built because the shared Figma MCP seat hit its tool-call limit on 27 Nov 2026 (
 - lib.js spacer() now resizes to 1×1 (empty hug frames defaulted to 100 px tall and opened big gaps); mlib.js uses the short mobile DEMO bar (decision #29) and stacks the card sub-title under the title.
 - cont/*.js are the scripts actually run in this session (out/ batch + a targeted fix block for frames built in the previous call). Frame ids are in ../../registry-gp-history.json.
 - REMAINING after the 28 Nov continuation (Figma MCP limit hit 3× in a row): run `cont/NEXT-m34-gp11-gp13-mobile.js` once (page 10, section 'GP — Mobile C' 188:72141). It builds [GP-11] Prize Distribution breakdown / 390, [GP-13] Round closed / 390 (sheet), [GP-13] Round cancelled, refund owed / 390, [GP-13] VRF delayed / 390 and screenshots each. Idempotent (same-name frames are replaced). Also re-screenshot 188:72142 and 188:72622 (GP-08 390) — their DEMO bar message was switched to the short mobile text after the last screenshot.
+
+## Continuation run 28 Nov 2026 (2) — slice COMPLETE
+- Ran `cont/RUN-m34-trimmed.js` (= NEXT-m34 with desktop-only lib functions removed, screenshots at scale 1, plus re-screenshots of 188:72142 / 188:72622). Built 293:99680 (GP-11 390), 293:99941 (GP-13 Round closed sheet 390), 293:100135 (GP-13 cancelled/refund owed 390), 293:100460 (GP-13 VRF delayed 390); MISS = [].
+- Targeted fix on 293:99680: 'Not part of the pool' values hug (0.00 USDT touched the card edge); total row reads 'Total · 13 prizes · 100%' / '186,400.00 USDT' (was wrapping). Re-screenshotted: pass.
+- Re-checked by screenshot: 188:72142 + 188:72622 (short DEMO bar) and 182:110323 (GP-09 settled, VRF stepper 20:02:10 / 35 s). All pass. Nothing remains for this slice.

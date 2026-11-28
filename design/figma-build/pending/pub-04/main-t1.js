@@ -15,7 +15,7 @@ if (!set) {
 }
 set.x = 120; set.y = 320;
 let hd = sec.findOne(x => x.name === 'Doc/PUB-04 header');
-if (!hd) { hd = col('Doc/PUB-04 header', { gap: 8 }); sec.appendChild(hd); hd.x = 120; hd.y = 80; add(hd, await T('PUB-04 Game Details — template + 6 game pages', 'Heading/H2', 'text/primary'), await T('Left: the Template/Game Details component set (Desktop 1136 + Mobile 358). Right: six 1440 pages built as instances with per-game overrides — Global Pool (Global Jackpot), Pool Roulette, Orbit Rush (Crash), Pool Dice, Double Side (Coinflip), Twenty-One (Blackjack). Mobile 390 frames live on page 10 › PUB-04 — Mobile.', 'Body/M', 'text/secondary', { w: 1500 })); }
+if (!hd) { hd = col('Doc/PUB-04 header', { gap: 8 }); sec.appendChild(hd); hd.x = 120; hd.y = 80; add(hd, await T('PUB-04 Game Details — template + 6 game pages', 'Heading/H2', 'text/primary'), await T('Top: the Template/Game Details component set (Desktop 1136 + Mobile 358). Below it: six 1440 pages built as instances with per-game overrides — Global Pool (Global Jackpot), Pool Roulette, Orbit Rush (Crash), Pool Dice, Double Side (Coinflip), Twenty-One (Blackjack). Mobile 390 frames live on page 10 › PUB-04 — Mobile.', 'Body/M', 'text/secondary', { w: 1500 })); }
 fitSection(sec);
 const vD = set.children.find(c => c.name === 'Breakpoint=Desktop'), vM = set.children.find(c => c.name === 'Breakpoint=Mobile');
 await vD.screenshot({ scale: 0.5 });

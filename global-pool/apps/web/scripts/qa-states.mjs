@@ -549,7 +549,11 @@ const VALIDATION = [
       // a player with saved addresses picks "Use a new address" first (WAL-12)
       const fresh = page.getByText('Use a new address').first();
       if (await fresh.count()) await fresh.click();
-      const input = page.locator('main input[type="text"], main input:not([type])').first();
+      // < 768 the flow is a bottom sheet (a dialog outside <main>): take the visible text input wherever it is
+      const input = page
+        .locator('input[type="text"]:visible, input:not([type]):visible')
+        .filter({ hasNot: page.locator('[role="search"]') })
+        .last();
       await input.fill('0x123-not-an-address');
       await input.blur();
     },

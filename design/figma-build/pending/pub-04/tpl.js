@@ -80,7 +80,7 @@ async function buildTpl(M, g) {
   // 4a how to play
   const hw = card('How to play', { p: M ? 20 : 24, gap: 20 }); add(mainC, [hw, 'FILL']); add(hw, await ctitle('How to play title', g.howT, { icon: 'play' }));
   const sg = AX(M ? 'VERTICAL' : 'HORIZONTAL', { name: 'Steps', gap: M ? 12 : 16, wrap: !M, cgap: 16 }); add(hw, [sg, 'FILL']);
-  for (let i = 0; i < 4; i++) { const s = row('Step ' + (i + 1), M ? { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14 } : { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14, w: 344 }); if (M) add(sg, [s, 'FILL']); else add(sg, s);
+  for (let i = 0; i < 4; i++) { const s = row('Step ' + (i + 1), M ? { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14 } : { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14, w: 340 }); if (M) add(sg, [s, 'FILL']); else add(sg, s);
     const n = AX('HORIZONTAL', { name: 'Step num', w: 32, h: 32, r: 9999, fill: 'brand/tint', align: 'CENTER', justify: 'CENTER' }); add(n, await tx(`Step ${i + 1} num`, String(i + 1), 'Label/M', 'text/brand'));
     const sc = col('Step text', { gap: 4 }); add(s, n, [sc, 'FILL']);
     add(sc, [await tx(`Step ${i + 1} title`, g.steps[i][0], 'Body/M Strong', 'text/primary', { w: M ? 234 : 268 }), 'FILL'], [await tx(`Step ${i + 1} body`, g.steps[i][1], 'Body/S', 'text/secondary', { w: M ? 234 : 268 }), 'FILL']); }

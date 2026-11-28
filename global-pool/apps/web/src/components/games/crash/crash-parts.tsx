@@ -555,7 +555,7 @@ export function ConnectionBanner({
     <div
       role="alert"
       className="flex flex-col gap-3 rounded-xl border border-status-warning/60 bg-status-warning-tint px-4 py-3 laptop:flex-row laptop:items-center laptop:gap-5"
-      data-testid="connection-banner"
+      data-testid="crash-connection-banner"
     >
       <p className="flex items-center gap-2 text-body-s-strong text-text-primary laptop:shrink-0">
         <TriangleAlert aria-hidden className="size-5 text-text-warning" />

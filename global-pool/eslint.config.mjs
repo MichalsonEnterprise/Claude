@@ -22,6 +22,8 @@ export const ignores = [
   '**/.next/**',
   // per-agent / per-job Next dist dirs (NEXT_DIST_DIR=.next-<key>)
   '**/.next-*/**',
+  // per-agent compiled API output (tsc --outDir .dist-<key>)
+  '**/.dist-*/**',
   '**/coverage/**',
   '**/.turbo/**',
   '**/.dev/**',

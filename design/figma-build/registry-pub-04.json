@@ -1,0 +1,11 @@
+{
+  "Template/Game Details": {
+    "id": "297:109867",
+    "page": "03 — Public Website",
+    "section": "PUB-04 Game Details (297:107083)",
+    "variants": { "Breakpoint": ["Desktop", "Mobile"] },
+    "variantIds": { "Breakpoint=Desktop": "297:107084", "Breakpoint=Mobile": "297:108516" },
+    "props": {},
+    "note": "Desktop = 1136 content column inside the casino shell (Sidebar 240 + Topbar Desktop + Footer Mega); Mobile = 358 inside a 390 frame. Per-game content is set by overriding named TEXT layers and toggling 'Objects — <game>', 'Play CTA'/'Play CTA gold', 'Rail CTA'/'Rail CTA gold', 'Payout row 1-10', 'Rule row 1-7', 'Payout DEMO'. Scripts that edit instances MUST set figma.skipInvisibleInstanceChildren = false first, or layers hidden in the main are invisible to findOne/findAll. Override script: pending/pub-04/frames.js apply()."
+  }
+}

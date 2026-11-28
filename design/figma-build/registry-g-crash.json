@@ -2,7 +2,7 @@
  "_note": "Agent g-crash (CR-01..CR-08, Orbit Rush). Screens only — no new library components. Composed from Shell/Sidebar (Collapsed, Member), Shell/Topbar Desktop/Mobile, Game/Multiplier Readout, Game/Crash Curve, Game/History Strip (Crash), RG/Session Bar, Notice/Licence, Badge/DEMO, Button/*, Nav/Mobile Tab Bar, Tile/Game Art/Orbit Rush. Inline pieces (component gaps): crash bet panel (Manual/Auto tabs, amount field, quick amounts, auto cash-out toggle + target, odds summary), live-bets list, mobile sticky bet bar, round-history table/cards with crash-point pills, crash-point distribution bars, auto-play settings dialog/bottom sheet, crash verifier (seed/hash/salt rows), connection-lost overlay, insufficient-balance alert.",
  "sections": {
   "CR Crash (page 08 — Games)": "32:90237",
-  "Games — Mobile Crash (page 10 — Mobile Experience)": "see README (section id not returned by the read-only inventory)"
+  "Games — Mobile Crash (page 10 — Mobile Experience)": "34:386551"
  },
  "frames": {
   "[CR-01] Orbit Rush — Pre-round betting / 1440 / Bets open": "32:90238",

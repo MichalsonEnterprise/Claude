@@ -1,5 +1,5 @@
 {
- "_note": "Agent mob-patterns (MOB-01/02/10/12) — continuation run 28 Nov 2026. Section 'MOB-01/02/10/12 Mobile patterns' = 188:158877 on page '10 — Mobile Experience' at X=224000, Y=0 (X=96000 would overlap 'USR — Mobile A/B'). No new library components were created; inline pieces documented as component gaps: mobile tx card, entry round card, tablet top bar (no 768 Shell/Topbar variant), tab-item Pressed/Focus spec cells, mobile hero banner. Scripts: pending/mob-patterns (finished ones in out/).",
+ "_note": "Agent mob-patterns (MOB-01/02/10/12) — continuation run 28 Nov 2026. Section 'MOB-01/02/10/12 Mobile patterns' = 188:158877 on page '10 — Mobile Experience' at X=224000, Y=0 (X=96000 would overlap 'USR — Mobile A/B'). No new library components were created; inline pieces documented as component gaps: mobile tx card, entry round card, tablet top bar (no 768 Shell/Topbar variant), tab-item Pressed/Focus spec cells, mobile hero banner. Scripts: pending/mob-patterns (finished ones in out/). 28 Nov 2026 (2nd continuation): MOB-12 board part B (Tables, Modals & overlays, switch points) appended to 199:77678; four 768x1024 frames built (scripts mob-08…10 now in out/).",
  "frames": {
   "[MOB-01] Public header / 390 / Guest — menu closed": "188:158881",
   "[MOB-01] Full-screen menu / 390 / Guest — menu open": "188:159315",
@@ -18,6 +18,10 @@
   "[MOB-10] Entries — cards / 390 / Default": "194:77008",
   "[MOB-10] Entries — cards / 390 / Loading (skeleton cards)": "194:77291",
   "[MOB-10] Spec — Table → card mapping / Board": "196:77250",
-  "[MOB-12] Tablet behaviour sheet / Board": "199:77678"
+  "[MOB-12] Tablet behaviour sheet / Board": "199:77678",
+  "[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)": "296:100315",
+  "[MOB-12] Tablet 768 — Navigation / 768 / Drawer open": "296:101496",
+  "[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column": "298:102586",
+  "[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)": "298:103186"
  }
 }

@@ -264,6 +264,20 @@ describe('CrashLiveClient (socket /crash)', () => {
     expect(s.history[0]).toEqual({ number: 55102, crashPoint: '1.80' });
   });
 
+  it('a round that already crashed draws its whole curve (take-off → crash frame)', async () => {
+    const c = await start();
+    socket.server(
+      'crash:snapshot',
+      snapshot({
+        round: round({ status: 'crashed', crashPoint: '2.21', crashedAt: '2026-11-28T18:42:12.100Z' }),
+        multiplier: '2.21',
+        elapsedMs: 0,
+      }),
+    );
+    expect(c.getSnapshot().elapsedMs).toBe(7_100);
+    expect(crash.timeToReachMs('2.21')).toBe(7_100);
+  });
+
   it('a tick for an unknown round asks the server for a fresh snapshot', async () => {
     await start();
     socket.server('crash:snapshot', snapshot());

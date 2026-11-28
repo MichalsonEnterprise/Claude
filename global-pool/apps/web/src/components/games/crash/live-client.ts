@@ -79,6 +79,13 @@ const INITIAL: CrashLiveState = {
 
 type Ack = { ok: true; bet: CrashMyBet } | { ok: false; error?: Record<string, unknown> };
 
+/** ms from take-off to the crash (the server's last frame) — draws the full curve of a crashed round. */
+function crashElapsed(round: CrashRoundView): number | null {
+  return round.status === 'crashed' && round.crashedAt
+    ? Math.max(0, Date.parse(round.crashedAt) - Date.parse(round.startedAt))
+    : null;
+}
+
 function frameTime(round: CrashRoundView | null, elapsedMs: number): string | null {
   if (!round) return null;
   return new Date(Date.parse(round.startedAt) + elapsedMs).toISOString();
@@ -317,7 +324,7 @@ export class CrashLiveClient {
         loadError: false,
         round: snap.round,
         multiplier: snap.multiplier,
-        elapsedMs: snap.elapsedMs,
+        elapsedMs: (snap.round && crashElapsed(snap.round)) ?? snap.elapsedMs,
         bets: snap.bets,
         history: snap.history,
         rules: snap.rules,
@@ -351,6 +358,7 @@ export class CrashLiveClient {
       return {
         round,
         multiplier: round.crashPoint ?? s.multiplier,
+        elapsedMs: crashElapsed(round) ?? s.elapsedMs,
         // every bet still open when the round crashes is lost (cap cash-outs arrive as `crash:cashout` first)
         bets: same
           ? s.bets.map((b) => (b.status === 'active' ? { ...b, status: 'lost' as const, payout: '0.00' } : b))

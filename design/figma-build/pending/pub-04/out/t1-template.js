@@ -88,6 +88,7 @@ async function BADGE(status, size = 'S') { return await I('6:119', { Status: sta
 function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n => n.type === 'SECTION' && n.name === name); if (!s) { s = figma.createSection(); s.name = name; s.x = x; s.y = y; s.fills = [paint('bg/secondary')]; } return s; }
 // ===== END GP HELPERS =====
 // ===== PUB-04 LIB (agent pub-04 game details) =====
+figma.skipInvisibleInstanceChildren = false; // REQUIRED: the MCP runtime skips hidden instance children by default, so layers hidden in the main (art groups, gold CTAs, rule 7, payout DEMO) could not be found/un-hidden
 const MISS = [];
 async function fnt(t) { const L = t.characters.length; if (L) { for (const f of t.getRangeAllFontNames(0, L)) await figma.loadFontAsync(f); } else if (t.fontName !== figma.mixed) await figma.loadFontAsync(t.fontName); }
 // O(node, {layerName: text}) -> overrides the first TEXT layer with that exact name (logs misses)
@@ -188,7 +189,7 @@ async function buildTpl(M, g) {
   // 4a how to play
   const hw = card('How to play', { p: M ? 20 : 24, gap: 20 }); add(mainC, [hw, 'FILL']); add(hw, await ctitle('How to play title', g.howT, { icon: 'play' }));
   const sg = AX(M ? 'VERTICAL' : 'HORIZONTAL', { name: 'Steps', gap: M ? 12 : 16, wrap: !M, cgap: 16 }); add(hw, [sg, 'FILL']);
-  for (let i = 0; i < 4; i++) { const s = row('Step ' + (i + 1), M ? { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14 } : { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14, w: 344 }); if (M) add(sg, [s, 'FILL']); else add(sg, s);
+  for (let i = 0; i < 4; i++) { const s = row('Step ' + (i + 1), M ? { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14 } : { gap: 12, align: 'MIN', p: 16, fill: 'surface/raised', r: 14, w: 340 }); if (M) add(sg, [s, 'FILL']); else add(sg, s);
     const n = AX('HORIZONTAL', { name: 'Step num', w: 32, h: 32, r: 9999, fill: 'brand/tint', align: 'CENTER', justify: 'CENTER' }); add(n, await tx(`Step ${i + 1} num`, String(i + 1), 'Label/M', 'text/brand'));
     const sc = col('Step text', { gap: 4 }); add(s, n, [sc, 'FILL']);
     add(sc, [await tx(`Step ${i + 1} title`, g.steps[i][0], 'Body/M Strong', 'text/primary', { w: M ? 234 : 268 }), 'FILL'], [await tx(`Step ${i + 1} body`, g.steps[i][1], 'Body/S', 'text/secondary', { w: M ? 234 : 268 }), 'FILL']); }
@@ -306,7 +307,7 @@ if (!set) {
 }
 set.x = 120; set.y = 320;
 let hd = sec.findOne(x => x.name === 'Doc/PUB-04 header');
-if (!hd) { hd = col('Doc/PUB-04 header', { gap: 8 }); sec.appendChild(hd); hd.x = 120; hd.y = 80; add(hd, await T('PUB-04 Game Details — template + 6 game pages', 'Heading/H2', 'text/primary'), await T('Left: the Template/Game Details component set (Desktop 1136 + Mobile 358). Right: six 1440 pages built as instances with per-game overrides — Global Pool (Global Jackpot), Pool Roulette, Orbit Rush (Crash), Pool Dice, Double Side (Coinflip), Twenty-One (Blackjack). Mobile 390 frames live on page 10 › PUB-04 — Mobile.', 'Body/M', 'text/secondary', { w: 1500 })); }
+if (!hd) { hd = col('Doc/PUB-04 header', { gap: 8 }); sec.appendChild(hd); hd.x = 120; hd.y = 80; add(hd, await T('PUB-04 Game Details — template + 6 game pages', 'Heading/H2', 'text/primary'), await T('Top: the Template/Game Details component set (Desktop 1136 + Mobile 358). Below it: six 1440 pages built as instances with per-game overrides — Global Pool (Global Jackpot), Pool Roulette, Orbit Rush (Crash), Pool Dice, Double Side (Coinflip), Twenty-One (Blackjack). Mobile 390 frames live on page 10 › PUB-04 — Mobile.', 'Body/M', 'text/secondary', { w: 1500 })); }
 fitSection(sec);
 const vD = set.children.find(c => c.name === 'Breakpoint=Desktop'), vM = set.children.find(c => c.name === 'Breakpoint=Mobile');
 await vD.screenshot({ scale: 0.5 });

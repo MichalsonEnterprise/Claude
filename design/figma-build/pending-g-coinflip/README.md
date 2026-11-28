@@ -16,3 +16,14 @@ Status as of 28 Nov 2026 (continuation run stopped after 3 Figma MCP limit error
    missing block(s): CF-06 ×4 states at x=2670 and/or CF-04 + CF-05 at x=1650/2160, with screenshots.
    Scripts 07/08/09 are superseded by 10 (09 = 07+08 combined; 10 = 09 + guards).
 2. Run `11_verify_desktop_readonly.js` (read-only) to screenshot the 13 desktop/tablet frames for verification.
+
+## DONE — continuation run 28 Nov 2026 (all CF frames built + VERIFIED)
+- Mobile section "Games — Mobile Coinflip" (104:48932) now holds 10 frames: CF-01 104:48933 · CF-02 104:49252 ·
+  CF-03 Win 104:49572 / Lose 104:49901 · CF-04 288:203530 · CF-05 Verified 288:203895 · CF-06 Insufficient 287:201075 /
+  Loss limit 287:201425 / Region 287:201779 / Connection lost 287:202101.
+- Script 10 was run in two passes (out/10a_cf06-mobile-only.js, then out/10b_cf04-cf05-mobile-only.js); both are guarded,
+  so re-running either returns `done:`. Do NOT run 06–10 again.
+- Fixes applied after verification: CF-04/CF-05 390 got the RG session strip + Licence/18+ line (cloned from CF-03 Lose 390);
+  CF-05 390 "Computed" rows got an 8px bound gap (label "SHA-256(revealed seed)" → "Seed hash check"); desktop CF-06 Region
+  restricted sidebar locale "English · Portugal" → "English · United States".
+- All 13 desktop/tablet + 10 mobile frames screenshotted and checked (no overflow, no placeholders, DEMO badges present).

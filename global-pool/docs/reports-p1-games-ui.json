@@ -1,0 +1,323 @@
+[
+  {
+    "key": "dice-coinflip",
+    "report": "KEY dice-coinflip (continuation run) is finished. Double Side at /games/double-side, with its My flips and Fairness pages, is implemented and verified against a running API: my own API instance on port 4213 and my own production build on port 3113. CF-01 to CF-06 are all IMPLEMENTED. The game uses DEMO credits only, labelled \"DEMO credits · no cash value\" everywhere. It never touches USDT, and every bet panel shows \"Fees 0.00 DEMO\" and \"You can lose your stake\".\n\n**Deviation from Figma (intentional):** the CF frames show USDT amounts from the wallet. The pages keep that layout but show DEMO credits. In the insufficient-balance state, Figma's \"Deposit USDT\" button is replaced by \"Reset to 1,000.00 DEMO\", because DEMO credits are never bought.\n\n**What I found on disk and kept:** the earlier run had built all of CF-01 to CF-06 and documented them (components/games/coinflip/**, the 3 routes, e2e, unit tests, QA script, an additive API pick/search filter on GET /games/:slug/bets with e2e coverage, and 9 Figma reference PNGs). I re-checked all of it against the design JSON and the Figma references.\n\n**Fixed or added this run (all inside my folders):**\n1. **Result revealed early (bug).** `usePlaceBet` updated the balance, recent results and nonce as soon as the server answered. The balance chip, session bar and \"Last 6\" strip therefore showed win or lose about 1.5 s before the coin landed. Now `gamesApi.placeBet` is called directly and `applySettledBet` runs only when the coin lands (or when the page unmounts), the same pattern Pool Roulette uses. While a flip is in flight, the chip, session bar and \"Bet amount · Balance\" all show the pre-flip balance minus the locked stake.\n2. **CF-06 connection lost** now matches Figma: an inline warning banner above the picks (attempt n of 5, stake locked, same request key, Retry now, Open my flips), and the stage stays visible. Before, the kit's overlay dimmed the stage. Fixed a related bug: the stage label showed the previous flip's ref while reconnecting.\n3. **New state when DEMO credits fail to load** with a non-network error: \"Couldn't load your DEMO credits\" plus Try again, and flipping is disabled. A 5xx was already handled by the kit's offline \"Connection lost\" notice; both paths are covered by e2e.\n4. **Blocked players** (on a break, loss or time limit, region, offline, account paused, onboarding) now see why on the button and the mobile sticky bar (\"On a break — flipping paused\", \"New flips are paused\"). They no longer see a disabled \"Flip for Heads\".\n5. Smaller polish: the coin toss is lower (14% instead of 32%) so the coin no longer covers the stage's top line; a duplicated \"UTC UTC\" is fixed; the Fairness \"Pay\" step formats amounts with thousands separators.\n6. Updated my Double Side section in docs/WEB_COMPONENTS.md.\n\n**Pool Dice (the kit report's PARTIAL items):** for DI-03 I captured the dice mid-roll with motion on. At 1440 the readout showed 20.45 and then settled exactly on the server's 8.02; at 390 it went 51.92 to 52.49. Screenshots: DI-03_rolling-motion_1440.png and _390.png. I did not change any dice code; observations for the kit owner are in `failing`. DI-05's all-player histogram still needs an API. The DI-05 CSV export already exists (added in my earlier run).\n\n**Verification (exact results):**\n- `pnpm --filter @gp/shared test`: PASS, 10 files / 141 tests.\n- `pnpm --filter @gp/api typecheck`: PASS.\n- `pnpm --filter @gp/api lint`: FAIL with 681 errors, all inside `.dist-roulette/` (compiled JS that the roulette agent left in apps/api, which the eslint ignores don't cover). The same lint with that folder ignored: PASS, 0 errors.\n- `pnpm --filter @gp/api test` (run under `flock /tmp/gp-api-test.lock`): PASS, unit 20 files / 89 tests, e2e 20 files / 167 tests.\n- `pnpm --filter @gp/web typecheck` and `lint`: PASS on the final code. Earlier in the run, both failed for a while on other agents' in-progress files (`compliance/age-gate.tsx`, then `crash/crash-math.ts`); they fixed them.\n- `pnpm --filter @gp/web test`: PASS, 17 files / 251 tests. test/games-coinflip.test.tsx + test/games-kit.test.ts: 35 passed.\n- Production build `flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-dice-coinflip NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4213 pnpm --filter @gp/web build`: EXIT 0. One attempt failed only because of the crash agent's type error; I waited for their fix and rebuilt.\n- e2e `apps/web/e2e/games-dice-coinflip.spec.ts` against the final build: **4/4 passed**. The tests cover:\n  - Happy path: lobby to game, real-money bet refused with 403 REAL_MONEY_DISABLED, keyboard play, one flip with balance = 1,000.00 + net, USDT wallet unchanged, dropped response retried with the same idempotency key and exactly one bet, auto-play needs an unticked confirmation, My flips filters, Fairness rotate & reveal with browser re-derivation and a truncated-seed failure, Rules & payouts.\n  - Motion on (new): the coin lands at least 1.2 s after the server answers, and until then the balance shows 990.00, no result banner and no new history disc.\n  - Cooling-off (new): the server refuses with 403 SELF_EXCLUDED, the game shows the break notice with the flip button disabled, and My flips stays readable.\n  - Credits failing to load (new): both the 5xx and the other-error paths recover after a retry.\n- Playwright QA `node scripts/games-coinflip-qa.mjs` against the production build: 42 screenshots at 1440 + 390, plus 16 at 768 + 1280. QA exit 0 (no horizontal overflow, no console errors). Saved in apps/web/test-results/visual/games/dice-coinflip/. They include new screens CF-01_loading, CF-02_flipping-motion (a real flip caught mid-turn) and CF-06_credits-error.\n- Compared with the Figma references in design/reference/games: CF-01 at 1440/768/390, CF-02, CF-03 win, CF-04, CF-05 verified, CF-06 insufficient and connection lost. No Figma calls this run (the earlier run had fetched the 9 frames).\n\n**Remaining differences from Figma, all intentional or kit-level:**\n- Collapsed 72 px sidebar (per the brief); Figma shows the expanded one.\n- Extra Manual/Auto switch and DEMO-credits chip.\n- The header button reads \"Provably fair\" (kit) instead of \"Fairness\", and there is no sound button.\n- On mobile the kit places the DEMO-credits chip and session bar above the coin card; Figma puts the session bar below the picks.\n- No \"All flips\" tab (there is no all-player feed) and no per-flip \"Balance after\" (the bet view has no running balance).\n- The Fairness code sample includes the \":0\" block index, which is what the engine actually computes; the Figma copy omits it.\n\n**Cleanup done:**\n- Stopped only my processes (next start on 3113, PIDs 4287/4317, and API on 4213). The states agent's next-server (PID 1043) was left running.\n- Removed apps/web/.next-dice-coinflip and apps/api/.dev/dist-dice-coinflip.\n- Removed my tsconfig include line (the crash agent's `.next-crash` line stays) and restored next-env.d.ts to HEAD.\n- Not committed.\n\n**Memory:** I read the global-pool-figma-design note (file key, BC.GAME casino direction, charcoal + mint, gold only for jackpot); it agreed with the brief. No memory note asked for any action, and I found nothing new worth saving.",
+    "implemented": [
+      {
+        "id": "CF-01",
+        "status": "IMPLEMENTED",
+        "note": "Bet interface, Heads/Tails. Screenshots: default 1440/1280/768/390, tails picked (T key), guest, loading skeleton. Keyboard: ←→ inside the radio group, H/T, Space to flip; 44 px targets on mobile; sticky bet bar on mobile. Covered by e2e. Matches the Figma 1440/768/390 frames apart from the DEMO-credits and kit-shell differences listed in the report."
+      },
+      {
+        "id": "CF-02",
+        "status": "IMPLEMENTED",
+        "note": "Flipping state: stake locked, picks locked. The coin-flip token is 1600 ms, the coin turns ≥ 6 half-turns to the SERVER's side, and reduced motion shows the result instantly. Screenshots: CF-02_flipping (request held) and CF-02_flipping-motion (a real flip caught mid-turn) at 1440/1280/768/390. e2e checks that nothing reveals the outcome before the coin lands."
+      },
+      {
+        "id": "CF-03",
+        "status": "IMPLEMENTED",
+        "note": "Win/lose banner built from the settled bet (ref, nonce, Verify result). 'Flip again' CTA; 'a loss doesn't make the other side due' note. Screenshots at 1440/1280/768/390; e2e checks the banner against the server's outcome and balance."
+      },
+      {
+        "id": "CF-04",
+        "status": "IMPLEMENTED",
+        "note": "My flips: period, pick and result filters plus search (API filters), KPIs, table with an expandable detail row, cards on mobile, pagination, Export CSV, empty state. Screenshots at 1440/1280/768/390; e2e covers the filters and the detail row. Not built: the 'All flips' tab (no all-player feed exists) and the per-flip 'Balance after' value (the API has no running balance per bet)."
+      },
+      {
+        "id": "CF-05",
+        "status": "IMPLEMENTED",
+        "note": "Fairness page states: verified, failed (63-character seed), secret seed with 'Rotate seeds & reveal'. Also the verify drawer on the game page. The browser re-derives the flip with verifyBet() from @gp/shared/fair (no duplicated maths). Screenshots at 1440/1280/768/390; covered by e2e."
+      },
+      {
+        "id": "CF-06",
+        "status": "IMPLEMENTED",
+        "note": "Screenshots of every state at 1440/390, connection lost and self-excluded also at 768/1280. States: insufficient DEMO credits (Reset instead of Deposit), above max ('Set to 1,000.00'), connection lost (new inline banner per Figma, same idempotency key), daily loss limit reached, region restricted (US preview via a mocked account-status response, because the API refuses US onboarding), self-excluded / cooling-off, DEMO credits failed to load (new), auto-play guardrails. e2e covers connection lost, cooling-off (server 403 plus the UI) and the credits-error states."
+      },
+      {
+        "id": "DI-03 (kit PARTIAL, verification only)",
+        "status": "VERIFIED",
+        "note": "Captured Pool Dice mid-roll with motion on: the readout showed 20.45, then settled exactly on the server's roll of 8.02 (1440); at 390 it went 51.92 → 52.49. Screenshots DI-03_rolling-motion_1440/390.png. No dice code changed."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/shared test → PASS (10 files, 141 tests)",
+      "pnpm --filter @gp/api typecheck → PASS",
+      "pnpm --filter @gp/api lint → FAIL: 681 errors, all in apps/api/.dist-roulette/ (the roulette agent's compiled output); npx eslint . --ignore-pattern '.dist-roulette/**' → PASS (0 errors)",
+      "flock /tmp/gp-api-test.lock pnpm --filter @gp/api test → PASS (unit 20 files / 89 tests; e2e 20 files / 167 tests)",
+      "pnpm --filter @gp/web typecheck → PASS (final); pnpm --filter @gp/web lint → PASS",
+      "pnpm --filter @gp/web test → PASS (17 files, 251 tests); test/games-coinflip.test.tsx + test/games-kit.test.ts → 35 passed",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-dice-coinflip NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4213 pnpm --filter @gp/web build → EXIT 0 (final build)",
+      "E2E_BASE_URL=http://localhost:3113 E2E_API_URL=http://localhost:4213 pnpm exec playwright test e2e/games-dice-coinflip.spec.ts → 4 passed (happy path + REAL_MONEY_DISABLED 403 + USDT wallet unchanged + idempotent retry; motion test with no early reveal; cooling-off 403 SELF_EXCLUDED + UI block; credits-error 5xx and other paths)",
+      "BASE_URL=http://localhost:3113 API_URL=http://localhost:4213 node scripts/games-coinflip-qa.mjs → exit 0: 42 screenshots at 1440/390 plus 16 at 768/1280 (WIDTHS=768,1280), no overflow, no console errors",
+      "Compared against Figma references in /home/user/Claude/design/reference/games/CF-*.png (CF-01 1440/768/390, CF-02, CF-03 win, CF-04, CF-05 verified, CF-06 insufficient + connection lost)",
+      "DI-03 mid-roll check with motion on (scratchpad script dice-motion.mjs) → readout caught mid-roll and settled exactly on the server's roll",
+      "Cleanup: my servers on 3113 and 4213 stopped (PIDs checked by NEXT_DIST_DIR), .next-dice-coinflip and apps/api/.dev/dist-dice-coinflip removed, my tsconfig include line removed, next-env.d.ts restored to HEAD"
+    ],
+    "failing": [
+      "apps/api lint is red repo-wide because apps/api/.dist-roulette/ (compiled JS, apparently committed in 5f8bc3f) is not in the eslint ignores. Owner: roulette agent / orchestrator. Delete the folder or add it to the ignores.",
+      "Pool Dice (kit-owned, not changed by me): its balance chip shows the post-roll balance during the 800 ms roll (usePlaceBet applies the settled bet at once). On a win this reveals the result early; the same pattern is now fixed in Double Side and Pool Roulette. The kit owner could apply the deferred applySettledBet pattern. The DI-03 screenshot also shows a large empty band at the top of the dice stage.",
+      "Other agents' in-progress files twice broke the shared web typecheck/build during this run (compliance/age-gate.tsx, then games/crash/crash-math.ts). Both were fixed by their owners before my final build."
+    ],
+    "decisions": [
+      "DEMO credits replace the Figma USDT amounts on every Double Side surface (owner instruction). In the insufficient state, 'Deposit USDT' becomes 'Reset to 1,000.00 DEMO' (once per hour), because DEMO credits are never bought.",
+      "No early reveal: Double Side applies the settled bet (balance, history, nonce) only when the coin lands. While a flip is in flight, the pre-flip balance minus the locked stake is shown — same as Pool Roulette.",
+      "Connection lost follows the Figma CF-06 inline banner instead of the kit overlay. The copy is honest: the flip settles once if it reached the server, otherwise it is resent with the same request key. No result is shown or guessed.",
+      "A 5xx on /games/credits keeps the kit's offline 'Connection lost' notice (classifyGameError maps 5xx to network). Any other failure shows the coinflip-local 'Couldn't load your DEMO credits' notice. Never a silent, playable state.",
+      "Blocked players (break, limits, region, offline, paused, onboarding) get a disabled CTA that states the reason, instead of 'Flip for Heads · X DEMO'.",
+      "No 'All flips' tab (there is no all-player feed; showing one would mean invented data) and no per-flip 'Balance after' (the bet view has no running balance).",
+      "The Fairness pseudo-code includes the ':0' HMAC block index, as the engine computes it (the Figma copy omits it).",
+      "The kit's collapsed 72 px sidebar is used in games (brief), though the Figma CF frames show the expanded 240 px sidebar.",
+      "The Figma MCP was not called this run; I used the 9 CF references the earlier run saved in design/reference/games."
+    ],
+    "next": [
+      "Orchestrator: remove apps/api/.dist-roulette (or add it to the apps/api eslint ignores) so pnpm --filter @gp/api lint goes green.",
+      "Kit owner: apply the deferred applySettledBet pattern to Pool Dice (same as Double Side / Roulette) so the balance never shows the outcome before the 800 ms roll ends; consider moving it into a shared kit hook (e.g. useDeferredSettle).",
+      "Optional API: a per-bet running balance (balanceAfter) in the bet view would enable the Figma CF-04 'Balance after' detail; an all-player flips feed would enable the 'All flips' tab.",
+      "Optional kit change: a mobile session-bar placement option, so the 390 layout can match Figma (session bar below the picks).",
+      "Design: the Figma CF mobile frames for CF-04/05/06 were never confirmed built (design/figma-build/pending-g-coinflip/10_GUARDED_*.js); the web was checked against the desktop/tablet frames plus the JSON notes."
+    ]
+  },
+  {
+    "key": "roulette",
+    "report": "CONTINUATION RUN, key \"roulette\". Pool Roulette was already built by the interrupted run and kept as found; this run reviewed it, fixed defects and ran the full VERIFY section against its own production build (web 3114) and its own API instance (4214, JOBS_ENABLED=false, shared dev DB).\n\nFIXES MADE THIS RUN\n1. Early reveal of the spin result (real bug). /games/credits polls every 30 s and the RG heartbeat refetches it after a bet. While the wheel turned, the live loss-limit meter and the gate could already reflect the settled spin; a spin that reached the loss limit would show the notice before the wheel stopped. RouletteGame now takes a snapshot when Spin is pressed (LockedSpin: pre-spin balance minus the stake, loss limit, gate, pre-spin balance for slip checks, nonce and server-seed hash) and shows only that until the wheel stops. The e2e waits for the mid-spin /games/credits refetch and asserts that balance 980.00, session net and the \"0.00 / 200.00 DEMO\" loss meter do not change. In 2 of the 3 passing runs the first spin lost (−5.00 and −20.00), so the assertion was meaningful. The nonce/hash part is defensive: the \"Nonce 1\" seen in the 390 spinning shot was correct (the QA script reuses one player for both widths).\n2. Rules page at 390: the pay-table columns ran together, so Straight read \"135:1\" and Split \"217:1\" (misleading odds). Added column spacing. The rules page's example table now uses the vertical mobile felt below 768 instead of a clipped side-scroller.\n3. Horizontal overflow of 40 px at 390 (loss-limit state, about 10 recent spins). The PocketDisc sr-only label escaped the overflow-x scroller. Fixed with a relative container.\n4. The 390 sticky Spin bar truncated its short labels. They are now \"Low credits\", \"Limit reached\", \"Unavailable\", \"Fix bets\".\n5. Shared kit GameSessionBar (layout only): in the \"Limit reached\" state the paused message squeezed the stats into a column at 1440. It is now a full-width row under the stats. This also affects Pool Dice and Double Side.\n6. Fairness page code chip changed from break-all to overflow-wrap:anywhere (it showed \"pocke t 9\").\n7. QA script pre-answers the new guest 18+ age gate (localStorage gp.ageGate, a returning visitor), so guest screenshots show the page. The e2e asserts the outcome preview with the pointer off the felt (hover correctly shows the hovered spot), and compares the session net by textContent.\n\nVERIFY (exact results)\n- pnpm --filter @gp/shared test: 10 files, 141 passed.\n- pnpm --filter @gp/web typecheck: exit 0 (final run). Earlier runs failed only on other agents' in-progress files (compliance/age-gate.tsx, admin-b/pool/control-pages.tsx), which were fixed by them.\n- pnpm --filter @gp/web lint: exit 0. eslint on the roulette files alone: exit 0.\n- pnpm --filter @gp/web test: 17 files, 251 passed (roulette: 16).\n- Production build: flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-roulette NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4214 pnpm --filter @gp/web build → exit 0 (final build). One intermediate build failed on admin-b's broken file; I waited for it to type-check, then rebuilt. /games/pool-roulette 13.4 kB; my-bets, rules and fairness also built.\n- Visual QA: BASE_URL=http://localhost:3114 API_URL=http://localhost:4214 node scripts/games-roulette-qa.mjs. 34 screenshots (17 screens × 1440 + 390, plus _vp viewport shots), exit 0, no overflow, no console errors. RL-07 re-shot after the final fix. Output: apps/web/test-results/visual/games/roulette/.\n- E2E: E2E_BASE_URL=http://localhost:3114 E2E_API_URL=http://localhost:4214 pnpm --filter @gp/web exec playwright test e2e/games-roulette.spec.ts --output test-results/e2e-roulette → passed 3 times in a row (18–21 s).\n- API: not touched, so its typecheck/lint/tests were not run.\n\nDESIGN COMPARISON\nThe RL frames were never built in Figma (the shared seat hit its quota). I compared against the prepared scripts in design/figma-build/pending/g-roulette (kit-felt.js buildPlay/stage/chipTray/limitsCard, bodies) and the Figma component renders already in design/reference/games (RL-betslip, cell, chip, wheel, history strip). I made no Figma calls. The structure matches: collapsed sidebar, header and chips, RG/Session Bar, stage with wheel + status column + felt, 340 px slip + Before you bet, history + seeds row, licence line; mobile vertical felt, Numbers | Outside bets toggle, bet-type bottom sheet, sticky chip tray with Undo/Clear/Repeat + Spin above the tab bar.\n\nFILES CHANGED THIS RUN\n/home/user/Claude/global-pool/apps/web/src/components/games/roulette/roulette-game.tsx, roulette-pages.tsx, roulette-parts.tsx; /home/user/Claude/global-pool/apps/web/src/components/games/kit/session-bar.tsx (shared, layout only); /home/user/Claude/global-pool/apps/web/e2e/games-roulette.spec.ts; /home/user/Claude/global-pool/apps/web/scripts/games-roulette-qa.mjs; /home/user/Claude/global-pool/docs/WEB_COMPONENTS.md (roulette section + kit fix note).\n\nCLEANUP\nServers on 3114 and 4214 stopped; ports confirmed free. apps/web/.next-roulette and apps/api/.dist-roulette deleted. The .dist-roulette folder had been committed by an earlier orchestrator commit, so git shows it as deleted. My tsconfig include line removed. next-env.d.ts now points at .next-dice-coinflip (another agent's build) and was left alone.\n\nMEMORY\nNo stored notes were used. Worth saving (learned from the code this run): the API port variable is API_PORT, not PORT (apps/api/src/config/env.ts); NEXT_PUBLIC_DATA_SOURCE=api and NEXT_PUBLIC_API_URL must be set at build time for production QA builds (src/lib/env.ts, src/lib/data/source.ts).",
+    "implemented": [
+      {
+        "id": "RL-01",
+        "status": "IMPLEMENTED",
+        "note": "Verified: table empty / bets placed / guest / loading at 1440 + 390 against the live API; e2e places the decision #35 slip (Straight 19 5 + Red 10 + 2nd dozen 5 = 20.00, outcome preview +195.00, max payout 215.00, Fees 0.00 DEMO, DEMO credits · no cash value, You can lose your stake, session bar). Compared to the build scripts; no Figma frame exists."
+      },
+      {
+        "id": "RL-02",
+        "status": "IMPLEMENTED",
+        "note": "Verified: split 17|20 line target + tooltip + covered-cell highlight (1440), bet-type bottom sheet for 19 (390), keyboard chooser (arrows + B) and Undo in the e2e."
+      },
+      {
+        "id": "RL-03",
+        "status": "IMPLEMENTED",
+        "note": "Verified: 2nd column hover highlight (1440), mobile Outside bets view with big boxes (390); e2e places Red and 2nd dozen."
+      },
+      {
+        "id": "RL-04",
+        "status": "IMPLEMENTED",
+        "note": "Verified: 4.5 s wheel (wheel-spin token) in the e2e with motion on; stake locked (980.00), felt and chips disabled, No more bets. Reduced motion shows the result instantly (QA default). The pre-spin snapshot is now enforced and tested against a mid-spin credits refetch."
+      },
+      {
+        "id": "RL-05",
+        "status": "IMPLEMENTED",
+        "note": "Verified: the result pocket equals the server's settled pocket (data-pocket and result-pocket checked against GET /games/pool-roulette/bets); per-bet settlement and win/even/lose banner; balance = 1,000.00 + net with decimal.js; USDT wallet unchanged; Repeat only reloads the bets."
+      },
+      {
+        "id": "RL-06",
+        "status": "IMPLEMENTED",
+        "note": "Verified: My bets with period and result filters, KPIs, expandable per-bet settlement and seeds, Verify spin, Repeat these bets, last-spins strip with the independence note (1440 + 390, e2e)."
+      },
+      {
+        "id": "RL-07",
+        "status": "IMPLEMENTED",
+        "note": "Verified after a fix: the pay table at 390 was misreadable (looked like 135:1); now spaced. Mobile example table uses the vertical felt. Payouts computed from the shared rules; e2e checks 35:1 and 35,000.00 DEMO."
+      },
+      {
+        "id": "RL-08",
+        "status": "IMPLEMENTED",
+        "note": "Verified in the e2e: secret seed → Rotate seeds & reveal → Verified with the pocket re-derived in the browser by @gp/shared/fair; an edited client seed shows the mismatch; Restore returns to Verified."
+      },
+      {
+        "id": "RL-09",
+        "status": "IMPLEMENTED",
+        "note": "Verified at 1440 + 390: connection lost (e2e: dropped response replayed with the same idempotency key, exactly one spin), insufficient DEMO credits (4.20), over spot limit (1,200.00 flagged, never auto-changed; API 400), daily loss limit reached (no raise-limit CTA), self-excluded / cooling-off, region. Caveat: the region screenshot uses a mocked /auth/account-status response because the API refuses restricted countries at onboarding; the server-side region block is engine-tested."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/shared test → 10 files, 141 passed",
+      "pnpm --filter @gp/web typecheck → exit 0 (final run)",
+      "pnpm --filter @gp/web lint → exit 0",
+      "pnpm --filter @gp/web test → 17 files, 251 passed (roulette 16)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-roulette NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4214 pnpm --filter @gp/web build → exit 0",
+      "node scripts/games-roulette-qa.mjs (BASE_URL 3114, API_URL 4214) → 34 screenshots at 1440 + 390, no overflow, no console errors, exit 0 (RL-07 re-shot after the final fix)",
+      "playwright test e2e/games-roulette.spec.ts → passed 3 times in a row (18–21 s), including the new no-early-reveal assertions (2 of the 3 runs had a losing first spin, so they exercised the check)",
+      "Server guard via e2e: currency USDT → 403 REAL_MONEY_DISABLED; straight 1,200.00 → 400",
+      "USDT wallet balances unchanged after DEMO play (e2e)"
+    ],
+    "failing": [],
+    "decisions": [
+      "Froze all gate-derived values (balance, loss-limit meter, gate, slip pre-checks, nonce + hash) in a LockedSpin snapshot while a spin is in flight, so no live refetch can reveal the result before the wheel stops.",
+      "Shared kit GameSessionBar (layout only): the 'New bets are paused' line is now a full-width row under the stats; this also changes Pool Dice and Double Side.",
+      "Rules page below 768 shows the vertical mobile felt instead of a clipped horizontal scroller (no mobile frame was specified).",
+      "Shortened the mobile sticky-bar CTA labels ('Low credits', 'Limit reached', 'Unavailable', 'Fix bets'); the full explanation stays in the on-page notice.",
+      "Kept the previous run's layout choices vs the design scripts: Undo / Clear / Repeat inside the bet slip (as in the Figma Bet Slip component) rather than the chip tray; stage label 'Bets open · next spin' (the spin ID only exists after the server settles it); wheel 300 px at 1440 instead of 360.",
+      "Intentional owner-mandated deviation: DEMO credits labelled 'DEMO credits · no cash value' everywhere the RL designs show USDT; CTA 'Spin · X DEMO' instead of 'Place bet · X USDT'; Fees 0.00 row added.",
+      "QA script pre-answers the new guest 18+ age gate (as a returning visitor) so guest screenshots show the page; e2e uses a private --output dir because other agents' runs wipe test-results/e2e."
+    ],
+    "next": [
+      "Orchestrator: commit the deletion of global-pool/apps/api/.dist-roulette (committed by accident in 449a1de) and add .dist-* to .gitignore.",
+      "Run the roulette QA at the in-between widths (WIDTHS=1280,768 node scripts/games-roulette-qa.mjs); not re-shot this run.",
+      "Engine/catalogue owner: the pool-roulette catalogue 'details' text says 'max 1,000 USDT per spot' for a DEMO-credit game.",
+      "Kit / dice-coinflip QA scripts likely need the same age-gate pre-answer now that ComplianceGate covers guest game pages.",
+      "Build the RL frames in Figma from pending/g-roulette when the seat quota allows, then re-compare.",
+      "next-env.d.ts currently points at .next-dice-coinflip; the dice-coinflip agent should revert it."
+    ]
+  },
+  {
+    "key": "crash",
+    "report": "Orbit Rush (key \"crash\") is built at /games/orbit-rush, with sub-pages /rounds, /my-bets and /fairness. Rounds are live over socket.io /crash and play uses DEMO credits only. Every check passed: shared tests, API typecheck/lint/unit/e2e, web typecheck/lint/unit, the flock'ed production build, 2/2 Playwright e2e, and visual QA at 1440 + 390 (plus 1280 and 768 for four screens), all against the production build and an API instance on 4215 that runs the crash loop.\n\n**What it does**\n- **Live data comes only from the server.** The client is an external store over socket.io /crash (`live-client.ts`). Phases, the 100 ms multiplier frames, crash points and the bets list all come from the server. The live bets list shows only real DEMO-credit bets.\n- **Countdowns use the server clock.** \"Round starts in X s\" and \"Next round opens in …\" come from the server's `startedAt` / `nextRoundAt`, corrected by the measured clock offset. The e2e checks the shown countdown against the API round to within 2.5 s.\n- **Bets and cash-outs are idempotent.** Bets go over the socket with one idempotency key per intent. A lost ack is treated as a network error and retried with the same key. While the socket is down, bets fall back to REST with the same key.\n- **Manual cash-out** uses the server multiplier and is disabled while offline. **Auto cash-out** runs on the server.\n- **Responsible gaming:** the reality check is held while my bet is in the air. A gate notice never covers a running bet. The kit's GM-01 session bar is shown.\n- **Compliance copy on every bet surface:** \"DEMO credits · no cash value\", \"Fees 0.00\", \"You can lose your stake\", 18+ and the licence line. Auto-play needs an unticked confirmation and a required stop-loss, uses a fixed bet, and is capped at 100 rounds.\n- **Real-money guard:** a bet with currency USDT is refused with 403 REAL_MONEY_DISABLED (e2e).\n- **Money:** amounts use decimal.js only. Pixel geometry is the only place floats are used.\n- **CR-07 verifier:** recomputes the commitment, the hash-chain position and the crash point in the browser with `crash.*` from @gp/shared/fair. There is no duplicated maths.\n\n**Files (web, own folders)**\n- `apps/web/src/components/games/crash/`: crash-game.tsx, crash-stage.tsx, crash-curve.tsx (stretchable SVG + HTML pills, no measuring), crash-parts.tsx, autoplay-dialog.tsx, crash-pages.tsx, live-client.ts, use-crash-live.ts, crash-math.ts, routes.ts\n- `apps/web/src/lib/api/orbit-rush.ts` (new wrappers + hooks; player keys live under 'games-kit' so sign-out clears them)\n- Routes in `apps/web/src/app/(app)/games/orbit-rush/`: page.tsx, rounds/, my-bets/, fairness/\n- Tests and QA: `apps/web/test/games-crash.test.ts` (21 tests), `apps/web/e2e/games-crash.spec.ts`, `apps/web/scripts/games-crash-qa.mjs`\n\n**API changes (additive, in engine-owned files)**\n- New env flag `CRASH_LOOP_ENABLED` (unset = follows JOBS_ENABLED). It lets a QA instance run the crash loop without the BullMQ workers. I added it so my instance did not run deposits, withdrawals or pool rounds against the shared dev DB.\n- `GET /games/orbit-rush/rounds`: items now carry players / wagered / paidOut (DEMO), plus optional `from` and `search=CR-n` filters.\n- New `GET /games/orbit-rush/stats?period=24h|7d|30d`: count, median, share reaching 2.00×, highest crash, and 6 buckets against the published 0.99 ÷ m.\n- `GET /games/orbit-rush/bets`: adds a `summary` and `from` / `result` filters.\n- Files touched: `apps/api/src/config/env.ts`, `src/config/env.spec.ts`, `src/modules/games/engine/crash.service.ts`, `src/modules/games/play.controller.ts`, new `apps/api/test/games-crash-history.e2e-spec.ts`.\n- Docs: `docs/API.md`, `docs/GAMES.md`, `docs/WEB_COMPONENTS.md` (new Orbit Rush section), `.env.example`.\n\n**Visual QA output**\n- 34 screenshots in `apps/web/test-results/visual/games/crash/` (plus `_vp` on mobile and 1280/768 extras). No overflow and no console errors.\n- Figma references (11 frames) saved to `/home/user/Claude/design/reference/games/CR-*.png`.\n\n**Intentional deviations from Figma**\n- **DEMO credits instead of USDT** (owner instruction): no \"≈ $10.00\" fiat line, and \"Insufficient balance → Deposit USDT\" became \"Bet X instead\" / \"Reset DEMO credits\".\n- **10-second betting window:** the engine rule is 10 s; the Figma copy says 5 s.\n- **No bet cancellation:** the API has no cancel endpoint, so the copy says bets can't be cancelled. The client-side \"Bet next round\" queue can be cancelled.\n- **Header:** uses the kit's GameHeader (breadcrumb, rocket icon, chips) instead of the art thumbnail with overline. The sound and chat icons are left out because those features don't exist.\n- **Live bets:** no \"Hidden\" privacy rows (the API returns @handle or public id). I defined \"High rollers\" as a stake of at least 100 DEMO.\n- **CR-07 links:** \"Open-source verifier\" / \"Published spec\" became \"How provably fair works\" / \"Published rules\". I added a hash-chain check.\n\n**Problems I hit and fixed**\n- The `next dev` server was OOM-killed twice (about 5 GB). All final QA and e2e ran against `next start`.\n- One production build failed on another agent's blackjack type error. The build passed once they fixed it.\n- The shell already used `data-testid=\"connection-banner\"`, so mine is now `crash-connection-banner`.\n- Chromium's offline mode keeps open WebSockets, so the QA script drops the socket through `routeWebSocket` instead.\n\n**Cleanup done**\n- Killed my web (3115) and API (4215) servers.\n- Removed `apps/web/.next-crash`, `apps/api/.dev/dist-crash` and the `.next-crash` tsconfig include line.\n- Shared dev DB now holds about 170 extra DEMO crash rounds and QA players.\n\n**Memory:** the project note \"global-pool-figma-design\" (BC.GAME-style casino shell, charcoal + mint, gold for jackpot only) matched what the task asked for. Nothing in memory asked for any extra action.\n\n**Possible new memory (learned this session, for the main session to decide)**\n- In this sandbox, Next dev servers get OOM-killed at about 5 GB; use `next start` for QA.\n- Chromium `setOffline` does not close open WebSockets.",
+    "implemented": [
+      {
+        "id": "CR-01",
+        "status": "IMPLEMENTED",
+        "note": "Pre-round betting: server-clock countdown + overlay, bet panel, If-the-round-reaches summary, Place bet over the socket. Verified: QA 1440/1280/768/390 (bets open, guest, loading skeleton) + e2e (countdown within 2.5 s of the server round, bet placed, balance 990.00)."
+      },
+      {
+        "id": "CR-02",
+        "status": "IMPLEMENTED",
+        "note": "Active run: live multiplier from 100 ms server frames, curve on server frames only, Your position (cash-out value, profit, chance to reach T = m/T), Cash out. Verified: QA 4 widths + e2e manual cash-out (payout = stake × server multiplier)."
+      },
+      {
+        "id": "CR-03",
+        "status": "IMPLEMENTED",
+        "note": "Cashed-out state (auto/manual) while the round runs; curve marker + callout. Verified: QA 1440/390, e2e auto cash-out at 1.01× = 10.10."
+      },
+      {
+        "id": "CR-04",
+        "status": "IMPLEMENTED",
+        "note": "Crashed/result: ResultCard built from my settled bet only (win and stake-lost), red curve, next-round info. Verified: QA win + lost at 1440/390; e2e checks the result against the API crash point and the balance against 1,000 + net."
+      },
+      {
+        "id": "CR-05",
+        "status": "IMPLEMENTED",
+        "note": "/games/orbit-rush/rounds (Last 50/Today/7 days, round search, table/cards, pagination) + Game statistics (24h/7d/30d vs expected, distribution) + Your session; /my-bets with summary. Uses the new additive API endpoints, covered by an API e2e. Verified: QA 1440/1280/768/390 + e2e."
+      },
+      {
+        "id": "CR-06",
+        "status": "PARTIAL",
+        "note": "Dialog (1440) and bottom sheet (390) verified: unticked consent, required stop-loss and auto cash-out, fixed bet, ≤100 rounds, Before you start summary; e2e checks Start stays disabled until stop-loss + tick. Not verified: a multi-round auto-play run end to end in the browser (only the kit's unit-tested rules and the store's waitFor unit test cover it)."
+      },
+      {
+        "id": "CR-07",
+        "status": "IMPLEMENTED",
+        "note": "/games/orbit-rush/fairness?round=N recomputes commitment, hash-chain position and crash point in the browser with @gp/shared/fair crash.*; edited seed shows the mismatch; seed-secret state for live rounds. Verified: QA verified + mismatch (1440/1280/768/390) + e2e."
+      },
+      {
+        "id": "CR-08",
+        "status": "IMPLEMENTED",
+        "note": "Verified by QA at 1440/390: connection lost (real WebSocket drop: banner, Paused readout, Reconnecting n of 5 + Retry now, Cash out unavailable offline, live bets paused), insufficient DEMO credits, daily loss limit, self-excluded, guest, loading. Region restricted is a UI preview with a mocked account-status; the server-side geo refusal is not re-tested here."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/shared test → 10 files, 141 tests passed",
+      "apps/api: pnpm typecheck → pass; pnpm lint → pass; pnpm test → unit 20 files / 90 tests passed (incl. new CRASH_LOOP_ENABLED env test), e2e 21 files / 168 tests passed (incl. new test/games-crash-history.e2e-spec.ts)",
+      "apps/web: tsc --noEmit (whole app) → pass; pnpm --filter @gp/web lint → pass (crash files re-linted after final edits → pass); pnpm --filter @gp/web test → 18 files / 272 tests passed (21 in test/games-crash.test.ts)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-crash NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4215 pnpm --filter @gp/web build → exit 0 (final build; /games/orbit-rush, /rounds, /my-bets, /fairness built)",
+      "E2E_BASE_URL=http://localhost:3115 E2E_API_URL=http://localhost:4215 pnpm --filter @gp/web exec playwright test e2e/games-crash.spec.ts → 2 passed (54 s) against the final production build and live rounds",
+      "BASE_URL=http://localhost:3115 API_URL=http://localhost:4215 node scripts/games-crash-qa.mjs → 34 screenshots at 1440 + 390 (CR-01…CR-08), exit 0, no horizontal overflow or console errors; CR-08 connection-lost / insufficient re-captured on the final build; WIDTHS=1280,768 for CR-01/02/05/07 → exit 0",
+      "Compared with 11 Figma frames (CR-01/02/03/04/05/06/07/08 at 1440, CR-01/02 at 390) saved to /home/user/Claude/design/reference/games/"
+    ],
+    "failing": [
+      "None of my checks fail at the end of the run.",
+      "Seen once on the next dev server, never on the production build: one React hydration-attribute warning (CR-02 1440).",
+      "Transient, fixed by another agent: the third production build failed on that agent's blackjack type error (BLACKJACK_RULES import in components/games/blackjack/bj-math.ts); the fourth build passed after their fix."
+    ],
+    "decisions": [
+      "DEMO credits instead of the USDT in the Figma frames (owner instruction): no fiat line; insufficient balance offers 'Bet X instead' / 'Reset DEMO credits' instead of 'Deposit USDT'.",
+      "Betting window copy follows the server rule (10 s), not the Figma '5-second window'.",
+      "No bet cancellation (the API has none); 'Bet next round' is a client-side queue that can be cancelled and places an ordinary bet when the next window opens.",
+      "Added CRASH_LOOP_ENABLED (unset = follows JOBS_ENABLED) so a QA/game API instance can run the crash loop without the BullMQ workers touching the shared dev DB.",
+      "Added read-only API views: /games/orbit-rush/stats, rounds totals + filters, my-bets summary + filters. Additive, in the engine owner's files; please review.",
+      "Auto-play requires an auto cash-out target, stops on disconnect, tab hidden, reality check, refusal, stop-loss, profit target or round count, and never raises the bet.",
+      "Guests can watch live rounds; betting needs sign-in. Other gates (region, self-exclusion, limits, onboarding, blocked) block the stage, except while my bet is running.",
+      "'High rollers' tab = real bets with a stake of at least 100.00 DEMO; Figma's 'Hidden' privacy rows are left out because the API has no privacy mode.",
+      "Header reuses the kit's GameHeader instead of the Figma art thumbnail; sound and chat icons are left out because those features don't exist.",
+      "Statistics expected values are the published 0.99 ÷ m buckets (34.00 / 16.50 / 29.70 / 9.90 / 8.91 / 0.99 %, median 1.98×, 49.50 % reach 2.00×)."
+    ],
+    "next": [
+      "Engine owner: review the additive crash.service / play.controller / env changes and decide whether deployments should use CRASH_LOOP_ENABLED.",
+      "Owner/designers: align the Figma CR copy ('5-second window', 'can be cancelled until bets close', USDT amounts) with the server rules and DEMO credits.",
+      "Optional API work: privacy mode ('Hidden') for crash live bets; a cancel-bet endpoint if cancelling during the betting window is wanted.",
+      "Add a browser e2e for a multi-round auto-play run (CR-06), so CR-06 can move to IMPLEMENTED.",
+      "Kit: consider a compact mobile GameHeader (the 390 header is taller than the Figma frames for every game).",
+      "Orchestrator: commit the remaining modified crash files (live-client.ts, crash-parts.tsx, games-crash.test.ts, games-crash-qa.mjs); earlier crash files were already in WIP commit 4cc0166's ancestors."
+    ]
+  },
+  {
+    "key": "blackjack",
+    "report": "KEY blackjack is done. Twenty-One is built at /games/twenty-one with four routes: Play (BJ-01…05 and BJ-09), My hands (BJ-06), Rules (BJ-07) and Fairness (BJ-08). It uses DEMO credits only, labelled \"DEMO credits · no cash value\", and shows \"Fees 0.00\" and \"You can lose your stake\" on every bet surface. It is built on the kit and the engine API that already existed. Every hand is dealt and settled by the server from commit–reveal seeds. The browser verifier rebuilds the 312-card shoe and replays the recorded decisions with the same @gp/shared/fair code the API uses. All ledger IDs BJ-01…BJ-09 are implemented and verified; the deviations and one design gap are listed below.\n\n**Intentional deviation (owner instruction):** the Figma BJ frames show USDT amounts from the wallet. The pages mirror those layouts but show DEMO credits, which never touch the USDT ledger, wallet, pool or fee ledgers. The e2e test checks that the wallet balances are unchanged after playing.\n\n**What was built**\n- **Web — new files only** (no shared kit or games.ts files edited):\n  - apps/web/src/lib/api/twenty-one.ts — API wrappers over apiRequest() and the TanStack hooks.\n  - apps/web/src/components/games/blackjack/: bj-math.ts (pure helpers), cards.tsx, chip.tsx, bj-table.tsx, bj-parts.tsx, bj-chrome.tsx, bj-game.tsx, bj-pages.tsx, bj-fairness.tsx, routes.ts.\n  - Routes: apps/web/src/app/(app)/games/twenty-one/{page, my-hands/page, rules/page, fairness/page}.tsx.\n  - Tests and QA: apps/web/test/games-blackjack.test.ts, apps/web/e2e/games-blackjack.spec.ts, apps/web/scripts/games-blackjack-qa.mjs.\n- **How a hand plays:**\n  - The deal and each decision are one request with one idempotency key. A network failure retries with the same key.\n  - Only the actions the server allows are enabled. The hole card stays hidden until the server settles the hand.\n  - Cards land in shoe order, one every 350 ms (card-deal token) plus a 150 ms gap. With reduced motion the result shows at once.\n  - The balance, session bar and history only update after the last card lands. Reality checks are held from the deal until then.\n  - An open hand is restored after a reload, with a \"Reconnected — hand BJ-x restored\" banner.\n  - Blocking notices (guest, onboarding, region, self-excluded, limits, offline) apply only when no hand is open. An open hand can always be finished. During self-exclusion, Double, Split and Insurance are disabled.\n  - Mobile has a sticky bar with the actions, an insurance bottom sheet, and the result card under the table.\n- **API — additive change** (needed so the BJ-06 result chips and KPIs are correct):\n  - `GET /games/:slug/bets` now accepts `outcome=win|lose|push|blackjack|bust|split_double`. win/lose/push compare payout with stake; blackjack and bust match any hand of the bet.\n  - The summary adds `outcomes {win, lose, push}`. The old `wins` count treats a push as a win, so it is wrong for Twenty-One.\n  - Files: packages/shared/src/fair/schemas.ts (BET_OUTCOME_FILTERS), apps/api/src/modules/games/engine/bets.service.ts, and a new e2e test apps/api/test/games-twenty-one-history.e2e-spec.ts (36 real hands, every filter checked against the hands).\n- **Docs:** docs/WEB_COMPONENTS.md has a new Twenty-One section; docs/API.md and docs/GAMES.md describe the new filter.\n- **Figma:** 13 screenshots fetched (limit 15), saved to /home/user/Claude/design/reference/games/BJ-*.png.\n\n**Verification**\n- Every command passed.\n- Screenshots and e2e were run against the final production build (web on 3116, API on 4216, JOBS_ENABLED=false).\n- 42 screenshots, 1440 and 390 for every state, in apps/web/test-results/visual/games/blackjack/. No horizontal overflow and no console errors on the production build. Every hand in them is a real API hand; the result variants were found by playing real hands from the UI.\n- Compared with Figma, the layout, copy and states match.\n\n**Remaining visual differences**\n- The panel is taller than in Figma, because of the DEMO credits chip and the Min/Max presets. The felt stretches to the panel height.\n- There is no sound button.\n- On a phone, the sticky bar covers the bottom of the felt until you scroll.\n- BJ-02's screenshot shows the deal request in flight with empty card spots; the deal motion itself is checked by the unit tests and by the BJ-04 capture taken mid-reveal.\n\n**Pre-existing issue, not in my code:** in the dev server there is an intermittent React hydration mismatch in the shell's Sidebar/NavGroup. It reproduces on /games/double-side too, and did not appear on the production build.\n\nCleanup: my web and API processes are stopped; `.next-blackjack`, `apps/api/.dev/dist-blackjack` and the tsconfig include line Next added are removed. Nothing was committed.\n\n**For the main session to save to memory (all learned this session, not from stored memory):**\n1. An absolutely positioned `sr-only` span inside an `overflow-x-auto` container without positioning escapes the clip and widens the page. Add `relative` to the scroller.\n2. The Next dev server shows an intermittent shell hydration mismatch (radix ids in Sidebar NavGroup). It is not caused by game pages.\n3. The Twenty-One engine has no automatic stand for abandoned hands (the Figma copy assumes one after 24 h).\n\nMemory used: only the project note on the GLOBAL POOL Figma file and its BC.GAME-style direction, which confirmed the visual direction. No memory text asked for any action.",
+    "implemented": [
+      {
+        "id": "BJ-01",
+        "status": "IMPLEMENTED",
+        "note": "Table and betting: chip tray, bet spot, Undo/Clear/Rebet, Deal, 'If you win this hand' box (decimal.js), Fees 0.00, risk note, RG/Session bar, recent hands, table rules, seeds. Screenshots at 1440 and 390 (guest and member); e2e."
+      },
+      {
+        "id": "BJ-02",
+        "status": "IMPLEMENTED",
+        "note": "Dealing: request in flight shows 'Dealing…', then cards land in shoe order (card-deal token, hole card face down). Unit test checks the reveal order over 300 real hands. The screenshot shows the in-flight state, not cards mid-flight."
+      },
+      {
+        "id": "BJ-03",
+        "status": "IMPLEMENTED",
+        "note": "Your move, insurance (card on the table on desktop, bottom sheet on mobile, ≈7.4% edge note), split hand 1 of 2 with 'Split again' disabled. Only server-allowed actions are enabled (e2e asserts it). Keyboard H/S/D/P, Space to deal."
+      },
+      {
+        "id": "BJ-04",
+        "status": "IMPLEMENTED",
+        "note": "Dealer turn: hole card turns over, then the dealer draws card by card with a 'Dealer draws on N' status. Captured mid-reveal with motion on."
+      },
+      {
+        "id": "BJ-05",
+        "status": "IMPLEMENTED",
+        "note": "Win, lose, push, blackjack (gold only for 3:2) and bust at 1440, plus win at 390, all from real hands. Result card shows ref, time and Verify."
+      },
+      {
+        "id": "BJ-06",
+        "status": "IMPLEMENTED",
+        "note": "My hands: KPIs, result chips filtered on the server (new outcome filter), period, search, table or cards, 'What happened' timeline, Verify, Export CSV. Deviation: the 4th KPI is W·L·P counts instead of 'Biggest win'."
+      },
+      {
+        "id": "BJ-07",
+        "status": "IMPLEMENTED",
+        "note": "Rules: how to play, table rules, payouts computed for a 10.00 bet, basic-strategy hard-totals chart, limits card. Deviation: 'Unfinished hands' says the hand stays open (the engine has no 24 h auto-stand)."
+      },
+      {
+        "id": "BJ-08",
+        "status": "IMPLEMENTED",
+        "note": "Fairness: load a hand, rotate and reveal, editable seeds re-derived with verifyInBrowser and the shared shoe, labelled shoe order, verified and failed states, hand data JSON download. e2e covers it."
+      },
+      {
+        "id": "BJ-09",
+        "status": "IMPLEMENTED",
+        "note": "Connection lost (same idempotency key; e2e drops a response and asserts exactly one stand), hand restored after reload, loading table, insufficient DEMO credits, loss limit, region (account-status mocked in QA, as other agents do), self-excluded."
+      }
+    ],
+    "verified": [
+      "pnpm --filter @gp/shared test: 10 files / 141 tests passed",
+      "pnpm --filter @gp/api typecheck: exit 0; lint: exit 0",
+      "pnpm --filter @gp/api test: unit 20 files / 90 tests passed; e2e 22 files / 169 tests passed, including the new games-twenty-one-history.e2e-spec.ts",
+      "pnpm --filter @gp/web typecheck: clean; lint (eslint .): clean; test: 19 files / 280 tests passed, including test/games-blackjack.test.ts (8 tests)",
+      "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-blackjack NEXT_PUBLIC_DATA_SOURCE=api NEXT_PUBLIC_API_URL=http://localhost:4216 pnpm --filter @gp/web build: exit 0 (run twice, final after the last edit); all 4 /games/twenty-one routes built",
+      "E2E_BASE_URL=http://localhost:3116 E2E_API_URL=http://localhost:4216 playwright test e2e/games-blackjack.spec.ts: 1 passed on the dev server and 1 passed on the production build",
+      "BASE_URL=http://localhost:3116 API_URL=http://localhost:4216 node scripts/games-blackjack-qa.mjs: 42 screenshots (1440 and 390), no overflow and no console errors on the production build",
+      "Compared with Figma frames BJ-01/03/05/06/07/08/09 (13 reference screenshots in /home/user/Claude/design/reference/games/)"
+    ],
+    "failing": [
+      "None in my scope. Pre-existing, not my code: an intermittent React hydration mismatch in the shell Sidebar/NavGroup on the Next dev server for signed-in players. It also reproduces on /games/double-side and did not appear on the production build."
+    ],
+    "decisions": [
+      "DEMO credits instead of USDT on every BJ surface (owner instruction); the Figma frames show USDT from the wallet.",
+      "Additive API change: GET /games/:slug/bets takes outcome=win|lose|push|blackjack|bust|split_double, and the summary adds outcomes{win,lose,push} by net. The old wins count treats a Twenty-One push or an insurance-only return as a win. BET_OUTCOME_FILTERS is in @gp/shared/fair.",
+      "BJ-06 4th KPI shows W·L·P counts instead of Figma's 'Biggest win' (the API has no exact max-net aggregate).",
+      "Unfinished hands: Figma says 'completed with Stand after 24 h', but the engine has no such job, so the copy says the hand stays open until finished. Owner or engine decision needed if auto-stand is wanted.",
+      "No sound toggle: the build has no audio.",
+      "Before a deal the panel shows 'Nonce N' instead of a hand ref, because the ref only exists once the hand is dealt.",
+      "Kit BetAmountField reused, so Min/Max presets appear alongside Figma's ½ and 2×. Max never exceeds the balance.",
+      "Insurance edge ≈7.4% (6 decks) is shown as published Figma copy, not computed in code.",
+      "Gate notices block only new hands. An open hand can always be finished; during self-exclusion Double, Split and Insurance are disabled (server re-checks them).",
+      "Engine as-is: Double and Split re-check self-exclusion only, not the DEMO loss limit. Not changed."
+    ],
+    "next": [
+      "Owner decision: add an auto-stand for abandoned Twenty-One hands (Figma copy says 24 h), or keep 'stays open until finished'.",
+      "Optional API: exact 'Biggest win' (max net) in the bets summary if the Figma KPI is wanted.",
+      "Shell owner: fix the intermittent dev-mode hydration mismatch (radix ids in Sidebar NavGroup).",
+      "Optional: shorter mobile felt-status copy and a slimmer mobile sticky bar so it covers less of the felt.",
+      "Orchestrator: commit the untracked blackjack files (web components, routes, lib/api/twenty-one.ts, tests, e2e, QA script, API e2e spec) and the modified bets.service.ts and docs."
+    ]
+  }
+]
