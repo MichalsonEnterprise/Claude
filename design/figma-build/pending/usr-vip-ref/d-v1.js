@@ -8,11 +8,11 @@ const hc = COL({ name: 'Status', gap: 16, p: 32 }); add(hero, [hc, 'FILL']);
 const tr = ROW({ gap: 10 }); add(tr, await I('6:211', { Tier: 'Gold', Size: 'M' })); add(tr, await T('Level 14 of 29', 'Label/M', 'text/secondary')); add(tr, await DEMO('S')); add(hc, tr);
 add(hc, await T('Gold III', 'Heading/H1', 'text/primary'));
 const pts = ROW({ gap: 8, align: 'MAX' }); add(pts, await T('12,840', 'Number/XL', 'text/primary')); add(pts, await T('/ 20,000 status points to Platinum', 'Body/M', 'text/tertiary')); add(hc, pts);
-const track = figma.createFrame(); track.name = 'Tier track (0 → 20,000)'; track.resize(520, 40); track.fills = []; track.clipsContent = false;
-track.appendChild(BAR(520, 0.642, 'vip/gold', 10));
-for (const [lbl, v] of [['Silver 2,500', 2500], ['Gold 8,000', 8000], ['Platinum 20,000', 20000]]) { const x = Math.round(520 * v / 20000); const tk = rect(2, 16, 'border/strong', 0, 'Tick ' + lbl); tk.x = Math.min(518, x - 1); tk.y = -3; track.appendChild(tk); const t = await T(lbl, 'Caption', 'text/tertiary'); track.appendChild(t); t.x = Math.min(520 - t.width, Math.max(0, x - t.width / 2)); t.y = 20; }
+const track = figma.createFrame(); track.name = 'Tier track (0 → 20,000)'; track.resize(440, 40); track.fills = []; track.clipsContent = false;
+track.appendChild(BAR(440, 0.642, 'vip/gold', 10));
+for (const [lbl, v] of [['Silver 2,500', 2500], ['Gold 8,000', 8000], ['Platinum 20,000', 20000]]) { const x = Math.round(440 * v / 20000); const tk = rect(2, 16, 'border/strong', 0, 'Tick ' + lbl); tk.x = Math.min(438, x - 1); tk.y = -3; track.appendChild(tk); const t = await T(lbl, 'Caption', 'text/tertiary'); track.appendChild(t); t.x = Math.min(440 - t.width, Math.max(0, x - t.width / 2)); t.y = 20; }
 add(hc, track);
-add(hc, await T('1,160 points to Level 15 (Gold IV) · 7,160 points to Platinum. Next roll-off: 410 pts on 1 Dec 2026 — you stay Gold (minimum 8,000).', 'Body/S', 'text/secondary', { w: 520 }));
+add(hc, [await T('1,160 points to Level 15 (Gold IV) · 7,160 points to Platinum. Next roll-off: 410 pts on 1 Dec 2026 — you stay Gold (minimum 8,000).', 'Body/S', 'text/secondary', { w: 440 }), 'FILL']);
 const hb = ROW({ gap: 12 }); add(hb, await BTN('Primary', 'See what Platinum unlocks', { trail: 'arrow-right' })); add(hb, await BTN('Ghost', 'Points history', { lead: 'history' })); add(hc, hb);
 const art = figma.createFrame(); art.name = 'Art — crown & coin cropped by the edge'; art.resize(240, 300); art.fills = []; art.clipsContent = true; add(hero, art); art.layoutSizingVertical = 'FILL';
 const b1 = rect(300, 640, 'accent/gold-tint-strong', 0, 'Angled block'); b1.rotation = -14; b1.x = 30; b1.y = -80; art.appendChild(b1);
@@ -49,8 +49,8 @@ const ex = ROW({ gap: 6 }); add(ex, await T('Example: 35 entries in round #1,248
 const rg = CARD({ name: 'Play within your limits', gap: 12 }); add(r3, [rg, 'FILL']); rg.layoutSizingVertical = 'FILL';
 const rgh = ROW({ gap: 8 }); add(rgh, await IC('shield', 20, 'icon/brand')); add(rgh, await T('Play within your limits', 'Heading/H5')); add(rg, rgh);
 add(rg, [await T('Levels reward play you were going to do anyway — never chase a level. VIP status never changes odds or outcomes.', 'Body/S', 'text/secondary', { w: 300 }), 'FILL']);
-add(rg, [await KV('Daily participation limit', '351.75 / 500.00 USDT', { demo: true }), 'FILL']); add(rg, BAR(320, 351.75 / 500, 'brand/primary', 6));
+const kvv = await KV('Daily limit used', '351.75 / 500.00 USDT', { demo: true }); kvv.layoutMode = 'VERTICAL'; kvv.counterAxisAlignItems = 'MIN'; gap(kvv, 4); add(rg, [kvv, 'FILL']); add(rg, BAR(320, 351.75 / 500, 'brand/primary', 6));
 const rb = ROW({ gap: 8 }); add(rb, await BTN('Secondary', 'Set limits', { size: 'S' })); add(rb, await BTN('Ghost', 'Take a break', { size: 'S', lead: 'pause-circle' })); add(rg, rb);
 await FOOT(content, 'VIP status, points and rewards never change odds, outcomes or security checks. All values are DEMO. 18+ only, in permitted jurisdictions.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

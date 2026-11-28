@@ -89,7 +89,7 @@ function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n
 // ===== END GP HELPERS =====
 
 // ===== usr-vip-ref LIB (common) =====
-const MISS = [];
+const MISS = []; const FILLC = new Set();
 async function ld(t) { if (t.fontName === figma.mixed) { for (const s of t.getStyledTextSegments(['fontName'])) await figma.loadFontAsync(s.fontName); } else await figma.loadFontAsync(t.fontName); }
 async function sx(root, name, val, i = 0) { const t = root.findAll(n => n.type === 'TEXT' && n.name === name)[i]; if (!t) { MISS.push(String(root.name).slice(0, 28) + '>' + name); return null; } await ld(t); t.characters = String(val); return t; }
 async function sxm(root, m) { for (const k in m) await sx(root, k, m[k]); return root; }
@@ -109,11 +109,11 @@ async function CHK(text, kind = 'ok', w = 300, style = 'Body/S', color = 'text/s
 async function KV(k, v, o = {}) { const r = ROW({ name: 'KV — ' + k, justify: 'SPACE_BETWEEN' }); add(r, await T(k, o.ks || 'Body/S', o.kc || 'text/secondary')); const rt = ROW({ gap: 6 }); add(rt, await T(v, o.vs || 'Number/S', o.vc || 'text/primary')); if (o.demo) add(rt, await DEMO('XS')); add(r, rt); return r; }
 async function KPI(label, value, unit, o = {}) { const c = CARD({ name: 'KPI — ' + label, gap: 10, p: o.p ?? 20 }); const top = ROW({ gap: 8 }); if (o.icon) add(top, await TILE(o.icon, o.ic || 'icon/default', o.bg || 'surface/raised', 32)); add(top, await T(label, 'Label/M', 'text/secondary')); add(top, await DEMO('XS')); add(c, top); const v = ROW({ gap: 6, align: 'MAX' }); add(v, await T(value, o.size || 'Number/L', o.color || 'text/primary')); if (unit) add(v, await T(unit, 'Body/S', 'text/tertiary')); add(c, v); if (o.cap) add(c, [await T(o.cap, 'Caption', o.capc || 'text/tertiary', { w: o.cw || 220 }), 'FILL']); if (o.extra) for (const e of o.extra) add(c, [e, 'FILL']); return c; }
 async function HC(label, w, right = false) { const h = await I('22:8309', { Align: right ? 'Right' : 'Left', Sort: 'None' }, { Label: label, 'Show sort icon': false }); h.resize(w, h.height); return h; }
-function CELL(w, kids, o = {}) { const c = AL(o.v ? 'VERTICAL' : 'HORIZONTAL', { name: o.name || 'Cell', gap: o.gap ?? (o.v ? 2 : 8), p: [o.py ?? 14, 16, o.py ?? 14, 16], align: o.v ? (o.right ? 'MAX' : 'MIN') : 'CENTER', justify: (!o.v && o.right) ? 'MAX' : undefined }); if (w !== 'FILL') { c.resize(w, Math.max(1, c.height)); if (o.v) { c.counterAxisSizingMode = 'FIXED'; c.primaryAxisSizingMode = 'AUTO'; } else { c.primaryAxisSizingMode = 'FIXED'; c.counterAxisSizingMode = 'AUTO'; } } for (const k of kids) add(c, k); c.__fill = w === 'FILL'; return c; }
-function addRow(table, cells, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', align: 'CENTER', fill: o.fill }); if (!o.last) strokeSides(r, 'border/subtle', { b: 1 }); for (const c of cells) { add(r, c); if (c.__fill) c.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
+function CELL(w, kids, o = {}) { const c = AL(o.v ? 'VERTICAL' : 'HORIZONTAL', { name: o.name || 'Cell', gap: o.gap ?? (o.v ? 2 : 8), p: [o.py ?? 14, 16, o.py ?? 14, 16], align: o.v ? (o.right ? 'MAX' : 'MIN') : 'CENTER', justify: (!o.v && o.right) ? 'MAX' : undefined }); if (w !== 'FILL') { c.resize(w, Math.max(1, c.height)); if (o.v) { c.counterAxisSizingMode = 'FIXED'; c.primaryAxisSizingMode = 'AUTO'; } else { c.primaryAxisSizingMode = 'FIXED'; c.counterAxisSizingMode = 'AUTO'; } } for (const k of kids) add(c, k); if (w === 'FILL') FILLC.add(c.id); return c; }
+function addRow(table, cells, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', align: 'CENTER', fill: o.fill }); if (!o.last) strokeSides(r, 'border/subtle', { b: 1 }); for (const c of cells) { add(r, c); if (FILLC.has(c.id)) c.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
 async function HEADROW(table, cols) { const r = AL('HORIZONTAL', { name: 'Header row', fill: 'bg/secondary' }); strokeSides(r, 'border/subtle', { b: 1 }); for (const [l, w, right] of cols) { const h = await HC(l, w === 'FILL' ? 160 : w, right); add(r, h); if (w === 'FILL') h.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
 async function TX(text, style = 'Body/S', color = 'text/primary', w) { return T(text, style, color, w ? { w } : {}); }
-async function TWO(a, b, o = {}) { const c = COL({ gap: 2 }); add(c, await T(a, o.as || 'Body/S Strong', o.ac || 'text/primary')); add(c, await T(b, 'Caption', 'text/tertiary')); return c; }
+async function TWO(a, b, o = {}) { const c = COL({ gap: 2 }); const t1 = await T(a, o.as || 'Body/S Strong', o.ac || 'text/primary', o.w ? { w: o.w } : {}); const t2 = await T(b, 'Caption', 'text/tertiary', o.w ? { w: o.w } : {}); add(c, o.w ? [t1, 'FILL'] : t1); add(c, o.w ? [t2, 'FILL'] : t2); return c; }
 async function BADGEL(status, label, size = 'S') { const b = await BADGE(status, size); if (label) await sxi(b, 0, label); return b; }
 async function AMT(v, o = {}) { const r = ROW({ gap: 4, align: 'MAX', name: 'Amount ' + v }); add(r, await T(v, o.s || 'Number/S', o.c || 'text/primary')); add(r, await T(o.u ?? 'USDT', 'Caption', 'text/tertiary')); if (o.demo) add(r, await DEMO('XS')); return r; }
 // bar chart: vals[], labels[], {w,h,color,last,lastColor,max,grid:[...]} -> frame
@@ -125,6 +125,19 @@ async function CHART(vals, labels, o = {}) { const W = o.w || 320, H = o.h || 14
 async function SCRIM(f, name = 'Scrim') { const s = rect(f.width, f.height, 'scrim/overlay', 0, name); f.appendChild(s); s.layoutPositioning = 'ABSOLUTE'; s.x = 0; s.y = 0; return s; }
 async function CIC(id, s = 20, color = 'icon/default') { const c = await figma.getNodeByIdAsync(id); const i = c.createInstance(); i.resize(s, s); tint(i, color); return i; }
 async function SWAPIC(inst, name, color) { if (!inst) { MISS.push('swap null'); return; } const w = inst.width; const c = await figma.getNodeByIdAsync(ICONS[name]); inst.swapComponent(c); inst.resize(w, w); tint(inst, color); }
+// Card/VIP Tier library benefit lines still say "Weekly reward 0.1–1.0%" / "Higher withdrawal limits" -> override per tier (same copy as PUB-10)
+const VIPB = { Bronze: ['Level-up rewards 0.50–1.50 USDT', 'Standard support', 'Monthly activity statement'], Silver: ['Weekly reward, paid in USDT', 'Level-up rewards 1.00–1.80 USDT', 'Standard support'], Gold: ['Weekly reward, paid in USDT', 'Level-up rewards 2.00–15.00 USDT', 'Priority support queue'], Platinum: ['Weekly + monthly reward', 'Level-up rewards 25.00–60.00 USDT', 'Dedicated VIP host', 'Platinum tournament series'], Diamond: ['Weekly + monthly reward', 'Level-up rewards 100.00–500.00 USDT', 'Dedicated VIP host', 'All VIP events & invitations'] };
+async function vipFix(inst) { const mc = await inst.getMainComponentAsync(); const tier = (mc && mc.name.match(/Tier=(\w+)/) || [])[1]; const b = VIPB[tier]; if (!b) return 0; const ts = inst.findAll(n => n.type === 'TEXT' && n.name === 'Benefit'); for (const [i, t] of ts.entries()) { if (b[i]) { await ld(t); t.characters = b[i]; } } for (const t of inst.findAll(n => n.type === 'TEXT' && /withdrawal limit|0\.1–1\.0%|rakeback/i.test(n.characters))) { await ld(t); t.characters = t.characters.replace(/Higher withdrawal limits/i, 'Same withdrawal checks for every tier').replace(/Weekly reward 0\.1–1\.0%/i, 'Weekly reward, paid in USDT'); } if (!ts.length) MISS.push('vipFix no Benefit in ' + tier); return ts.length; }
+// Pagination: set range text, rows-per-page label and last page number; hide pages beyond `last`
+async function PAG(range, per, last) { const p = await I('23:16756', { Type: 'Numbered' }); await sx(p, 'Range', range);
+  const rp = p.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Button/Secondary')); if (rp) setP(rp, { Label: String(per) });
+  const pg = (k) => p.findOne(n => n.name === 'Page ' + k);
+  const lastNode = pg(65); if (lastNode) { if (last <= 5) lastNode.visible = false; else { if (lastNode.type === 'INSTANCE') { const cp = lastNode.componentProperties; if (Object.keys(cp).some(x => x.startsWith('Label#'))) setP(lastNode, { Label: String(last) }); else await sxi(lastNode, 0, String(last)); } else await sxi(lastNode, 0, String(last)); } } else MISS.push('Page 65');
+  if (last <= 6) { const g = p.findOne(n => n.name === 'Gap'); if (g) g.visible = false; }
+  for (let k = last + 1; k <= 5; k++) { const n = pg(k); if (n) n.visible = false; }
+  return p; }
+async function SEARCH(ph, size = 'S') { const s = await I('16:3820', { Size: size, State: 'Default' }, { 'Show shortcut': false }); await sxc(s, 'Search', ph); return s; }
+function FIXEMPTY(root) { let n = 0; for (const x of root.findAll(x => x.type === 'FRAME' && x.children.length === 0 && (x.name === 'Row' || x.name === 'Cell' || x.name === 'Stack') && x.height >= 99)) { const fillW = x.layoutSizingHorizontal === 'FILL'; x.resize(Math.max(1, x.width), 1); if (fillW) x.layoutSizingHorizontal = 'FILL'; n++; } return n; }
 // ===== END LIB =====
 
 // ===== usr-vip-ref DESKTOP SHELL =====
@@ -135,7 +148,7 @@ async function DESK(NAME, X, Y, m) {
   const bar = await DEMOBAR(); add(f, [bar, 'FILL']);
   const body = AL('HORIZONTAL', { name: 'Body' }); add(f, [body, 'FILL']);
   const sb = await I('23:6697', { State: 'Expanded', Auth: 'Member' }); add(body, sb); sb.name = 'Shell/Sidebar'; sb.layoutSizingVertical = 'FILL';
-  for (const it of sb.findAll(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.name === 'Shell/Sidebar Item')) { const cp = it.componentProperties; const lk = Object.keys(cp).find(k => k.startsWith('Label#')); const lab = lk ? cp[lk].value : ''; const st = cp.State && cp.State.value; const ic = it.findOne(n => n.name === 'Icon'); if (lab === m.active) { it.setProperties({ State: 'Active' }); if (ic) tint(ic, 'icon/brand'); } else if (st === 'Active') { it.setProperties({ State: 'Default' }); if (ic) tint(ic, 'icon/muted'); } }
+  for (const it of sb.findAll(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.name === 'Shell/Sidebar Item')) { const cp = it.componentProperties; const lk = Object.keys(cp).find(k => k.startsWith('Label#')); const lab = lk ? cp[lk].value : ''; const st = cp.State && cp.State.value; if (lab === m.active) { it.setProperties({ State: 'Active' }); const ic = it.findOne(n => n.name === 'Icon'); if (ic) tint(ic, 'icon/brand'); } else if (st === 'Active') { it.setProperties({ State: 'Default' }); const ic = it.findOne(n => n.name === 'Icon'); if (ic) tint(ic, 'icon/muted'); } }
   const main = AL('VERTICAL', { name: 'Main column' }); add(body, [main, 'FILL']);
   const tb = await I('23:9832', { State: 'Member' }); tb.name = 'Shell/Topbar Desktop'; add(main, [tb, 'FILL']);
   const content = AL('VERTICAL', { name: 'Content', gap: 24, p: [32, 32, 48, 32] }); add(main, [content, 'FILL']);
@@ -168,11 +181,11 @@ const hc = COL({ name: 'Status', gap: 16, p: 32 }); add(hero, [hc, 'FILL']);
 const tr = ROW({ gap: 10 }); add(tr, await I('6:211', { Tier: 'Gold', Size: 'M' })); add(tr, await T('Level 14 of 29', 'Label/M', 'text/secondary')); add(tr, await DEMO('S')); add(hc, tr);
 add(hc, await T('Gold III', 'Heading/H1', 'text/primary'));
 const pts = ROW({ gap: 8, align: 'MAX' }); add(pts, await T('12,840', 'Number/XL', 'text/primary')); add(pts, await T('/ 20,000 status points to Platinum', 'Body/M', 'text/tertiary')); add(hc, pts);
-const track = figma.createFrame(); track.name = 'Tier track (0 → 20,000)'; track.resize(520, 40); track.fills = []; track.clipsContent = false;
-track.appendChild(BAR(520, 0.642, 'vip/gold', 10));
-for (const [lbl, v] of [['Silver 2,500', 2500], ['Gold 8,000', 8000], ['Platinum 20,000', 20000]]) { const x = Math.round(520 * v / 20000); const tk = rect(2, 16, 'border/strong', 0, 'Tick ' + lbl); tk.x = Math.min(518, x - 1); tk.y = -3; track.appendChild(tk); const t = await T(lbl, 'Caption', 'text/tertiary'); track.appendChild(t); t.x = Math.min(520 - t.width, Math.max(0, x - t.width / 2)); t.y = 20; }
+const track = figma.createFrame(); track.name = 'Tier track (0 → 20,000)'; track.resize(440, 40); track.fills = []; track.clipsContent = false;
+track.appendChild(BAR(440, 0.642, 'vip/gold', 10));
+for (const [lbl, v] of [['Silver 2,500', 2500], ['Gold 8,000', 8000], ['Platinum 20,000', 20000]]) { const x = Math.round(440 * v / 20000); const tk = rect(2, 16, 'border/strong', 0, 'Tick ' + lbl); tk.x = Math.min(438, x - 1); tk.y = -3; track.appendChild(tk); const t = await T(lbl, 'Caption', 'text/tertiary'); track.appendChild(t); t.x = Math.min(440 - t.width, Math.max(0, x - t.width / 2)); t.y = 20; }
 add(hc, track);
-add(hc, await T('1,160 points to Level 15 (Gold IV) · 7,160 points to Platinum. Next roll-off: 410 pts on 1 Dec 2026 — you stay Gold (minimum 8,000).', 'Body/S', 'text/secondary', { w: 520 }));
+add(hc, [await T('1,160 points to Level 15 (Gold IV) · 7,160 points to Platinum. Next roll-off: 410 pts on 1 Dec 2026 — you stay Gold (minimum 8,000).', 'Body/S', 'text/secondary', { w: 440 }), 'FILL']);
 const hb = ROW({ gap: 12 }); add(hb, await BTN('Primary', 'See what Platinum unlocks', { trail: 'arrow-right' })); add(hb, await BTN('Ghost', 'Points history', { lead: 'history' })); add(hc, hb);
 const art = figma.createFrame(); art.name = 'Art — crown & coin cropped by the edge'; art.resize(240, 300); art.fills = []; art.clipsContent = true; add(hero, art); art.layoutSizingVertical = 'FILL';
 const b1 = rect(300, 640, 'accent/gold-tint-strong', 0, 'Angled block'); b1.rotation = -14; b1.x = 30; b1.y = -80; art.appendChild(b1);
@@ -209,12 +222,12 @@ const ex = ROW({ gap: 6 }); add(ex, await T('Example: 35 entries in round #1,248
 const rg = CARD({ name: 'Play within your limits', gap: 12 }); add(r3, [rg, 'FILL']); rg.layoutSizingVertical = 'FILL';
 const rgh = ROW({ gap: 8 }); add(rgh, await IC('shield', 20, 'icon/brand')); add(rgh, await T('Play within your limits', 'Heading/H5')); add(rg, rgh);
 add(rg, [await T('Levels reward play you were going to do anyway — never chase a level. VIP status never changes odds or outcomes.', 'Body/S', 'text/secondary', { w: 300 }), 'FILL']);
-add(rg, [await KV('Daily participation limit', '351.75 / 500.00 USDT', { demo: true }), 'FILL']); add(rg, BAR(320, 351.75 / 500, 'brand/primary', 6));
+const kvv = await KV('Daily limit used', '351.75 / 500.00 USDT', { demo: true }); kvv.layoutMode = 'VERTICAL'; kvv.counterAxisAlignItems = 'MIN'; gap(kvv, 4); add(rg, [kvv, 'FILL']); add(rg, BAR(320, 351.75 / 500, 'brand/primary', 6));
 const rb = ROW({ gap: 8 }); add(rb, await BTN('Secondary', 'Set limits', { size: 'S' })); add(rb, await BTN('Ghost', 'Take a break', { size: 'S', lead: 'pause-circle' })); add(rg, rb);
 await FOOT(content, 'VIP status, points and rewards never change odds, outcomes or security checks. All values are DEMO. 18+ only, in permitted jurisdictions.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'd-v1', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'd-v1', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 try { // ---- d-v2
 const NAME = '[USR-V2] VIP — Points & History / 1440 / Default';
 const { f, content } = await DESK(NAME, 1680, 160, { active: 'VIP Club', area: 'VIP Club', page: 'Points', title: 'Status points',
@@ -227,12 +240,12 @@ const hist = CARD({ name: 'Points history', gap: 0, p: 0, clip: true }); add(col
 const hh = ROW({ name: 'Card header', gap: 12, p: [20, 24, 16, 24] }); add(hh, await T('Points history', 'Heading/H4')); add(hh, await DEMO('S')); const spc = ROW({}); add(hh, [spc, 'FILL']);
 const seg = await I('20:6978', { Segments: '4' }); const segs = seg.findAll(n => n.type === 'INSTANCE' && n.name.includes('Segment')); ['All', 'Global Pool', 'Games', 'Level-ups'].forEach((l, i) => { if (segs[i]) setP(segs[i], { Label: l }); }); add(hh, seg); add(hist, [hh, 'FILL']);
 const tbl = COL({ name: 'Table', gap: 0 }); add(hist, [tbl, 'FILL']);
-await HEADROW(tbl, [['Date', 176], ['Activity', 'FILL'], ['Source', 168], ['Points', 112, true], ['Balance', 120, true]]);
-const H = [['27 Nov 2026, 14:12', 'Round #1,248 · 35 entries', '350.00 USDT entered · fee excluded', 'Global Pool', 'pool', '+350', '12,840'], ['27 Nov 2026, 11:05', 'Orbit Rush', '124.00 USDT staked', 'Originals', 'crash', '+124', '12,490'], ['26 Nov 2026, 21:40', 'Pool Dice', '80.00 USDT staked', 'Originals', 'dice', '+80', '12,366'], ['26 Nov 2026, 18:02', 'Twenty-One', '90.00 USDT staked', 'Table games', 'cards', '+90', '12,286'], ['26 Nov 2026, 12:15', 'Round #1,247 · 15 entries', '150.00 USDT entered', 'Global Pool', 'pool', '+150', '12,196'], ['25 Nov 2026, 19:30', 'Level up — Gold III (Level 14)', 'Level-up reward 5.00 USDT → Rewards', 'VIP', 'crown', '0', '12,046'], ['25 Nov 2026, 19:30', 'Round #1,246 · 20 entries', '200.00 USDT entered', 'Global Pool', 'pool', '+200', '12,046'], ['25 Nov 2026, 09:10', 'Vault Sweeper', '46.00 USDT staked', 'Originals', 'games', '+46', '11,846']];
-for (const [i, [d, a, a2, s, ic, p, b]] of H.entries()) { const src = ROW({ gap: 8 }); add(src, await IC(ic, 16, ic === 'crown' ? 'icon/gold' : 'icon/muted')); add(src, await T(s, 'Body/S', 'text/secondary'));
+await HEADROW(tbl, [['Date', 156], ['Activity', 'FILL'], ['Points', 108, true], ['Balance', 108, true]]);
+const H = [['27 Nov 2026, 18:05', 'Round #1,248 · 35 entries', '350.00 USDT entered, fee excluded', 'Global Pool', 'pool', '+350', '12,840'], ['27 Nov 2026, 11:05', 'Orbit Rush', '36.00 USDT staked', 'Originals', 'crash', '+36', '12,490'], ['26 Nov 2026, 21:40', 'Pool Dice', '24.00 USDT staked', 'Originals', 'dice', '+24', '12,454'], ['26 Nov 2026, 18:02', 'Twenty-One', '30.00 USDT staked', 'Table games', 'cards', '+30', '12,430'], ['26 Nov 2026, 12:40', 'Round #1,247 · 40 entries', '400.00 USDT entered, fee excluded', 'Global Pool', 'pool', '+400', '12,400'], ['25 Nov 2026, 19:32', 'Level up — Gold III (Level 14)', 'reward 5.00 USDT to Available', 'VIP', 'crown', '0', '12,000'], ['25 Nov 2026, 19:30', 'Skyline', '18.00 USDT staked — 12,000 reached', 'Originals', 'games', '+18', '12,000'], ['25 Nov 2026, 19:12', 'Round #1,246 · 24 entries', '240.00 USDT entered, fee excluded', 'Global Pool', 'pool', '+240', '11,982']];
+for (const [i, [d, a, a2, s, ic, p, b]] of H.entries()) { const act = ROW({ gap: 12 }); add(act, await TILE(ic, ic === 'crown' ? 'icon/gold' : 'icon/default', ic === 'crown' ? 'accent/gold-tint' : 'surface/raised', 32)); add(act, await TWO(a, s + ' · ' + a2));
   const pc = ROW({ gap: 4 }); add(pc, await T(p, 'Number/S', p === '0' ? 'text/tertiary' : 'text/success')); add(pc, await DEMO('XS'));
-  await addRow(tbl, [CELL(176, [await TX(d, 'Body/S', 'text/secondary')]), CELL('FILL', [await TWO(a, a2)]), CELL(168, [src]), CELL(112, [pc], { right: true }), CELL(120, [await TX(b, 'Number/S')], { right: true })], { name: 'Row — ' + a, last: i === H.length - 1, fill: ic === 'crown' ? 'accent/gold-tint' : null }); }
-const pag = await I('23:16756', { Type: 'Numbered' }); await sx(pag, 'Range', '1–8 of 214'); add(hist, [pag, 'FILL']);
+  await addRow(tbl, [CELL(156, [await TX(d, 'Body/S', 'text/secondary')]), CELL('FILL', [act], { py: 12 }), CELL(108, [pc], { right: true }), CELL(108, [await TX(b, 'Number/S')], { right: true })], { name: 'Row — ' + a, last: i === H.length - 1, fill: ic === 'crown' ? 'accent/gold-tint' : null }); }
+const pag = await PAG('1–8 of 214', 8, 27); add(hist, [pag, 'FILL']);
 const side = COL({ name: 'Side column', gap: 16, w: 376 }); add(cols, side);
 const ch = CARD({ name: 'Points by week', gap: 12 }); add(side, [ch, 'FILL']);
 const chh = ROW({ gap: 8 }); add(chh, await T('Points by week', 'Heading/H5')); add(chh, await DEMO('S')); add(ch, chh);
@@ -246,7 +259,7 @@ const no = CARD({ name: "What doesn't earn points", gap: 10 }); add(side, [no, '
 add(no, await T("What doesn't earn points", 'Heading/H5'));
 for (const s of ['The 0.05 USDT platform fee on each entry', 'Bets placed with bonus funds', 'Refunded entries — round #1,245 was cancelled, so its 30 entries earned 0 pts']) add(no, [await CHK(s, 'lock', 300), 'FILL']);
 await FOOT(content, 'Points are a loyalty measure only — they have no cash value and never change odds or outcomes. All values are DEMO.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'd-v2', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'd-v2', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 return { sec: sec.id, R, MISS: MISS.slice(0, 60) };

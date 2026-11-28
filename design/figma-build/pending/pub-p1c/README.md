@@ -25,3 +25,15 @@ with real text layers + an open-end wrench (maintenance), a gold trophy cup (lea
 - 1440 frames: `r3-verify-desktop.js` ran on the 3rd try. Screenshots seen for 404, 500, Maintenance, Leaderboard Weekly and Daily; Monthly returned
   0 text overflow but its screenshot was not included in the response. 404 reports 3 texts outside the frame = the 7th
   "Popular right now" tile is deliberately cropped by the carousel edge (peek). Nothing else is outstanding.
+
+## Continuation run 2 (28 Nov 2026) — QA fixes, all frames verified
+- Inventory (read-only, one call per page): page 03 section 54:101508 holds the doc header + six 1440 frames (all auto height); page 10 section
+  215:78629 holds the five 390 frames (all auto height, 0 text overflow). Nothing missing, nothing rebuilt.
+- Monthly 1440 (84:105918) screenshot now seen. A per-node overflow audit found and `out/f1-leader-header-podium.js` fixed, in all three 1440 leaderboard frames:
+  (1) the Standings column header (fixed 48/730/120/120 cells) overflowed its 702 px row behind the right column; H/Player now FILL, padding/gap and
+  column widths match the Table/Leaderboard Row instance (16 | 48 · 346 · 120 · 120 | 16, gap 12); (2) podium handles (68–97 px) overflowed their 51 px
+  Handle frame under the DEMO badge; the badge now sits in a new 'Place' row under the handle ("1st place  DEMO"), 'Who' gap 8.
+- `out/f2-404tiles-maint-window.js`: 404 'Popular right now' tiles — HOT/NEW tag + player pill with DEMO clipped the 160 px tile; tag turned off via
+  'Show tag' on the 3 affected tiles. Maintenance hero — 'Window' facts row (530) overflowed its 520 px copy column; gap 20 + FILL.
+- Post-fix screenshots seen: Monthly, Weekly, Daily main grids; 404 tile row; Maintenance hero. Post-fix audit = 0 overflow (except the deliberate
+  7th-tile carousel peek on 404). Both fix scripts are idempotent (they skip already-fixed nodes).

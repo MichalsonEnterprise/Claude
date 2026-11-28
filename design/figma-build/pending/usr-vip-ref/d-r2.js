@@ -30,5 +30,5 @@ add(ap, await T('Active = made at least one qualifying Global Pool entry in the 
 const dn = CARD({ name: 'How stats are counted', gap: 10, fill: 'bg/secondary' }); add(side, [dn, 'FILL']);
 for (const s of ['Stats refresh every 15 minutes', 'Repeat clicks from one device within 24 h count once', 'Sign-ups from restricted countries are blocked and never counted']) add(dn, [await CHK(s, 'info', 300, 'Caption'), 'FILL']);
 await FOOT(content, 'Statistics are DEMO values. You only see aggregate numbers — never personal data about the players you invite.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

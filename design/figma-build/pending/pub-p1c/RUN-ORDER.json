@@ -1,3 +1,16 @@
-{"page_mobile":"10 — Mobile Experience","section_mobile":"PUB-06/24/25/26 — Mobile (215:78629, X=42000)","page_desktop":"03 — Public Website","section_desktop":"PUB-24/25/26 Errors & PUB-06 Leaderboard (54:101508, X=70000)",
- "order":["r0-inventory-03.js (read-only)","r1-inventory-10.js (read-only)","out/m1-errors.js (DONE 28 Nov)","out/m2-leader.js (DONE 28 Nov)","r3-verify-desktop.js (DONE 28 Nov, read-only)"],
- "do_not_run":"unused-desktop/* — the desktop frames already exist (built by the interrupted earlier run under other names); running these would create duplicates."}
+{
+ "page_mobile": "10 — Mobile Experience",
+ "section_mobile": "PUB-06/24/25/26 — Mobile (215:78629, X=42000)",
+ "page_desktop": "03 — Public Website",
+ "section_desktop": "PUB-24/25/26 Errors & PUB-06 Leaderboard (54:101508, X=70000)",
+ "order": [
+  "r0-inventory-03.js (read-only)",
+  "r1-inventory-10.js (read-only)",
+  "out/m1-errors.js (DONE 28 Nov)",
+  "out/m2-leader.js (DONE 28 Nov)",
+  "r3-verify-desktop.js (DONE 28 Nov, read-only)",
+  "out/f1-leader-header-podium.js (DONE 28 Nov, run 2 — idempotent)",
+  "out/f2-404tiles-maint-window.js (DONE 28 Nov, run 2 — idempotent)"
+ ],
+ "do_not_run": "unused-desktop/* — the desktop frames already exist (built by the interrupted earlier run under other names); running these would create duplicates."
+}

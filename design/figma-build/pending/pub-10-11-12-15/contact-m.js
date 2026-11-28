@@ -16,8 +16,8 @@ const msg = await I('16:3858', { State: 'Default' }, { Label: 'Message *', 'Show
 const cb = await I('20:3205', { Value: 'Unchecked', State: 'Default' }, { Label: 'Email me a copy of this message', 'Show description': false }); cb.name = 'Field — Copy to email'; add(fields, cb);
 const pn = AL('HORIZONTAL', { name: 'Privacy note', gap: 8, align: 'CENTER' }); add(pn, await IC('lock', 14, 'icon/muted'), [await T('Used only to answer your request. Privacy Policy.', 'Caption', 'text/tertiary', { w: 280 }), 'FILL']); add(form, [pn, 'FILL']);
 add(C, [await mhead('OTHER CHANNELS', 'Response times', null, await DEMO('S')), 'FILL']);
-add(C, [await rowsList('Response times', [['Email · support@globalpool.example', 'within 24 h'], ['Withdrawal questions', 'within 4 h'], ['Security · security@globalpool.example', 'within 24 h'], ['Restrictions & appeals', 'within 72 h'], ['Complaints & disputes', 'decision in 14 days']], { vw: 130 }), 'FILL']);
-add(C, [await T('Email addresses are placeholders for this design. Times: last 30 days, to first reply from a person.', 'Caption', 'text/tertiary', { w: 358 }), 'FILL']);
+add(C, [await rowsList('Response times', [['Email', 'within 24 h'], ['Withdrawal questions', 'within 4 h'], ['Security reports', 'within 24 h'], ['Restrictions & appeals', 'within 72 h'], ['Complaints & disputes', 'decision in 14 days']], { vw: 130 }), 'FILL']);
+add(C, [await T('support@globalpool.example and security@globalpool.example are placeholders for this design. Times: last 30 days, to the first reply from a person.', 'Caption', 'text/tertiary', { w: 358 }), 'FILL']);
 const rg = box('Need help with gambling?', { gap: 10, p: 16 }); add(C, [rg, 'FILL']);
 const rgh = AL('HORIZONTAL', { gap: 10, align: 'CENTER' }); const rgi = AL('HORIZONTAL', { fill: 'status/info-tint', r: 10, p: 8 }); add(rgi, await IC('heart', 18, 'text/info')); add(rgh, rgi, [await T('Need help with gambling?', 'Heading/H5', 'text/primary'), 'FILL'], await I('6:159')); add(rg, [rgh, 'FILL']);
 add(rg, [await T('Free, confidential support: Gambling Therapy, Gamblers Anonymous, GamCare. You can also set limits or take a break yourself — instantly.', 'Body/S', 'text/secondary', { w: 326 }), 'FILL']);
@@ -30,7 +30,7 @@ const base = S.f; const Fd = (k, n) => k.findOne(x => x.name === 'Field — ' + 
 function val(inst, v, color = 'text/primary', layer = 'Value text') { const t = inst.findOne(n => n.name === layer && n.type === 'TEXT'); if (t) { t.characters = v; t.fills = [paint(color)]; } }
 function mk(state, y) { const name = '[PUB-15] Contact / 390 / ' + state; { const old = sec.children.find(n => n.name === name); if (old) old.remove(); } const k = base.clone(); sec.appendChild(k); k.name = name; k.x = base.x; k.y = y; return k; }
 const k1 = mk('Validation error', base.y + base.height + 160); out.validation = k1.id;
-{ const tp = Fd(k1, 'Topic'); tp.setProperties({ State: 'Error' }); const nm = Fd(k1, 'Name'); nm.setProperties({ State: 'Filled' }); val(nm, 'Nova K.');
+{ const tp = Fd(k1, 'Topic'); tp.setProperties({ State: 'Error' }); { const tv1 = tp.findOne(n => n.type === 'TEXT' && n.name === 'Value'); if (tv1) { tv1.characters = 'Choose a topic'; tv1.fills = [paint('text/tertiary')]; } } const nm = Fd(k1, 'Name'); nm.setProperties({ State: 'Filled' }); val(nm, 'Nova K.');
   const em = Fd(k1, 'Email'); em.setProperties({ State: 'Error' }); val(em, 'nova.k@example'); txt(em, 'Helper text', 'Enter a full email address, e.g. name@example.com');
   const ms = Fd(k1, 'Message'); ms.setProperties({ State: 'Error' }); val(ms, 'It’s stuck'); txt(ms, 'Helper text', 'Add a little more detail — at least 20 characters (10 / 20).'); txt(ms, 'Counter', '10 / 2,000');
   const f1 = k1.findOne(n => n.name === 'Contact form'); const a1 = f1.findOne(n => n.name === 'Anti-phishing notice');
@@ -50,7 +50,18 @@ const k2 = mk('Sent — success', k1.y + k1.height + 160); out.sent = k2.id;
   f2.appendChild(sp); sp.layoutSizingHorizontal = 'FILL';
   const sb = k2.findOne(n => n.name === 'Button — Sticky CTA'); setProp(sb, 'Label', 'Track withdrawal WD-20931'); setProp(sb, 'Leading icon', ICONS['withdraw']);
   k2.findOne(n => n.name === 'Sticky note').characters = 'Withdrawal questions: reply within 4 h'; }
+const MSG = 'My withdrawal WD-20931 (1,500.00 USDT to 0x7c4e…a21D on Arbitrum) was submitted at 18:44 UTC and is still under review. The tracker says a decision by 22:44 UTC — is anything else needed from me?';
+const k3 = mk('Send failed — error', k2.y + k2.height + 160); out.failed = k3.id;
+{ for (const [n, v] of [['Name', 'Nova K.'], ['Email', 'nova.k@example.com'], ['Account ID', 'GP-48213'], ['Reference', 'WD-20931']]) { const f = Fd(k3, n); f.setProperties({ State: 'Filled' }); val(f, v); }
+  const tp = Fd(k3, 'Topic'); val(tp, 'Withdrawals', 'text/primary', 'Value');
+  const ms = Fd(k3, 'Message'); val(ms, 'WD-20931 (1,500.00 USDT, Arbitrum) is still under review since 18:44 UTC. Is anything else needed from me?'); txt(ms, 'Counter', '106 / 2,000');
+  const f3 = k3.findOne(n => n.name === 'Contact form'); const a3 = f3.findOne(n => n.name === 'Anti-phishing notice');
+  const es = AL('HORIZONTAL', { name: 'Send error', fill: 'status/danger-tint', stroke: 'border/danger', r: 10, p: 12, gap: 10 }); add(es, await IC('wifi-off', 18, 'text/danger')); const et = AL('VERTICAL', { gap: 4 }); add(et, await T('Your message wasn’t sent', 'Body/S Strong', 'text/primary'), [await T('The request timed out after 30 seconds. Nothing is lost — everything you typed is still below.', 'Caption', 'text/secondary', { w: 260 }), 'FILL']); const er = AL('HORIZONTAL', { gap: 6, align: 'CENTER' }); add(er, await T('Error ref ERR-CT-5F2A', 'Mono/S', 'text/secondary'), await DEMO('XS')); add(et, er); add(es, [et, 'FILL']);
+  f3.insertChild(f3.children.indexOf(a3), es); es.layoutSizingHorizontal = 'FILL';
+  const sb = k3.findOne(n => n.name === 'Button — Sticky CTA'); setProp(sb, 'Label', 'Try again'); setProp(sb, 'Leading icon', ICONS['refresh']);
+  k3.findOne(n => n.name === 'Sticky note').characters = 'Still failing? Use live chat above'; }
 fitSection(sec);
 await k1.findOne(n => n.name === 'Contact form').screenshot({ scale: 0.6 });
 await k2.findOne(n => n.name === 'Contact form').screenshot({ scale: 0.6 });
+await k3.findOne(n => n.name === 'Contact form').screenshot({ scale: 0.6 });
 return out;

@@ -1,7 +1,7 @@
 const S = await mshell('[PUB-11] Affiliate Program / 390 / Default — calculator', 630, 120); const C = S.C;
 const hd = AL('VERTICAL', { name: 'Page header', gap: 12 }); add(C, [hd, 'FILL']);
 const ov = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(ov, await IC('users', 16, 'icon/brand'), await T('AFFILIATE PROGRAM · FOR PARTNERS', 'Overline', 'text/brand')); add(hd, ov);
-add(hd, [await T('Earn 20% of the platform fees your players pay', 'Heading/H2', 'text/primary', { w: 358 }), 'FILL'], [await T('Share your link. You earn 20% of the 0.05 USDT platform fee on every qualifying Global Pool entry your players buy — paid in USDT every Monday.', 'Body/M', 'text/secondary', { w: 358 }), 'FILL']);
+add(hd, [await T('Earn 20% of the platform fees your players pay', 'Heading/H2', 'text/primary', { w: 358 }), 'FILL'], [await T('Share your link. You earn 20% of the 0.05 USDT platform fee on every qualifying Global Pool entry your players buy, for 12 months — paid to your balance in USDT.', 'Body/M', 'text/secondary', { w: 358 }), 'FILL']);
 const art = artFrame('Hero art — partner dashboard preview (cropped)', 300); add(C, [art, 'FILL']);
 abs(art, rect(340, 640, 'brand/tint', 0, 'Angled colour block — mint tint'), 150, -150, 14);
 abs(art, rect(40, 640, 'brand/primary', 0, 'Angled colour block — mint stripe'), 96, -150, 14);
@@ -10,7 +10,7 @@ const dash = AL('VERTICAL', { name: 'Preview — partner dashboard', fill: 'surf
 const dh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(dh, [await T('Partner dashboard · Nov 2026', 'Label/M', 'text/primary'), 'FILL'], await DEMO('XS')); add(dash, [dh, 'FILL']);
 const lnk = AL('HORIZONTAL', { name: 'Referral link', fill: 'surface/raised', r: 10, p: [8, 10, 8, 10], gap: 8, align: 'CENTER' }); add(lnk, await IC('link', 14, 'icon/muted'), [await T('globalpool.example/r/PARTNER-0427', 'Mono/S', 'text/primary'), 'FILL'], await IC('copy', 14, 'icon/brand')); add(dash, [lnk, 'FILL']);
 const st = AL('HORIZONTAL', { name: 'Stats', gap: 8, wrap: true, cgap: 8 }); add(dash, [st, 'FILL']);
-for (const [k, v, c] of [['Referred players', '40', 'text/primary'], ['Qualifying entries', '4,800', 'text/primary'], ['Platform fees', '240.00 USDT', 'text/primary'], ['Commission · 20%', '48.00 USDT', 'text/brand']]) { const s = AL('VERTICAL', { fill: 'surface/raised', r: 10, p: 10, gap: 2, w: 135 }); add(s, await T(k, 'Caption', 'text/tertiary'), await T(v, 'Number/S', c)); add(st, s); }
+for (const [k, v, c] of [['Referred players', '40', 'text/primary'], ['Qualifying entries', '4,800', 'text/primary'], ['Platform fees', '240.00 USDT', 'text/primary'], ['Commission · 20%', '48.00 USDT', 'text/brand']]) { const s = AL('VERTICAL', { fill: 'surface/raised', r: 10, p: 10, gap: 2, w: 132 }); add(s, await T(k, 'Caption', 'text/tertiary'), await T(v, 'Number/S', c)); add(st, s); }
 abs(art, dash, 24, 20); await fx(dash, 'Elevation/3 — Popover');
 const cta = AL('VERTICAL', { name: 'Actions', gap: 12 }); add(C, [cta, 'FILL']);
 const pm = AL('HORIZONTAL', { name: 'Promise', gap: 8, align: 'CENTER', fill: 'brand/tint-subtle', r: 10, p: [8, 12, 8, 12] }); add(pm, await IC('shield-check', 16, 'icon/brand'), [await T('Never a share of player losses, deposits or stakes.', 'Body/S Strong', 'text/primary', { w: 290 }), 'FILL']); add(cta, [pm, 'FILL']);
@@ -27,7 +27,7 @@ add(rules, [await iconRow('x-circle', 'You never earn on', 'Player losses, house
 add(rules, [await iconRow('users', 'Your players always get', 'The same odds, fees and limits as everyone else, and RG tools from day one.', {}), 'FILL']);
 add(C, [await mhead('COMMISSION CALCULATOR', 'Estimate your monthly commission', 'An illustration, not a forecast or a promise of income.', await DEMO('S')), 'FILL']);
 const calc = box('Calculator', { gap: 16, p: 16, r: 20 }); add(C, [calc, 'FILL']);
-const chips = AL('HORIZONTAL', { name: 'Scenarios — scroll', gap: 8, clip: true, w: 326 }); for (const [l, s] of [['Starter · 10', 'Default'], ['Growing · 40', 'Selected'], ['Established · 250', 'Default']]) add(chips, await I('17:2766', { State: s }, { Label: l })); add(calc, chips);
+const chips = AL('HORIZONTAL', { name: 'Scenarios — scroll', gap: 8, clip: true, w: 326 }); for (const [l, s] of [['Starter · 10', 'Default'], ['Growing · 40', 'Selected'], ['Established · 250', 'Default']]) add(chips, await I('17:2766', { State: s }, { Label: l, 'Show icon': false })); add(calc, chips);
 const i1 = await I('13:762', { State: 'Filled', Size: 'L' }, { Label: 'Active referred players', 'Show leading icon': true, 'Leading icon': ICONS['users'], 'Show trailing icon': false, 'Show helper': false }); i1.name = 'Field — Active referred players'; txt(i1, 'Value text', '40'); add(calc, [i1, 'FILL']);
 const i2 = await I('13:762', { State: 'Focus', Size: 'L' }, { Label: 'Qualifying entries per player, per month', 'Show leading icon': true, 'Leading icon': ICONS['ticket'], 'Show trailing icon': false, 'Show helper': true }); i2.name = 'Field — Entries per player'; txt(i2, 'Value text', '120'); txt(i2, 'Helper text', 'About 4 entries a day'); add(calc, [i2, 'FILL']);
 const fx2 = AL('HORIZONTAL', { name: 'Fixed values', gap: 8 }); add(calc, [fx2, 'FILL']);
@@ -37,16 +37,16 @@ const rh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(rh, [await T('ESTI
 add(res, await T('48.00 USDT', 'Number/L', 'text/brand'));
 for (const [k, v] of [['40 × 120 entries', '4,800'], ['× 0.05 USDT fee', '240.00 USDT'], ['× 20% commission', '48.00 USDT'], ['12 months at this pace', '≈ 576.00 USDT']]) { const r = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [6, 0, 6, 0] }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, [await T(k, 'Body/S', 'text/secondary'), 'FILL'], await T(v, 'Number/S', 'text/primary')); add(res, [r, 'FILL']); }
 add(calc, [await T('Commission depends on real qualifying entries and is never based on what players lose. Refunded entries earn nothing.', 'Caption', 'text/tertiary', { w: 326 }), 'FILL']);
-add(C, [await mhead('PAYOUTS', 'Paid every Monday, in USDT', null), 'FILL']);
+add(C, [await mhead('PAYOUTS', 'Paid in the Monday run, in USDT', 'Request a payout from 20.00 USDT — it is paid in the next Monday run to your Available balance.'), 'FILL']);
 const tl = box('Weekly cycle', { gap: 0, p: [4, 16, 4, 16] }); add(C, [tl, 'FILL']);
-const cy = [['activity', 'Accrues daily', 'After each round settles (draw 20:00 UTC).'], ['receipt', 'Statement · Mon 00:00 UTC', 'Itemised by round; covers Mon–Sun.'], ['wallet', 'Paid · Mon 10:00 UTC', 'To Available in USDT; under 10.00 rolls over.'], ['withdraw', 'Withdraw any time', '2FA, whitelisted address, network fee shown first.']];
+const cy = [['activity', 'Accrues round by round', 'After each daily draw settles (20:00 UTC). Cancelled rounds earn nothing.'], ['receipt', 'Statement · Mon 00:00 UTC', 'Itemised by round ID; covers Mon–Sun.'], ['wallet', 'Request from 20.00 USDT', 'KYC Level 2 + 2FA. Smaller amounts roll over and never expire.'], ['check-circle', 'Paid · Mon 10:00 UTC', 'To Available in USDT, payout fee 0.00. Withdraw like any balance.']];
 for (let i = 0; i < cy.length; i++) add(tl, [await iconRow(cy[i][0], cy[i][1], cy[i][2], { line: i < 3 }), 'FILL']);
 const npc = box('Next payout', { gap: 4, fill: 'brand/tint-subtle', stroke: 'border/brand' }); add(C, [npc, 'FILL']);
-const nh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(nh, [await T('NEXT PAYOUT', 'Overline', 'text/brand'), 'FILL'], await DEMO('XS')); add(npc, [nh, 'FILL']);
-add(npc, await T('Mon 30 Nov 2026, 10:00 UTC', 'Heading/H5', 'text/primary'), await T('Covers Mon 23 – Sun 29 Nov 2026', 'Body/S', 'text/secondary'));
+const nh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(nh, [await T('NEXT PAYOUT RUN', 'Overline', 'text/brand'), 'FILL'], await DEMO('XS')); add(npc, [nh, 'FILL']);
+add(npc, await T('Mon 30 Nov 2026, 10:00 UTC', 'Heading/H5', 'text/primary'), await T('For requests made by Sun 29 Nov, 23:59 UTC', 'Body/S', 'text/secondary'));
 add(C, [await mhead('PARTNER TERMS', 'Key terms in plain language', null), 'FILL']);
 const tg = box('Terms list', { gap: 0, p: [4, 16, 4, 16] }); add(C, [tg, 'FILL']);
-const tms = [['id-card', 'Eligibility', '18+, permitted jurisdiction, KYC Level 2 before your first payout.'], ['calendar', 'Commission period', '12 months per referred player; 30 days’ notice of any rate change.'], ['megaphone', 'Responsible marketing', 'Show 18+ and RG links; no “guaranteed win” or “risk-free” claims.'], ['ban', 'Restricted regions', 'Never promote there or suggest VPNs or geo-block workarounds.'], ['user-x', 'No self-referral', 'Own accounts, paid sign-ups or bonus abuse void commission.'], ['shield', 'Player protection first', 'Self-exclusion or account closure stops commission at once.']];
+const tms = [['id-card', 'Eligibility', '18+, permitted jurisdiction, KYC Level 2 and 2FA before your first payout.'], ['calendar', 'Commission period', '12 months per referred player; 30 days’ notice of any rate change.'], ['megaphone', 'Responsible marketing', 'Show 18+ and RG links; no “guaranteed win” or “risk-free” claims.'], ['ban', 'Restricted regions', 'Never promote there or suggest VPNs or geo-block workarounds.'], ['user-x', 'No self-referral', 'Own accounts, paid sign-ups or bonus abuse void commission.'], ['shield', 'Player protection first', 'Self-exclusion or account closure stops commission at once.']];
 for (let i = 0; i < tms.length; i++) add(tg, [await iconRow(tms[i][0], tms[i][1], tms[i][2], { line: i < tms.length - 1 }), 'FILL']);
 add(C, [await BTN('Secondary', 'Full partner terms', { size: 'L', trail: 'external-link' }), 'FILL']);
 await mlic(C);

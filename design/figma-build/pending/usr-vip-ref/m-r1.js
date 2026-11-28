@@ -17,5 +17,5 @@ const po = ROW({ gap: 8 }); add(po, await IC('gift', 18, 'icon/brand')); add(po,
 add(pr, await T('You and your friend each get 5.00 USDT in bonus funds', 'Body/S Strong', 'text/primary', { w: 320 })); add(pr, await T('After their KYC Level 2 and first deposit of 20.00+ USDT. 1× wagering, 14 days. No self-referrals.', 'Caption', 'text/secondary', { w: 320 }));
 const pt = ROW({ gap: 8 }); add(pt, await BTN('Ghost', 'Terms apply', { size: 'S' })); add(pt, await I('6:159')); add(pr, pt);
 await MFOOT(content, 'Referral figures are DEMO. Share only with adults in permitted countries.');
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

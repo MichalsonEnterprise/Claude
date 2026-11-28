@@ -1,5 +1,56 @@
 {
- "_note": "PUB-10/11/12/15 agent. PARTIAL — Figma MCP tool-call limit reached. Pending build scripts (body only; prepend helpers.js verbatim, then the matching prelude) in design/figma-build/pending/pub-10-11-12-15/.",
- "Section/PUB-10/11/12/15 VIP, Affiliates, About, Contact (page 03)": {"id": "36:530715", "note": "page 03 — Public Website, at X=80000, Y=0"},
- "[PUB-10] VIP Program / 1440 / Default (logged out)": {"id": "36:530716", "note": "PARTIAL: part A only (DEMOBAR, Shell/Sidebar Expanded Guest with VIP Club active, Shell/Topbar Desktop Guest, breadcrumb, hero with Card/VIP Tier Gold preview, facts strip, tier bento grid with 5 Card/VIP Tier + points ladder + weekly reward example, Shell/Footer Mega). Frame height is still FIXED 800 (content clipped) and the hero mint stripe overlaps the copy; run pending/vip-d-b.js to fix both and add the remaining sections. Content frame 36:531074, hero 36:531321, tier grid 36:531488, footer 36:531075."}
+ "_note": "PUB-10/11/12/15 agent — COMPLETE (continuation run 28 Nov 2026). Screens, not components. Scripts: design/figma-build/pending/pub-10-11-12-15/out.",
+ "Section/PUB-10/11/12/15 VIP, Affiliates, About, Contact (page 03)": {
+  "id": "36:530715",
+  "note": "page 03 — Public Website, X 80000 Y 0"
+ },
+ "Section/PUB-10/11/12/15 — Mobile (page 10)": {
+  "id": "335:114596",
+  "note": "page 10 — Mobile Experience, X 49000 Y 0"
+ },
+ "[PUB-10] VIP Program / 1440 / Default (logged out)": {
+  "id": "36:530716"
+ },
+ "[PUB-11] Affiliate Program / 1440 / Default — calculator": {
+  "id": "330:117038"
+ },
+ "[PUB-12] About Us / 1440 / Default": {
+  "id": "333:117841"
+ },
+ "[PUB-15] Contact / 1440 / Default — empty form": {
+  "id": "333:118907"
+ },
+ "[PUB-15] Contact / 1440 / Validation error": {
+  "id": "334:119477"
+ },
+ "[PUB-15] Contact / 1440 / Sending — loading": {
+  "id": "334:120083"
+ },
+ "[PUB-15] Contact / 1440 / Sent — success": {
+  "id": "334:120696"
+ },
+ "[PUB-15] Contact / 1440 / Send failed — error": {
+  "id": "334:121204"
+ },
+ "[PUB-10] VIP Program / 390 / Default (logged out)": {
+  "id": "335:114597"
+ },
+ "[PUB-11] Affiliate Program / 390 / Default — calculator": {
+  "id": "336:115755"
+ },
+ "[PUB-12] About Us / 390 / Default": {
+  "id": "335:115518"
+ },
+ "[PUB-15] Contact / 390 / Default — empty form": {
+  "id": "336:116422"
+ },
+ "[PUB-15] Contact / 390 / Validation error": {
+  "id": "336:116912"
+ },
+ "[PUB-15] Contact / 390 / Sent — success": {
+  "id": "336:117145"
+ },
+ "[PUB-15] Contact / 390 / Send failed — error": {
+  "id": "336:117595"
+ }
 }

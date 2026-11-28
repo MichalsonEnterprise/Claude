@@ -8,7 +8,7 @@ function insertAfter(parent, ref, node) { parent.insertChild(parent.children.ind
 const out = {};
 // 1 — Validation error
 const k1 = await mk('Validation error', base); out.validation = k1.id;
-{ const tp = Fd(k1, 'Topic'); tp.setProperties({ State: 'Error' }); txt(tp, 'Helper text', 'Choose a topic so we can route your message to the right team.');
+{ const tp = Fd(k1, 'Topic'); tp.setProperties({ State: 'Error' }); val(tp, 'Choose a topic', 'text/tertiary', 'Value'); txt(tp, 'Helper text', 'Choose a topic so we can route your message to the right team.');
   const nm = Fd(k1, 'Name'); nm.setProperties({ State: 'Filled' }); val(nm, 'Nova K.');
   const em = Fd(k1, 'Email'); em.setProperties({ State: 'Error' }); val(em, 'nova.k@example'); txt(em, 'Helper text', 'Enter a full email address, e.g. name@example.com');
   const rf = Fd(k1, 'Reference'); rf.setProperties({ State: 'Filled' }); val(rf, 'WD-20931');
@@ -19,7 +19,7 @@ const k1 = await mk('Validation error', base); out.validation = k1.id;
 const k2 = await mk('Sending — loading', k1); out.sending = k2.id;
 { for (const [n, v] of [['Name', 'Nova K.'], ['Email', 'nova.k@example.com'], ['Account ID', 'GP-48213'], ['Reference', 'WD-20931']]) { const f = Fd(k2, n); f.setProperties({ State: 'Disabled' }); val(f, v, 'text/tertiary'); }
   const tp = Fd(k2, 'Topic'); tp.setProperties({ State: 'Disabled' }); val(tp, 'Withdrawals', 'text/tertiary', 'Value');
-  const ms = Fd(k2, 'Message'); ms.setProperties({ State: 'Disabled' }); val(ms, MSG, 'text/tertiary'); txt(ms, 'Counter', '195 / 2,000');
+  const ms = Fd(k2, 'Message'); ms.setProperties({ State: 'Disabled' }); val(ms, MSG, 'text/tertiary'); txt(ms, 'Counter', '195 / 2,000'); txt(ms, 'Helper text', 'Fields are locked while we send your message.');
   const cb = Fd(k2, 'Copy to email'); cb.setProperties({ State: 'Disabled' });
   const sb = k2.findOne(n => n.name === 'Button — Send'); sb.setProperties({ State: 'Loading' }); setProp(sb, 'Label', 'Sending…');
   const an = k2.findOne(n => n.name === 'Action note text'); an.characters = 'Sending securely — please keep this page open.'; }
@@ -34,7 +34,7 @@ const k3 = await mk('Sent — success', k2); out.sent = k3.id;
   const kv = AL('VERTICAL', { name: 'Ticket summary', fill: 'surface/raised', r: 14, p: 20, gap: 0 }); add(sp, [kv, 'FILL']);
   const kh = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [0, 0, 10, 0] }); const st = await BADGE('Pending', 'S'); const stt = st.findOne(n => n.type === 'TEXT'); if (stt) stt.characters = 'Open'; add(kh, [await T('Ticket CS-58214', 'Mono/M', 'text/primary'), 'FILL'], st, await DEMO('XS')); add(kv, [kh, 'FILL']);
   for (const [k, v] of [['Topic', 'Withdrawals'], ['Reference', 'WD-20931'], ['Sent', '27 Nov 2026, 19:52 UTC'], ['First reply expected', 'by 27 Nov 2026, 23:52 UTC · withdrawal questions within 4 h']]) { const r = AL('HORIZONTAL', { gap: 16, p: [10, 0, 10, 0], align: 'CENTER' }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, await T(k, 'Body/S', 'text/tertiary', { w: 180 }), [await T(v, 'Body/S Strong', 'text/primary', { w: 400 }), 'FILL']); add(kv, [r, 'FILL']); }
-  const ac = AL('HORIZONTAL', { name: 'Next steps', gap: 12, align: 'CENTER' }); add(ac, await BTN('Primary', 'Track withdrawal WD-20931', { size: 'L', lead: 'withdraw' }), await BTN('Secondary', 'Send another message', { size: 'L' }), await BTN('Ghost', 'Back to lobby', { size: 'L' })); add(sp, ac);
+  const ac = AL('HORIZONTAL', { name: 'Next steps', gap: 12, align: 'CENTER' }); add(ac, await BTN('Primary', 'Track withdrawal WD-20931', { size: 'L', lead: 'withdraw' }), await BTN('Secondary', 'Send another message', { size: 'L' }), await BTN('Ghost', 'Back to lobby', { size: 'L' })); add(sp, [ac, 'FILL']); ac.layoutWrap = 'WRAP'; ac.counterAxisSpacing = 12;
   f3.appendChild(sp); sp.layoutSizingHorizontal = 'FILL'; }
 // 4 — Send failed
 const k4 = await mk('Send failed — error', k3); out.failed = k4.id;
@@ -46,7 +46,7 @@ const k4 = await mk('Send failed — error', k3); out.failed = k4.id;
   const co = await callout('Send error', 'status/danger-tint', 'border/danger', 'wifi-off', 'text/danger', 'Your message wasn’t sent', 'We couldn’t reach our server — the request timed out after 30 seconds. Nothing is lost: everything you typed is still below. Try again, or use live chat if it keeps failing.', ref);
   form.insertChild(form.children.indexOf(an), co); co.layoutSizingHorizontal = 'FILL';
   const sb = k4.findOne(n => n.name === 'Button — Send'); setProp(sb, 'Label', 'Try again'); setProp(sb, 'Leading icon', ICONS['refresh']);
-  k4.findOne(n => n.name === 'Action note text').characters = 'Still failing? Email support@globalpool.example (placeholder) and quote the error reference.'; }
+  k4.findOne(n => n.name === 'Action note text').characters = 'Still failing? Use live chat, or email us and quote the error reference.'; }
 { let y = base.y + base.height + 160; for (const k of [k1, k2, k3, k4]) { k.y = y; y += k.height + 160; } }
 fitSection(sec);
 await k1.findOne(n => n.name === 'Contact form').screenshot({ scale: 0.5 });

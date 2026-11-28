@@ -18,7 +18,7 @@ for (const [n, nm, th, rw, st] of [[13, 'Gold II', '10,000', '3.00', 'done'], [1
   const c = COL({ gap: 2 }); add(c, await T(nm + ' · Level ' + n, 'Body/S Strong', st === 'lock' ? 'text/secondary' : 'text/primary')); add(c, await T(st === 'now' ? 'You are here · ' + th + ' pts' : st === 'next' ? '840 / 2,000 pts' : th + ' pts', 'Caption', st === 'now' ? 'text/brand' : 'text/tertiary')); if (st === 'next') add(c, BAR(160, 0.42, 'brand/primary', 6)); add(r, [c, 'FILL']); add(r, await AMT(rw, { c: ok ? 'text/primary' : 'text/secondary' })); add(lv, [r, 'FILL']); }
 const rg = CARD({ name: 'Play within your limits', gap: 10, p: 16 }); add(content, [rg, 'FILL']);
 const rgh = ROW({ gap: 8 }); add(rgh, await IC('shield', 18, 'icon/brand')); add(rgh, await T('Never chase a level', 'Heading/H5')); add(rg, rgh);
-add(rg, [await KV('Daily participation limit', '351.75 / 500.00', { demo: true }), 'FILL']); add(rg, BAR(326, 0.7, 'brand/primary', 6)); add(rg, [await BTN('Secondary', 'Set limits', { size: 'L' }), 'FILL']);
+add(rg, [await KV('Daily limit used', '351.75 / 500.00', { demo: true }), 'FILL']); add(rg, BAR(326, 0.7, 'brand/primary', 6)); add(rg, [await BTN('Secondary', 'Set limits', { size: 'L' }), 'FILL']);
 await MFOOT(content, 'VIP status never changes odds or outcomes. DEMO values. 18+ · Terms apply.');
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

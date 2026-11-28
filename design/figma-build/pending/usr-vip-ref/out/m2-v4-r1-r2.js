@@ -89,7 +89,7 @@ function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n
 // ===== END GP HELPERS =====
 
 // ===== usr-vip-ref LIB (common) =====
-const MISS = [];
+const MISS = []; const FILLC = new Set();
 async function ld(t) { if (t.fontName === figma.mixed) { for (const s of t.getStyledTextSegments(['fontName'])) await figma.loadFontAsync(s.fontName); } else await figma.loadFontAsync(t.fontName); }
 async function sx(root, name, val, i = 0) { const t = root.findAll(n => n.type === 'TEXT' && n.name === name)[i]; if (!t) { MISS.push(String(root.name).slice(0, 28) + '>' + name); return null; } await ld(t); t.characters = String(val); return t; }
 async function sxm(root, m) { for (const k in m) await sx(root, k, m[k]); return root; }
@@ -109,11 +109,11 @@ async function CHK(text, kind = 'ok', w = 300, style = 'Body/S', color = 'text/s
 async function KV(k, v, o = {}) { const r = ROW({ name: 'KV — ' + k, justify: 'SPACE_BETWEEN' }); add(r, await T(k, o.ks || 'Body/S', o.kc || 'text/secondary')); const rt = ROW({ gap: 6 }); add(rt, await T(v, o.vs || 'Number/S', o.vc || 'text/primary')); if (o.demo) add(rt, await DEMO('XS')); add(r, rt); return r; }
 async function KPI(label, value, unit, o = {}) { const c = CARD({ name: 'KPI — ' + label, gap: 10, p: o.p ?? 20 }); const top = ROW({ gap: 8 }); if (o.icon) add(top, await TILE(o.icon, o.ic || 'icon/default', o.bg || 'surface/raised', 32)); add(top, await T(label, 'Label/M', 'text/secondary')); add(top, await DEMO('XS')); add(c, top); const v = ROW({ gap: 6, align: 'MAX' }); add(v, await T(value, o.size || 'Number/L', o.color || 'text/primary')); if (unit) add(v, await T(unit, 'Body/S', 'text/tertiary')); add(c, v); if (o.cap) add(c, [await T(o.cap, 'Caption', o.capc || 'text/tertiary', { w: o.cw || 220 }), 'FILL']); if (o.extra) for (const e of o.extra) add(c, [e, 'FILL']); return c; }
 async function HC(label, w, right = false) { const h = await I('22:8309', { Align: right ? 'Right' : 'Left', Sort: 'None' }, { Label: label, 'Show sort icon': false }); h.resize(w, h.height); return h; }
-function CELL(w, kids, o = {}) { const c = AL(o.v ? 'VERTICAL' : 'HORIZONTAL', { name: o.name || 'Cell', gap: o.gap ?? (o.v ? 2 : 8), p: [o.py ?? 14, 16, o.py ?? 14, 16], align: o.v ? (o.right ? 'MAX' : 'MIN') : 'CENTER', justify: (!o.v && o.right) ? 'MAX' : undefined }); if (w !== 'FILL') { c.resize(w, Math.max(1, c.height)); if (o.v) { c.counterAxisSizingMode = 'FIXED'; c.primaryAxisSizingMode = 'AUTO'; } else { c.primaryAxisSizingMode = 'FIXED'; c.counterAxisSizingMode = 'AUTO'; } } for (const k of kids) add(c, k); c.__fill = w === 'FILL'; return c; }
-function addRow(table, cells, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', align: 'CENTER', fill: o.fill }); if (!o.last) strokeSides(r, 'border/subtle', { b: 1 }); for (const c of cells) { add(r, c); if (c.__fill) c.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
+function CELL(w, kids, o = {}) { const c = AL(o.v ? 'VERTICAL' : 'HORIZONTAL', { name: o.name || 'Cell', gap: o.gap ?? (o.v ? 2 : 8), p: [o.py ?? 14, 16, o.py ?? 14, 16], align: o.v ? (o.right ? 'MAX' : 'MIN') : 'CENTER', justify: (!o.v && o.right) ? 'MAX' : undefined }); if (w !== 'FILL') { c.resize(w, Math.max(1, c.height)); if (o.v) { c.counterAxisSizingMode = 'FIXED'; c.primaryAxisSizingMode = 'AUTO'; } else { c.primaryAxisSizingMode = 'FIXED'; c.counterAxisSizingMode = 'AUTO'; } } for (const k of kids) add(c, k); if (w === 'FILL') FILLC.add(c.id); return c; }
+function addRow(table, cells, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', align: 'CENTER', fill: o.fill }); if (!o.last) strokeSides(r, 'border/subtle', { b: 1 }); for (const c of cells) { add(r, c); if (FILLC.has(c.id)) c.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
 async function HEADROW(table, cols) { const r = AL('HORIZONTAL', { name: 'Header row', fill: 'bg/secondary' }); strokeSides(r, 'border/subtle', { b: 1 }); for (const [l, w, right] of cols) { const h = await HC(l, w === 'FILL' ? 160 : w, right); add(r, h); if (w === 'FILL') h.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
 async function TX(text, style = 'Body/S', color = 'text/primary', w) { return T(text, style, color, w ? { w } : {}); }
-async function TWO(a, b, o = {}) { const c = COL({ gap: 2 }); add(c, await T(a, o.as || 'Body/S Strong', o.ac || 'text/primary')); add(c, await T(b, 'Caption', 'text/tertiary')); return c; }
+async function TWO(a, b, o = {}) { const c = COL({ gap: 2 }); const t1 = await T(a, o.as || 'Body/S Strong', o.ac || 'text/primary', o.w ? { w: o.w } : {}); const t2 = await T(b, 'Caption', 'text/tertiary', o.w ? { w: o.w } : {}); add(c, o.w ? [t1, 'FILL'] : t1); add(c, o.w ? [t2, 'FILL'] : t2); return c; }
 async function BADGEL(status, label, size = 'S') { const b = await BADGE(status, size); if (label) await sxi(b, 0, label); return b; }
 async function AMT(v, o = {}) { const r = ROW({ gap: 4, align: 'MAX', name: 'Amount ' + v }); add(r, await T(v, o.s || 'Number/S', o.c || 'text/primary')); add(r, await T(o.u ?? 'USDT', 'Caption', 'text/tertiary')); if (o.demo) add(r, await DEMO('XS')); return r; }
 // bar chart: vals[], labels[], {w,h,color,last,lastColor,max,grid:[...]} -> frame
@@ -125,6 +125,19 @@ async function CHART(vals, labels, o = {}) { const W = o.w || 320, H = o.h || 14
 async function SCRIM(f, name = 'Scrim') { const s = rect(f.width, f.height, 'scrim/overlay', 0, name); f.appendChild(s); s.layoutPositioning = 'ABSOLUTE'; s.x = 0; s.y = 0; return s; }
 async function CIC(id, s = 20, color = 'icon/default') { const c = await figma.getNodeByIdAsync(id); const i = c.createInstance(); i.resize(s, s); tint(i, color); return i; }
 async function SWAPIC(inst, name, color) { if (!inst) { MISS.push('swap null'); return; } const w = inst.width; const c = await figma.getNodeByIdAsync(ICONS[name]); inst.swapComponent(c); inst.resize(w, w); tint(inst, color); }
+// Card/VIP Tier library benefit lines still say "Weekly reward 0.1–1.0%" / "Higher withdrawal limits" -> override per tier (same copy as PUB-10)
+const VIPB = { Bronze: ['Level-up rewards 0.50–1.50 USDT', 'Standard support', 'Monthly activity statement'], Silver: ['Weekly reward, paid in USDT', 'Level-up rewards 1.00–1.80 USDT', 'Standard support'], Gold: ['Weekly reward, paid in USDT', 'Level-up rewards 2.00–15.00 USDT', 'Priority support queue'], Platinum: ['Weekly + monthly reward', 'Level-up rewards 25.00–60.00 USDT', 'Dedicated VIP host', 'Platinum tournament series'], Diamond: ['Weekly + monthly reward', 'Level-up rewards 100.00–500.00 USDT', 'Dedicated VIP host', 'All VIP events & invitations'] };
+async function vipFix(inst) { const mc = await inst.getMainComponentAsync(); const tier = (mc && mc.name.match(/Tier=(\w+)/) || [])[1]; const b = VIPB[tier]; if (!b) return 0; const ts = inst.findAll(n => n.type === 'TEXT' && n.name === 'Benefit'); for (const [i, t] of ts.entries()) { if (b[i]) { await ld(t); t.characters = b[i]; } } for (const t of inst.findAll(n => n.type === 'TEXT' && /withdrawal limit|0\.1–1\.0%|rakeback/i.test(n.characters))) { await ld(t); t.characters = t.characters.replace(/Higher withdrawal limits/i, 'Same withdrawal checks for every tier').replace(/Weekly reward 0\.1–1\.0%/i, 'Weekly reward, paid in USDT'); } if (!ts.length) MISS.push('vipFix no Benefit in ' + tier); return ts.length; }
+// Pagination: set range text, rows-per-page label and last page number; hide pages beyond `last`
+async function PAG(range, per, last) { const p = await I('23:16756', { Type: 'Numbered' }); await sx(p, 'Range', range);
+  const rp = p.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Button/Secondary')); if (rp) setP(rp, { Label: String(per) });
+  const pg = (k) => p.findOne(n => n.name === 'Page ' + k);
+  const lastNode = pg(65); if (lastNode) { if (last <= 5) lastNode.visible = false; else { if (lastNode.type === 'INSTANCE') { const cp = lastNode.componentProperties; if (Object.keys(cp).some(x => x.startsWith('Label#'))) setP(lastNode, { Label: String(last) }); else await sxi(lastNode, 0, String(last)); } else await sxi(lastNode, 0, String(last)); } } else MISS.push('Page 65');
+  if (last <= 6) { const g = p.findOne(n => n.name === 'Gap'); if (g) g.visible = false; }
+  for (let k = last + 1; k <= 5; k++) { const n = pg(k); if (n) n.visible = false; }
+  return p; }
+async function SEARCH(ph, size = 'S') { const s = await I('16:3820', { Size: size, State: 'Default' }, { 'Show shortcut': false }); await sxc(s, 'Search', ph); return s; }
+function FIXEMPTY(root) { let n = 0; for (const x of root.findAll(x => x.type === 'FRAME' && x.children.length === 0 && (x.name === 'Row' || x.name === 'Cell' || x.name === 'Stack') && x.height >= 99)) { const fillW = x.layoutSizingHorizontal === 'FILL'; x.resize(Math.max(1, x.width), 1); if (fillW) x.layoutSizingHorizontal = 'FILL'; n++; } return n; }
 // ===== END LIB =====
 
 // ===== usr-vip-ref MOBILE SHELL =====
@@ -132,7 +145,7 @@ async function MOB(NAME, X, Y, m) {
   for (const c of [...sec.children]) if (c.name === NAME) c.remove();
   if (Y === 'BELOW') { let my = 0; for (const c of sec.children) if (Math.abs(c.x - X) < 2) my = Math.max(my, c.y + c.height); Y = my + 160; }
   const f = await screen(NAME, 390, {}); sec.appendChild(f); f.x = X; f.y = Y;
-  const bar = await DEMOBAR(); add(f, [bar, 'FILL']);
+  const bar = await DEMOBAR('DEMO DATA — illustrative values only'); add(f, [bar, 'FILL']);
   const tb = await I('23:12908', { State: 'Member' }); tb.name = 'Shell/Topbar Mobile'; add(f, [tb, 'FILL']);
   const content = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [content, 'FILL']);
   const hr = ROW({ name: 'Page header', gap: 8 }); add(content, [hr, 'FILL']);
@@ -157,19 +170,19 @@ const NAME = '[USR-V4] VIP — Benefits & Tier Comparison / 390 / Default';
 const { f, content } = await MOB(NAME, 1650, 160, { title: 'Tiers & benefits', sub: '5 tiers · 29 levels · same odds for all', tabs: MVT('Benefits') });
 const tp = AL('HORIZONTAL', { name: 'Tier chips (scroll)', gap: 8, clip: true }); add(content, [tp, 'FILL']);
 for (const t of ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']) add(tp, await I('20:6895', { State: t === 'Gold' ? 'Active' : 'Default' }, { Label: t, 'Show icon': false }));
-const cw = ROW({ name: 'Current tier card', justify: 'CENTER' }); add(cw, await I('23:12669', { Tier: 'Gold', Current: 'Yes' })); add(content, [cw, 'FILL']);
+const cw = ROW({ name: 'Current tier card', justify: 'CENTER' }); const gvc = await I('23:12669', { Tier: 'Gold', Current: 'Yes' }); gvc.name = 'Card/VIP Tier — Gold (your tier)'; await vipFix(gvc); add(cw, gvc); add(content, [cw, 'FILL']);
 const cc = CARD({ name: 'Gold vs Platinum', gap: 0, p: 0, clip: true }); add(content, [cc, 'FILL']);
 const hh = ROW({ gap: 8, p: [14, 16, 10, 16] }); add(hh, await T('Gold vs Platinum', 'Heading/H5')); add(hh, await DEMO('XS')); add(cc, [hh, 'FILL']);
 const hr = ROW({ name: 'Header', fill: 'bg/secondary' }); add(hr, CELL(130, [await TX('BENEFIT', 'Overline', 'text/tertiary')], { py: 10, name: 'h0' })); for (const t of ['Gold', 'Platinum']) { const c = CELL('FILL', [await I('6:211', { Tier: t, Size: 'S' })], { py: 10 }); if (t === 'Gold') fill(c, 'surface/selected'); add(hr, c); c.layoutSizingHorizontal = 'FILL'; } add(cc, [hr, 'FILL']);
-for (const [l, a, b] of [['Points needed', '8,000', '20,000'], ['Level-up rewards', '2.00–15.00', '25.00–60.00'], ['Weekly reward', '✓', '✓'], ['Monthly reward', '—', '✓'], ['Support', 'Priority queue', 'Dedicated VIP host'], ['VIP tournaments', 'Monthly invitational', '+ Platinum series']]) { const cells = [CELL(130, [await TX(l, 'Caption', 'text/secondary', 98)], { py: 12 })]; for (const [j, v] of [a, b].entries()) { const k = v === '✓' ? await IC('check-circle', 18, 'status/success') : await TX(v, 'Body/S', v === '—' ? 'text/disabled' : 'text/primary', 90); const c = CELL('FILL', [k], { py: 12 }); if (j === 0) fill(c, 'surface/selected'); cells.push(c); } addRow(cc, cells, { name: 'Row — ' + l }); }
+for (const [l, a, b] of [['Points needed', '8,000', '20,000'], ['Level-up rewards', '2.00–15.00', '25.00–60.00'], ['Weekly reward', '✓', '✓'], ['Monthly reward', '—', '✓'], ['Support', 'Priority queue', 'Dedicated VIP host'], ['VIP tournaments', 'Monthly invitational', '+ Platinum series']]) { const cells = [CELL(130, [await TX(l, 'Caption', 'text/secondary', 98)], { py: 12 })]; for (const [j, v] of [a, b].entries()) { const k = v === '✓' ? await IC('check-circle', 18, 'status/success') : await TX(v, 'Body/S', v === '—' ? 'text/disabled' : 'text/primary', 80); const c = CELL('FILL', [k], { py: 12 }); if (j === 0) fill(c, 'surface/selected'); cells.push(c); } addRow(cc, cells, { name: 'Row — ' + l }); }
 const same = CARD({ name: 'Same for every tier', gap: 10, p: 16, fill: 'brand/tint-subtle', stroke: 'border/brand' }); add(content, [same, 'FILL']);
 const sh = ROW({ gap: 8 }); add(sh, await IC('shield-check', 18, 'icon/brand')); add(sh, await T('Same for every tier', 'Heading/H5')); add(same, sh);
 for (const s of ['Odds, house edge and payouts', 'Chainlink VRF / seed verification', 'Withdrawal security checks', 'Responsible-gaming tools & limits']) add(same, [await CHK(s, 'info', 300, 'Body/S'), 'FILL']);
 add(content, [await BTN('Secondary', 'Compare all five tiers', { size: 'L', trail: 'arrow-right' }), 'FILL']);
 await MFOOT(content, 'Thresholds and rewards are DEMO. Benefits can change with 30 days’ notice. 18+.');
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'm-v4', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'm-v4', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 try { // ---- m-r1
 const NAME = '[USR-R1] Referrals — Link & Overview / 390 / Default';
 const { f, content } = await MOB(NAME, 2160, 160, { title: 'Refer friends', sub: 'Earn 20% of their platform fees', tabs: MRT('Overview') });
@@ -190,9 +203,9 @@ const po = ROW({ gap: 8 }); add(po, await IC('gift', 18, 'icon/brand')); add(po,
 add(pr, await T('You and your friend each get 5.00 USDT in bonus funds', 'Body/S Strong', 'text/primary', { w: 320 })); add(pr, await T('After their KYC Level 2 and first deposit of 20.00+ USDT. 1× wagering, 14 days. No self-referrals.', 'Caption', 'text/secondary', { w: 320 }));
 const pt = ROW({ gap: 8 }); add(pt, await BTN('Ghost', 'Terms apply', { size: 'S' })); add(pt, await I('6:159')); add(pr, pt);
 await MFOOT(content, 'Referral figures are DEMO. Share only with adults in permitted countries.');
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'm-r1', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'm-r1', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 try { // ---- m-r2
 const NAME = '[USR-R2] Referrals — Statistics / 390 / Default';
 const { f, content } = await MOB(NAME, 2670, 160, { title: 'Referral statistics', sub: 'Last 30 days · 29 Oct – 27 Nov 2026', tabs: MRT('Stats') });
@@ -207,7 +220,7 @@ add(ec, [await CHK('24 Nov: round #1,245 cancelled — no commission. 27 Nov: 3.
 const cc = CARD({ name: 'Clicks by channel', gap: 10, p: 16 }); add(content, [cc, 'FILL']); add(cc, await T('Clicks by channel', 'Heading/H5'));
 for (const [c, ic, a, b] of [['Copied link', 'copy', '268', '4 sign-ups'], ['Telegram', 'chat', '196', '3 sign-ups'], ['X', 'external-link', '112', '1 sign-up'], ['Email', 'mail', '36', '1 sign-up']]) { const r = ROW({ gap: 10 }); add(r, await IC(ic, 18, 'icon/muted')); add(r, [await TWO(c, b), 'FILL']); add(r, await T(a, 'Number/S')); add(r, await DEMO('XS')); add(cc, [r, 'FILL']); }
 await MFOOT(content, 'Aggregate DEMO statistics. Refreshes every 15 minutes.');
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'm-r2', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'm-r2', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 return { sec: sec.id, R, MISS: MISS.slice(0, 60) };

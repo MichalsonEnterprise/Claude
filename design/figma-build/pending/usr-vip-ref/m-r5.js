@@ -12,5 +12,5 @@ for (const [id, d, a, bs, bl, done] of [['PO-0412', 'Requested 2 Nov 2026, 10:14
 add(content, [await KV('Paid out in total · 2 payouts', '90.00 USDT', { demo: true }), 'FILL']);
 await MFOOT(content, 'Payout IDs and amounts are DEMO. Affiliate Terms and AML/KYC policy apply.');
 const sticky = ROW({ name: 'Sticky CTA', p: [12, 16, 12, 16], fill: 'bg/secondary' }); strokeSides(sticky, 'border/subtle', { t: 1 }); const cta = await BTN('Primary', 'Request payout · 48.60 USDT', { size: 'L' }); cta.name = 'Request payout CTA'; add(sticky, [cta, 'FILL']); add(f, [sticky, 'FILL']);
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

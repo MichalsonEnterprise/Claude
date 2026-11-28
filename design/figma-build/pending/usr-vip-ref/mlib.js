@@ -3,7 +3,7 @@ async function MOB(NAME, X, Y, m) {
   for (const c of [...sec.children]) if (c.name === NAME) c.remove();
   if (Y === 'BELOW') { let my = 0; for (const c of sec.children) if (Math.abs(c.x - X) < 2) my = Math.max(my, c.y + c.height); Y = my + 160; }
   const f = await screen(NAME, 390, {}); sec.appendChild(f); f.x = X; f.y = Y;
-  const bar = await DEMOBAR(); add(f, [bar, 'FILL']);
+  const bar = await DEMOBAR('DEMO DATA — illustrative values only'); add(f, [bar, 'FILL']);
   const tb = await I('23:12908', { State: 'Member' }); tb.name = 'Shell/Topbar Mobile'; add(f, [tb, 'FILL']);
   const content = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [content, 'FILL']);
   const hr = ROW({ name: 'Page header', gap: 8 }); add(content, [hr, 'FILL']);

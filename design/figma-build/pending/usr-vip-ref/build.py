@@ -25,7 +25,7 @@ for name, parts in BATCHES.items():
     k = name[0]
     s = H + '\n' + L + '\n' + (DL if k == 'd' else ML) + '\n' + HEAD[k]
     for p in parts:
-        s += "try { // ---- " + p + "\n" + rd(p + '.js').strip() + "\n} catch (e) { R.push({ body: '" + p + "', err: String(e && e.stack || e).slice(0, 400) }); }\n"
+        s += "try { // ---- " + p + "\n" + rd(p + '.js').strip() + "\n} catch (e) { R.push({ body: '" + p + "', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }\n"
     s += "return { sec: sec.id, R, MISS: MISS.slice(0, 60) };\n"
     assert len(s) < 50000, (name, len(s))
     open(os.path.join(D, 'out', name + '.js'), 'w').write(s)

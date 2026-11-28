@@ -124,7 +124,9 @@ let vipFixed = 0; for (const inst of F.findAll(n => n.type === 'INSTANCE' && n.n
 const g = hero.findOne(n => n.name === 'Angled colour block — gold'); g.rotation = 14; g.x = 730; g.y = -170;
 const m = hero.findOne(n => n.name === 'Angled colour block — mint stripe'); m.rotation = 14; m.x = 640; m.y = -170;
 const pv = hero.findOne(n => n.name.startsWith('Preview — Card/VIP Tier')); pv.x = 836; pv.y = 52;
-const ts = hero.findOne(n => n.name === 'Preview — weekly reward toast'); ts.x = 624; ts.y = 304;
+const ts = hero.findOne(n => n.name === 'Preview — weekly reward toast'); ts.x = 600; ts.y = 28;
+const c1 = hero.findOne(n => n.name === 'Object — chip 100'); c1.x = 1080; c1.y = -24;
+const c5 = hero.findOne(n => n.name === 'Object — chip 500'); c5.x = 1080; c5.y = 462;
 // ---- how points work ----
 add(C, [await head('HOW POINTS WORK', 'Earn, level up, keep your tier', 'Points follow real-money play only, so your status tracks what you actually play — never deposits, platform fees, bonus funds or refunds.'), 'FILL']);
 const steps = AL('HORIZONTAL', { name: 'Steps', gap: 16 }); add(C, [steps, 'FILL']);

@@ -89,7 +89,7 @@ function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n
 // ===== END GP HELPERS =====
 
 // ===== usr-vip-ref LIB (common) =====
-const MISS = [];
+const MISS = []; const FILLC = new Set();
 async function ld(t) { if (t.fontName === figma.mixed) { for (const s of t.getStyledTextSegments(['fontName'])) await figma.loadFontAsync(s.fontName); } else await figma.loadFontAsync(t.fontName); }
 async function sx(root, name, val, i = 0) { const t = root.findAll(n => n.type === 'TEXT' && n.name === name)[i]; if (!t) { MISS.push(String(root.name).slice(0, 28) + '>' + name); return null; } await ld(t); t.characters = String(val); return t; }
 async function sxm(root, m) { for (const k in m) await sx(root, k, m[k]); return root; }
@@ -109,11 +109,11 @@ async function CHK(text, kind = 'ok', w = 300, style = 'Body/S', color = 'text/s
 async function KV(k, v, o = {}) { const r = ROW({ name: 'KV — ' + k, justify: 'SPACE_BETWEEN' }); add(r, await T(k, o.ks || 'Body/S', o.kc || 'text/secondary')); const rt = ROW({ gap: 6 }); add(rt, await T(v, o.vs || 'Number/S', o.vc || 'text/primary')); if (o.demo) add(rt, await DEMO('XS')); add(r, rt); return r; }
 async function KPI(label, value, unit, o = {}) { const c = CARD({ name: 'KPI — ' + label, gap: 10, p: o.p ?? 20 }); const top = ROW({ gap: 8 }); if (o.icon) add(top, await TILE(o.icon, o.ic || 'icon/default', o.bg || 'surface/raised', 32)); add(top, await T(label, 'Label/M', 'text/secondary')); add(top, await DEMO('XS')); add(c, top); const v = ROW({ gap: 6, align: 'MAX' }); add(v, await T(value, o.size || 'Number/L', o.color || 'text/primary')); if (unit) add(v, await T(unit, 'Body/S', 'text/tertiary')); add(c, v); if (o.cap) add(c, [await T(o.cap, 'Caption', o.capc || 'text/tertiary', { w: o.cw || 220 }), 'FILL']); if (o.extra) for (const e of o.extra) add(c, [e, 'FILL']); return c; }
 async function HC(label, w, right = false) { const h = await I('22:8309', { Align: right ? 'Right' : 'Left', Sort: 'None' }, { Label: label, 'Show sort icon': false }); h.resize(w, h.height); return h; }
-function CELL(w, kids, o = {}) { const c = AL(o.v ? 'VERTICAL' : 'HORIZONTAL', { name: o.name || 'Cell', gap: o.gap ?? (o.v ? 2 : 8), p: [o.py ?? 14, 16, o.py ?? 14, 16], align: o.v ? (o.right ? 'MAX' : 'MIN') : 'CENTER', justify: (!o.v && o.right) ? 'MAX' : undefined }); if (w !== 'FILL') { c.resize(w, Math.max(1, c.height)); if (o.v) { c.counterAxisSizingMode = 'FIXED'; c.primaryAxisSizingMode = 'AUTO'; } else { c.primaryAxisSizingMode = 'FIXED'; c.counterAxisSizingMode = 'AUTO'; } } for (const k of kids) add(c, k); c.__fill = w === 'FILL'; return c; }
-function addRow(table, cells, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', align: 'CENTER', fill: o.fill }); if (!o.last) strokeSides(r, 'border/subtle', { b: 1 }); for (const c of cells) { add(r, c); if (c.__fill) c.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
+function CELL(w, kids, o = {}) { const c = AL(o.v ? 'VERTICAL' : 'HORIZONTAL', { name: o.name || 'Cell', gap: o.gap ?? (o.v ? 2 : 8), p: [o.py ?? 14, 16, o.py ?? 14, 16], align: o.v ? (o.right ? 'MAX' : 'MIN') : 'CENTER', justify: (!o.v && o.right) ? 'MAX' : undefined }); if (w !== 'FILL') { c.resize(w, Math.max(1, c.height)); if (o.v) { c.counterAxisSizingMode = 'FIXED'; c.primaryAxisSizingMode = 'AUTO'; } else { c.primaryAxisSizingMode = 'FIXED'; c.counterAxisSizingMode = 'AUTO'; } } for (const k of kids) add(c, k); if (w === 'FILL') FILLC.add(c.id); return c; }
+function addRow(table, cells, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', align: 'CENTER', fill: o.fill }); if (!o.last) strokeSides(r, 'border/subtle', { b: 1 }); for (const c of cells) { add(r, c); if (FILLC.has(c.id)) c.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
 async function HEADROW(table, cols) { const r = AL('HORIZONTAL', { name: 'Header row', fill: 'bg/secondary' }); strokeSides(r, 'border/subtle', { b: 1 }); for (const [l, w, right] of cols) { const h = await HC(l, w === 'FILL' ? 160 : w, right); add(r, h); if (w === 'FILL') h.layoutSizingHorizontal = 'FILL'; } add(table, [r, 'FILL']); return r; }
 async function TX(text, style = 'Body/S', color = 'text/primary', w) { return T(text, style, color, w ? { w } : {}); }
-async function TWO(a, b, o = {}) { const c = COL({ gap: 2 }); add(c, await T(a, o.as || 'Body/S Strong', o.ac || 'text/primary')); add(c, await T(b, 'Caption', 'text/tertiary')); return c; }
+async function TWO(a, b, o = {}) { const c = COL({ gap: 2 }); const t1 = await T(a, o.as || 'Body/S Strong', o.ac || 'text/primary', o.w ? { w: o.w } : {}); const t2 = await T(b, 'Caption', 'text/tertiary', o.w ? { w: o.w } : {}); add(c, o.w ? [t1, 'FILL'] : t1); add(c, o.w ? [t2, 'FILL'] : t2); return c; }
 async function BADGEL(status, label, size = 'S') { const b = await BADGE(status, size); if (label) await sxi(b, 0, label); return b; }
 async function AMT(v, o = {}) { const r = ROW({ gap: 4, align: 'MAX', name: 'Amount ' + v }); add(r, await T(v, o.s || 'Number/S', o.c || 'text/primary')); add(r, await T(o.u ?? 'USDT', 'Caption', 'text/tertiary')); if (o.demo) add(r, await DEMO('XS')); return r; }
 // bar chart: vals[], labels[], {w,h,color,last,lastColor,max,grid:[...]} -> frame
@@ -125,6 +125,19 @@ async function CHART(vals, labels, o = {}) { const W = o.w || 320, H = o.h || 14
 async function SCRIM(f, name = 'Scrim') { const s = rect(f.width, f.height, 'scrim/overlay', 0, name); f.appendChild(s); s.layoutPositioning = 'ABSOLUTE'; s.x = 0; s.y = 0; return s; }
 async function CIC(id, s = 20, color = 'icon/default') { const c = await figma.getNodeByIdAsync(id); const i = c.createInstance(); i.resize(s, s); tint(i, color); return i; }
 async function SWAPIC(inst, name, color) { if (!inst) { MISS.push('swap null'); return; } const w = inst.width; const c = await figma.getNodeByIdAsync(ICONS[name]); inst.swapComponent(c); inst.resize(w, w); tint(inst, color); }
+// Card/VIP Tier library benefit lines still say "Weekly reward 0.1–1.0%" / "Higher withdrawal limits" -> override per tier (same copy as PUB-10)
+const VIPB = { Bronze: ['Level-up rewards 0.50–1.50 USDT', 'Standard support', 'Monthly activity statement'], Silver: ['Weekly reward, paid in USDT', 'Level-up rewards 1.00–1.80 USDT', 'Standard support'], Gold: ['Weekly reward, paid in USDT', 'Level-up rewards 2.00–15.00 USDT', 'Priority support queue'], Platinum: ['Weekly + monthly reward', 'Level-up rewards 25.00–60.00 USDT', 'Dedicated VIP host', 'Platinum tournament series'], Diamond: ['Weekly + monthly reward', 'Level-up rewards 100.00–500.00 USDT', 'Dedicated VIP host', 'All VIP events & invitations'] };
+async function vipFix(inst) { const mc = await inst.getMainComponentAsync(); const tier = (mc && mc.name.match(/Tier=(\w+)/) || [])[1]; const b = VIPB[tier]; if (!b) return 0; const ts = inst.findAll(n => n.type === 'TEXT' && n.name === 'Benefit'); for (const [i, t] of ts.entries()) { if (b[i]) { await ld(t); t.characters = b[i]; } } for (const t of inst.findAll(n => n.type === 'TEXT' && /withdrawal limit|0\.1–1\.0%|rakeback/i.test(n.characters))) { await ld(t); t.characters = t.characters.replace(/Higher withdrawal limits/i, 'Same withdrawal checks for every tier').replace(/Weekly reward 0\.1–1\.0%/i, 'Weekly reward, paid in USDT'); } if (!ts.length) MISS.push('vipFix no Benefit in ' + tier); return ts.length; }
+// Pagination: set range text, rows-per-page label and last page number; hide pages beyond `last`
+async function PAG(range, per, last) { const p = await I('23:16756', { Type: 'Numbered' }); await sx(p, 'Range', range);
+  const rp = p.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Button/Secondary')); if (rp) setP(rp, { Label: String(per) });
+  const pg = (k) => p.findOne(n => n.name === 'Page ' + k);
+  const lastNode = pg(65); if (lastNode) { if (last <= 5) lastNode.visible = false; else { if (lastNode.type === 'INSTANCE') { const cp = lastNode.componentProperties; if (Object.keys(cp).some(x => x.startsWith('Label#'))) setP(lastNode, { Label: String(last) }); else await sxi(lastNode, 0, String(last)); } else await sxi(lastNode, 0, String(last)); } } else MISS.push('Page 65');
+  if (last <= 6) { const g = p.findOne(n => n.name === 'Gap'); if (g) g.visible = false; }
+  for (let k = last + 1; k <= 5; k++) { const n = pg(k); if (n) n.visible = false; }
+  return p; }
+async function SEARCH(ph, size = 'S') { const s = await I('16:3820', { Size: size, State: 'Default' }, { 'Show shortcut': false }); await sxc(s, 'Search', ph); return s; }
+function FIXEMPTY(root) { let n = 0; for (const x of root.findAll(x => x.type === 'FRAME' && x.children.length === 0 && (x.name === 'Row' || x.name === 'Cell' || x.name === 'Stack') && x.height >= 99)) { const fillW = x.layoutSizingHorizontal === 'FILL'; x.resize(Math.max(1, x.width), 1); if (fillW) x.layoutSizingHorizontal = 'FILL'; n++; } return n; }
 // ===== END LIB =====
 
 // ===== usr-vip-ref DESKTOP SHELL =====
@@ -135,7 +148,7 @@ async function DESK(NAME, X, Y, m) {
   const bar = await DEMOBAR(); add(f, [bar, 'FILL']);
   const body = AL('HORIZONTAL', { name: 'Body' }); add(f, [body, 'FILL']);
   const sb = await I('23:6697', { State: 'Expanded', Auth: 'Member' }); add(body, sb); sb.name = 'Shell/Sidebar'; sb.layoutSizingVertical = 'FILL';
-  for (const it of sb.findAll(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.name === 'Shell/Sidebar Item')) { const cp = it.componentProperties; const lk = Object.keys(cp).find(k => k.startsWith('Label#')); const lab = lk ? cp[lk].value : ''; const st = cp.State && cp.State.value; const ic = it.findOne(n => n.name === 'Icon'); if (lab === m.active) { it.setProperties({ State: 'Active' }); if (ic) tint(ic, 'icon/brand'); } else if (st === 'Active') { it.setProperties({ State: 'Default' }); if (ic) tint(ic, 'icon/muted'); } }
+  for (const it of sb.findAll(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.name === 'Shell/Sidebar Item')) { const cp = it.componentProperties; const lk = Object.keys(cp).find(k => k.startsWith('Label#')); const lab = lk ? cp[lk].value : ''; const st = cp.State && cp.State.value; if (lab === m.active) { it.setProperties({ State: 'Active' }); const ic = it.findOne(n => n.name === 'Icon'); if (ic) tint(ic, 'icon/brand'); } else if (st === 'Active') { it.setProperties({ State: 'Default' }); const ic = it.findOne(n => n.name === 'Icon'); if (ic) tint(ic, 'icon/muted'); } }
   const main = AL('VERTICAL', { name: 'Main column' }); add(body, [main, 'FILL']);
   const tb = await I('23:9832', { State: 'Member' }); tb.name = 'Shell/Topbar Desktop'; add(main, [tb, 'FILL']);
   const content = AL('VERTICAL', { name: 'Content', gap: 24, p: [32, 32, 48, 32] }); add(main, [content, 'FILL']);
@@ -169,27 +182,27 @@ const cols = ROW({ name: 'Two columns', gap: 16, align: 'MIN' }); add(content, [
 const mc = CARD({ name: 'Monthly earnings', gap: 12 }); add(cols, [mc, 'FILL']); mc.layoutSizingVertical = 'FILL';
 const mh = ROW({ gap: 8 }); add(mh, await T('Monthly earnings', 'Heading/H4')); add(mh, await DEMO('S')); add(mh, [ROW({}), 'FILL']); add(mh, await T('Mar – Nov 2026 · USDT', 'Caption', 'text/tertiary')); add(mc, [mh, 'FILL']);
 add(mc, await CHART([1.20, 3.60, 5.10, 8.40, 12.30, 14.70, 17.40, 27.30, 52.50], ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], { w: 696, h: 200, gap: 24, max: 60, grid: [10, 20, 30, 40, 50, 60], fmt: v => String(v), last: true, name: 'monthly commission' }));
-const pm = ROW({ gap: 24 }); add(pm, await CHK('Paid: PO-0388 · 40.00 USDT · 5 Oct 2026', 'ok', 260, 'Caption')); add(pm, await CHK('Paid: PO-0412 · 50.00 USDT · 2 Nov 2026', 'ok', 260, 'Caption')); add(pm, await CHK('November so far (lighter bar)', 'clock', 180, 'Caption')); add(mc, pm);
+const pm = ROW({ gap: 24 }); add(pm, await CHK('Paid: PO-0388 · 40.00 USDT · 5 Oct 2026', 'ok', 200, 'Caption')); add(pm, await CHK('Paid: PO-0412 · 50.00 USDT · 2 Nov 2026', 'ok', 200, 'Caption')); add(pm, await CHK('November so far (lighter bar)', 'clock', 150, 'Caption')); add(mc, pm);
 const cc = CARD({ name: 'How your 20% is calculated', gap: 12, w: 376 }); add(cols, cc);
 const chh = ROW({ gap: 8 }); add(chh, await T('How your 20% is calculated', 'Heading/H5')); add(chh, await DEMO('S')); add(cc, chh);
 for (const [a, b, st] of [['Referred qualifying entries (1–27 Nov)', '5,250'], ['× platform fee per entry', '0.05 USDT'], ['= platform fees', '262.50 USDT'], ['× your share', '20%']]) add(cc, [await KV(a, b), 'FILL']);
 const dv = rect(328, 1, 'border/subtle', 0, 'Divider'); add(cc, [dv, 'FILL']);
-add(cc, [await KV('= your commission, November', '52.50 USDT', { ks: 'Body/S Strong', kc: 'text/primary', vs: 'Number/M' }), 'FILL']);
-add(cc, await T('48.60 available + 3.90 pending', 'Caption', 'text/tertiary'));
+add(cc, [await KV('= your commission', '52.50 USDT', { ks: 'Body/S Strong', kc: 'text/primary', vs: 'Number/M' }), 'FILL']);
+add(cc, await T('November so far: 48.60 available + 3.90 pending', 'Caption', 'text/tertiary'));
 add(cc, [await CHK('Calculated on platform fees only — never on deposits, stakes, wins or losses.', 'info', 300, 'Caption'), 'FILL']);
 add(cc, [await CHK('Cancelled rounds refund their fees, so they earn no commission (round #1,245).', 'warn', 300, 'Caption'), 'FILL']);
 const rt = CARD({ name: 'Earnings by round', gap: 0, p: 0, clip: true }); add(content, [rt, 'FILL']);
 const rh = ROW({ gap: 8, p: [20, 24, 16, 24] }); add(rh, await T('Earnings by round', 'Heading/H4')); add(rh, await DEMO('S')); add(rh, [ROW({}), 'FILL']); add(rh, await T('November 2026', 'Caption', 'text/tertiary')); add(rt, [rh, 'FILL']);
 const tbl = COL({ name: 'Table', gap: 0 }); add(rt, [tbl, 'FILL']);
-await HEADROW(tbl, [['Round', 140], ['Status', 140], ['Referred entries', 150, true], ['Platform fees', 150, true], ['Your 20%', 130, true], ['Settlement', 'FILL']]);
+await HEADROW(tbl, [['Round', 180], ['Status', 130], ['Entries', 110, true], ['Platform fees', 140, true], ['Your 20%', 120, true], ['Settlement', 'FILL']]);
 const RR = [['#1,248', 'Live', 'Open', '390', '19.50', '3.90', 'Pending — settles after the draw, 27 Nov 2026, 20:00 UTC', 'text/secondary'], ['#1,247', 'Confirmed', 'Settled', '410', '20.50', '4.10', 'Available · 26 Nov 2026, 20:02 UTC', 'text/success'], ['#1,246', 'Confirmed', 'Settled', '365', '18.25', '3.65', 'Available · 25 Nov 2026, 20:02 UTC', 'text/success'], ['#1,245', 'Expired', 'Cancelled', '280', '0.00', '0.00', 'No commission — threshold not met, 14.00 USDT fees refunded to players', 'text/tertiary'], ['#1,244', 'Confirmed', 'Settled', '402', '20.10', '4.02', 'Available · 23 Nov 2026, 20:02 UTC', 'text/success'], ['#1,243', 'Confirmed', 'Settled', '376', '18.80', '3.76', 'Available · 22 Nov 2026, 20:02 UTC', 'text/success']];
 for (const [i, [r, bs, bl, e, fe, cm, note, nc]] of RR.entries()) { const rc = ROW({ gap: 6 }); add(rc, await IC('pool', 16, 'icon/gold')); add(rc, await T('Round ' + r, 'Body/S Strong')); add(rc, await DEMO('XS'));
-  await addRow(tbl, [CELL(140, [rc]), CELL(140, [await BADGEL(bs, bl)]), CELL(150, [await TX(e, 'Number/S')], { right: true }), CELL(150, [await AMT(fe, { c: 'text/secondary' })], { right: true }), CELL(130, [await AMT(cm, { c: cm === '0.00' ? 'text/tertiary' : 'text/primary' })], { right: true }), CELL('FILL', [await TX(note, 'Body/S', nc)])], { name: 'Row — ' + r, last: i === RR.length - 1, fill: bl === 'Open' ? 'surface/selected' : null }); }
-const pag = await I('23:16756', { Type: 'Numbered' }); await sx(pag, 'Range', '1–6 of 27 rounds'); add(rt, [pag, 'FILL']);
+  await addRow(tbl, [CELL(180, [rc]), CELL(130, [await BADGEL(bs, bl)]), CELL(110, [await TX(e, 'Number/S')], { right: true }), CELL(140, [await AMT(fe, { c: 'text/secondary' })], { right: true }), CELL(120, [await AMT(cm, { c: cm === '0.00' ? 'text/tertiary' : 'text/primary' })], { right: true }), CELL('FILL', [await TX(note, 'Body/S', nc, 400)])], { name: 'Row — ' + r, last: i === RR.length - 1, fill: bl === 'Open' ? 'surface/selected' : null }); }
+const pag = await PAG('1–6 of 27 rounds', 6, 5); add(rt, [pag, 'FILL']);
 await FOOT(content, 'Earnings are DEMO values. Commission applies to Global Pool platform fees only (0.05 USDT per qualifying entry); games carry no platform fee.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'd-r4', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'd-r4', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 try { // ---- d-r5
 const NAME = '[USR-R5] Referrals — Payout History / 1440 / Default';
 const { f, content } = await DESK(NAME, 12600, 160, { active: 'Affiliates', area: 'Referrals', page: 'Payouts', title: 'Payouts',
@@ -199,26 +212,26 @@ const r1 = ROW({ name: 'Payout row', gap: 16, align: 'MIN' }); add(content, [r1,
 const ps = CARD({ name: 'Payout summary', gap: 20, p: 28 }); add(r1, [ps, 'FILL']); ps.layoutSizingVertical = 'FILL';
 const top = ROW({ gap: 16, align: 'MAX' }); const tl = COL({ gap: 6 }); const ov = ROW({ gap: 8 }); add(ov, await T('AVAILABLE FOR PAYOUT', 'Overline', 'text/tertiary')); add(ov, await DEMO('S')); add(tl, ov);
 const av = ROW({ gap: 8, align: 'MAX' }); const avv = await T('48.60', 'Number/XL', 'balance/available'); avv.name = 'Payout amount value'; add(av, avv); add(av, await T('USDT', 'Body/M', 'text/tertiary')); add(tl, av);
-const pn = await T('Pending 3.90 USDT joins after round #1,248 draws (27 Nov 2026, 20:00 UTC).', 'Body/S', 'text/secondary'); pn.name = 'Pending note'; add(tl, pn); add(top, [tl, 'FILL']);
+const pn = await T('Pending 3.90 USDT joins after round #1,248 draws (27 Nov 2026, 20:00 UTC).', 'Body/S', 'text/secondary', { w: 440 }); pn.name = 'Pending note'; add(tl, [pn, 'FILL']); add(top, [tl, 'FILL']);
 const cta = await BTN('Primary', 'Request payout', { size: 'L', lead: 'arrow-up-right' }); cta.name = 'Request payout CTA'; add(top, cta); add(ps, [top, 'FILL']);
 const rq = ROW({ name: 'Requirements', gap: 12, align: 'MIN' }); add(ps, [rq, 'FILL']);
-for (const [nm, s] of [['Requirement — minimum', 'Minimum 20.00 USDT — you have 48.60'], ['Requirement — KYC', 'KYC Level 2 — Verified'], ['Requirement — 2FA', '2FA on — confirm with your authenticator']]) { const c = CARD({ name: nm, gap: 0, p: 14, fill: 'surface/raised' }); add(c, [await CHK(s, 'ok', 200, 'Body/S', 'text/primary'), 'FILL']); add(rq, [c, 'FILL_BOTH']); }
-add(ps, [await CHK('Paid to your GLOBAL POOL Available balance (@nova.k · GP-48213). No payout fee. Usually reviewed within 24 hours.', 'info', 680), 'FILL']);
+for (const [nm, s] of [['Requirement — minimum', 'Minimum 20.00 USDT — you have 48.60'], ['Requirement — KYC', 'KYC Level 2 — Verified'], ['Requirement — 2FA', '2FA on — confirm with your authenticator']]) { const c = CARD({ name: nm, gap: 0, p: 14, fill: 'surface/raised' }); add(c, [await CHK(s, 'ok', 160, 'Body/S', 'text/primary'), 'FILL']); add(rq, [c, 'FILL_BOTH']); }
+add(ps, [await CHK('Paid to your GLOBAL POOL Available balance (@nova.k · GP-48213). No payout fee. Usually reviewed within 24 hours.', 'info', 640), 'FILL']);
 const pr = CARD({ name: 'Payout rules', gap: 12, w: 376 }); add(r1, pr); pr.layoutSizingVertical = 'FILL';
 add(pr, await T('Payout rules', 'Heading/H5'));
 for (const s of ['Minimum 20.00 USDT per request; maximum = your available commission', 'One open request at a time', 'KYC Level 2 and 2FA required', 'Paid in USDT to Available — network fees apply only if you later withdraw on-chain', 'Requests that break the Affiliate Terms are rejected with a reason; your balance stays intact']) add(pr, [await CHK(s, 'info', 300, 'Caption'), 'FILL']);
 const hc = CARD({ name: 'Payout history', gap: 0, p: 0, clip: true }); add(content, [hc, 'FILL']);
 const hh = ROW({ gap: 8, p: [20, 24, 16, 24] }); add(hh, await T('Payout history', 'Heading/H4')); add(hh, await DEMO('S')); add(hc, [hh, 'FILL']);
 const tbl = COL({ name: 'Table', gap: 0 }); add(hc, [tbl, 'FILL']);
-await HEADROW(tbl, [['Payout ID', 150], ['Requested', 200], ['Amount', 140, true], ['Paid to', 180], ['Status', 140], ['Completed / reason', 'FILL']]);
+await HEADROW(tbl, [['Payout ID', 150], ['Requested', 190], ['Amount', 140, true], ['Paid to', 160], ['Status', 140], ['Completed / reason', 'FILL']]);
 const P = [['PO-0412', '2 Nov 2026, 10:14 UTC', '50.00', 'Available balance', 'Confirmed', 'Paid', '2 Nov 2026, 13:40 UTC', 'text/secondary'], ['PO-0388', '5 Oct 2026, 18:02 UTC', '40.00', 'Available balance', 'Confirmed', 'Paid', '6 Oct 2026, 09:15 UTC', 'text/secondary'], ['PO-0351', '12 Sep 2026, 08:30 UTC', '25.00', '—', 'Rejected', 'Rejected', 'KYC Level 2 was still under review. The 25.00 USDT stayed in your affiliate balance — nothing was lost.', 'text/danger']];
 for (const [id, d, a, to, bs, bl, done, dc] of P) { const ic = ROW({ gap: 6 }); add(ic, await T(id, 'Mono/S', 'text/primary')); add(ic, await DEMO('XS'));
-  await addRow(tbl, [CELL(150, [ic]), CELL(200, [await TX(d, 'Body/S', 'text/secondary')]), CELL(140, [await AMT(a, { c: bl === 'Paid' ? 'text/primary' : 'text/tertiary' })], { right: true }), CELL(180, [await TX(to, 'Body/S', 'text/secondary')]), CELL(140, [await BADGEL(bs, bl)]), CELL('FILL', [await TX(done, 'Body/S', dc, 420)])], { name: 'Row — ' + id }); }
+  await addRow(tbl, [CELL(150, [ic]), CELL(190, [await TX(d, 'Body/S', 'text/secondary')]), CELL(140, [await AMT(a, { c: bl === 'Paid' ? 'text/primary' : 'text/tertiary' })], { right: true }), CELL(160, [await TX(to, 'Body/S', 'text/secondary')]), CELL(140, [await BADGEL(bs, bl)]), CELL('FILL', [await TX(done, 'Body/S', dc, 320)])], { name: 'Row — ' + id }); }
 const tt = ROW({ gap: 6 }); add(tt, await T('Paid out in total · 2 payouts', 'Body/S Strong')); add(tt, await DEMO('XS'));
-await addRow(tbl, [CELL(350, [tt]), CELL(140, [await AMT('90.00')], { right: true }), CELL('FILL', [])], { name: 'Totals row', fill: 'bg/secondary', last: true });
+await addRow(tbl, [CELL(340, [tt]), CELL(140, [await AMT('90.00')], { right: true }), CELL('FILL', [])], { name: 'Totals row', fill: 'bg/secondary', last: true });
 const hp = ROW({ name: 'Help', gap: 12 }); add(hp, await CHK('Questions about a payout? Contact support and quote the payout ID.', 'info', 520, 'Caption')); add(hp, await BTN('Ghost', 'Contact support', { size: 'S', lead: 'chat' })); add(content, hp);
 await FOOT(content, 'Payout IDs and amounts are DEMO. Affiliate payouts are subject to the Affiliate Terms and our AML/KYC policy.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });
-} catch (e) { R.push({ body: 'd-r5', err: String(e && e.stack || e).slice(0, 400) }); }
+} catch (e) { R.push({ body: 'd-r5', err: (String(e && e.message || e) + ' | ' + String(e && e.stack || '')).slice(0, 500) }); }
 return { sec: sec.id, R, MISS: MISS.slice(0, 60) };

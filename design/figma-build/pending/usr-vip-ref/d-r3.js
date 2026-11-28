@@ -1,7 +1,7 @@
 const NAME = '[USR-R3] Referrals — Invited Users / 1440 / Default';
 const { f, content } = await DESK(NAME, 9480, 160, { active: 'Affiliates', area: 'Referrals', page: 'Invited users', title: 'Invited users',
   sub: 'Everyone who joined with your link or code. Handles are masked to protect their privacy.',
-  actions: async () => [await I('16:3820', { Size: 'S', State: 'Default' }, { 'Show shortcut': false }), await BTN('Secondary', 'Export CSV', { lead: 'download' })], tabs: RTABS('Invited users') });
+  actions: async () => [await SEARCH('Search by handle…'), await BTN('Secondary', 'Export CSV', { lead: 'download' })], tabs: RTABS('Invited users') });
 const fr = ROW({ name: 'Filters', gap: 16 }); add(content, [fr, 'FILL']);
 const seg = await I('20:6978', { Segments: '4' }); const s = seg.findAll(n => n.type === 'INSTANCE' && n.name.includes('Segment')); ['All · 48', 'Active · 19', 'Inactive · 12', 'Unverified · 17'].forEach((l, i) => { if (s[i]) setP(s[i], { Label: l }); }); add(fr, seg);
 add(fr, [ROW({}), 'FILL']); add(fr, await T('Sorted by your commission, highest first', 'Caption', 'text/tertiary'));
@@ -16,10 +16,10 @@ for (const [ini, h, j, kyc, st, e, fe, cm, until] of U) { const pc = ROW({ gap: 
   await addRow(tbl, [CELL('FILL', [pc], { py: 12 }), CELL(130, [kb]), CELL(140, [sb]), CELL(110, [await TX(e, 'Number/S')], { right: true }), CELL(140, [await AMT(fe, { c: 'text/secondary' })], { right: true }), CELL(124, [await AMT(cm, { c: cm === '0.00' ? 'text/tertiary' : 'text/success' })], { right: true }), CELL(150, [await TX(until, 'Body/S', until.startsWith('Starts') ? 'text/tertiary' : 'text/secondary')])], { name: 'Row — ' + h }); }
 const tot = ROW({}); add(tot, await T('All 48 players', 'Body/S Strong')); add(tot, await DEMO('XS'));
 await addRow(tbl, [CELL('FILL', [tot]), CELL(130, []), CELL(140, []), CELL(110, [await TX('14,250', 'Number/S')], { right: true }), CELL(140, [await AMT('712.50')], { right: true }), CELL(124, [await AMT('142.50', { c: 'text/success' })], { right: true }), CELL(150, [])], { name: 'Totals row', fill: 'bg/secondary', last: true });
-const pag = await I('23:16756', { Type: 'Numbered' }); await sx(pag, 'Range', '1–10 of 48'); add(tc, [pag, 'FILL']);
+const pag = await PAG('1–10 of 48', 10, 5); add(tc, [pag, 'FILL']);
 const hn = ROW({ name: 'Help row', gap: 24 }); add(content, [hn, 'FILL']);
 add(hn, await CHK('Unverified friends don’t earn you commission until they complete KYC Level 1. You can resend your link — we never share their details with you.', 'info', 520, 'Caption'));
 add(hn, await CHK('Seeing a handle you don’t recognise? Report it — self-referrals and fake accounts void commission.', 'warn', 460, 'Caption'));
 await FOOT(content, 'Handles, counts and amounts are DEMO. Commission = 20% of the 0.05 USDT platform fee on referred qualifying entries.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

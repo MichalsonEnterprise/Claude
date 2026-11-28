@@ -11,5 +11,5 @@ add(ec, [await CHK('24 Nov: round #1,245 cancelled — no commission. 27 Nov: 3.
 const cc = CARD({ name: 'Clicks by channel', gap: 10, p: 16 }); add(content, [cc, 'FILL']); add(cc, await T('Clicks by channel', 'Heading/H5'));
 for (const [c, ic, a, b] of [['Copied link', 'copy', '268', '4 sign-ups'], ['Telegram', 'chat', '196', '3 sign-ups'], ['X', 'external-link', '112', '1 sign-up'], ['Email', 'mail', '36', '1 sign-up']]) { const r = ROW({ gap: 10 }); add(r, await IC(ic, 18, 'icon/muted')); add(r, [await TWO(c, b), 'FILL']); add(r, await T(a, 'Number/S')); add(r, await DEMO('XS')); add(cc, [r, 'FILL']); }
 await MFOOT(content, 'Aggregate DEMO statistics. Refreshes every 15 minutes.');
-await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+await MEND(f); FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

@@ -8,7 +8,7 @@ const rh = ROW({ gap: 12 }); const rht = COL({ gap: 2 }); add(rht, await T('Read
 const tot = ROW({ gap: 6, align: 'MAX' }); const tv = await T('118.62', 'Number/L', 'text/primary'); tv.name = 'Total claimable'; add(tot, tv); add(tot, await T('USDT', 'Body/S', 'text/tertiary')); add(tot, await DEMO('S')); add(rh, tot); add(rc, [rh, 'FILL']);
 for (const [nm, icon, ic, bg, ov, ttl, note, kind, v, vc] of [['Weekly reward', 'crown', 'icon/gold', 'accent/gold-tint', 'WEEKLY REWARD · GOLD', 'Your play Mon 16 – Sun 22 Nov 2026', 'Settles automatically Mon 30 Nov 2026, 10:00 UTC', 'clock', '115.20', 'balance/owed'], ['Rakeback', 'percent', 'icon/brand', 'brand/tint', 'RAKEBACK', '5% of the house edge on your bets since 24 Nov', 'Claim any time — rakeback never expires', 'info', '3.42', 'text/primary']]) {
   const it = CARD({ name: 'Reward — ' + nm, dir: 'HORIZONTAL', gap: 16, p: 16, fill: 'surface/raised', align: 'CENTER' }); add(rc, [it, 'FILL']);
-  add(it, await TILE(icon, ic, bg, 48)); const c = COL({ gap: 4 }); add(c, await T(ov, 'Overline', 'text/tertiary')); add(c, await T(ttl, 'Body/M Strong', 'text/primary')); add(c, await CHK(note, kind, 360, 'Caption', 'text/tertiary')); add(it, [c, 'FILL']);
+  add(it, await TILE(icon, ic, bg, 48)); const c = COL({ gap: 4 }); add(c, await T(ov, 'Overline', 'text/tertiary')); add(c, [await T(ttl, 'Body/M Strong', 'text/primary', { w: 300 }), 'FILL']); add(c, await CHK(note, kind, 300, 'Caption', 'text/tertiary')); add(it, [c, 'FILL']);
   add(it, await AMT(v, { s: 'Number/M', c: vc, demo: true })); const b = await BTN('Primary', 'Claim', { size: 'M' }); b.name = 'Claim button'; add(it, b); }
 const rf = ROW({ name: 'Claim footer', gap: 16 }); add(rf, [await T('Owed balance 415.20 USDT = 300.00 refund (round #1,245) + 115.20 weekly reward. Rakeback is tracked separately.', 'Caption', 'text/tertiary', { w: 440 }), 'FILL']);
 const ca = await BTN('Primary', 'Claim all · 118.62 USDT', { size: 'L' }); ca.name = 'Claim all'; add(rf, ca); add(rc, [rf, 'FILL']);
@@ -26,5 +26,5 @@ const tm = CARD({ name: 'Reward terms', dir: 'HORIZONTAL', gap: 24, p: [16, 24, 
 for (const s of ['Paid in USDT to Available', 'No wagering requirements', 'Unclaimed rewards settle automatically', 'Never changes odds or outcomes']) add(tm, await CHK(s, 'ok', 200, 'Caption', 'text/secondary'));
 add(tm, await BTN('Ghost', 'Terms apply', { size: 'S' }));
 await FOOT(content, 'Reward amounts are DEMO. VIP rewards are a thank-you for play, not an incentive to play more — set limits any time.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

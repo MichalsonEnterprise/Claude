@@ -9,12 +9,12 @@ const acts = AL('HORIZONTAL', { name: 'Actions', gap: 12, align: 'CENTER' }); ad
 const tr = AL('HORIZONTAL', { name: 'Terms', gap: 8, align: 'CENTER' }); add(tr, await T('Partners must be 18+ and based in a permitted jurisdiction · Terms apply', 'Caption', 'text/tertiary'), await I('6:159'), await DEMO('S')); add(copy, tr);
 abs(hero, rect(560, 820, 'brand/tint', 0, 'Angled colour block — mint tint'), 720, -170, 14);
 abs(hero, rect(64, 820, 'brand/primary', 0, 'Angled colour block — mint stripe'), 650, -170, 14);
-const tk = await I('23:8534', { State: 'Active' }); tk.name = 'Object — entry ticket (cropped)'; abs(hero, tk, 860, 330, -10);
+const tk = await I('23:8534', { State: 'Active' }); tk.name = 'Object — entry ticket (cropped)'; abs(hero, tk, 700, 372, -10);
 const dash = AL('VERTICAL', { name: 'Preview — partner dashboard', fill: 'surface/overlay', stroke: 'border/default', r: 14, p: 20, gap: 14, w: 400 });
 const dh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(dh, [await T('Partner dashboard · November 2026', 'Label/L', 'text/primary'), 'FILL'], await DEMO('XS')); add(dash, [dh, 'FILL']);
 const lnk = AL('HORIZONTAL', { name: 'Referral link', fill: 'surface/raised', r: 10, p: [10, 12, 10, 12], gap: 8, align: 'CENTER' }); add(lnk, await IC('link', 16, 'icon/muted'), [await T('globalpool.example/r/PARTNER-0427', 'Mono/S', 'text/primary'), 'FILL'], await IC('copy', 16, 'icon/brand')); add(dash, [lnk, 'FILL']);
 const st = AL('HORIZONTAL', { name: 'Stats', gap: 10, wrap: true, cgap: 10 }); add(dash, [st, 'FILL']);
-for (const [k, v, c] of [['Referred players', '40', 'text/primary'], ['Qualifying entries', '4,800', 'text/primary'], ['Platform fees paid', '240.00 USDT', 'text/primary'], ['Your commission · 20%', '48.00 USDT', 'text/brand']]) { const s = AL('VERTICAL', { fill: 'surface/raised', r: 10, p: 12, gap: 4, w: 175 }); add(s, await T(k, 'Caption', 'text/tertiary'), await T(v, 'Number/M', c)); add(st, s); }
+for (const [k, v, c] of [['Referred players', '40', 'text/primary'], ['Qualifying entries', '4,800', 'text/primary'], ['Platform fees paid', '240.00 USDT', 'text/primary'], ['Your commission · 20%', '48.00 USDT', 'text/brand']]) { const s = AL('VERTICAL', { fill: 'surface/raised', r: 10, p: 12, gap: 4, w: 170 }); add(s, await T(k, 'Caption', 'text/tertiary'), await T(v, 'Number/M', c)); add(st, s); }
 const np = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(np, await IC('calendar', 16, 'icon/muted'), await T('Next payout run Mon 30 Nov 2026, 10:00 UTC', 'Caption', 'text/secondary')); add(dash, np);
 abs(hero, dash, 680, 48); await fx(dash, 'Elevation/3 — Popover');
 
@@ -43,9 +43,9 @@ add(C, [await head('COMMISSION CALCULATOR', 'Estimate your monthly commission', 
 const calc = box('Calculator', { dir: 'HORIZONTAL', gap: 0, p: 0, r: 20 }); calc.clipsContent = true; add(C, [calc, 'FILL']);
 const inp = AL('VERTICAL', { name: 'Inputs', p: 32, gap: 20 }); add(calc, [inp, 'FILL']);
 add(inp, await T('Your numbers', 'Heading/H5', 'text/primary'));
-const chips = AL('HORIZONTAL', { name: 'Scenarios', gap: 8, align: 'CENTER' }); add(chips, await T('Try a scenario', 'Label/M', 'text/secondary'));
-for (const [l, s] of [['Starter · 10 players', 'Default'], ['Growing · 40 players', 'Selected'], ['Established · 250 players', 'Default']]) add(chips, await I('17:2766', { State: s }, { Label: l }));
-add(inp, chips);
+const chips = AL('HORIZONTAL', { name: 'Scenarios', gap: 8, align: 'CENTER', wrap: true, cgap: 8 }); add(chips, await T('Try a scenario', 'Label/M', 'text/secondary'));
+for (const [l, s] of [['Starter · 10 players', 'Default'], ['Growing · 40 players', 'Selected'], ['Established · 250 players', 'Default']]) add(chips, await I('17:2766', { State: s }, { Label: l, 'Show icon': false }));
+add(inp, [chips, 'FILL']);
 const i1 = await I('13:762', { State: 'Filled', Size: 'L' }, { Label: 'Active referred players', 'Show leading icon': true, 'Leading icon': ICONS['users'], 'Show trailing icon': false, 'Show helper': true }); i1.name = 'Field — Active referred players'; txt(i1, 'Value text', '40'); txt(i1, 'Helper text', 'Players who bought at least one entry this month');
 const i2 = await I('13:762', { State: 'Focus', Size: 'L' }, { Label: 'Qualifying entries per player, per month', 'Show leading icon': true, 'Leading icon': ICONS['ticket'], 'Show trailing icon': false, 'Show helper': true }); i2.name = 'Field — Entries per player'; txt(i2, 'Value text', '120'); txt(i2, 'Helper text', 'Average across your players — about 4 entries a day');
 const rw = AL('HORIZONTAL', { gap: 16 }); add(rw, [i1, 'FILL'], [i2, 'FILL']); add(inp, [rw, 'FILL']);

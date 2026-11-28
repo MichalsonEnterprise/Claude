@@ -1,0 +1,21 @@
+{
+ "_note": "Slice pub-legal (PUB-16 Terms & Conditions, PUB-17 Privacy Policy, PUB-19 AML/KYC Policy). One new component set, placed in its module section on page 03 (like Template/Game Details). Scripts: design/figma-build/pending/pub-16-17-19 (README.md).",
+ "Template/Legal Document": {
+  "id": "335:237300",
+  "page": "03 — Public Website",
+  "section": "PUB-16/17/19 Legal documents (335:236364)",
+  "variants": { "Breakpoint": ["Desktop", "Mobile"] },
+  "variantIds": { "Breakpoint=Desktop": "335:236368", "Breakpoint=Mobile": "335:236849" },
+  "props": {},
+  "note": "Desktop = 1136 content column inside the casino shell (Shell/Sidebar Expanded Guest with no active item + Shell/Topbar Desktop Guest + Shell/Footer Mega with 24 side padding); Mobile = 358 inside a 390 frame (Topbar Mobile Guest, Footer Mega Mobile, sticky reading bar with a Contents button, Nav/Mobile Tab Bar). 11 section slots, 5 summary points, 11 TOC rows, 3 version-history rows, 6 legal-document links. Per-document content = override TEXT layers by name (Doc overline, Doc title, Current page, Doc lead, Version, Effective, Updated, Read time, Det v1–v4, PDF meta, TOC count, TOC N, Summary title/note/N, SN heading/p1/p2/note, Hist N ver/date/change) and toggle Section N / TOC row N / SN p2 / SN note box / SN note DEMO; current document = Doc row N fill surface/selected + Doc link N text/brand + Doc icon N icon/brand. Mobile contents accordion: show 'TOC list', hide 'Chevron down', show 'Chevron up'. Set figma.skipInvisibleInstanceChildren = false before editing instances. apply() in pending/pub-16-17-19/frames.js does all of this from a data object."
+ },
+ "Section/PUB-16/17/19 Legal documents (page 03)": { "id": "335:236364" },
+ "[PUB-16] Terms & Conditions / 1440 / Default — long-form (logged out)": { "id": "336:238828" },
+ "[PUB-17] Privacy Policy / 1440 / Default — long-form (logged out)": { "id": "337:123899" },
+ "[PUB-19] AML/KYC Policy / 1440 / Default — long-form (logged out)": { "id": "337:125150" },
+ "Section/PUB-16/17/19 — Mobile (page 10)": { "id": "338:117637" },
+ "[PUB-16] Terms & Conditions / 390 / Default — long-form, contents collapsed": { "id": "338:117638" },
+ "[PUB-16] Terms & Conditions / 390 / Contents expanded (viewport 390×844, scrolled to contents)": { "id": "341:182984" },
+ "[PUB-17] Privacy Policy / 390 / Default — long-form, contents collapsed": { "id": "339:118342" },
+ "[PUB-19] AML/KYC Policy / 390 / Default — long-form, contents collapsed": { "id": "340:118936" }
+}

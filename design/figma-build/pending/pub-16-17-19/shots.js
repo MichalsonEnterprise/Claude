@@ -1,0 +1,8 @@
+// vshot(src, {cols, chunkH, scale, start, hideFooter}) — place `cols` vertical windows of src side by side in a temporary clipped viewport, screenshot, remove. src = COMPONENT (instanced) or FRAME (cloned).
+async function vshot(src, o = {}) { const cols = o.cols || 1, H = o.chunkH || 1600, st = o.start || 0; const vp = figma.createFrame(); vp.name = 'TMP verify viewport'; fill(vp, 'bg/secondary'); vp.clipsContent = true; vp.x = -70000; vp.y = -70000; const W = src.width; let x = 0;
+  try { for (let k = 0; k < cols; k++) { const hold = figma.createFrame(); hold.name = 'hold'; hold.clipsContent = true; fill(hold, 'bg/base'); vp.appendChild(hold); hold.resize(W, H); hold.x = x; hold.y = 0; x += W + 24;
+      const cl = src.type === 'COMPONENT' ? src.createInstance() : src.clone(); hold.appendChild(cl); cl.x = 0; cl.y = -(st + k * H);
+      if (o.hideFooter) { const ft = cl.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Shell/Footer')); if (ft) ft.visible = false; } }
+    vp.resize(x - 24, H); await vp.screenshot({ scale: o.scale || 0.5 }); } finally { vp.remove(); }
+  return { src: src.name.slice(0, 60), H: Math.round(src.height), from: st, to: st + cols * H }; }
+function overflowList(root) { const rb = root.absoluteBoundingBox; const bad = []; for (const t of root.findAllWithCriteria({ types: ['TEXT'] })) { let v = true, p = t; while (p && p !== root) { if (p.visible === false) { v = false; break; } p = p.parent; } if (!v) continue; const b = t.absoluteBoundingBox; if (!b) continue; if (b.width < 2 || b.x + b.width > rb.x + rb.width + 1 || b.x < rb.x - 1) bad.push(t.name.slice(0, 30) + '@' + Math.round(b.x - rb.x) + '+' + Math.round(b.width)); } return bad; }

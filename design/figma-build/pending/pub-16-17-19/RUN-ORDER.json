@@ -1,0 +1,6 @@
+{
+ "slice": "pub-legal (PUB-16/17/19)",
+ "status_28nov": "COMPLETE — template + 3 desktop + 4 mobile frames built and verified; nothing to run",
+ "order": ["out/t1-template.js", "out/d-terms.js", "out/d-privacy.js", "out/d-aml.js", "out/m-terms.js", "out/m-privacy.js", "out/m-aml.js", "out/mx-terms.js"],
+ "ids": {"section_03": "335:236364", "template_set": "335:237300", "tpl_desktop": "335:236368", "tpl_mobile": "335:236849", "PUB-16 1440": "336:238828", "PUB-17 1440": "337:123899", "PUB-19 1440": "337:125150", "section_10": "338:117637", "PUB-16 390": "338:117638", "PUB-16 390 contents expanded": "341:182984", "PUB-17 390": "339:118342", "PUB-19 390": "340:118936"}
+}

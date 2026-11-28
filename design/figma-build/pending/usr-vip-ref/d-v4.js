@@ -4,7 +4,7 @@ const { f, content } = await DESK(NAME, 4800, 160, { active: 'VIP Club', area: '
   actions: async () => [await BTN('Secondary', 'Points history', { lead: 'history' })], tabs: VTABS('Benefits') });
 const ch = await I('23:17672', {}, { Title: 'All five tiers', 'Show live dot': false, 'Show All': false, 'Show arrows': true }); add(content, [ch, 'FILL']);
 const trk = AL('HORIZONTAL', { name: 'Tier track (scrolls)', gap: 16, clip: true }); add(content, [trk, 'FILL']);
-for (const t of ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']) add(trk, await I('23:12669', { Tier: t, Current: t === 'Gold' ? 'Yes' : 'No' }));
+for (const t of ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']) { const vc = await I('23:12669', { Tier: t, Current: t === 'Gold' ? 'Yes' : 'No' }); vc.name = 'Card/VIP Tier — ' + t; await vipFix(vc); add(trk, vc); }
 const tc = CARD({ name: 'Tier comparison', gap: 0, p: 0, clip: true }); add(content, [tc, 'FILL']);
 const th = ROW({ gap: 12, p: [20, 24, 16, 24] }); add(th, await T('Compare tiers', 'Heading/H4')); add(th, await DEMO('S')); add(th, [ROW({}), 'FILL']); add(th, await T('Reward amounts in USDT, paid to Available', 'Caption', 'text/tertiary')); add(tc, [th, 'FILL']);
 const tbl = COL({ name: 'Table', gap: 0 }); add(tc, [tbl, 'FILL']);
@@ -30,5 +30,5 @@ const fh = ROW({ gap: 8 }); add(fh, await IC('shield-check', 20, 'icon/brand'));
 for (const s of ['Odds, house edge and payouts are identical for every player', 'Draw results come from Chainlink VRF and verifiable seeds — status can’t influence them', 'Withdrawals go through the same security checks at every tier', 'We never offer higher limits or paused reality checks as a VIP perk']) add(fp, [await CHK(s, 'info', 480), 'FILL']);
 add(fp, await BTN('Ghost', 'Responsible gaming tools', { size: 'S', lead: 'shield', trail: 'arrow-right' }));
 await FOOT(content, 'Tier thresholds and reward ranges are DEMO values. VIP benefits can change with 30 days’ notice. 18+ only, in permitted jurisdictions.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

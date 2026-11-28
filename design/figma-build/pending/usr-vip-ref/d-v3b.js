@@ -8,6 +8,7 @@ const cb = rw.findOne(n => n.name === 'Claim button'); const done = await BADGEL
 await sxc(rw, 'Settles automatically', 'Claimed 27 Nov 2026, 18:44 UTC — now in Available');
 fill(rw, 'surface/default');
 await sx(f, 'Total claimable', '3.42');
+for (const ti of byName(f, 'Sub-nav').children) { const cn = nest(ti, 'Count'); if (cn && ti.findAll(n => n.type === 'TEXT').some(t => t.characters === 'Rewards')) setP(cn, { Count: '1' }); }
 setP(byName(f, 'Claim all'), { Label: 'Claim 3.42 USDT' });
 await sxc(f, 'Owed balance 415.20', 'Owed balance now 300.00 USDT (refund, round #1,245). Available 9,330.50 USDT = 9,215.30 + 115.20.');
 await sxc(byName(f, 'Shell/Topbar Desktop'), '9,215.30', '9,330.50');
@@ -15,6 +16,6 @@ const tbl = byName(byName(f, 'Reward history'), 'Table');
 const tmp = COL({ name: 'tmp' }); const row = await addRow(tmp, [CELL(200, [await TX('27 Nov 2026, 18:44', 'Body/S', 'text/secondary')]), CELL('FILL', [await TWO('Weekly reward — Gold', 'Your play 16–22 Nov 2026 · claimed early')]), CELL(150, [await AMT('+115.20', { c: 'text/success', demo: true })], { right: true }), CELL(170, [await BADGEL('Confirmed', 'Claimed')]), CELL(160, [await TX('Available', 'Body/S', 'text/secondary')])], { name: 'Row — new claim', fill: 'surface/selected' });
 tbl.insertChild(1, row); row.layoutSizingHorizontal = 'FILL'; tmp.remove();
 const toast = await I('30:16872', { Type: 'Success' }); f.appendChild(toast); toast.layoutPositioning = 'ABSOLUTE'; toast.x = 1440 - toast.width - 24; toast.y = 140;
-await sxi(toast, 0, 'Weekly reward claimed'); await sxi(toast, 1, '115.20 USDT moved to Available. Available 9,330.50 USDT · Owed 300.00 USDT.');
-fitSection(sec); await f.screenshot({ scale: 0.5 });
+await sx(toast, 'Title', 'Weekly reward claimed'); await sx(toast, 'Label', '+115.20 USDT'); await sx(toast, 'Body', '115.20 USDT moved to Available. Available 9,330.50 USDT · Owed 300.00 USDT.');
+FIXEMPTY(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
 R.push({ id: f.id, name: NAME, h: Math.round(f.height), toastTexts: toast.findAll(n => n.type === 'TEXT').map(t => t.name + '=' + t.characters.slice(0, 30)).join(' | ') });
