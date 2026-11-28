@@ -6,7 +6,11 @@
  * next to each query; where the API has no endpoint yet the query stays on the mock (`api: not yet`).
  */
 import { DEMO_BALANCES, DEMO_GAMES } from '@gp/shared/demo';
+import { add } from '@gp/shared/money';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
+
+import { apiRequest } from '@/lib/api/client';
+import { publicEnv } from '@/lib/env';
 
 import {
   mockDrawRandomness,
@@ -27,9 +31,11 @@ import type {
   GameView,
   HomeScenario,
   LiveBetTab,
+  MyEntriesView,
   PoolSnapshot,
   RegionStatus,
   RoundView,
+  ViewerBalance,
 } from './types';
 
 const api = DATA_SOURCE === 'api';
@@ -53,19 +59,26 @@ export const queryKeys = {
 
 // ── fetchers ────────────────────────────────────────────────────────────────────────────────────
 
-/** GET /pool/rounds/current (+ the API's Date header as server clock). */
+/**
+ * GET /pool/rounds/current, and between rounds GET /pool/rounds?pageSize=1 for the latest closed / drawing /
+ * settled / cancelled round: `last` must be the previous round with its real status, never the next scheduled one
+ * (the current endpoint prefers a scheduled round once the daily round has closed).
+ */
 async function fetchPoolSnapshot(scenario: HomeScenario): Promise<PoolSnapshot> {
   if (!api) return mockResolve(mockPoolSnapshot(scenario));
   // The endpoint returns the open round, else the next scheduled one, else the latest.
   const round = await apiGet<RoundView & { opensAt?: string }>('/pool/rounds/current');
   const open = round.status === 'open';
   const scheduled = round.status === 'scheduled';
+  const previous = open
+    ? null
+    : ((await apiGet<{ items: RoundView[] }>('/pool/rounds?pageSize=1')).items[0] ?? null);
   const DAY = 24 * 3600_000;
   const plusDay = (iso: string) => new Date(new Date(iso).getTime() + DAY).toISOString();
   return {
     serverNow: new Date().toISOString(),
     current: open ? round : null,
-    last: round,
+    last: previous ?? round,
     next: scheduled
       ? { number: round.number, opensAt: round.opensAt ?? round.openedAt, closesAt: round.closesAt }
       : {
@@ -104,18 +117,64 @@ export const entriesFeedQuery = (roundNumber: number) =>
     refetchInterval: 15_000,
   });
 
-// api: GET /pool/rounds/:roundId/my-entries needs the player token — wired by the pool page agent.
-export const myEntriesQuery = (roundNumber: number) =>
+/** GET /pool/rounds/:roundId/my-entries … `GET` view of the API (player token; client only). */
+interface ApiMyRoundEntries {
+  roundNumber: number;
+  roundId: string;
+  entries: number;
+  firstEntryId: string | null;
+  lastEntryId: string | null;
+  entryAmount: string;
+  platformFee: string;
+  purchases: { reference: string; total: string; at: string }[];
+  odds: { anyPrizeApproxPercent: string; firstPrizePercent: string } | null;
+}
+
+/** The viewer's entries in the current round (player token; never prefetched on the server). null = none. */
+async function fetchMyEntries(roundId: string | undefined): Promise<MyEntriesView | null> {
+  if (!api) return mockResolve(mockMyEntries());
+  if (!roundId) return null;
+  const r = await apiRequest<ApiMyRoundEntries>(`/pool/rounds/${roundId}/my-entries`);
+  if (r.entries <= 0 || !r.firstEntryId || !r.lastEntryId) return null;
+  return {
+    roundId: r.roundId,
+    roundNumber: r.roundNumber,
+    entries: r.entries,
+    firstEntryId: r.firstEntryId,
+    lastEntryId: r.lastEntryId,
+    entryAmount: r.entryAmount,
+    platformFee: r.platformFee,
+    networkFee: '0.00',
+    total: add(r.entryAmount, r.platformFee).toFixed(2),
+    txHashDisplay: '',
+    purchasedAt: r.purchases.at(-1)?.at ?? new Date().toISOString(),
+    status: 'active',
+    odds: {
+      anyPrizeApproxPercent: r.odds?.anyPrizeApproxPercent ?? '0',
+      firstPrizePercent: r.odds?.firstPrizePercent ?? '0',
+    },
+    isDemo: publicEnv.demoMode,
+  };
+}
+
+/** API: GET /pool/rounds/:roundId/my-entries (the viewer's real entries); mock: the DEMO player's 35 entries. */
+export const myEntriesQuery = (roundNumber: number, roundId?: string) =>
   queryOptions({
     queryKey: queryKeys.myEntries(roundNumber),
-    queryFn: () => mockResolve(mockMyEntries()),
+    queryFn: () => fetchMyEntries(roundId),
   });
 
-// api: GET /wallet/balances needs the player token — wired with the wallet screens.
+/** API: GET /wallet/balances (the viewer's real Available); mock: the DEMO player's balance. */
 export const viewerBalanceQuery = () =>
   queryOptions({
     queryKey: queryKeys.viewerBalance(),
-    queryFn: () => mockResolve({ available: DEMO_BALANCES.available, isDemo: true }),
+    queryFn: async (): Promise<ViewerBalance> =>
+      api
+        ? {
+            available: (await apiRequest<{ available: string }>('/wallet/balances')).available,
+            isDemo: publicEnv.demoMode,
+          }
+        : mockResolve({ available: DEMO_BALANCES.available, isDemo: true }),
   });
 
 /** GET /games */

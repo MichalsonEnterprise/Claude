@@ -90,8 +90,8 @@ function section(name, x = 0, y = 0) { let s = figma.currentPage.children.find(n
 // ===== END GP HELPERS =====
 
 // ===== ADM-CORE LIB v1 (agent adm-core: ADM-00/01/02/X1 + MOB-11) =====
-const pg = figma.root.children.find(p => p.name === '09 — Admin Panel'); await figma.setCurrentPageAsync(pg);
-const sec = section('ADM-00/01/02/X1 Shell, login, overview, approvals', 0, 0); // existing section id 36:522944
+const pg = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(pg);
+const sec = section('ADM — Mobile', 217000, 0); // existing section id 36:522944
 async function setT(root, name, s, nth = 0) { const a = root.findAll(n => n.type === 'TEXT' && n.name === name); const t = a[nth]; if (!t) return null; const fs = t.fontName === figma.mixed ? t.getRangeAllFontNames(0, t.characters.length) : [t.fontName]; for (const fo of fs) await figma.loadFontAsync(fo); t.characters = s; return t; }
 async function rep(root, from, to) { for (const t of root.findAll(n => n.type === 'TEXT' && n.characters.includes(from))) { const fs = t.fontName === figma.mixed ? t.getRangeAllFontNames(0, t.characters.length) : [t.fontName]; for (const fo of fs) await figma.loadFontAsync(fo); t.characters = t.characters.split(from).join(to); } }
 const sp = () => AL('HORIZONTAL', { name: 'Spacer', h: 1 }); // 1px tall: empty auto-layout frames default to 100px
@@ -113,54 +113,76 @@ function bandY(id) { const b = sec.children.find(n => n.name === 'Band — ' + i
 const SHOT = async (ids, scale = 0.3) => { for (const id of ids) { const n = await figma.getNodeByIdAsync(id); if (n) await n.screenshot({ scale }); } };
 // ===== END ADM-CORE LIB =====
 
-// adm-core #07 — two remaining 1440 states:
-//  (a) [ADM-01] Session timeout — Warning (real countdown to an absolute sign-out time) over the Approvals inbox (K. Osei, 19:00 UTC), x=3240 in the ADM-01 row;
-//  (b) [ADM-02] Overview — Restricted role (Support L2 R. Duarte): money KPIs, pool liabilities, finance queue, pool balance chart and audit panel are
-//      removed (not blurred) and replaced by one explanation panel; sidebar groups without access show the lock state. x=1680 in the ADM-02 row. IDEMPOTENT.
+// adm-core m-02 — MOB-11 approvals on page 10: Approvals queue / 390 (K. Osei, Compliance Officer, 18:46 UTC)
+// and the ADM-X1 second-approver review as a bottom sheet over the queue (AR-1042). IDEMPOTENT.
+// ===== ADM-CORE mobile helpers (page 10, section 'ADM — Mobile'); same inline admin top bar + tab bar as the adm-bc mobile frames =====
+function setP(inst, base, val) { if (!inst || inst.type !== 'INSTANCE') return false; const k = Object.keys(inst.componentProperties).find(x => x.split('#')[0] === base); if (!k) return false; inst.setProperties({ [k]: val }); return true; }
+// my mobile frames sit in their own row under anything already in the section (adm-bc / adm-finance frames use y = 160)
+function MROW() { const mine = sec.children.filter(n => /MOB-11/.test(n.name)); if (mine.length) return { x: Math.max(...mine.map(n => n.x + n.width)) + 120, y: Math.min(...mine.map(n => n.y)) }; return { x: 120, y: sec.children.length ? nextY(sec) + 80 : 160 }; }
+async function MSHELL(name, ini, back) {
+  if (EX(name)) { OUT.skipped.push(name); return null; }
+  const p = MROW(); const f = await screen(name, 390, {}); sec.appendChild(f); f.x = p.x; f.y = p.y;
+  add(f, [await DEMOBAR('DEMO DATA — illustrative values only'), 'FILL']);
+  const bar = AL('HORIZONTAL', { name: 'Admin Topbar — Mobile', gap: 8, p: [8, 12, 8, 12], fill: 'bg/secondary', align: 'CENTER' }); strokeSides(bar, 'border/subtle', { b: 1 });
+  if (back) { add(bar, await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] }), await T(back, 'Label/L', 'text/primary')); }
+  else { const lm = await I('4:792'); lm.rescale(28 / lm.width); add(bar, lm, await T('Admin', 'Label/L', 'text/primary')); const env = AL('HORIZONTAL', { name: 'PROD', p: [2, 8, 2, 8], stroke: 'border/danger', r: 6 }); add(env, await T('PROD', 'Label/S', 'text/danger')); add(bar, env); }
+  add(bar, [sp(), 'FILL']);
+  const bl = row({ name: 'Alerts bell', gap: 2 }); add(bl, await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS.bell })); const bc = await I('6:216', { Size: 'S' }); setP(bc, 'Count', '5'); add(bl, bc); add(bar, bl);
+  add(bar, await I('9:238', { Size: 'S' }, { Initials: ini }));
+  add(f, [bar, 'FILL']);
+  const c = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [c, 'FILL']);
+  return { f, c, bar };
+}
+async function MTABS(f, active) { const tb = AL('VERTICAL', { name: 'Admin Tab Bar — Mobile', fill: 'bg/secondary' }); strokeSides(tb, 'border/subtle', { t: 1 }); const r = AL('HORIZONTAL', { name: 'Tabs', p: [4, 4, 0, 4] }); for (const [ic, lab, cnt] of [['dashboard', 'Overview'], ['user-check', 'Approvals', '4'], ['id-card', 'KYC', '214'], ['shield-alert', 'Alerts', '23'], ['menu', 'More']]) { const on = lab === active; const t = AL('VERTICAL', { name: 'Tab ' + lab, gap: 4, p: [8, 0, 6, 0], align: 'CENTER' }); const ir = row({ name: 'Icon', gap: 2 }); add(ir, await IC(ic, 24, on ? 'icon/brand' : 'icon/muted')); if (cnt) { const b = await I('6:216', { Size: 'S' }); setP(b, 'Count', cnt); add(ir, b); } add(t, ir, await T(lab, 'Label/S', on ? 'text/brand' : 'text/tertiary')); add(r, [t, 'FILL']); } add(tb, [r, 'FILL']); const hi = AL('HORIZONTAL', { name: 'Home indicator', h: 34, align: 'CENTER', justify: 'CENTER' }); add(hi, rect(134, 5, 'text/primary', 9999, 'Indicator')); add(tb, [hi, 'FILL']); add(f, [tb, 'FILL']); return tb; }
+async function mtitle(c, title, sub) { const h = col({ name: 'Page title', gap: 4 }); const r = row({ gap: 8 }); add(r, await T(title, 'Heading/H3'), await DEMO('M')); add(h, r, await T(sub, 'Body/S', 'text/secondary', { w: 358 })); add(c, [h, 'FILL']); return h; }
+async function mcard(name, o = {}) { return AL('VERTICAL', Object.assign({ name, gap: 10, p: 16, fill: 'surface/default', stroke: 'border/subtle', r: 14 }, o)); }
+async function wt(parent, s, style = 'Body/S', color = 'text/secondary', w = 326) { const t = await T(s, style, color, { w }); add(parent, [t, 'FILL']); return t; }
+// ===== END mobile helpers =====
+
 const made = [];
-async function stxt(t, v) { const fs = t.fontName === figma.mixed ? t.getRangeAllFontNames(0, t.characters.length) : [t.fontName]; for (const fo of fs) await figma.loadFontAsync(fo); t.characters = v; }
-// ---------- (a) session timeout warning ----------
-{ const nm = '[ADM-01] Session timeout — Warning / 1440 / 01:42 left'; if (EX(nm)) OUT.skipped.push(nm); else {
-  const base = EX('[ADM-01] Admin login — Sign in / 1440 / Default'); const SRC = await figma.getNodeByIdAsync('36:522948');
-  const f = SRC.clone(); sec.appendChild(f); f.x = 3240; f.y = base.y; f.name = nm;
-  const sb = f.findOne(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.id === '22:5501'); const tb = f.findOne(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.id === '22:6483');
-  for (const r of [sb, tb]) if (r) { await setT(r, 'Initials', 'KO'); await setT(r, 'A. Marin', 'K. Osei'); await setT(r, 'Finance Lead', 'Compliance Officer'); } if (sb) await setT(sb, '8 of 10 modules', '7 of 10 modules');
-  if (sb) for (const t of sb.findAll(n => n.type === 'TEXT' && n.characters.startsWith('2FA session'))) await stxt(t, '2FA session · until 19:30 UTC');
-  const m = AL('VERTICAL', { name: 'Modal — Session timeout warning', w: 440, fill: 'surface/overlay', stroke: 'border/subtle', r: 20, clip: true }); await fx(m, 'Elevation/4 — Modal');
-  const b = col({ name: 'Body', gap: 16, p: [28, 28, 24, 28] });
-  const tl = AL('HORIZONTAL', { name: 'Icon tile', w: 44, h: 44, fill: 'status/warning-tint', r: 10, align: 'CENTER', justify: 'CENTER' }); add(tl, await IC('timer', 22, 'status/warning'));
-  const hr = row({ gap: 12 }); add(hr, tl, [sp(), 'FILL'], await DEMO('S')); add(b, [hr, 'FILL']);
-  add(b, await T('Still there?', 'Heading/H4'));
-  const cd = row({ name: 'Countdown', gap: 8, align: 'MAX' }); add(cd, await T('01:42', 'Number/XL', 'text/primary'), await T('until sign-out at 19:02 UTC', 'Body/S', 'text/secondary')); add(b, cd);
-  const pr = row({ name: 'Countdown bar', gap: 0, r: 9999, clip: true, w: 384 }); const used = rect(10, 6, 'status/warning', 0, 'Elapsed 13:18 of 15:00'); add(pr, [used, 'FILL'], rect(45, 6, 'surface/raised', 0, 'Remaining 01:42')); add(b, [pr, 'FILL']);
-  add(b, [await T('No activity since 18:47 UTC. Admin sessions end after 15 minutes without activity. Unsent dialogs are discarded at sign-out — nothing is submitted for you.', 'Body/S', 'text/secondary', { w: 384 }), 'FILL']);
-  const nt = row({ name: 'Note', gap: 8, p: [10, 12], fill: 'surface/raised', r: 10, align: 'MIN' }); add(nt, await IC('info', 16, 'icon/muted'), await T('Staying signed in needs no new code. Approvals, restrictions and exports still ask for a fresh 2FA code.', 'Caption', 'text/secondary', { w: 332 })); add(b, [nt, 'FILL']);
-  add(m, [b, 'FILL']);
-  const fr = row({ name: 'Footer', gap: 8, p: [16, 28] }); strokeSides(fr, 'border/subtle', { t: 1 }); add(fr, [await BTN('Secondary', 'Sign out now', { size: 'L', lead: 'logout' }), 'FILL'], [await BTN('Primary', 'Stay signed in', { size: 'L' }), 'FILL']); add(m, [fr, 'FILL']);
-  overlay(f, m); made.push(f); } }
-// ---------- (b) overview, restricted role ----------
-{ const nm = '[ADM-02] Overview / 1440 / Restricted role — Support L2'; if (EX(nm)) OUT.skipped.push(nm); else {
-  const src = EX('[ADM-02] Overview / 1440 / Default'); const f = src.clone(); sec.appendChild(f); f.x = 1680; f.y = src.y; f.name = nm;
-  const sb = f.findOne(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.id === '22:5501'); const tb = f.findOne(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.id === '22:6483');
-  await who(sb, tb, 'RD', 'R. Duarte', 'Support L2', '3 of 10 modules');
-  const ALLOWED = ['Overview', 'User Management', 'Blockchain Management'];
-  for (const it of sb.findAll(n => n.type === 'INSTANCE' && /^Group — /.test(n.name))) { const lbl = it.name.split(' — ')[1]; if (!ALLOWED.includes(lbl)) { it.setProperties({ State: 'No access' }); const cnt = it.findOne(n => n.name === 'Count'); if (cnt) cnt.visible = false; } }
-  const c = f.findOne(n => n.name === 'Content');
-  const money = c.findOne(n => n.name === 'KPIs — money'); const idx = c.children.indexOf(money); money.visible = false;
-  const pl = c.findOne(n => n.name === 'KPI — Pool liabilities'); if (pl) pl.visible = false;
-  const wq = c.findOne(n => n.name === 'Work queues'); if (wq) { const ins = wq.children.filter(n => n.type === 'INSTANCE'); if (ins[0]) ins[0].visible = false; if (ins[1]) ins[1].visible = false; }
-  const pool = c.findOne(n => n.name === 'Pool'); if (pool && pool.children[0]) pool.children[0].visible = false;
-  const nw = c.findOne(n => n.name === 'Networks & audit'); if (nw) { const au = nw.findOne(n => n.name === 'Recent sensitive actions'); if (au) au.visible = false; }
-  const np = row({ name: 'Restricted — financial KPIs', gap: 16, p: [20, 24], fill: 'surface/default', stroke: 'border/subtle', r: 14, align: 'MIN' });
-  const tl = AL('HORIZONTAL', { name: 'Icon tile', w: 40, h: 40, fill: 'surface/raised', r: 10, align: 'CENTER', justify: 'CENTER' }); add(tl, await IC('lock', 20, 'icon/muted'));
-  const tx = col({ gap: 6 }); add(tx, await T('Financial KPIs are hidden for your role', 'Label/L'), await T('Deposits, withdrawals, revenue, platform fees, pool liabilities, the withdrawal queue and the audit feed are limited to Finance, Compliance and Super Admin. They are left out of this page — not blurred — so no figures reach your screen.', 'Body/S', 'text/secondary', { w: 760 }));
-  const ac = row({ gap: 8 }); add(ac, await BTN('Secondary', 'Request access', { size: 'S', lead: 'key' }), await BTN('Ghost', 'Role permissions', { size: 'S', trail: 'arrow-right' })); add(tx, ac);
-  add(np, tl, [tx, 'FILL'], await I('23:18440', { Role: 'Support', Size: 'M' }));
-  c.insertChild(idx, np); np.layoutSizingHorizontal = 'FILL';
-  const ph = c.findOne(n => n.name === 'Page header'); if (ph) { const st = ph.findAll(n => n.type === 'TEXT' && n.characters.startsWith('KPIs for'))[0]; if (st) await stxt(st, 'Player and operations KPIs for the last 30 days. Data as of 27 Nov 2026, 18:45 UTC · updates live. Some panels are hidden for the Support role.'); const ex = ph.findAll(n => n.type === 'INSTANCE' && n.name.startsWith('Button/Secondary'))[0]; if (ex) ex.visible = false; }
-  made.push(f); } }
+const RQ = [ // id, title, detail, requester, role chip, requested, expires, your role — same 4 open requests as the 1440 inbox (K. Osei's view)
+  ['AR-1047', 'Pinfall max bet 1,000.00 → 500.00 USDT', 'Games · config v14 · effective from the next round only', 'S. Iyer', 'Super Admin', '16:30 UTC', '20:30 UTC · 1 h 44 min', 'role'],
+  ['AR-1045', 'Lift sign-in suspension · @juno88', 'Users · player passed the ID re-check', 'R. Duarte', 'Support', '17:55 UTC', '21:55 UTC · 3 h 09 min', 'yes'],
+  ['AR-1049', 'Export KYC file for regulator request REG-221', 'Compliance · 1 encrypted file, 7-day link', 'You', 'Compliance', '18:05 UTC', '22:05 UTC · 3 h 19 min', 'self'],
+  ['AR-1042', 'Release flagged withdrawal WD-20931', 'Finance · 1,500.00 USDT → 0x7c4e…a21D · Arbitrum', 'A. Marin', 'Finance', '18:20 UTC', '22:20 UTC · 3 h 34 min', 'yes']];
+async function reqCard(r) { const [id, t, d, by, role, at, exp, el] = r; const k = await mcard('Request — ' + id, { gap: 8 });
+  const top = row({ gap: 8 }); add(top, await T(id, 'Mono/S', 'text/tertiary'), await BADGE('Pending'), [sp(), 'FILL'], await stat('hourglass', 'icon/muted', exp, 'text/tertiary', 'Caption')); add(k, [top, 'FILL']);
+  await wt(k, t, 'Label/L', 'text/primary'); await wt(k, d, 'Body/S', 'text/secondary');
+  const rq = row({ gap: 8 }); const av = await I('9:238', { Size: 'XS' }, { Initials: by === 'You' ? 'KO' : by.split(' ').map(s => s[0]).join('').replace('.', '') }); add(rq, av, await T((by === 'You' ? 'Requested by you' : by) + ' · ' + at, 'Caption', 'text/secondary'), await I('23:18440', { Role: role, Size: 'S' }), [sp(), 'FILL'], await DEMO('XS')); add(k, [rq, 'FILL']);
+  if (el === 'self') { const n = row({ name: 'Self-approval note', gap: 8, p: [10, 12], fill: 'surface/raised', r: 10, align: 'MIN' }); add(n, await IC('ban', 16, 'icon/muted')); await wt(n, "Your own request — another Compliance admin or the Super Admin must decide. You can withdraw it.", 'Caption', 'text/secondary', 290); add(k, [n, 'FILL']); add(k, [await BTN('Ghost', 'Withdraw my request', { size: 'L' }), 'FILL']); }
+  else if (el === 'role') { const n = row({ name: 'Role note', gap: 8, p: [10, 12], fill: 'surface/raised', r: 10, align: 'MIN' }); add(n, await IC('lock', 16, 'icon/muted')); await wt(n, 'Super Admin only — you can see it, but you can’t decide it.', 'Caption', 'text/secondary', 290); add(k, [n, 'FILL']); add(k, [await BTN('Ghost', 'View details', { size: 'L' }), 'FILL']); }
+  else add(k, [await BTN(id === 'AR-1042' ? 'Primary' : 'Secondary', 'Review', { size: 'L', trail: 'arrow-right' }), 'FILL']);
+  return k; }
+async function queue(name) { const S = await MSHELL(name, 'KO'); if (!S) return null; const { f, c } = S;
+  await mtitle(c, 'Approvals', 'Four-eyes requests. You can decide requests from other admins only; every decision needs a reason and a fresh 2FA code.');
+  const tabs = row({ name: 'Filter pills (scrolls)', gap: 8, w: 358, clip: true }); for (const [l, on] of [['Open · 4', true], ['Waiting for me · 2', false], ['Created by me · 1', false], ['Decided today · 4', false]]) { const p = await I('20:6895', { State: on ? 'Active' : 'Default' }); if (!setP(p, 'Label', l)) { const tx = p.findOne(n => n.type === 'TEXT'); if (tx) await setT(p, tx.name, l); } add(tabs, p); } add(c, [tabs, 'FILL']);
+  const pol = row({ name: 'Policy strip', gap: 8, p: [10, 12], fill: 'brand/tint-subtle', r: 10, align: 'MIN' }); add(pol, await IC('shield-check', 16, 'icon/brand')); await wt(pol, 'SYS-1.1 · the requester can never approve · requests expire after 4 h and then change nothing', 'Caption', 'text/secondary', 300); add(c, [pol, 'FILL']);
+  for (const r of RQ) add(c, [await reqCard(r), 'FILL']);
+  await MTABS(f, 'Approvals'); return f; }
+// ---------- 1. Queue ----------
+{ const f = await queue('[MOB-11] Approvals queue / 390 / Open'); if (f) made.push(f); }
+// ---------- 2. Review sheet (AR-1042) over the queue ----------
+{ const f = await queue('[ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet'); if (f) {
+  f.primaryAxisSizingMode = 'FIXED'; f.resize(390, 844); f.clipsContent = true;
+  const s = rect(390, 808, 'scrim/overlay', 0, 'Scrim'); f.appendChild(s); s.layoutPositioning = 'ABSOLUTE'; s.x = 0; s.y = 36;
+  const sh = AL('VERTICAL', { name: 'Sheet — Review AR-1042', w: 390, fill: 'surface/overlay', stroke: 'border/subtle' }); for (const k of ['topLeftRadius', 'topRightRadius']) sh.setBoundVariable(k, VAR['radius/2xl']); await fx(sh, 'Elevation/4 — Modal');
+  const gr = AL('HORIZONTAL', { name: 'Grabber', p: [8, 0, 4, 0], justify: 'CENTER' }); add(gr, rect(36, 4, 'border/strong', 9999, 'Grabber')); add(sh, [gr, 'FILL']);
+  const hd = row({ name: 'Header', gap: 8, p: [4, 8, 8, 16] }); add(hd, await T('Review AR-1042', 'Heading/H5'), await DEMO('S'), [sp(), 'FILL'], await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS.x })); add(sh, [hd, 'FILL']);
+  const bd = col({ name: 'Body', gap: 12, p: [4, 16, 12, 16] });
+  const sm = col({ name: 'Summary', gap: 6, p: 12, fill: 'surface/raised', r: 10 }); add(sm, await T('RELEASE FLAGGED WITHDRAWAL · WD-20931', 'Overline', 'text/tertiary'));
+  const am = row({ gap: 6, align: 'MAX' }); add(am, await T('1,500.00', 'Number/M'), await T('USDT', 'Label/M', 'text/tertiary'), [sp(), 'FILL'], await I('9:377', { Chain: 'Arbitrum', Status: 'Operational' })); add(sm, [am, 'FILL']);
+  const ad = row({ gap: 6 }); add(ad, await T('→ 0x7c4e…a21D', 'Mono/S', 'text/secondary'), await T('· @nova.k · KYC L2 · player receives 1,499.92', 'Caption', 'text/tertiary')); add(sm, ad);
+  const rq = row({ gap: 6, p: [6, 0, 0, 0] }); strokeSides(rq, 'border/subtle', { t: 1 }); add(rq, await I('9:238', { Size: 'XS' }, { Initials: 'AM' }), await T('A. Marin · 18:20 UTC', 'Caption', 'text/secondary'), await I('23:18440', { Role: 'Finance', Size: 'S' })); add(sm, [rq, 'FILL']);
+  await wt(sm, '“AML-3317 closed as a false positive on the velocity rule. Destination whitelisted since 14 Oct 2026, ownership proven by signature. Release per FIN-2.3.”', 'Caption', 'text/secondary', 334);
+  add(bd, [sm, 'FILL']);
+  const ta = await I('16:3858', { State: 'Focus' }, { Label: 'Your reason (required)', 'Show counter': true }); add(bd, [ta, 'FILL']); await setT(ta, 'Value text', 'Reviewed AML-3317 evidence and the signed ownership proof. Velocity hit explained by the 14 Oct whitelisting. Agree to release.'); await setT(ta, 'Counter', '128 / 500');
+  const otp = await I('16:3761', { State: 'Complete' }, { Label: 'Fresh 2FA code', Description: 'Needed for every decision, even inside an active session.' }); add(bd, otp);
+  const nt = row({ name: 'Audit note', gap: 8, align: 'MIN' }); add(nt, await IC('history', 16, 'icon/muted')); await wt(nt, 'Both admins, both reasons, IPs and 2FA checks are stored in one hash-chained audit entry. You can’t edit amount, address or network.', 'Caption', 'text/tertiary', 330); add(bd, [nt, 'FILL']);
+  add(sh, [bd, 'FILL']);
+  const ft = col({ name: 'Sticky footer', gap: 0, p: [12, 16, 0, 16] }); strokeSides(ft, 'border/subtle', { t: 1 }); const fa = row({ name: 'Actions', gap: 8 }); add(fa, [await BTN('Danger', 'Reject', { size: 'L', lead: 'x-circle' }), 'FILL'], [await BTN('Primary', 'Approve & release', { size: 'L', lead: 'shield-check' }), 'FILL']); add(ft, [fa, 'FILL']); const hi = AL('HORIZONTAL', { name: 'Home indicator', h: 34, align: 'CENTER', justify: 'CENTER' }); add(hi, rect(134, 5, 'text/primary', 9999, 'Indicator')); add(ft, [hi, 'FILL']); add(sh, [ft, 'FILL']);
+  f.appendChild(sh); sh.layoutPositioning = 'ABSOLUTE'; sh.x = 0; sh.y = 844 - sh.height; made.push(f); } }
 fitSection(sec);
-for (const f of made) await f.screenshot({ scale: 0.32 });
+for (const f of made) await f.screenshot({ scale: 0.5 });
 return { made: made.map(f => [f.name, f.id, f.x, f.y, f.height]), skipped: OUT.skipped };
 
 }

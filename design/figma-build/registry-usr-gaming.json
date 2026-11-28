@@ -1,5 +1,5 @@
 {
- "_note": "USR-G1..G7 Gaming (agent key: usr-gaming). No new library components were created: every screen is composed from existing instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Nav/Breadcrumb, Tabs/Underline, Tabs/Pill, Table/*, Jackpot/*, Card/*, Tile/Game Generic, RG/Session Bar, Nav/Mobile Tab Bar ...). Entries below are SCREEN FRAMES (type FRAME) for page-index links. Desktop frames: page '05 — User Dashboard', section 'USR-G1..G7 Gaming' (32:97624) at X=12000,Y=0. Mobile frames: page '10 — Mobile Experience', section 'USR — Mobile B' (34:432314) at X=98000,Y=0. Pieces built inline from tokens (no library component existed): Export dialog body (Modal/Base slot is fixed), filter popovers, settlement timeline, settlement receipt card, mobile bet/game list rows, mobile session strip. Continuation 28 Nov 2026: added G1 390 Default, G7 390 Default/Empty, G2 390 Filters (bottom sheet) and G6 390 Export (bottom sheet); scripts in pending/usr-gaming.",
+ "_note": "USR-G1..G7 Gaming (agent key: usr-gaming). No new library components were created: every screen is composed from existing instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Nav/Breadcrumb, Tabs/Underline, Tabs/Pill, Table/*, Jackpot/*, Card/*, Tile/Game Generic, RG/Session Bar, Nav/Mobile Tab Bar ...). Entries below are SCREEN FRAMES (type FRAME) for page-index links. Desktop frames: page '05 — User Dashboard', section 'USR-G1..G7 Gaming' (32:97624) at X=12000,Y=0. Mobile frames: page '10 — Mobile Experience', section 'USR — Mobile B' (34:432314) at X=98000,Y=0. Pieces built inline from tokens (no library component existed): Export dialog body (Modal/Base slot is fixed), filter popovers, settlement timeline, settlement receipt card, mobile bet/game list rows, mobile session strip. Continuation 28 Nov 2026: added G1 390 Default, G7 390 Default/Empty, G2 390 Filters (bottom sheet) and G6 390 Export (bottom sheet); scripts in pending/usr-gaming. Continuation 28 Nov 2026 (2nd): added G6 390 Filters (229:241469, bottom sheet: Orbit Rush · Wins · 7 days -> Show 38 results; Result uses Tabs/Segmented 20:6978 with nested Tabs/Segment overrides); reconciled G2-G5 copy with demo-data (#1,247 = 40 entries/402.00, #1,246 = 24/241.20, #1,245 bought 14:22 UTC, VIP 115.20 auto-settles Mon 30 Nov 10:00 UTC); applied fix 04; all 29 frames screenshot-verified.",
  "Section/USR-G1..G7 Gaming": {
   "id": "32:97624",
   "type": "SECTION"
@@ -114,6 +114,10 @@
  },
  "[USR-G6] Game History / 390 / Export": {
   "id": "152:65321",
+  "type": "FRAME"
+ },
+ "[USR-G6] Game History / 390 / Filters": {
+  "id": "229:241469",
   "type": "FRAME"
  }
 }

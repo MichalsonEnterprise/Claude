@@ -213,7 +213,7 @@ export function DashboardOverview() {
       demo={demo}
       banner={banner}
     >
-      {restricted && <ShellOverride restricted />}
+      {restricted && <ShellOverride restricted regionName={gate.country} />}
       {isNew && me.data ? (
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 laptop:grid-cols-[minmax(0,1fr)_360px]">
           <SetupChecklist

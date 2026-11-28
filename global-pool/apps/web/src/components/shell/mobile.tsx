@@ -154,7 +154,7 @@ export interface MobileDrawerProps {
   member?: ShellMember | null;
   activeHref: string | null;
   counts?: SidebarCounts;
-  poolAmount: string;
+  poolAmount: string | null;
   demo?: boolean;
   onSignIn: () => void;
   onSignUp: () => void;
@@ -199,7 +199,11 @@ export function MobileDrawer({
                   <div>
                     <p className="text-caption text-text-tertiary">Available</p>
                     <p className="flex items-center gap-2 text-number-s tabular-nums">
-                      {formatUSDT(member.available)}
+                      {member.available === null ? (
+                        <Skeleton className="h-5 w-24" />
+                      ) : (
+                        formatUSDT(member.available)
+                      )}
                       {member.demo && <DemoBadge size="xs" />}
                     </p>
                   </div>

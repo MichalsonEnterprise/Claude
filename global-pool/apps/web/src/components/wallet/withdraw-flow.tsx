@@ -23,6 +23,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
+import { ACCOUNT_ROUTES } from '@/components/account/nav';
 import { ChainMark, TokenMark } from '@/components/brand/chain-mark';
 import { AddressChip } from '@/components/domain/address-chip';
 import { AddressInput } from '@/components/domain/address-input';
@@ -35,7 +36,7 @@ import { Card } from '@/components/ui/card';
 import { CheckboxField } from '@/components/ui/checkbox';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ApiRequestError, newIdempotencyKey } from '@/lib/api/client';
+import { ApiRequestError, isOutcomeUnknown, newIdempotencyKey } from '@/lib/api/client';
 import {
   useBalances,
   useInvalidateWallet,
@@ -1091,7 +1092,7 @@ function RiskAlert({ p, onEdit }: { p: WithdrawalPrecheck; onEdit: (s: StepKey) 
         title="Identity verification is required for withdrawals"
         actions={
           <Button asChild size="s">
-            <Link href="/account/verification">Verify identity</Link>
+            <Link href={ACCOUNT_ROUTES.kycVerify}>Verify identity</Link>
           </Button>
         }
       >
@@ -1169,6 +1170,8 @@ function TwoFactorStep({
     },
     onError: (e) => {
       setCode('');
+      // No definite answer: the request may have been accepted — show the real state (withdrawals, balances).
+      if (isOutcomeUnknown(e)) void invalidate();
       if (e instanceof ApiRequestError) {
         if (e.code === 'INSUFFICIENT_FUNDS') setShortfall(true);
         if (e.code === 'SERVICE_UNAVAILABLE') setMaintenance(e.message);
@@ -1176,9 +1179,13 @@ function TwoFactorStep({
     },
   });
   const info = stepUpError(submit.error);
+  // Network drop / 5xx / still processing: never claim it "wasn't requested". The draft keeps its idempotency key,
+  // so confirming again re-sends the SAME request and the API answers with the existing withdrawal if there is one.
+  const unknown = Boolean(submit.error) && isOutcomeUnknown(submit.error);
   const other =
     submit.error &&
     !info &&
+    !unknown &&
     !(
       submit.error instanceof ApiRequestError &&
       ['INSUFFICIENT_FUNDS', 'SERVICE_UNAVAILABLE'].includes(submit.error.code)
@@ -1211,6 +1218,21 @@ function TwoFactorStep({
           }
         >
           Withdrawals need an authenticator code.
+        </Alert>
+      )}
+      {unknown && (
+        <Alert
+          type="warning"
+          title="We couldn’t confirm your withdrawal"
+          actions={
+            <Button asChild size="s" variant="secondary">
+              <Link href={`${WALLET_ROUTES.history}?type=withdrawal`}>Withdrawal history</Link>
+            </Button>
+          }
+        >
+          The connection dropped before GLOBAL POOL answered, so this withdrawal may already be
+          requested. Check your withdrawal history before you change anything. Enter a new code and
+          confirm again to re-send this same request — it can’t be requested twice.
         </Alert>
       )}
       {other && (

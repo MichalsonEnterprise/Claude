@@ -106,6 +106,23 @@ export const resetCreditsSchema = z.object({ idempotencyKey: idempotencyKey.opti
 export const gameBetsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  // ── optional filters (additive; GET /games/:slug/bets — the summary follows the same filters) ──
+  /** Bets placed at / after this instant (ISO 8601). */
+  from: z.string().datetime({ offset: true }).optional(),
+  /** Bets placed at / before this instant (ISO 8601). */
+  to: z.string().datetime({ offset: true }).optional(),
+  /** Settled wins (payout > 0) or losses. */
+  result: z.enum(['win', 'lose']).optional(),
+  /** Double Side only: the side the player picked. */
+  pick: z.enum(['heads', 'tails']).optional(),
+  /** Bet reference ("CF-52107" or "52107") or nonce ("418"). */
+  search: z
+    .string()
+    .trim()
+    .max(32)
+    .regex(/^[A-Za-z]{0,3}-?\d{1,9}$/, 'Search by bet reference (e.g. CF-52107) or nonce')
+    .optional(),
 });
+export type GameBetsQuery = z.infer<typeof gameBetsQuerySchema>;
 
 export { DEMO_CREDITS_CURRENCY };

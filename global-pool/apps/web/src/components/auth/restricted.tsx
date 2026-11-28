@@ -302,8 +302,9 @@ function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
             body: 'No emails, push messages or bonus offers. VIP rewards stop accruing.',
           },
           {
-            title: 'New accounts',
-            body: 'We check identity at sign-up, so a second account can’t be opened.',
+            // Truthful scope: exclusions are bound to this account; nothing links other accounts yet (R26).
+            title: 'Other accounts',
+            body: 'This break covers this account. If you have another GLOBAL POOL account, exclude it too — support can help.',
           },
         ],
         balNote:
@@ -559,7 +560,9 @@ export function RestrictedView({
 
   return (
     <div className="flex flex-col gap-6 pb-6">
-      {variant === 'region' && <ShellOverride restricted />}
+      {variant === 'region' && (
+        <ShellOverride restricted regionName={status.region.current?.name ?? null} />
+      )}
       <nav aria-label="Breadcrumb" className="text-caption text-text-tertiary">
         <Link href="/account" className="hover:text-text-secondary">
           Account

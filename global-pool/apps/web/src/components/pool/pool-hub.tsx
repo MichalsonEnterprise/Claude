@@ -131,7 +131,7 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
 
   const header = (
     <>
-      <ShellOverride restricted={restricted} previewGuest={has('guest')} />
+      <ShellOverride restricted={restricted} regionName={countryName} previewGuest={has('guest')} />
       <PoolPageHeader
         crumbs={[{ label: 'Lobby', href: '/' }, { label: 'Global Pool' }]}
         title="Global Pool"
@@ -291,6 +291,8 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
           myEntries={myCount}
           available={balances.data?.available ?? null}
           limits={rg.data?.limits ?? null}
+          limitsStatus={rg.data ? 'ready' : rg.isError ? 'error' : 'loading'}
+          onRetryLimits={() => void rg.refetch()}
           wrongNetwork={has('wrong-network')}
         />
       )}

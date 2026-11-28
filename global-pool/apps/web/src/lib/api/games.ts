@@ -165,6 +165,19 @@ export interface GameBetView<
   replayed?: boolean;
 }
 
+/** Optional filters of GET /games/:slug/bets (the summary follows them too). */
+export interface GameBetsFilters {
+  /** ISO instant — bets at / after. */
+  from?: string;
+  /** ISO instant — bets at / before. */
+  to?: string;
+  result?: 'win' | 'lose';
+  /** Double Side only. */
+  pick?: 'heads' | 'tails';
+  /** Bet reference ("CF-52107") or nonce. */
+  search?: string;
+}
+
 /** GET /games/:slug/bets */
 export interface GameBetsPage<B = GameBetView> {
   items: B[];
@@ -172,7 +185,13 @@ export interface GameBetsPage<B = GameBetView> {
   pageSize: number;
   total: number;
   totalPages: number;
-  summary: DemoPlaySummary;
+  summary: DemoPlaySummary & {
+    /** Settled bets with a payout (added with the history filters). */
+    wins?: number;
+    losses?: number;
+    /** Double Side: how the coin landed in the filtered set. */
+    landed?: { heads: number; tails: number };
+  };
   currency: 'DEMO';
   isDemo: true;
 }
@@ -277,8 +296,10 @@ export const gamesApi = {
       method: 'POST',
       body: { ...input, currency: DEMO_CREDITS_CURRENCY },
     }),
-  bets: <B = GameBetView>(slug: string, page = 1, pageSize = 20) =>
-    apiRequest<GameBetsPage<B>>(`/games/${enc(slug)}/bets`, { query: { page, pageSize } }),
+  bets: <B = GameBetView>(slug: string, page = 1, pageSize = 20, filters?: GameBetsFilters) =>
+    apiRequest<GameBetsPage<B>>(`/games/${enc(slug)}/bets`, {
+      query: { page, pageSize, ...(filters ?? {}) },
+    }),
   bet: (id: string) => apiRequest<GameBetView>(`/games/bets/${enc(id)}`),
   verify: (id: string) => apiRequest<BetVerification>(`/games/bets/${enc(id)}/verify`),
 };
@@ -292,8 +313,10 @@ export const gameKeys = {
   credits: ['games-kit', 'credits'] as const,
   seeds: (slug: string) => ['games-kit', 'seeds', slug] as const,
   bets: (slug: string) => ['games-kit', 'bets', slug] as const,
-  betsPage: (slug: string, page: number, pageSize: number) =>
-    ['games-kit', 'bets', slug, page, pageSize] as const,
+  betsPage: (slug: string, page: number, pageSize: number, filters?: GameBetsFilters) =>
+    filters
+      ? (['games-kit', 'bets', slug, page, pageSize, filters] as const)
+      : (['games-kit', 'bets', slug, page, pageSize] as const),
   verify: (id: string) => ['games-kit', 'verify', id] as const,
 };
 
@@ -325,11 +348,16 @@ export function useSeeds(slug: string) {
   return useQuery({ queryKey: gameKeys.seeds(slug), queryFn: () => gamesApi.seeds(slug), enabled: member });
 }
 
-export function useGameBets<B = GameBetView>(slug: string, page = 1, pageSize = 20) {
+export function useGameBets<B = GameBetView>(
+  slug: string,
+  page = 1,
+  pageSize = 20,
+  filters?: GameBetsFilters,
+) {
   const member = useMember();
   return useQuery({
-    queryKey: gameKeys.betsPage(slug, page, pageSize),
-    queryFn: () => gamesApi.bets<B>(slug, page, pageSize),
+    queryKey: gameKeys.betsPage(slug, page, pageSize, filters),
+    queryFn: () => gamesApi.bets<B>(slug, page, pageSize, filters),
     enabled: member,
     placeholderData: keepPreviousData,
   });

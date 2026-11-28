@@ -7,6 +7,7 @@ import * as React from 'react';
 
 import { AgeBadge, CountBadge, StatusBadge } from '@/components/ui/badge';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { MQ, useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
@@ -240,7 +241,14 @@ export function SidebarNav({
 
 // ── promo tiles ────────────────────────────────────────────────────────────────────────────────
 
-export function SidebarPromoTiles({ poolAmount, demo }: { poolAmount: string; demo: boolean }) {
+/** `poolAmount` null = the live round is still loading (skeleton). */
+export function SidebarPromoTiles({
+  poolAmount,
+  demo,
+}: {
+  poolAmount: string | null;
+  demo: boolean;
+}) {
   return (
     <>
       <div className="grid grid-cols-[1fr_auto] gap-2 rail:hidden">
@@ -251,9 +259,13 @@ export function SidebarPromoTiles({ poolAmount, demo }: { poolAmount: string; de
           <span className="flex items-center gap-1 text-label-s">
             <CircleDollarSign aria-hidden className="size-3.5" /> Global Pool
           </span>
-          <span className="text-number-s font-semibold tabular-nums">
-            {formatUSDT(poolAmount, { symbol: false })}
-          </span>
+          {poolAmount === null ? (
+            <Skeleton className="h-5 w-20 bg-ink-950/15" />
+          ) : (
+            <span className="text-number-s font-semibold tabular-nums">
+              {formatUSDT(poolAmount, { symbol: false })}
+            </span>
+          )}
           <span className="flex items-center gap-1.5 text-caption">
             USDT
             {demo && (
@@ -273,7 +285,11 @@ export function SidebarPromoTiles({ poolAmount, demo }: { poolAmount: string; de
       </div>
       <div className="hidden flex-col items-center gap-2 rail:flex">
         <RailTooltip
-          label={`Global Pool — ${formatUSDT(poolAmount)}${demo ? ' (DEMO)' : ''}`}
+          label={
+            poolAmount === null
+              ? 'Global Pool'
+              : `Global Pool — ${formatUSDT(poolAmount)}${demo ? ' (DEMO)' : ''}`
+          }
           enabled
         >
           <Link
@@ -307,7 +323,7 @@ export interface SidebarProps {
   activeHref: string | null;
   counts?: SidebarCounts;
   /** Pool balance for the gold promo tile (decimal string). */
-  poolAmount: string;
+  poolAmount: string | null;
   demo?: boolean;
   /** Hide promo tiles (e.g. while self-excluded, decision #30). */
   hidePromos?: boolean;

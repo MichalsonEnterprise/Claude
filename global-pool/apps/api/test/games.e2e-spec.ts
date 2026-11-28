@@ -270,6 +270,73 @@ describe('instant games: bet → rotate → verify round trip', () => {
       details: { currency: 'DEMO', available: '4.20', required: '10.00', shortBy: '5.80' },
     });
   });
+
+  it('Double Side history filters (period, result, pick, ref / nonce search) drive the page AND the summary', async () => {
+    const p = await newPlayer(t);
+    const flips: { ref: string; win: boolean; pick: string; side: string; nonce: number }[] = [];
+    for (const pick of ['heads', 'tails', 'heads', 'heads', 'tails', 'tails']) {
+      const r = await post(p, '/games/double-side/bets', {
+        stake: '1.00',
+        params: { pick },
+        idempotencyKey: key(),
+      }).expect(201);
+      expect(r.body).toMatchObject({ currency: 'DEMO', fee: '0.00', outcome: { pick } });
+      flips.push({
+        ref: r.body.ref,
+        win: r.body.win,
+        pick,
+        side: r.body.outcome.side,
+        nonce: r.body.fairness.nonce,
+      });
+    }
+    const all = await get(p, '/games/double-side/bets?pageSize=100').expect(200);
+    const wins = flips.filter((f) => f.win).length;
+    const heads = flips.filter((f) => f.side === 'heads').length;
+    expect(all.body.summary).toMatchObject({
+      bets: 6,
+      wins,
+      losses: 6 - wins,
+      landed: { heads, tails: 6 - heads },
+    });
+    // every win pays 1.96× on a 1.00 stake → returned = 1.96 × wins
+    expect(all.body.summary.returned).toBe(money('1.96').times(wins).toFixed(2));
+
+    const won = await get(p, '/games/double-side/bets?result=win').expect(200);
+    expect(won.body.total).toBe(wins);
+    expect(won.body.items.every((b: { win: boolean }) => b.win)).toBe(true);
+    const lost = await get(p, '/games/double-side/bets?result=lose').expect(200);
+    expect(lost.body.summary).toMatchObject({ bets: 6 - wins, wins: 0, returned: '0.00' });
+
+    const pickedTails = await get(p, '/games/double-side/bets?pick=tails').expect(200);
+    expect(pickedTails.body.total).toBe(3);
+    expect(
+      pickedTails.body.items.every((b: { params: { pick: string } }) => b.params.pick === 'tails'),
+    ).toBe(true);
+
+    const byRef = await get(p, `/games/double-side/bets?search=${flips[2]!.ref}`).expect(200);
+    expect(byRef.body.items.map((b: { ref: string }) => b.ref)).toEqual([flips[2]!.ref]);
+    const byNonce = await get(p, '/games/double-side/bets?search=4').expect(200);
+    expect(byNonce.body.items.some((b: { fairness: { nonce: number } }) => b.fairness.nonce === 4)).toBe(
+      true,
+    );
+
+    const future = new Date(Date.now() + 3_600_000).toISOString();
+    const none = await get(p, `/games/double-side/bets?from=${encodeURIComponent(future)}`).expect(
+      200,
+    );
+    expect(none.body).toMatchObject({ total: 0, summary: { bets: 0, wagered: '0.00' } });
+    await get(p, '/games/double-side/bets?search=DROP%20TABLE').expect(400);
+    await get(p, '/games/double-side/bets?result=maybe').expect(400);
+
+    // REAL_MONEY_ENABLED=false: Double Side refuses any non-DEMO currency
+    const usdt = await post(p, '/games/double-side/bets', {
+      stake: '1.00',
+      currency: 'USDT',
+      params: { pick: 'heads' },
+      idempotencyKey: key(),
+    }).expect(403);
+    expect(usdt.body.error.code).toBe('REAL_MONEY_DISABLED');
+  });
 });
 
 describe('REAL_MONEY guard + responsible gaming', () => {

@@ -6,45 +6,17 @@
  * their own reason + 2FA → the restriction is active and the audit chain verifies.
  *
  *   E2E_BASE_URL=http://localhost:3106 E2E_API_URL=http://localhost:4106 pnpm --filter @gp/web test:e2e -- e2e/admin-a.spec.ts
+ *   (E2E_DATABASE_URL, default postgresql://postgres@127.0.0.1:5432/globalpool, must be the API's database: the
+ *   admin TOTP step is chosen after the step last consumed there.)
  */
-import { createHmac } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-
 import { expect, test, type Browser, type Page } from '@playwright/test';
 
+// The DEMO admins are shared by every agent / run and each TOTP step is accepted ONCE per admin: codes come from
+// adminCode(), which reads totp_secrets.last_used_step and picks the next unused step (never a replay → no
+// rejected code, no failed-login count, no lockout). Needs psql + E2E_DATABASE_URL = the API's database.
+import { admin, adminCode, type DemoAdmin } from './integration/_journey';
+
 const API = process.env.E2E_API_URL ?? 'http://localhost:4000';
-
-interface DemoAdmin {
-  name: string;
-  email: string;
-  password: string;
-  totpSecret: string;
-}
-const ADMINS = (
-  JSON.parse(
-    readFileSync(path.join(import.meta.dirname, '../../api/.dev/demo-admins.json'), 'utf8'),
-  ) as {
-    admins: DemoAdmin[];
-  }
-).admins;
-const admin = (prefix: string) => ADMINS.find((a) => a.email.startsWith(prefix))!;
-
-/** RFC 6238 TOTP (SHA-1, 6 digits, 30 s) at an absolute step. */
-function totpAt(secretBase32: string, step: number): string {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let bits = '';
-  for (const ch of secretBase32.replace(/[\s=]/g, '').toUpperCase())
-    bits += alphabet.indexOf(ch).toString(2).padStart(5, '0');
-  const key = Buffer.from(bits.match(/.{8}/g)!.map((b) => Number.parseInt(b, 2)));
-  const counter = Buffer.alloc(8);
-  counter.writeBigUInt64BE(BigInt(step));
-  const h = createHmac('sha1', key).update(counter).digest();
-  const o = h[h.length - 1]! & 0xf;
-  const n = ((h[o]! & 0x7f) << 24) | (h[o + 1]! << 16) | (h[o + 2]! << 8) | h[o + 3]!;
-  return String(n % 1_000_000).padStart(6, '0');
-}
-const timeStep = () => Math.floor(Date.now() / 30_000);
 
 /** Fresh onboarded DEMO player (DEV MOCK token). */
 async function newPlayer() {
@@ -76,19 +48,17 @@ async function newPlayer() {
   return { handle };
 }
 
-/** ADM-01 two-step sign-in through the UI. Returns the TOTP step that was consumed. */
-async function signIn(page: Page, a: DemoAdmin): Promise<number> {
+/** ADM-01 two-step sign-in through the UI with a never-used TOTP step. */
+async function signIn(page: Page, a: DemoAdmin): Promise<void> {
   await page.goto('/admin/login');
   await expect(page.getByRole('heading', { name: 'Sign in to the admin console' })).toBeVisible();
   await page.getByLabel('Work email').fill(a.email);
   await page.getByLabel('Password', { exact: true }).fill(a.password);
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Confirm it’s you' })).toBeVisible();
-  const step = timeStep();
-  await page.getByLabel('Authenticator code').fill(totpAt(a.totpSecret, step));
-  await expect(page).toHaveURL(/\/admin$/);
+  await page.getByLabel('Authenticator code').fill(await adminCode(a));
+  await expect(page).toHaveURL(/\/admin$/, { timeout: 30_000 });
   await expect(page.getByRole('heading', { name: 'Overview', level: 1 })).toBeVisible();
-  return step;
 }
 
 async function pickCategory(page: Page, category: string) {
@@ -115,7 +85,7 @@ test.describe('ADMIN — four-eyes restriction (ADM-01 → U1 → U2 → U8 → 
 
     // ── requester: K. Osei ──────────────────────────────────────────────────────────────────────
     const a = await newContext(browser);
-    const loginStep = await signIn(a.page, osei);
+    await signIn(a.page, osei);
     await expect(a.page.getByTestId('admin-signed-in')).toContainText('K. Osei');
 
     await a.page.getByRole('link', { name: 'User Management' }).click();
@@ -143,7 +113,7 @@ test.describe('ADMIN — four-eyes restriction (ADM-01 → U1 → U2 → U8 → 
     await dialog
       .getByLabel(/Reason \(required/)
       .fill('E2E: velocity alert under investigation, hold new withdrawals');
-    await dialog.getByLabel('Your 2FA code').fill(totpAt(osei.totpSecret, loginStep + 1));
+    await dialog.getByLabel('Your 2FA code').fill(await adminCode(osei));
     await shot(a.page, 'X1-U8_apply_ready_1440');
     await submit.click();
     await expect(dialog.getByRole('heading', { name: 'Request submitted' })).toBeVisible();
@@ -171,7 +141,7 @@ test.describe('ADMIN — four-eyes restriction (ADM-01 → U1 → U2 → U8 → 
 
     // ── second approver: S. Iyer ───────────────────────────────────────────────────────────────
     const b = await newContext(browser);
-    const step2 = await signIn(b.page, iyer);
+    await signIn(b.page, iyer);
     await b.page.goto('/admin/approvals?view=waiting_for_me');
     await b.page.getByRole('button', { name: new RegExp(`Open ${ref}`) }).click();
     const review = b.page.getByTestId('approval-review');
@@ -180,7 +150,7 @@ test.describe('ADMIN — four-eyes restriction (ADM-01 → U1 → U2 → U8 → 
     await review
       .getByLabel(/Your reason/)
       .fill('E2E: reviewed the alert evidence, hold is proportionate');
-    await review.getByLabel('Fresh 2FA code').fill(totpAt(iyer.totpSecret, step2 + 1));
+    await review.getByLabel('Fresh 2FA code').fill(await adminCode(iyer));
     await shot(b.page, 'X1_second-approver-ready_1440');
     await review.getByTestId('approve-request').click();
     await expect(review.getByRole('heading', { name: `${ref} approved` })).toBeVisible();

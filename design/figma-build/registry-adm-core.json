@@ -20,9 +20,30 @@
   "[ADM-X1] Re-authenticate — Fresh 2FA before approving / 1440 / Default": "180:143765",
   "[ADM-X1] Four-eyes — Second approver review / 1440 / Ready to approve": "180:144187",
   "[ADM-X1] Four-eyes — Approved / 1440 / Released": "180:144734",
-  "[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request": "180:145242"
+  "[ADM-X1] Four-eyes — Self-approval blocked / 1440 / Requester opens own request": "180:145242",
+  "[ADM-01] Session timeout — Warning / 1440 / 01:42 left": "221:191799",
+  "[ADM-02] Overview / 1440 / Restricted role — Support L2": "221:192192",
+  "Band — Laptop 1280": "in section 36:522944",
+  "[ADM-00] Admin shell — Approvals inbox / 1280 / Default": "222:125633",
+  "[ADM-01] Admin login — Sign in / 1280 / Default": "222:126124",
+  "[ADM-02] Overview / 1280 / Default": "222:126310",
+  "[ADM-X1] Four-eyes — Confirm with reason / 1280 / Ready": "222:127249",
+  "Band — Tablet 768": "in section 36:522944",
+  "[ADM-02] Overview / 768 / Default": "224:95574",
+  "[ADM-01] Admin login — Sign in / 768 / Default": "224:96327",
+  "[ADM-X1] Four-eyes — Confirm with reason / 768 / Ready": "224:96513",
+  "[ADM-00] Admin shell — Navigation drawer / 768 / Open": "224:159273",
+  "[ADM-00] Admin shell — Command palette / 768 / Results": "224:159747",
+  "[ADM-00] Admin shell — No permission / 768 / Support role opens Finance link": "224:160161",
+  "[ADM-02 · MOB-11] Overview / 390 / Default (page 10, section ADM — Mobile 173:71503)": "226:80653",
+  "[MOB-11] Alerts / 390 / Operations (page 10)": "226:81089",
+  "[MOB-11] Approvals queue / 390 / Open (page 10)": "227:142765",
+  "[ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet (page 10)": "227:143053",
+  "[ADM-02] Overview / 1280 / Restricted role — Support L2": "229:160132",
+  "[ADM-02] Overview / 768 / Restricted role — Support L2": "229:160932",
+  "[ADM-00] Admin shell — No permission / 1280 / Support role opens Finance link": "229:161520"
  },
  "pending": {
-  "pending/adm-core/RUN-ORDER.json": "04-laptop, 05-tablet, 06-tablet-shell, m-01-overview-alerts, m-02-approvals (see file)"
+  "none": "All RUN-ORDER scripts ran on 28 Nov 2026 (continuation run); slice complete."
  }
 }

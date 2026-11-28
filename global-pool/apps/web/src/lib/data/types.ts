@@ -24,7 +24,10 @@ export interface PoolSnapshot {
   serverNow: string;
   /** The open round, or null between rounds. */
   current: RoundView | null;
-  /** Most recent closed round (settled or cancelled). */
+  /**
+   * Most recent past round (closed, drawing, settled or cancelled) — its status drives the copy. Before any round
+   * has closed this is the current / scheduled round itself.
+   */
   last: RoundView;
   /** Next scheduled round (always present in the daily 08:00–20:00 UTC schedule). */
   next: { number: number; opensAt: string; closesAt: string };

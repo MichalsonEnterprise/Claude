@@ -19,6 +19,7 @@ import {
   shot,
   uniq,
   watch,
+  MOBILE,
   VIEWPORT,
 } from './_journey';
 
@@ -195,7 +196,8 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
         await expect(breakdown).toContainText('69.85 USDT');
         const consent = dialog.getByRole('checkbox', { name: /entries are final/ });
         await expect(consent).not.toBeChecked();
-        const confirm = dialog.getByRole('button', { name: 'Confirm 3 entries · 30.15 USDT' });
+        // desktop "Confirm 3 entries · 30.15 USDT" · mobile sheet "Confirm · 30.15 USDT"
+        const confirm = dialog.getByRole('button', { name: /^Confirm (3 entries )?· 30\.15 USDT$/ });
         await expect(confirm).toBeDisabled();
         await consent.click();
         await shot(page, J, '06_participate_preview');
@@ -219,9 +221,9 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
         await page.goto('/wallet');
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 60_000 });
         const main = page.locator('main');
-        await expect(main.getByText('69.85').first()).toBeVisible();
-        await expect(main.getByText('30.00').first()).toBeVisible();
-        await expect(main.getByText('99.85').first()).toBeVisible();
+        await expect(main.getByText('69.85').filter({ visible: true }).first()).toBeVisible();
+        await expect(main.getByText('30.00').filter({ visible: true }).first()).toBeVisible();
+        await expect(main.getByText('99.85').filter({ visible: true }).first()).toBeVisible();
         await shot(page, J, '07_wallet');
       });
 
@@ -244,15 +246,18 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
 
         await page.goto('/history/transactions');
         await expect(page.getByRole('heading', { name: 'Transaction history', level: 1 })).toBeVisible();
-        await expect(page.getByText('Entries 30.00 + fee 0.15').first()).toBeVisible();
+        // table ≥ 1024, cards below — assert on whatever is visible
+        await expect(page.getByText('Entries 30.00 + fee 0.15').filter({ visible: true }).first()).toBeVisible();
         await shot(page, J, '08_history_transactions');
         await page.goto('/history/fees');
-        await expect(page.locator('main').getByText('0.15').first()).toBeVisible();
+        await expect(page.getByText('Platform fee · 3 × 0.05', { exact: false }).filter({ visible: true }).first()).toBeVisible();
+        await expect(page.locator('main').getByText('−0.15').filter({ visible: true }).first()).toBeVisible();
         await shot(page, J, '08_history_fees');
         await page.goto('/pool/entries');
-        const table = page.getByRole('table', { name: /Your entry purchases/ });
-        await expect(table).toContainText('3 entries');
-        await expect(table).toContainText('30.00 + 0.15 fee');
+        await expect(page.getByRole('heading', { level: 1, name: 'Entry history' })).toBeVisible();
+        const main = page.locator('main');
+        await expect(main.getByText(/3 entries/).filter({ visible: true }).first()).toBeVisible();
+        await expect(main.getByText(/30\.00 \+ 0\.15 fee/).filter({ visible: true }).first()).toBeVisible();
         await shot(page, J, '08_pool_entries');
       });
 
@@ -260,9 +265,13 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
       await test.step('dashboard + lobby reflect THIS player (KYC + deposit + entries)', async () => {
         await page.goto('/dashboard');
         await expect(page.locator('main')).toBeVisible();
-        await expect
-          .soft(page.getByText('3 of 4 complete'), 'checklist: email + KYC + first deposit done, 2FA open')
-          .toBeVisible({ timeout: 20_000 });
+        // After the first deposit the dashboard switches from the checklist to the Active state with ledger balances.
+        const main = page.locator('main');
+        await expect(main.getByText('69.85').filter({ visible: true }).first()).toBeVisible({ timeout: 30_000 });
+        await expect(main.getByText('99.85').filter({ visible: true }).first()).toBeVisible();
+        // lifetime card (desktop dashboard; the < 768 compact breakdown does not render it)
+        if (!MOBILE)
+          await expect(main.getByText('0.15 USDT platform fees paid (3 × 0.05)').filter({ visible: true }).first()).toBeVisible();
         await shot(page, J, '09_dashboard_after');
         await page.goto('/');
         await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible({ timeout: 60_000 });

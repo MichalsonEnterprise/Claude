@@ -278,7 +278,7 @@ export function MyGames() {
               <EmptyCard
                 title="No games played in the last 30 days"
                 description="Originals and table games you play appear here."
-                actions={<LinkButton href="/originals">Browse Originals</LinkButton>}
+                actions={<LinkButton href="/games?category=originals">Browse Originals</LinkButton>}
               />
             )}
             <SimulationNote />
@@ -944,7 +944,7 @@ export function GameHistory() {
             title="No game rounds yet"
             description="Rounds you play in Originals and table games appear here with their seeds."
             icon={<Gamepad2 aria-hidden />}
-            actions={<LinkButton href="/originals">Browse Originals</LinkButton>}
+            actions={<LinkButton href="/games?category=originals">Browse Originals</LinkButton>}
           />
         ) : (
           <>

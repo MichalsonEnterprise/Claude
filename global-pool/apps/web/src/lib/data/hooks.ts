@@ -28,8 +28,8 @@ export const usePoolSnapshot = (s: HomeScenario) => useQuery(poolSnapshotQuery(s
 export const usePoolHistory = (s: HomeScenario) => useQuery(poolHistoryQuery(s));
 export const useEntriesFeed = (roundNumber: number, enabled = true) =>
   useQuery({ ...entriesFeedQuery(roundNumber), enabled });
-export const useMyEntries = (roundNumber: number, enabled: boolean) =>
-  useQuery({ ...myEntriesQuery(roundNumber), enabled });
+export const useMyEntries = (roundNumber: number, enabled: boolean, roundId?: string) =>
+  useQuery({ ...myEntriesQuery(roundNumber, roundId), enabled });
 export const useViewerBalance = (enabled: boolean) =>
   useQuery({ ...viewerBalanceQuery(), enabled });
 export const useGames = () => useQuery(gamesQuery());

@@ -17,7 +17,7 @@ interface FooterColumn {
   links: { label: string; href: string }[];
 }
 
-const COLUMNS: FooterColumn[] = [
+export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: 'Games',
     links: [
@@ -26,20 +26,20 @@ const COLUMNS: FooterColumn[] = [
       { label: 'Double Side', href: ROUTES.game('double-side') },
       { label: 'Pool Roulette', href: ROUTES.game('pool-roulette') },
       { label: 'Twenty-One', href: ROUTES.game('twenty-one') },
-      { label: 'Slots', href: `${ROUTES.casino}/slots` },
-      { label: 'Live casino', href: `${ROUTES.casino}/live` },
-      { label: 'All games', href: ROUTES.casino },
+      { label: 'Slots', href: ROUTES.category('slots') },
+      { label: 'Live casino', href: ROUTES.category('live') },
+      { label: 'All games', href: ROUTES.games },
     ],
   },
   {
     title: 'Global Pool',
     links: [
       { label: 'Current round', href: ROUTES.pool },
-      { label: 'How it works', href: `${ROUTES.pool}/how-it-works` },
-      { label: 'Past rounds', href: `${ROUTES.pool}/rounds` },
+      { label: 'How it works', href: '/#how-it-works' },
+      { label: 'Past rounds', href: `${ROUTES.pool}/history` },
       { label: 'Winners', href: ROUTES.winners },
       { label: 'Draw verification (VRF)', href: ROUTES.provablyFair },
-      { label: 'Refunds', href: `${ROUTES.pool}/refunds` },
+      { label: 'Refunds', href: '/history/refunds' },
     ],
   },
   {
@@ -67,7 +67,7 @@ const COLUMNS: FooterColumn[] = [
     title: 'About us',
     links: [
       { label: 'About GLOBAL POOL', href: '/about' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Contact', href: '/support#contact' },
       { label: 'Official channels', href: '/official-channels' },
       { label: 'Status page', href: '/status' },
     ],
@@ -230,7 +230,7 @@ export function FooterMega({ className }: { className?: string }) {
         </section>
 
         <div className="grid border-t border-border-subtle pt-8 tablet:grid-cols-3 tablet:gap-8 laptop:grid-cols-6 laptop:gap-x-0">
-          {COLUMNS.map((col) => (
+          {FOOTER_COLUMNS.map((col) => (
             <LinkColumn key={col.title} col={col} />
           ))}
           <div className="mt-6 flex flex-col gap-3 tablet:mt-0">

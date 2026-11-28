@@ -65,6 +65,7 @@ export function GameHeader({
   category = 'GLOBAL POOL Originals',
   onFairness,
   aside,
+  chips,
 }: {
   slug: string;
   title: string;
@@ -73,6 +74,8 @@ export function GameHeader({
   category?: string;
   onFairness?: () => void;
   aside?: React.ReactNode;
+  /** Extra game-specific chips after "House edge" (e.g. "Payout 1.96×", bet limits). */
+  chips?: React.ReactNode;
 }) {
   const info = fairGame(slug);
   return (
@@ -108,8 +111,9 @@ export function GameHeader({
             <KitChip icon={Percent}>House edge {info.houseEdgePercent}%</KitChip>
           )}
         </div>
+        {chips && <div className="flex flex-wrap items-center gap-2">{chips}</div>}
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 laptop:shrink-0 laptop:flex-nowrap">
         {aside}
         <FavouriteButton slug={slug} name={title} />
         <IconButton variant="secondary" label="My bets" asChild className="size-11 tablet:size-10 laptop:hidden">
@@ -167,6 +171,17 @@ export interface GameLayoutProps {
   children?: React.ReactNode;
   /** Open the seeds dialog from the header "Provably fair" action. */
   onFairness?: () => void;
+  /**
+   * `split` (default): [bet panel 340 | stage] side by side ≥ 1024. `stacked`: one card, the stage on top and the bet
+   * panel as a full-width bar under it (CF Double Side frames).
+   */
+  arrangement?: 'split' | 'stacked';
+  /** Where the GM-01 session bar sits on ≥ 768: under the game card (default) or above it (CF frames). */
+  sessionBarPosition?: 'above' | 'below';
+  /** Render the DEMO credits chip at the top of the panel (default true). Set false when the panel shows its own. */
+  panelCredits?: boolean;
+  /** Extra header chips (see {@link GameHeader}). */
+  headerChips?: React.ReactNode;
 }
 
 /**
@@ -189,13 +204,34 @@ export function GameLayout({
   aside,
   children,
   onFairness,
+  arrangement = 'split',
+  sessionBarPosition = 'below',
+  panelCredits = true,
+  headerChips,
 }: GameLayoutProps) {
   const kind = notice?.kind ?? noticeKindOf(gate.gate);
   const blocked = kind !== null && kind !== 'reconnecting';
+  const stacked = arrangement === 'stacked';
+  const desktopSessionBar =
+    gate.gate !== 'guest' ? (
+      <GameSessionBar
+        data={gate.credits}
+        lossLimit={gate.lossLimit}
+        loading={gate.gate === 'loading'}
+        className="hidden tablet:flex"
+      />
+    ) : null;
   return (
     <div className={cn('flex flex-col gap-5 tablet:gap-6', mobileBar && 'pb-36 tablet:pb-0')}>
       <ShellOverride collapseSidebar restricted={gate.gate === 'region'} />
-      <GameHeader slug={slug} title={title} mechanic={mechanic} icon={icon} onFairness={onFairness} />
+      <GameHeader
+        slug={slug}
+        title={title}
+        mechanic={mechanic}
+        icon={icon}
+        onFairness={onFairness}
+        chips={headerChips}
+      />
       {gate.gate !== 'guest' && (
         <DemoCreditsChip data={gate.credits} loading={gate.gate === 'loading'} disabled={busy} compact className="tablet:hidden" />
       )}
@@ -208,15 +244,25 @@ export function GameLayout({
         />
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-0 lg:overflow-hidden lg:rounded-xl lg:border lg:border-border-subtle lg:bg-bg-secondary">
+      {sessionBarPosition === 'above' && desktopSessionBar}
+
+      <div
+        className={cn(
+          stacked
+            ? 'flex flex-col gap-4 tablet:gap-6 tablet:rounded-xl tablet:border tablet:border-border-subtle tablet:bg-surface-default tablet:p-6 laptop:p-8'
+            : 'grid gap-4 lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-0 lg:overflow-hidden lg:rounded-xl lg:border lg:border-border-subtle lg:bg-bg-secondary',
+        )}
+      >
         <div
           className={cn(
-            'order-2 flex flex-col gap-5 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-5 lg:order-1 lg:rounded-none lg:border-0 lg:border-r',
+            stacked
+              ? 'order-2 flex min-w-0 flex-col gap-5 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:bg-bg-secondary tablet:p-5 laptop:p-6'
+              : 'order-2 flex flex-col gap-5 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-5 lg:order-1 lg:rounded-none lg:border-0 lg:border-r',
             blocked && 'opacity-60',
           )}
           inert={blocked || undefined}
         >
-          {gate.gate !== 'guest' && (
+          {panelCredits && gate.gate !== 'guest' && (
             <DemoCreditsChip
               data={gate.credits}
               loading={gate.gate === 'loading'}
@@ -227,7 +273,13 @@ export function GameLayout({
           )}
           {panel}
         </div>
-        <div className={cn('relative order-1 min-w-0 lg:order-2 lg:p-6', kind && 'min-h-[460px]')}>
+        <div
+          className={cn(
+            'relative order-1 min-w-0',
+            !stacked && 'lg:order-2 lg:p-6',
+            kind && 'min-h-[460px]',
+          )}
+        >
           <div className={cn('h-full', kind && 'opacity-25')} inert={kind ? true : undefined} aria-hidden={kind ? true : undefined}>
             {stage}
           </div>
@@ -247,14 +299,7 @@ export function GameLayout({
         </div>
       </div>
 
-      {gate.gate !== 'guest' && (
-        <GameSessionBar
-          data={gate.credits}
-          lossLimit={gate.lossLimit}
-          loading={gate.gate === 'loading'}
-          className="hidden tablet:flex"
-        />
-      )}
+      {sessionBarPosition === 'below' && desktopSessionBar}
 
       {(below ?? aside) && (
         <div className="grid gap-5 laptop:grid-cols-[minmax(0,1fr)_400px] tablet:gap-6">

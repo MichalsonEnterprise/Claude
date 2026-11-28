@@ -180,7 +180,7 @@ function SupportCards() {
             </Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="/contact">Email us</Link>
+            <Link href="/support#contact">Email us</Link>
           </Button>
         </div>
       </article>

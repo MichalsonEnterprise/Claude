@@ -1,13 +1,19 @@
 'use client';
 
 import { DEMO_BALANCES, DEMO_CURRENT_ROUND, DEMO_MY_ENTRIES, DEMO_USER } from '@gp/shared/demo';
+import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { DemoBar } from '@/components/ui/demo-badge';
+import { accountApi, accountKeys } from '@/lib/api/account';
+import { getCurrentRound, getMyRoundEntries } from '@/lib/api/pool';
+import { walletApi, walletKeys } from '@/lib/api/wallet';
 import { useAuth } from '@/lib/auth';
+import { DATA_SOURCE } from '@/lib/data/source';
 import { publicEnv } from '@/lib/env';
 import { MQ } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
@@ -22,7 +28,10 @@ import { Topbar } from './topbar';
 
 const SIDEBAR_PREF_KEY = 'gp.sidebar';
 
-/** DEMO member data for the shell until the API profile/balance endpoints exist. */
+/**
+ * DEMO member chrome: the dev `?state=member` preview and the mock data source (NEXT_PUBLIC_DATA_SOURCE ≠ api).
+ * With the API, signed-in members see their own balance, entries and unread notifications (`useLiveShell`).
+ */
 export const DEMO_SHELL_MEMBER: ShellMember = {
   handle: DEMO_USER.displayHandle,
   initials: 'NK',
@@ -43,8 +52,11 @@ export interface AppShellFrameProps {
   onSignOut: () => void;
   wrongNetwork?: boolean;
   restricted?: boolean;
+  /** Country named in the region banner (from the page's region check); omitted → no country is named. */
+  regionName?: string | null;
   demoBar?: boolean;
-  poolAmount?: string;
+  /** null = the live round is still loading. */
+  poolAmount?: string | null;
   /** Game pages: start with the 72 px rail (≥ 1024); the burger expands it for this visit only. */
   collapseSidebar?: boolean;
   children: React.ReactNode;
@@ -64,6 +76,7 @@ export function AppShellFrame({
   onSignOut,
   wrongNetwork = false,
   restricted = false,
+  regionName = null,
   demoBar = publicEnv.demoMode,
   poolAmount = DEMO_CURRENT_ROUND.poolBalance ?? '0.00',
   collapseSidebar = false,
@@ -137,13 +150,13 @@ export function AppShellFrame({
                 <a href={ROUTES.wallet}>Withdraw funds</a>
               </Button>
               <Button size="s" variant="ghost" asChild>
-                <a href="/legal/restricted-countries">Restricted countries</a>
+                <Link href="/legal/restricted-countries">Restricted countries</Link>
               </Button>
             </>
           }
         >
-          GLOBAL POOL games are not available in your region (United States). You can still view
-          your account and withdraw funds.
+          GLOBAL POOL games are not available in your region{regionName ? ` (${regionName})` : ''}.
+          You can still view your account and withdraw funds.
         </Alert>
       )}
       <div className="flex flex-1">
@@ -230,6 +243,53 @@ export function AppShell({
   );
 }
 
+/** Same query keys as the pool module (`poolKeys.current()` / `poolKeys.myRound(id)`), so caches are shared. */
+export const SHELL_POOL_KEYS = {
+  current: () => ['pool', 'round', 'current'] as const,
+  myRound: (roundId: string) => ['pool', 'me', 'round', roundId] as const,
+};
+const UNREAD_QUERY = { page: 1, pageSize: 1, unread: true };
+
+/**
+ * The signed-in member's own shell data in API mode — Available (GET /wallet/balances, shared with the wallet
+ * pages), entries in the open round, unread notifications — and the live pool amount for everyone. Keys are the
+ * modules' own, so every financial write that refreshes them (player-cache.ts) refreshes the shell too.
+ */
+function useLiveShell(member: boolean) {
+  const api = DATA_SOURCE === 'api';
+  const live = api && member;
+  const round = useQuery({
+    queryKey: SHELL_POOL_KEYS.current(),
+    queryFn: getCurrentRound,
+    enabled: api,
+    staleTime: 30_000,
+  });
+  const open = round.data?.status === 'open' ? round.data : null;
+  const balances = useQuery({
+    queryKey: walletKeys.balances(),
+    queryFn: ({ signal }) => walletApi.balances(signal),
+    enabled: live,
+  });
+  const mine = useQuery({
+    queryKey: SHELL_POOL_KEYS.myRound(open?.id ?? 'none'),
+    queryFn: () => getMyRoundEntries(open!),
+    enabled: live && Boolean(open),
+  });
+  const unread = useQuery({
+    queryKey: accountKeys.notifications(UNREAD_QUERY),
+    queryFn: ({ signal }) => accountApi.notifications(UNREAD_QUERY, signal),
+    enabled: live,
+    staleTime: 60_000,
+  });
+  return {
+    api,
+    poolAmount: api ? (round.data ? (round.data.poolBalance ?? '0.00') : null) : undefined,
+    available: balances.data?.available ?? null,
+    activeEntries: open ? (mine.data?.entries ?? 0) : 0,
+    notifications: unread.data?.unread ?? 0,
+  };
+}
+
 function ConnectedShell({
   children,
   wrongNetwork,
@@ -242,17 +302,28 @@ function ConnectedShell({
   const auth = useAuth();
   const pathname = usePathname();
   const overrides = useShellOverrides();
-  // Until the API profile/balance endpoints exist, members see the DEMO profile (with DEMO markers).
   const user = auth.status === 'member' ? auth.user : null;
   const signedIn = Boolean(user);
+  const live = useLiveShell(signedIn && !overrides.previewGuest);
+  // API mode: the member's real data. Mock data source: the DEMO profile (with DEMO markers), like every mock view.
   const member: ShellMember | null = overrides.previewGuest
     ? null
     : user
-      ? {
-          ...DEMO_SHELL_MEMBER,
-          handle: user.handle ?? DEMO_SHELL_MEMBER.handle,
-          initials: user.isDemo ? DEMO_SHELL_MEMBER.initials : user.initials,
-        }
+      ? live.api
+        ? {
+            handle: user.handle ?? 'Player',
+            initials: user.initials,
+            publicId: auth.profile?.publicId,
+            available: live.available,
+            notifications: live.notifications,
+            activeEntries: live.activeEntries,
+            demo: publicEnv.demoMode,
+          }
+        : {
+            ...DEMO_SHELL_MEMBER,
+            handle: user.handle ?? DEMO_SHELL_MEMBER.handle,
+            initials: user.isDemo ? DEMO_SHELL_MEMBER.initials : user.initials,
+          }
       : overrides.previewMember
         ? DEMO_SHELL_MEMBER
         : null;
@@ -271,6 +342,8 @@ function ConnectedShell({
       onSignOut={() => void auth.signOut()}
       wrongNetwork={wrongNetwork}
       restricted={restricted ?? overrides.restricted}
+      regionName={overrides.regionName}
+      poolAmount={live.poolAmount}
       collapseSidebar={overrides.collapseSidebar}
     >
       {children}

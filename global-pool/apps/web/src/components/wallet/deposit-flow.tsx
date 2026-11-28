@@ -49,6 +49,7 @@ import {
   walletKeys,
   type DepositView,
 } from '@/lib/api/wallet';
+import { useInvalidatePlayerFinancials } from '@/lib/api/player-cache';
 import { publicEnv } from '@/lib/env';
 import { statePreviewEnabled } from '@/lib/home-preview';
 import { cn } from '@/lib/utils';
@@ -70,6 +71,7 @@ import {
   ConfirmationBar,
   ConfirmationRing,
   KeyValueList,
+  QueryError,
   SectionTitle,
   WALLET_ROUTES,
   chainName,
@@ -191,10 +193,15 @@ export function DepositFlow() {
 
   const deposit = useDeposit(ref);
   const failed = deposit.data?.status === 'rejected';
-  // Auto-advance once the deposit is credited (pending → confirmation).
+  const refreshFinancials = useInvalidatePlayerFinancials();
+  // Auto-advance once the deposit is credited (pending → confirmation). The credit (chain watcher or DEMO control)
+  // moved Pending → Available on the server, so every cached balance is refreshed — not only on the DEMO paths.
   React.useEffect(() => {
-    if (step === 'pending' && deposit.data?.status === 'credited') go('confirmation');
-  }, [deposit.data?.status, go, step]);
+    if (step === 'pending' && deposit.data?.status === 'credited') {
+      void refreshFinancials();
+      go('confirmation');
+    }
+  }, [deposit.data?.status, go, step, refreshFinancials]);
 
   const context =
     ref && deposit.data
@@ -255,7 +262,11 @@ export function DepositFlow() {
         />
       )}
       {step === 'confirmation' && ref && (
-        <ConfirmationStep deposit={deposit.data} onNext={() => go('done')} />
+        <ConfirmationStep
+          deposit={deposit.data}
+          creditSeenAt={deposit.dataUpdatedAt}
+          onNext={() => go('done')}
+        />
       )}
       {step === 'done' && ref && (
         <DoneStep deposit={deposit.data} onNew={() => go('network', { ref: null })} />
@@ -1105,16 +1116,43 @@ function FailedDeposit({ deposit, onNew }: { deposit: DepositView; onNew: () => 
 
 // ── step 6 · confirmation (WAL-08) ─────────────────────────────────────────────────────────────
 
+/**
+ * Do the cached balances already include a credited deposit? Only a balances response fetched after the deposit was
+ * seen as credited (both client-clock times, so server clock skew does not matter) can be shown as "After".
+ */
+export function balancesIncludeCredit(
+  credited: boolean,
+  balancesUpdatedAt: number,
+  creditSeenAt: number,
+): boolean {
+  return !credited || (balancesUpdatedAt > 0 && balancesUpdatedAt >= creditSeenAt);
+}
+
 function ConfirmationStep({
   deposit,
+  creditSeenAt,
   onNext,
 }: {
   deposit: DepositView | undefined;
+  /** When the deposit query last returned (client clock) — balances older than this predate the credit. */
+  creditSeenAt: number;
   onNext: () => void;
 }) {
   const balances = useBalances();
   const round = useCurrentRound();
-  if (!deposit || !balances.data) {
+  const fresh = balancesIncludeCredit(
+    deposit?.status === 'credited',
+    balances.dataUpdatedAt,
+    creditSeenAt,
+  );
+  const { isFetching, refetch } = balances;
+  React.useEffect(() => {
+    if (!fresh && !isFetching) void refetch();
+  }, [fresh, isFetching, refetch]);
+  if (!fresh && balances.isError) {
+    return <QueryError error={balances.error} onRetry={() => void balances.refetch()} />;
+  }
+  if (!deposit || !balances.data || !fresh) {
     return <Skeleton className="h-64 w-full" />;
   }
   const b = balances.data;

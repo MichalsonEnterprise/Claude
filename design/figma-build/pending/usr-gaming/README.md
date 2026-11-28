@@ -1,14 +1,17 @@
-# pending/usr-gaming — USR-G1..G7 Gaming (continuation run, 28 Nov 2026)
+# pending/usr-gaming — USR-G1..G7 Gaming (continuation runs, 28 Nov 2026)
 
-State after the continuation run:
-- Desktop 1440 (page 05, section `USR-G1..G7 Gaming` 32:97624): all 14 frames already existed (built by the first run) — nothing rebuilt.
-- Mobile 390 (page 10, section `USR — Mobile B` 34:432314): the first run had 8 frames. This run added 5:
-  - `[USR-G1] My Games / 390 / Default` 149:124836  (script out/01_g1_mobile.js — DONE)
-  - `[USR-G7] Favourites / 390 / Default` 151:63647 + `/ Empty` 151:64719  (out/02 — DONE)
-  - `[USR-G2] My Entries / 390 / Filters` 152:64961 + `[USR-G6] Game History / 390 / Export` 152:65321  (out/03 — DONE)
-- out/04_fix_g6_export_filename.js = optional cosmetic fix (export filename wraps after "game-"). Run it if it is not yet applied
-  (check: in 152:65321 the 'File preview' row still has a Badge/DEMO instance as its last child).
+STATE: COMPLETE — all frames exist and were screenshot-verified in the 2nd continuation run. Nothing left to run.
+- Desktop 1440 (page 05, section `USR-G1..G7 Gaming` 32:97624): 14 frames (G1 D; G2 D/Empty/Filters; G3 Live/Empty; G4 D; G5 Owed/Settled; G6 D/Filters/Export; G7 D/Empty).
+- Mobile 390 (page 10, section `USR — Mobile B` 34:432314): 15 frames (G1 D; G2 D/Empty/Filters; G3 Live/Empty; G4 D; G5 Owed/Settled; G6 D/Export/Filters; G7 D/Empty).
 
-Scripts are idempotent: each frame is removed by name before being rebuilt. Sources: src/kit.js + src/m_*.js, assembled with
-`python3 src/build.py` (helpers.js is prepended verbatim). Do NOT re-run 01–03 unless the frames are missing (it would re-create them with new ids).
-Note: the first G1 build had 100 px-tall 'Spacer' frames; the kit's spacer() now has h:1 and the fix was applied in the 02/03 calls.
+Scripts in out/ (all already APPLIED — do NOT re-run unless the frames are missing):
+- 01–03 first continuation (G1 390, G7 390 D/E, G2 390 Filters + G6 390 Export) — idempotent (remove-by-name then rebuild; new ids).
+- 04 fix G6 390 Export filename — applied (also included in 07).
+- 05 reconcile desktop G2–G5 copy with demo-data (rounds #1,247/#1,246, #1,245 purchase time, VIP reward auto-settle 30 Nov, G4 proof cell).
+  NOT idempotent: it swaps two 'Recently settled' rows in G5 Settled — re-running would swap them back.
+- 06 desktop G5 timeline text wrap (idempotent).
+- 07 reconcile mobile G2–G5 copy + fix 04. NOT idempotent (row swap in G5 Settled).
+- 08 clean rebuild of `[USR-G6] Game History / 390 / Filters` (final compact version; idempotent, new id). Current frame: 229:241469.
+- 09 compaction of 229:241469 + G6 390 Default session-strip wrap (already reflected in src/m_g6f.js; the strip fix is idempotent).
+
+Sources: src/kit.js + src/m_*.js (mobile frames, assembled with helpers.js prepended — see build.py), src/edit_*.js / fix*_body.js (edits), src/audit.js (read-only clipping/off-canvas/placeholder audit used before screenshots).

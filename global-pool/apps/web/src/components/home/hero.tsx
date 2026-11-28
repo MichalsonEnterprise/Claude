@@ -31,6 +31,7 @@ import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { toast } from '@/components/ui/sonner';
 import { ROUTES } from '@/components/shell/nav-config';
+import type { RoundView } from '@/lib/data/types';
 import { cn } from '@/lib/utils';
 
 import {
@@ -169,8 +170,7 @@ function PoolSlide() {
         }
         meta={
           <>
-            Paid to {last.winners.length || 13} winners · Round{' '}
-            {formatRoundNumber(snapshot.next.number)} opens{' '}
+            {lastRoundCaption(last)} · Round {formatRoundNumber(snapshot.next.number)} opens{' '}
             <time dateTime={snapshot.next.opensAt}>{formatDateTimeUTC(snapshot.next.opensAt)}</time>
           </>
         }
@@ -261,6 +261,25 @@ function statusWord(status: string) {
   return status === 'cancelled' ? 'cancelled' : status === 'settled' ? 'settled' : status;
 }
 
+/** What happened to the last round, from its real status (never a refund claim for a round that was not cancelled). */
+export function lastRoundCaption(last: Pick<RoundView, 'status' | 'winners' | 'draw'>): string {
+  switch (last.status) {
+    case 'settled': {
+      const settledAt = last.draw?.settledAt ?? null;
+      return `Paid to ${last.winners.length} winners${settledAt ? ` · settled ${formatTimeUTC(settledAt)}` : ''}`;
+    }
+    case 'cancelled':
+      return 'Round cancelled — every entry refunded to Owed';
+    case 'drawing':
+      return 'Drawing winners with Chainlink VRF';
+    case 'closed':
+      return 'Entries closed — the draw starts shortly';
+    case 'open':
+    case 'scheduled':
+      return 'No round has been drawn yet';
+  }
+}
+
 function TournamentSlide() {
   return (
     <SlideBody
@@ -287,10 +306,10 @@ function TournamentSlide() {
       actions={
         <>
           <Button size="l" asChild>
-            <Link href={`${ROUTES.promotions}/orbit-rush-sprint`}>See leaderboard</Link>
+            <Link href={`${ROUTES.promotions}#other-promotions`}>See leaderboard</Link>
           </Button>
           <Button variant="ghost" size="l" asChild>
-            <Link href={`${ROUTES.promotions}/orbit-rush-sprint#rules`}>Rules</Link>
+            <Link href={`${ROUTES.promotions}#other-promotions`}>Rules</Link>
           </Button>
         </>
       }
@@ -319,7 +338,7 @@ function DailySlide() {
       meta="Day 1 0.50 · Day 4 1.50 · Day 7 5.00 USDT in bonus funds · resets 00:00 UTC"
       actions={
         <Button size="l" asChild>
-          <Link href={`${ROUTES.promotions}/daily-rewards`}>See rewards</Link>
+          <Link href={`${ROUTES.promotions}#other-promotions`}>See rewards</Link>
         </Button>
       }
       fine="Bonus funds · wagering applies · Global Pool contribution 0% · 18+ · Terms apply"
@@ -600,7 +619,7 @@ function PromoRow() {
           extra={<p className="mt-0.5 text-caption text-text-secondary">30× wagering · 14 days</p>}
           link={
             <span className="flex items-center gap-3">
-              <ArrowLink href={`${ROUTES.promotions}/welcome`}>Claim offer</ArrowLink>
+              <ArrowLink href={`${ROUTES.promotions}#welcome-offer`}>Claim offer</ArrowLink>
               <span className="text-caption text-text-tertiary">Terms apply</span>
             </span>
           }
@@ -653,7 +672,6 @@ function DrawCard() {
   if (!round) {
     const last = snapshot.last;
     const first = last.winners.find((w) => w.tier === 'first');
-    const settledAt = last.draw?.settledAt ?? null;
     return (
       <aside
         aria-label="Next draw"
@@ -667,11 +685,7 @@ function DrawCard() {
           demo={demo}
           className="min-w-0"
           label={`Round ${formatRoundNumber(last.number)} · ${statusWord(last.status)}`}
-          caption={
-            last.status === 'settled'
-              ? `Paid to ${last.winners.length} winners${settledAt ? ` · settled ${formatTimeUTC(settledAt)}` : ''}`
-              : 'Threshold not met — entries refunded to Owed'
-          }
+          caption={lastRoundCaption(last)}
         />
         <div className="flex flex-col gap-2">
           <p className="flex items-center gap-2 text-label-m text-text-secondary">

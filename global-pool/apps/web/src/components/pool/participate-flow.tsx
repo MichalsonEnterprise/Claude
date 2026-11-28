@@ -50,14 +50,16 @@ import {
   SheetFooter,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
 import { InfoTooltip } from '@/components/ui/tooltip';
-import { ApiRequestError, newIdempotencyKey } from '@/lib/api/client';
+import { ApiRequestError, isOutcomeUnknown, newIdempotencyKey } from '@/lib/api/client';
 import {
   enterRound,
   type EntryPurchaseResult,
   type PoolRoundView,
   type RgLimitView,
 } from '@/lib/api/pool';
+import { invalidatePlayerFinancials } from '@/lib/api/player-cache';
 import { MQ, useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 
@@ -84,7 +86,16 @@ type Phase =
       limitsBefore: RgLimitView[] | null;
     }
   | { kind: 'closed'; entries: number }
-  | { kind: 'error'; entries: number; error: unknown };
+  /** `unknown`: no definite answer (network drop, 5xx, still processing) — the purchase may have gone through. */
+  | { kind: 'error'; entries: number; error: unknown; unknown: boolean };
+
+/** One purchase intent: its idempotency key is reused on every retry of the same intent. */
+interface Intent {
+  entries: number;
+  key: string;
+  /** Set while the last attempt has no definite answer: the intent is locked until one arrives. */
+  unknownError?: unknown;
+}
 
 export interface ParticipateFlowProps {
   open: boolean;
@@ -94,6 +105,12 @@ export interface ParticipateFlowProps {
   myEntries: number;
   available: string | null;
   limits: RgLimitView[] | null;
+  /**
+   * State of the RG limits query behind `limits` (default 'ready'). While 'loading' / 'error' the modal never claims
+   * "No participation limit set" and Confirm stays disabled (limits are enforced server-side either way).
+   */
+  limitsStatus?: 'loading' | 'error' | 'ready';
+  onRetryLimits?: () => void;
   /** Wallet on the wrong network (GP-02 state). Entries are paid from the platform balance, so this only blocks. */
   wrongNetwork?: boolean;
   initialEntries?: number;
@@ -102,33 +119,56 @@ export interface ParticipateFlowProps {
 /**
  * GP-02 participation preview → GP-03 pending → GP-04 receipt (desktop dialog, mobile bottom sheet), plus the
  * GP-13 "round closed before your entries were placed" outcome. One idempotency key per intent (entries count),
- * reused on retry; the API enforces balance, round window and RG limits in one DB transaction.
+ * reused on retry; the API enforces balance, round window and RG limits in one DB transaction. When an attempt gets
+ * no definite answer the outcome is unknown: the modal says so (never "nothing was charged"), locks the entries
+ * count and retries with the same key, so the purchase can never be booked twice.
  */
 export function ParticipateFlow(props: ParticipateFlowProps) {
   const { open, onOpenChange, round } = props;
   const desktop = useMediaQuery(MQ.tablet, true);
   const qc = useQueryClient();
   const [phase, setPhase] = React.useState<Phase>({ kind: 'preview' });
-  const intent = React.useRef<{ entries: number; key: string } | null>(null);
+  const intent = React.useRef<Intent | null>(null);
 
   React.useEffect(() => {
-    if (open) setPhase({ kind: 'preview' });
+    if (!open) return;
+    // Re-opening after an unanswered attempt shows that attempt again (same entries, same key) — not a fresh form.
+    const pending = intent.current;
+    setPhase(
+      pending?.unknownError !== undefined
+        ? { kind: 'error', entries: pending.entries, error: pending.unknownError, unknown: true }
+        : { kind: 'preview' },
+    );
   }, [open]);
 
-  const submit = async (entries: number) => {
+  const refreshAfterWrite = () => {
+    void qc.invalidateQueries({ queryKey: ['pool'] });
+    // other modules' views of the same balances / limits / history
+    void invalidatePlayerFinancials(qc);
+  };
+
+  const submit = async (requested: number) => {
+    // An unanswered attempt is retried as the SAME intent (entries + key) until a definite answer arrives.
+    const entries = intent.current?.unknownError !== undefined ? intent.current.entries : requested;
     if (!intent.current || intent.current.entries !== entries)
       intent.current = { entries, key: newIdempotencyKey() };
+    const attempt = { entries, key: intent.current.key };
     setPhase({ kind: 'pending', entries });
     const before = { myEntriesBefore: props.myEntries, limitsBefore: props.limits };
     try {
-      const result = await enterRound(round.id, entries, intent.current.key);
+      const result = await enterRound(round.id, entries, attempt.key);
       intent.current = null;
       setPhase({ kind: 'success', result, ...before });
-      void qc.invalidateQueries({ queryKey: ['pool'] });
-      // other modules' views of the same balances / history
-      void qc.invalidateQueries({ queryKey: ['wallet'] });
-      void qc.invalidateQueries({ queryKey: ['me'] });
+      refreshAfterWrite();
     } catch (err) {
+      if (isOutcomeUnknown(err)) {
+        intent.current = { ...attempt, unknownError: err ?? new Error('No response') };
+        setPhase({ kind: 'error', entries, error: err, unknown: true });
+        refreshAfterWrite();
+        return;
+      }
+      // A definite answer: the intent is no longer locked (same key is still reused for the same count).
+      intent.current = attempt;
       const code = err instanceof ApiRequestError ? err.code : null;
       if (code === 'ROUND_NOT_OPEN') {
         intent.current = null;
@@ -138,9 +178,9 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
       }
       if (code === 'INSUFFICIENT_FUNDS' || code === 'RG_LIMIT_EXCEEDED') {
         intent.current = null;
-        void qc.invalidateQueries({ queryKey: ['pool', 'me'] });
+        void invalidatePlayerFinancials(qc);
       }
-      setPhase({ kind: 'error', entries, error: err });
+      setPhase({ kind: 'error', entries, error: err, unknown: false });
     }
   };
 
@@ -165,6 +205,7 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
         <PreviewStep
           {...props}
           error={phase.kind === 'error' ? phase.error : null}
+          unknownOutcome={phase.kind === 'error' && phase.unknown}
           defaultEntries={phase.kind === 'error' ? phase.entries : (props.initialEntries ?? 1)}
           onCancel={() => onOpenChange(false)}
           onSubmit={submit}
@@ -264,15 +305,20 @@ function PreviewStep({
   myEntries,
   available,
   limits,
+  limitsStatus = 'ready',
+  onRetryLimits,
   wrongNetwork,
   defaultEntries,
   error,
+  unknownOutcome,
   onCancel,
   onSubmit,
   desktop,
 }: ParticipateFlowProps & {
   defaultEntries: number;
   error: unknown;
+  /** The last attempt got no definite answer: entries are locked to that attempt and Confirm retries it. */
+  unknownOutcome: boolean;
   onCancel: () => void;
   onSubmit: (entries: number) => Promise<void>;
   desktop: boolean;
@@ -292,7 +338,12 @@ function PreviewStep({
   const odds = oddsAfter(round, myEntries, entries);
   const serverCode = error instanceof ApiRequestError ? error.code : null;
   const blocked =
-    check.insufficient || check.limitReached || Boolean(wrongNetwork) || !form.formState.isValid;
+    check.insufficient ||
+    check.limitReached ||
+    limitsStatus !== 'ready' ||
+    Boolean(wrongNetwork) ||
+    !form.formState.isValid;
+  const entryWord = (n: number) => (n === 1 ? 'entry' : 'entries');
 
   const Body = desktop ? DialogBody : SheetBody;
   const Footer = desktop ? DialogFooter : SheetFooter;
@@ -314,7 +365,26 @@ function PreviewStep({
             your platform balance — there is no on-chain payment from your wallet.
           </Callout>
         )}
+        {unknownOutcome && (
+          <Callout tone="warning" icon={<TriangleAlert />} title="We couldn’t confirm your entries">
+            <p>
+              The connection dropped before GLOBAL POOL answered, so your {formatCount(entries)}{' '}
+              {entryWord(entries)} ({formatUSDT(check.quote.total)}) may already be placed. Check{' '}
+              <Link href={POOL_ROUTES.entries} className="text-text-brand hover:underline">
+                My entries
+              </Link>{' '}
+              before you buy again. Trying again re-sends this same purchase, so it can’t be charged
+              twice.
+            </p>
+            {error instanceof ApiRequestError && error.requestId ? (
+              <span className="block font-mono text-mono-s text-text-tertiary">
+                Ref {error.requestId}
+              </span>
+            ) : null}
+          </Callout>
+        )}
         {error !== null &&
+          !unknownOutcome &&
           serverCode !== 'INSUFFICIENT_FUNDS' &&
           serverCode !== 'RG_LIMIT_EXCEEDED' && (
             <Callout tone="danger" icon={<TriangleAlert />} title="Your entries were not placed">
@@ -349,7 +419,7 @@ function PreviewStep({
                   size="l"
                   className="size-11 px-0"
                   aria-label="One entry fewer"
-                  disabled={entries <= 1}
+                  disabled={unknownOutcome || entries <= 1}
                   onClick={() => field.onChange(Math.max(1, entries - 1))}
                 >
                   <Minus aria-hidden />
@@ -360,6 +430,7 @@ function PreviewStep({
                   pattern="[0-9]*"
                   aria-describedby="pool-entries-hint"
                   aria-invalid={fieldState.invalid || undefined}
+                  readOnly={unknownOutcome}
                   className="h-11 w-20 rounded-md border border-border-default bg-bg-base text-center text-h4 text-text-primary tabular-nums outline-none focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-border-focus/40"
                   value={Number.isNaN(field.value) ? '' : String(field.value)}
                   onChange={(e) => {
@@ -374,7 +445,7 @@ function PreviewStep({
                   size="l"
                   className="size-11 px-0"
                   aria-label="One more entry"
-                  disabled={entries >= MAX_ENTRIES_PER_PURCHASE}
+                  disabled={unknownOutcome || entries >= MAX_ENTRIES_PER_PURCHASE}
                   onClick={() => field.onChange(Math.min(MAX_ENTRIES_PER_PURCHASE, entries + 1))}
                 >
                   <Plus aria-hidden />
@@ -498,6 +569,8 @@ function PreviewStep({
 
         <LimitCheck
           check={check}
+          status={limitsStatus}
+          onRetry={onRetryLimits}
           serverError={serverCode === 'RG_LIMIT_EXCEEDED' ? error : null}
           onReduce={(n) => form.setValue('entries', n, { shouldValidate: true })}
         />
@@ -547,9 +620,13 @@ function PreviewStep({
           disabled={blocked || !consent}
           aria-describedby={!consent ? 'pool-consent-hint' : undefined}
         >
-          {desktop
-            ? `Confirm ${formatCount(entries)} ${entries === 1 ? 'entry' : 'entries'} · ${formatUSDT(check.quote.total)}`
-            : `Confirm · ${formatUSDT(check.quote.total)}`}
+          {unknownOutcome
+            ? desktop
+              ? `Try again · ${formatCount(entries)} ${entryWord(entries)} · ${formatUSDT(check.quote.total)}`
+              : `Try again · ${formatUSDT(check.quote.total)}`
+            : desktop
+              ? `Confirm ${formatCount(entries)} ${entryWord(entries)} · ${formatUSDT(check.quote.total)}`
+              : `Confirm · ${formatUSDT(check.quote.total)}`}
         </Button>
         {!consent && (
           <p id="pool-consent-hint" className="sr-only">
@@ -563,10 +640,14 @@ function PreviewStep({
 
 function LimitCheck({
   check,
+  status,
+  onRetry,
   serverError,
   onReduce,
 }: {
   check: ParticipationCheck;
+  status: 'loading' | 'error' | 'ready';
+  onRetry?: () => void;
   serverError: unknown;
   onReduce: (entries: number) => void;
 }) {
@@ -575,6 +656,32 @@ function LimitCheck({
     serverError instanceof ApiRequestError
       ? (serverError.details as { limit?: string; used?: string } | undefined)
       : undefined;
+  // Unknown limits are never shown as "no limit": loading → skeleton, failed → say so (still enforced).
+  if (status === 'loading' && !details)
+    return (
+      <div
+        className="flex flex-col gap-2.5 rounded-lg bg-surface-raised p-4"
+        aria-busy="true"
+        aria-label="Checking your participation limits"
+      >
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-2 w-full" />
+      </div>
+    );
+  if (status === 'error' && !details)
+    return (
+      <Callout tone="warning" icon={<TriangleAlert />} title="We couldn’t load your limits">
+        <p>
+          Your responsible-gaming limits are still enforced when you confirm. Load them again to see
+          how much of your limit is left.
+        </p>
+        {onRetry && (
+          <Button size="s" variant="secondary" type="button" className="mt-2" onClick={onRetry}>
+            Try again
+          </Button>
+        )}
+      </Callout>
+    );
   if (!l && !details)
     return (
       <Callout tone="info" title="No participation limit set">

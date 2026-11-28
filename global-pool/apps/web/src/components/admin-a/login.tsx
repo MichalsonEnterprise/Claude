@@ -259,7 +259,9 @@ export function AdminLogin() {
     const { email, password } = form1.getValues();
     try {
       await session.login({ email, password, totpCode: code });
-      router.replace(safeAdminNext(params.get('next')) ?? safeAdminNext(expired?.returnTo) ?? '/admin');
+      router.replace(
+        safeAdminNext(params.get('next')) ?? safeAdminNext(expired?.returnTo) ?? '/admin',
+      );
     } catch (err) {
       form2.reset({ totpCode: '' });
       if (err instanceof ApiRequestError) {

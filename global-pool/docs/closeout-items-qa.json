@@ -1,0 +1,301 @@
+{
+ "items": [
+  {
+   "id": "Q01",
+   "source": "qa",
+   "severity": "high",
+   "qaSeverity": "blocker",
+   "area": "web",
+   "title": "Every signed-in member sees @nova.k's static DEMO profile and money. A brand-new player with 0.00 USDT sees 'Available balance 9,215.30 USDT (demo)', 'Account menu for @nova.k', 'GP-48213 · VIP Gold · Available 9,215.30 ",
+   "file": "apps/web/src/components/shell/app-shell.tsx (ConnectedShell spreads DEMO_SHELL_MEMBER with the comment 'until the API profile/balance endpoints exist'; GET /me, /wallet/balances, /notifications and /pool/me/entries all exist now)",
+   "scenario": "WHERE: All player routes — shell topbar balance pill, user menu, sidebar 'My entries' count, notifications badge\nROLE: brand-new player (any signed-in player other than @nova.k) VIEWPORT: 1440 and 390\nSYMPTOM: Every signed-in member sees @nova.k's static DEMO profile and money. A brand-new player with 0.00 USDT sees 'Available balance 9,215.30 USDT (demo)', 'Account menu for @nova.k', 'GP-48213 · VIP Gold · Available 9,215.30 USDT' and 'My entries 35'. For nova herself the handle shows as 'nova.k' without the '@'.\nEVIDENCE: Probe at /responsible-gaming as did:privy:qa-probe-shell-*: the balance pill aria-label is 'Available balance 9,215.30 USDT (demo) — open wallet' and the menu text is 'NK @nova.k GP-48213 VIP Gold Available 9,215.30 USDT DEMO …'. For the same new player the API returns GET /wallet/balances available '0.00', GET /me handle null, GET /notifications unread 0. Screenshot: apps/web/test-results/visual/qa-crawl/evidence_new-player-shell_1440.png\nALSO (journeys): The top-bar balance pill shows the seeded @nova.k DEMO Available \"9,215.30\" for every signed-in player, together with avatar \"NK\", notification count 3 and \"My entries 35\" in the sidebar. On the same screen the wallet and dashboard show the player's real ledger balance (100.00, later 69.85). The money shown in the header is wrong for every player.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q02",
+   "source": "qa",
+   "severity": "high",
+   "qaSeverity": "blocker",
+   "area": "web",
+   "title": "The homepage member data is always the mock: every member sees nova's 35 entries, 351.75 USDT staked, the odds line and a 9,215.30 USDT available balance. The new player sees it behind the onboarding dialog.",
+   "file": "apps/web/src/lib/data/queries.ts (myEntriesQuery ~L107, viewerBalanceQuery ~L114)",
+   "scenario": "WHERE: / (homepage hero 'Your 35 entries · 351.75 USDT · ≈2.44% chance', Global Pool card 'Your 35 entries', 'Available balance 9,215.30 USDT')\nROLE: every signed-in member (seen as the new player and as nova) VIEWPORT: 1440 and 390\nSYMPTOM: The homepage member data is always the mock: every member sees nova's 35 entries, 351.75 USDT staked, the odds line and a 9,215.30 USDT available balance. The new player sees it behind the onboarding dialog.\nEVIDENCE: apps/web/test-results/visual/qa-crawl/new-player/home_1440.png and nova/home_1440.png. In code, myEntriesQuery and viewerBalanceQuery always mockResolve; the comments say they would be 'wired by the pool page agent' / 'wired with the wallet screens', which never happened.\nALSO (journeys): The lobby shows another player's (mock @nova.k) data to every fresh player: \"Your 35 entries · 351.75 USDT · ≈2.44% chance of any prize\", \"E-1248-00981 … 01015\", \"Available balance 9,215.30 USDT\", \"Rakeback 3.42 USDT claimable now · Claim\". Latest-entries times read 18:43–18:44 UTC while it is 08:3x UTC. The J1 player actually holds 3 entries and 69.85.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q03",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "At 06:04 UTC the homepage shows round #1,248 'Closes in 13h 55m', 'Enter round', 'Add entries' and, for guests, 'Participate'. /pool shows 'BETWEEN ROUNDS — Next round opens 28 Nov 2026, 08:00 UTC … nothing can be bought",
+   "file": "apps/web/src/lib/data/queries.ts fetchPoolSnapshot (L56-76: `current: open ? round : null` ignores opensAt); apps/api seed/rounds.service gives status 'open' to a round that has not opened",
+   "scenario": "WHERE: / (hero and Global Pool card) vs /pool and /pool/rounds/1248\nROLE: guest, nova VIEWPORT: 1440 and 390\nSYMPTOM: At 06:04 UTC the homepage shows round #1,248 'Closes in 13h 55m', 'Enter round', 'Add entries' and, for guests, 'Participate'. /pool shows 'BETWEEN ROUNDS — Next round opens 28 Nov 2026, 08:00 UTC … nothing can be bought before then', and /pool/rounds/1248 shows a green 'Open' badge next to 'SCHEDULED · Not open yet'. The API refuses entries before opensAt. The homepage 'Latest entries' feed also shows entries at 18:42–18:44 UTC, which is in the future at 06:04.\nEVIDENCE: GET /pool/rounds/current → status 'open', statusLabel 'Open', opensAt 2026-11-28T08:00Z (future). entries.service.ts:68 rejects `now < round.opensAt`. Screenshots nova/home_1440.png, nova/pool_1440.png, nova/pool_rounds_1248_1440.png\nALSO (journeys blocker, API side → see Q20): Seeded DEMO round #1248 is status \"open\"/\"Open\" while opensAt is in the future (08:00 UTC; seeded ~03:55 UTC). Every entry is refused with 409 {\"code\":\"ROUND_NOT_OPEN\",\"message\":\"Round #1,248 is not accepting entries\",\"details\":{\"status\":\"open\"}}. The UIs disagree: /pool says \"Between rounds · Next round opens 28 Nov 2026, 08:00 UTC\" with Participate disabled, while the lobby showed \"Closes in 13h 15m\" with Participate / Enter round (observed 06:45 UTC). J1, J2 (limit block) and J6 could not run before 08:00; apps/web/e2e/pool.spec.ts fails in the same window.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q04",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "api-b",
+   "title": "Every RG page shows 'Something went wrong'. The web exempts /responsible-gaming from the onboarding redirect (and the onboarding dialog links there as 'Play responsibly'), but the API answers 403 ONBOARDING_REQUIRED. A r",
+   "file": "API RG route policy (apps/api/src/modules/compliance) vs apps/web/src/lib/auth/session-layer.tsx exemption list; apps/web/src/components/rg-history/page-shell.tsx QueryError",
+   "scenario": "WHERE: /responsible-gaming and all 6 sub-pages (deposit, participation and time limits; reality checks; cooling-off; self-exclusion)\nROLE: brand-new player (signed in, not onboarded) VIEWPORT: 1440 and 390\nSYMPTOM: Every RG page shows 'Something went wrong'. The web exempts /responsible-gaming from the onboarding redirect (and the onboarding dialog links there as 'Play responsibly'), but the API answers 403 ONBOARDING_REQUIRED. A registered player therefore cannot reach limits or self-exclusion, and sees an error instead of an explanation.\nEVIDENCE: GET /responsible-gaming → 403 {code: ONBOARDING_REQUIRED, 'Finish setting up your account first'} (39× in the crawl). Screenshots new-player/responsible-gaming*_1440.png and _390.png\nWeb side: RealityCheckHost and member queries before onboarding also fail (crawler #13, journeys #15) — fix both: the API must allow a not-onboarded member to read/set RG tools (protective), and the web host must not poll before onboarding.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q05",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "The consent links go to /legal/terms and /legal/privacy, which do not exist (HTTP 404, 'Page not found'). The player is asked to accept documents that cannot be opened. Also dead: /legal/aml-kyc, /legal/restricted-countr",
+   "file": "apps/web/src/components/auth/onboarding.tsx:349,356; footer-mega.tsx; account/kyc-flow/flow.tsx; pool/parts.tsx; home/faq.tsx",
+   "scenario": "WHERE: /onboarding consent checkbox 'I accept the Terms of Service and Privacy Policy'; footer 'Support / Legal'; /account/kyc/verify; /provably-fair; homepage\nROLE: all players (new player at onboarding) VIEWPORT: 1440 and 390\nSYMPTOM: The consent links go to /legal/terms and /legal/privacy, which do not exist (HTTP 404, 'Page not found'). The player is asked to accept documents that cannot be opened. Also dead: /legal/aml-kyc, /legal/restricted-countries, /legal/cookies, /legal/aml (KYC flow), /legal/licence (provably-fair), /legal/fees (homepage 'Read the fee schedule').\nEVIDENCE: No page.tsx matches /legal/*. GET /legal/terms → 404. The links appear on 69 crawled pages.\nALSO (journeys #11): Compliance-critical links lead to 404. The onboarding consent links /legal/terms and /legal/privacy cannot be opened, yet the player must accept them. The restricted pages' \"Talk to someone\" / \"Contact support\" and RG \"Talk to support\" go to /support (404). Nav prefetches also 404: /vip /winners /affiliates /promotions /promotions/welcome /casino /casino/slots /casino/live /originals /pool/how-it-works /pool/rounds /pool/refunds /about /contact /official-channels /status /legal/aml-kyc /legal/cookies /legal/restricted-countries /games/* (games were being built by another agent).",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q06",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "api-a",
+   "title": "Settled rounds show 'Participants 0 · min 500' next to 'Threshold Met' and 17,295 qualifying entries. The Draw threshold card shows 'Minimum not met' next to '3.4× the minimum'. The public fairness data contradicts itsel",
+   "file": "apps/api/prisma/seed.ts:411 (`participantsCount: r.participants ?? 0`; the shared DEMO rounds have no participants field)",
+   "scenario": "WHERE: /pool (round #1,247 card and Draw threshold card), /pool/rounds/1247, /pool/history\nROLE: guest, nova VIEWPORT: 1440 and 390\nSYMPTOM: Settled rounds show 'Participants 0 · min 500' next to 'Threshold Met' and 17,295 qualifying entries. The Draw threshold card shows 'Minimum not met' next to '3.4× the minimum'. The public fairness data contradicts itself.\nEVIDENCE: GET /pool/rounds/1247 → participants 0, entries 17295, thresholds {minParticipants 500, met true}. DB: rounds 1247 and 1246 have participants_count 0. Screenshot nova/pool_1440.png\nALSO (journeys #12): The #1,247 results page says \"paid to 1 winners — 100% of the pool\" over 172,950.00, but its winners table totals 86,475.00 (50%). The pool hub says \"13 winning entries shared the 172,950.00\". Participants show \"0\"/\"—\" while the threshold (min 500) shows \"Met\". Every settled round in the dev DB (#1244, #1246, #1247) is a DEMO snapshot with randomness null, so /verify shows \"Nothing to verify yet\" and no in-browser verification can pass, even though the hub offers \"Verify this draw\".\nFix the DEMO seed so history rounds are internally consistent (participants, threshold, winners, prize split, randomness/verify data) and the hub copy derives from data.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q07",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "api-a",
+   "title": "nova is seeded above her own daily loss limit. The strip reads 'Daily loss limit 351.75 / 200.00 USDT' (red), so entries fail RG_LIMIT_EXCEEDED for the whole seed day. The shared DEMO data says loss used is 24.60, but th",
+   "file": "apps/api/prisma/seed.ts (RG limits plus entries); packages/shared/src/demo/compliance.ts",
+   "scenario": "WHERE: /pool (RG strip), participate flow, /responsible-gaming\nROLE: nova (the DEMO account) VIEWPORT: 1440 and 390\nSYMPTOM: nova is seeded above her own daily loss limit. The strip reads 'Daily loss limit 351.75 / 200.00 USDT' (red), so entries fail RG_LIMIT_EXCEEDED for the whole seed day. The shared DEMO data says loss used is 24.60, but the API computes stakes − prizes = 351.75. The seeded entries are also dated in the future (created_at 14:06 UTC while it was 06:10 UTC).\nEVIDENCE: GET /responsible-gaming → loss {limit '200.00', used '351.75', remaining '0.00'}. responsible-gaming.service.ts usage() and assertCanParticipate. packages/shared/src/demo/compliance.ts has loss used '24.60'. DB: nova's 35 entries in round 1248 have created_at 2026-11-28 14:06\nDEMO seed: nova's RG usage must reconcile with demo-data.md (loss used 24.60 of 200.00; participation 351.75 of 500.00).",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q08",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "The page shows 'Your role can't open this page'. The Pool section is gated on rounds.read, but this page loads GET /admin/finance/refunds, which needs ledger.read. The panel also offers a pointless 'Try again'.",
+   "file": "apps/web/src/app/admin/(console)/pool/refunds + admin-b API (pool refunds should use a rounds.read endpoint)",
+   "scenario": "WHERE: /admin/pool/refunds ('Global Pool Management → Refunds', shown unlocked in the nav)\nROLE: Compliance, Support VIEWPORT: 1440 and 390\nSYMPTOM: The page shows 'Your role can't open this page'. The Pool section is gated on rounds.read, but this page loads GET /admin/finance/refunds, which needs ledger.read. The panel also offers a pointless 'Try again'.\nEVIDENCE: 403 GET /admin/finance/refunds FORBIDDEN missingPermissions=[ledger.read] (16×). Screenshot apps/web/test-results/visual/qa-crawl/compliance/admin_pool_refunds_1440.png\nAdd a rounds.read-gated pool refunds endpoint (additive, in admin-ops) or adapt the page; fix the pointless Try again on 403.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q09",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "50 link targets have no route and return 404 'Page not found'. They include 1 of the 5 primary mobile tabs ('Games' → /originals), all sidebar Originals and Casino entries (/games/orbit-rush … /games/twenty-one, /casino/",
+   "file": "apps/web/src/components/shell/nav-config.ts (ROUTES / PRIMARY_NAV / TAB_NAV), footer-mega.tsx, components/home/*",
+   "scenario": "WHERE: Shell on every player page: sidebar, footer, topbar search, mobile tab bar, mobile drawer; homepage tiles\nROLE: guest, nova, new player VIEWPORT: 1440 and 390\nSYMPTOM: 50 link targets have no route and return 404 'Page not found'. They include 1 of the 5 primary mobile tabs ('Games' → /originals), all sidebar Originals and Casino entries (/games/orbit-rush … /games/twenty-one, /casino/*), every homepage game tile (/games/*), /vip, /affiliates, /promotions, /promotions/welcome, /winners, /support ('Help centre'), /search, /security, /status, /about, /contact, /official-channels, /pool/how-it-works, /pool/rules. Some point to features that exist under another URL: footer 'Past rounds' → /pool/rounds (the page is /pool/history) and 'Refunds' → /pool/refunds (the page is /history/refunds).\nEVIDENCE: Shell check per page: sidebar 16/25 bad, footer 25/34, tabBar 1/5, drawer 16/26. Full list with counts in test-results/visual/qa-crawl/summary.txt, section 'Links to routes that do not exist'.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q10",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "web",
+   "title": "The skeletons never resolve: 3 on /restricted and 2 in the KYC dialog are still showing after 10 s, with no sign-in prompt and no state. The KYC verification dialog opens for a guest with step content stuck loading.",
+   "file": "apps/web/src/app/(app)/restricted/page.tsx + components/auth/restricted.tsx; components/account/kyc-flow/*",
+   "scenario": "WHERE: /restricted and /account/kyc/verify\nROLE: guest (/restricted also for the new player) VIEWPORT: 1440 and 390\nSYMPTOM: The skeletons never resolve: 3 on /restricted and 2 in the KYC dialog are still showing after 10 s, with no sign-in prompt and no state. The KYC verification dialog opens for a guest with step content stuck loading.\nEVIDENCE: skeletonsAfterWait 3 / 2. Screenshots guest/restricted_1440.png, guest/account_kyc_verify_1440.png, new-player/restricted_1440.png",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q11",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "web",
+   "title": "The mobile tab bar shows the KYC tab to every role (it is not permission-aware like the sidebar). Finance taps it and lands on 'Your role can't open this page' (403 kyc.read).",
+   "file": "apps/web/src/components/admin-a/shell.tsx MobileTabBar (~L509-516)",
+   "scenario": "WHERE: Admin mobile tab bar (< 768) 'KYC' tab\nROLE: Finance VIEWPORT: 390\nSYMPTOM: The mobile tab bar shows the KYC tab to every role (it is not permission-aware like the sidebar). Finance taps it and lands on 'Your role can't open this page' (403 kyc.read).\nEVIDENCE: 403 GET /admin/compliance/kyc missingPermissions=[kyc.read] (finance, 8×). Screenshot finance/admin_compliance_kyc_390.png",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q12",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "web",
+   "title": "The RealityCheckHost polls GET /responsible-gaming/session, which returns 403 ONBOARDING_REQUIRED (134 failed requests in the crawl). Pages also fire member queries before the onboarding redirect: /history/*, /pool/me/en",
+   "file": "apps/web/src/components/rg-history/reality-check.tsx (RealityCheckHost); apps/web/src/lib/auth/session-layer.tsx",
+   "scenario": "WHERE: Every page for a not-onboarded player\nROLE: brand-new player VIEWPORT: 1440 and 390\nSYMPTOM: The RealityCheckHost polls GET /responsible-gaming/session, which returns 403 ONBOARDING_REQUIRED (134 failed requests in the crawl). Pages also fire member queries before the onboarding redirect: /history/*, /pool/me/entries, /deposits, /withdrawals, /kyc/application and others, all 403.\nEVIDENCE: summary.txt 'API request failures' section (all ONBOARDING_REQUIRED, marked expected for the role)",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q13",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "web",
+   "title": "These nav groups lead to the admin catch-all 'module not built' state. For some roles they look unlocked in the nav.",
+   "file": "apps/web/src/components/admin-a/nav-config.ts",
+   "scenario": "WHERE: Admin sidebar groups Game Management, Blockchain Management, Affiliate Management, Marketing\nROLE: Super Admin (all 4), other roles (2 each) VIEWPORT: 1440 and 390\nSYMPTOM: These nav groups lead to the admin catch-all 'module not built' state. For some roles they look unlocked in the nav.\nEVIDENCE: Links /admin/games, /admin/blockchain, /admin/affiliates, /admin/marketing resolve only to app/admin/(console)/[...slug]",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q14",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "web",
+   "title": "Two separate 'Transaction history' pages from two modules on two endpoints (GET /transactions vs GET /history/transactions). The shell 'Transactions' link goes to one, the wallet tab to the other. Their data agrees today",
+   "file": "apps/web/src/components/wallet/history.tsx; apps/web/src/components/rg-history/history-common.tsx",
+   "scenario": "WHERE: /wallet/history vs /history/transactions\nROLE: nova VIEWPORT: 1440 and 390\nSYMPTOM: Two separate 'Transaction history' pages from two modules on two endpoints (GET /transactions vs GET /history/transactions). The shell 'Transactions' link goes to one, the wallet tab to the other. Their data agrees today (9 items each), but the two UIs, filters and exports are duplicated.\nEVIDENCE: h1 'Transaction history' on both URLs; both API totals are 9",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q15",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "After signing in again, a self-excluded player lands on the lobby \"/\" with Participate / Enter round CTAs and mock entries, not on /restricted/self-excluded. The correct page is reached only by opening /restricted by han",
+   "file": "apps/web/src/components/auth/auth-dialog.tsx SuccessView proceed() (only onboardingRequired is checked; GET /auth/account-status gate ignored); lib/auth/session-layer.tsx only gates onboarding",
+   "scenario": "WHERE: /sign-in → post-login landing\nROLE: self-excluded player VIEWPORT: 1440 + 390\nSYMPTOM: After signing in again, a self-excluded player lands on the lobby \"/\" with Participate / Enter round CTAs and mock entries, not on /restricted/self-excluded. The correct page is reached only by opening /restricted by hand.\nEVIDENCE: J5 soft: \"after sign-in a self-excluded player should land on /restricted/self-excluded\" Received \"http://localhost:3302/\"; test-results/e2e-journeys-shots/j5_06_after_sign_in.png vs j5_07_restricted_self_excluded.png",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q16",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "During a break or self-exclusion, Participate is enabled. The dialog says \"Within your daily participation limit: 10.05 of 20.00 USDT\", and the hub still offers \"Take a break\" with no hint that a break is on. Only after ",
+   "file": "apps/web/src/components/pool/pool-hub.tsx, participate-flow.tsx, logic.ts checkParticipation (exclusion from useViewerRg / account-status not considered)",
+   "scenario": "WHERE: /pool hub + participate dialog (GP-01/GP-02)\nROLE: player on a 24 h break / self-excluded VIEWPORT: 1440 + 390\nSYMPTOM: During a break or self-exclusion, Participate is enabled. The dialog says \"Within your daily participation limit: 10.05 of 20.00 USDT\", and the hub still offers \"Take a break\" with no hint that a break is on. Only after Confirm does the server refuse (403 SELF_EXCLUDED); the dialog then shows \"Your entries were not placed — You are on a break … Nothing was charged.\"\nEVIDENCE: J5 soft \"Participate must not be enabled while self-excluded\" (received true); J2 soft \"no enabled Participate button during a break\" (count 1) and \"participation dialog explains the break\"; screenshots j5_03_pool_blocked.png, j2_05_pool_during_break.png, j2_05b_participate_dialog_during_break.png, j2_05c_participate_confirm_during_break.png",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q17",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "The deposit flow does not say deposits are closed. Steps 1–2 work and Continue is enabled; at step 3 the page shows a skeleton and then \"We couldn't load your deposit address\" with \"Something went wrong\", the API message",
+   "file": "apps/web/src/components/wallet/deposit-flow.tsx (no account-status paused.deposits check; addr.isError mapped to 'security · Something went wrong')",
+   "scenario": "WHERE: /wallet/deposit (WAL-03…05)\nROLE: player on a break / self-excluded VIEWPORT: 1440 + 390\nSYMPTOM: The deposit flow does not say deposits are closed. Steps 1–2 work and Continue is enabled; at step 3 the page shows a skeleton and then \"We couldn't load your deposit address\" with \"Something went wrong\", the API message and a \"Try again\" button. The top-bar Deposit CTA stays on. The page also polls GET /deposits?pageSize=10, which answers 403 SELF_EXCLUDED 10–14 times per visit.\nEVIDENCE: J5 soft \"deposit step 1 must not let a self-excluded player continue\" (enabled) and \"blocked state is shown as a generic error\" (count 1); J2 soft \"deposit flow blocked up front during a break\"; test-results/e2e-journeys-shots/j5_04_deposit_step1.png, j5_04_deposit_blocked.png, j2_06_deposit_during_break.png; j5_signals.json",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q18",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "api-b",
+   "title": "While GET /auth/account-status returns restrictions [withdrawals_frozen] and paused.withdrawals=true, /restricted stays on /restricted and says \"No restrictions on your account — Play, entries, deposits and withdrawals a",
+   "file": "apps/api/src/modules/auth/account-status.controller.ts (gate ignores withdrawals_frozen → 'ok'); apps/web/src/components/auth/restricted.tsx RestrictedIndex routes only by gate",
+   "scenario": "WHERE: /restricted and /restricted/under-review\nROLE: player with withdrawals_frozen (after four-eyes) VIEWPORT: 1440 + 390\nSYMPTOM: While GET /auth/account-status returns restrictions [withdrawals_frozen] and paused.withdrawals=true, /restricted stays on /restricted and says \"No restrictions on your account — Play, entries, deposits and withdrawals are available where permitted.\" /restricted/under-review shows the same text.\nEVIDENCE: J4 soft: URL stays \"http://localhost:3302/restricted\"; \"must not claim 'No restrictions'\" count 1; under-review main text = \"No restrictions on your account…\"; test-results/e2e-journeys-shots/j4_05_restricted_index.png, j4_05b_restricted_under_review.png, j4_05c_restricted_under_review_390.png\nWeb side too: /restricted must show the withdrawals hold (and under-review mapping).",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q19",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "The withdraw flow gives no hold notice. At the amount step GET /withdrawals/quote answers 403 {\"code\":\"FORBIDDEN\",\"message\":\"This action is restricted on your account — contact support\",\"details\":{\"restriction\":\"withdraw",
+   "file": "apps/web/src/components/wallet/withdraw-flow.tsx (no paused.withdrawals check; quote error not shown); apps/api/src/modules/auth/guards.ts blockedBy withdrawals_frozen → generic FORBIDDEN",
+   "scenario": "WHERE: /wallet/withdraw (WAL-10…13)\nROLE: player with withdrawals_frozen VIEWPORT: 1440 + 390\nSYMPTOM: The withdraw flow gives no hold notice. At the amount step GET /withdrawals/quote answers 403 {\"code\":\"FORBIDDEN\",\"message\":\"This action is restricted on your account — contact support\",\"details\":{\"restriction\":\"withdrawals_frozen\"}}. The UI swallows it: \"You receive —\", no quote, and the player cannot continue or find out why. POST /withdrawals also answers a generic 403 FORBIDDEN, and the \"contact support\" target /support is a 404.\nEVIDENCE: J4 annotations \"quote for frozen player => 403 … withdrawals_frozen\" and \"withdrawal refusal => 403 FORBIDDEN\"; soft failures \"/wallet/withdraw explains the hold up front\" and \"amount step explains why no quote\"; screenshots j4_04_wallet_withdraw.png, j4_04b_withdraw_amount_step.png; j4_signals.json",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q20",
+   "source": "qa",
+   "severity": "high",
+   "qaSeverity": "blocker",
+   "area": "api-a",
+   "title": "Seeded DEMO round #1248 is status \"open\"/\"Open\" while opensAt is in the future (08:00 UTC; seeded ~03:55 UTC). Every entry is refused with 409 {\"code\":\"ROUND_NOT_OPEN\",\"message\":\"Round #1,248 is not accepting entries\",\"d",
+   "file": "apps/api/prisma/seed.ts (SHIFT_DAYS → closes next 20:00; seedCurrentRound creates status 'open' ~l.910 regardless of opensAt); apps/api/src/modules/pool/entries.service.ts window check vs rounds.service current-round status; lobby hero/pool-live uses status only",
+   "scenario": "WHERE: POST /pool/rounds/:id/entries · GET /pool/rounds/current · / (lobby) vs /pool\nROLE: player VIEWPORT: 1440 + 390\nSYMPTOM: Seeded DEMO round #1248 is status \"open\"/\"Open\" while opensAt is in the future (08:00 UTC; seeded ~03:55 UTC). Every entry is refused with 409 {\"code\":\"ROUND_NOT_OPEN\",\"message\":\"Round #1,248 is not accepting entries\",\"details\":{\"status\":\"open\"}}. The UIs disagree: /pool says \"Between rounds · Next round opens 28 Nov 2026, 08:00 UTC\" with Participate disabled, while the lobby showed \"Closes in 13h 15m\" with Participate / Enter round (observed 06:45 UTC). J1, J2 (limit block) and J6 could not run before 08:00; apps/web/e2e/pool.spec.ts fails in the same window.\nEVIDENCE: J1 run at 06:03 UTC: \"round #1248 must accept entries now (status open, opensAt 2026-11-28T08:00:00.000Z, closesAt 2026-11-28T20:00:00.000Z, now 2026-11-28T06:03:06Z)\"; API probe 05:57 UTC → 409 ROUND_NOT_OPEN; screenshot apps/web/test-results/e2e-journeys-evidence/pre0800_pool_hub_390_round_open_but_not_accepting.png\nSeed: the current DEMO round must be 'open' only when opensAt <= now; otherwise 'scheduled' (or opensAt in the past). Homepage + /pool must agree (web side in Q03).",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q21",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "web",
+   "title": "\"Add to whitelist\" stays disabled with a valid address, the ownership box ticked and a 6-digit code entered. It enables only if the OPTIONAL Label field is edited after the box is ticked, so a player who skips the label ",
+   "file": "apps/web/src/components/wallet/addresses.tsx AddAddressModal (disabled={code.length !== 6 || !form.formState.isValid}; isValid not recomputed for Controller-driven address/owner changes)",
+   "scenario": "WHERE: /wallet/whitelist → Add a withdrawal address (WAL-23 AddAddressModal)\nROLE: player with 2FA VIEWPORT: 1440 + 390\nSYMPTOM: \"Add to whitelist\" stays disabled with a valid address, the ownership box ticked and a 6-digit code entered. It enables only if the OPTIONAL Label field is edited after the box is ticked, so a player who skips the label (or types it first) cannot whitelist an address.\nEVIDENCE: J3 soft \"Add to whitelist enabled without the optional label\" (disabled) at 1440 and 390; debug run: after address → owner → code = disabled, after typing label = enabled; screenshots test-results/e2e-journeys-shots/j3_01a_whitelist_modal_ready_but_disabled.png, e2e-journeys-evidence/whitelist_modal_debug.png",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q22",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "api-b",
+   "title": "Real one- and two-letter names are rejected as \"initials aren't enough, enter it in full\": last names \"Li\" and \"Ng\", first name \"Jo\". The API rejects them too (400 issues [{path:[lastNames], message:'Last name(s) — initi",
+   "file": "packages/shared/src/schemas/account.ts legalNameSchema refine (rejects any ≤2-letter Latin name)",
+   "scenario": "WHERE: KYC Level 1 details (AUTH-12) web + PUT /kyc/application/details\nROLE: player VIEWPORT: 1440\nSYMPTOM: Real one- and two-letter names are rejected as \"initials aren't enough, enter it in full\": last names \"Li\" and \"Ng\", first name \"Jo\". The API rejects them too (400 issues [{path:[lastNames], message:'Last name(s) — initials aren't enough…'}]). KYC L1 is required to withdraw (daily limit for level none = 0.00), so these players cannot withdraw.\nEVIDENCE: API probe 06:3x UTC: Wei/Li → 400, Anna/Ng → 400, Jo/Silva → 400, Wei/Lim → 200; first J1 run failed at the KYC dialog with the inline error for \"Jo\"\nThe rule lives in packages/shared/src/schemas/account.ts (legalNameSchema): accept real short names (Li, Ng, Jo, O, Wu); reject only obvious initials like 'J.' — add tests.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q23",
+   "source": "qa",
+   "severity": "medium",
+   "qaSeverity": "major",
+   "area": "api-a",
+   "title": "No DEMO/dev helper exists to close, draw (mock VRF) or settle a round. The lifecycle runs only from the BullMQ rounds tick at the real closesAt (JOBS_ENABLED=true), and DEMO rounds are never drawn unless DEMO_ROUNDS_AUTO",
+   "file": "apps/api/src/modules/pool/round-lifecycle.service.ts (tick/autoSettle), rounds.processor.ts",
+   "scenario": "WHERE: J6 round lifecycle (close → draw → settle) on the dev stack\nROLE: QA / DEMO VIEWPORT: n/a\nSYMPTOM: No DEMO/dev helper exists to close, draw (mock VRF) or settle a round. The lifecycle runs only from the BullMQ rounds tick at the real closesAt (JOBS_ENABLED=true), and DEMO rounds are never drawn unless DEMO_ROUNDS_AUTO_SETTLE=true. The settle → results → verifier → player winnings in history path therefore cannot be tested end to end without waiting until 20:00 UTC on a JOBS-enabled API, which would also mutate the shared round. Test skipped.\nEVIDENCE: J6.2 annotation: /dev/rounds/<id>/close → 404 · /dev/rounds/1248/close → 404 · /dev/pool/rounds/<id>/close → 404 · /admin/rounds/1248/close → 404 · /admin/pool/rounds/1248/draw → 404\nAdd DEMO/dev-only (NODE_ENV!=production AND REAL_MONEY disabled) admin-audited or dev endpoints to close → draw (mock VRF) → settle the current DEMO round for QA, mirrored by e2e; never usable in production.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q24",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "api-b",
+   "title": "The read-only deposit list and deposit detail answer 403 SELF_EXCLUDED during a break or self-exclusion. docs/API.md says history stays available, and the RG7 page says \"Pending deposits · withdrawable once confirmed\", b",
+   "file": "apps/api/src/modules/deposits/deposits.controller.ts (self-exclusion route policy applied to read routes)",
+   "scenario": "WHERE: GET /deposits, GET /deposits/ref/{reference}\nROLE: player on a break / self-excluded VIEWPORT: n/a (API)\nSYMPTOM: The read-only deposit list and deposit detail answer 403 SELF_EXCLUDED during a break or self-exclusion. docs/API.md says history stays available, and the RG7 page says \"Pending deposits · withdrawable once confirmed\", but the wallet deposit tracker and receipt cannot load. /history/transactions?types=deposit works (200).\nEVIDENCE: probe 06:4x UTC: /deposits 403, /deposits/ref/DP-77450 403, /transactions 200, /history/transactions 200, /withdrawals 200\nSame as review R27 — check whether api-b already fixed it.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q25",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "api-a",
+   "title": "A newly whitelisted address is blocked for 24 h (422 ADDRESS_NOT_WHITELISTED), yet any brand-new, non-whitelisted address can be used at once (it goes to manual four-eyes review). The whitelist cool-down therefore does n",
+   "file": "apps/api/src/modules/withdrawals/withdrawals.service.ts (cool-down only checked when wallet.whitelistedAt is set)",
+   "scenario": "WHERE: Withdrawal destination policy (whitelist vs new address)\nROLE: player VIEWPORT: n/a\nSYMPTOM: A newly whitelisted address is blocked for 24 h (422 ADDRESS_NOT_WHITELISTED), yet any brand-new, non-whitelisted address can be used at once (it goes to manual four-eyes review). The whitelist cool-down therefore does not limit an account takeover; this is a business decision to confirm with compliance.\nEVIDENCE: J3: POST /withdrawals to the cooling whitelisted address → 422 ADDRESS_NOT_WHITELISTED; the same player's withdrawal to a new address → under_review\nPolicy: a brand-new non-whitelisted address must not bypass the whitelist cool-down; either apply the same 24 h cool-down/hold to new destinations or require four-eyes review (it does) and state it — choose the protective option consistent with WAL-23 copy and document it.",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q26",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "web",
+   "title": "The page copy says \"The 0.05 USDT platform fee is always its own line, separate from network fees\", but All activity merges the entry and its fee into one row (−30.15, \"Entries 30.00 + fee 0.15\"). The fee appears as its ",
+   "file": "apps/web/src/components/rg-history/history-common.tsx",
+   "scenario": "WHERE: /history/transactions (All activity)\nROLE: player VIEWPORT: 1440 + 390\nSYMPTOM: The page copy says \"The 0.05 USDT platform fee is always its own line, separate from network fees\", but All activity merges the entry and its fee into one row (−30.15, \"Entries 30.00 + fee 0.15\"). The fee appears as its own line only under Fees (/history/fees).\nEVIDENCE: test-results/e2e-journeys-shots/j1_08_history_transactions.png vs j1_08_history_fees.png",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q27",
+   "source": "qa",
+   "severity": "low",
+   "qaSeverity": "minor",
+   "area": "api-b",
+   "title": "Repeating a 24h cooling-off while an equal 24h break is active returns 200 and moves endsAt later. docs/API.md says it should answer 409 when an equal or longer exclusion is active. The behaviour is safe (it extends), bu",
+   "file": "apps/api/src/modules/compliance/responsible-gaming.service.ts; docs/API.md responsible-gaming table",
+   "scenario": "WHERE: POST /responsible-gaming/cooling-off\nROLE: player VIEWPORT: n/a (API)\nSYMPTOM: Repeating a 24h cooling-off while an equal 24h break is active returns 200 and moves endsAt later. docs/API.md says it should answer 409 when an equal or longer exclusion is active. The behaviour is safe (it extends), but it contradicts the docs.\nEVIDENCE: probe 05:58 UTC: first 200 endsAt 2026-11-29T05:58:36.834Z, repeat 200 endsAt 05:58:36.920Z",
+   "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  }
+ ]
+}

@@ -25,8 +25,9 @@ import {
 } from 'lucide-react';
 
 /**
- * Casino-shell navigation, exactly as the Figma Shell/Sidebar (CASINO-01). Routes are the planned URL map;
- * pages are added by later agents.
+ * Casino-shell navigation, exactly as the Figma Shell/Sidebar (CASINO-01). Every href resolves to a built page:
+ * game categories go to the games lobby (`/games?category=…`); planned sections (Winners, VIP Club, Affiliates)
+ * render an honest "not in this build yet" page. test/logic.test.ts checks every href against src/app.
  */
 export interface NavItem {
   id: string;
@@ -48,8 +49,10 @@ export interface NavItem {
 export const ROUTES = {
   lobby: '/',
   pool: '/pool',
-  originals: '/originals',
-  casino: '/casino',
+  /** Games lobby (PUB-03) — all categories. */
+  games: '/games',
+  originals: '/games?category=originals',
+  casino: '/games',
   favourites: '/favourites',
   recent: '/recently-played',
   winners: '/winners',
@@ -67,6 +70,8 @@ export const ROUTES = {
   dashboard: '/dashboard',
   notifications: '/notifications',
   game: (slug: string) => `/games/${slug}`,
+  /** Lobby filtered to one category (originals · table · slots · live · draws · jackpot). */
+  category: (category: string) => `/games?category=${category}`,
 } as const;
 
 export const PRIMARY_NAV: NavItem[] = [
@@ -97,10 +102,10 @@ export const PRIMARY_NAV: NavItem[] = [
     href: ROUTES.casino,
     icon: LayoutGrid,
     children: [
-      { id: 'table-games', label: 'Table games', href: `${ROUTES.casino}/table`, icon: Spade },
-      { id: 'slots', label: 'GP Studios slots', href: `${ROUTES.casino}/slots`, icon: LayoutGrid },
-      { id: 'live', label: 'Live tables', href: `${ROUTES.casino}/live`, icon: Disc3 },
-      { id: 'draws', label: 'Draws & bingo', href: `${ROUTES.casino}/draws`, icon: Ticket },
+      { id: 'table-games', label: 'Table games', href: ROUTES.category('table'), icon: Spade },
+      { id: 'slots', label: 'GP Studios slots', href: ROUTES.category('slots'), icon: LayoutGrid },
+      { id: 'live', label: 'Live tables', href: ROUTES.category('live'), icon: Disc3 },
+      { id: 'draws', label: 'Draws & bingo', href: ROUTES.category('draws'), icon: Ticket },
     ],
   },
   { id: 'favourites', label: 'Favourites', href: ROUTES.favourites, icon: Heart },
@@ -137,7 +142,7 @@ export const ACCOUNT_NAV: NavItem[] = [
 export const TAB_NAV: NavItem[] = [
   { id: 'lobby', label: 'Lobby', href: ROUTES.lobby, icon: House },
   { id: 'pool', label: 'Pool', href: ROUTES.pool, icon: CircleDollarSign },
-  { id: 'games', label: 'Games', href: ROUTES.originals, icon: Gamepad2 },
+  { id: 'games', label: 'Games', href: ROUTES.games, icon: Gamepad2 },
   { id: 'wallet', label: 'Wallet', href: ROUTES.wallet, icon: Wallet },
   {
     id: 'account',

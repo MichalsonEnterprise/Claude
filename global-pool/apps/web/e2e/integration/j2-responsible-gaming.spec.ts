@@ -88,7 +88,7 @@ test.describe('J2 — participation limit → server-enforced block → pending 
         await expect(dialog.getByRole('button', { name: 'Reduce to 1 entry' })).toBeVisible();
         const consent = dialog.getByRole('checkbox', { name: /entries are final/ });
         if (await consent.isEnabled()) await consent.click();
-        await expect(dialog.getByRole('button', { name: /Confirm 3 entries/ })).toBeDisabled();
+        await expect(dialog.getByRole('button', { name: /^Confirm (3 entries )?· 30\.15 USDT$/ })).toBeDisabled();
         await shot(page, J, '02_limit_blocks_3_entries');
         await page.keyboard.press('Escape');
 
@@ -164,6 +164,17 @@ test.describe('J2 — participation limit → server-enforced block → pending 
           await shot(page, J, '05b_participate_dialog_during_break');
           await expect
             .soft(dialog.getByText(/break|self-exclu|paused/i).first(), 'participation dialog explains the break')
+            .toBeVisible({ timeout: 5_000 });
+          // What a player on a break gets when confirming anyway (the API answers 403 SELF_EXCLUDED).
+          const consent = dialog.getByRole('checkbox', { name: /entries are final/ });
+          await consent.click();
+          const enter = page.waitForResponse((r) => r.url().includes('/entries') && r.request().method() === 'POST');
+          await dialog.getByRole('button', { name: /^Confirm (1 entry )?· 10\.05 USDT$/ }).click();
+          expect((await enter).status()).toBe(403);
+          await page.waitForTimeout(2_000);
+          await shot(page, J, '05c_participate_confirm_during_break');
+          await expect
+            .soft(page.getByText(/on a break|break is on|self-exclu/i).filter({ visible: true }).first(), 'confirm during a break shows the break, not a generic error')
             .toBeVisible({ timeout: 5_000 });
           await page.keyboard.press('Escape');
         }

@@ -13,6 +13,7 @@ import {
   useServerNow,
   useViewerBalance,
 } from '@/lib/data/hooks';
+import { DATA_SOURCE } from '@/lib/data/source';
 import { HOME_PREVIEW_FLAGS, type HomePreview } from '@/lib/home-preview';
 import { cn } from '@/lib/utils';
 
@@ -47,13 +48,20 @@ export function HomePage({
   const snapshotQuery = usePoolSnapshot(scenario);
   const snapshot = snapshotQuery.data;
   const roundNumber = snapshot?.current?.number ?? 0;
-  const myEntries = useMyEntries(roundNumber, viewer === 'member' && roundNumber > 0);
-  const balance = useViewerBalance(viewer === 'member');
+  // API mode: the viewer's own entries and balance (player token) — only for a real session, never a preview.
+  const playerData = DATA_SOURCE !== 'api' || auth.status === 'member';
+  const myEntries = useMyEntries(
+    roundNumber,
+    viewer === 'member' && roundNumber > 0 && playerData,
+    snapshot?.current?.id,
+  );
+  const balance = useViewerBalance(viewer === 'member' && playerData);
   const now = useServerNow(snapshot?.serverNow, snapshotQuery.dataUpdatedAt);
 
   const shellOverride = (
     <ShellOverride
       restricted={restricted}
+      regionName={region.data?.countryName ?? null}
       previewMember={preview.viewer === 'member'}
       previewGuest={preview.viewer === 'guest'}
     />
@@ -79,7 +87,7 @@ export function HomePage({
     // next 20:00 UTC (lib/data/demo-clock.ts), so countdowns never anchor to a fixed DEMO moment.
     demoNow: undefined,
     now,
-    myEntries: myEntries.data,
+    myEntries: myEntries.data ?? undefined,
     balance: balance.data,
     signIn: auth.signIn,
     signUp: auth.signUp,

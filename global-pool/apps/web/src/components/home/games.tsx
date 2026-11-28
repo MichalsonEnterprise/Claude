@@ -305,7 +305,7 @@ function Categories({ games }: { games: GameView[] | undefined }) {
           title="Table games"
           description="Roulette, blackjack, baccarat, sic bo and live tables"
           chip={`${table} games`}
-          href={`${ROUTES.casino}/table`}
+          href={ROUTES.category('table')}
           art={<CardsChipsArt className="absolute right-[-2%] bottom-2 w-[160px]" />}
         />
         <CategoryTile
@@ -314,7 +314,7 @@ function Categories({ games }: { games: GameView[] | undefined }) {
           title="Instant games"
           description="Orbit Rush, Skyline, Pinfall — results in seconds"
           chip={`${instant} games`}
-          href={`${ROUTES.originals}?type=instant`}
+          href={ROUTES.originals}
           art={<CurveArt className="absolute inset-0 h-full w-full" />}
         />
         <CategoryTile
@@ -362,7 +362,7 @@ export function GamesSection() {
       <GameRail
         id="table-live-title"
         title="Table games & live"
-        allHref={`${ROUTES.casino}/table`}
+        allHref={ROUTES.category('table')}
         specs={TABLE_LIVE}
         games={valid}
       />

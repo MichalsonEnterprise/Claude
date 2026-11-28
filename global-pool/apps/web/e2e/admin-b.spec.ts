@@ -6,49 +6,16 @@
  * no-permission state (Compliance has no `ledger.read`).
  *
  *   E2E_BASE_URL=http://localhost:3107 E2E_API_URL=http://localhost:4107 pnpm --filter @gp/web test:e2e -- e2e/admin-b.spec.ts
+ *   (E2E_DATABASE_URL, default postgresql://postgres@127.0.0.1:5432/globalpool, must be the API's database: the
+ *   admin TOTP step is chosen after the step last consumed there.)
  */
-import { createHmac } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { expect, test, type Page } from '@playwright/test';
 
+// Shared DEMO admins: every TOTP step is accepted once per admin, so codes come from adminCode() (next step after
+// totp_secrets.last_used_step — never a replay, no lockout). Needs psql + E2E_DATABASE_URL = the API's database.
+import { admin, adminCode, type DemoAdmin } from './integration/_journey';
+
 const API = process.env.E2E_API_URL ?? 'http://localhost:4000';
-
-interface DemoAdmin {
-  name: string;
-  email: string;
-  password: string;
-  totpSecret: string;
-}
-const ADMINS = (
-  JSON.parse(
-    readFileSync(
-      path.join(path.dirname(fileURLToPath(import.meta.url)), '../../api/.dev/demo-admins.json'),
-      'utf8',
-    ),
-  ) as {
-    admins: DemoAdmin[];
-  }
-).admins;
-const admin = (prefix: string) => ADMINS.find((a) => a.email.startsWith(prefix))!;
-
-/** RFC 6238 TOTP (SHA-1, 6 digits, 30 s) at an absolute step. */
-function totpAt(secretBase32: string, step: number): string {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let bits = '';
-  for (const ch of secretBase32.replace(/[\s=]/g, '').toUpperCase())
-    bits += alphabet.indexOf(ch).toString(2).padStart(5, '0');
-  const key = Buffer.from(bits.match(/.{8}/g)!.map((b) => Number.parseInt(b, 2)));
-  const counter = Buffer.alloc(8);
-  counter.writeBigUInt64BE(BigInt(step));
-  const h = createHmac('sha1', key).update(counter).digest();
-  const o = h[h.length - 1]! & 0xf;
-  const n = ((h[o]! & 0x7f) << 24) | (h[o + 1]! << 16) | (h[o + 2]! << 8) | h[o + 3]!;
-  return String(n % 1_000_000).padStart(6, '0');
-}
-const timeStep = () => Math.floor(Date.now() / 30_000);
 
 /** Fresh onboarded DEMO player (DEV MOCK token) with an open KYC Level 1 case. */
 async function playerWithKycCase() {
@@ -87,17 +54,15 @@ async function playerWithKycCase() {
   return { handle };
 }
 
-async function signIn(page: Page, a: DemoAdmin): Promise<number> {
+async function signIn(page: Page, a: DemoAdmin): Promise<void> {
   await page.goto('/admin/login');
   await expect(page.getByRole('heading', { name: 'Sign in to the admin console' })).toBeVisible();
   await page.getByLabel('Work email').fill(a.email);
   await page.getByLabel('Password', { exact: true }).fill(a.password);
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Confirm it’s you' })).toBeVisible();
-  const step = timeStep();
-  await page.getByLabel('Authenticator code').fill(totpAt(a.totpSecret, step));
-  await expect(page).toHaveURL(/\/admin$/);
-  return step;
+  await page.getByLabel('Authenticator code').fill(await adminCode(a));
+  await expect(page).toHaveURL(/\/admin$/, { timeout: 30_000 });
 }
 
 test.describe('ADMIN-B — Compliance KYC decision + Finance / Pool read-only views', () => {
@@ -107,7 +72,7 @@ test.describe('ADMIN-B — Compliance KYC decision + Finance / Pool read-only vi
     test.setTimeout(240_000);
     const player = await playerWithKycCase();
     const osei = admin('k.osei');
-    const loginStep = await signIn(page, osei);
+    await signIn(page, osei);
 
     // ADM-C1 KYC queue → the new case
     await page.goto('/admin/compliance/kyc');
@@ -128,7 +93,7 @@ test.describe('ADMIN-B — Compliance KYC decision + Finance / Pool read-only vi
     await dialog
       .getByLabel('Reason (required)')
       .fill('E2E: provider result clear, profile matches, no watchlist hit');
-    await dialog.getByLabel('Authenticator code').fill(totpAt(osei.totpSecret, loginStep + 1));
+    await dialog.getByLabel('Authenticator code').fill(await adminCode(osei));
     await dialog.getByRole('button', { name: 'Approve', exact: true }).click();
     await expect(dialog).toBeHidden();
     await expect(page.getByText('Approved').first()).toBeVisible();

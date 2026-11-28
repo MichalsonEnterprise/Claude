@@ -347,8 +347,11 @@ export class GameSeedsBetsController {
 
   @Get(':slug/bets')
   @PlayerAuth()
-  @ApiOperation({ summary: 'My bets for a game (newest first) + DEMO totals' })
+  @ApiOperation({
+    summary:
+      'My bets for a game (newest first) + DEMO totals; optional filters from / to / result / pick / search apply to both',
+  })
   history(@CurrentUser() user: AuthUser, @Param('slug') slug: string, @Query() q: BetsQueryDto) {
-    return this.bets.history(user.id, slug, q.page, q.pageSize);
+    return this.bets.history(user.id, slug, q.page, q.pageSize, q);
   }
 }

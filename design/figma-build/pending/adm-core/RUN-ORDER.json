@@ -4,32 +4,14 @@
     "01a-adm01": "ran 28 Nov 2026 — ADM-01 sign in default 170:66492 + 5 states",
     "01b-adm02": "ran 28 Nov 2026 — ADM-02 overview 1440 171:73506",
     "02-x1-requester": "ran 28 Nov 2026 — 178:99766 / 178:100079 / 178:100360 / 178:100654",
-    "03-x1-approver": "ran 28 Nov 2026 — 180:143765 / 180:144187 / 180:144734 / 180:145242"
+    "03-x1-approver": "ran 28 Nov 2026 — 180:143765 / 180:144187 / 180:144734 / 180:145242",
+    "07-states": "ran 28 Nov 2026 (cont.) — 221:191799 / 221:192192",
+    "04-laptop": "ran 28 Nov 2026 (cont.) — 222:125633 / 222:126124 / 222:126310 / 222:127249 (+ touch-ups on 180:145242, 180:144187, 180:144734)",
+    "05-tablet": "ran 28 Nov 2026 (cont.) — 224:95574 / 224:96327 / 224:96513",
+    "06-tablet-shell": "ran 28 Nov 2026 (cont.) — 224:159273 / 224:159747 / 224:160161",
+    "m-01-overview-alerts": "ran 28 Nov 2026 (cont.) — 226:80653 / 226:81089",
+    "m-02-approvals": "ran 28 Nov 2026 (cont.) — 227:142765 / 227:143053"
   },
-  "order": [
-    [
-      "out/07-states.js",
-      "1440: [ADM-01] Session timeout — Warning (x=3240, ADM-01 row) + [ADM-02] Overview — Restricted role Support L2 (x=1680, ADM-02 row)"
-    ],
-    [
-      "out/04-laptop.js",
-      "Laptop 1280 band: ADM-00 inbox, ADM-01 sign in, ADM-02 overview (rebuilt), ADM-X1 confirm Ready + consistency touch-ups on the #03 approver frames"
-    ],
-    [
-      "out/05-tablet.js",
-      "Tablet 768 band (needs #04 first so the band sits below the laptop band): ADM-02 overview, ADM-01 sign in, ADM-X1 confirm Ready"
-    ],
-    [
-      "out/06-tablet-shell.js",
-      "ADM-00 at 768: navigation drawer open, command palette, no-permission (needs #05)"
-    ],
-    [
-      "out/m-01-overview-alerts.js",
-      "page 10: [ADM-02 · MOB-11] Overview / 390, [MOB-11] Alerts / 390 / Operations"
-    ],
-    [
-      "out/m-02-approvals.js",
-      "page 10: [MOB-11] Approvals queue / 390 / Open, [ADM-X1 · MOB-11] Review AR-1042 / 390 / Bottom sheet"
-    ]
-  ]
+  "order": [],
+  "_status": "COMPLETE — every script ran; post-run fixes applied inline (see decisions.md, adm-core continuation entry)."
 }

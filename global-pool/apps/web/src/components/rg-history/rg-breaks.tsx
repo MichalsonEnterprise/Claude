@@ -855,9 +855,8 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
             </Button>
           </div>
           <p className="text-caption text-text-tertiary">
-            The button unlocks when {needsCode ? 'your code (or a backup code) is entered, ' : ''}the
-            phrase matches
-            and the box is ticked. Leaving this page changes nothing.
+            The button unlocks when {needsCode ? 'your code (or a backup code) is entered, ' : ''}
+            the phrase matches and the box is ticked. Leaving this page changes nothing.
           </p>
         </form>
       )}
@@ -890,9 +889,10 @@ function SelfExclusionBody({ state }: { state: RgStateView }) {
         <Card padding="l" className="gap-2">
           <h2 className="text-body-m-strong">Want to block other sites too?</h2>
           <p className="text-body-s text-text-secondary">
-            Self-exclusion here covers this GLOBAL POOL account and any new account opened with the
-            same verified identity. Your national gambling regulator may run a register that covers
-            every licensed operator, and blocking software can add another layer.
+            Self-exclusion here covers this GLOBAL POOL account. If you have another GLOBAL POOL
+            account, exclude it too — support can help. Your national gambling regulator may run a
+            register that covers every licensed operator, and blocking software can add another
+            layer.
           </p>
         </Card>
       </>
@@ -972,8 +972,8 @@ function ReopenCard({ reopen }: { reopen: Reopen }) {
         <h2 className="flex-1 text-h5">Your self-exclusion period has ended</h2>
       </div>
       <p className="text-body-s text-text-secondary">
-        It ended {dateTime(reopen.endedAt)}. Your account stays closed to play and deposits until you
-        ask to reopen it — nothing reopens automatically.
+        It ended {dateTime(reopen.endedAt)}. Your account stays closed to play and deposits until
+        you ask to reopen it — nothing reopens automatically.
       </p>
       {reopen.status === 'awaiting_request' && (
         <>

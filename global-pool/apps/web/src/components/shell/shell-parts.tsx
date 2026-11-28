@@ -24,6 +24,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { CountBadge, VipBadge, type VipTierName } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,8 +45,8 @@ export interface ShellMember {
   initials: string;
   publicId?: string;
   vipTier?: VipTierName;
-  /** Available balance, decimal string. */
-  available: string;
+  /** Available balance, decimal string. null while the player's real balance is loading (skeleton, never a guess). */
+  available: string | null;
   notifications: number;
   activeEntries: number;
   demo: boolean;
@@ -75,17 +76,25 @@ export function BalancePill({
       <Link
         href={ROUTES.wallet}
         className="flex h-full items-center gap-2 rounded-l-md pr-2.5 pl-3 transition-colors hover:bg-surface-hover"
-        aria-label={`Available balance ${formatUSDT(member.available)}${member.demo ? ' (demo)' : ''} — open wallet`}
+        aria-label={
+          member.available === null
+            ? 'Available balance loading — open wallet'
+            : `Available balance ${formatUSDT(member.available)}${member.demo ? ' (demo)' : ''} — open wallet`
+        }
       >
         <TokenMark size={compact ? 16 : 18} />
-        <span
-          className={cn(
-            'tabular-nums text-text-primary',
-            compact ? 'text-label-s' : 'text-label-m',
-          )}
-        >
-          {formatUSDT(member.available, { symbol: false })}
-        </span>
+        {member.available === null ? (
+          <Skeleton className={cn('h-4', compact ? 'w-12' : 'w-16')} />
+        ) : (
+          <span
+            className={cn(
+              'tabular-nums text-text-primary',
+              compact ? 'text-label-s' : 'text-label-m',
+            )}
+          >
+            {formatUSDT(member.available, { symbol: false })}
+          </span>
+        )}
         {member.demo && <DemoBadge size="xs" />}
       </Link>
       <Button
@@ -165,7 +174,11 @@ export function UserMenu({ member, onSignOut }: { member: ShellMember; onSignOut
         <div className="mx-2 mb-1 rounded-md bg-bg-secondary px-3 py-2.5">
           <p className="text-caption text-text-tertiary">Available</p>
           <p className="flex items-center gap-2 text-number-s tabular-nums">
-            {formatUSDT(member.available)}
+            {member.available === null ? (
+              <Skeleton className="h-5 w-24" />
+            ) : (
+              formatUSDT(member.available)
+            )}
             {member.demo && <DemoBadge size="xs" />}
           </p>
         </div>

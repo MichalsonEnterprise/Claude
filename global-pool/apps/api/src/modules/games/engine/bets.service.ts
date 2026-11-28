@@ -10,10 +10,11 @@ import {
   playInstant,
   verifyBet,
   type FairGameSlug,
+  type GameBetsQuery,
   type PlaceBetInput,
 } from '@gp/shared/fair';
 import { money } from '@gp/shared/money';
-import type { Game, GameResult, GameSession } from '@prisma/client';
+import type { Game, GameResult, GameSession, Prisma } from '@prisma/client';
 
 import { AppError, notFound } from '../../../common/errors';
 import type { AuthUser } from '../../../common/request';
@@ -125,10 +126,19 @@ export class BetsService {
     };
   }
 
-  /** GET /games/:slug/bets — my bets for one game, newest first. */
-  async history(userId: string, slug: string, page: number, pageSize: number) {
+  /**
+   * GET /games/:slug/bets — my bets for one game, newest first. Optional filters (period, win / lose, Double Side
+   * pick, reference or nonce search) apply to the page AND the summary, so KPIs always describe the listed bets.
+   */
+  async history(
+    userId: string,
+    slug: string,
+    page: number,
+    pageSize: number,
+    filters: Pick<GameBetsQuery, 'from' | 'to' | 'result' | 'pick' | 'search'> = {},
+  ) {
     const game = await this.seeds.gameRow(this.prisma, slug);
-    const where = { userId, gameId: game.id };
+    const where = this.historyWhere(userId, game.id, filters);
     const [rows, total] = await Promise.all([
       this.prisma.gameResult.findMany({
         where,
@@ -139,11 +149,26 @@ export class BetsService {
       }),
       this.prisma.gameResult.count({ where }),
     ]);
-    const settled = await this.prisma.gameResult.aggregate({
-      where: { ...where, status: 'settled' },
-      _sum: { stake: true, payout: true },
-      _count: true,
-    });
+    const settledWhere: Prisma.GameResultWhereInput = { AND: [where, { status: 'settled' }] };
+    const [settled, wins, landedHeads, landedTails] = await Promise.all([
+      this.prisma.gameResult.aggregate({
+        where: settledWhere,
+        _sum: { stake: true, payout: true },
+        _count: true,
+      }),
+      this.prisma.gameResult.count({ where: { AND: [settledWhere, { payout: { gt: 0 } }] } }),
+      // Double Side: how the coin landed (a record, not a pattern — every flip is 50 / 50)
+      slug === 'double-side'
+        ? this.prisma.gameResult.count({
+            where: { AND: [settledWhere, { outcome: { path: ['side'], equals: 'heads' } }] },
+          })
+        : Promise.resolve(null),
+      slug === 'double-side'
+        ? this.prisma.gameResult.count({
+            where: { AND: [settledWhere, { outcome: { path: ['side'], equals: 'tails' } }] },
+          })
+        : Promise.resolve(null),
+    ]);
     const wagered = credits(settled._sum.stake);
     const returned = credits(settled._sum.payout);
     return {
@@ -157,10 +182,40 @@ export class BetsService {
         wagered,
         returned,
         net: credits(money(returned).minus(money(wagered)).toFixed()),
+        wins,
+        losses: settled._count - wins,
+        ...(landedHeads !== null && landedTails !== null
+          ? { landed: { heads: landedHeads, tails: landedTails } }
+          : {}),
       },
       currency: DEMO.currency,
       isDemo: true,
     };
+  }
+
+  private historyWhere(
+    userId: string,
+    gameId: string,
+    f: Pick<GameBetsQuery, 'from' | 'to' | 'result' | 'pick' | 'search'>,
+  ): Prisma.GameResultWhereInput {
+    const and: Prisma.GameResultWhereInput[] = [{ userId, gameId }];
+    if (f.from || f.to) {
+      and.push({
+        createdAt: { ...(f.from ? { gte: new Date(f.from) } : {}), ...(f.to ? { lte: new Date(f.to) } : {}) },
+      });
+    }
+    if (f.result === 'win') and.push({ status: 'settled', payout: { gt: 0 } });
+    if (f.result === 'lose') and.push({ status: 'settled', payout: { lte: 0 } });
+    if (f.pick) and.push({ params: { path: ['pick'], equals: f.pick } });
+    if (f.search) {
+      const digits = /(\d{1,9})$/.exec(f.search)?.[1];
+      const n = digits ? Number(digits) : NaN;
+      if (Number.isSafeInteger(n)) {
+        // "CF-52107" names a reference; a bare number may be a reference or a nonce
+        and.push(/[A-Za-z-]/.test(f.search) ? { refNumber: n } : { OR: [{ refNumber: n }, { nonce: n }] });
+      }
+    }
+    return { AND: and };
   }
 
   async byId(userId: string, id: string): Promise<BetRow> {

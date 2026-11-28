@@ -10,6 +10,8 @@ import * as React from 'react';
 export interface ShellOverrides {
   /** Region restricted: gating banner, Sign up / Deposit disabled. */
   restricted?: boolean;
+  /** Country the region gate is about (shown in the banner); omitted → the banner names no country. */
+  regionName?: string | null;
   /** Preview the shell as the DEMO member (dev-only state preview). */
   previewMember?: boolean;
   /** Preview the shell as a guest even when signed in (dev-only state preview). */
@@ -44,6 +46,7 @@ const useIsomorphicLayoutEffect =
 /** Declarative override; cleared when the page unmounts. Renders nothing. */
 export function ShellOverride({
   restricted,
+  regionName,
   previewMember,
   previewGuest,
   collapseSidebar,
@@ -51,8 +54,8 @@ export function ShellOverride({
   const set = React.useContext(ShellOverridesContext)?.setOverrides;
   useIsomorphicLayoutEffect(() => {
     if (!set) return;
-    set({ restricted, previewMember, previewGuest, collapseSidebar });
+    set({ restricted, regionName, previewMember, previewGuest, collapseSidebar });
     return () => set({});
-  }, [set, restricted, previewMember, previewGuest, collapseSidebar]);
+  }, [set, restricted, regionName, previewMember, previewGuest, collapseSidebar]);
   return null;
 }

@@ -33,7 +33,9 @@ pnpm --filter @gp/web visual             # Playwright screenshots → apps/web/t
 | `src/app/(app)/page.tsx`             | **Homepage / public lobby (PUB-01, MOB-03)** — see “Homepage” below                   |
 | `src/app/(auth)/layout.tsx`          | focused pages without the shell (onboarding, 2FA, admin sign-in)                      |
 | `src/app/design-system/…`            | kitchen sink + shell preview (noindex)                                                |
-| `src/components/shell/nav-config.ts` | `ROUTES`, `PRIMARY_NAV`, `ACCOUNT_NAV`, `TAB_NAV` (planned URL map)                   |
+| `src/components/shell/nav-config.ts` | `ROUTES`, `PRIMARY_NAV`, `ACCOUNT_NAV`, `TAB_NAV` — every href is a built page (unit-tested) |
+| `src/app/(app)/legal/[doc]`, `/support`, `/promotions` | DEMO summaries behind consent / KYC / footer / bonus links (`components/legal/*`) |
+| `/winners` `/vip` `/affiliates` `/about` `/official-channels` `/status` `/security` | honest "not in this build yet" pages (`ComingSoonPage`) |
 
 ## Auth — `@/lib/auth` + `@/components/auth/*`
 
@@ -58,6 +60,12 @@ signOut(), openAuth(view?, { next }), getAccessToken() }`. `profile` is the API 
   `NEXT_PUBLIC_IDLE_TIMEOUT_MINUTES` (default 30, `0` = off) or when any player query/mutation fails with 401
   `UNAUTHENTICATED`, then shows **AUTH-20** `<SessionExpiredDialog>` ("Sign in again" returns to the same page), and
   shows **AUTH-21** `<NewDeviceDialog>` for `GET /auth/new-device-alerts` (never auto-opens for seeded DEMO accounts).
+- **Player caches** (`src/lib/api/player-cache.ts`): player query keys are not scoped by user, so sign-out / expiry /
+  sign-out in another tab removes every player prefix (`clearPlayerData`), and every financial or RG write calls
+  `invalidatePlayerFinancials()` (wallet, pool/me, account, history, rg, me, auth balances + account-status). Admin
+  sign-out / idle expiry removes `['admin']` and `['admin-b']` (`clearAdminData`). `?next=` goes through `safeNext()`
+  (`safeAdminNext()` in the admin console): no control characters / whitespace / backslashes, same origin only.
+  Writes whose response is lost (`isOutcomeUnknown()`) are shown as "couldn't confirm" and retried with the same key.
 - **Onboarding** `/onboarding` (`<OnboardingScreen>`): handle, country (prefilled from `GET /compliance/region`), date of
   birth (18+), consents never pre-checked (Terms + Privacy · 18+ + jurisdiction · optional marketing) →
   `POST /auth/onboarding`. Errors: taken handle, `GEO_RESTRICTED` (no bypass hints).
@@ -173,7 +181,10 @@ fixtures; `node scripts/auth-qa.mjs` screenshots them at 1440 / 390; e2e: `e2e/a
 
 Responsive: ≥ 1280 sidebar 240 (burger collapses to 72, saved in localStorage `gp.sidebar`) · 1024–1279 rail 72
 (burger expands) · < 1024 burger opens the drawer · < 768 mobile top bar 56 + tab bar 56 (+ safe area).
-`DEMO_SHELL_MEMBER` (from `app-shell.tsx`) supplies @nova.k's DEMO balance until the API profile endpoint exists.
+Shell member data: with `NEXT_PUBLIC_DATA_SOURCE=api` a signed-in member sees their own Available (`walletKeys.balances`),
+entries in the open round (`poolKeys.myRound`), unread notifications and the live pool amount (skeletons while loading);
+`DEMO_SHELL_MEMBER` is only the mock data source / `?state=member` preview. The region banner names the country only
+when the page passes `<ShellOverride restricted regionName=… />`.
 
 ## Homepage (PUB-01) — `src/components/home/*`
 

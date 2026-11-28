@@ -39,7 +39,9 @@ export const PLAYER_DATA_PREFIXES: readonly QueryKey[] = [
 
 /** Refresh every module's copy of the player's balances / limits / history after a financial or RG write. */
 export async function invalidatePlayerFinancials(qc: QueryClient): Promise<void> {
-  await Promise.all(PLAYER_FINANCIAL_PREFIXES.map((queryKey) => qc.invalidateQueries({ queryKey })));
+  await Promise.all(
+    PLAYER_FINANCIAL_PREFIXES.map((queryKey) => qc.invalidateQueries({ queryKey })),
+  );
 }
 
 /** Drop every cached query of the signed-in player (sign-out, session expiry, sign-out in another tab). */

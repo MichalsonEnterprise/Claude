@@ -42,8 +42,20 @@ export interface BrowserVerification {
   error: string | null;
 }
 
+/** Key-order-independent JSON form (stored outcomes come back from JSONB with their keys re-ordered). */
+function canonical(v: unknown): unknown {
+  if (Array.isArray(v)) return v.map(canonical);
+  if (v && typeof v === 'object')
+    return Object.fromEntries(
+      Object.keys(v as Record<string, unknown>)
+        .sort()
+        .map((k) => [k, canonical((v as Record<string, unknown>)[k])]),
+    );
+  return v;
+}
+
 function sameValue(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
 }
 
 /**

@@ -106,7 +106,7 @@ export function HowItWorksSection() {
         title="How it works"
         action={
           <Button variant="secondary" size="s" asChild>
-            <Link href={`${ROUTES.pool}/how-it-works`}>Full guide</Link>
+            <Link href="/legal/terms#entries">Full guide</Link>
           </Button>
         }
         subtitle="From sign-up to payout in five steps — each step leaves a record you can check in your account or on-chain."
@@ -264,7 +264,7 @@ export function HowItWorksSection() {
           </Button>
         )}
         <Link
-          href={`${ROUTES.pool}/rules`}
+          href="/legal/terms#entries"
           className="inline-flex items-center gap-2 text-label-l text-text-primary hover:underline hover:underline-offset-4"
         >
           Read the round rules <ArrowRight aria-hidden className="size-5" />
@@ -449,7 +449,7 @@ const SECURITY: { icon: LucideIcon; title: string; body: string; cta: string; hr
     title: 'Address whitelisting',
     body: 'Withdraw only to approved addresses. New addresses unlock after a 24-hour cooldown.',
     cta: 'Manage addresses',
-    href: '/account/security#addresses',
+    href: '/wallet/whitelist',
   },
   {
     icon: Hash,

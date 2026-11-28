@@ -49,7 +49,7 @@ test.describe('J6 — round lifecycle: enter → close → draw → settle → r
         headers,
         data: { entries: 2, idempotencyKey: `qa-j6-${uniq()}` },
       });
-      expect(res.status(), await res.text()).toBe(200);
+      expect(res.status(), await res.text()).toBe(201);
       const buy = await json<{ entries: number; entryAmount: string; platformFee: string; networkFee: string; total: string; firstEntryId: string; lastEntryId: string }>(res);
       expect(buy).toMatchObject({ entries: 2, entryAmount: '20.00', platformFee: '0.10', networkFee: '0.00', total: '20.10' });
       expect(await balances(request, player)).toMatchObject({ available: '29.90', locked: '20.00', total: '49.90' });
@@ -63,7 +63,7 @@ test.describe('J6 — round lifecycle: enter → close → draw → settle → r
         await request.get(`${API}/history/rounds/active`, { headers }),
       );
       expect(JSON.stringify(active)).toContain(String(round.number));
-      await page.goto('/history/active');
+      await page.goto('/history/games/active');
       await expect(page.locator('main')).toContainText(round.number.toLocaleString('en-US'));
       await shot(page, J, '02_history_active');
     } finally {

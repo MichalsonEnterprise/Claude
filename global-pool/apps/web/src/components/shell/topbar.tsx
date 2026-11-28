@@ -11,6 +11,7 @@ import { SearchInput } from '@/components/ui/search-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
+import { ROUTES } from './nav-config';
 import type { ShellAuth } from './sidebar';
 import {
   BalancePill,
@@ -81,10 +82,13 @@ export function Topbar({
       <form
         role="search"
         className="mx-auto hidden w-full max-w-[400px] min-w-[200px] flex-1 lg:block"
-        onSubmit={(e) => e.preventDefault()}
+        // Searches the games lobby (`/games?q=…`), which filters by name.
+        action={ROUTES.games}
+        method="get"
       >
         <SearchInput
           shortcut
+          name="q"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onClear={() => setQuery('')}
@@ -94,7 +98,7 @@ export function Topbar({
 
       <div className="ml-auto flex shrink-0 items-center gap-2 laptop:gap-3">
         <IconButton label="Search games and rounds" asChild className="lg:hidden">
-          <Link href="/search">
+          <Link href={ROUTES.games}>
             <Search aria-hidden />
           </Link>
         </IconButton>
