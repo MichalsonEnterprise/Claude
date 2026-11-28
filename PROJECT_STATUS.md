@@ -15,15 +15,15 @@ Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verifie
 | Figma throughput | **Blocker-ish:** Figma MCP tool-call limit on the Pro/Full seat (≈200/day + per-minute cap) throttles design work since 27 Nov 22:50 UTC; ~1 call/min effective. Agents saved ready-to-run scripts in `design/figma-build/pending/` and `queue/`. |
 
 ## 2. Figma progress (details: `FIGMA_PROGRESS.md`, ledger `design/figma-build/ledger.json`)
-Ledger (306 rows incl. 12 added for catalogue/promotions): **105 verified · 18 built · 20 in progress · 163 not started** (as of ~03:00 UTC 28 Nov; continuation workflows running for wallet withdraw 1–5 / 2FA / KYC / draw / pool hub, admin P0 + mobile patterns, and the 5 games).
+Ledger (306 rows incl. 12 added for catalogue/promotions): **128 verified · 18 built · 10 in progress · 150 not started** (P0: 87 verified / 11 built / 19 left). Running: admin P0 + mobile patterns, the 5 games, and the P1 batch (pool history, promotions, catalogue, game details, public P1, admin games).
 
 ### Screens ready for coding (verified/built in Figma)
 - **01/02 Design system & components:** DS-01…09, CMP-01…18, casino kit (shell, lobby, catalogue, promotions)
 - **03 Public website:** PUB-01 Home (all states, 1440/1280/768/390) ✅, PUB-02 Global Pool public 🟠, PUB-03 Games lobby 🟠, PUB-07 Provably Fair 🟠, PUB-21 Geo-block ✅, PUB-22 Age gate ✅
-- **04 Authentication:** AUTH-01 Register ✅, AUTH-02 Wallet-first ✅, AUTH-03 Login ✅, AUTH-04 Email verification ✅, AUTH-05/06 password reset ✅ (not used for players under Privy), AUTH-18 Restricted account ✅, AUTH-19 Recovery ✅, AUTH-20 Session expired ✅, AUTH-21 New-device alert ✅
+- **04 Authentication:** AUTH-01 Register ✅, AUTH-02 Wallet-first ✅, AUTH-03 Login ✅, AUTH-04 Email verification ✅, AUTH-05/06 password reset ✅ (not used for players under Privy), AUTH-18 Restricted account ✅, AUTH-19 Recovery ✅, AUTH-20 Session expired ✅, AUTH-21 New-device alert ✅, KYC AUTH-11…17 ✅, 2FA AUTH-07 ✅, AUTH-08 🟠, Connect wallet AUTH-09 🟠, Wallet verification AUTH-10 ✅
 - **05 User dashboard:** USR-00 Shell ✅, USR-01 Overview ✅, USR-02 Notifications ✅, Account & security USR-A1…A10 ✅, Financial history USR-F1…F6 ✅, Responsible gaming USR-RG1…RG7 ✅, Gaming USR-G1…G7 🟠
-- **06 Wallet:** WAL-01/02/20–24 overview, wallets, history, detail, whitelist, banners ✅; Deposit WAL-03…09 ✅; Withdraw WAL-15…19 ✅ (steps 1–5 WAL-10…14 still in Figma)
-- **07 Global Pool:** GP-01 Hub 🟠, GP-02 Participation preview 🟠
+- **06 Wallet:** WAL-01/02/20–24 overview, wallets, history, detail, whitelist, banners ✅; Deposit WAL-03…09 ✅; Withdraw WAL-10…19 (all 9 steps) ✅; mobile MOB-05/06/07 ✅
+- **07 Global Pool:** GP-01 Hub ✅, GP-02 Participation preview ✅, GP-03 Pending ✅, GP-04 Success 🟠, GP-05 Drawing (VRF) ✅, GP-06/07 Results ✅, GP-12 PF verification ✅, MOB-04 ✅
 - **09 Admin:** ADM-U1…U10 ✅, ADM-F1, F3…F9 ✅, ADM-P4…P6 🟠
 - **10 Mobile:** MOB-03 ✅, MOB-05 ✅, MOB-04 🟠, MOB-06 🟠
 
