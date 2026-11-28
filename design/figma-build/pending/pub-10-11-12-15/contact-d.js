@@ -4,7 +4,7 @@ const top = AL('VERTICAL', { name: 'Page top', gap: 16 }); add(C, [top, 'FILL'])
 const bc = await I('14:1145', { Levels: '2' }); txt(bc, 'Crumb 1', 'Home'); txt(bc, 'Current page', 'Contact'); add(top, bc);
 const ph = AL('HORIZONTAL', { name: 'Page header', gap: 24, align: 'MAX' }); add(top, [ph, 'FILL']);
 const pl = AL('VERTICAL', { gap: 8 }); add(pl, await T('Contact support', 'Heading/H1', 'text/primary'), [await T('Real people, around the clock. Tell us what happened and we’ll get back to you — most emails get a first reply in about 2 hours.', 'Body/L', 'text/secondary', { w: 680 }), 'FILL']); add(ph, [pl, 'FILL']);
-const stt = AL('HORIZONTAL', { name: 'System status', fill: 'surface/default', stroke: 'border/subtle', r: 9999, p: [8, 16, 8, 12], gap: 8, align: 'CENTER' }); add(stt, await IC('check-circle', 16, 'text/success'), await T('All systems operational', 'Label/M', 'text/primary'), await T('Status page', 'Label/M', 'text/brand'), await IC('external-link', 14, 'icon/brand')); add(ph, stt);
+const stt = AL('HORIZONTAL', { name: 'System status', fill: 'surface/default', stroke: 'border/subtle', r: 9999, p: [8, 16, 8, 12], gap: 8, align: 'CENTER' }); add(stt, await IC('alert-triangle', 16, 'text/warning'), await T('Ethereum deposits slower than usual · all else operational', 'Label/M', 'text/primary'), await T('Status page', 'Label/M', 'text/brand'), await IC('external-link', 14, 'icon/brand')); add(ph, stt);
 const cols = AL('HORIZONTAL', { name: 'Form + channels', gap: 24 }); add(C, [cols, 'FILL']);
 const form = AL('VERTICAL', { name: 'Contact form', fill: 'surface/default', stroke: 'border/subtle', r: 20, p: 32, gap: 24 }); add(cols, [form, 'FILL']);
 const fh = AL('HORIZONTAL', { name: 'Form header', gap: 12, align: 'CENTER' }); add(fh, [await T('Send us a message', 'Heading/H4', 'text/primary', { name: 'Form title' }), 'FILL'], await T('* required', 'Caption', 'text/tertiary')); add(form, [fh, 'FILL']);
@@ -42,7 +42,7 @@ const rgh = await I('24:14743'); rgh.name = 'RG/Help Resources'; add(side, [rgh,
 add(C, [await head('BEFORE YOU WRITE', 'You might get an answer faster here', null), 'FILL']);
 const ql = AL('HORIZONTAL', { name: 'Quick links', gap: 16 }); add(C, [ql, 'FILL']);
 for (const [ic, t, d, l] of [['withdraw', 'Track a withdrawal', 'Live status for every withdrawal, including AML review and network confirmations.', 'Open tracker'], ['help-circle', 'Browse the FAQ', 'Fees, withdrawals, fairness, KYC and restricted regions in plain language.', 'Go to FAQ'], ['sliders', 'Change your limits', 'Lower a limit instantly or take a break — no need to contact us.', 'Responsible gaming']]) {
-  const c = await I('23:16859', { State: 'Default' }, { Title: t, Body: d, Link: l, 'Show link': true, Icon: ICONS[ic] }); c.name = 'Card/Feature — ' + t; tint(c.findOne(n => n.name === 'Icon'), 'icon/brand'); add(ql, [c, 'FILL_BOTH']); }
+  const c = await I('23:16859', { State: 'Default' }, { Title: t, Body: d, Link: l, 'Show link': true, Icon: ICONS[ic] }); c.name = 'Card/Feature — ' + t; tint(c.findOne(n => n.name === 'Icon') || c.findOne(n => n.type === 'INSTANCE' && n.componentPropertyReferences && n.componentPropertyReferences.mainComponent), 'icon/brand'); add(ql, [c, 'FILL_BOTH']); }
 await licence(C);
 S.f.primaryAxisSizingMode = 'AUTO'; fitSection(sec);
 await cols.screenshot({ scale: 0.6 });

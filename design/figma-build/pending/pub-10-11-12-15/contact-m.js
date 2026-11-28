@@ -1,7 +1,7 @@
 const S = await mshell('[PUB-15] Contact / 390 / Default — empty form', 1650, 120); const C = S.C;
 const hd = AL('VERTICAL', { name: 'Page header', gap: 12 }); add(C, [hd, 'FILL']);
 add(hd, await T('Contact support', 'Heading/H2', 'text/primary'), [await T('Real people, around the clock. Most emails get a first reply in about 2 hours.', 'Body/M', 'text/secondary', { w: 358 }), 'FILL']);
-const stt = AL('HORIZONTAL', { name: 'System status', fill: 'surface/default', stroke: 'border/subtle', r: 9999, p: [8, 14, 8, 10], gap: 8, align: 'CENTER' }); add(stt, await IC('check-circle', 16, 'text/success'), await T('All systems operational', 'Label/M', 'text/primary'), await IC('external-link', 14, 'icon/brand')); add(hd, stt);
+const stt = AL('HORIZONTAL', { name: 'System status', fill: 'surface/default', stroke: 'border/subtle', r: 9999, p: [8, 14, 8, 10], gap: 8, align: 'CENTER' }); add(stt, await IC('alert-triangle', 16, 'text/warning'), await T('Ethereum slower than usual', 'Label/M', 'text/primary'), await IC('external-link', 14, 'icon/brand')); add(hd, stt);
 const chat = box('Live chat', { gap: 12, p: 16 }); add(C, [chat, 'FILL']);
 const chh = AL('HORIZONTAL', { gap: 12, align: 'CENTER' }); const ci = AL('HORIZONTAL', { fill: 'brand/tint', r: 10, p: 8 }); add(ci, await IC('chat', 20, 'icon/brand')); const ct = AL('VERTICAL', { gap: 2 }); add(ct, await T('Live chat · 24/7', 'Body/M Strong', 'text/primary'), await T('Median wait under 2 min', 'Body/S', 'text/secondary')); add(chh, ci, [ct, 'FILL'], await DEMO('XS')); add(chat, [chh, 'FILL']);
 add(chat, [await BTN('Secondary', 'Start live chat', { size: 'L', lead: 'chat' }), 'FILL']);
@@ -45,11 +45,11 @@ const k2 = mk('Sent — success', k1.y + k1.height + 160); out.sent = k2.id;
   add(sp, ic, [await T('Thanks, Nova — we’ve got your message', 'Heading/H4', 'text/primary', { w: 326 }), 'FILL'], [await T('A person will reply by email. We sent a copy to n•••@example.com — check our reply shows your anti-phishing code.', 'Body/S', 'text/secondary', { w: 326 }), 'FILL']);
   const kv = AL('VERTICAL', { name: 'Ticket summary', fill: 'surface/raised', r: 14, p: 14, gap: 0 }); add(sp, [kv, 'FILL']);
   const kh = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [0, 0, 8, 0] }); const st = await BADGE('Pending', 'S'); const stt2 = st.findOne(n => n.type === 'TEXT'); if (stt2) stt2.characters = 'Open'; add(kh, [await T('Ticket CS-58214', 'Mono/S', 'text/primary'), 'FILL'], st, await DEMO('XS')); add(kv, [kh, 'FILL']);
-  for (const [k, v] of [['Topic', 'Withdrawals'], ['Reference', 'WD-20931'], ['Sent', '27 Nov 2026, 16:42 UTC'], ['Reply expected', 'by 28 Nov 2026, 16:42 UTC']]) { const r = AL('HORIZONTAL', { gap: 12, p: [8, 0, 8, 0], align: 'CENTER' }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, [await T(k, 'Caption', 'text/tertiary'), 'FILL'], await T(v, 'Body/S Strong', 'text/primary')); add(kv, [r, 'FILL']); }
+  for (const [k, v] of [['Topic', 'Withdrawals'], ['Reference', 'WD-20931'], ['Sent', '27 Nov 2026, 19:52 UTC'], ['Reply expected', 'by 23:52 UTC (within 4 h)']]) { const r = AL('HORIZONTAL', { gap: 12, p: [8, 0, 8, 0], align: 'CENTER' }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, [await T(k, 'Caption', 'text/tertiary'), 'FILL'], await T(v, 'Body/S Strong', 'text/primary')); add(kv, [r, 'FILL']); }
   add(sp, [await BTN('Secondary', 'Send another message', { size: 'L' }), 'FILL']);
   f2.appendChild(sp); sp.layoutSizingHorizontal = 'FILL';
   const sb = k2.findOne(n => n.name === 'Button — Sticky CTA'); setProp(sb, 'Label', 'Track withdrawal WD-20931'); setProp(sb, 'Leading icon', ICONS['withdraw']);
-  k2.findOne(n => n.name === 'Sticky note').characters = 'Reply expected within 24 h · median 2 h 10 min'; }
+  k2.findOne(n => n.name === 'Sticky note').characters = 'Withdrawal questions: reply within 4 h'; }
 fitSection(sec);
 await k1.findOne(n => n.name === 'Contact form').screenshot({ scale: 0.6 });
 await k2.findOne(n => n.name === 'Contact form').screenshot({ scale: 0.6 });
