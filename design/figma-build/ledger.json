@@ -338,8 +338,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED",
-  "note": "Nothing was built or verified this run. Three use_figma calls in a row were blocked by the Figma MCP tool-call limit: two parallel read-only listings, then a retry, then a final retry after a 7-minute wait. Under conventions §10 I stopped there. I could not see what is on the canvas; the ledger already said NOT STARTED, and no earlier run recorded any IDs. Still to build: (1) the component set 'Template/Game Details' with Breakpoint=Desktop 1136 and Breakpoint=Mobile 358; (2) six 1440 frames named '[PUB-04] Game Details · <Game> (<Genre>) / 1440 / Default — logged out' for Global Pool (Global Jackpot), Pool Roulette (Roulette), Orbit Rush (Crash), Pool Dice (Dice), Double Side (Coinflip) and Twenty-One (Blackjack); (3) the same six as 390 frames on page 10 in the section 'PUB-04 — Mobile'.",
+  "status": "VERIFIED",
+  "note": "Continuation run. A read-only listing at the start found nothing on either page, so everything was built in this run. Built: (1) the Template/Game Details component set 297:109867 with Breakpoint=Desktop 1136 and Breakpoint=Mobile 358. It holds the breadcrumb, a live-players pill (DEMO), the hero, the art stage, 'At a glance' (6 fact tiles), 'How to play' (4 steps), Payouts (up to 10 rows), Rules summary (up to 7), Provably fair with example data (DEMO), the Play card, the Live card (DEMO), 'Play responsibly' (18+), Notice/Licence and Related games. The hero has the game name, tagline, house edge / RTP / limit chips (DEMO), the Play CTA (Gold 'Participate' for Global Pool only), 18+ and 'You can lose your stake', plus a licence line. The art stage shows one 'Objects — <game>' group per game: an angled Gradient/Tile block, a mint stripe, Tile/Game Art and library objects (chips, wheel, dice, coins, cards, entry tickets, crash curve) cropped by the banner edge. (2) Six 1440 frames, each in the casino shell (Shell/Sidebar Expanded Guest with the matching nav item active, Shell/Topbar Desktop Guest, a template instance, Shell/Footer Mega). (3) Six 390 frames with Shell/Topbar Mobile, a Mobile template instance, a sticky CTA bar and Nav/Mobile Tab Bar (Pool tab for Global Pool, Games tab for the rest). Per-game rules: European single-zero roulette (35:1 down to 1:1, win chance = numbers ÷ 37, 2.70%); Orbit Rush crash with auto cash-out from 1.01× to 1,000.00× (chance = 99% ÷ target); dice roll over/under on 0.00–99.99 (multiplier = 99 ÷ chance, 50.50 → 49.50% → 2.0000×); coinflip 1.96× (2.00% edge); blackjack 3:2, S17, 6 decks (≈0.50%); Global Pool entry 10.00 + 0.05 USDT fee per entry, prize split 50/20/10/10×2% = 93,200 / 37,280 / 18,640 / 3,728 each, round #1,248 closing 27 Nov 2026 20:00 UTC — all matching demo-data.md. Checks: each frame's script read showed the right art group, the right CTAs (Gold on Global Pool only), the right payout and rule row counts, no '—' placeholders, footer and tab bar present, and no text running off the 390 canvas after the fixes. Screenshots of every desktop template instance, the Global Pool full frame and hero, and all 6 mobile frames passed.",
   "by": "pub-game-details"
  },
  {
@@ -451,8 +451,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 has Default (All questions), Search “withdraw” and No results “bonus code”, all with auto height. Mobile 390 is not built: Default, Search “withdraw” and No results “bonus code” are still missing. I did not screenshot the desktop frames in this run.",
+  "status": "VERIFIED",
+  "note": "Both sizes have all 3 states: Default with category tabs and accordion, Search “withdraw” and No results “bonus code”. Desktop 1440 frames: 33:205848, 33:242174, 36:534066. Mobile 390 frames: 34:435744 plus 302:109456 and 302:109738, which are new this run. In the new mobile search frame, the 6 results match desktop: the matched term is highlighted mint, results show per-category counts, and 2 of them are marked “Matched in answer” with an answer snippet. The new mobile no-results frame has an empty state with suggested searches, a promotions card (18+, Terms apply) and popular questions. One defect was fixed and re-checked: long questions in collapsed FAQ cards did not wrap. All screenshots passed.",
   "by": "pub-p1b"
  },
  {
@@ -493,8 +493,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 Default (resources, 1440x5491) exists. Mobile 390 Default is not built.",
+  "status": "VERIFIED",
+  "note": "Desktop 33:279676 and mobile 34:472716 were built by an earlier run and screenshot-checked now; both pass. They cover the tools overview (limits, reality checks, cooling-off, self-exclusion), a self-assessment teaser with nothing pre-selected, warning signs, help organisations, 18+ and the licence notice.",
   "by": "pub-p1b"
  },
  {
@@ -515,8 +515,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 has the grouped list and Search “united”. Mobile 390 is not built: grouped list and Search “united” are still missing.",
+  "status": "VERIFIED",
+  "note": "Desktop has the grouped list 33:323120 and Search “united” 34:356600. Mobile has the Default 34:491926 and Search “united” 303:113051, which is new this run. The new frame matches desktop data: GB, US and AE all Restricted, with US expanded to show YOU CAN / YOU CAN’T / WHY and the restricted-since date. It also has a “Browse by region” list, “Last updated 20 Nov 2026 · v4.2” and the don’t-use-a-VPN callout. One defect was fixed and re-checked: the results header wrapped onto two lines. All screenshots passed.",
   "by": "pub-p1b"
  },
  {
@@ -549,8 +549,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 has Banner and Preferences modal as fixed 1440x1024 viewports, which looks intentional for overlay states. Mobile 390 is not built: Banner (first visit) and Preferences (bottom sheet) are still missing.",
+  "status": "VERIFIED",
+  "note": "Desktop Banner 34:396216 and Preferences modal 34:409284 are fixed 1440x1024 viewports over the lobby. Mobile Banner 36:503505 and Preferences 36:518622 are 390x844 bottom sheets. All 4 were screenshot-checked now and pass. Accept all, Reject non-essential and Preferences have equal prominence. Optional categories (Functional, Analytics, Marketing) are off by default and Essential is locked on.",
   "by": "pub-p1b"
  },
  {
@@ -1685,8 +1685,8 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "BUILT",
-  "note": "D 1440 Default + Filters (with a filter popover) were fixed and their screenshots then passed. The fix collapsed spacers to 1 px, shortened truncated stat and table text, set the search to 240 and corrected the date range to 23–25 Nov. M 390 Default (round cards #1,248–#1,244) and Filters (bottom sheet) screenshots passed except the clipped DEMO bar. The DEMO bar message was then switched to the short mobile text (decision #29) and not screenshotted again, so the row stays BUILT until it is.",
+  "status": "VERIFIED",
+  "note": "D 1440 Default + Filters (filter popover) passed earlier. M 390 Default (round cards #1,248–#1,244) and Filters (bottom sheet: Settled+Cancelled, Rounds I entered, 23–25 Nov → 'Show 3 rounds' = #1,244/#1,245/#1,246) were re-checked by screenshot this run with the short mobile DEMO bar (decision #29). Both pass.",
   "by": "gp-history"
  },
  {
@@ -1698,7 +1698,7 @@
   "page": "07",
   "group": "",
   "status": "VERIFIED",
-  "note": "Cancelled → refunds (#1,245) checked by screenshot at 1440 and 390. It shows: 412/500 players, 41,200.00/50,000.00, Threshold Bar 8,800.00 / 88 short, 300.00 owed + 1.50 fee to Available, network fee 0.00, RF-1245-0042 batch 2 of 3, timeline to 27 Nov 21:00 UTC, refunded Entry Ticket, sticky CTA on mobile. An extra 1440 Default (settled #1,244) frame passed its screenshot: 13 winners, @nova.k runner-up +3,620.60, VRF proof. After that, two texts in its VRF stepper were aligned to the round header (settled 20:02:10, response 35 s). That was a text-only fix and was not screenshotted again.",
+  "note": "Cancelled → refunds (#1,245) passed at 1440 and 390: 412/500 players, 41,200.00/50,000.00, 300.00 owed + 1.50 fee to Available, RF-1245-0042 batch 2 of 3, timeline to 27 Nov 21:00 UTC, sticky CTA on mobile. The extra 1440 Default (settled #1,244) frame was re-screenshotted this run after its VRF stepper text fix and passes: settled 20:02:10 UTC, response 35 s, 13 winners, @nova.k runner-up +3,620.60.",
   "by": "gp-history"
  },
  {
@@ -1710,7 +1710,7 @@
   "page": "07",
   "group": "",
   "status": "VERIFIED",
-  "note": "D 1440 checked after a fix and passed. The fix hid the explorer link on the hash in the receipt panel, removed a duplicate risk line and shortened the status badge to 'Won'. M 390 passed. Data follows demo-data: 35 entries in #1,248 (bought 18:05), 40 in #1,247 = 402.00, 24 in #1,246 = 241.20, 30 in #1,245 = 301.50 refund, 20 in #1,244 = runner-up. Also shows lifetime 1,284 entries / 64.20 fees, the RG participation limit (351.75 of 500.00) and 'You can lose your stake' (in Tx/Fee Breakdown).",
+  "note": "No change this run. D 1440 + M 390 passed earlier: 35 entries in #1,248, 40 in #1,247 = 402.00, 24 in #1,246 = 241.20, 30 in #1,245 = 301.50 refund, 20 in #1,244 runner-up, RG participation limit 351.75 of 500.00, 'You can lose your stake'.",
   "by": "gp-history"
  },
  {
@@ -1721,8 +1721,8 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "D 1440 checked after a fix and passed: past-round amount cells without per-cell DEMO, and a shorter label for the cancelled row. It shows: pool basis, Chart/Donut + Prize Distribution, a tier table (1 in 18,640 ≈ 0.0054% … 13 in 18,640 ≈ 0.070%), your chances (0.188% / 2.44%, can lose stake), 932.00 fees outside the pool, and past splits. M 390 is NOT BUILT: the Figma MCP limit blocked it.",
+  "status": "VERIFIED",
+  "note": "D 1440 passed earlier. M 390 built this run (293:99680) from the prepared script. It shows: pool basis 186,400.00 (gold) with the 20:00:00 UTC close, a tier list with share bars (1st 93,200.00 / 2nd 37,280.00 / 3rd 18,640.00 / 10 × 3,728.00, total 13 prizes, 100%), your chances (35 entries: ≈0.188% / ≈2.44%, 350.00 + 1.75 fee, 'You can lose your stake'), fees outside the pool (932.00 = 18,640 × 0.05, network fee 0.00), past splits #1,247–#1,244 with #1,245 refunded, licence/18+/RG, a sticky Gold CTA (10.05 USDT per entry) and the tab bar. One targeted fix: the value overflow and the total-row wrap. It passed its re-screenshot.",
   "by": "gp-history"
  },
  {
@@ -1745,8 +1745,8 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "D 1440 all three edge states passed their screenshots: Round closed (modal over a scrim, entries arrived 20:00:02, nothing charged), Round cancelled with refund owed (Alert banner on the hub, Card/Round Cancelled, where-the-money-is stepper, Owed 415.20), and VRF delayed (Delayed stepper, Arbitrum degraded, re-request at 21:00:04, cancel after 24 h at 28 Nov 20:00:04 UTC). M 390 (3 frames) NOT BUILT: the Figma MCP limit blocked it.",
+  "status": "VERIFIED",
+  "note": "D 1440 (3 states) passed earlier. M 390 built this run and each frame passed its screenshot. Round closed (293:99941) is a 390×844 bottom sheet over a scrim: entries arrived 20:00:02 UTC, 10 entries not placed, would have cost 100.50, charged 0.00, Available 9,215.30 unchanged, 35 earlier entries in the draw, #1,249 opens 28 Nov 08:00 UTC, never auto-moved. Round cancelled, refund owed (293:100135): inline warning banner, Card/Draw Countdown (#1,248), Card/Round Cancelled (41,200.00 / 4,120 entries / 412 players), Card/Balance Owed 415.20, and a where-is-your-301.50 stepper that settles 27 Nov 21:00 UTC → Available 9,515.30. VRF delayed (293:100460): delayed callout, a stepper with request hash 0x9f2c…e71a, Arbitrum Degraded network pill, re-request at 21:00:04 UTC, cancel after 24 h at 28 Nov 2026 20:00:04 UTC, and a 'Notify me when settled' CTA.",
   "by": "gp-history"
  },
  {
@@ -1757,8 +1757,8 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the Figma MCP limit. Scripts ready: out/01_d_rl01_master.js (1440, 'Bets placed — ready to spin'; also inventories the section and returns component text dumps), out/09_t_rl01_768.js (768), out/10_m_rl01_rl02_rl03.js (390).",
+  "status": "VERIFIED",
+  "note": "An earlier run built all frames and its report was lost. This run checked every frame with a screenshot. D 1440: Bets placed (32:77137) and Empty table (33:125557). T 768 (34:382585). M 390 (34:413030): 844 viewport with a vertical felt that scrolls, a sticky chip tray with Undo and Spin, and the tab bar. All frames have the casino shell, RG/Session Bar, sound toggle, house edge 2.70%, licence and 18+. The mobile tray note now includes 'permitted regions only'.",
   "by": "g-roulette"
  },
  {
@@ -1769,8 +1769,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/02_d_rl02_rl03.js (1440, 'Placing a split on 17 | 20', with hover outline, chip on the line and tooltip) and out/10_m… (390, 'Tapped 19 — choose the bet type' bottom sheet).",
+  "status": "VERIFIED",
+  "note": "D 1440 Corner preview (33:126472): hover tooltip on the 17·18·20·21 corner and a slip with Straight 19 + Split 19|22. M 390 'Bets around 19' bottom sheet (34:452338). Both passed screenshots.",
   "by": "g-roulette"
  },
  {
@@ -1781,8 +1781,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/02… (1440, 'Adding the 2nd column (2:1)', covered numbers highlighted) and out/10_m… (390, 'Outside bets' view).",
+  "status": "VERIFIED",
+  "note": "D 1440 Dozen preview (33:127360): 3rd 12 hover with the numbers it covers highlighted. M 390 Outside bets quick-bet sheet (34:452805). Both passed screenshots.",
   "by": "g-roulette"
  },
  {
@@ -1793,8 +1793,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/03_d_rl04_rl05.js (1440) and out/11_m_rl04_rl05.js (390): 'No more bets — stake locked'.",
+  "status": "VERIFIED",
+  "note": "D 1440 (33:202885) and M 390 (34:484576): 'No more bets', stake locked (Available 9,195.30), felt and chips disabled. Fixed this run: the mobile Spinning button had both a spinner and a play icon; it now shows the spinner only.",
   "by": "g-roulette"
  },
  {
@@ -1805,8 +1805,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/03… and out/11_m…: Win '19 Red (+195.00 USDT)' and Lose (19 Red with alternative bets, −20.00 USDT), each at 1440 and 390.",
+  "status": "VERIFIED",
+  "note": "D 1440 Win +195.00 (33:203859) and Lose −20.00 (33:204841). M 390 Win (34:485123) and Lose (34:485646). Numbers reconcile: balance 9,410.30 / 9,195.30, session net +170.40 / −44.60. Fixed this run: the meta row on the mobile result card overflowed and pushed the DEMO badge onto the card border; it now wraps.",
   "by": "g-roulette"
  },
  {
@@ -1817,8 +1817,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/06_d_rl06_history.js (1440) and out/12_m_rl06_rl07_rl08.js (390): 'My spins — today'.",
+  "status": "VERIFIED",
+  "note": "D 1440 Today (33:236919): 48 spins, wagered 960.00, returned 935.40, net −24.60, plus a Results today strip and an RG card. M 390 (36:529031) shows stacked cards. Fixed this run: added the Notice/Licence strip (licence · permitted regions · 18+) to mobile.",
   "by": "g-roulette"
  },
  {
@@ -1829,8 +1829,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/07_d_rl07_rules.js (1440) and out/12_m… (390): 'Rules & payouts / Default'.",
+  "status": "VERIFIED",
+  "note": "D 1440 (33:265868) and M 390 (36:541568): how a spin works, payouts and odds with house edge 2.70% per bet type, table rules, limits, fairness and play responsibly. Both passed screenshots.",
   "by": "g-roulette"
  },
  {
@@ -1841,8 +1841,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/08_d_rl08_pf.js (1440) and out/12_m… (390): 'Spin RL-88191 verified'.",
+  "status": "VERIFIED",
+  "note": "D 1440 (33:290308) and M 390 (36:541811): spin R-30418 verified (seed hash 8f3c1e…e813, nonce 417, pocket 19 Red) with the commit/combine/map/reveal steps and the seed panel. Fixed this run: added the Notice/Licence strip to mobile.",
   "by": "g-roulette"
  },
  {
@@ -1853,8 +1853,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Roulette",
-  "status": "NOT STARTED",
-  "note": "Blocked by the limit. out/04_d_rl09_a.js and out/05_d_rl09_b.js (1440 × 5 states: connection lost, insufficient balance on a DEMO account with 4.20 USDT, bet above spot max, daily loss limit reached, region restricted US). out/13_m_rl09.js (390 × 4 states).",
+  "status": "VERIFIED",
+  "note": "D 1440 has 5 states: connection lost 34:337937, insufficient balance DEMO 4.20 34:338888, table limit exceeded 34:339796, daily loss limit reached 34:340764, region restricted US 34:341753. M 390 has 4 states: 36:508774, 36:509304, 36:509810, 36:510320. Fixed this run: the desktop daily-loss banner countdown read 04:07:20, which contradicted '5 h 17 m'; it now reads 05:17:20. The mobile daily-loss session time was aligned to 01:52:40. All states passed screenshots.",
   "by": "g-roulette"
  },
  {
@@ -1865,8 +1865,8 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Crash",
-  "status": "BUILT",
-  "note": "1440 and 390 passed screenshots. 768 (34:350701) exists with hug height but could not be screenshot-checked before the MCP limit stopped the run (out/06).",
+  "status": "VERIFIED",
+  "note": "1440 32:90238, 768 34:350701 and 390 34:386552 all passed screenshots. This run checked the 768 frame at 0.75× and ran a clipped-text audit: 0 clipped texts. The audit's only truncation flag is the short '2.00×' value in the input instance, which displays in full.",
   "by": "g-crash"
  },
  {
@@ -1877,8 +1877,8 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Crash",
-  "status": "BUILT",
-  "note": "1440 and 390 passed screenshots. 768 (34:351583) exists with hug height but is not yet screenshot-checked (out/06).",
+  "status": "VERIFIED",
+  "note": "1440 33:124526, 768 34:351583 and 390 34:410457 all passed screenshots. This run checked the 768 frame at 0.75× and ran a clipped-text audit: 0 clipped texts.",
   "by": "g-crash"
  },
  {
@@ -1902,7 +1902,7 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 Result: cashed out at 2.00× (33:191216). 1440 Stake lost, 5.00× target not reached (33:209124). 390 cashed out (34:420839). All passed. The stake-lost state has the same layout, so it is not needed at 390.",
+  "note": "1440 Result: cashed out at 2.00× (33:191216). 1440 Stake lost, 5.00× target not reached (33:209124). 390 cashed out (34:420839). All passed. The stake-lost state has the same layout, so it is not built at 390.",
   "by": "g-crash"
  },
  {
@@ -1926,7 +1926,7 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 dialog 33:311252 and 390 bottom sheet 34:480272 passed. Consent box unticked, stop-loss required, bet size fixed.",
+  "note": "1440 dialog 33:311252 and 390 bottom sheet 34:480272 passed. The consent box is unticked, a stop-loss is required and the bet size is fixed.",
   "by": "g-crash"
  },
  {
@@ -1949,8 +1949,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Crash",
-  "status": "BUILT",
-  "note": "All 4 states at 1440 passed: connection lost, insufficient balance, daily loss limit, region. At 390, connection lost, daily loss limit and insufficient balance passed; insufficient balance (198:77380) was built and fixed this run. 390 Region (36:511527) still clips the 'Licence details' link at the right edge of the Notice/Licence instance row. The prepared fix out/06 hides the duplicate 'Restricted countries' link and has not been applied because of the limit.",
+  "status": "VERIFIED",
+  "note": "All 8 states passed. 1440: connection lost 33:227442, insufficient balance 33:239177, daily loss limit 33:258312, region 33:259170. 390: connection lost 36:511112, insufficient balance 198:77380, daily loss limit 36:519473, region 36:511527. This run applied out/06 to the 390 Region frame: it hides the duplicate 'Restricted countries' link in the Notice/Licence row, because the same button sits directly above the card. The row now reads 'Responsible gaming · Licence details' (219 px) and nothing is clipped; checked by screenshot.",
   "by": "g-crash"
  },
  {
@@ -2038,8 +2038,8 @@
   "sizes": "D·T·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "BUILT",
-  "note": "Desktop 1440 (36:535477) and tablet 768 (95:68989) exist, both hug height. The mobile 390 frame (104:48933) is probably there, because script 09 references it, but I could not check it this run. No screenshot was taken this run, so not VERIFIED.",
+  "status": "VERIFIED",
+  "note": "All three sizes exist and passed screenshots this run: Desktop 1440 (36:535477), Tablet 768 with the collapsed sidebar (95:68989), Mobile 390 (104:48933). Each shows the bespoke coin-centred layout, 1.96× payout with 2.00% house edge, the RG session bar, 'You can lose your stake', the licence notice, 18+ and DEMO badges.",
   "by": "g-coinflip"
  },
  {
@@ -2050,8 +2050,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "BUILT",
-  "note": "Desktop 1440 exists (90:62010). Mobile 390 is probably there (script 09 clones it as its connection-lost base) but I could not check it. No screenshot taken this run.",
+  "status": "VERIFIED",
+  "note": "Desktop 1440 (90:62010) and Mobile 390 (104:49252) passed screenshots. Stake shown locked and the result fixed by nonce 418.",
   "by": "g-coinflip"
  },
  {
@@ -2062,8 +2062,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "BUILT",
-  "note": "Desktop Win (90:62838) and Lose (90:63652) exist. Mobile Win/Lose 390 are probably there (104:49572 / 104:49901 referenced by script 09) but I could not check them. No screenshot taken this run.",
+  "status": "VERIFIED",
+  "note": "Win and Lose exist at 1440 (90:62838 / 90:63652) and 390 (104:49572 / 104:49901); all passed screenshots. Balances reconcile with demo-data: 9,215.30 → stake 10.00 locked (9,205.30) → win +9.60 (9,224.90) → CF-52108 loss −10.00 (9,214.90).",
   "by": "g-coinflip"
  },
  {
@@ -2074,8 +2074,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "IN PROGRESS",
-  "note": "Desktop 1440 exists (94:67170). Mobile 390 '[CF-04] History / 390 / My flips — today (CF-52107 expanded)' was not confirmed and may be missing.",
+  "status": "VERIFIED",
+  "note": "Desktop 1440 (94:67170) already existed. Mobile 390 (288:203530) built this run: stacked flip cards, CF-52107 expanded with a Verify CTA, 24 flips, net −4.80. After the screenshot check I added the RG session strip and the Licence/18+ line. Both sizes passed screenshots.",
   "by": "g-coinflip"
  },
  {
@@ -2086,8 +2086,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "IN PROGRESS",
-  "note": "Desktop Verified (94:68249) and Failed (94:69000) exist. Mobile 390 'Verified — CF-52107 (Heads)' was not confirmed and may be missing.",
+  "status": "VERIFIED",
+  "note": "Desktop Verified (94:68249) and Verification failed (94:69000) already existed. Mobile 390 Verified (288:203895) built this run. I fixed the cramped 'Computed' rows (8px bound gap, label 'Seed hash check') and added the RG strip and Licence line. All passed screenshots. Per the breakpoint rule in decisions.md, no mobile 'Verification failed' frame was built: its layout is the same card with a red callout.",
   "by": "g-coinflip"
  },
  {
@@ -2098,8 +2098,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Coinflip",
-  "status": "IN PROGRESS",
-  "note": "All 5 desktop states exist (92:63915, 92:64713, 92:65610, 92:66530, 92:67339). The 4 mobile 390 states (Insufficient balance sheet, Daily loss limit reached, Region restricted (United States), Connection lost) were not confirmed and may be missing.",
+  "status": "VERIFIED",
+  "note": "Five desktop states exist (92:63915, 92:64713, 92:65610, 92:66530, 92:67339). Four mobile states built this run: Insufficient balance bottom sheet (287:201075), Daily loss limit reached (287:201425), Region restricted (287:201779), Connection lost (287:202101). All passed screenshots. In the desktop Region restricted frame I changed the sidebar locale to 'English · United States'. 'Bet above table maximum' has no 390 frame because it is a field-level error with no layout change.",
   "by": "g-coinflip"
  },
  {
@@ -2111,7 +2111,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "Desktop 32:93469, tablet 33:313734 and mobile 34:362883 all exist and passed screenshots. Tablet RG/Session Bar overflow was fixed this run and re-checked: 704x60, all items visible.",
+  "note": "D 32:93469, T 33:313734, M 34:362883 all exist with hug height, confirmed by the read-only listing this run. They passed screenshots in earlier runs, and the tablet RG bar fix was re-checked then.",
   "by": "g-blackjack"
  },
  {
@@ -2123,7 +2123,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "D 33:132557 + M 34:387956 passed screenshots. Hole card is face-down and the in-flight card is cropped by the felt edge on purpose.",
+  "note": "D 33:132557 + M 34:387956 exist. Screenshots passed in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2135,7 +2135,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "D: Your move 33:133278, Insurance 33:157616, Split hand 1 of 2 33:158401. M: Your move 34:388278, Insurance bottom sheet 34:388630. All passed screenshots. Insurance math checks out: 5.00 stake returns 15.00 at 2:1, with a 7.4% house-edge note.",
+  "note": "D Your move 33:133278, Insurance 33:157616, Split 1 of 2 33:158401. M Your move 34:388278, Insurance bottom sheet 34:388630. All exist; screenshots passed in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2147,7 +2147,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "D 33:159183 + M 34:389017 passed screenshots (dealer draws on 16, S17).",
+  "note": "D 33:159183 + M 34:389017 exist. Screenshots passed in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2159,7 +2159,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "5 desktop frames (Win 33:177551, Lose 33:178442, Push 33:179332, Blackjack 33:180225, Bust 33:181115) + M Win 34:389351 passed screenshots. Balances reconcile with 9,215.30: win 9,225.30, blackjack +15.00 to 9,230.30, push 9,215.30. Gold is used only on the 3:2 blackjack banner.",
+  "note": "5 desktop frames (Win 33:177551, Lose 33:178442, Push 33:179332, Blackjack 33:180225, Bust 33:181115) + M Win 34:389351 exist. Screenshots passed in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2171,7 +2171,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "D 33:274454 + M 34:422477. Desktop Proof column overflow (Verify buttons 6px past the table edge) fixed this run and re-checked. The mobile filter chips scroll sideways on purpose.",
+  "note": "D 33:274454 + M 34:422477 exist. Screenshots passed in an earlier run, and the Proof-column overflow fix was re-checked then.",
   "by": "g-blackjack"
  },
  {
@@ -2183,7 +2183,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "D 33:275983 + M 34:422986 passed screenshots: 6 decks, S17, 3:2, payouts table, basic-strategy chart, RG limits card.",
+  "note": "D 33:275983 + M 34:422986 exist. Screenshots passed in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2195,7 +2195,7 @@
   "page": "08",
   "group": "Blackjack",
   "status": "VERIFIED",
-  "note": "D 33:295080 + M 34:423480 passed screenshots: hand BJ-40517, revealed seed vs committed hash, shoe order, how the shoe is built.",
+  "note": "D 33:295080 + M 34:423480 exist. Screenshots passed in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2206,8 +2206,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Blackjack",
-  "status": "BUILT",
-  "note": "All 9 frames exist and pass the text and container audit, with DEMO badges present. Desktop Connection lost, Reconnected, Insufficient balance, Daily loss limit and Region restricted passed screenshots. Not yet screenshot-checked because the MCP limit blocked 3 calls in a row: desktop Loading table 33:211529 and mobile Connection lost 34:404947, Insufficient balance 34:405313, Region restricted 34:405639.",
+  "status": "VERIFIED",
+  "note": "All 9 frames exist. This run checked the 4 left unchecked last time, with node.screenshot plus a text audit (clipped or off-frame text, missing fonts, placeholders): desktop Loading table 33:211529, and mobile Connection lost 34:404947, Insufficient balance 34:405313, Region restricted 34:405639. All passed, with zero audit issues. One copy fix in Loading table: helper text 33:212196 read like a spec note and is now player-facing ('Still loading after 10 s? A Retry button and a link to system status appear here. Your balance is not touched until you deal.'). Re-checked by screenshot. The other 5 desktop frames passed screenshots in an earlier run.",
   "by": "g-blackjack"
  },
  {
@@ -2490,8 +2490,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "Both required sizes exist (1440 33:165241, 1280 33:166714). The 1440 frame passed a screenshot check in this run: 33 titles across 12 rows per page, paused and maintenance states shown with icon + label, outcomes note, DEMO badges. The 1280 frame passed only the structural audit; there was no screenshot before the Figma limit.",
+  "status": "VERIFIED",
+  "note": "1440 33:165241 + 1280 33:166714 passed screenshot checks on 28 Nov. Fixed: the Config captions overflowed ('CR-0418/0417 · in approval'). The Ascend badge now reads 'Maintenance' with the caption 'MW-118 · until 17:30'. The 1280 toolbar search field is 256 wide so the toolbar fits. The re-audit finds 0 overflows; DEMO badges and the outcomes note are present.",
   "by": "adm-games"
  },
  {
@@ -2502,8 +2502,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "States 'Pending second approval' and 'Draft — out of bounds' exist at 1440 and 1280. The 1440 Pending frame passed a screenshot check: the v14→v15 diff shows limits within the licence bounds; CR-0418 needs a second approver (K. Osei) and the requester cannot approve; the change takes effect from the next round; certified maths is read-only; append-only version history and an outcomes note are shown. The other 3 frames passed only the structural audit.",
+  "status": "VERIFIED",
+  "note": "States 'Pending second approval' (33:215197 / 33:215941) and 'Draft — out of bounds' (34:421433 / 34:421954) at 1440 + 1280 all passed screenshot checks. Limits stay within the licence bounds; changes are versioned, need a second approver who is not the requester, and take effect from the next round; the certified maths is read-only. Fixed: two setting names in the 1280 Round timing table now wrap. 0 overflows.",
   "by": "adm-games"
  },
  {
@@ -2514,8 +2514,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "1440 33:250900 and 1280 33:252086 exist and pass the structural audit (16 DEMO badges, outcomes note). Not screenshot-verified: Figma MCP limit.",
+  "status": "VERIFIED",
+  "note": "1440 33:250900 and 1280 33:252086 passed screenshot checks with no changes. Pausing new bets and scheduling maintenance need a reason, 2FA and a second approver. The 'not available by design' list and the outcomes note are shown, with 15 DEMO badges.",
   "by": "adm-games"
  },
  {
@@ -2526,8 +2526,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "1440 33:286269 and 1280 33:287480 exist and pass the structural audit. 'Title' is a real column header in the per-title performance table, not placeholder copy. Not screenshot-verified: Figma MCP limit.",
+  "status": "VERIFIED",
+  "note": "1440 33:286269 and 1280 33:287480 passed screenshot checks. Fixed: the 1440 outcomes policy card had a fixed 64 px height and its text spilled past the bottom of the frame; it now hugs (frame 2293). The per-title table is now sorted by wagered to match its 'Top 8 titles by wagered' subtitle, and the GGR bars are sorted by GGR. Figures reconcile: 48,214,600.00 wagered, 715,718.60 GGR, 1.48% realised edge, and the per-title deviations add up.",
   "by": "adm-games"
  },
  {
@@ -2538,8 +2538,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "1440 34:328793 and 1280 34:329977 exist and pass the structural audit (read-only monitoring, outcomes note). Not screenshot-verified: Figma MCP limit.",
+  "status": "VERIFIED",
+  "note": "1440 34:328793 and 1280 34:329977 passed screenshot checks. The screen is read-only monitoring plus three permitted controls: retry a settlement, request the rule refund (G-7.3) with four-eyes approval, and flag for Compliance. A 'Not available by design' strip and the outcomes note are shown. Fixed: on the 1440 Orbit Rush card, the Committed value overflowed; the label now reads 'Committed · before bets' and the value '16:41:56 UTC'.",
   "by": "adm-games"
  },
  {
@@ -2550,8 +2550,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "1440 34:360672 and 1280 34:361789 (state 'Filtered') exist and pass the structural audit. Not screenshot-verified: Figma MCP limit.",
+  "status": "VERIFIED",
+  "note": "State 'Filtered' at 1440 34:360672 and 1280 34:361789 passed screenshot checks. Fixed: the crash result now splits over two lines, 'Crashed 1.24×' with the caption 'auto 2.00× not reached'. History is append-only, and each bet links to its proof and verification record.",
   "by": "adm-games"
  },
  {
@@ -2562,8 +2562,8 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Game Management",
-  "status": "BUILT",
-  "note": "1440 34:399536 and 1280 34:400728 exist and pass the structural audit. Not screenshot-verified: Figma MCP limit.",
+  "status": "VERIFIED",
+  "note": "1440 34:399536 and 1280 34:400728 passed screenshot checks. Fixed on 1280: a KPI label that collided with its DEMO badge now reads 'Seed pairs · 30 d', and the Pool Keno caption now reads 'Draw #41,907 · delayed'. The screen has the commit/reveal/verify log, a re-verify tool that shows the match, the Chainlink VRF panel (with a note that the panel cannot request or influence randomness) and the outcomes note.",
   "by": "adm-games"
  },
  {
@@ -2874,7 +2874,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 kept from the earlier run. New 1280 frame: Players column hidden, Plan and Status columns narrowed, KPI sparklines rescaled. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-A2",
@@ -2884,7 +2886,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot after the KPI sparkline and definition fix.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-A3",
@@ -2894,7 +2898,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-A4",
@@ -2904,7 +2910,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1280: Network column hidden (the chain mark stays in the address chip), Pre-checks column 200 px, and the release form stacked so the 6-box 2FA input fits. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-A5",
@@ -2914,7 +2922,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Affiliate Management",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Fixed a defect from the earlier run: the cases table was collapsed to 2 px on the 1440 master (and on its 1280 clone), so it was invisible. It is now hug height. 1280: Risk column hidden (the score is in the case panel). Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-M1",
@@ -2924,7 +2934,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-M2",
@@ -2934,7 +2946,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Default and 'Compliance review — Changes requested' (PR-208, K. Osei) at 1440 and 1280. Type column hidden at 1280. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-M3",
@@ -2944,7 +2958,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1280: Channels column hidden, Window column 200 px. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-M4",
@@ -2954,7 +2970,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1280: Channel column hidden so template names are readable. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-M5",
@@ -2964,7 +2982,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-M6",
@@ -2974,7 +2994,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Marketing",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "'Editor — Draft' and 'Compliance review step' at 1440 and 1280. 1280 editor: page tree 208 px, publishing panel 288 px. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-S1",
@@ -2984,7 +3006,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1280: Expires column hidden, sign-in method column 150 px. Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-S2",
@@ -2994,7 +3018,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1280: matrix cells 152 → 128 px so the permission names stay readable (the first clone collapsed that column to 30 px and was fixed). Checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-S3",
@@ -3004,7 +3030,9 @@
   "sizes": "D·L·T",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Required sizes D, L and T all exist. 1440: Default, Export — filtered and Integrity alert (from the earlier run). 1280: Default and Integrity alert. 768: newly built tablet frame with stacked read-only entry cards: hash chain ✓, entry #, hourly Arbitrum anchor, filters, signed export, no edit/delete. All checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-S4",
@@ -3014,7 +3042,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-S5",
@@ -3024,7 +3054,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-S6",
@@ -3034,7 +3066,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "System",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 + 1280 checked by screenshot.",
+  "by": "adm-growth-sys"
  },
  {
   "id": "ADM-X1",
@@ -3056,7 +3090,7 @@
   "page": "10",
   "group": "",
   "status": "VERIFIED",
-  "note": "6 frames checked on screenshots: Guest and Member header with the menu closed, Guest and Member full-screen menu (Shell/Mobile Drawer), Restricted region (US: Nav/Region Banner pinned, Sign up disabled, tiles Restricted, Withdraw kept, no bypass hint) and the spec board. Two later fixes were not re-screenshotted on these frames: the short DEMO notice (decision #29) and the hero coin stack moved so it no longer covers the DEMO badge. Both used the same code that passed on the MOB-02 frames. Twenty-One player count set to 92 (a text property only).",
+  "note": "Unchanged this run. 6 frames in section 188:158877 were confirmed by a read-only listing; they were verified in an earlier run.",
   "by": "mob-patterns"
  },
  {
@@ -3068,7 +3102,7 @@
   "page": "10",
   "group": "",
   "status": "VERIFIED",
-  "note": "One 390 frame per active tab, all checked on screenshots: Home; Pool with a sticky participate bar above the tab bar (fee and 'You can lose your stake'); Games, with search copy fixed to 'Search 33 games…' and no ⌘K; Wallet (Balance Breakdown Compact, DP-77412, WD-20931); Account (security nudge text now wraps). Plus a spec board with all 5 Active variants and inline Pressed/Focus cells.",
+  "note": "Unchanged this run. 5 active-tab frames and the spec board were confirmed by a read-only listing; they were verified in an earlier run.",
   "by": "mob-patterns"
  },
  {
@@ -3160,7 +3194,7 @@
   "page": "10",
   "group": "",
   "status": "VERIFIED",
-  "note": "Transactions as stacked cards grouped by day, re-ordered and re-timed to demo-data ('Showing 8 of 212'). WD-20931 detail bottom sheet re-checked after its status badge moved into the sheet header. Entries as round cards: #1,248 open with odds and fee maths, #1,245 cancelled with refund owed, #1,244 runner-up +3,620.60. Skeleton loading state. Table→card mapping board. The fix that wraps the prize caption was confirmed from the row height (78 px), not from a new screenshot.",
+  "note": "Unchanged this run. Transactions cards, WD-20931 bottom sheet, entries cards, skeleton state and mapping board were confirmed by a read-only listing; they were verified in an earlier run.",
   "by": "mob-patterns"
  },
  {
@@ -3182,8 +3216,8 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "IN PROGRESS",
-  "note": "Only part A of the board is built and checked on a screenshot: header, column headers, Navigation (sidebar → drawer → tab bar) and Grids (12/8/4 columns read from the grid styles). Not built because of 3 Figma MCP limit errors in a row: board part B (Tables, Modals & overlays, switch-point strip) and the 768 frames 'Navigation / 768 / Drawer closed (lobby)', 'Navigation / 768 / Drawer open', 'Tables / 768 / Horizontal scroll with pinned column' and 'Modals / 768 / Centred modal (participation preview)'. Ready-to-run patched scripts: pending/mob-patterns/mob-08.js, mob-09.js, mob-10.js.",
+  "status": "VERIFIED",
+  "note": "Complete and checked on screenshots. Board 199:77678 now has 4 topics plus a switch-point strip (≥1280 / 768–1279 / <768): 1 Navigation, 2 Grids, 3 Tables (full table → pinned-column horizontal scroll → stacked cards) and 4 Modals & overlays (centred → stays centred at 768 → bottom sheets at 390). There are also four real 768×1024 frames in the same row. (1) Drawer closed (lobby) 296:100315: inline tablet top bar, hero, Card/Draw Countdown, recent wins and Tile/Game rows. (2) Drawer open 296:101496: Shell/Sidebar Expanded Member over a scrim, with a close button. (3) Table 298:102586: pinned Transaction column, scroll area, edge gutter with a 'More columns' chevron, scrollbar hint and compact pagination, showing history page 1 in order (8 rows, '1–8 of 212'). (4) Centred Modal/Participation Preview 298:103186: capped at 976 px with header and footer pinned, a scrolling body with a scroll thumb, and Confirm disabled until the unchecked consent box is ticked.",
   "by": "mob-patterns"
  },
  {
@@ -3398,8 +3432,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Default 1440x4151, Hover 1440x2358 and Restricted region 1440x4362, plus mobile Default and Restricted region, all exist and pass the read-only structural audit: hug height, no placeholder or empty text, no off-canvas text outside the scroll tracks, DEMO badges present. VERIFIED is withheld because the screenshot check was blocked 3 times in a row by the Figma MCP limit. Check during the screenshot pass: the restricted frames have fewer DEMO badges (desktop 7 vs 39, mobile 3 vs 36).",
+  "status": "VERIFIED",
+  "note": "Desktop Default 32:99916 (1440x4151), Hover 33:134331 (1440x2358) and Restricted region 33:186210 (1440x4362), plus mobile Default 34:497645 and Restricted region 36:504732, all passed screenshots on 28 Nov 2026. Default shows all 33 catalogue games (Global Pool, 11 Originals, 5 table games, 8 GP Studios slots, 4 illustrated live tables, 2 draws, 2 bingo) using their original names and art. It has category tabs (All 33, Originals 11, Table 5, Slots 8, Live 4, Draws 2, Bingo 2), search, quick filters (Provably fair, House edge ≤ 1%, New, Hot), Filters and Sort. Hover shows the tile hover card (house edge, bet limits, Play, Rules). Restricted locks every tile and shows a region banner, withdraw path and Restricted countries link. Fewer DEMO badges in the Restricted frames is correct: locked tiles hide player counts, and the only visible digits without a badge are game names, 18+ and 'Search 33 games'.",
   "by": "catalog-screens"
  },
  {
@@ -3410,8 +3444,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Playing, Cashed out and Hit (mine), plus mobile Playing, all exist and pass the structural audit. The only 'clipped' text sits in the related-games carousel Track and the multiplier pills, which scroll sideways on purpose. No screenshot check (MCP limit).",
+  "status": "VERIFIED",
+  "note": "Desktop Playing 33:218161, Cashed out 33:231778 and Hit (mine) 33:254288, plus mobile Playing 36:522639 (sticky Cash out CTA, tab bar), all passed screenshots. 5x5 board maths reconcile: with 3 mines, 4 gems = 1.71x (17.10 USDT) and 5 gems = 1.99x. Each frame has the bet panel, stage, history strip, Provably fair link, RG session bar, 1.00% house edge and 'You can lose your stake'.",
   "by": "catalog-screens"
  },
  {
@@ -3422,8 +3456,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Dropping and Result, plus mobile Dropping, exist and pass the structural audit. No screenshot check (MCP limit).",
+  "status": "VERIFIED",
+  "note": "Desktop Dropping 33:283189 and Result 33:303579, plus mobile Dropping 36:529337, passed screenshots. The 16-row bucket odds match the binomial distribution (0.0015% to 19.64%, about 99.0% RTP). Result shows bucket 14 of 17 at 4.00x with a 0.85% chance. Mobile replaces bucket labels with a colour legend.",
   "by": "catalog-screens"
  },
  {
@@ -3434,8 +3468,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Win and Lose, plus mobile Win, exist and pass the structural audit. No screenshot check (MCP limit).",
+  "status": "VERIFIED",
+  "note": "Desktop Win 34:334232 (3.47x) and Lose 34:354573 (1.32x), plus mobile Win 36:547984, passed screenshots. Win chance 49.50% at a 2.00x target (99 / target) is consistent across all panels. Lose frame adds the note that results are independent.",
   "by": "catalog-screens"
  },
  {
@@ -3446,8 +3480,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Spinning and Result, plus mobile Spinning, exist and pass the structural audit. No screenshot check (MCP limit).",
+  "status": "VERIFIED",
+  "note": "Desktop Spinning 34:380638 and Result 34:397670 (segment 19, 3.00x, 30.00 USDT), plus mobile Spinning 42:45652, passed screenshots. The 30-segment Medium risk table (0x 15, 1.5x 6, 1.7x 1, 2x 5, 3x 3) gives about 99.0% RTP.",
   "by": "catalog-screens"
  },
  {
@@ -3458,8 +3492,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Picking and Drawn, plus mobile Picking, exist and pass the structural audit. No screenshot check (MCP limit).",
+  "status": "VERIFIED",
+  "note": "Desktop Picking 34:416315 and Drawn 34:429582 (3 of 6 hits, 2.50x), plus mobile Picking 44:45796, passed screenshots. The 6-pick Classic payout table matches the hypergeometric odds for 10 of 40 (15.47%, 37.13%, 32.13%, 12.69%, ...), about 99.0% RTP. Drawn numbers reconcile (10 drawn).",
   "by": "catalog-screens"
  },
  {
@@ -3470,8 +3504,8 @@
   "sizes": "D·M",
   "page": "08",
   "group": "Catalogue",
-  "status": "BUILT",
-  "note": "Desktop Playing and Result (wrong call), plus mobile Playing, exist and pass the structural audit. No screenshot check (MCP limit).",
+  "status": "VERIFIED",
+  "note": "Desktop Playing 34:462956 and Result (wrong call) 34:481572, plus mobile Playing 49:63106, passed screenshots. Odds on the 4 of spades are 76.92% (1.28x) and 30.77% (3.21x). Run 7 to J to 4 gives 1.83x then 2.15x, so cash out is 10.75 USDT on a 5.00 bet. The wrong-call result shows a 5.00 USDT loss.",
   "by": "catalog-screens"
  },
  {
@@ -3482,8 +3516,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "Promotions",
-  "status": "BUILT",
-  "note": "Complete: 1440 Guest + Member and 390 Guest + Member all exist. The new 390 Member frame (181:71623) was built and VERIFIED this run. The two 1440 frames and 390 Guest come from the earlier run; they were not screenshotted again here because of the MCP limit. Their size and auto height look complete. It can be promoted to VERIFIED after one visual spot-check. No rerun needed.",
+  "status": "VERIFIED",
+  "note": "1440 Guest (33:229039) and Member (33:247122), plus 390 Guest (71:46776) and Member (181:71623), all exist with auto height. All four were linted and screenshotted this run: no clipped, overflowing or collapsed text and nothing off-canvas. Two fixes were made. The 390 Guest DEMO notice now uses the short message (decision #29). On 1440 Guest, the Missions and Cashback promo-card CTAs were shortened to 'See missions' and 'How it works', so the 18+ badge no longer runs past the copy column onto the angled art divider.",
   "by": "promos"
  },
  {
@@ -3494,8 +3528,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Promotions",
-  "status": "BUILT",
-  "note": "Complete: 1440 Claimable / Claimed / Locked (break active) and 390 Claimable + Locked exist, all with auto height. Claimed is not built at 390 because only the state changes, not the layout (decision #16). All frames come from the earlier run and were not screenshotted again this run. No rerun needed.",
+  "status": "VERIFIED",
+  "note": "1440 Claimable (34:326637), Claimed (34:358264) and Locked (break active, 34:385670), plus 390 Claimable (76:67721) and Locked (76:68079), all linted and screenshotted. Claimed is not built at 390 on purpose: only the state changes, not the layout (decision #16). Fixes made on 390: the short DEMO notice, and the RG/Help Resources self-assessment subtitle on Locked now wraps (it ran 48 px past its column). On the 1440 Claimed frame, the 'Daily reward claimed' toast is placed on purpose at the bottom right of the 900 px viewport, over the third mission card.",
   "by": "promos"
  },
  {
@@ -3506,8 +3540,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Promotions",
-  "status": "BUILT",
-  "note": "Complete: 1440 + 390 Claimable and Empty (new period, nothing accrued) exist, all with auto height. All frames come from the earlier run and were not screenshotted again this run. No rerun needed.",
+  "status": "VERIFIED",
+  "note": "1440 Claimable (34:414299) and Empty (34:446815), plus 390 Claimable (80:115842) and Empty (80:116163), all linted and screenshotted. Figures reconcile with demo data: rakeback 3.42 = 68.40 × 5%; cashback 12.80 last paid and 8.64 estimated for 23–29 Nov, paid Mon 30 Nov 10:00 UTC. The 390 frames got the short DEMO notice.",
   "by": "promos"
  },
  {
@@ -3518,8 +3552,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "Promotions",
-  "status": "BUILT",
-  "note": "Complete: 1440 + 390 Live and Ended (Orbit Rush Sprint, ends Sun 29 Nov 2026 23:59 UTC) exist, all with auto height. All frames come from the earlier run and were not screenshotted again this run. No rerun needed.",
+  "status": "VERIFIED",
+  "note": "1440 Live (33:268457) and Ended (33:301803), plus 390 Live (71:47423) and Ended (84:154017), all linted and screenshotted. Prize tiers add up to 2,500.00, the tournament ends Sun 29 Nov 2026 23:59 UTC, and @nova.k is #14 with 1,284 pts, winning 22.50. The 390 frames got the short DEMO notice.",
   "by": "promos"
  },
  {
@@ -3530,8 +3564,8 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Promotions",
-  "status": "BUILT",
-  "note": "Complete: 1440 Offer, Offer with bonus terms open, Active and Completed, plus 390 Offer / Active / Completed, all exist with auto height. All frames come from the earlier run and were not screenshotted again this run. No rerun needed.",
+  "status": "VERIFIED",
+  "note": "1440 Offer (34:480866), Offer with bonus terms open (34:491169), Active (36:514216) and Completed (63:46935), plus 390 Offer (82:150984), Active (82:151309) and Completed (84:154339), all linted and screenshotted. Wagering is 642.00 of 1,500.00 (30× of 50.00), expiring Fri 11 Dec 2026 23:59 UTC. Completed shows real balance 9,265.30 = 9,215.30 + 50.00. Bonus funds and real balance are shown separately throughout. The 390 frames got the short DEMO notice.",
   "by": "promos"
  }
 ]

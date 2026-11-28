@@ -1,8 +1,14 @@
 {
   "slice": "adm-games (ADM-G1..G7, page '09 — Admin Panel', section 'ADM-G1..G7 Game management' 33:165240)",
-  "status": "All 16 frames are BUILT (1440 + 1280 for G1..G7, plus G2 'Draft — out of bounds'). Only visual verification is left.",
-  "already_verified_by_screenshot": ["33:165241 [ADM-G1] 1440", "33:215197 [ADM-G2] 1440 Pending second approval"],
+  "status": "DONE 28 Nov 2026 — all 16 frames screenshot-verified (1440 + 1280) after targeted fixes (see decisions.md, adm-games verification run). Nothing left to run.",
+  "already_verified_by_screenshot": "all 16",
   "structural_audit_passed_all_16": "28 Nov 2026 03:44 UTC — no clipped or off-canvas text, no placeholder copy, DEMO badges and the 'Outcomes cannot be changed by admins' note in every frame, all frames hug height.",
-  "run_order": ["verify-1-desktop.js", "verify-2-desktop.js", "verify-3-laptop.js", "verify-4-laptop.js", "verify-5-laptop.js"],
+  "run_order": [
+    "verify-1-desktop.js",
+    "verify-2-desktop.js",
+    "verify-3-laptop.js",
+    "verify-4-laptop.js",
+    "verify-5-laptop.js"
+  ],
   "how": "Pass each file's full content as use_figma code (read-only). Inspect each screenshot; fix only what fails with a targeted script, then mark the ledger rows VERIFIED."
 }

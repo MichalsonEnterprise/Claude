@@ -12,3 +12,7 @@ frame is already there. It also returns a read-only inventory of the three PROMO
 Rebuild after editing the source: `cat ../../helpers.js src/m01-member.body.js > out/m01-member.js`.
 
 PROMO-02 Claimed at 390 is intentionally not built (state-only change, decision #16).
+
+VERIFIED 28 Nov 2026 (run 3): inventory = all 24 frames present; every frame linted + screenshotted inside use_figma.
+Targeted fixes applied directly (no scripts needed): short DEMO notice on 10 mobile frames, wrapping self-assessment
+subtitle on PROMO-02 390 Locked, shorter Missions/Cashback CTA labels on PROMO-01 1440 Guest. Nothing left to run.

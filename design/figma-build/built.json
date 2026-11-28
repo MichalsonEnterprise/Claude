@@ -4343,10 +4343,10 @@
   ]
  },
  "g-coinflip": {
-  "section": "36:535476",
+  "section": "36:535476 (page \"08 — Games\", section \"CF Coinflip\" at 48000,0) + 104:48932 (page \"10 — Mobile Experience\", section \"Games — Mobile Coinflip\" at 203000,0)",
   "created": [
    {
-    "name": "Section — CF Coinflip (page 08 — Games, X=48000 Y=0, 9480 × 11055)",
+    "name": "Section — CF Coinflip (08 — Games)",
     "id": "36:535476"
    },
    {
@@ -4400,15 +4400,59 @@
    {
     "name": "[CF-01] Bet interface — Heads/Tails / 768 / Default — Heads selected",
     "id": "95:68989"
+   },
+   {
+    "name": "Section — Games — Mobile Coinflip (10 — Mobile Experience)",
+    "id": "104:48932"
+   },
+   {
+    "name": "[CF-01] Bet interface — Heads/Tails / 390 / Default — Heads selected",
+    "id": "104:48933"
+   },
+   {
+    "name": "[CF-02] Flipping state / 390 / Flipping — stake locked",
+    "id": "104:49252"
+   },
+   {
+    "name": "[CF-03] Result / 390 / Win — landed Heads (+9.60 USDT)",
+    "id": "104:49572"
+   },
+   {
+    "name": "[CF-03] Result / 390 / Lose — landed Tails (−10.00 USDT)",
+    "id": "104:49901"
+   },
+   {
+    "name": "[CF-04] History / 390 / My flips — today (CF-52107 expanded) — NEW this run",
+    "id": "288:203530"
+   },
+   {
+    "name": "[CF-05] Provably-fair verification / 390 / Verified — CF-52107 (Heads) — NEW this run",
+    "id": "288:203895"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 390 / Insufficient balance (sheet) — DEMO account · Available 4.20 USDT — NEW this run",
+    "id": "287:201075"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 390 / Daily loss limit reached — NEW this run",
+    "id": "287:201425"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 390 / Region restricted (United States) — NEW this run",
+    "id": "287:201779"
+   },
+   {
+    "name": "[CF-06] Error & limit states / 390 / Connection lost — flip held on server — NEW this run",
+    "id": "287:202101"
    }
   ],
   "issues": [
-   "STOPPED because of the Figma MCP limit: 3 'tool call limit for your Full seat' errors in a row (conventions §10). The first call worked: the read-only listing of page 08. The page 10 listing failed twice. The third attempt also failed: a guarded script that first lists the page and then builds only the missing frames. Nothing was changed on either page in this run.",
-   "Frames that may remain, on page '10 — Mobile Experience', section 'Games — Mobile Coinflip' (X=203000, Y=0), not checked: [CF-04] History / 390 / My flips — today (CF-52107 expanded); [CF-05] Provably-fair verification / 390 / Verified — CF-52107 (Heads); [CF-06] Error & limit states / 390 / Insufficient balance (sheet) — DEMO account · Available 4.20 USDT; [CF-06] … / 390 / Daily loss limit reached; [CF-06] … / 390 / Region restricted (United States); [CF-06] … / 390 / Connection lost — flip held on server. The mobile CF-01/CF-02/CF-03 Win/Lose frames (IDs 104:48933, 104:49252, 104:49572, 104:49901, referenced by the earlier script 09) are probably there but also not checked.",
-   "To finish: run /home/user/Claude/design/figma-build/pending-g-coinflip/10_GUARDED_mobile_cf06-cf04-cf05.js as a single use_figma call. It contains helpers.js verbatim and passed a syntax check. It lists the mobile section first and returns counts. If the CF-01/CF-02 390 base frames are missing it stops (run 06_mobile_cf01-cf03.js first). Otherwise it builds only the missing CF-06 ×4 and/or CF-04 + CF-05 frames and ends with node.screenshot() for each. It replaces scripts 07, 08 and 09. Run order is in /home/user/Claude/design/figma-build/pending-g-coinflip/README.md.",
-   "Desktop and tablet frames were not screenshotted in this run, so no row is VERIFIED. /home/user/Claude/design/figma-build/pending-g-coinflip/11_verify_desktop_readonly.js is a read-only script. It screenshots all 13 frames in section 36:535476 and counts placeholder text and DEMO badges. Run it before marking any row VERIFIED.",
-   "Ledger choice: rows CF-01..CF-03 are BUILT, not PARTIAL. Every required desktop and tablet frame exists, and the earlier run's script 09 references their mobile frame IDs. CF-04..CF-06 are PARTIAL because their mobile frames were never confirmed.",
-   "No memory notes bore on this slice beyond the project index entry for the GLOBAL POOL Figma file. No new facts worth saving."
+   "Continuation run. The read-only inventory showed all 13 desktop/tablet frames and the CF-01/02/03 mobile frames already existed. I built only the 6 missing mobile frames, by running the prepared guarded script pending-g-coinflip/10 in two passes: first the CF-06 ×4 states, then CF-04 + CF-05. The pass scripts are saved in /home/user/Claude/design/figma-build/pending-g-coinflip/out/ and the README there now says DONE.",
+   "Post-check fixes (targeted): (1) mobile CF-04/CF-05 390 had no RG session strip or Licence/18+ line, while every other CF frame has both; I cloned them from CF-03 Lose 390. (2) In mobile CF-05 the 'SHA-256(revealed seed)' label ran into 'Matches commitment ✓'; the rows now have a bound space/2 gap and the label reads 'Seed hash check'. The same gap was added to the CF-04 390 detail rows. (3) The desktop CF-06 Region restricted frame showed the sidebar locale 'English · Portugal'; it now reads 'English · United States', matching the other restricted frames.",
+   "Possible data mismatch, left unchanged: the RG session bar on CF-03 Lose / CF-04 / CF-05 shows 'Daily loss limit 25.00 / 200.00', but the CF-04 History summary shows today's Double Side net as −4.80. The two only agree if the loss limit counts every game, or losses from earlier sessions. All these figures are DEMO-badged. Consider adding an 'all games' label to the limit row.",
+   "Not every CF frame says 'You can lose your stake'. These frames don't: desktop CF-02 Flipping, CF-06 Daily loss limit, CF-06 Connection lost, CF-04 and CF-05; mobile Region restricted, CF-04 and CF-05. None of them confirms a new bet. Every bet-confirmation surface has the line: CF-01, CF-03, CF-06 Insufficient balance and CF-06 Above max.",
+   "Tool limitation (seen this run): one use_figma response showed only 5 inline node.screenshot() images even though the script requested 13. Verification therefore took 4 extra screenshot calls. Future scripts should request at most 5 screenshots per call.",
+   "No new library components were created, so there is no registry file for this slice. No Figma limit errors occurred: 10 use_figma calls in total, no get_screenshot or get_metadata calls."
   ]
  },
  "g-blackjack": {
@@ -4556,37 +4600,163 @@
    }
   ],
   "issues": [
-   "Continuation run: every required frame from the earlier run was already in Figma: 21 frames on page 08 (20 desktop + tablet) and 12 mobile frames on page 10. No pending/queue folder existed for g-blackjack and no frame was missing, so nothing was rebuilt. All frames hug their height (primaryAxisSizingMode AUTO).",
-   "FIXED this run: [BJ-01] 768 RG/Session Bar instance 33:313866. The library bar is designed at 1360 wide and its content overflowed the 704px slot by about 46px, pushing 'Take a break' past the frame edge. I hid the third divider (I33:313866;23:24828) and the empty FILL 'Message' spacer (I33:313866;23:24829), and set gap space/3, SPACE_BETWEEN and hug height. It is now 704x60 with Session, Net, Daily loss limit + meter, DEMO and Take a break all visible. Library follow-up: RG/Session Bar needs a compact or wrapping variant for tablet.",
-   "FIXED this run: [BJ-06] 1440 Hands table 33:275432. The 8 fixed cells summed to 1136px in a 1134px row, and the 'Verify' ghost buttons ran 6px past the table edge. I set the last Cell of all 10 rows to 74px with padding space/1, so the Verify labels now align with the PROOF header. Re-checked: buttons sit 6px inside the edge.",
-   "NOT SCREENSHOT-VERIFIED (Figma MCP limit hit 3 times in a row, conventions §10): 33:211529 ([BJ-09] 1440 Loading table), 34:404947, 34:405313, 34:405639 ([BJ-09] 390 Connection lost / Insufficient balance / Region restricted). All four passed the structural audit (no clipped text, placeholders, missing fonts or container overflow; DEMO badges present). Ready-to-run read-only check: screenshot those 4 IDs in one use_figma call.",
-   "Overflows left on purpose: mobile 'Card B — in flight' is cropped 6px by the felt edge as it leaves the shoe (BJ-02/BJ-04 390), and the mobile BJ-06 filter chips are a horizontal scroller.",
-   "Pieces built inline by the earlier run because no library component exists: felt table (Dealer zone / Felt print / Player hands / Felt status), bet panel, card shoe + table-limits placard, mini card chips, result chips, prompt cards (insurance / connection lost / limit / region), mobile RG session strip, mobile insurance bottom sheet, mobile result card, basic-strategy chart. These are candidates for library components.",
-   "DEMO values introduced by the earlier run (not in demo-data.md, all DEMO-badged): hand IDs BJ-40508…BJ-40518, limits 1.00–1,000.00 USDT per hand, insufficient-balance demo account with Available 4.20 USDT, client seed nova-k-7f2a91, nonce 417/418.",
-   "Updated /home/user/Claude/design/figma-build/registry-g-blackjack.json with a '_continuation_28nov' note describing both fixes. Audit scripts are saved in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/bj/ (audit.js, overflow.js, fix-08.js).",
-   "Learned this session (worth remembering for other slices): a use_figma call returns at most 5 node.screenshot() images, however many are requested. Under the current limit only about one use_figma call per 5–10 minutes succeeded. Also, an audit based on absoluteRenderBounds misses text clipped completely out of view; check absoluteBoundingBox against the clipping ancestor instead. No memory notes were used for this task."
+   "No frames were missing. The read-only listing found all 21 page-08 frames (section 32:93468) and all 12 page-10 frames (section 34:362882), every one hug height (primaryAxisSizingMode AUTO), so nothing was rebuilt.",
+   "This slice had no prepared-script folder (nothing under pending/, pending-*/ or queue/ for g-blackjack). Work was limited to checking the 4 BJ-09 frames left unverified and one copy fix.",
+   "After the copy fix, [BJ-09] Loading table 33:211529 is 16 px taller (1738 to 1754, hug), so the gap to the 'Insufficient balance' frame below is now 145 px instead of the 160 px convention. Nothing overlaps; I did not move the frames below.",
+   "Minor, left as is: on desktop the bet panel's keyboard-shortcut caption wraps and leaves 'split' alone on the second line (seen in the Loading table frame; other play frames share the panel). This is cosmetic.",
+   "Inline-built pieces with no library component yet (unchanged from earlier runs, listed in registry-g-blackjack.json): felt table, bet panel, card shoe and limits placard, prompt cards (insurance / connection lost / limit / region), mobile RG session strip, mobile insurance bottom sheet, basic-strategy chart.",
+   "Updated /home/user/Claude/design/figma-build/registry-g-blackjack.json with a '_continuation_28nov_b' note. Memory was not used for this task; I found nothing new worth saving."
   ]
  },
  "g-roulette": {
-  "section": "NOT CREATED — 'RL Roulette' (page '08 — Games', X=0,Y=0) and 'Games — Mobile Roulette' (page '10 — Mobile Experience', X=182000,Y=0) were never reached. The Figma MCP seat limit refused all 3 use_figma calls of this run in a row: the read-only inventory, then the idempotent RL-01 master script twice. Per conventions §10 I stopped. No Figma node was created or changed. Prepared, ready-to-run scripts are in /home/user/Claude/design/figma-build/pending/g-roulette/ (README.md, RUN-ORDER.json, out/01..13).",
-  "created": [],
+  "section": "RL Roulette 32:77136 (page '08 — Games', X=0,Y=0) + Games — Mobile Roulette 34:413029 (page '10 — Mobile Experience', X=182000,Y=0)",
+  "created": [
+   {
+    "name": "Section — RL Roulette (page 08)",
+    "id": "32:77136"
+   },
+   {
+    "name": "Section — Games — Mobile Roulette (page 10)",
+    "id": "34:413029"
+   },
+   {
+    "name": "RL-01 Table — Felt, chips & bet slip / 1440 / Bets placed",
+    "id": "32:77137"
+   },
+   {
+    "name": "RL-01 Table — Felt, chips & bet slip / 1440 / Empty table",
+    "id": "33:125557"
+   },
+   {
+    "name": "RL-02 Inside bets — Number selection / 1440 / Corner preview",
+    "id": "33:126472"
+   },
+   {
+    "name": "RL-03 Outside bets — Red/Black, Odd/Even, dozens, columns / 1440 / Dozen preview",
+    "id": "33:127360"
+   },
+   {
+    "name": "RL-04 Spinning — Wheel in motion / 1440 / No more bets",
+    "id": "33:202885"
+   },
+   {
+    "name": "RL-05 Result — 19 Red / 1440 / Win",
+    "id": "33:203859"
+   },
+   {
+    "name": "RL-05 Result — 19 Red / 1440 / Lose",
+    "id": "33:204841"
+   },
+   {
+    "name": "RL-06 Bet history — My bets / 1440 / Today",
+    "id": "33:236919"
+   },
+   {
+    "name": "RL-07 Rules & payouts / 1440 / Default",
+    "id": "33:265868"
+   },
+   {
+    "name": "RL-08 Provably fair — Verify a spin / 1440 / Verified",
+    "id": "33:290308"
+   },
+   {
+    "name": "RL-09 Error & limit states / 1440 / Connection lost",
+    "id": "34:337937"
+   },
+   {
+    "name": "RL-09 Error & limit states / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "34:338888"
+   },
+   {
+    "name": "RL-09 Error & limit states / 1440 / Table limit exceeded",
+    "id": "34:339796"
+   },
+   {
+    "name": "RL-09 Error & limit states / 1440 / Daily loss limit reached",
+    "id": "34:340764"
+   },
+   {
+    "name": "RL-09 Error & limit states / 1440 / Region restricted",
+    "id": "34:341753"
+   },
+   {
+    "name": "RL-01 Table — Felt, chips & bet slip / 768 / Bets placed",
+    "id": "34:382585"
+   },
+   {
+    "name": "RL-01 Table — Felt, chips & bet slip / 390 / Bets placed",
+    "id": "34:413030"
+   },
+   {
+    "name": "RL-02 Inside bets — Number selection / 390 / Bets around 19 (sheet)",
+    "id": "34:452338"
+   },
+   {
+    "name": "RL-03 Outside bets — Quick-bet sheet / 390 / Red, Odd, 2nd dozen",
+    "id": "34:452805"
+   },
+   {
+    "name": "RL-04 Spinning — Wheel in motion / 390 / No more bets",
+    "id": "34:484576"
+   },
+   {
+    "name": "RL-05 Result — 19 Red / 390 / Win",
+    "id": "34:485123"
+   },
+   {
+    "name": "RL-05 Result — 19 Red / 390 / Lose",
+    "id": "34:485646"
+   },
+   {
+    "name": "RL-06 Bet history — My bets / 390 / Today",
+    "id": "36:529031"
+   },
+   {
+    "name": "RL-07 Rules & payouts / 390 / Default",
+    "id": "36:541568"
+   },
+   {
+    "name": "RL-08 Provably fair — Verify a spin / 390 / Verified",
+    "id": "36:541811"
+   },
+   {
+    "name": "RL-09 Error & limit states / 390 / Connection lost",
+    "id": "36:508774"
+   },
+   {
+    "name": "RL-09 Error & limit states / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "36:509304"
+   },
+   {
+    "name": "RL-09 Error & limit states / 390 / Daily loss limit reached",
+    "id": "36:509810"
+   },
+   {
+    "name": "RL-09 Error & limit states / 390 / Region restricted",
+    "id": "36:510320"
+   },
+   {
+    "name": "Licence & age strip added to RL-06 / 390 (this run)",
+    "id": "285:270089"
+   },
+   {
+    "name": "Licence & age strip added to RL-08 / 390 (this run)",
+    "id": "285:270092"
+   }
+  ],
   "issues": [
-   "Figma MCP seat limit ('tool call limit for your Full seat on the Professional plan') refused 3 calls in a row: the inventory, then the RL-01 master twice. Nothing was built or verified. All 28 frames still need building: desktop 1440 (14), RL-01 tablet 768 (1), mobile 390 (13). Exact frame names are in /home/user/Claude/design/figma-build/pending/g-roulette/RUN-ORDER.json and /home/user/Claude/design/figma-build/registry-g-roulette.json.",
-   "Next run: execute /home/user/Claude/design/figma-build/pending/g-roulette/out/01_d_rl01_master.js first. It lists any frames already in 'RL Roulette' and skips a complete frame (height > 900). It returns text dumps of Game/Bet Slip, Game/History Strip (Roulette), Shell/Topbar Desktop, Game/Roulette Wheel Result, Result Banner, Seed Display, Provably Fair Verifier, RG/Session Bar and Bet Slip Over limit. Check its notes (balance, sidebarItem, slipN, rgN, resMiss) before running scripts 02–13. Edit src/ and rebuild with `python3 build.py`. README.md lists what each note means.",
-   "All 13 scripts pass node --check and a mock dry run, but none has run against the real file yet. Layer-name guesses may need one targeted fix after the first real run: 'Balance value' in the topbar, 'Item/Pool Roulette' in the sidebar, 'Number' in the roulette cell, the Bet Slip CTA, the RG bar value formats and the Verifier's Pool Dice texts.",
-   "Component gap: Game/Roulette Wheel has no result-number property, and its Result variant always shows 19 Red. So the Lose frame uses the same spin with alternative DEMO bets on Black, 1st 12 and 26 instead of a different pocket.",
-   "Component gap: the Game/History Strip (Roulette) sequence is fixed with 19 first. It may not match the history rows and the mobile last-results row (19, 26, 14, 0, 32, 17, 8, 23). It needs an override or a property.",
-   "Built inline because no component exists: outside-bet boxes and the felt grid wrapper, chip tray, outcome preview card, settlement card, mobile vertical felt, mobile outside-bets panel, mobile verifier (Game/Provably Fair Verifier is 520 wide), bet-type bottom sheet content, mobile sticky chip tray + Spin bar.",
-   "These demo values are not in demo-data.md and are all DEMO-badged: spin IDs RL-88182…RL-88191; nonce 417 for spin RL-88191; float 0.528137 → pocket 19; today's Pool Roulette history (10 spins, staked 136.00, returned 323.00, net +187.00); Win balance 9,410.30 with session net +170.40; alternative-bets Lose balance 9,195.30 with net −44.60; locked-stake balance 9,195.30. Add them to demo-data.md if other screens reuse them. Decisions are logged as #35 in decisions.md."
+   "Nothing new was built this run. An earlier interrupted run had already created all 29 RL frames, but under different names from the prepared scripts in pending/g-roulette. Running those scripts would create duplicates, so README.md and RUN-ORDER.json in that folder are now marked SUPERSEDED / DO NOT RUN. Real frame ids are in /home/user/Claude/design/figma-build/registry-g-roulette.json, and decision #58 was added to decisions.md.",
+   "Targeted fixes made this run (each passed a screenshot): (1) desktop daily-loss RG banner '(04:07:20)' changed to '(05:17:20)' to match '5 h 17 m' to 00:00 UTC; (2) mobile Win/Lose result-card meta rows (34:485486, 34:486009) set to FILL + wrap so the DEMO badge stays inside the card; (3) mobile Spinning button 34:484724 now shows only the loading spinner (leading play icon hidden); (4) mobile daily-loss session time changed from 00:42:18 to 01:52:40 to match desktop; (5) the tray note in 10 mobile game frames now reads 'You can lose your stake. Bets are final once the wheel spins. 18+ · permitted regions only.' (height unchanged); (6) the Notice/Licence strip was cloned into RL-06 and RL-08 mobile (285:270089, 285:270092).",
+   "Component-level issue to fix in the library, not in this section: the RG/Session Bar 'Limit reached' variant renders the session values and the 'Responsible gaming' link at disabled contrast. RG entry points should stay fully enabled when a limit is reached.",
+   "Component detail: inside rescaled Game/Roulette Wheel instances, the rim number text '11' is a 3 px-wide text node. It renders fine; it was noted by the audit only.",
+   "Component gaps carried over (built inline in the frames): outside-bet boxes and felt wrapper, chip tray, settlement/result card, mobile vertical felt, mobile verifier, bet-type bottom sheet. Game/Roulette Wheel has no result-number property (Result variant is always 19 Red).",
+   "Deviation from the plan in decision #35: the mobile region-restricted frame keeps Nav/Mobile Tab Bar instead of being a focused page. It is acceptable (no bypass hint; Withdraw funds is the primary action) and was left as is.",
+   "Mobile game frames are fixed 390 × 844 viewports by design (#36 pattern: content scrolls between the sticky header/RG strip and the sticky tray + tab bar). They are not incomplete. The mobile RL-06/07/08 pages hug their content height."
   ]
  },
  "g-crash": {
-  "section": "CR Crash (page 08 — Games) 32:90237 at X=16000,Y=0 · mobile: 'Games — Mobile Crash' (page 10 — Mobile Experience) at X=189000,Y=0. Continuation run: an earlier interrupted run had already built 14 desktop/tablet frames and 10 of 11 mobile frames. This run checked both sections without changing them, added the one missing mobile state (198:77380), checked 25 of 27 frames by screenshot and fixed one defect. It stopped after 3 Figma MCP limit errors in a row (conventions §10).",
+  "section": "32:90237",
   "created": [
-   {
-    "name": "[CR-08] Orbit Rush — Error states / 390 / Insufficient balance (DEMO account · Available 4.20 USDT) — NEW this run",
-    "id": "198:77380"
-   },
    {
     "name": "[CR-01] Orbit Rush — Pre-round betting / 1440 / Bets open",
     "id": "32:90238"
@@ -4648,12 +4818,12 @@
     "id": "36:527187"
    },
    {
-    "name": "CR Crash section title",
-    "id": "36:527185"
+    "name": "Section title + subtitle (page 08)",
+    "id": "36:527185, 36:527186"
    },
    {
-    "name": "CR Crash section subtitle",
-    "id": "36:527186"
+    "name": "Section 'Games — Mobile Crash' (page 10)",
+    "id": "34:386551"
    },
    {
     "name": "[CR-01] Orbit Rush — Pre-round betting / 390 / Bets open",
@@ -4676,7 +4846,7 @@
     "id": "34:446321"
    },
    {
-    "name": "[CR-06] Orbit Rush — Auto cash-out & auto-play / 390 / Bottom sheet · consent unticked (full sheet shown, scrolls in product)",
+    "name": "[CR-06] Orbit Rush — Auto cash-out & auto-play / 390 / Bottom sheet · consent unticked",
     "id": "34:480272"
    },
    {
@@ -4696,25 +4866,20 @@
     "id": "36:519473"
    },
    {
-    "name": "Mobile Crash section title",
-    "id": "36:527216"
-   },
-   {
-    "name": "Mobile Crash section subtitle",
-    "id": "36:527217"
+    "name": "[CR-08] Orbit Rush — Error states / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)",
+    "id": "198:77380"
    }
   ],
   "issues": [
-   "FIGMA MCP LIMIT: the run stopped after 3 limit errors in a row (conventions §10). Two things are left. (1) Run /home/user/Claude/design/figma-build/pending/g-crash/out/06_m_region_links_fix_verify_tablet.js: it fixes the clipped link row in [CR-08] 390 Region (36:511527) and screenshot-checks tablet CR-01 768 (34:350701), tablet CR-02 768 (34:351583) and the dev notes (36:527187). If those pass, CR-01, CR-02 and CR-08 can move to VERIFIED. (2) No other frame is missing.",
-   "An earlier attempt of that fix failed with 'node 203:58796 does not exist' after it set visible=false on an instance sublayer. I could not check whether the hide was saved before the error. out/06 looks the nodes up again after the change and is safe to re-run.",
-   "Component gap: the link row inside Notice/Licence (the 'Links' row, 352 px) does not wrap. At 390 it is wider than its card, so 'Licence details' clips. The library component should wrap that row or stack it on mobile.",
-   "Component gaps (built inline in the CR frames): crash bet panel (Manual/Auto tabs, amount field, quick amounts, auto cash-out toggle and target, odds summary), live-bets list, mobile sticky bet bar, round-history table and cards with crash-point pills, crash-point distribution bars, auto-play settings dialog and sheet, crash verifier rows, connection-lost overlay, insufficient-balance alert. The new 390 insufficient-balance alert is an inline status/warning-tint card because no 358-wide Alert/Banner exists.",
-   "Data consistency: screens use round CR-55102, crash point 3.82×, a 10.00 USDT bet with auto cash-out at 2.00× (49.50%, 20.00 payout, +10.00) and a 5.00× stake-lost alternative. Several library defaults disagree and should be aligned: Game/Multiplier Readout Rising (auto 3.00×) and Cashed out (2.10× / 21.00 / +11.00); Game/Crash Curve Running/Crashed (3.00×, 2.10×); Chart/Multiplier Curve (round #88,214, 2.47× / 3.12×); and the built.json note 'Crash win 248.00 USDT, round #C-88214'.",
-   "No dedicated pending folder existed for this slice. I created /home/user/Claude/design/figma-build/pending/g-crash/ (README.md, out/00–06, src_01, src_03). I also wrote /home/user/Claude/design/figma-build/registry-g-crash.json (frame ids, no new components) and appended decision #42 to /home/user/Claude/design/figma-build/decisions.md. These tooling facts were observed in this session and are not in memory: use_figma returned at most 5 inline screenshots per call, and node.screenshot() works on frames of another page."
+   "Continuation run: no new frames were needed. Read-only inventories of section 'CR Crash' (32:90237, page 08) and 'Games — Mobile Crash' (34:386551, page 10) confirmed all 26 screen frames plus dev notes. All of them use hug height, except CR-06 390 (34:480272), which is intentionally fixed at 1209 px for the full bottom sheet.",
+   "Ran the prepared script pending/g-crash/out/06_m_region_links_fix_verify_tablet.js. It hid one 'Restricted countries' link inside a Notice/Licence instance as an instance override, in CR-08 390 Region only. The Notice/Licence 'Links' row is fixed at 352 px and cannot wrap. If the component is changed to let that row wrap, this override can be removed.",
+   "The tablet 768 frames (34:350701, 34:351583) use the top bar with a hamburger drawer instead of a collapsed sidebar. They were kept as built.",
+   "Updated /home/user/Claude/design/figma-build/pending/g-crash/README.md (closing note: nothing left to run) and /home/user/Claude/design/figma-build/registry-g-crash.json (added the mobile section id 34:386551). I did not edit ledger.json or decisions.md, which other agents are editing at the same time. Decision #42 already covers this slice.",
+   "Figma MCP use this run: 4 use_figma calls (2 read-only inventories, 1 fix with verification, 1 read-only audit with screenshots). There were no limit errors."
   ]
  },
  "gp-history": {
-  "section": "Desktop: 179:100736 ('GP-08..11/13 History & edge states', page 07, X=32000 Y=0). Mobile: 188:72141 ('GP — Mobile C', page 10, X=175000 Y=0).",
+  "section": "179:100736 (page '07 — Global Pool', 'GP-08..11/13 History & edge states' at 32000,0) + 188:72141 (page '10 — Mobile Experience', 'GP — Mobile C' at 175000,0)",
   "created": [
    {
     "name": "Section/GP-08..11/13 History & edge states",
@@ -4775,126 +4940,153 @@
    {
     "name": "[GP-10] Entry History / 390 / Default",
     "id": "189:74725"
+   },
+   {
+    "name": "[GP-11] Prize Distribution breakdown / 390 / Default (round #1,248) — NEW this run",
+    "id": "293:99680"
+   },
+   {
+    "name": "[GP-13] Edge state — Round closed / 390 / Entries arrived after close (sheet) — NEW this run",
+    "id": "293:99941"
+   },
+   {
+    "name": "[GP-13] Edge state — Round cancelled, refund owed / 390 / Hub banner (#1,245) — NEW this run",
+    "id": "293:100135"
+   },
+   {
+    "name": "[GP-13] Edge state — VRF delayed / 390 / Waiting 00:14:32 (20:14:36 UTC) — NEW this run",
+    "id": "293:100460"
    }
   ],
   "issues": [
-   "STOPPED: the Figma MCP tool-call limit blocked the same call 3 times in a row. Four 390 frames are NOT built: [GP-11] Prize Distribution breakdown / 390 / Default (round #1,248); [GP-13] Edge state — Round closed / 390 / Entries arrived after close (sheet); [GP-13] Edge state — Round cancelled, refund owed / 390 / Hub banner (#1,245); [GP-13] Edge state — VRF delayed / 390 / Waiting 00:14:32 (20:14:36 UTC). A ready, idempotent script (41 kB, passes the mock run) is at /home/user/Claude/design/figma-build/pending/gp-history/cont/NEXT-m34-gp11-gp13-mobile.js: one use_figma call on page 10, section 188:72141. After it, re-screenshot 188:72142 and 188:72622 (their DEMO bar message changed after the last check).",
-   "DATA CONFLICT: round #1,245 pool. These frames use 41,200.00 USDT / 4,120 entries / 206.00 fees, matching the admin frames (ADM-F3/F4/F7/P9: 38,900 claimed + 2,300 outstanding = 41,200). demo-data.md (usr-finance extras, last commit) says 46,850.00 / 50,000.00, and the USR-F mobile script m-b.js uses 46,850.00. One of the two needs correcting in demo-data.md and the frames that use it.",
-   "Data aligned to demo-data.md, which differs from the original pending scripts: @nova.k had 40 entries in #1,247 (402.00) and 24 in #1,246 (241.20); vals.json changed from 10/15. Purchase times are #1,248 18:05, #1,247 12:40, #1,246 19:12, #1,245 14:22 UTC. I could not read USR-G2's per-round counts to cross-check them.",
-   "Demo 'now' differs between modules. GP frames use 16:42 UTC (countdown 03:17:42, Card/Balance 'Updated 16:42 UTC'), while wallet/finance flows use about 18:44 UTC. The #1,248 purchase time 18:05 comes from the finance history and is shown only where no countdown appears.",
-   "Built inline because no library component fits: the 'Filter rounds' popover (desktop); the round-closed modal (the Modal/Base slot is fixed); mobile bottom sheets (Sheet/Bottom content is fixed); the mobile refund/VRF callouts (Alert/Banner minimum width is 720); vertical steppers. Library suggestions: a Notice/Demo Data mobile variant with wrapping text (decision #29), a Popover/Filter panel slot, and a Sheet/Bottom with a content slot.",
-   "Fixes to the gp-history lib that other agents may want: an empty createAutoLayout spacer hugs to 100 px tall and opens large vertical gaps in rows aligned CENTER, so spacer() now resizes to 1×1. Card/Stat 'Delta context' truncates after about 20 characters at four cards per row. Table/Cell Amount with DEMO needs about 180 px."
+   "Nothing remains in this slice. All 9 desktop and 8 mobile frames exist and passed screenshots. Section 'GP — Mobile C' is now 2,670 × 5,177.",
+   "Built inline because the library has no equivalent: the mobile round-closed bottom sheet, the mobile refund-owed banner (Alert/Banner is 720+ wide) and the mobile VRF-delayed callout, plus the inline vertical stepper and the prize-tier share bars.",
+   "Library gap: the Card/Round 'Cancelled' variant ships 29,640.00 / 2,964. It was overridden per instance to 41,200.00 / 4,120 (demo-data canonical). Card/Balance Owed ships 'Updated 18:42 UTC'; overridden to 16:42 UTC. Suggest fixing the component defaults.",
+   "Runnable script saved: /home/user/Claude/design/figma-build/pending/gp-history/cont/RUN-m34-trimmed.js (idempotent). The README in /home/user/Claude/design/figma-build/pending/gp-history/ now says the slice is complete. Frame ids added to /home/user/Claude/design/figma-build/registry-gp-history.json.",
+   "Figma calls this run: 2 read-only inventories, 1 build, 1 targeted fix and 1 read-only check. No rate-limit errors."
   ]
  },
  "promos": {
-  "section": "32:117004 (page 03 'PROMO-01..05 Promotions'); 34:326636 (page 05 'PROMO-02/03/05 Rewards'); 71:46775 (page 10 'PROMO — Mobile')",
+  "section": "32:117004 (PROMO-01..05 Promotions, page 03, X=100000) · 34:326636 (PROMO-02/03/05 Rewards, page 05, X=72000) · 71:46775 (PROMO — Mobile, page 10, X=238000)",
   "created": [
+   {
+    "name": "Section/PROMO-01..05 Promotions (page 03)",
+    "id": "32:117004"
+   },
+   {
+    "name": "[PROMO-01] Promotions hub / 1440 / Guest",
+    "id": "33:229039"
+   },
+   {
+    "name": "[PROMO-01] Promotions hub / 1440 / Member",
+    "id": "33:247122"
+   },
+   {
+    "name": "[PROMO-04] Weekly tournament — Orbit Rush Sprint / 1440 / Live",
+    "id": "33:268457"
+   },
+   {
+    "name": "[PROMO-04] Weekly tournament — Orbit Rush Sprint / 1440 / Ended",
+    "id": "33:301803"
+   },
+   {
+    "name": "Section/PROMO-02/03/05 Rewards (page 05)",
+    "id": "34:326636"
+   },
+   {
+    "name": "[PROMO-02] Daily rewards & missions / 1440 / Claimable",
+    "id": "34:326637"
+   },
+   {
+    "name": "[PROMO-02] Daily rewards & missions / 1440 / Claimed",
+    "id": "34:358264"
+   },
+   {
+    "name": "[PROMO-02] Daily rewards & missions / 1440 / Locked (break active)",
+    "id": "34:385670"
+   },
+   {
+    "name": "[PROMO-03] Rakeback & cashback / 1440 / Claimable",
+    "id": "34:414299"
+   },
+   {
+    "name": "[PROMO-03] Rakeback & cashback / 1440 / Empty (new period, nothing accrued)",
+    "id": "34:446815"
+   },
+   {
+    "name": "[PROMO-05] Welcome offer & bonus / 1440 / Offer",
+    "id": "34:480866"
+   },
+   {
+    "name": "[PROMO-05] Welcome offer & bonus / 1440 / Offer — bonus terms open",
+    "id": "34:491169"
+   },
+   {
+    "name": "[PROMO-05] Welcome offer & bonus / 1440 / Active",
+    "id": "36:514216"
+   },
+   {
+    "name": "[PROMO-05] Welcome offer & bonus / 1440 / Completed",
+    "id": "63:46935"
+   },
+   {
+    "name": "Section/PROMO — Mobile (page 10)",
+    "id": "71:46775"
+   },
+   {
+    "name": "[PROMO-01] Promotions hub / 390 / Guest",
+    "id": "71:46776"
+   },
    {
     "name": "[PROMO-01] Promotions hub / 390 / Member",
     "id": "181:71623"
    },
    {
-    "name": "(existing) [PROMO-01] Promotions hub / 1440 / Guest",
-    "id": "33:229039"
-   },
-   {
-    "name": "(existing) [PROMO-01] Promotions hub / 1440 / Member",
-    "id": "33:247122"
-   },
-   {
-    "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 1440 / Live",
-    "id": "33:268457"
-   },
-   {
-    "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 1440 / Ended",
-    "id": "33:301803"
-   },
-   {
-    "name": "(existing) [PROMO-02] Daily rewards & missions / 1440 / Claimable",
-    "id": "34:326637"
-   },
-   {
-    "name": "(existing) [PROMO-02] Daily rewards & missions / 1440 / Claimed",
-    "id": "34:358264"
-   },
-   {
-    "name": "(existing) [PROMO-02] Daily rewards & missions / 1440 / Locked (break active)",
-    "id": "34:385670"
-   },
-   {
-    "name": "(existing) [PROMO-03] Rakeback & cashback / 1440 / Claimable",
-    "id": "34:414299"
-   },
-   {
-    "name": "(existing) [PROMO-03] Rakeback & cashback / 1440 / Empty (new period, nothing accrued)",
-    "id": "34:446815"
-   },
-   {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Offer",
-    "id": "34:480866"
-   },
-   {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Offer — bonus terms open",
-    "id": "34:491169"
-   },
-   {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Active",
-    "id": "36:514216"
-   },
-   {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Completed",
-    "id": "63:46935"
-   },
-   {
-    "name": "(existing) [PROMO-01] Promotions hub / 390 / Guest",
-    "id": "71:46776"
-   },
-   {
-    "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 390 / Live",
+    "name": "[PROMO-04] Weekly tournament — Orbit Rush Sprint / 390 / Live",
     "id": "71:47423"
    },
    {
-    "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 390 / Ended",
+    "name": "[PROMO-04] Weekly tournament — Orbit Rush Sprint / 390 / Ended",
     "id": "84:154017"
    },
    {
-    "name": "(existing) [PROMO-02] Daily rewards & missions / 390 / Claimable",
+    "name": "[PROMO-02] Daily rewards & missions / 390 / Claimable",
     "id": "76:67721"
    },
    {
-    "name": "(existing) [PROMO-02] Daily rewards & missions / 390 / Locked (break active)",
+    "name": "[PROMO-02] Daily rewards & missions / 390 / Locked (break active)",
     "id": "76:68079"
    },
    {
-    "name": "(existing) [PROMO-03] Rakeback & cashback / 390 / Claimable",
+    "name": "[PROMO-03] Rakeback & cashback / 390 / Claimable",
     "id": "80:115842"
    },
    {
-    "name": "(existing) [PROMO-03] Rakeback & cashback / 390 / Empty (new period, nothing accrued)",
+    "name": "[PROMO-03] Rakeback & cashback / 390 / Empty (new period, nothing accrued)",
     "id": "80:116163"
    },
    {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 390 / Offer",
+    "name": "[PROMO-05] Welcome offer & bonus / 390 / Offer",
     "id": "82:150984"
    },
    {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 390 / Active",
+    "name": "[PROMO-05] Welcome offer & bonus / 390 / Active",
     "id": "82:151309"
    },
    {
-    "name": "(existing) [PROMO-05] Welcome offer & bonus / 390 / Completed",
+    "name": "[PROMO-05] Welcome offer & bonus / 390 / Completed",
     "id": "84:154339"
    }
   ],
   "issues": [
-   "Figma MCP seat limit: my first two use_figma attempts this run (one inventory call per page, then a single combined inventory call) were refused. After a 4-minute pause, the third attempt succeeded, so 3 refusals in a row never happened.",
-   "Continuation inventory (28 Nov): all 23 frames from the interrupted run exist. Every one has auto height and none is stuck at 800, so nothing needed fixing. The only missing frame was [PROMO-01] Promotions hub / 390 / Member. It is now built and verified: 181:71623, page '10 — Mobile Experience', section 71:46775, x=120 y=5039, 390×5203.",
-   "Frames from the earlier run were not screenshotted again in this run, to save MCP calls. That is why PROMO rows are reported as BUILT (complete) and not VERIFIED. One low-cost visual spot-check per row would be enough to promote them.",
-   "No new components were added; the new frame uses only library instances. Two pieces were built inline with tokens: the 'Ready to claim' summary card and the mobile promotions list rows (icon tile, key terms, status, 'Terms apply', chevron). Both are candidates for a 'Card/Reward Summary' and a 'List/Promo Row' component. Banner/Promo (580 wide) and Card/Daily Reward Calendar (616 wide) do not fit a 358 mobile content column.",
-   "The new frame uses tournament rank #14 / 1,284 pts / 22.50 USDT and mission progress 25/50, as baked into Card/Tournament and Card/Mission. Another agent's decisions log uses tournament rank #148 and mission 32/50 (built.json notes). The orchestrator should reconcile these in demo-data.md.",
-   "Claimable cash on the new frame is 118.62 USDT = VIP Gold weekly 115.20 + rakeback 3.42, matching the usr-finance extras in demo-data.md. Daily streak day 4 (1.50 USDT) is shown separately as bonus funds and is not added to the cash total.",
-   "Prepared script saved for re-runs (idempotent; it also returns the 3-section inventory): /home/user/Claude/design/figma-build/pending/promos/out/m01-member.js (source src/m01-member.body.js, README.md). /home/user/Claude/design/figma-build/registry-promos.json updated with 181:71623 and a _continuation_28nov note.",
-   "Did not edit ledger.json or decisions.md (left for the orchestrator merge). No memory notes were used beyond the index; nothing new to save."
+   "Continuation run: a read-only inventory found all 24 PROMO frames already present (13 at 1440 on pages 03 and 05, 11 at 390 on page 10), all with auto height. No frames were missing and nothing was rebuilt. pending/promos had only the already-finished m01-member.js script.",
+   "Verification was done inside use_figma: per-frame text lint (overflow, clipping, collapsed text, text overlap, off-frame, and overflow past ancestors) plus a screenshot of every frame. get_screenshot and get_metadata were not used (conventions §10). One use_figma call failed on a script bug and was fixed and retried; there were no rate-limit errors.",
+   "Fix: the Notice/Demo Data Message on 10 older 390 frames was changed to 'DEMO DATA — illustrative values only'. The full sentence was clipped on both sides at 390 (decision #29). Bar instances 71:46777, 71:47424, 84:154018, 76:67722, 76:68080, 80:115843, 80:116164, 82:150985, 82:151310, 84:154340. 181:71623 already had the short message.",
+   "Fix: on PROMO-02 390 Locked, the self-assessment subtitle inside RG/Help Resources (I76:68333;24:14792) is now set to textAutoResize HEIGHT and FILL. It was 272 px wide in a 224 px column. The title above it still overhangs by 2 px, which is not visible.",
+   "Fix: on PROMO-01 1440 Guest, the Banner/Promo button labels were overridden: 'See this week's missions' became 'See missions' (I33:229685;29:17846) and 'How cashback works' became 'How it works' (I33:229806;29:17965). The Actions row was 323 px and 300 px wide in a 290 px Content column.",
+   "Library issue, not fixed: in the Banner/Promo Cashback art, a coin covers part of the top-right DEMO badge. The badge stays readable as '·EMO'. The fix belongs in the component: put the DEMO badge above the art layer.",
+   "Intentional lint hits left as they are: the Account tab badge '3' overhangs its icon wrap by 2 px (component design); the mobile Rewards sub-nav tabs are clipped because they scroll horizontally; the PROMO-02 1440 Claimed toast overlays the third mission card at the viewport's bottom right; the PROMO-05 terms modal sits over a scrim.",
+   "Files updated: registry-promos.json (_verification_28nov_run3 note) and pending/promos/README.md (marked verified, nothing left to run). ledger.json and decisions.md were not edited; the orchestrator merges the ledger."
   ]
  },
  "catalog-screens": {
@@ -5006,22 +5198,104 @@
    }
   ],
   "issues": [
-   "All 24 required frames (16 desktop on '08 — Games', 8 mobile on '10 — Mobile Experience') were built by the earlier run, and this run built nothing. Two read-only audits (one per page) found no incomplete frames: every frame hugs its height (primaryAxisSizingMode AUTO, none stuck at 800), with no placeholder text, no empty text and no vertical overflow.",
-   "Nothing remains to build. Only the visual screenshot check is missing, for all 24 frames. It was blocked by the Figma MCP tool-call limit 3 times in a row (after cooldowns of 200 s and 360 s), so per conventions section 10 I stopped. The ready-to-run read-only check scripts and the run order are in /home/user/Claude/design/figma-build/pending/catalog-screens/ (README.md, shot08_0..5.js, shot10_0..1.js, audit08.js, audit10.js).",
-   "Things to look at in the screenshot pass: the GM-02 Restricted region frames have far fewer DEMO badges than Default (desktop 33:186210 has 7 vs 39, mobile 36:504732 has 3 vs 36). Confirm the greyed or restricted tiles still mark illustrative numbers as DEMO.",
-   "The audit flagged text clipped or past the frame edge only inside tracks that scroll sideways on purpose: the related-games carousel 'Track' (desktop game frames), 'Pills (scroll)', 'Category pills (scroll)', 'Track (swipe)' and 'Run strip (scroll)' (mobile). This is the expected carousel peek, still to be confirmed visually.",
-   "The earlier run recorded no decisions in decisions.md for this slice. Its notes on which components it reused are in registry-catalog-screens.json: tiles are Tile/Game Generic with Tile/Game Art swaps, and the game stages are drawn inline with tokens. No new components were created."
+   "No frames were missing. This continuation run made 2 read-only inventory calls and 5 read-only screenshot calls (24 frames). It made no changes in Figma.",
+   "Intentional, not defects: the 'More GLOBAL POOL Originals' carousel at the bottom of each desktop game frame is cut off by the right edge of the frame, and on mobile the category pills, game rows, multiplier pills and the High Card run strip are cut off by the screen edge. These are horizontal-scroll previews.",
+   "The game stages (mines board, peg board, skyline scene, wheel, keno board, card table) are inline, token-bound frames rather than library components, because no matching components exist. This is recorded in /home/user/Claude/design/figma-build/registry-catalog-screens.json.",
+   "Mobile frames exist only for the default state (plus Restricted for GM-02), as decisions.md allows. Mobile Hover for GM-02 does not apply on touch screens.",
+   "Files: added a DONE note to /home/user/Claude/design/figma-build/pending/catalog-screens/README.md so later runs skip this slice. Did not edit ledger.json or decisions.md (left for the orchestrator merge). The registry file is unchanged.",
+   "Memory: the GLOBAL POOL Figma note in the memory index (project_global_pool_figma.md) was not opened, because the project files had everything needed. Nothing new to save."
   ]
  },
  "pub-game-details": {
-  "section": "PUB-04 Game Details (page '03 — Public Website', planned at X=40000, Y=0) + PUB-04 — Mobile (page '10 — Mobile Experience', planned at X=21000, Y=0). Section IDs are unknown: no Figma call got through, so I could not read the canvas or confirm whether the sections exist.",
-  "created": [],
+  "section": "PUB-04 Game Details (297:107083) on page '03 — Public Website' at 40000,0, 9480 wide, so it ends at x=49480, before PUB-05 at 50000. Mobile section: PUB-04 — Mobile (302:104065) on page '10 — Mobile Experience' at 21000,0.",
+  "created": [
+   {
+    "name": "Section · PUB-04 Game Details (page 03)",
+    "id": "297:107083"
+   },
+   {
+    "name": "Template/Game Details (component set)",
+    "id": "297:109867"
+   },
+   {
+    "name": "Template/Game Details · Breakpoint=Desktop (1136)",
+    "id": "297:107084"
+   },
+   {
+    "name": "Template/Game Details · Breakpoint=Mobile (358)",
+    "id": "297:108516"
+   },
+   {
+    "name": "Doc/PUB-04 header",
+    "id": "297:109868"
+   },
+   {
+    "name": "[PUB-04] Game Details · Global Pool (Global Jackpot) / 1440 / Default — logged out",
+    "id": "299:210300"
+   },
+   {
+    "name": "[PUB-04] Game Details · Pool Roulette (Roulette) / 1440 / Default — logged out",
+    "id": "299:212227"
+   },
+   {
+    "name": "[PUB-04] Game Details · Orbit Rush (Crash) / 1440 / Default — logged out",
+    "id": "299:213743"
+   },
+   {
+    "name": "[PUB-04] Game Details · Pool Dice (Dice) / 1440 / Default — logged out",
+    "id": "301:112676"
+   },
+   {
+    "name": "[PUB-04] Game Details · Double Side (Coinflip) / 1440 / Default — logged out",
+    "id": "301:115162"
+   },
+   {
+    "name": "[PUB-04] Game Details · Twenty-One (Blackjack) / 1440 / Default — logged out",
+    "id": "301:117324"
+   },
+   {
+    "name": "Section · PUB-04 — Mobile (page 10)",
+    "id": "302:104065"
+   },
+   {
+    "name": "Doc/PUB-04 mobile header",
+    "id": "302:104066"
+   },
+   {
+    "name": "[PUB-04] Game Details · Global Pool (Global Jackpot) / 390 / Default — logged out",
+    "id": "302:104069"
+   },
+   {
+    "name": "[PUB-04] Game Details · Pool Roulette (Roulette) / 390 / Default — logged out",
+    "id": "302:106617"
+   },
+   {
+    "name": "[PUB-04] Game Details · Orbit Rush (Crash) / 390 / Default — logged out",
+    "id": "302:107928"
+   },
+   {
+    "name": "[PUB-04] Game Details · Pool Dice (Dice) / 390 / Default — logged out",
+    "id": "303:108310"
+   },
+   {
+    "name": "[PUB-04] Game Details · Double Side (Coinflip) / 390 / Default — logged out",
+    "id": "303:110055"
+   },
+   {
+    "name": "[PUB-04] Game Details · Twenty-One (Blackjack) / 390 / Default — logged out",
+    "id": "303:111573"
+   }
+  ],
   "issues": [
-   "The Figma MCP tool-call limit ('You've reached the Figma MCP tool call limit for your Full seat on the Professional plan') blocked 3 attempts in a row, including one after a 7-minute wait. No canvas read or write happened, so no frames exist from this run and none are verified.",
-   "Scripts are ready to run in /home/user/Claude/design/figma-build/pending/pub-04/out/: t1-template.js (46.2k chars), d1-gp-roulette-crash.js, d2-dice-coin-bj.js, m1-gp-roulette-crash.js, m2-dice-coin-bj.js. Each is under 50k chars and assembled by build.py from helpers.js, lib.js, tpl.js/frames.js, data/*.js and main-*.js. A mock run (_mock-run.cjs) passes t1, d1 and d2: t1 ~1,179 nodes, empty MISS list.",
-   "Required step between runs: the mobile scripts m1/m2 need the template's ID. The template lives on page 03 and the mobile frames go on page 10, and getTpl() only searches the current page, so it fails there unless tpl_id.txt is set. After t1 runs, write its returned 'set' ID to /home/user/Claude/design/figma-build/pending/pub-04/tpl_id.txt and run 'python3 build.py' in that folder. Then run d1, d2, m1, m2 in that order. I wrote the order to /home/user/Claude/design/figma-build/pending/pub-04/RUN-ORDER.json.",
-   "Content check on the prepared data: it matches demo-data.md. Round #1,248 closes 27 Nov 2026 20:00 UTC; 186,400.00 pool = 18,640 × 10.00; 0.05 platform fee shown as its own line; 932.00 fees kept out of the pool; 50/20/10/10×2% split; VRF 0x9f2c…e71a; player counts match. European single-zero payouts 35:1–1:1 with 2.70% edge; crash auto cash-out from 1.01× with a 1,000× cap; dice 0.00–99.99 over/under with multiplier = 99 ÷ chance; coinflip 1.96× with 2.00% edge; blackjack 3:2, S17, 6 decks, ≈0.50% edge. The template includes 'You can lose your stake', 18+, the licence notice, the RG card and DEMO badges.",
-   "Minor copy nit to consider: in data/dice.js the win chances use the simplified 100 − target rule (e.g. Over 50.50 → 49.50%). With 10,000 equally likely values from 0.00 to 99.99, the exact chance is 49.49%. This matches demo-data.md, so I left it."
+   "I fixed this one during the run, and it matters for other agents: the use_figma runtime skips hidden layers inside instances by default (figma.skipInvisibleInstanceChildren = true). A layer hidden in the main component therefore can't be found in an instance with findOne/findAll, so it can't be un-hidden either. In the first desktop pass, Global Pool lost its art group, both Gold Participate CTAs, rule 7 and the payout DEMO badge, and Orbit Rush lost its art group. I fixed those in place by setting figma.skipInvisibleInstanceChildren = false. That line is now in pending/pub-04/lib.js. Any other slice that edits instance layers hidden in the main component needs the same line.",
+   "Every use_figma call that built 3 frames hit the 60-second MCP timeout (d1, d2, m1, m2). The work still finished each time: a read-only check confirmed all frames were there and correct, and I took screenshots in separate calls. No frames were duplicated. The prepared scripts are idempotent, because they replace frames with the same name.",
+   "Shared component issue, not fixed at component level: the default message in Notice/Demo Data (6:131) renders a centred Label 591 px wide, so at 390 it is clipped on both sides. I set a shorter Message ('DEMO — every figure on this page is illustrative') on my 6 mobile frames only. Other agents' 390 frames probably have the same clipping; the right fix is to make the Label wrap or truncate inside the component.",
+   "Fixed: the mobile sticky CTA bar used a FILL button, which got clipped when the bar info text was long (Orbit Rush, Pool Dice). The info column now fills and wraps, and the button hugs its label. Also patched in pending/pub-04/frames.js.",
+   "Fixed in the main component: on desktop the 'How to play' steps were 344 wide, which did not fit 2 per row in the 702 px track, so they stacked in one column. They are now 340 wide, giving 2 per row (also patched in tpl.js).",
+   "Layout change from the prepared plan: the six desktop frames sit in a row below the template (y=5896 within the section) instead of to its right. Placed to the right, the row would have run into the PUB-05 section at x=50000.",
+   "Not a defect: the template variants have a transparent background, so text set directly on the page background (breadcrumb, 'At a glance', 'More … games') looks faint in screenshots of the component alone. In the frames it sits on bg/base and reads correctly, and the component set itself has a surface/default fill on the canvas.",
+   "Small wording point I left as written: the dice rule says 'win chance = 100 − target'. For a strict 'over' on 0.00–99.99, over 50.50 is really 49.49%. I kept it because it matches the demo-data example (49.50% → 2.0000×).",
+   "Files written: /home/user/Claude/design/figma-build/registry-pub-04.json (template set and variant IDs, plus the override recipe). I updated /home/user/Claude/design/figma-build/pending/pub-04/RUN-ORDER.json with a status_28nov_run2 entry, patched lib.js, frames.js, tpl.js, main-d.js and main-m.js, set tpl_id.txt to 297:109867, and rebuilt out/*.js. The memory notes were not used in this run."
   ]
  },
  "pub-p1a": {
@@ -5111,48 +5385,80 @@
   ]
  },
  "pub-p1b": {
-  "section": "33:205847",
+  "section": "33:205847 (page '03 — Public Website', 'PUB-14/18/20/23 FAQ, RG, Restricted, Cookies', X 60000 Y 0) + 34:435743 (page '10 — Mobile Experience', 'PUB-14/18/20/23 — Mobile', X 35000 Y 0)",
   "created": [
    {
-    "name": "[PUB-14] FAQ / 1440 / Default — All questions (earlier run)",
+    "name": "[PUB-14] FAQ / 390 / Search results — “withdraw” (NEW this run, cloned from mobile Default; 390x4143)",
+    "id": "302:109456"
+   },
+   {
+    "name": "[PUB-14] FAQ / 390 / Search — no results “bonus code” (NEW this run; 390x3655)",
+    "id": "302:109738"
+   },
+   {
+    "name": "[PUB-20] Restricted Countries / 390 / Search — “united” (NEW this run, cloned from mobile Default; 390x4400)",
+    "id": "303:113051"
+   },
+   {
+    "name": "[PUB-14] FAQ / 390 / Default — All questions (earlier run, verified now)",
+    "id": "34:435744"
+   },
+   {
+    "name": "[PUB-18] Responsible Gaming / 390 / Default (earlier run, verified now)",
+    "id": "34:472716"
+   },
+   {
+    "name": "[PUB-20] Restricted Countries / 390 / Default — search & regions (earlier run, verified now)",
+    "id": "34:491926"
+   },
+   {
+    "name": "[PUB-23] Cookie Consent / 390 / Banner — bottom sheet (earlier run, 390x844 viewport, verified now)",
+    "id": "36:503505"
+   },
+   {
+    "name": "[PUB-23] Cookie Consent / 390 / Preferences — bottom sheet (earlier run, 390x844 viewport, verified now)",
+    "id": "36:518622"
+   },
+   {
+    "name": "[PUB-14] FAQ / 1440 / Default — All questions (earlier run, verified now)",
     "id": "33:205848"
    },
    {
-    "name": "[PUB-14] FAQ / 1440 / Search results — “withdraw” (earlier run)",
+    "name": "[PUB-14] FAQ / 1440 / Search results — “withdraw” (earlier run, verified now)",
     "id": "33:242174"
    },
    {
-    "name": "[PUB-14] FAQ / 1440 / Search — no results “bonus code” (earlier run)",
+    "name": "[PUB-14] FAQ / 1440 / Search — no results “bonus code” (earlier run, verified now)",
     "id": "36:534066"
    },
    {
-    "name": "[PUB-18] Responsible Gaming / 1440 / Default (earlier run)",
+    "name": "[PUB-18] Responsible Gaming / 1440 / Default (earlier run, verified now)",
     "id": "33:279676"
    },
    {
-    "name": "[PUB-20] Restricted Countries / 1440 / Default — grouped list (earlier run)",
+    "name": "[PUB-20] Restricted Countries / 1440 / Default — grouped list (earlier run, verified now)",
     "id": "33:323120"
    },
    {
-    "name": "[PUB-20] Restricted Countries / 1440 / Search — “united” (earlier run)",
+    "name": "[PUB-20] Restricted Countries / 1440 / Search — “united” (earlier run, verified now)",
     "id": "34:356600"
    },
    {
-    "name": "[PUB-23] Cookie Consent / 1440 / Banner — first visit (earlier run, 1440x1024 viewport)",
+    "name": "[PUB-23] Cookie Consent / 1440 / Banner — first visit (earlier run, 1440x1024 viewport, verified now)",
     "id": "34:396216"
    },
    {
-    "name": "[PUB-23] Cookie Consent / 1440 / Preferences modal (earlier run, 1440x1024 viewport)",
+    "name": "[PUB-23] Cookie Consent / 1440 / Preferences modal (earlier run, 1440x1024 viewport, verified now)",
     "id": "34:409284"
    }
   ],
   "issues": [
-   "Mobile build stopped by the Figma MCP limit: the page-10 read-only inventory failed 3 times in a row with 'You've reached the Figma MCP tool call limit for your Full seat on the Professional plan', so I stopped as conventions §10 requires. No nodes were created or changed in this run. The only successful call was the read-only inventory of page 03, which found the 8 desktop frames.",
-   "8 mobile frames still need building (page '10 — Mobile Experience', section 'PUB-14/18/20/23 — Mobile', X 35000, Y 0; I could not confirm whether the section exists): [PUB-14] FAQ / 390 / Default — All questions; [PUB-14] FAQ / 390 / Search results — “withdraw”; [PUB-14] FAQ / 390 / Search — no results “bonus code”; [PUB-18] Responsible Gaming / 390 / Default; [PUB-20] Restricted Countries / 390 / Default — grouped list; [PUB-20] Restricted Countries / 390 / Search — “united”; [PUB-23] Cookie Consent / 390 / Banner — first visit; [PUB-23] Cookie Consent / 390 / Preferences — bottom sheet.",
-   "Prepared scripts for the next run are in /home/user/Claude/design/figma-build/pending/pub-14-18-20-23/ (README.md, RUN-ORDER.json). Run 00-read.js first (read-only), then out/m1-faq.js, out/m2-rg.js, out/m3-restricted.js, out/m4-cookie.js. Each is under 32k chars, safe to re-run, and ends with screenshots plus an overflow audit. All four pass the dry-run mock (_mock-run.cjs); none has run against the real file.",
-   "The mobile copy has not been checked against the desktop frames, because the read that extracts the desktop text failed. Before running the build scripts, compare 00-read.js output with these data arrays and fix any differences, then run python3 build.py: FAQ questions and result counts (CATS, RES in m1-faq.js), the illustrative country list and status-badge mapping (REG, HITS, BADGE_MAP in m3-restricted.js; currently 18 DEMO rows: 10 restricted, 4 limited, 4 permitted), and the cookie copy and categories (m4-cookie.js).",
-   "The 8 desktop frames were built by the interrupted earlier run. I judged them complete from name and size only (auto height, and the two cookie frames are deliberate 1024 viewports). Nothing was screenshotted in this run, so none of the four rows can be marked VERIFIED.",
-   "Wrote /home/user/Claude/design/figma-build/registry-pub-p1b.json with the section and desktop frame ids (no new library components)."
+   "Inventory correction: the earlier ledger said mobile was not built, but a later run had already built 5 mobile frames: FAQ Default, RG Default, Restricted Default, Cookie Banner and Cookie Preferences. That run used different frame names from the prepared scripts in pending/pub-14-18-20-23/m1–m4.js. I did not run those scripts, because they would have created duplicate frames. I built only the 3 missing mobile states, by cloning the existing mobile Defaults so they match visually.",
+   "I put a status block at the top of /home/user/Claude/design/figma-build/pending/pub-14-18-20-23/README.md: the slice is complete, with all 16 frame IDs listed and a warning not to run m1–m4. The scripts I actually ran are in /home/user/Claude/design/figma-build/pending/pub-14-18-20-23/done-28nov/.",
+   "Verification method: use_figma returned at most about 5 inline images per call, and a transparent child frame screenshots on a white background. So I cloned frames into a temporary clipped viewport off-canvas at -60000, put several chunks side by side, took the screenshot and then removed the viewport. The shared library footer was hidden only inside those temporary clones. compose.js in done-28nov is reusable for other slices.",
+   "The overflow audit flags only the horizontally scrolling Tabs/Pill and Filter Chip rows on mobile. These are clipped by their 358-wide container on purpose, the same as on the existing mobile Defaults.",
+   "No new components were created, so there is no registry-*.json to write. No get_screenshot or get_metadata calls were made. There were no MCP limit errors. One read-only call timed out because it read nodes across pages; I retried it split into one call per page.",
+   "Memory: I used no stored notes, and found nothing new about the user worth saving."
   ]
  },
  "pub-p1c": {
@@ -5227,7 +5533,7 @@
   ]
  },
  "adm-games": {
-  "section": "33:165240 (page '09 — Admin Panel', section 'ADM-G1..G7 Game management', X=42000 Y=0, 11040 × 8040)",
+  "section": "33:165240",
   "created": [
    {
     "name": "Section/ADM-G1..G7 Game management",
@@ -5296,23 +5602,15 @@
    {
     "name": "[ADM-G7] Provably Fair Logs / 1280 / Default",
     "id": "34:400728"
-   },
-   {
-    "name": "Label — Desktop row",
-    "id": "34:428845"
-   },
-   {
-    "name": "Label — Laptop row",
-    "id": "34:428846"
    }
   ],
   "issues": [
-   "Nothing needed building: all 16 frames this slice requires were already on the canvas from the interrupted run. That is 1440 + 1280 for G1–G7 plus the extra G2 state 'Draft — out of bounds'. All of them hug height (primaryAxisSizingMode AUTO) and none was cut off at 800. The rows are sized D·L only (§2.8: M only for rows marked (M)), so no frames belong on page 10 'ADM — Mobile'.",
-   "A read-only structural audit passed for all 16 frames. It found no clipped or off-canvas text and no placeholder copy. Every frame has DEMO badges (5–16 each) and an 'Outcomes cannot be changed by admins' note. The empty text nodes are action-column Table/Header Cells, which is intended.",
-   "BLOCKED: the Figma MCP limit ('tool call limit for your Full seat') rejected 3 use_figma calls in a row (03:44–03:48 UTC 28 Nov), including after a 150 s wait. Per conventions §10 I stopped. Only 2 frames were screenshot-verified: 33:165241 (G1 1440) and 33:215197 (G2 1440 Pending). Both passed.",
-   "STILL TO VERIFY by screenshot (14 frames, read-only, no building needed): 34:421433, 33:250900, 33:286269, 34:328793, 34:360672, 34:399536 (1440) and 33:166714, 33:215941, 34:421954, 33:252086, 33:287480, 34:329977, 34:361789, 34:400728 (1280). Ready-to-run read-only scripts are in /home/user/Claude/design/figma-build/pending/adm-games/ (RUN-ORDER.json plus verify-1-desktop.js … verify-5-laptop.js). Once they pass, upgrade the rows to VERIFIED.",
-   "Time inconsistency: the Game Management screens are a ~16:42 UTC snapshot of 27 Nov 2026 (G1 'refreshed 16:42:10 UTC', CR-0418 requested 15:12 UTC, maintenance 'until 17:30 UTC'). The other admin modules use 18:44 UTC (decision #35). This is logged as decision #44 in /home/user/Claude/design/figma-build/decisions.md. Align it if one admin-wide time is wanted.",
-   "Files changed in this run: I appended decision #44 to /home/user/Claude/design/figma-build/decisions.md. /home/user/Claude/design/figma-build/registry-adm-games.json already lists every frame ID and was left unchanged. No Figma nodes were created or changed in this run."
+   "No new frames were needed. The earlier run had already built all 16 required frames: D 1440 and L 1280 for G1 to G7, plus the G2 'Draft — out of bounds' state. This run only verified them and applied targeted fixes. Frame IDs are unchanged.",
+   "No mobile frames were built in 'ADM — Mobile' on page 10. These rows are sized D·L only, as recorded in decisions.md #44.",
+   "I did not edit ledger.json directly, to avoid racing parallel agents; the statuses above are meant to go in through merge-ledger. I appended decisions.md #61 with the fixes and marked pending/adm-games/RUN-ORDER.json as done.",
+   "Carried over from #44: these admin screens show a 27 Nov ~16:42 UTC snapshot, while other admin modules use 18:44 UTC. Align them if one admin-wide time is wanted.",
+   "Inline pieces, no new components: the Game Statistics GGR-by-title bar list and the KV fact grids are built with tokens inside the screens.",
+   "Memory: the build context in this report (file key, BC.GAME-style casino direction, admin keeps its own shell) agrees with the stored project note on the GLOBAL POOL Figma design. Nothing new needs saving."
   ]
  },
  "adm-core": {
@@ -5414,10 +5712,6 @@
   "section": "188:158877",
   "created": [
    {
-    "name": "Section — MOB-01/02/10/12 Mobile patterns (page 10, X=224000, Y=0)",
-    "id": "188:158877"
-   },
-   {
     "name": "[MOB-01] Public header / 390 / Guest — menu closed",
     "id": "188:158881"
    },
@@ -5486,18 +5780,33 @@
     "id": "196:77250"
    },
    {
-    "name": "[MOB-12] Tablet behaviour sheet / Board (part A only: header, Navigation, Grids)",
+    "name": "[MOB-12] Tablet behaviour sheet / Board (parts A + B complete this run)",
     "id": "199:77678"
+   },
+   {
+    "name": "[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)",
+    "id": "296:100315"
+   },
+   {
+    "name": "[MOB-12] Tablet 768 — Navigation / 768 / Drawer open",
+    "id": "296:101496"
+   },
+   {
+    "name": "[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column",
+    "id": "298:102586"
+   },
+   {
+    "name": "[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)",
+    "id": "298:103186"
    }
   ],
   "issues": [
-   "STOPPED EARLY under conventions §10: 3 Figma MCP limit errors in a row (mob-08). Not built yet: (1) MOB-12 board part B (Topic 3 Tables, Topic 4 Modals & overlays, 'Breakpoint ranges' strip), to be appended to board 199:77678. (2) '[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)'. (3) '[MOB-12] Tablet 768 — Navigation / 768 / Drawer open'. (4) '[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column'. (5) '[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)'. Run /home/user/Claude/design/figma-build/pending/mob-patterns/mob-08.js, then mob-09.js, then mob-10.js (mob-10 clones the drawer-closed frame from mob-09). Each script is idempotent and already patched; see README.md in that folder.",
-   "Placement: all four rows are in one section on page 10 at X=224000. The assigned module-section X=96000 would overlap 'USR — Mobile A' (91000–93160) and 'USR — Mobile B' (98000). The 224000–231000 gap fits the planned width (about 5,750 px including the 768 frames).",
-   "Component gaps (built inline from tokens): mobile transaction card, entry round-group card, mobile hero banner, tablet top bar (Shell/Topbar has no 768 variant), Pressed/Focus cells for tab-bar items (Nav/Mobile Tab Bar has no such variants), bottom-sheet scaffold (scrim + grabber + sheet).",
-   "Library defaults that needed overrides: Input/Search's default placeholder is 'Search transactions…' and its ⌘K shortcut shows on phones (overridden per instance). Menu/Filter Chip shows a chain icon by default ('Show icon' turned off). Notice/Demo Data's full message clips at 390 (short message used, as in #29).",
-   "Script bug fixed: the kit's SHEET() gives the overlay the same name as the sheet, so a fix script that searched by name moved the wrong node (the 'USDT' label of a list card). It was repaired and the sheet re-checked on a screenshot. Later scripts locate the sheet through 'Sheet header'.parent.",
-   "Data aligned to demo-data/decisions inside the prepared scripts: WD-20931 18:44 (decision by 22:44 UTC), DP-77412 18:39, #1,248 entries 18:05, DP-77380 09:12, refund #1,245 20:00 with 1.50 fees reversed, 212 transaction rows (not 1,284), and player counts per decision #34. Decisions entry 36 appended to /home/user/Claude/design/figma-build/decisions.md; frame ids written to /home/user/Claude/design/figma-build/registry-mob-patterns.json.",
-   "Spec board MOB-10 (196:77250), cosmetic: annotation pins 1, 3 and 4 slightly overlap the icon, chain mark and status badge on the example mobile card."
+   "Section placement: everything is on page 10 in 'MOB-01/02/10/12 Mobile patterns' (188:158877) at X=224000, Y=0. The assigned module X=96000 would overlap 'USR — Mobile A/B' (decision #44). The 768 frames sit in the MOB-12 row to the right of the board (x 2080, 2968, 3856, 4744; y 5663) instead of in a separate row below.",
+   "Component gap: Shell/Topbar has no 768 (tablet) variant. The tablet top bar in all four 768 frames is built inline from library parts: Icon Button menu/search, Logo, balance chip, Deposit button, notification bell and Avatar.",
+   "Component gap: Modal/Participation Preview has no max-height / scrolling-body variant. On the 768 frame the instance was resized to 976 px with Body set to FILL + clipped as instance overrides, and a scroll track/thumb was added as plain rects on the overlay. Suggest adding a 'Max height' variant to the component.",
+   "Data patch: mob-10.js table rows changed from a non-contiguous sample to history page 1 in date order (WD-20931, DP-77412, #1,248 entries, #1,247 entries, Gold III level-up, #1,246 entries, refund #1,245 +300.00 Owed, #1,245 entries). Pagination reads '1–8 of 212' to match the visible rows and MOB-10's 'Showing 8 of 212'. The board's Tables cell still describes the 768 pagination generically as '‹ 1–20 of 212 ›' (desktop default page size).",
+   "Post-run inline fixes (not in the out/ scripts): the modal cap and scroll thumb, and a 48 px edge gutter (299:104067) behind the table's 'More columns' chevron so it no longer covers the Status badges. Both were re-checked on screenshots.",
+   "Carried over from the earlier run: two later MOB-01 fixes (short DEMO notice #29, hero coin-stack move) were never re-screenshotted on the MOB-01 frames themselves."
   ]
  },
  "undefined": {
@@ -6715,6 +7024,194 @@
    "New DEMO scenarios, logged as decision 57 in decisions.md: a Level 1 account with a 2,000.00 USDT daily withdrawal limit (ERR-04.1); Global Pool not licensed in Ontario, Canada while Originals and tables are (ERR-05.3); look-alike phishing domain globalpool-bonus.example (ERR-07.5). security@example.com is a placeholder.",
    "Files: rerunnable scripts are in /home/user/Claude/design/figma-build/pending/err-b (README.md, RUN-ORDER.json, build.sh, lib.js, lib-m.js, mlib.js, b04–b07.js, m1–m2.js, out/); post-run fixes are folded into the sources. Registry: /home/user/Claude/design/figma-build/registry-err-b.json. Decision 57 was appended to /home/user/Claude/design/figma-build/decisions.md. ledger.json was not edited; the orchestrator merges it.",
    "Figma MCP use: 15 use_figma calls, no rate-limit errors. get_metadata and get_screenshot were never used; checks were in-script screenshots plus a clip/off-frame text audit."
+  ]
+ },
+ "adm-growth-sys": {
+  "section": "33:192221. Page '09 — Admin Panel', section 'ADM-A/M Affiliates & marketing, ADM-S System' (X 86000, Y 0, now 26,640 × 13,333). Layout inside the section: 1440 masters in one row at y=200, extra states stacked below their default, the Laptop 1280 row at y=6440 directly under each master, and the S3 Tablet 768 frame at y=10758 in the S3 column. A light check found no overlapping frames. No Mobile 390 frames: the ledger sizes for these rows are D·L (S3 is D·L·T), and §H asks for admin 390 frames only for the approvals/alerts/overview subset.",
+  "created": [
+   {
+    "name": "[ADM-A1] Affiliates / 1440 / Default",
+    "id": "33:192225"
+   },
+   {
+    "name": "[ADM-A1] Affiliates / 1280 / Default",
+    "id": "285:266479"
+   },
+   {
+    "name": "[ADM-A2] Referral Statistics / 1440 / Default",
+    "id": "33:230940"
+   },
+   {
+    "name": "[ADM-A2] Referral Statistics / 1280 / Default",
+    "id": "285:267373"
+   },
+   {
+    "name": "[ADM-A3] Commissions / 1440 / Default",
+    "id": "33:265034"
+   },
+   {
+    "name": "[ADM-A3] Commissions / 1280 / Default",
+    "id": "285:268097"
+   },
+   {
+    "name": "[ADM-A4] Payouts / 1440 / Default",
+    "id": "33:294350"
+   },
+   {
+    "name": "[ADM-A4] Payouts / 1280 / Default",
+    "id": "285:268766"
+   },
+   {
+    "name": "[ADM-A5] Fraud Detection / 1440 / Default",
+    "id": "33:322372"
+   },
+   {
+    "name": "[ADM-A5] Fraud Detection / 1280 / Default",
+    "id": "285:269410"
+   },
+   {
+    "name": "[ADM-M1] Banners / 1440 / Default",
+    "id": "34:355822"
+   },
+   {
+    "name": "[ADM-M1] Banners / 1280 / Default",
+    "id": "287:101365"
+   },
+   {
+    "name": "[ADM-M2] Promotions / 1440 / Default",
+    "id": "34:381855"
+   },
+   {
+    "name": "[ADM-M2] Promotions / 1440 / Compliance review — Changes requested",
+    "id": "34:403572"
+   },
+   {
+    "name": "[ADM-M2] Promotions / 1280 / Default",
+    "id": "287:102004"
+   },
+   {
+    "name": "[ADM-M2] Promotions / 1280 / Compliance review — Changes requested",
+    "id": "292:107815"
+   },
+   {
+    "name": "[ADM-M3] Announcements / 1440 / Default",
+    "id": "34:419221"
+   },
+   {
+    "name": "[ADM-M3] Announcements / 1280 / Default",
+    "id": "287:102595"
+   },
+   {
+    "name": "[ADM-M4] Notifications / 1440 / Default",
+    "id": "34:447541"
+   },
+   {
+    "name": "[ADM-M4] Notifications / 1280 / Default",
+    "id": "287:103118"
+   },
+   {
+    "name": "[ADM-M5] Referral Campaigns / 1440 / Default",
+    "id": "34:475127"
+   },
+   {
+    "name": "[ADM-M5] Referral Campaigns / 1280 / Default",
+    "id": "288:103009"
+   },
+   {
+    "name": "[ADM-M6] CMS / 1440 / Editor — Draft",
+    "id": "34:495176"
+   },
+   {
+    "name": "[ADM-M6] CMS / 1440 / Compliance review step",
+    "id": "36:528110"
+   },
+   {
+    "name": "[ADM-M6] CMS / 1280 / Editor — Draft",
+    "id": "288:103574"
+   },
+   {
+    "name": "[ADM-M6] CMS / 1280 / Compliance review step",
+    "id": "288:104081"
+   },
+   {
+    "name": "[ADM-S1] Admin Roles / 1440 / Default",
+    "id": "36:540626"
+   },
+   {
+    "name": "[ADM-S1] Admin Roles / 1280 / Default",
+    "id": "288:104534"
+   },
+   {
+    "name": "[ADM-S2] Permissions Matrix / 1440 / Default",
+    "id": "50:50682"
+   },
+   {
+    "name": "[ADM-S2] Permissions Matrix / 1280 / Default",
+    "id": "290:104469"
+   },
+   {
+    "name": "[ADM-S3] Audit Logs / 1440 / Default",
+    "id": "66:51328"
+   },
+   {
+    "name": "[ADM-S3] Audit Logs / 1440 / Export — filtered",
+    "id": "80:66941"
+   },
+   {
+    "name": "[ADM-S3] Audit Logs / 1440 / Integrity alert",
+    "id": "80:67571"
+   },
+   {
+    "name": "[ADM-S3] Audit Logs / 1280 / Default",
+    "id": "290:105350"
+   },
+   {
+    "name": "[ADM-S3] Audit Logs / 1280 / Integrity alert",
+    "id": "292:106908"
+   },
+   {
+    "name": "[ADM-S3] Audit Logs / 768 / Default",
+    "id": "293:207494"
+   },
+   {
+    "name": "[ADM-S4] API Settings / 1440 / Default",
+    "id": "66:52353"
+   },
+   {
+    "name": "[ADM-S4] API Settings / 1280 / Default",
+    "id": "290:106239"
+   },
+   {
+    "name": "[ADM-S5] Security / 1440 / Default",
+    "id": "80:65828"
+   },
+   {
+    "name": "[ADM-S5] Security / 1280 / Default",
+    "id": "291:106243"
+   },
+   {
+    "name": "[ADM-S6] System Configuration / 1440 / Default",
+    "id": "80:66459"
+   },
+   {
+    "name": "[ADM-S6] System Configuration / 1280 / Default",
+    "id": "291:106784"
+   },
+   {
+    "name": "Section — ADM-A/M Affiliates & marketing, ADM-S System",
+    "id": "33:192221"
+   }
+  ],
+  "issues": [
+   "Continuation run: the interrupted earlier run had already built all 21 Desktop 1440 frames, including extra states for M2, M6 and S3. I kept them and renamed them from 'ADM-xx Name / …' to the '[ADM-xx] Name / 1440 / State' convention. No file referenced the old names. This run added 20 Laptop 1280 frames and 1 Tablet 768 frame (S3).",
+   "How the 1440 masters were checked: their 1280 clones were screenshotted (same content) and every frame got overflow and collapsed-container audits. The three state frames were screenshotted directly. The only defect found, the collapsed A5 cases table, is fixed in both A5 frames.",
+   "Library gap: Admin/Role Chip (23:18440) has no 'Marketing' variant. The S3 tablet frame uses a clone of the desktop Marketing chip instance (label overridden). Suggest adding Role=Marketing.",
+   "Library limitation: in the Permissions matrix, the Admin/Permission Cell Focus outline (2 px OUTSIDE stroke on the 'cell under discussion', PCR-0087) is partly covered by neighbouring cells and rows. Only its top and left edges show, at 1440 and 1280.",
+   "1280 reflow followed the adm-bc approach (decision #35): cloned masters in Breakpoint mode Laptop 1280, children that overflow set to FILL, and low-priority columns hidden per table (listed in decisions.md #59 and pending/adm-growth-sys/README.md).",
+   "Figma MCP: one read-only verification call timed out after 60 s (a section-wide screenshot). A lighter version ran successfully. No rate-limit errors. Ten use_figma calls in total.",
+   "No Mobile 390 frames were built: the ledger sizes for these rows are D·L (S3 D·L·T), and §H restricts admin 390 frames to the approvals/alerts/overview subset.",
+   "Files written: /home/user/Claude/design/figma-build/registry-adm-growth-sys.json (frame ids); /home/user/Claude/design/figma-build/pending/adm-growth-sys/ (README.md, RUN-ORDER.json, _laptop.js, _tablet.js, build.py, l1–l7, l1fix, t-s3, v1 + out/; all already ran, slice complete); decision #59 appended to /home/user/Claude/design/figma-build/decisions.md.",
+   "Memory: no stored notes were read or used for this task, and nothing new needs saving."
   ]
  }
 }
