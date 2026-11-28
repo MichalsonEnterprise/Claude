@@ -11,6 +11,14 @@ Repository: `/home/user/Claude` (branch `claude/keen-wozniak-q8eb3p`). The platf
 - **Compliance:** geo-restriction (configurable country list), age 18+, KYC levels, responsible-gaming limits (deposit/participation/loss/time, cool-down on increases, self-exclusion) enforced server-side. Consent checkboxes never pre-checked. No dark patterns: no fake timers, no fabricated wins presented as real, no VPN/geo-bypass hints, no hidden fees/odds, no obstruction of withdrawals or self-exclusion. Games run as non-monetary simulations until separately approved.
 - Never commit secrets; use `.env.example`. Never use real/production wallets or keys; tests use Anvil/testnets and throwaway keys generated at runtime.
 
+
+## Owner decisions (28 Nov 2026, answered in chat)
+1. **Custody = hybrid.** Player funds live in platform balances: an append-only double-entry ledger with Available / Locked / Pending / Owed buckets. Deposits go to per-user deposit addresses, are detected by a chain watcher and credited after N confirmations. Withdrawals are queued with risk/AML checks, step-up 2FA and four-eyes approval for flagged cases. **Global Pool rounds are mirrored and drawn on-chain:** the pool contract records round commitments, requests Chainlink VRF v2.5, and settlement is verifiable. Entries are paid from the platform balance (network fee 0.00 for entries).
+2. **MVP chain = Arbitrum Sepolia (chainId 421614)** for the pool contract, VRF and USDT deposits/withdrawals (test USDT). BNB Chain, Polygon, Ethereum and Solana stay in config as "coming soon" (disabled flags).
+3. **Player auth = Privy.** Frontend: `@privy-io/react-auth` with email OTP, social logins and wallet login (incl. WalletConnect and embedded wallets); custom-styled to the GLOBAL POOL look. Backend: verify the Privy access token (ES256) with `@privy-io/server-auth` (env PRIVY_APP_ID, PRIVY_APP_SECRET, PRIVY_VERIFICATION_KEY); upsert the user by Privy DID (`privy_user_id` unique); sync linked email and wallets. First login runs an onboarding step that captures consents (18+, permitted jurisdiction, terms/privacy — never pre-checked; marketing opt-in separate) and country before any gaming or financial action. **No passwords for players.** Step-up 2FA (own TOTP + anti-phishing code) protects withdrawals, whitelist changes and security settings. **DEV MOCK:** when PRIVY_APP_ID is unset or PRIVY_MOCK=true, the web uses a mock auth provider and the API accepts locally signed dev tokens, so dev and e2e tests run offline. **Admins do NOT use Privy:** separate admin auth with email + password (argon2id) + mandatory TOTP.
+   Figma impact: AUTH-01/03 show email+password. Implement the Privy flow in the same visual language: the email step then a 6-digit code (≈ AUTH-04), social/wallet options (≈ AUTH-02/09), and the onboarding consents from AUTH-01. Note deviations in your report.
+4. **Code location = `global-pool/` in this repo** (confirmed).
+
 ## Stack & layout
 ```
 global-pool/
