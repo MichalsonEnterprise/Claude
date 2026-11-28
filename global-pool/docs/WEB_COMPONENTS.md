@@ -111,6 +111,52 @@ self-excluded · region`** (`/restricted` picks the right one). Withdrawals stay
 QA: `/auth-preview?show=<state>` (dev / `NEXT_PUBLIC_STATE_PREVIEW=true` only) renders every dialog state with DEMO
 fixtures; `node scripts/auth-qa.mjs` screenshots them at 1440 / 390; e2e: `e2e/auth.spec.ts`.
 
+### Compliance gates — PUB-21 · PUB-22 · ERR-05 (`@/components/compliance/*`)
+
+A courtesy layer over the server-side rules: the API decides the location (`GET /compliance/region` · `/compliance/geo`)
+and refuses every gaming / deposit request from a restricted country (451 `GEO_RESTRICTED`), so the web never is the
+control. No VPN / proxy / bypass hints anywhere (Figma decision #26 keeps one explicit "please don't use a VPN or proxy").
+
+- **`<ComplianceGate>` + `<GateContent>`** (mounted in `app/(app)/layout.tsx` around / inside `AppShell`) — per render
+  `gateView()` (pure, unit-tested) picks: `geo` → **PUB-21 `<GeoBlockInterstitial>`** INSTEAD of shell + page (no
+  sidebar / tab bar) on gaming & financial pages (`isGeoGated`: `/games`, `/pool`, `/promotions`, `/favourites`,
+  `/recently-played`, `/wallet/deposit`); `hold` → skeleton while the decision loads on such a page (no gaming UI first;
+  an unreachable API shows the page — the server still refuses); `age` → **PUB-22 `<AgeGateDialog>`** (modal ≥ 768,
+  bottom sheet < 768; no close icon, Esc / outside ignored) for guests on gambling surfaces (`isAgeGated` = `/` + the
+  geo-gated pages) without a valid confirmation; `exit` → `/age-restricted` after "I am under 18" (this browser session).
+  Always open: withdraw, wallet, history, account, RG, legal, support, sign-in/up, onboarding, `/restricted/*`, admin.
+- **Members** never get the browser age gate: the onboarding `ageConfirmed` consent is authoritative (a member who still
+  needs consents is sent to `/onboarding` by the session layer). The age question waits while the sign-in dialog is open.
+- **Memory** (`storage.ts`, every access in try/catch — blocked storage means "ask again", never "skip"): first-party
+  cookie `gp_age_ok=<epoch s>.<country>` (30 days, SameSite=Lax, Secure on https) mirrored in localStorage `gp.ageGate`;
+  "under 18" in sessionStorage `gp.ageGate.under18`. QA scripts that screenshot guest gambling pages pre-set the cookie
+  (`context.addCookies([{ name: 'gp_age_ok', value: '<epoch>.PT', url }])`) — the same state a visitor has after Enter.
+- **PUB-22 form** `<AgeGateForm>`: Yes / No radios (neither selected), country of residence prefilled with the detected
+  country and checked by the API (`?declared=`), jurisdiction checkbox (never pre-checked), licence notice, Terms /
+  Privacy / RG / Restricted countries, Leave + Enter (`ageGateAction()`: Enter only after Yes + the box for a permitted
+  country; No → Continue → exit page). Exit page `<AgeRestrictedPage>` (`/age-restricted`): help organisations, note for
+  parents and carers, "Leave GLOBAL POOL", no casino navigation.
+- **PUB-21** `<GeoBlockInterstitial decision>`: region banner, focused top bar (Sign up disabled), detected region (+ DEMO
+  badge for a DEV override, "Checked at … UTC", "Wrong location? Tell support"), what still works (guest: "Log in to
+  withdraw" → sign-in dialog → `/wallet/withdraw`; member: "Withdraw funds", entries & history), support, restricted
+  countries, licence information, locked-tiles preview, sticky withdraw CTA < 768. Page version: `/region-unavailable`.
+- **ERR-05** one set for every regulatory block — `regulatoryCopy(kind, ctx)` (`region · licence · kyc_required ·
+  self_excluded · cooling_off · age`: what happened, what still works, what is paused, actions with withdraw first where
+  money is held, note), `regulatoryFromError(err)` (451 / `GEO_RESTRICTED` with the country's name, `SELF_EXCLUDED` →
+  self-exclusion or cooling-off by `details.kind`, `KYC_REQUIRED`, `REAL_MONEY_DISABLED` → licence),
+  `<RegulatoryState kind ctx layout="page|card">`, `<RegulatoryNotice>` (inline Alert), **`<RegulatoryGuard error>`**
+  (module guard: the card instead of the module for a regulatory refusal, else its children — used by the deposit
+  address step), `<HelpOrganisations>`, `<RegulatoryFooter>` (18+ · licence · RG). The AUTH-18 `/restricted/self-excluded`
+  page uses the ERR-05 cooling-off copy for a break.
+- Routes: `app/(gates)/region-unavailable`, `app/(gates)/age-restricted` (outside `(app)`: no shell);
+  dev / `NEXT_PUBLIC_STATE_PREVIEW=true` only: `/compliance-preview?kind=<kind|age-gate>&layout=page|card|notice`.
+  DEV QA location (state-preview builds + an API with NODE_ENV=development): `?devCountry=US` (kept for the tab).
+
+QA: `BASE_URL=http://localhost:3313 API_URL=http://localhost:4313 node scripts/gates-qa.mjs` →
+`test-results/visual/gates/*.png` (API with `TRUST_PROXY=true GEO_COUNTRY_HEADER=x-country`; the script adds the CDN
+header per shot); e2e: `E2E_BASE_URL=http://localhost:3313 E2E_API_URL=http://localhost:4313 pnpm --filter @gp/web
+test:e2e -- e2e/gates.spec.ts`; unit: `test/gates.test.tsx`.
+
 ## UI primitives — `@/components/ui/*`
 
 | Component                                                                                                                 | Key props                                                                                                                                                          |
@@ -138,9 +184,45 @@ fixtures; `node scripts/auth-qa.mjs` screenshots them at 1440 / 390; e2e: `e2e/a
 | `Alert`                                                                                                                   | `type` info·warning·security·restricted·maintenance·regulatory, `layout` inline·full, `title`, `actions`, `onDismiss` (ignored for security/restricted/regulatory) |
 | `Skeleton`, `LoadingLabel`                                                                                                | shimmer stops under reduced motion                                                                                                                                 |
 | `EmptyState`                                                                                                              | `type` no-data·no-results·error, `title`, `description`, `actions`, `reference`                                                                                    |
+| `ErrorState` (+ `useRetryCountdown`)                                                                                      | ERR-02. `error` (whatever the query threw), `onRetry`, `retrying`, `what`, `title`/`description` overrides, `note`, `actions`, `variant` panel·inline — see "States" |
+| `SecurityWarning` (+ `securityWarningCopy()`)                                                                             | ERR-07. `kind` wrong-network·new-address·new-device·suspicious-login·phishing·anti-phishing·unverified-contract + context props, `actions`, `layout` — never dismissible |
 | `Table`(`density`), `TableContainer`, `TableHeader/Body/Row/Head`(`align`, `sort`, `onSort`)`/Cell`(`align`), `CellStack` |                                                                                                                                                                    |
 | `Avatar`                                                                                                                  | `initials`, `size` xs·s·m·l·xl, `status`, `tone`, `label`                                                                                                          |
 | `Separator`, `Label`                                                                                                      |                                                                                                                                                                    |
+
+### States — empty · error · loading · security (ERR-01 / 02 / 03 / 07)
+
+Audit + route × state matrix: **`docs/STATES.md`** (`scripts/qa-states.mjs`). Rules for every query-backed view:
+
+1. **Loading (ERR-03)** — `Skeleton` blocks shaped like the content (+ `LoadingLabel` or `aria-busy`) **only while the
+   request is pending**. A failed request is never "still loading": render an error instead. Buttons use `loading`.
+2. **Error (ERR-02)** — `<ErrorState error={q.error} onRetry={() => void q.refetch()} what="your balances" />`
+   (module wrappers `QueryError` / `QueryErrorPanel` / `QueryState` / `DashboardPage failure` already use it).
+   `describeError(err, what)` (`@/lib/api/errors`) maps every error to one readable title + next step per kind:
+   `network` (offline / API down) · `timeout` · `rate-limited` (429, Try again disabled for `Retry-After` seconds,
+   default 10 s) · `maintenance` (503, keeps the API's "… is temporarily paused" message) · `server` (5xx, request id
+   as "Ref …") · `not-found` · `forbidden` · `unauthenticated` · `validation` (field issues) · `client` (the API's own
+   business message). Raw transport text ("Failed to fetch", "502 Bad Gateway", HTML, "signal is aborted") never
+   reaches the UI. Several queries on one page: `failedQueries(a, b, …)` → `{ failed, error, retry, retrying }`
+   (only queries that failed **with nothing cached**). Writes: `isOutcomeUnknown(err)` → never say "nothing was
+   saved / charged" for a timeout, a dropped connection or a 5xx; retry with the same idempotency key.
+   `writeErrorText(err, unknownOutcome, what?)` gives the player text for a failed write (field issue / API message,
+   plus your honest "we couldn't confirm…" sentence when the outcome is unknown) — used by the RG limit and break forms.
+3. **Empty (ERR-01)** — `EmptyState` (`no-data` with the next action, `no-results` with "Clear filters"). A failed
+   request is never an empty state ("No transactions yet", "Choose a round", "Not set" for an unknown value).
+4. **Security (ERR-07)** — `SecurityWarning` (copy library, consistent next steps, no dark patterns / bypass hints).
+
+Plumbing: every request has a timeout (`apiRequest` / `apiGet` → `fetchText()` in `@/lib/api/transport`, 20 s,
+`NEXT_PUBLIC_API_TIMEOUT_MS`) and throws `ApiNetworkError` / `ApiTimeoutError` with readable messages; envelope-less
+error responses get `statusMessage(status)`; `Retry-After` is parsed into `details.retryAfterSeconds`. Queries retry
+once for network / 5xx and never for 4xx, 429, 503 or a timeout (`shouldRetryQuery`, set in `providers.tsx`). The
+player shell shows a connection banner with Try again when the API can't be reached (`useApiConnectivity()`), and
+its own figures show "—" instead of an endless skeleton (`shellValue()`); the admin console keeps the session and shows
+"Can't reach the admin API" + Try again on a transient failure (`AdminSessionStatus` `unreachable`).
+Wrong network: `useInjectedWallet()` + `isWrongNetwork()` (`@/lib/wallet/injected`, prompt-free `eth_chainId` /
+`eth_accounts`) drive the topbar "Wrong network" button (≥ 768) and a `SecurityWarning` banner (< 768) only when the
+member's own linked wallet is connected on another chain; `switchToMvpChain()` asks the wallet to switch.
+Catalogue: `/design-system` → Feedback (ErrorState per kind, SecurityWarning kinds). Tests: `test/states.test.tsx`.
 
 ## Brand — `@/components/brand/*`
 
@@ -407,10 +489,12 @@ always comes from `roulette.coveredNumbers` / `ROULETTE_PAYOUTS` in `@gp/shared/
 
 | Route | Component | Notes |
 | --- | --- | --- |
-| `/games/pool-roulette` | `RouletteGame` (`roulette-game.tsx`) | RL-01…05 + RL-09. Own layout built from kit parts (`GameHeader` + `chips`, `GameSessionBar` above the table, `GameNotice` over the dimmed table, `DemoCreditsChip`, `BeforeYouBet`, `SeedDisplay`, `BetHistory`, `VerifyDrawer`, `useBetRunner`, `useGameGate`): [stage \| 340 px slip] ≥ 1280, stacked below. `RouletteWheel` (SVG, wheel order, 4 500 ms `wheel-spin` token with `--ease-wheel`, ball drops at 71 %, lands exactly on the server's pocket; reduced motion = instant). `RouletteFelt` (≥ 768): 0 · 1–36 · 2:1 · dozens · even-money; pointer targets on lines / edges / crossings (`feltZones()` = 60 splits, 14 streets incl. trios, 23 corners incl. first four, 11 lines); keyboard: roving arrows, Enter = straight, B = bet-type chooser, Delete = take a chip off, Space = spin, Backspace / Ctrl+Z = undo; right-click removes. `RouletteFeltVertical` + `OutsidePanel` (< 768, "Numbers \| Outside bets"), `BetTypeSheet` (bottom sheet on mobile, dialog on desktop), sticky chip tray + Undo / Clear / Repeat + Spin above the tab bar, slip in a bottom sheet. `BetSlip` (Empty · Filled · Over limit · Locked), outcome preview ("If the ball lands on…", expected return), locked card while spinning, per-bet settlement + result banner (win / even / lose) from the server's outcome. Limits are flagged, never auto-changed ("Set Straight · 19 to 1,000.00"). The balance shown while the wheel turns is the pre-spin balance minus the stake (frozen snapshot), so the result is never revealed early; the reality check is held until the wheel stops. "Repeat" only loads the last bets onto the felt — the player still presses Spin. |
+| `/games/pool-roulette` | `RouletteGame` (`roulette-game.tsx`) | RL-01…05 + RL-09. Own layout built from kit parts (`GameHeader` + `chips`, `GameSessionBar` above the table, `GameNotice` over the dimmed table, `DemoCreditsChip`, `BeforeYouBet`, `SeedDisplay`, `BetHistory`, `VerifyDrawer`, `useBetRunner`, `useGameGate`): [stage \| 340 px slip] ≥ 1280, stacked below. `RouletteWheel` (SVG, wheel order, 4 500 ms `wheel-spin` token with `--ease-wheel`, ball drops at 71 %, lands exactly on the server's pocket; reduced motion = instant). `RouletteFelt` (≥ 768): 0 · 1–36 · 2:1 · dozens · even-money; pointer targets on lines / edges / crossings (`feltZones()` = 60 splits, 14 streets incl. trios, 23 corners incl. first four, 11 lines); keyboard: roving arrows, Enter = straight, B = bet-type chooser, Delete = take a chip off, Space = spin, Backspace / Ctrl+Z = undo; right-click removes. `RouletteFeltVertical` + `OutsidePanel` (< 768, "Numbers \| Outside bets"), `BetTypeSheet` (bottom sheet on mobile, dialog on desktop), sticky chip tray + Undo / Clear / Repeat + Spin above the tab bar, slip in a bottom sheet. `BetSlip` (Empty · Filled · Over limit · Locked), outcome preview ("If the ball lands on…", expected return), locked card while spinning, per-bet settlement + result banner (win / even / lose) from the server's outcome. Limits are flagged, never auto-changed ("Set Straight · 19 to 1,000.00"). Everything shown while a spin is in flight comes from a snapshot taken when Spin is pressed (`LockedSpin`: pre-spin balance minus the stake, loss-limit meter, gate, slip pre-checks, nonce + commitment) — `/games/credits` keeps polling and the RG heartbeat refetches it after a bet, so live values would already carry the settled spin (a spin that reaches the loss limit would flip the gate early); the e2e asserts the snapshot survives a mid-spin refetch; the reality check is held until the wheel stops. "Repeat" only loads the last bets onto the felt — the player still presses Spin. |
 | `/games/pool-roulette/my-bets` | `RouletteHistoryPage` (`roulette-pages.tsx`) | RL-06: period (Today / 7 / 30 days / All, UTC) + result filters sent to `GET /games/pool-roulette/bets?from&result` (KPIs follow the filters), table ≥ 1024 / cards below, row details (per-bet settlement, seeds, Verify, "Repeat these bets" → `/games/pool-roulette?repeat=1`), your last 50 pockets with the independence note, session & limits card. |
 | `/games/pool-roulette/rules` | `RouletteRulesPage` | RL-07: "Where each bet goes" (static felt with example chips), inside / outside pay tables computed from the shared rules, how a spin works, limits (largest single win = 1,000.00 × 35), RG card. |
 | `/games/pool-roulette/fairness` | `RouletteFairnessPage` | RL-08: choose a spin (`?bet=<id>`), rotate & reveal, editable seeds, five steps recomputed in the browser with `verifyInBrowser()` (HMAC block 0 → f → × 37 → pocket → per-bet sum), "check it yourself" pseudo-code. |
+
+Kit fix (shared, layout only): `GameSessionBar` (desktop) renders the "New bets are paused" line as a full-width row under the stats — as a sibling flex item it squeezed the stats into a column at ≥ 1280 in the Limit reached state.
 
 Kit fix (shared, behaviour-preserving): `verifyInBrowser` compared outcome values with `JSON.stringify`, which is key-order
 sensitive — a roulette outcome (nested `bets[]`) read back from JSONB therefore showed a false "doesn't match"; it now
@@ -428,7 +512,7 @@ browser re-derives it with `verifyBet()` (`@gp/shared/fair`). Fees 0.00 on every
 
 | Route | Component | Notes |
 | --- | --- | --- |
-| `/games/double-side` | `CoinflipGame` (`coinflip-game.tsx`) | CF-01…03 + CF-06 on `GameLayout arrangement="stacked" sessionBarPosition="above" panelCredits={false} headerChips` (CF frames: one card, Heads card \| coin \| Tails card ≥ 1024, coin + compact picks below; full-width bet bar with Manual/Auto + DEMO credits chip, Bet amount, "This flip" tiles, Fees 0.00 line, `StakeRiskNote`, CTA "Flip for Heads · 10.00 DEMO"). `CoinflipStage` (`coinflip-stage.tsx`, `role="radiogroup"` "Your pick", ←→ / H / T, Space flips), `FlipCoin` (`coin.tsx`: CSS 3D + Web Animations, `coin-flip` 1 600 ms token, ≥ 6 half-turns to the SERVER's side via `landingAngle()` — spin length never depends on win/lose; instant under reduced motion; reality check held until the coin lands), `CoinFace` (Heads mint + logo medallion, Tails silver + pool glyph, never gold), `SideDisc` (H/T). States: loading skeleton, guest, insufficient DEMO credits ("Bet X instead" / reset), above max ("Set to 1,000.00"), connection lost (same idempotency key), loss / time limit, self-excluded, region, offline (kit `GameNotice`). Recent results (last 12 landed sides, counts, `#my-bets`) + "How Double Side works" + `SeedDisplay` + `MoreGamesRail`. |
+| `/games/double-side` | `CoinflipGame` (`coinflip-game.tsx`) | CF-01…03 + CF-06 on `GameLayout arrangement="stacked" sessionBarPosition="above" panelCredits={false} headerChips` (CF frames: one card, Heads card \| coin \| Tails card ≥ 1024, coin + compact picks below; full-width bet bar with Manual/Auto + DEMO credits chip, Bet amount, "This flip" tiles, Fees 0.00 line, `StakeRiskNote`, CTA "Flip for Heads · 10.00 DEMO"). `CoinflipStage` (`coinflip-stage.tsx`, `role="radiogroup"` "Your pick", ←→ / H / T, Space flips), `FlipCoin` (`coin.tsx`: CSS 3D + Web Animations, `coin-flip` 1 600 ms token, ≥ 6 half-turns to the SERVER's side via `landingAngle()` — spin length never depends on win/lose; instant under reduced motion; reality check held until the coin lands), `CoinFace` (Heads mint + logo medallion, Tails silver + pool glyph, never gold), `SideDisc` (H/T). States: loading skeleton, guest, insufficient DEMO credits ("Bet X instead" / reset), above max ("Set to 1,000.00"), connection lost (CF-06 inline banner above the picks — same idempotency key, Retry now, the stage stays visible), DEMO credits failed to load (server error: "Couldn’t load your DEMO credits" + Try again, flipping paused), loss / time limit, self-excluded, region, offline (kit `GameNotice`). **No early reveal:** bets go through `gamesApi.placeBet` and `applySettledBet` runs only when the coin lands (or on unmount), so the balance chip, session bar, recent strip and nonce never show the outcome before the animation does; while a flip is in flight they show the pre-flip balance minus the locked stake. Recent results (last 12 landed sides, counts, `#my-bets`) + "How Double Side works" + `SeedDisplay` + `MoreGamesRail`. |
 | `/games/double-side/my-flips` | `MyFlipsPage` (`my-flips.tsx`) | CF-04: period (Today · 7 days · 30 days · All, UTC) + Picked Heads/Tails + Wins/Losses + search (flip ID or nonce) → `GET /games/double-side/bets?from&pick&result&search` (KPIs follow the filters: flips, wagered, net, landed Heads/Tails), table ≥ 1024 with expandable detail row (hash, client seed, nonce, `0.2288 → below 0.5000 → Heads`, Verify this flip, Copy details) / cards below, rows per page + pagination, Export CSV (`/history/game-rounds/export?game=double-side`). |
 | `/games/double-side/fairness` | `CoinflipFairnessPage` (`fairness.tsx`) | CF-05: load a flip (`?bet=<id>` or flip ID / nonce), secret seed → "Rotate seeds & reveal", editable server seed / client seed / nonce re-derived with `verifyInBrowser()` (verified / failed — e.g. a 63-char seed), "Verify with your own tools" with the flip's real HMAC values, "Your seeds" (previous pair revealed, new commitment, client seed, rotate), "How a flip is decided" (commit → combine → scale `u32 ÷ 2³²` → map → pay). |
 
@@ -438,7 +522,36 @@ Shared: `CoinflipSubpage` + `CoinflipTabs` (`coinflip-pages.tsx`: breadcrumb, se
 `panelCredits`, `headerChips`; `GameHeader` `chips` (second row); `BetHistory` `actions` (Pool Dice now has DI-05 "Export
 CSV"); `useGameBets(slug, page, pageSize, filters?)` / `gamesApi.bets(…, filters?)` + `GameBetsFilters`.
 
-QA: `BASE_URL=http://localhost:3113 API_URL=http://localhost:4213 node scripts/games-coinflip-qa.mjs [CF-0x…]` →
+QA: `BASE_URL=http://localhost:3113 API_URL=http://localhost:4213 [WIDTHS=1440,390] node scripts/games-coinflip-qa.mjs [CF-0x…]` (includes `CF-01_loading`, `CF-02_flipping-motion` — a real flip captured mid-turn with motion on — and `CF-06_credits-error`) →
 `test-results/visual/games/dice-coinflip/*.png` (fresh DEV MOCK players; fails on overflow / console errors); e2e:
 `E2E_BASE_URL=http://localhost:3113 E2E_API_URL=http://localhost:4213 pnpm --filter @gp/web exec playwright test e2e/games-dice-coinflip.spec.ts`.
 Unit tests: `test/games-coinflip.test.tsx`.
+
+### Orbit Rush (key "crash") — `src/components/games/crash/*`
+
+Live crash rounds (decision #42) over socket.io **`/crash`**, DEMO credits only ("DEMO credits · no cash value"), Fees
+0.00, house edge 1.00 % at every target. Everything live comes from the server: phases, 100 ms multiplier frames
+(`crash-frame` token), crash points and the bets other players really placed — nothing is simulated or fabricated
+client-side, and every countdown is the server's `startedAt` / `nextRoundAt` corrected by the measured clock offset.
+API wrappers + hooks: **`src/lib/api/orbit-rush.ts`** (`orbitRushApi`, `orbitRushKeys`, `useCrashRounds`,
+`useCrashStats`, `useCrashVerification`, `useCrashMyBets`; player keys live under `['games-kit', …]` so sign-out clears them).
+
+| Route | Component | Notes |
+| --- | --- | --- |
+| `/games/orbit-rush` | `CrashGame` (`crash-game.tsx`) | CR-01…04, CR-06, CR-08. [bet panel 320 \| stage \| live bets 340] ≥ 1280, [panel \| stage] + live bets below at 1024, stacked below. Kit parts: `GameHeader` (+ Max / Bet chips), `DemoCreditsChip`, `BetPanel` Manual/Auto, `BetAmountField`, `GameSessionBar`, `GameNotice` (guest is not blocked — watching is public), `StakeRiskNote`, `LicenceLine`, `useBetRunner` (one idempotency key per bet, retried with the same key), `useAutoPlay`, `useGameGate`. `ReadoutCard` + `CrashCurve` (SVG in real pixels; samples `crash.multiplierAt` on server frames up to the last frame received, auto cash-out line, my cash-out marker + callout, red once crashed) + `RoundFooter` (seed hash, Verify). Bet panel summary per state (If the round reaches T · Your bet · Your position at m with "Chance to reach T" = m ÷ T · Cashed out · Result), CTA Place bet / Bet placed / Cash out · value / Cash out unavailable offline / Bet next round (queued, cancellable) / Not enough DEMO credits; Space = primary action. `ResultCard` from MY settled bet only. A round in progress is never interrupted: with my bet in the air no gate notice covers the stage, and the reality check is held until the bet settles. Mobile: recent strip, compact readout + curve, 3 summary tiles, sticky bet bar above the tab bar. |
+| (dialog) | `AutoPlayDialog` (`autoplay-dialog.tsx`) | CR-06: fixed bet (never raised after a loss), REQUIRED auto cash-out target + stop-loss, optional profit stop, ≤ 100 rounds, UNTICKED "I understand I can lose my stake in every auto round" every time it opens; dialog ≥ 768, bottom sheet below. Auto-play places one ordinary bet per betting window and stops on stop-loss / profit / count / refusal / reality check / tab hidden / lost connection. |
+| `/games/orbit-rush/rounds` | `RoundHistoryPage` (`crash-pages.tsx`) | CR-05: Last 50 · Today · 7 days + round search, table ≥ 1024 / cards below (players, wagered, paid out in DEMO credits, ended, Verify), rows per page; `#statistics` Game statistics (24h/7d/30d KPIs vs expected, distribution bars with the published 0.99 ÷ m marker, independence note) + "Your session · Orbit Rush" (my bets since the RG session start). |
+| `/games/orbit-rush/my-bets` | `MyCrashBetsPage` | My crash bets + summary (All · Cashed out · Lost), Verify per round. |
+| `/games/orbit-rush/fairness?round=N` | `CrashFairnessPage` | CR-07: recomputes the round in the browser with `verifyRoundInBrowser()` (`crash-math.ts` → `crash.crashCommitment`, `crash.verifyChainSeed`, `crash.crashPointOf` from `@gp/shared/fair`): commitment, hash-chain position, crash point vs recorded; editable seed shows the mismatch; "seed still secret" for a live round; verify another round; report. |
+
+`live-client.ts` = `CrashLiveClient` (external store: snapshot / phase / tick / bet / cashout / crashed, my bet merged
+from events, ack errors → `ApiRequestError`, lost acks → `ApiNetworkError` so callers retry with the same key, REST
+fallback for bets while the socket is down, `waitFor()` for auto-play, reconnect attempts 1…5 then offline + Retry now);
+`use-crash-live.ts` = `useCrashLive()` (one connection per screen, re-auth on sign-in/out) + `useServerNow()`.
+`crash-math.ts` = pure helpers (win chance 99 ÷ T, conditional chance, payout/profit with decimal.js, targets, ticks,
+curve samples, median, pill tones, browser verification).
+
+QA: `BASE_URL=http://localhost:3115 API_URL=http://localhost:4215 node scripts/games-crash-qa.mjs [CR-0x…]` against an
+API with `CRASH_LOOP_ENABLED=true` (real rounds; fresh DEV MOCK players) → `test-results/visual/games/crash/*.png`;
+e2e: `E2E_BASE_URL=http://localhost:3115 E2E_API_URL=http://localhost:4215 pnpm --filter @gp/web exec playwright test e2e/games-crash.spec.ts`.
+Unit tests: `test/games-crash.test.ts`.

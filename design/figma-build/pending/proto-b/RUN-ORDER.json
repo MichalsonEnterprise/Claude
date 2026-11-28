@@ -1,0 +1,69 @@
+{
+ "_note": "proto-b (PRO-06..10 prototypes, page '11 — Prototypes', section 'PRO-06..10 Prototypes (P1)' 255:19082). Scripts are assembled by `node build.cjs <spec> <name> <cloneKeys|-> <wire 0|1> <first 0|1> [shotKey]` from helpers.js + _lib_*.js chunks + spec-0x.js. They are idempotent: wrappers are found by name prefix 'PRO-0x · <step> — ' and skipped if present; wire() deletes and redraws hotspots, headers and arrows. To refresh a flow after a source screen changes, delete that flow's wrapper frames (or the whole sub-section) and re-run its scripts in order. fix-audit.js adds two hotspots that need wider button-label matching and audits every frame for dead ends/broken links (light version, < 60 s).",
+ "built": "28 Nov 2026 — all scripts below ran successfully",
+ "order": [
+  [
+   "out/06a.js",
+   "PRO-06 section header + sub-section + flow card + 6 happy-path clones"
+  ],
+  [
+   "out/06b.js",
+   "PRO-06 5 branch clones + wiring"
+  ],
+  [
+   "out/07a.js",
+   "PRO-07 card + 9 happy-path clones"
+  ],
+  [
+   "out/07b.js",
+   "PRO-07 7 branch clones + wiring"
+  ],
+  [
+   "out/08a.js",
+   "PRO-08 card + 7 happy-path clones"
+  ],
+  [
+   "out/08b.js",
+   "PRO-08 3 branch clones + wiring"
+  ],
+  [
+   "out/09a.js",
+   "PRO-09 card + 7 clones"
+  ],
+  [
+   "out/09b.js",
+   "PRO-09 remaining 3 main + 3 branch clones + wiring"
+  ],
+  [
+   "out/10a.js",
+   "PRO-10 card + 4 main + refund branch"
+  ],
+  [
+   "out/10b.js",
+   "PRO-10 circuit-breaker chain + VRF delayed + wiring"
+  ],
+  [
+   "out/fix-audit.js",
+   "extra hotspots PRO-08 B3 (Sign in again) and PRO-10 B3 (Approve & pause) + dead-end audit"
+  ]
+ ],
+ "sections": {
+  "main": "255:19082",
+  "PRO-06": "255:19116",
+  "PRO-07": "257:77211",
+  "PRO-08": "259:110238",
+  "PRO-09": "261:113250",
+  "PRO-10": "263:120155"
+ },
+ "flow_starts": {
+  "PRO-06": "255:19240",
+  "PRO-07": "257:77367",
+  "PRO-08": "259:110354",
+  "PRO-09": "261:113384",
+  "PRO-10": "263:120267"
+ },
+ "unused": [
+  "out/07c.js and out/07d.js are from an abandoned 4-part split of PRO-07 — not needed (07a + 07b cover all 16 frames)",
+  "_lib.js is superseded by the _lib_*.js chunks"
+ ]
+}

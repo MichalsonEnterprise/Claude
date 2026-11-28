@@ -5675,5 +5675,1046 @@
    "Figma MCP usage this run: 7 use_figma calls (2 read-only listings, 3 builds, 2 read-only audits). No limit errors. No get_screenshot or get_metadata calls.",
    "Memory: no stored memory notes were read or used for this task. Nothing new to save."
   ]
+ },
+ "proto-a": {
+  "section": "252:962",
+  "created": [
+   {
+    "name": "Section PRO-01..05 Prototypes (P0) — page 11, X0 Y0",
+    "id": "252:962"
+   },
+   {
+    "name": "Section PRO — Mobile — page 10, X245000 Y0",
+    "id": "263:205224"
+   },
+   {
+    "name": "PRO-01 desktop flow section",
+    "id": "252:963"
+   },
+   {
+    "name": "PRO-01 flow map",
+    "id": "252:14625"
+   },
+   {
+    "name": "PRO-01 · 1 Homepage guest (flow start)",
+    "id": "252:964"
+   },
+   {
+    "name": "PRO-01 · 2 Register",
+    "id": "252:1215"
+   },
+   {
+    "name": "PRO-01 · 3 Account created",
+    "id": "252:1295"
+   },
+   {
+    "name": "PRO-01 · 4 Email code sent",
+    "id": "252:1397"
+   },
+   {
+    "name": "PRO-01 · 5 Code entered",
+    "id": "252:1476"
+   },
+   {
+    "name": "PRO-01 · 6 Email verified",
+    "id": "252:1548"
+   },
+   {
+    "name": "PRO-01 · 7 Dashboard new user",
+    "id": "252:1649"
+   },
+   {
+    "name": "PRO-01 · 2a Validation",
+    "id": "252:1913"
+   },
+   {
+    "name": "PRO-01 · 2b Sign-up error",
+    "id": "252:1998"
+   },
+   {
+    "name": "PRO-01 · 4a Resend cooldown",
+    "id": "252:2087"
+   },
+   {
+    "name": "PRO-01 · 5a Code expired",
+    "id": "252:2164"
+   },
+   {
+    "name": "PRO-02 desktop flow section",
+    "id": "255:26426"
+   },
+   {
+    "name": "PRO-02 flow map",
+    "id": "255:47517"
+   },
+   {
+    "name": "PRO-02 · 1 Dashboard (flow start)",
+    "id": "255:26427"
+   },
+   {
+    "name": "PRO-02 · 2 Connect wallet list",
+    "id": "255:26683"
+   },
+   {
+    "name": "PRO-02 · 3 Connecting",
+    "id": "255:26693"
+   },
+   {
+    "name": "PRO-02 · 4 Wallet connected",
+    "id": "255:26732"
+   },
+   {
+    "name": "PRO-02 · 5 Sign message",
+    "id": "255:26743"
+   },
+   {
+    "name": "PRO-02 · 6 Wallet verified",
+    "id": "255:26823"
+   },
+   {
+    "name": "PRO-02 · 2a WalletConnect QR",
+    "id": "255:26881"
+   },
+   {
+    "name": "PRO-02 · 3a Connection rejected",
+    "id": "255:26891"
+   },
+   {
+    "name": "PRO-02 · 3b Wrong network",
+    "id": "255:26901"
+   },
+   {
+    "name": "PRO-02 · 5a Signature rejected",
+    "id": "255:26911"
+   },
+   {
+    "name": "PRO-02 · 5b Nonce expired",
+    "id": "255:26963"
+   },
+   {
+    "name": "PRO-03 desktop flow section",
+    "id": "256:53185"
+   },
+   {
+    "name": "PRO-03 flow map",
+    "id": "256:63816"
+   },
+   {
+    "name": "PRO-03 · 1 Wallet overview (flow start)",
+    "id": "256:53186"
+   },
+   {
+    "name": "PRO-03 · 2 Deposit network",
+    "id": "256:53307"
+   },
+   {
+    "name": "PRO-03 · 3 Deposit token",
+    "id": "256:53436"
+   },
+   {
+    "name": "PRO-03 · 4 Deposit address",
+    "id": "256:53564"
+   },
+   {
+    "name": "PRO-03 · 5 QR code",
+    "id": "256:53678"
+   },
+   {
+    "name": "PRO-03 · 6 Confirming 7/12",
+    "id": "256:53950"
+   },
+   {
+    "name": "PRO-03 · 7 Credited",
+    "id": "256:54076"
+   },
+   {
+    "name": "PRO-03 · 8 Receipt",
+    "id": "256:54208"
+   },
+   {
+    "name": "PRO-03 · 4a Wrong network",
+    "id": "256:54290"
+   },
+   {
+    "name": "PRO-03 · 4b Address expired",
+    "id": "256:54412"
+   },
+   {
+    "name": "PRO-03 · 4c Below minimum",
+    "id": "256:54530"
+   },
+   {
+    "name": "PRO-03 · 6a Delayed",
+    "id": "256:54658"
+   },
+   {
+    "name": "PRO-03 · 6b Failed reverted",
+    "id": "256:54791"
+   },
+   {
+    "name": "PRO-03 · 6c Unrecognised token",
+    "id": "256:54908"
+   },
+   {
+    "name": "PRO-04 desktop flow section",
+    "id": "258:71564"
+   },
+   {
+    "name": "PRO-04 flow map",
+    "id": "258:89966"
+   },
+   {
+    "name": "PRO-04 · 1 Wallet overview (flow start)",
+    "id": "258:71565"
+   },
+   {
+    "name": "PRO-04 · 2 Asset",
+    "id": "258:71686"
+   },
+   {
+    "name": "PRO-04 · 3 Network",
+    "id": "258:71841"
+   },
+   {
+    "name": "PRO-04 · 4 Address",
+    "id": "258:71983"
+   },
+   {
+    "name": "PRO-04 · 5 Amount",
+    "id": "258:72143"
+   },
+   {
+    "name": "PRO-04 · 6 Fees & summary",
+    "id": "258:72294"
+   },
+   {
+    "name": "PRO-04 · 7 Risk pass",
+    "id": "258:72464"
+   },
+   {
+    "name": "PRO-04 · 8 2FA",
+    "id": "258:72625"
+   },
+   {
+    "name": "PRO-04 · 9 Processing",
+    "id": "258:72764"
+   },
+   {
+    "name": "PRO-04 · 10 Successful",
+    "id": "258:72922"
+   },
+   {
+    "name": "PRO-04 · 4a Invalid address",
+    "id": "258:73079"
+   },
+   {
+    "name": "PRO-04 · 4b New-address cooldown",
+    "id": "258:73247"
+   },
+   {
+    "name": "PRO-04 · 5a Over balance",
+    "id": "258:73412"
+   },
+   {
+    "name": "PRO-04 · 5b Below minimum",
+    "id": "258:73566"
+   },
+   {
+    "name": "PRO-04 · 5c Daily limit",
+    "id": "258:73720"
+   },
+   {
+    "name": "PRO-04 · 7a KYC required",
+    "id": "258:73875"
+   },
+   {
+    "name": "PRO-04 · 7b Flagged",
+    "id": "258:74054"
+   },
+   {
+    "name": "PRO-04 · 8a 2FA wrong code",
+    "id": "258:74220"
+   },
+   {
+    "name": "PRO-04 · 8a·1 2FA locked",
+    "id": "258:74365"
+   },
+   {
+    "name": "PRO-04 · 9a Queued",
+    "id": "258:74512"
+   },
+   {
+    "name": "PRO-04 · 9b Manual review",
+    "id": "258:74678"
+   },
+   {
+    "name": "PRO-04 · 9c Network failure",
+    "id": "258:74849"
+   },
+   {
+    "name": "PRO-04 · 9d Sanctions rejected",
+    "id": "258:75027"
+   },
+   {
+    "name": "PRO-05 desktop flow section",
+    "id": "260:113802"
+   },
+   {
+    "name": "PRO-05 flow map",
+    "id": "260:126354"
+   },
+   {
+    "name": "PRO-05 · 1 Global Pool hub (flow start)",
+    "id": "260:113803"
+   },
+   {
+    "name": "PRO-05 · 2 Participation preview",
+    "id": "260:113936"
+   },
+   {
+    "name": "PRO-05 · 3 Pending",
+    "id": "260:114028"
+   },
+   {
+    "name": "PRO-05 · 4 Entry receipt",
+    "id": "260:114172"
+   },
+   {
+    "name": "PRO-05 · 5 Drawing VRF",
+    "id": "260:114312"
+   },
+   {
+    "name": "PRO-05 · 6 Result not selected",
+    "id": "260:114475"
+   },
+   {
+    "name": "PRO-05 · 1a Restricted region",
+    "id": "260:114680"
+   },
+   {
+    "name": "PRO-05 · 1b Wallet disconnected",
+    "id": "260:114816"
+   },
+   {
+    "name": "PRO-05 · 2a Insufficient funds",
+    "id": "260:114951"
+   },
+   {
+    "name": "PRO-05 · 2b Limit reached",
+    "id": "260:115043"
+   },
+   {
+    "name": "PRO-05 · 2c Wrong network",
+    "id": "260:115135"
+   },
+   {
+    "name": "PRO-05 · 5a VRF delayed",
+    "id": "260:115227"
+   },
+   {
+    "name": "PRO-05 · 5b Win illustrative",
+    "id": "260:115387"
+   },
+   {
+    "name": "PRO-01 mobile section",
+    "id": "263:205225"
+   },
+   {
+    "name": "PRO-01 mobile flow map",
+    "id": "263:205866"
+   },
+   {
+    "name": "PRO-01 (390) · 1 Home (flow start)",
+    "id": "263:205226"
+   },
+   {
+    "name": "PRO-01 (390) · 2 Register",
+    "id": "263:205450"
+   },
+   {
+    "name": "PRO-01 (390) · 3 Code entry",
+    "id": "263:205506"
+   },
+   {
+    "name": "PRO-01 (390) · 4 Verified",
+    "id": "263:205542"
+   },
+   {
+    "name": "PRO-01 (390) · 5 Dashboard new user",
+    "id": "263:205605"
+   },
+   {
+    "name": "PRO-01 (390) · 2a Validation",
+    "id": "263:205744"
+   },
+   {
+    "name": "PRO-01 (390) · 3a Code expired",
+    "id": "263:205795"
+   },
+   {
+    "name": "PRO-02 mobile section",
+    "id": "264:209397"
+   },
+   {
+    "name": "PRO-02 mobile flow map",
+    "id": "264:209805"
+   },
+   {
+    "name": "PRO-02 (390) · 1 Dashboard (flow start)",
+    "id": "264:209398"
+   },
+   {
+    "name": "PRO-02 (390) · 2 Wallet list",
+    "id": "264:209568"
+   },
+   {
+    "name": "PRO-02 (390) · 3 Deep link",
+    "id": "264:209596"
+   },
+   {
+    "name": "PRO-02 (390) · 4 Sign request",
+    "id": "264:209649"
+   },
+   {
+    "name": "PRO-02 (390) · 3a Wrong network",
+    "id": "264:209692"
+   },
+   {
+    "name": "PRO-02 (390) · 4a Nonce expired",
+    "id": "264:209733"
+   },
+   {
+    "name": "PRO-03 mobile section",
+    "id": "265:209648"
+   },
+   {
+    "name": "PRO-03 mobile flow map",
+    "id": "265:210735"
+   },
+   {
+    "name": "PRO-03 (390) · 1 Wallet (flow start)",
+    "id": "265:209649"
+   },
+   {
+    "name": "PRO-03 (390) · 2 Network",
+    "id": "265:209761"
+   },
+   {
+    "name": "PRO-03 (390) · 3 Token",
+    "id": "265:209801"
+   },
+   {
+    "name": "PRO-03 (390) · 4 Address",
+    "id": "265:209840"
+   },
+   {
+    "name": "PRO-03 (390) · 5 QR",
+    "id": "265:210016"
+   },
+   {
+    "name": "PRO-03 (390) · 6 Confirming",
+    "id": "265:210185"
+   },
+   {
+    "name": "PRO-03 (390) · 7 Credited",
+    "id": "265:210234"
+   },
+   {
+    "name": "PRO-03 (390) · 8 Receipt",
+    "id": "265:210290"
+   },
+   {
+    "name": "PRO-03 (390) · 4a Expired",
+    "id": "265:210323"
+   },
+   {
+    "name": "PRO-03 (390) · 6a Delayed",
+    "id": "265:210488"
+   },
+   {
+    "name": "PRO-03 (390) · 6b Failed",
+    "id": "265:210544"
+   },
+   {
+    "name": "PRO-03 (390) · 6c Unrecognised token",
+    "id": "265:210596"
+   },
+   {
+    "name": "PRO-04 mobile section",
+    "id": "266:212970"
+   },
+   {
+    "name": "PRO-04 mobile flow map",
+    "id": "266:214334"
+   },
+   {
+    "name": "PRO-04 (390) · 1 Wallet (flow start)",
+    "id": "266:212971"
+   },
+   {
+    "name": "PRO-04 (390) · 2 Asset",
+    "id": "266:213083"
+   },
+   {
+    "name": "PRO-04 (390) · 3 Network",
+    "id": "266:213138"
+   },
+   {
+    "name": "PRO-04 (390) · 4 Address",
+    "id": "266:213185"
+   },
+   {
+    "name": "PRO-04 (390) · 5 Amount",
+    "id": "266:213236"
+   },
+   {
+    "name": "PRO-04 (390) · 6 Review",
+    "id": "266:213277"
+   },
+   {
+    "name": "PRO-04 (390) · 7 Risk pass",
+    "id": "266:213316"
+   },
+   {
+    "name": "PRO-04 (390) · 8 2FA",
+    "id": "266:213386"
+   },
+   {
+    "name": "PRO-04 (390) · 9 Processing",
+    "id": "266:213437"
+   },
+   {
+    "name": "PRO-04 (390) · 10 Sent",
+    "id": "266:213524"
+   },
+   {
+    "name": "PRO-04 (390) · 4a Invalid",
+    "id": "266:213593"
+   },
+   {
+    "name": "PRO-04 (390) · 4b Cooldown",
+    "id": "266:213651"
+   },
+   {
+    "name": "PRO-04 (390) · 5a Over balance",
+    "id": "266:213708"
+   },
+   {
+    "name": "PRO-04 (390) · 5b Limit",
+    "id": "266:213753"
+   },
+   {
+    "name": "PRO-04 (390) · 7a KYC required",
+    "id": "266:213797"
+   },
+   {
+    "name": "PRO-04 (390) · 8a 2FA locked",
+    "id": "266:213880"
+   },
+   {
+    "name": "PRO-04 (390) · 9a Manual review",
+    "id": "266:213933"
+   },
+   {
+    "name": "PRO-04 (390) · 9b Sanctions",
+    "id": "266:214033"
+   },
+   {
+    "name": "PRO-04 (390) · 9c Network failure",
+    "id": "266:214122"
+   },
+   {
+    "name": "PRO-05 mobile section",
+    "id": "267:92913"
+   },
+   {
+    "name": "PRO-05 mobile flow map",
+    "id": "267:95004"
+   },
+   {
+    "name": "PRO-05 (390) · 1 Hub (flow start)",
+    "id": "267:92914"
+   },
+   {
+    "name": "PRO-05 (390) · 2 Preview sheet",
+    "id": "267:93095"
+   },
+   {
+    "name": "PRO-05 (390) · 3 Pending",
+    "id": "267:93269"
+   },
+   {
+    "name": "PRO-05 (390) · 4 Receipt",
+    "id": "267:93499"
+   },
+   {
+    "name": "PRO-05 (390) · 5 Drawing",
+    "id": "267:93718"
+   },
+   {
+    "name": "PRO-05 (390) · 6 Not selected",
+    "id": "267:93848"
+   },
+   {
+    "name": "PRO-05 (390) · 1a Restricted",
+    "id": "267:93976"
+   },
+   {
+    "name": "PRO-05 (390) · 2a Insufficient",
+    "id": "267:94159"
+   },
+   {
+    "name": "PRO-05 (390) · 2b Limit",
+    "id": "267:94338"
+   },
+   {
+    "name": "PRO-05 (390) · 2c Wrong network",
+    "id": "267:94517"
+   },
+   {
+    "name": "PRO-05 (390) · 5a VRF delayed",
+    "id": "267:94696"
+   },
+   {
+    "name": "PRO-05 (390) · 5b Win",
+    "id": "267:94804"
+   }
+  ],
+  "issues": [
+   "Layout changed from the brief: on page 11 the P0 flow sections sit side by side, not stacked. The parallel proto-b section 'PRO-06..10 Prototypes (P1)' (255:19082) was placed right below this parent, and proto-b now moves itself under it (it is at Y 17308). The P0 parent is 67,400 × 8,883 px. Logged as decisions.md #55.",
+   "OVERLAY was not used. The source modal states are full-frame compositions with the scrim and page baked in, so every step uses NAVIGATE with Smart Animate (ease-out, 0.3 s). resetScrollPosition:true is used in place of the deprecated preserveScrollPosition:false.",
+   "System branches use frame-level ON_KEY_DOWN keys 1–4 (each branch label names the key). User-error branches use click hotspots on the relevant field. Keys only work when the prototype is played in a desktop browser, not in the Figma mobile app.",
+   "Pending screens auto-advance with AFTER_TIMEOUT. The values are set as seconds (3–6), and the read-back gives timeout 4. Figma's plugin docs don't state the unit; if Figma reads these as milliseconds, raise them to 3000–6000. proto-b chose never to auto-advance, so the two prototype slices behave differently here.",
+   "The WalletConnect QR 'simulated scan' hotspot on PRO-02 2a (610,363,220,220) is placed around the provider mark at the centre of the QR, not measured from the QR node itself.",
+   "390 states that don't exist were skipped in the mobile flows and listed in each flow description: AUTH-01 Success and AUTH-04 Sent, AUTH-09 Connecting/Success, AUTH-10 Success, WAL-05 wrong network and below minimum, WAL-13 below minimum, WAL-15 flagged, WAL-16 wrong code, WAL-17 queued.",
+   "Fresh clones report stale bounds inside the script that creates them, so logo hotspots were first placed at a fallback position. Verify passes on both pages moved them onto Brand/Logo: 58 on desktop, 7 on mobile.",
+   "Dead-end-by-design screens keep only the logo restart: PRO-05 1a Restricted region (participation is blocked), PRO-05 5b illustrative win, and the final new-user dashboard in PRO-01. On PRO-01 step 6, 'Set up 2FA' is not wired because AUTH-07 is outside this flow; 'Remind me later' continues.",
+   "No new library components were created. The flow map chips, legend and branch boxes are built inline from tokens inside a locked 'Flow map / PRO-0n' frame behind the screens of each flow.",
+   "Files written: /home/user/Claude/design/figma-build/registry-proto-a.json, /home/user/Claude/design/figma-build/pending/proto-a/ (lib, specs, assemble.py, verify11.js, README marked DONE) and decisions.md #55."
+  ]
+ },
+ "proto-b": {
+  "section": "255:19082 — 'PRO-06..10 Prototypes (P1)' on page '11 — Prototypes' at (0, 17308), 19920 × 41827. It sits below the P0 section 'PRO-01..05 Prototypes (P0)' (252:962) that another agent was building in parallel. Sub-sections: PRO-06 255:19116 · PRO-07 257:77211 · PRO-08 259:110238 · PRO-09 261:113250 · PRO-10 263:120155. Re-runnable scripts are in /home/user/Claude/design/figma-build/pending/proto-b (RUN-ORDER.json, build.cjs, spec-06..10.js, _lib_*.js, out/*.js). Decision #54 was appended to /home/user/Claude/design/figma-build/decisions.md.",
+  "created": [
+   {
+    "name": "Section 'PRO-06..10 Prototypes (P1)'",
+    "id": "255:19082"
+   },
+   {
+    "name": "Header — PRO-06..10 (section intro, legend, flow list)",
+    "id": "255:19083"
+   },
+   {
+    "name": "Sub-section 'PRO-06 Games Lobby → Game → Result'",
+    "id": "255:19116"
+   },
+   {
+    "name": "Flow map — PRO-06",
+    "id": "255:19117"
+   },
+   {
+    "name": "PRO-06 · 1 — [PUB-03] Games Lobby / 1440 / All games (flow start)",
+    "id": "255:19240"
+   },
+   {
+    "name": "PRO-06 · 2 — [CR-01] Orbit Rush — Pre-round betting",
+    "id": "255:19407"
+   },
+   {
+    "name": "PRO-06 · 3 — [CR-02] Orbit Rush — Active run 1.64×",
+    "id": "255:19702"
+   },
+   {
+    "name": "PRO-06 · 4 — [CR-03] Orbit Rush — Auto cash-out 2.00×",
+    "id": "255:20021"
+   },
+   {
+    "name": "PRO-06 · 5 — [CR-04] Orbit Rush — Result cashed out",
+    "id": "255:20325"
+   },
+   {
+    "name": "PRO-06 · 6 — [CR-07] Orbit Rush — Provably-fair verified",
+    "id": "255:20619"
+   },
+   {
+    "name": "PRO-06 · B1 — [PUB-03] Restricted games — United States",
+    "id": "256:46519"
+   },
+   {
+    "name": "PRO-06 · B2 — [CR-08] Insufficient balance",
+    "id": "256:46706"
+   },
+   {
+    "name": "PRO-06 · B3 — [CR-04] Crashed — stake lost",
+    "id": "256:46986"
+   },
+   {
+    "name": "PRO-06 · B4 — [CR-08] Connection lost",
+    "id": "256:47278"
+   },
+   {
+    "name": "PRO-06 · B5 — [CR-08] Daily loss limit reached",
+    "id": "256:47576"
+   },
+   {
+    "name": "Sub-section 'PRO-07 Profile → KYC'",
+    "id": "257:77211"
+   },
+   {
+    "name": "Flow map — PRO-07",
+    "id": "257:77212"
+   },
+   {
+    "name": "PRO-07 · 1 — [USR-A4] KYC Status / Not started (flow start)",
+    "id": "257:77367"
+   },
+   {
+    "name": "PRO-07 · 2 — AUTH-11 KYC Intro & levels",
+    "id": "257:77562"
+   },
+   {
+    "name": "PRO-07 · 3 — AUTH-12 Personal Details",
+    "id": "257:77739"
+   },
+   {
+    "name": "PRO-07 · 4 — AUTH-13 Document Upload / Requirements",
+    "id": "257:77871"
+   },
+   {
+    "name": "PRO-07 · 5 — AUTH-13 Document Upload / Preview",
+    "id": "257:78071"
+   },
+   {
+    "name": "PRO-07 · 6 — AUTH-14 Liveness / Camera ready",
+    "id": "257:78304"
+   },
+   {
+    "name": "PRO-07 · 7 — AUTH-15 KYC Pending",
+    "id": "257:78522"
+   },
+   {
+    "name": "PRO-07 · 8 — AUTH-16 KYC Approved",
+    "id": "257:78690"
+   },
+   {
+    "name": "PRO-07 · 9 — [USR-A4] KYC Status / Approved",
+    "id": "257:78839"
+   },
+   {
+    "name": "PRO-07 · B1 — AUTH-12 Validation errors",
+    "id": "258:91023"
+   },
+   {
+    "name": "PRO-07 · B2 — AUTH-13 Upload error (blurry back photo)",
+    "id": "258:91161"
+   },
+   {
+    "name": "PRO-07 · B3 — AUTH-14 Liveness retake (face too dark)",
+    "id": "258:91372"
+   },
+   {
+    "name": "PRO-07 · B4 — AUTH-14 Camera permission denied",
+    "id": "258:91572"
+   },
+   {
+    "name": "PRO-07 · B5 — AUTH-17 KYC Rejected / Reasons",
+    "id": "258:91768"
+   },
+   {
+    "name": "PRO-07 · B6 — AUTH-17 KYC Rejected / Resubmit",
+    "id": "258:91946"
+   },
+   {
+    "name": "PRO-07 · B7 — [USR-A4] KYC Status / Rejected",
+    "id": "258:92082"
+   },
+   {
+    "name": "Sub-section 'PRO-08 Admin → User Management'",
+    "id": "259:110238"
+   },
+   {
+    "name": "Flow map — PRO-08",
+    "id": "259:110239"
+   },
+   {
+    "name": "PRO-08 · 1 — [ADM-02] Overview (flow start)",
+    "id": "259:110354"
+   },
+   {
+    "name": "PRO-08 · 2 — [ADM-U1] Users List",
+    "id": "259:110637"
+   },
+   {
+    "name": "PRO-08 · 3 — [ADM-U2] User Profile — @nova.k",
+    "id": "259:110814"
+   },
+   {
+    "name": "PRO-08 · 4 — [ADM-U8] Account Restrictions / Default",
+    "id": "259:111193"
+   },
+   {
+    "name": "PRO-08 · 5 — [ADM-U8] Apply — reason + 2FA + four-eyes",
+    "id": "259:111473"
+   },
+   {
+    "name": "PRO-08 · 6 — [ADM-U8] Restriction active — after approval",
+    "id": "259:111814"
+   },
+   {
+    "name": "PRO-08 · 7 — [ADM-U8] Lift — reason + 2FA",
+    "id": "259:112130"
+   },
+   {
+    "name": "PRO-08 · B1 — [ADM-02] Restricted role — Support L2",
+    "id": "260:112595"
+   },
+   {
+    "name": "PRO-08 · B2 — [ADM-01] 2FA locked — too many codes",
+    "id": "260:112894"
+   },
+   {
+    "name": "PRO-08 · B3 — [ADM-01] Session expired — re-authenticate",
+    "id": "260:112974"
+   },
+   {
+    "name": "Sub-section 'PRO-09 Admin → Finance'",
+    "id": "261:113250"
+   },
+   {
+    "name": "Flow map — PRO-09",
+    "id": "261:113251"
+   },
+   {
+    "name": "PRO-09 · 1 — [ADM-F2] Withdrawals — Queue (flow start)",
+    "id": "261:113384"
+   },
+   {
+    "name": "PRO-09 · 2 — [ADM-F2] WD-20931 — Under review",
+    "id": "261:113589"
+   },
+   {
+    "name": "PRO-09 · 3 — [ADM-X1] Confirm with reason / empty",
+    "id": "261:113803"
+   },
+   {
+    "name": "PRO-09 · 4 — [ADM-X1] Confirm with reason / Ready",
+    "id": "261:114017"
+   },
+   {
+    "name": "PRO-09 · 5 — [ADM-X1] Request submitted / awaiting 2nd approver",
+    "id": "261:114231"
+   },
+   {
+    "name": "PRO-09 · 6 — [ADM-F2] WD-20931 — Awaiting 2nd approver",
+    "id": "261:114445"
+   },
+   {
+    "name": "PRO-09 · 7 — [ADM-X1] Second approver review (K. Osei)",
+    "id": "261:114650"
+   },
+   {
+    "name": "PRO-09 · 8 — [ADM-X1] Re-authenticate — fresh 2FA",
+    "id": "262:117247"
+   },
+   {
+    "name": "PRO-09 · 9 — [ADM-X1] Approved / Released",
+    "id": "262:117469"
+   },
+   {
+    "name": "PRO-09 · 10 — [ADM-F2] WD-20931 — Approved, broadcasting",
+    "id": "262:117708"
+   },
+   {
+    "name": "PRO-09 · B1 — [ADM-F2] Reject (validation error)",
+    "id": "262:117916"
+   },
+   {
+    "name": "PRO-09 · B2 — [ADM-X1] Confirm with reason / Error (wrong 2FA)",
+    "id": "262:118130"
+   },
+   {
+    "name": "PRO-09 · B3 — [ADM-X1] Self-approval blocked",
+    "id": "262:118344"
+   },
+   {
+    "name": "Sub-section 'PRO-10 Admin → Pool Monitoring'",
+    "id": "263:120155"
+   },
+   {
+    "name": "Flow map — PRO-10",
+    "id": "263:120156"
+   },
+   {
+    "name": "PRO-10 · 1 — [ADM-P1] Pool Overview (flow start)",
+    "id": "263:120267"
+   },
+   {
+    "name": "PRO-10 · 2 — [ADM-P3] Active Round #1,248",
+    "id": "263:120506"
+   },
+   {
+    "name": "PRO-10 · 3 — [ADM-P7] VRF Status / Fulfilled",
+    "id": "263:120805"
+   },
+   {
+    "name": "PRO-10 · 4 — [ADM-P8] Settlement / Crediting batch 3 of 4",
+    "id": "263:121072"
+   },
+   {
+    "name": "PRO-10 · B1 — [ADM-P9] Refund Status — round #1,245",
+    "id": "263:121398"
+   },
+   {
+    "name": "PRO-10 · B2 — [ADM-P10] Pause request — reason + 2FA + four-eyes",
+    "id": "264:122963"
+   },
+   {
+    "name": "PRO-10 · B3 — [ADM-P10] Second approval — approver view",
+    "id": "264:123251"
+   },
+   {
+    "name": "PRO-10 · B4 — [ADM-P10] New entries paused",
+    "id": "264:123523"
+   },
+   {
+    "name": "PRO-10 · B5 — [ADM-P7] VRF Delayed — no fulfilment after 12 min",
+    "id": "264:123785"
+   },
+   {
+    "name": "Hotspot fix PRO-08 B3 'Sign in again' → step 7",
+    "id": "266:125077"
+   },
+   {
+    "name": "Hotspot fix PRO-10 B3 'Approve & pause' → B4",
+    "id": "266:125079"
+   }
+  ],
+  "issues": [
+   "Placement: the assignment said X=0, Y=0, but the P0 agent created 'PRO-01..05 Prototypes (P0)' (252:962) at 0,0 at the same time. My section 255:19082 was therefore placed below it and is now at (0, 17308). The P0 section is currently 8,883 px tall, so there is a gap of about 7.4k px. Every proto-b build script moves my section down if the P0 section grows into it; re-check once the P0 agent has finished.",
+   "Flow starting points are shared with the P0 agent. My scripts merge and de-duplicate the list; the first attempt failed with 'Found duplicate input nodeIds', which the de-duplication fixed. Page 11 now lists 10 flows. If the P0 agent later overwrites the list, re-run any proto-b build script (for example out/10b.js; they are idempotent) to restore PRO-06..10.",
+   "No 'PRO — Mobile' section and no mobile frames on page 10. The PRO rows list no breakpoints, and prototype links only work within one page. All five flows are desktop 1440.",
+   "Verification: screenshots plus a structural audit of all 59 frames (196 navigate reactions, 0 dead ends, 0 broken destinations). Playing the prototypes in Figma presentation mode cannot be done through the API.",
+   "The prototype frames are clones, not instances, of the source screens. Changes to the sources do not carry over: delete the affected wrappers and re-run that flow's scripts. Hotspot coordinates are measured from the current source layouts.",
+   "PRO-08: the ADM-X1 approver frames show withdrawal AR-1042, so there is no restriction-specific second-approver screen. The prototype goes from 'Submit for approval' to 'Restriction active' through the chip 'Second approver approves'; the approver UI is shown in PRO-09.",
+   "PRO-09: ADM-F2 has no 'Rejected — funds returned to Available' detail state. The reject branch ends at the validation-error dialog (Cancel goes back to the detail page). A rejected-outcome frame is a gap for the admin-finance slice.",
+   "Two text-matched hotspots missed in the build (PRO-08 B3 and PRO-10 B3) and were added in a fix pass ('Sign in again', 'Approve & pause'). The first fix/audit call timed out after 60 s (deep findAll plus a huge section screenshot). It was retried with a lighter audit; the hotspot step is idempotent, so there are no duplicates.",
+   "No new library components were created, so no registry file was written."
+  ]
+ },
+ "err-a": {
+  "section": "272:962",
+  "created": [
+   {
+    "name": "Section/ERR-01/02/03 Empty, error & loading matrices (page 12 '12 — Empty & Error States', X 0, Y 0, 1680 × 21292)",
+    "id": "272:962"
+   },
+   {
+    "name": "[ERR-01] Empty-state matrix / 1440 / Board (E-01…E-12: wallet, Global Pool entries, transactions, winnings, referrals, filters/no results, notifications, lobby favourites, devices, game bet history, admin user search, admin withdrawal queue)",
+    "id": "272:963"
+   },
+   {
+    "name": "[ERR-02] Error matrix / 1440 / Board (X-01…X-13: list 504, action with no response, 5xx, 4xx message map 400/401/403/404/409/422/429, timeout on a money action, validation, Ethereum congestion, deposit reverted, withdrawal broadcast failed, tx dropped, tx replaced, toast stack, game bet not placed)",
+    "id": "273:1292"
+   },
+   {
+    "name": "[ERR-03] Loading matrix / 1440 / Board (L-01…L-13: table skeleton, balance card skeleton, in-button spinners, lobby tiles + live bets skeleton, inline address check, deposit confirmations, chart + drawer, VRF stepper, KYC upload, optimistic UI, money never optimistic, live reconnect, route progress bar)",
+    "id": "277:2501"
+   },
+   {
+    "name": "Section/ERR — Mobile (page 10, X 253000, Y 0)",
+    "id": "281:97573"
+   },
+   {
+    "name": "[ERR-01 · MOB] Transactions / 390 / Empty — new account",
+    "id": "281:97574"
+   },
+   {
+    "name": "[ERR-02 · MOB] Withdraw — Step 4 Amount / 390 / Validation errors",
+    "id": "281:97695"
+   },
+   {
+    "name": "[ERR-02 · MOB] Withdrawal WD-20931 / 390 / Failed to broadcast — bottom sheet",
+    "id": "281:97831"
+   },
+   {
+    "name": "[ERR-03 · MOB] Wallet / 390 / Loading (skeleton)",
+    "id": "281:98012"
+   }
+  ],
+  "issues": [
+   "Placement: 'ERR — Mobile' is at X 253000, not the assigned 252000, because 'PRO — Mobile' (263:205224) runs from x 245000 to 252670 and would have overlapped. err-b shares this section name, so its frames will land in the same section via nextX. On page 12 the err-a section is 1680 px wide; err-b's section 'ERR-04..07 …' sits at X 3000, with no overlap.",
+   "Library gap (Toast 30:16872): the first TEXT layer named 'Label' belongs to the nested DEMO badge, so setting action labels by layer name writes into the badge. I worked around it with a set-by-current-text helper. Suggest renaming the badge's text layer or exposing the action labels as TEXT properties.",
+   "Library gap (Chart/Line-Area 27:15865): State=Loading is a refresh state (previous data dimmed + 'Updating · last 14 days' chip), not a first-load skeleton. L-07 documents it that way. Suggest adding an 'Initial load' skeleton variant.",
+   "Library gap (Tx/Status Timeline 20:8473): the Failed variant is deposit-only (DP-77412 reverted). X-09 (WD-20931 broadcast failed) overrides header, steps and details and hides the nested Tx/Hash. Its third step ('Returned to Available') keeps the neutral not-yet icon instead of a success check. Suggest adding a Withdrawal-failed variant.",
+   "Library gap (Input/Address 15:3617): the Focus variant only shows the placeholder. L-05's 'While checking' field overrides Value text to 0x7c4e…a21D in text/primary.",
+   "Built inline from tokens (no matching component; candidates for the library): error summary box, HTTP 4xx message-map table, timeout/status-check panel, dropped-tx and replaced-tx panels, 5xx panel with copyable reference, balance-card skeleton, optimistic do/don't panels, route progress bar, mobile flow top bar, and the mobile withdrawal-failed bottom sheet (Sheet/Bottom only offers Default/Participation).",
+   "DEMO alternative outcomes (labelled as such in each Trigger line): DP-77412 reverted (X-08) and replaced by 0x9b2d…14e7 (X-11); WD-20931 broadcast failure (X-09 + mobile sheet, numbers per demo-data: Available 10,715.30, no network fee); a dropped Polygon deposit of 250.00 at 0x2c8e…71fa (X-10); a new referrer with 0 sign-ups (E-05); an empty admin withdrawal queue instead of the 37-item queue (E-12); Orbit Rush round CR-55103 for the bet-not-placed case (X-13); 5xx ref GP-503-2B91-04DE at 18:44:18 UTC (X-03).",
+   "Time snapshot: L-12 (reconnect) uses 'last update 16:42:18 UTC' so it agrees with Card/Draw Countdown's 03:17:42. The error and timeout cells use the 18:44 UTC withdrawal timeline from demo-data. This mirrors the existing 16:42 vs 18:42–18:44 split noted in decisions #50/#54.",
+   "Rerunnable scripts are in /home/user/Claude/design/figma-build/pending/err-a (src/*.js + build.cjs → out/, README.md). Decision #56 was appended to decisions.md, and registry-err-a.json was written (frames only; no new components).",
+   "Memory: none of the user's stored notes were needed for this task. Nothing new to save beyond the decisions/registry entries above (source: this run)."
+  ]
+ },
+ "err-b": {
+  "section": "275:2409",
+  "created": [
+   {
+    "name": "Section/ERR-04..07 Permission, regulatory, maintenance & security (page 12, X 3000, Y 0)",
+    "id": "275:2409"
+   },
+   {
+    "name": "[ERR-04] Permission, session & offline states / 1440 / Board",
+    "id": "275:2410"
+   },
+   {
+    "name": "[ERR-05] Regulatory states — region, licence, self-exclusion, age gate / 1440 / Board",
+    "id": "278:3108"
+   },
+   {
+    "name": "[ERR-06] Service status — maintenance, degraded chain, VRF delayed, entries paused / 1440 / Board",
+    "id": "280:4065"
+   },
+   {
+    "name": "[ERR-07] Security warnings library — wrong network, new address, phishing, suspicious sign-in / 1440 / Board",
+    "id": "281:101532"
+   },
+   {
+    "name": "Section/ERR — Mobile (page 10, X 253000; shared with err-a, ERR-04..07 in row 2 at y 1124)",
+    "id": "281:97573"
+   },
+   {
+    "name": "[ERR-04] Offline — reconnecting / 390 / Global Pool round",
+    "id": "282:97947"
+   },
+   {
+    "name": "[ERR-05] Licence required / 390 / Global Pool entries off",
+    "id": "282:98104"
+   },
+   {
+    "name": "[ERR-06] New entries paused / 390 / Circuit breaker",
+    "id": "282:98272"
+   },
+   {
+    "name": "[ERR-06] Wallet maintenance / 390 / BNB Chain paused",
+    "id": "283:98246"
+   },
+   {
+    "name": "[ERR-07] Wrong network / 390 / Bottom sheet",
+    "id": "283:98464"
+   },
+   {
+    "name": "[ERR-07] Suspicious sign-in / 390 / New device alert",
+    "id": "283:98610"
+   }
+  ],
+  "issues": [
+   "Placement: the page 12 section sits at X=3000, not 2000. err-a's 'ERR-01/02/03' section (272:962) already covered X 0–1680 and the lib computes X from existing sections. On page 10, 'PRO — Mobile' ends at x 252,670, so the assigned X=252000 would overlap. err-a had already created 'ERR — Mobile' at X=253000 and this slice reuses that section.",
+   "Shared mobile section: my first mobile batch placed its 3 frames on err-a's row (x 120/630/1140, y 120). For one call they covered err-a's frames [ERR-01 · MOB] Transactions, [ERR-02 · MOB] Withdraw step 4 and [ERR-02 · MOB] WD-20931 failed. The next call moved my frames to their own row (y 1124). No err-a frame was edited, and pending/err-b/mlib.js now always uses that row.",
+   "The first ERR-04 run errored on a wrong effect style name ('Elevation/4' instead of 'Elevation/4 — Modal'). Nothing was left behind: page 12 holds only the two sections. The fixed run was briefly preceded by a cleanup line that removes top-level non-section nodes on page 12; it removed nothing of err-a's (err-a's content is inside its section) and has been taken out of lib.js.",
+   "Component gaps, built inline with tokens: there is no library component for a player permission/KYC gate card, an admin 'no access' page, a blocked-action/geo interstitial, an inline re-auth dialog (Modal/Base has only a dashed slot), a maintenance status panel, a security-email preview, a link-check ('You're leaving') dialog, a mobile full-width status banner, or a mobile bottom sheet with custom content (Sheet/Bottom has only 2 fixed variants).",
+   "Library defaults overridden per instance; better fixed at source: Alert/Banner Security body says 22:14 UTC but User/Device Row and User/Notification Item say 19:06 UTC. Alert/Banner Maintenance says 28 Nov 2026, but AN-88 is 1 Dec 2026. Input/Password placeholder 'Create a password' is wrong in sign-in contexts. The Input/Text email helper is hidden in re-auth. Toast Title is auto-width, so long titles push the DEMO badge out of the 400 px toast. Select/Network Option truncates 'standard · confirmations' at 358 px. Text layers named 'Label' inside nested Badge/DEMO collide with link 'Label' layers, so overrides by layer name hit the badge first; lib.ov now skips badges.",
+   "New DEMO scenarios, logged as decision 57 in decisions.md: a Level 1 account with a 2,000.00 USDT daily withdrawal limit (ERR-04.1); Global Pool not licensed in Ontario, Canada while Originals and tables are (ERR-05.3); look-alike phishing domain globalpool-bonus.example (ERR-07.5). security@example.com is a placeholder.",
+   "Files: rerunnable scripts are in /home/user/Claude/design/figma-build/pending/err-b (README.md, RUN-ORDER.json, build.sh, lib.js, lib-m.js, mlib.js, b04–b07.js, m1–m2.js, out/); post-run fixes are folded into the sources. Registry: /home/user/Claude/design/figma-build/registry-err-b.json. Decision 57 was appended to /home/user/Claude/design/figma-build/decisions.md. ledger.json was not edited; the orchestrator merges it.",
+   "Figma MCP use: 15 use_figma calls, no rate-limit errors. get_metadata and get_screenshot were never used; checks were in-script screenshots plus a clip/off-frame text audit."
+  ]
  }
 }

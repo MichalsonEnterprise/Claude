@@ -1,0 +1,63 @@
+{
+ "_section_desktop": {
+  "id": "252:962",
+  "page": "11 — Prototypes",
+  "name": "PRO-01..05 Prototypes (P0)"
+ },
+ "_section_mobile": {
+  "id": "263:205224",
+  "page": "10 — Mobile Experience",
+  "name": "PRO — Mobile"
+ },
+ "PRO-01 desktop": {
+  "section": "252:963",
+  "start": "252:964",
+  "flowMap": "252:14625"
+ },
+ "PRO-02 desktop": {
+  "section": "255:26426",
+  "start": "255:26427",
+  "flowMap": "255:47517"
+ },
+ "PRO-03 desktop": {
+  "section": "256:53185",
+  "start": "256:53186",
+  "flowMap": "256:63816"
+ },
+ "PRO-04 desktop": {
+  "section": "258:71564",
+  "start": "258:71565",
+  "flowMap": "258:89966"
+ },
+ "PRO-05 desktop": {
+  "section": "260:113802",
+  "start": "260:113803",
+  "flowMap": "260:126354"
+ },
+ "PRO-01 mobile": {
+  "section": "263:205225",
+  "start": "263:205226",
+  "flowMap": "263:205866"
+ },
+ "PRO-02 mobile": {
+  "section": "264:209397",
+  "start": "264:209398",
+  "flowMap": "264:209805"
+ },
+ "PRO-03 mobile": {
+  "section": "265:209648",
+  "start": "265:209649",
+  "flowMap": "265:210735"
+ },
+ "PRO-04 mobile": {
+  "section": "266:212970",
+  "start": "266:212971",
+  "flowMap": "266:214334"
+ },
+ "PRO-05 mobile": {
+  "section": "267:92913",
+  "start": "267:92914",
+  "flowMap": "267:95004"
+ },
+ "_note": "No new components. Prototype sections, flow starting points and flow-map containers built by proto-a (PRO-01..05). Rebuild scripts: pending/proto-a."
+}

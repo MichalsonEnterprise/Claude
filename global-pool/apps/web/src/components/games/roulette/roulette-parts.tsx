@@ -90,7 +90,8 @@ export function PocketDisc({
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full border font-bold tabular-nums',
+        // relative: keeps the sr-only colour label inside the disc, so a scrolled pocket strip can't widen the page
+        'relative inline-flex shrink-0 items-center justify-center rounded-full border font-bold tabular-nums',
         c === 'red' ? 'bg-status-danger-strong text-ink-50' : c === 'black' ? 'bg-ink-950 text-ink-50' : 'bg-green-500 text-ink-950',
         newest ? 'border-2 border-border-focus' : 'border-border-strong',
         size >= 56 ? 'text-h2' : size >= 40 ? 'text-label-l' : 'text-label-s',

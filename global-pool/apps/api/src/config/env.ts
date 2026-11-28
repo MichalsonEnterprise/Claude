@@ -192,6 +192,11 @@ export const envSchema = z.object({
   BULLMQ_PREFIX: z.string().default('gp'),
   /** Start BullMQ workers + repeatable jobs in this process (disable for one-off scripts / some tests). */
   JOBS_ENABLED: bool.default(true),
+  /**
+   * Run the Orbit Rush crash loop (100 ms frames, Redis-leased leader) in this process. Unset = follows JOBS_ENABLED.
+   * Lets a QA / game instance run live crash rounds without the BullMQ workers (deposits, withdrawals, pool rounds).
+   */
+  CRASH_LOOP_ENABLED: bool.optional(),
   /** DEMO convenience: automatically open the next daily round (08:00–20:00 UTC) when none is open. */
   ROUND_AUTO_SCHEDULE: bool.default(true),
   /** DEMO rounds are a frozen snapshot: they close at their real time but are not drawn unless this is true. */

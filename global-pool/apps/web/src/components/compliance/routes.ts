@@ -31,11 +31,12 @@ export const GATE_ROUTES = {
 /** Where "Leave" / "Leave GLOBAL POOL" goes: a neutral page outside the product. */
 export const LEAVE_URL = 'https://www.google.com/';
 
-const GEO_GATED = /^\/(games|pool|promotions|favourites|recently-played|casino|originals)(\/|$)|^\/wallet\/deposit(\/|$)/;
+const GEO_GATED =
+  /^\/(games|pool|promotions|favourites|recently-played|casino|originals)(\/|$)|^\/wallet\/deposit(\/|$)/;
 
 /** Pages that are always reachable, whatever the gates say (sign-in, withdraw, legal, RG, support, gates). */
 const ALWAYS_OPEN =
-  /^\/(region-unavailable|age-restricted|restricted|legal|support|responsible-gaming|sign-in|sign-up|verify|onboarding|2fa|design-system|auth-preview|admin)(\/|$)/;
+  /^\/(region-unavailable|age-restricted|restricted|legal|support|responsible-gaming|sign-in|sign-up|verify|onboarding|2fa|design-system|auth-preview|compliance-preview|admin)(\/|$)/;
 
 function normalise(pathname: string): string {
   const p = pathname.split(/[?#]/)[0] || '/';

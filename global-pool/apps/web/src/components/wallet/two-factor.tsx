@@ -66,7 +66,13 @@ export function AntiPhishingCode({ className }: { className?: string }) {
       <div className="min-w-0 flex-1">
         <p className="text-caption text-text-tertiary">Your anti-phishing code</p>
         <p className="font-mono text-mono-m text-text-primary">
-          {code ?? (me.isPending ? '…' : 'Not set')}
+          {/* ERR-07: an unknown code (profile failed) is never shown as "Not set". */}
+          {code ??
+            (me.isPending
+              ? '…'
+              : me.isError
+                ? 'Couldn’t load — check before you continue'
+                : 'Not set')}
         </p>
       </div>
       {me.data?.isDemo && <DemoBadge size="xs" />}

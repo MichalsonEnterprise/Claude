@@ -5,16 +5,19 @@
  * use it, and the shell shows "—" instead of an endless skeleton when its data failed.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { QueryState } from '@/components/account/primitives';
 import { QueryErrorPanel } from '@/components/admin-a/primitives';
+import { RestrictedIndex } from '@/components/auth/restricted';
 import { QueryError as AdminBQueryError } from '@/components/admin-b/primitives';
 import { QueryError as PoolQueryError } from '@/components/pool/parts';
 import { QueryError as RgQueryError } from '@/components/rg-history/page-shell';
 import { AppShellFrame, shellValue } from '@/components/shell/app-shell';
 import { ErrorState } from '@/components/ui/error-state';
+import { SecurityWarning, securityWarningCopy } from '@/components/ui/security-warning';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryError as WalletQueryError } from '@/components/wallet/wallet-ui';
 import {
@@ -24,9 +27,13 @@ import {
   apiRequest,
   isOutcomeUnknown,
 } from '@/lib/api/client';
-import { describeError, shouldRetryQuery } from '@/lib/api/errors';
+import { authKeys, type AccountStatus } from '@/lib/api/auth';
+import { describeError, shouldRetryQuery, writeErrorText } from '@/lib/api/errors';
 import { parseRetryAfter, statusMessage } from '@/lib/api/transport';
+import { AuthContext } from '@/lib/auth/context';
+import type { AuthContextValue } from '@/lib/auth/types';
 import { ApiError, apiGet } from '@/lib/data/source';
+import { isWrongNetwork } from '@/lib/wallet/injected';
 
 const RAW =
   /Failed to fetch|Bad Gateway|HTTP_ERROR|signal is aborted|<html|TypeError|\[object|undefined/;
@@ -223,10 +230,65 @@ describe('describeError — the ERR-02 matrix', () => {
   });
 });
 
+describe('writeErrorText — failed writes never claim "nothing was changed" when the outcome is unknown', () => {
+  const UNKNOWN = 'We couldn’t confirm whether it was applied.';
+  it.each([
+    new ApiNetworkError('/responsible-gaming/self-exclusion'),
+    new ApiTimeoutError('/responsible-gaming/limits', 20_000),
+    new ApiRequestError(
+      502,
+      '/x',
+      statusMessage(502),
+      'HTTP_ERROR',
+      undefined,
+      undefined,
+      undefined,
+    ),
+    new ApiRequestError(409, '/x', 'In progress', 'CONFLICT', undefined, undefined, undefined),
+  ])('%s → readable text + the honest "couldn’t confirm" sentence', (err) => {
+    const t = writeErrorText(err, UNKNOWN);
+    expect(t.endsWith(UNKNOWN)).toBe(true);
+    expect(t).not.toMatch(/nothing was (changed|saved)/i);
+    expect(t).not.toMatch(RAW);
+  });
+
+  it('a definite refusal keeps the API message; a 400 shows the field issue', () => {
+    expect(
+      writeErrorText(
+        new ApiRequestError(
+          422,
+          '/x',
+          'Limit can only be lowered right now',
+          'RG_LIMIT',
+          'r',
+          undefined,
+          undefined,
+        ),
+        UNKNOWN,
+      ),
+    ).toBe('Limit can only be lowered right now');
+    expect(
+      writeErrorText(
+        new ApiRequestError(
+          400,
+          '/x',
+          'Request validation failed',
+          'VALIDATION_FAILED',
+          'r',
+          [{ path: ['amount'], message: 'Amount must be at most 1,000,000.00' }],
+          undefined,
+        ),
+        UNKNOWN,
+      ),
+    ).toBe('Amount must be at most 1,000,000.00');
+  });
+});
+
 describe('query retry policy', () => {
-  it('retries transient failures once, never 4xx / 429 / 503', () => {
+  it('retries transient failures once, never 4xx / 429 / 503 / timeouts', () => {
     expect(shouldRetryQuery(0, new ApiNetworkError('/x'))).toBe(true);
-    expect(shouldRetryQuery(0, new ApiTimeoutError('/x', 1))).toBe(true);
+    // a timeout already waited 20 s — a second wait would double the skeleton time (ERR-03)
+    expect(shouldRetryQuery(0, new ApiTimeoutError('/x', 1))).toBe(false);
     expect(
       shouldRetryQuery(
         0,
@@ -390,5 +452,156 @@ describe('shell figures: loading vs failed (ERR-03 — no endless skeleton)', ()
     expect(html).toContain('Available balance couldn’t be loaded');
     expect(html).toContain('Pool amount couldn’t be loaded');
     expect(html).not.toContain('data-slot="skeleton"');
+  });
+});
+
+describe('ERR-07 security warnings library', () => {
+  const kinds = [
+    'wrong-network',
+    'new-address',
+    'new-device',
+    'suspicious-login',
+    'phishing',
+    'anti-phishing',
+    'unverified-contract',
+  ] as const;
+
+  it.each(kinds)('%s: readable title + next step, never raw / undefined text', (kind) => {
+    const html = render(<SecurityWarning kind={kind} />);
+    const copy = securityWarningCopy({ kind });
+    expect(copy.title.length).toBeGreaterThan(8);
+    expect(copy.body.length).toBeGreaterThan(40);
+    expect(html).toContain(`data-security-warning="${kind}"`);
+    expect(`${copy.title} ${copy.body}`).not.toMatch(/undefined|null|NaN|\[object/);
+    // security warnings are never dismissible
+    expect(html).not.toContain('aria-label="Dismiss"');
+  });
+
+  it('security kinds are announced as alerts; context values are used', () => {
+    expect(render(<SecurityWarning kind="wrong-network" currentChainId={1} />)).toMatch(
+      /role="alert"[^>]*>.*chain ID 1\..*Arbitrum Sepolia/s,
+    );
+    const unlocks = '2026-11-29T10:00:00.000Z';
+    expect(
+      securityWarningCopy({ kind: 'new-address', address: '0x12…ab', unlocksAt: unlocks }),
+    ).toMatchObject({ title: '0x12…ab is cooling down' });
+    expect(securityWarningCopy({ kind: 'new-address', unlocksAt: unlocks }).body).toContain(
+      '29 Nov 2026',
+    );
+    expect(securityWarningCopy({ kind: 'anti-phishing', code: 'AURORA-27' }).title).toBe(
+      'Your anti-phishing code: AURORA-27',
+    );
+    expect(securityWarningCopy({ kind: 'anti-phishing', code: null }).title).toBe(
+      'Set an anti-phishing code',
+    );
+    expect(
+      securityWarningCopy({ kind: 'unverified-contract', tokenLabel: 'tUSDT on Arbitrum Sepolia' })
+        .title,
+    ).toBe('Only tUSDT on Arbitrum Sepolia is credited');
+    // no dark patterns / bypass hints: never suggests skipping a protection or a VPN
+    for (const kind of kinds)
+      expect(securityWarningCopy({ kind }).body).not.toMatch(
+        /\bVPN\b|proxy|skip the|hurry|act now/i,
+      );
+  });
+
+  it('wrong network only for the member’s own linked wallet connected on another chain', () => {
+    const mine = '0xAbC0000000000000000000000000000000000001';
+    const st = (chainId: number | null, accounts: string[]) => ({ chainId, accounts });
+    expect(isWrongNetwork(st(1, [mine.toLowerCase()]), mine)).toBe(true);
+    expect(isWrongNetwork(st(421614, [mine.toLowerCase()]), mine)).toBe(false);
+    // extension installed but not connected to this site / another address / no linked wallet / unknown chain
+    expect(isWrongNetwork(st(1, []), mine)).toBe(false);
+    expect(isWrongNetwork(st(1, ['0x9999999999999999999999999999999999999999']), mine)).toBe(false);
+    expect(isWrongNetwork(st(1, [mine.toLowerCase()]), null)).toBe(false);
+    expect(isWrongNetwork(st(null, [mine.toLowerCase()]), mine)).toBe(false);
+  });
+
+  it('the shell shows the wrong-network state (topbar button ≥ 768 + banner < 768) with Switch', () => {
+    const html = render(
+      <AppShellFrame
+        auth="member"
+        member={{
+          handle: '@x',
+          initials: 'X',
+          available: '1.00',
+          notifications: 0,
+          activeEntries: 0,
+          demo: true,
+        }}
+        pathname="/wallet"
+        onSignIn={() => undefined}
+        onSignUp={() => undefined}
+        onSignOut={() => undefined}
+        wrongNetwork
+        onSwitchNetwork={() => undefined}
+      >
+        <p>page</p>
+      </AppShellFrame>,
+    );
+    expect(html).toContain('data-security-warning="wrong-network"');
+    expect(html).toContain('Switch to Arbitrum');
+    expect(html).toContain('Wrong network');
+  });
+});
+
+describe('/restricted index (ERR-03: never an endless skeleton)', () => {
+  const authValue = (status: AuthContextValue['status']): AuthContextValue => ({
+    mode: 'mock',
+    status,
+    user: null,
+    signIn: () => undefined,
+    signUp: () => undefined,
+    signOut: () => Promise.resolve(),
+    getAccessToken: () => Promise.resolve(null),
+  });
+  const renderIndex = (status: AuthContextValue['status'], seed?: (qc: QueryClient) => void) => {
+    const qc = new QueryClient({
+      defaultOptions: { queries: { retryOnMount: false, staleTime: Infinity, retry: false } },
+    });
+    seed?.(qc);
+    return renderToStaticMarkup(
+      <QueryClientProvider client={qc}>
+        <AuthContext.Provider value={authValue(status)}>
+          <RestrictedIndex />
+        </AuthContext.Provider>
+      </QueryClientProvider>,
+    );
+  };
+
+  it('guest → sign-in prompt, no skeleton', () => {
+    const html = renderIndex('guest');
+    expect(html).toContain('Sign in to see your account status');
+    expect(html).not.toContain('data-slot="skeleton"');
+  });
+
+  it('failed account status → ErrorState with Try again, no skeleton', () => {
+    const html = renderIndex('member', (qc) => {
+      qc.getQueryCache()
+        .build(qc, { queryKey: authKeys.accountStatus })
+        .setState({
+          status: 'error',
+          error: new ApiNetworkError('/auth/account-status'),
+          errorUpdatedAt: Date.now(),
+          fetchStatus: 'idle',
+        });
+    });
+    expect(html).toContain('You seem to be offline');
+    expect(html).toContain('Try again');
+    expect(html).not.toContain('data-slot="skeleton"');
+    expect(html).not.toMatch(RAW);
+  });
+
+  it('account still onboarding → link to finish setup, no skeleton', () => {
+    const html = renderIndex('member', (qc) =>
+      qc.setQueryData<Partial<AccountStatus>>(authKeys.accountStatus, { gate: 'onboarding' }),
+    );
+    expect(html).toContain('Finish setting up your account');
+    expect(html).toContain('href="/onboarding?next=/restricted"');
+    expect(html).not.toContain('data-slot="skeleton"');
+  });
+
+  it('while the status is loading for a member it is a (temporary) skeleton', () => {
+    expect(renderIndex('member')).toContain('data-slot="skeleton"');
   });
 });

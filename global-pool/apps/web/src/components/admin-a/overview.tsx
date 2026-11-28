@@ -295,7 +295,13 @@ export function OverviewPage() {
 
       <div className="grid gap-4 laptop:grid-cols-[1.1fr_1fr]">
         <HealthPanel />
-        <RoundPanel round={round.data} loading={round.isPending} error={round.error} now={now} />
+        <RoundPanel
+          round={round.data}
+          loading={round.isPending}
+          error={round.error}
+          onRetry={() => void round.refetch()}
+          now={now}
+        />
       </div>
 
       <div className="grid gap-4 laptop:grid-cols-[1.4fr_1fr]">
@@ -314,7 +320,12 @@ export function OverviewPage() {
             {audit.isPending ? (
               <Skeleton className="h-40" />
             ) : audit.isError ? (
-              <QueryErrorPanel error={audit.error} role={role} what="the audit feed" />
+              <QueryErrorPanel
+                error={audit.error}
+                onRetry={() => void audit.refetch()}
+                role={role}
+                what="the audit feed"
+              />
             ) : (audit.data?.items.length ?? 0) === 0 ? (
               <p className="text-body-s text-text-secondary">No audit entries yet.</p>
             ) : (
@@ -427,7 +438,11 @@ function ApprovalsPanel({ now }: { now: number }) {
       {inbox.isPending ? (
         <Skeleton className="h-40" />
       ) : inbox.isError ? (
-        <QueryErrorPanel error={inbox.error} what="approvals" />
+        <QueryErrorPanel
+          error={inbox.error}
+          onRetry={() => void inbox.refetch()}
+          what="approvals"
+        />
       ) : items.length === 0 ? (
         <p className="text-body-s text-text-secondary">
           No open requests. Sensitive actions that need a second admin appear here.
@@ -601,11 +616,13 @@ function RoundPanel({
   round,
   loading,
   error,
+  onRetry,
   now,
 }: {
   round: CurrentRound | undefined;
   loading: boolean;
   error: Error | null;
+  onRetry?: () => void;
   now: number;
 }) {
   return (
@@ -625,7 +642,11 @@ function RoundPanel({
       {loading ? (
         <Skeleton className="h-56" />
       ) : error || !round ? (
-        <QueryErrorPanel error={error ?? new Error('No round scheduled')} what="the round" />
+        <QueryErrorPanel
+          error={error ?? new Error('No round scheduled')}
+          onRetry={error ? onRetry : undefined}
+          what="the round"
+        />
       ) : (
         <>
           <p className="text-overline uppercase text-text-tertiary">Pool balance</p>
@@ -674,7 +695,11 @@ function NetworksPanel() {
       {health.isPending ? (
         <Skeleton className="h-40" />
       ) : health.isError || !health.data ? (
-        <QueryErrorPanel error={health.error} what="networks" />
+        <QueryErrorPanel
+          error={health.error}
+          onRetry={() => void health.refetch()}
+          what="networks"
+        />
       ) : (
         <ul className="flex flex-col" data-testid="networks">
           {health.data.chains.map((c, i) => (

@@ -13,7 +13,7 @@
  */
 import { ApiError } from '@/lib/data/source';
 
-import { ApiRequestError } from './client';
+import { ApiRequestError, isOutcomeUnknown } from './client';
 import { ApiNetworkError, ApiTimeoutError } from './transport';
 
 export type ErrorKind =
@@ -217,13 +217,27 @@ export function describeError(err: unknown, what = 'this'): ErrorDescription {
 }
 
 /**
- * TanStack Query `retry` policy for every query: one automatic retry for transient failures (network, timeout,
- * 5xx except 501), never for 4xx — a 429 is not hammered again and a 404 / 403 / validation error cannot heal.
+ * Player copy for a failed WRITE (limit change, break, save): `describeError`'s description — field issues for a
+ * 400, the API's own message for a business refusal — and, when no definite answer came back (timeout, dropped
+ * connection, 5xx, an idempotency key still in flight), the caller's honest `unknownOutcome` sentence. Never claim
+ * "nothing was saved / changed" for such a write: it may have been applied.
+ */
+export function writeErrorText(err: unknown, unknownOutcome: string, what = 'this'): string {
+  const d = describeError(err, what);
+  return isOutcomeUnknown(err) ? `${d.description} ${unknownOutcome}` : d.description;
+}
+
+/**
+ * TanStack Query `retry` policy for every query: one automatic retry for transient failures (network, 5xx except
+ * 501 / 503), never for 4xx — a 429 is not hammered again and a 404 / 403 / validation error cannot heal. A timeout
+ * is not retried automatically either: the request already waited `DEFAULT_API_TIMEOUT_MS`, and a second wait would
+ * keep the skeleton on screen for twice as long (ERR-03) — the error offers Try again instead.
  */
 export function shouldRetryQuery(failureCount: number, error: unknown): boolean {
   if (failureCount >= 1) return false;
   if (error instanceof ApiError)
     return error.status >= 500 && error.status !== 501 && error.status !== 503;
+  if (error instanceof ApiTimeoutError) return false;
   return !isAbort(error);
 }
 

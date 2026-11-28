@@ -27,7 +27,7 @@ import { Card } from '@/components/ui/card';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Field, Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
-import { ApiRequestError } from '@/lib/api/client';
+import { writeErrorText } from '@/lib/api/errors';
 import { rgApi, useRgMutation } from '@/lib/api/rg-history';
 import { cn } from '@/lib/utils';
 
@@ -86,9 +86,16 @@ const minutesForm = z.object({
     }),
 });
 
+/**
+ * ERR-02 copy for a failed limit change: field issues for a 400, the API's own message for a business refusal, and —
+ * when no definite answer came back (timeout, dropped connection, 5xx) — never a claim that nothing was saved.
+ */
 function errorText(e: unknown): string {
-  if (e instanceof ApiRequestError) return e.message;
-  return 'Could not save — please try again.';
+  return writeErrorText(
+    e,
+    'We couldn’t confirm whether the change was saved — check the limit shown here before you try again.',
+    'your limit',
+  );
 }
 
 /** RG/Limit Setter — period segmented control, limit input, usage bar, pending increase/removal state. */

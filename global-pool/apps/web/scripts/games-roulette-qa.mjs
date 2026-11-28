@@ -103,6 +103,14 @@ async function contextFor(browser, width, player, s) {
     deviceScaleFactor: 1,
     reducedMotion: s.motion ? 'no-preference' : 'reduce',
   });
+  // a returning visitor who already answered the 18+ gate (PUB-22, components/compliance) — members use onboarding
+  await ctx.addInitScript(() => {
+    try {
+      window.localStorage.setItem('gp.ageGate', JSON.stringify({ confirmedAt: new Date().toISOString(), country: 'PT' }));
+    } catch {
+      // storage unavailable: the gate simply asks
+    }
+  });
   if (player) {
     await ctx.addCookies([{ name: 'privy-token', value: player.token, domain: new URL(BASE).hostname, path: '/' }]);
     await ctx.addInitScript(

@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 
 import {
   regulatoryCopy,
+  regulatoryFromError,
   type RegulatoryAction,
   type RegulatoryContext,
   type RegulatoryCopy,
@@ -205,7 +206,11 @@ export function RegulatoryState({
       <div className="flex flex-col gap-3 pt-1 tablet:flex-row tablet:flex-wrap">
         {primary && <RegulatoryActionButton action={primary} variant="primary" />}
         {rest.map((a, i) => (
-          <RegulatoryActionButton key={a.label} action={a} variant={i === 0 ? 'secondary' : 'ghost'} />
+          <RegulatoryActionButton
+            key={a.label}
+            action={a}
+            variant={i === 0 ? 'secondary' : 'ghost'}
+          />
         ))}
       </div>
     </div>
@@ -266,6 +271,40 @@ export function RegulatoryState({
   );
 }
 
+/**
+ * ERR-05 module guard: renders the compact regulatory card INSTEAD of the module's content when `error` is a
+ * regulatory refusal from the API (451 GEO_RESTRICTED · SELF_EXCLUDED → self-exclusion or cooling-off ·
+ * KYC_REQUIRED · REAL_MONEY_DISABLED → licence) or an explicit `kind` is given; otherwise renders `children`
+ * (pass the module's own error UI as children for every other error).
+ *
+ *   <RegulatoryGuard error={query.error}><ErrorState error={query.error} onRetry={…} /></RegulatoryGuard>
+ */
+export function RegulatoryGuard({
+  error,
+  kind,
+  ctx,
+  className,
+  children,
+}: {
+  error?: unknown;
+  kind?: RegulatoryKind | null;
+  ctx?: RegulatoryContext;
+  className?: string;
+  children?: React.ReactNode;
+}) {
+  const fromError = error ? regulatoryFromError(error) : null;
+  const k = kind ?? fromError?.kind ?? null;
+  if (!k) return <>{children}</>;
+  return (
+    <RegulatoryState
+      kind={k}
+      ctx={{ ...fromError?.ctx, ...ctx }}
+      layout="card"
+      className={className}
+    />
+  );
+}
+
 /** Inline banner variant (Alert/Banner Regional restriction · Regulatory notice) for pages that stay usable. */
 export function RegulatoryNotice({
   kind,
@@ -299,7 +338,9 @@ export function RegulatoryNotice({
 /** 18+ · licence · RG line under every regulatory state. */
 export function RegulatoryFooter({ className }: { className?: string }) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2 text-caption text-text-tertiary', className)}>
+    <div
+      className={cn('flex flex-wrap items-center gap-2 text-caption text-text-tertiary', className)}
+    >
       <AgeBadge />
       <LicenceChip />
       <span>

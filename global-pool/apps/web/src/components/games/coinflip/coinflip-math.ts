@@ -3,7 +3,13 @@
  * re-derived in the browser with @gp/shared/fair); nothing here decides a side. Amounts use decimal.js
  * (@gp/shared/money), never JS floats.
  */
-import { coinflip, fairGame, type CoinSide, type CoinflipOutcome, type CoinflipParams } from '@gp/shared/fair';
+import {
+  coinflip,
+  fairGame,
+  type CoinSide,
+  type CoinflipOutcome,
+  type CoinflipParams,
+} from '@gp/shared/fair';
 import { MoneyDecimal, money } from '@gp/shared/money';
 
 import type { GameBetView } from '@/lib/api/games';
@@ -18,7 +24,10 @@ export const WIN_CHANCE = '50.00';
 /** 2³² — the first 4 HMAC bytes are scaled by it (CF-05 "Scale" step). */
 export const TWO_POW_32 = '4294967296';
 
-export type CoinflipBet = GameBetView<Record<string, unknown> & CoinflipParams, Record<string, unknown> & CoinflipOutcome>;
+export type CoinflipBet = GameBetView<
+  Record<string, unknown> & CoinflipParams,
+  Record<string, unknown> & CoinflipOutcome
+>;
 
 export const SIDES: readonly CoinSide[] = ['heads', 'tails'];
 export const sideLabel = (s: CoinSide): string => (s === 'heads' ? 'Heads' : 'Tails');
@@ -58,7 +67,9 @@ export type FlipPeriod = 'today' | '7d' | '30d' | 'all';
 export function periodFrom(period: FlipPeriod, now: Date = new Date()): string | undefined {
   switch (period) {
     case 'today':
-      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
+      return new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+      ).toISOString();
     case '7d':
       return new Date(now.getTime() - 7 * 86_400_000).toISOString();
     case '30d':
@@ -79,7 +90,10 @@ export function normaliseFlipSearch(text: string): string | null {
 
 /** Payout on a win for a stake (2 dp, truncated) — e.g. 10.00 → 19.60. */
 export function payoutOnWin(stake: string): string {
-  return money(stake).times(money(MULTIPLIER)).toDecimalPlaces(2, MoneyDecimal.ROUND_DOWN).toFixed(2);
+  return money(stake)
+    .times(money(MULTIPLIER))
+    .toDecimalPlaces(2, MoneyDecimal.ROUND_DOWN)
+    .toFixed(2);
 }
 
 /** Short summary of a settled flip: "Picked Heads · landed Tails". */
@@ -90,7 +104,8 @@ export function flipSummary(o: Pick<CoinflipOutcome, 'pick' | 'side'>): string {
 /** Verifier one-liner ("x = 0.2288 → Heads · picked Heads → Win · 1.96×"). */
 export function describeFlipOutcome(o: Record<string, unknown>): string {
   const c = o as Partial<CoinflipOutcome>;
-  if (typeof c.u32 !== 'number' || (c.side !== 'heads' && c.side !== 'tails')) return JSON.stringify(o);
+  if (typeof c.u32 !== 'number' || (c.side !== 'heads' && c.side !== 'tails'))
+    return JSON.stringify(o);
   const pick = c.pick === 'heads' || c.pick === 'tails' ? ` · picked ${sideLabel(c.pick)}` : '';
   const win = typeof c.win === 'boolean' ? ` → ${c.win ? `Win · ${MULTIPLIER}×` : 'Lose'}` : '';
   return `x = ${u32Fraction(c.u32)} → ${sideLabel(c.side)}${pick}${win}`;

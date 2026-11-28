@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { FAIR_GAMES, crash, creditString, parseStake } from '@gp/shared/fair';
 import { money } from '@gp/shared/money';
-import type { CrashBet, CrashRound } from '@prisma/client';
+import type { CrashBet, CrashRound, Prisma } from '@prisma/client';
 import type Redis from 'ioredis';
 import { Subject } from 'rxjs';
 
@@ -23,6 +23,26 @@ import { IdempotencyService } from '../../idempotency/idempotency.service';
 import { CreditsService } from './credits.service';
 import { DEMO, GameClock, assertDemoOnly, credits, rules } from './games-common';
 import { GamesPolicyService } from './policy.service';
+
+/** CR-05 statistics windows. */
+export type CrashStatsPeriod = '24h' | '7d' | '30d';
+export const CRASH_STATS_PERIOD_MS: Record<CrashStatsPeriod, number> = {
+  '24h': 24 * 3_600_000,
+  '7d': 7 * 24 * 3_600_000,
+  '30d': 30 * 24 * 3_600_000,
+};
+/**
+ * Crash-point buckets with the published expectation: P(a ≤ crash < b) = 0.99/a − 0.99/b for a ≥ 1.01 and
+ * 1 − 0.99/1.5 for the first bucket (which includes the 1 % instant crashes). Percent strings.
+ */
+export const CRASH_STATS_BUCKETS = [
+  { label: '1.00–1.49×', min: '1.00', max: '1.50', expected: '34.00' },
+  { label: '1.50–1.99×', min: '1.50', max: '2.00', expected: '16.50' },
+  { label: '2.00–4.99×', min: '2.00', max: '5.00', expected: '29.70' },
+  { label: '5.00–9.99×', min: '5.00', max: '10.00', expected: '9.90' },
+  { label: '10.00–99.99×', min: '10.00', max: '100.00', expected: '8.91' },
+  { label: '100.00× +', min: '100.00', max: null, expected: '0.99' },
+] as const;
 
 /** Rounds per hash chain (a new chain is committed when one is used up). */
 export const CRASH_CHAIN_LENGTH = 10_000;
@@ -76,7 +96,7 @@ export class CrashEngineService implements OnApplicationBootstrap, OnModuleDestr
   ) {}
 
   onApplicationBootstrap(): void {
-    if (!this.config.env.JOBS_ENABLED) return;
+    if (!(this.config.env.CRASH_LOOP_ENABLED ?? this.config.env.JOBS_ENABLED)) return;
     this.timer = setInterval(() => void this.loop(), crash.CRASH_RULES.frameMs);
     this.logger.log('Orbit Rush loop started (100 ms frames)');
   }
@@ -517,23 +537,108 @@ export class CrashEngineService implements OnApplicationBootstrap, OnModuleDestr
     };
   }
 
-  async rounds(page: number, pageSize: number) {
+  /**
+   * Crashed rounds, newest first, with players / wagered / paid out per round (DEMO credits). Optional filters
+   * (additive, CR-05 round history): `from` = crashed at / after, `number` = one round ("CR-55102" search).
+   */
+  async rounds(page: number, pageSize: number, filters: { from?: Date; number?: number } = {}) {
+    const where: Prisma.CrashRoundWhereInput = {
+      status: 'crashed',
+      ...(filters.from ? { crashedAt: { gte: filters.from } } : {}),
+      ...(filters.number !== undefined ? { number: filters.number } : {}),
+    };
     const [rows, total] = await Promise.all([
       this.prisma.crashRound.findMany({
-        where: { status: 'crashed' },
+        where,
         orderBy: { number: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
         include: { _count: { select: { bets: true } } },
       }),
-      this.prisma.crashRound.count({ where: { status: 'crashed' } }),
+      this.prisma.crashRound.count({ where }),
     ]);
+    const sums = rows.length
+      ? await this.prisma.crashBet.groupBy({
+          by: ['roundId'],
+          where: { roundId: { in: rows.map((r) => r.id) } },
+          _sum: { stake: true, payout: true },
+        })
+      : [];
+    const byRound = new Map(sums.map((x) => [x.roundId, x._sum]));
     return {
-      items: rows.map((r) => ({ ...this.publicRound(r, null), bets: r._count.bets })),
+      items: rows.map((r) => ({
+        ...this.publicRound(r, null),
+        bets: r._count.bets,
+        players: r._count.bets,
+        wagered: credits(byRound.get(r.id)?.stake),
+        paidOut: credits(byRound.get(r.id)?.payout),
+      })),
       page,
       pageSize,
       total,
       totalPages: Math.max(1, Math.ceil(total / pageSize)),
+      currency: DEMO.currency,
+      isDemo: true,
+    };
+  }
+
+  /**
+   * Public statistics of crashed rounds in the last 24 h / 7 d / 30 d (CR-05): count, median, share reaching 2.00×,
+   * highest crash and the crash-point distribution next to the published expectation P(crash ≥ m) = 0.99 ÷ m.
+   * Read-only aggregates — nothing here can influence a round.
+   */
+  async stats(period: CrashStatsPeriod, now: Date = this.clock.now()) {
+    const from = new Date(now.getTime() - CRASH_STATS_PERIOD_MS[period]);
+    const [agg] = await this.prisma.$queryRaw<
+      {
+        rounds: bigint;
+        median: Prisma.Decimal | null;
+        reach2: bigint;
+        b1: bigint;
+        b2: bigint;
+        b3: bigint;
+        b4: bigint;
+        b5: bigint;
+        b6: bigint;
+      }[]
+    >`
+      SELECT count(*)::bigint AS rounds,
+             percentile_disc(0.5) WITHIN GROUP (ORDER BY crash_point) AS median,
+             count(*) FILTER (WHERE crash_point >= 2)::bigint AS reach2,
+             count(*) FILTER (WHERE crash_point < 1.5)::bigint AS b1,
+             count(*) FILTER (WHERE crash_point >= 1.5 AND crash_point < 2)::bigint AS b2,
+             count(*) FILTER (WHERE crash_point >= 2 AND crash_point < 5)::bigint AS b3,
+             count(*) FILTER (WHERE crash_point >= 5 AND crash_point < 10)::bigint AS b4,
+             count(*) FILTER (WHERE crash_point >= 10 AND crash_point < 100)::bigint AS b5,
+             count(*) FILTER (WHERE crash_point >= 100)::bigint AS b6
+        FROM crash_rounds
+       WHERE status = 'crashed' AND crashed_at >= ${from}`;
+    const top = await this.prisma.crashRound.findFirst({
+      where: { status: 'crashed', crashedAt: { gte: from } },
+      orderBy: [{ crashPoint: 'desc' }, { number: 'desc' }],
+      select: { number: true, crashPoint: true },
+    });
+    const rounds = Number(agg?.rounds ?? 0n);
+    const share = (n: bigint | undefined) =>
+      rounds ? money(Number(n ?? 0n)).div(rounds).times(100).toFixed(2) : '0.00';
+    const counts = [agg?.b1, agg?.b2, agg?.b3, agg?.b4, agg?.b5, agg?.b6];
+    return {
+      period,
+      from: from.toISOString(),
+      to: now.toISOString(),
+      rounds,
+      median: agg?.median ? money(agg.median.toFixed()).toFixed(2) : null,
+      expectedMedian: '1.98',
+      reach2: { share: share(agg?.reach2), expected: '49.50' },
+      highest: top?.crashPoint
+        ? { crashPoint: money(top.crashPoint.toFixed()).toFixed(2), number: top.number, ref: `CR-${top.number}` }
+        : null,
+      buckets: CRASH_STATS_BUCKETS.map((b, i) => ({
+        ...b,
+        count: Number(counts[i] ?? 0n),
+        share: share(counts[i]),
+      })),
+      houseEdgePercent: crash.CRASH_RULES.houseEdgePercent,
       isDemo: true,
     };
   }
@@ -576,23 +681,58 @@ export class CrashEngineService implements OnApplicationBootstrap, OnModuleDestr
     };
   }
 
-  async myBets(userId: string, page: number, pageSize: number) {
-    const [rows, total] = await Promise.all([
+  /**
+   * My crash bets (newest first) + a summary over the same filters (additive: `from`, `result`): bets, wagered,
+   * returned, net, wins (cashed out), losses and the best cash-out multiplier. DEMO credits only.
+   */
+  async myBets(
+    userId: string,
+    page: number,
+    pageSize: number,
+    filters: { from?: Date; result?: 'win' | 'lose' } = {},
+  ) {
+    const where: Prisma.CrashBetWhereInput = {
+      userId,
+      ...(filters.from ? { createdAt: { gte: filters.from } } : {}),
+      ...(filters.result === 'win'
+        ? { status: 'cashed_out' }
+        : filters.result === 'lose'
+          ? { status: 'lost' }
+          : {}),
+    };
+    const [rows, total, sums, wins, losses, best] = await Promise.all([
       this.prisma.crashBet.findMany({
-        where: { userId },
+        where,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
         include: { round: true },
       }),
-      this.prisma.crashBet.count({ where: { userId } }),
+      this.prisma.crashBet.count({ where }),
+      this.prisma.crashBet.aggregate({ where, _sum: { stake: true, payout: true } }),
+      this.prisma.crashBet.count({ where: { ...where, status: 'cashed_out' } }),
+      this.prisma.crashBet.count({ where: { ...where, status: 'lost' } }),
+      this.prisma.crashBet.aggregate({ where, _max: { cashOutMultiplier: true } }),
     ]);
+    const wagered = credits(sums._sum.stake);
+    const returned = credits(sums._sum.payout);
     return {
       items: rows.map((b) => this.myBet(b, b.round)),
       page,
       pageSize,
       total,
       totalPages: Math.max(1, Math.ceil(total / pageSize)),
+      summary: {
+        bets: total,
+        wagered,
+        returned,
+        net: credits(money(returned).minus(money(wagered)).toFixed()),
+        wins,
+        losses,
+        bestCashOut: best._max.cashOutMultiplier
+          ? money(best._max.cashOutMultiplier.toFixed()).toFixed(2)
+          : null,
+      },
       currency: DEMO.currency,
       isDemo: true,
     };

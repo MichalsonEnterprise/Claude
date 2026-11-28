@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   CellStack,
@@ -441,6 +442,17 @@ function LifetimeTiles() {
         },
       ]
     : null;
+  // ERR-03: a failed request is never an endless row of skeleton tiles.
+  if (!tiles && l.isError)
+    return (
+      <ErrorState
+        variant="inline"
+        error={l.error}
+        onRetry={() => void l.refetch()}
+        retrying={l.isFetching}
+        what="your lifetime totals"
+      />
+    );
   return (
     <ul className="grid grid-cols-2 gap-3 tablet:grid-cols-3 laptop:grid-cols-5">
       {(tiles ?? Array.from({ length: 5 }, () => null)).map((t, i) => (

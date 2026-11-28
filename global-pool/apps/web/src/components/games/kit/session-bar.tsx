@@ -281,12 +281,13 @@ export function GameSessionBar({
           </div>
         )}
         <DemoBadge size="s" />
+        {/* own row under the stats — as a sibling flex item it squeezed the stats into a column at ≥ 1280 */}
+        {state === 'reached' && (
+          <p role="status" className="basis-full text-body-s text-text-danger">
+            New bets are paused. Your history and withdrawals stay available.
+          </p>
+        )}
       </div>
-      {state === 'reached' && (
-        <p role="status" className="text-body-s text-text-danger">
-          New bets are paused. Your history and withdrawals stay available.
-        </p>
-      )}
       <div className="flex flex-wrap items-center gap-2">
         <AgeBadge />
         <Popover open={open} onOpenChange={setOpen}>

@@ -22,6 +22,16 @@ describe('config validation', () => {
     expect(env.ADMIN_SESSION_TTL).toBe(28_800);
   });
 
+  it('CRASH_LOOP_ENABLED is optional (unset = follow JOBS_ENABLED) and parsed as a boolean', () => {
+    expect(parseEnv(base).CRASH_LOOP_ENABLED).toBeUndefined();
+    expect(parseEnv({ ...base, CRASH_LOOP_ENABLED: '' }).CRASH_LOOP_ENABLED).toBeUndefined();
+    expect(parseEnv({ ...base, JOBS_ENABLED: 'false', CRASH_LOOP_ENABLED: 'true' })).toMatchObject({
+      JOBS_ENABLED: false,
+      CRASH_LOOP_ENABLED: true,
+    });
+    expect(() => parseEnv({ ...base, CRASH_LOOP_ENABLED: 'maybe' })).toThrow(/CRASH_LOOP_ENABLED/);
+  });
+
   it('refuses to boot with REAL_MONEY_ENABLED=true', () => {
     expect(() => parseEnv({ ...base, REAL_MONEY_ENABLED: 'true' })).toThrow(/REAL_MONEY_ENABLED/);
   });

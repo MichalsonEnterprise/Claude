@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { z } from 'zod';
 import {
   blackjackActionSchema,
   cashOutSchema,
@@ -47,6 +48,9 @@ class StartHiloDto extends createZodDto(startHiloSchema) {}
 class HiloActionDto extends createZodDto(hiloActionSchema) {}
 class CashOutDto extends createZodDto(cashOutSchema) {}
 class CrashBetDto extends createZodDto(crashBetSchema) {}
+class CrashStatsQueryDto extends createZodDto(
+  z.object({ period: z.enum(['24h', '7d', '30d']).default('24h') }),
+) {}
 
 /** Bets per IP per minute on the game write routes (on top of the global throttler). */
 const betLimit = () => Number(process.env.GAMES_BET_THROTTLE_LIMIT ?? 600);
@@ -232,9 +236,25 @@ export class CrashController {
   }
 
   @Get('rounds')
-  @ApiOperation({ summary: 'Crashed rounds with revealed seeds and crash points' })
+  @ApiOperation({
+    summary:
+      'Crashed rounds with revealed seeds and crash points, players / wagered / paid out (DEMO); optional `from` (crashed at / after) and `search` (round "CR-55102" or "55102")',
+  })
   rounds(@Query() q: BetsQueryDto) {
-    return this.crash.rounds(q.page, q.pageSize);
+    const number = q.search ? Number(q.search.replace(/^[A-Za-z]*-?/, '')) : undefined;
+    return this.crash.rounds(q.page, q.pageSize, {
+      from: q.from ? new Date(q.from) : undefined,
+      number: number !== undefined && Number.isSafeInteger(number) ? number : undefined,
+    });
+  }
+
+  @Get('stats')
+  @ApiOperation({
+    summary:
+      'Public statistics of crashed rounds (24h / 7d / 30d): count, median, share reaching 2.00×, highest crash, distribution vs the published expectation',
+  })
+  stats(@Query() q: CrashStatsQueryDto) {
+    return this.crash.stats(q.period);
   }
 
   @Get('rounds/:number')
@@ -254,7 +274,10 @@ export class CrashController {
   @Get('bets')
   @PlayerAuth()
   myBets(@CurrentUser() user: AuthUser, @Query() q: BetsQueryDto) {
-    return this.crash.myBets(user.id, q.page, q.pageSize);
+    return this.crash.myBets(user.id, q.page, q.pageSize, {
+      from: q.from ? new Date(q.from) : undefined,
+      result: q.result,
+    });
   }
 
   @Get('bets/current')

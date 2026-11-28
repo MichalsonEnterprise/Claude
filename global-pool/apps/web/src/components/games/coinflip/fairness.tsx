@@ -2,6 +2,7 @@
 
 import { CLIENT_SEED_PATTERN, sha256Hex, type CoinSide } from '@gp/shared/fair';
 import { formatCount, formatDateTimeUTC } from '@gp/shared/format';
+import { formatAmount } from '@gp/shared/money';
 import {
   BookOpen,
   CircleCheck,
@@ -19,7 +20,15 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
-import { CopyValue, CreditsAmount, KitChip, SeedLine, GAMES_ROUTES, shortHash, verifyInBrowser } from '@/components/games/kit';
+import {
+  CopyValue,
+  CreditsAmount,
+  KitChip,
+  SeedLine,
+  GAMES_ROUTES,
+  shortHash,
+  verifyInBrowser,
+} from '@/components/games/kit';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Field, Input, InputControl, InputGroup } from '@/components/ui/input';
@@ -52,9 +61,20 @@ import {
 } from './coinflip-math';
 import { COINFLIP_ROUTES } from './routes';
 
-const CARD = 'flex min-w-0 flex-col gap-4 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-6';
+const CARD =
+  'flex min-w-0 flex-col gap-4 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-6';
 
-function CardTitle({ icon: Icon, title, sub, aside }: { icon: LucideIcon; title: string; sub?: string; aside?: React.ReactNode }) {
+function CardTitle({
+  icon: Icon,
+  title,
+  sub,
+  aside,
+}: {
+  icon: LucideIcon;
+  title: string;
+  sub?: string;
+  aside?: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-3">
       <Icon aria-hidden className="mt-0.5 size-5 shrink-0 text-icon-brand" />
@@ -62,7 +82,9 @@ function CardTitle({ icon: Icon, title, sub, aside }: { icon: LucideIcon; title:
         <h2 className="text-h5 text-text-primary">{title}</h2>
         {sub && <p className="text-caption text-text-tertiary">{sub}</p>}
       </div>
-      <div className="ml-auto flex shrink-0 items-center gap-2">{aside ?? <DemoBadge size="s" />}</div>
+      <div className="ml-auto flex shrink-0 items-center gap-2">
+        {aside ?? <DemoBadge size="s" />}
+      </div>
     </div>
   );
 }
@@ -86,11 +108,19 @@ function safeSha(s: string): string {
 function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => void }) {
   const bet = v.bet as unknown as CoinflipBet;
   const rotate = useRotateSeed(SLUG);
-  const [edit, setEdit] = React.useState<{ serverSeed: string; clientSeed: string; nonce: string } | null>(null);
+  const [edit, setEdit] = React.useState<{
+    serverSeed: string;
+    clientSeed: string;
+    nonce: string;
+  } | null>(null);
   React.useEffect(() => {
     setEdit(
       v.verify.serverSeed
-        ? { serverSeed: v.verify.serverSeed, clientSeed: v.verify.clientSeed, nonce: String(v.verify.nonce) }
+        ? {
+            serverSeed: v.verify.serverSeed,
+            clientSeed: v.verify.clientSeed,
+            nonce: String(v.verify.nonce),
+          }
         : null,
     );
   }, [v.verify.serverSeed, v.verify.clientSeed, v.verify.nonce]);
@@ -98,12 +128,19 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
   const check = React.useMemo(
     () =>
       edit && nonceNum !== null
-        ? verifyInBrowser(v, { serverSeed: edit.serverSeed.trim(), clientSeed: edit.clientSeed.trim(), nonce: nonceNum })
+        ? verifyInBrowser(v, {
+            serverSeed: edit.serverSeed.trim(),
+            clientSeed: edit.clientSeed.trim(),
+            nonce: nonceNum,
+          })
         : null,
     [v, edit, nonceNum],
   );
   const edited =
-    !!edit && (edit.serverSeed !== v.verify.serverSeed || edit.clientSeed !== v.verify.clientSeed || edit.nonce !== String(v.verify.nonce));
+    !!edit &&
+    (edit.serverSeed !== v.verify.serverSeed ||
+      edit.clientSeed !== v.verify.clientSeed ||
+      edit.nonce !== String(v.verify.nonce));
   const computedSide = (check?.result?.outcome as { side?: CoinSide } | undefined)?.side;
   const hashOfInput = edit ? safeSha(edit.serverSeed.trim()) : '';
 
@@ -111,34 +148,56 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
     try {
       await rotate.mutateAsync(undefined);
       onRevealed();
-      toast({ type: 'success', title: 'Seed pair rotated', description: 'The server seed is revealed — recomputing your flip.' });
+      toast({
+        type: 'success',
+        title: 'Seed pair rotated',
+        description: 'The server seed is revealed — recomputing your flip.',
+      });
     } catch (err) {
-      toast({ type: 'error', title: 'Could not rotate seeds', description: classifyGameError(err).message });
+      toast({
+        type: 'error',
+        title: 'Could not rotate seeds',
+        description: classifyGameError(err).message,
+      });
     }
   };
 
   return (
-    <section aria-labelledby="verify-title" className={cn(CARD, check?.matches ? 'border-border-brand' : check ? 'border-border-danger' : '')}>
+    <section
+      aria-labelledby="verify-title"
+      className={cn(
+        CARD,
+        check?.matches ? 'border-border-brand' : check ? 'border-border-danger' : '',
+      )}
+    >
       <div className="flex items-start gap-3">
         <ShieldCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-icon-brand" />
         <div className="flex min-w-0 flex-col">
           <h2 id="verify-title" className="text-h5 text-text-primary">
             Verify a result
           </h2>
-          <p className="text-caption text-text-tertiary">Recompute flip {bet.ref} — runs in your browser</p>
+          <p className="text-caption text-text-tertiary">
+            Recompute flip {bet.ref} — runs in your browser
+          </p>
         </div>
         <DemoBadge size="s" className="ml-auto" />
       </div>
 
       {!v.revealed || !edit ? (
         <>
-          <div className="flex items-start gap-3 rounded-lg border border-status-info bg-status-info-tint p-4" role="status">
+          <div
+            className="flex items-start gap-3 rounded-lg border border-status-info bg-status-info-tint p-4"
+            role="status"
+          >
             <Lock aria-hidden className="mt-0.5 size-5 shrink-0 text-text-info" />
             <div className="flex flex-col gap-2 text-body-s">
-              <p className="text-body-s-strong text-text-primary">The server seed of this pair is still secret.</p>
+              <p className="text-body-s-strong text-text-primary">
+                The server seed of this pair is still secret.
+              </p>
               <p className="text-text-secondary">
-                Rotate your seed pair to reveal it — then {bet.ref} (and every other flip made with the pair) can be
-                recomputed here. Rotating never changes a result: it only reveals the seed you were committed to.
+                Rotate your seed pair to reveal it — then {bet.ref} (and every other flip made with
+                the pair) can be recomputed here. Rotating never changes a result: it only reveals
+                the seed you were committed to.
               </p>
               <Button
                 size="s"
@@ -152,7 +211,10 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
               </Button>
             </div>
           </div>
-          <SeedLine label="Server seed hash (committed before the bet)" value={v.verify.serverSeedHash} />
+          <SeedLine
+            label="Server seed hash (committed before the bet)"
+            value={v.verify.serverSeedHash}
+          />
           <div className="grid grid-cols-[1fr_120px] gap-3">
             <SeedLine label="Client seed" value={v.verify.clientSeed} />
             <SeedLine label="Nonce" value={String(v.verify.nonce)} />
@@ -177,10 +239,17 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
             </InputGroup>
           </Field>
           <div className="flex flex-col gap-1">
-            <span className="text-caption text-text-tertiary">Server seed hash (committed before the bet)</span>
+            <span className="text-caption text-text-tertiary">
+              Server seed hash (committed before the bet)
+            </span>
             <div className="flex min-h-11 items-center gap-2 rounded-md border border-border-subtle bg-bg-secondary px-3">
-              <span className="min-w-0 flex-1 break-all font-mono text-mono-s text-text-primary">{v.verify.serverSeedHash}</span>
-              <Lock aria-label="Locked — published before the flip" className="size-4 shrink-0 text-icon-muted" />
+              <span className="min-w-0 flex-1 break-all font-mono text-mono-s text-text-primary">
+                {v.verify.serverSeedHash}
+              </span>
+              <Lock
+                aria-label="Locked — published before the flip"
+                className="size-4 shrink-0 text-icon-muted"
+              />
             </div>
           </div>
           <div className="grid grid-cols-[1fr_120px] gap-3">
@@ -209,7 +278,9 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-col">
                 <span className="text-caption text-text-tertiary">SHA-256(revealed seed)</span>
-                <span className="font-mono text-mono-s text-text-primary">{shortHash(hashOfInput, 12, 8)}</span>
+                <span className="font-mono text-mono-s text-text-primary">
+                  {shortHash(hashOfInput, 12, 8)}
+                </span>
               </div>
               {check?.commitmentValid ? (
                 <KitChip icon={CircleCheck} tone="brand">
@@ -238,21 +309,34 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
           </div>
 
           {check?.matches ? (
-            <div role="status" className="flex items-start gap-3 rounded-lg border border-border-brand bg-brand-tint-subtle p-4" data-testid="verify-ok">
+            <div
+              role="status"
+              className="flex items-start gap-3 rounded-lg border border-border-brand bg-brand-tint-subtle p-4"
+              data-testid="verify-ok"
+            >
               <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-icon-brand" />
               <div>
-                <p className="text-body-s-strong text-text-brand">Verified — the result was fixed before you bet</p>
+                <p className="text-body-s-strong text-text-brand">
+                  Verified — the result was fixed before you bet
+                </p>
                 <p className="text-body-s text-text-secondary">
-                  The revealed seed hashes to the commitment shown before flip {bet.ref}, and HMAC-SHA256(server seed,
-                  client seed:nonce:0) reproduces {sideLabel(bet.outcome.side)} — the recorded result.
+                  The revealed seed hashes to the commitment shown before flip {bet.ref}, and
+                  HMAC-SHA256(server seed, client seed:nonce:0) reproduces{' '}
+                  {sideLabel(bet.outcome.side)} — the recorded result.
                 </p>
               </div>
             </div>
           ) : (
-            <div role="alert" className="flex items-start gap-3 rounded-lg border border-border-danger bg-status-danger-tint p-4" data-testid="verify-failed">
+            <div
+              role="alert"
+              className="flex items-start gap-3 rounded-lg border border-border-danger bg-status-danger-tint p-4"
+              data-testid="verify-failed"
+            >
               <CircleX aria-hidden className="mt-0.5 size-5 shrink-0 text-text-danger" />
               <div className="flex flex-col gap-1">
-                <p className="text-body-s-strong text-text-primary">Verification failed — the inputs don’t reproduce {bet.ref}</p>
+                <p className="text-body-s-strong text-text-primary">
+                  Verification failed — the inputs don’t reproduce {bet.ref}
+                </p>
                 <p className="text-body-s text-text-secondary">
                   {check?.error
                     ? check.error
@@ -267,20 +351,28 @@ function Verifier({ v, onRevealed }: { v: BetVerification; onRevealed: () => voi
           <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={() =>
-                setEdit({ serverSeed: v.verify.serverSeed!, clientSeed: v.verify.clientSeed, nonce: String(v.verify.nonce) })
+                setEdit({
+                  serverSeed: v.verify.serverSeed!,
+                  clientSeed: v.verify.clientSeed,
+                  nonce: String(v.verify.nonce),
+                })
               }
               leadingIcon={edited ? <RefreshCw aria-hidden /> : <ShieldCheck aria-hidden />}
               className="min-h-11 tablet:min-h-10"
             >
               {edited ? `Use the seeds of ${bet.ref}` : 'Verify again'}
             </Button>
-            <Link href={GAMES_ROUTES.provablyFair} className="ml-auto inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-brand hover:underline tablet:min-h-0">
+            <Link
+              href={GAMES_ROUTES.provablyFair}
+              className="ml-auto inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-brand hover:underline tablet:min-h-0"
+            >
               <BookOpen aria-hidden className="size-4" /> How verification works
             </Link>
           </div>
           <p className="text-caption text-text-tertiary">
-            Recomputed with <code className="font-mono">verifyBet()</code> from @gp/shared/fair — the same code the server
-            settles with. Server check: {v.matches === null ? 'pending' : v.matches ? 'match' : 'mismatch'}.
+            Recomputed with <code className="font-mono">verifyBet()</code> from @gp/shared/fair —
+            the same code the server settles with. Server check:{' '}
+            {v.matches === null ? 'pending' : v.matches ? 'match' : 'mismatch'}.
           </p>
         </>
       )}
@@ -293,13 +385,26 @@ function OwnTools({ v }: { v: BetVerification }) {
   const bet = v.bet as unknown as CoinflipBet;
   const seed = v.verify.serverSeed;
   const check = React.useMemo(
-    () => (seed ? verifyInBrowser(v, { serverSeed: seed, clientSeed: v.verify.clientSeed, nonce: v.verify.nonce }) : null),
+    () =>
+      seed
+        ? verifyInBrowser(v, {
+            serverSeed: seed,
+            clientSeed: v.verify.clientSeed,
+            nonce: v.verify.nonce,
+          })
+        : null,
     [v, seed],
   );
   const u32 = u32OfBlock(check?.firstBlock ?? null) ?? bet.outcome.u32;
   const lines: [string, string][] = [
-    [`server_seed = "${seed ? shortHash(seed, 8, 7) : '(secret until you rotate)'}"`, '# revealed at rotation'],
-    [`sha256(server_seed) == "${shortHash(v.verify.serverSeedHash, 8, 8)}"`, seed && check?.commitmentValid ? '# ✓ matches commitment' : '# commitment'],
+    [
+      `server_seed = "${seed ? shortHash(seed, 8, 7) : '(secret until you rotate)'}"`,
+      '# revealed at rotation',
+    ],
+    [
+      `sha256(server_seed) == "${shortHash(v.verify.serverSeedHash, 8, 8)}"`,
+      seed && check?.commitmentValid ? '# ✓ matches commitment' : '# commitment',
+    ],
     [`h = HMAC_SHA256(key=server_seed, msg="${v.verify.clientSeed}:${v.verify.nonce}:0")`, ''],
     ['x = int(h[0:8], 16) / 2**32', `# ${u32Hex(u32)} → ${u32Fraction(u32)}`],
     ['side = "Heads" if x < 0.5 else "Tails"', `# → ${sideLabel(sideOfU32(u32))}`],
@@ -316,14 +421,29 @@ function OwnTools({ v }: { v: BetVerification }) {
       <pre className="no-scrollbar overflow-x-auto rounded-lg border border-border-subtle bg-bg-secondary p-4 font-mono text-mono-s leading-6">
         {lines.map(([code, comment], i) => (
           <div key={i} className="whitespace-pre">
-            <span className={i === 1 && check?.commitmentValid ? 'text-text-success' : i === 4 ? 'text-text-brand' : 'text-text-primary'}>{code}</span>
-            {comment && <span className="text-text-tertiary">{'  '}{comment}</span>}
+            <span
+              className={
+                i === 1 && check?.commitmentValid
+                  ? 'text-text-success'
+                  : i === 4
+                    ? 'text-text-brand'
+                    : 'text-text-primary'
+              }
+            >
+              {code}
+            </span>
+            {comment && (
+              <span className="text-text-tertiary">
+                {'  '}
+                {comment}
+              </span>
+            )}
           </div>
         ))}
       </pre>
       <p className="text-caption text-text-tertiary">
-        Values of flip {bet.ref} ({v.verify.rulesVersion}). The byte order and mapping are published in the rules; they
-        never depend on your bet size or your pick.
+        Values of flip {bet.ref} ({v.verify.rulesVersion}). The byte order and mapping are published
+        in the rules; they never depend on your bet size or your pick.
       </p>
     </section>
   );
@@ -349,7 +469,11 @@ function YourSeeds() {
         description: `Server seed ${shortHash(r.revealed.serverSeed)} revealed — new hash ${shortHash(r.active.serverSeedHash)} committed.`,
       });
     } catch (err) {
-      toast({ type: 'error', title: 'Could not change seeds', description: classifyGameError(err).message });
+      toast({
+        type: 'error',
+        title: 'Could not change seeds',
+        description: classifyGameError(err).message,
+      });
     }
   };
   return (
@@ -376,7 +500,8 @@ function YourSeeds() {
               <div className="flex flex-col gap-0.5">
                 <p className="text-body-s-strong text-text-brand">Seed pair rotated</p>
                 <p className="text-caption text-text-secondary">
-                  The previous server seed is revealed below — use it to verify your last {prev.bets} bet
+                  The previous server seed is revealed below — use it to verify your last{' '}
+                  {prev.bets} bet
                   {prev.bets === 1 ? '' : 's'}. New bets use the new pair from nonce 0.
                 </p>
               </div>
@@ -384,9 +509,14 @@ function YourSeeds() {
           )}
           {prev?.serverSeed && (
             <div className="flex flex-col gap-1">
-              <SeedLine label="Previous server seed (revealed)" value={prev.serverSeed} display={shortHash(prev.serverSeed, 16, 12)} />
+              <SeedLine
+                label="Previous server seed (revealed)"
+                value={prev.serverSeed}
+                display={shortHash(prev.serverSeed, 16, 12)}
+              />
               <p className="text-caption text-text-tertiary">
-                SHA-256 of this value = the hash you were shown before betting ({shortHash(prev.serverSeedHash)}).
+                SHA-256 of this value = the hash you were shown before betting (
+                {shortHash(prev.serverSeedHash)}).
               </p>
             </div>
           )}
@@ -397,7 +527,12 @@ function YourSeeds() {
                 LIVE
               </KitChip>
             </span>
-            <SeedLine label="Committed server seed hash" value={a.serverSeedHash} display={shortHash(a.serverSeedHash, 16, 12)} className="[&>span:first-child]:sr-only" />
+            <SeedLine
+              label="Committed server seed hash"
+              value={a.serverSeedHash}
+              display={shortHash(a.serverSeedHash, 16, 12)}
+              className="[&>span:first-child]:sr-only"
+            />
             <p className="text-caption text-text-tertiary">
               Committed before your next bet — the unhashed seed stays secret until you rotate.
             </p>
@@ -405,7 +540,9 @@ function YourSeeds() {
           <Field
             label="Client seed"
             helper="Yours to change at any time — it is mixed into every result. Changing it reveals the current server seed."
-            error={client && !valid ? 'Use 1–64 letters, digits, dot, dash or underscore.' : undefined}
+            error={
+              client && !valid ? 'Use 1–64 letters, digits, dot, dash or underscore.' : undefined
+            }
           >
             <InputGroup size="l">
               <InputControl
@@ -432,7 +569,9 @@ function YourSeeds() {
             <div className="flex flex-col">
               <span className="text-caption text-text-tertiary">Next nonce</span>
               <span className="font-mono text-h4 text-text-primary">{a.nonce}</span>
-              <span className="text-caption text-text-tertiary">Resets to 0 with every new pair</span>
+              <span className="text-caption text-text-tertiary">
+                Resets to 0 with every new pair
+              </span>
             </div>
             <div className="flex flex-col items-end gap-1">
               <Button
@@ -444,7 +583,11 @@ function YourSeeds() {
               >
                 Rotate seed
               </Button>
-              {prev?.endedAt && <span className="text-caption text-text-tertiary">Last rotated {formatDateTimeUTC(prev.endedAt)}</span>}
+              {prev?.endedAt && (
+                <span className="text-caption text-text-tertiary">
+                  Last rotated {formatDateTimeUTC(prev.endedAt)}
+                </span>
+              )}
             </div>
           </div>
         </>
@@ -468,10 +611,13 @@ function HowDecided({ bet }: { bet: CoinflipBet | null }) {
         ? `First 4 bytes ${u32Hex(o.u32)} = ${formatCount(o.u32)} ÷ 4,294,967,296 = ${u32Fraction(o.u32)}`
         : 'First 4 bytes ÷ 4,294,967,296 = x (between 0 and 1).',
     ],
-    ['Map', `Below 0.5000 → Heads · 0.5000 or above → Tails.${o ? ` Here: ${sideLabel(o.side)}.` : ''}`],
+    [
+      'Map',
+      `Below 0.5000 → Heads · 0.5000 or above → Tails.${o ? ` Here: ${sideLabel(o.side)}.` : ''}`,
+    ],
     [
       'Pay',
-      `A correct pick pays ${MULTIPLIER}× (house edge ${HOUSE_EDGE}%).${bet ? ` ${bet.stake} → ${payoutOnWin(bet.stake)} DEMO.` : ''}`,
+      `A correct pick pays ${MULTIPLIER}× (house edge ${HOUSE_EDGE}%).${bet ? ` ${formatAmount(bet.stake)} → ${formatAmount(payoutOnWin(bet.stake))} DEMO.` : ''}`,
     ],
   ];
   return (
@@ -499,7 +645,8 @@ function HowDecided({ bet }: { bet: CoinflipBet | null }) {
         <div className="flex flex-wrap items-center gap-3 border-t border-border-subtle pt-4">
           <CoinFace side={o.side} size={44} />
           <span className="text-body-s-strong text-text-primary">
-            Flip {bet.ref} · {sideLabel(o.side)} · {bet.win ? 'Win' : 'Lose'} <CreditsAmount value={bet.net} signed tone="net" />
+            Flip {bet.ref} · {sideLabel(o.side)} · {bet.win ? 'Win' : 'Lose'}{' '}
+            <CreditsAmount value={bet.net} signed tone="net" />
           </span>
           <DemoBadge size="xs" />
         </div>
@@ -560,14 +707,22 @@ export function CoinflipFairnessPage() {
         </>
       }
       actions={
-        <Button variant="secondary" asChild className="min-h-11 tablet:min-h-10" leadingIcon={<History aria-hidden />}>
+        <Button
+          variant="secondary"
+          asChild
+          className="min-h-11 tablet:min-h-10"
+          leadingIcon={<History aria-hidden />}
+        >
           <Link href={COINFLIP_ROUTES.myFlips}>My flips</Link>
         </Button>
       }
     >
       <div className="grid gap-5 laptop:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] tablet:gap-6">
         <div className="flex min-w-0 flex-col gap-5 tablet:gap-6">
-          <form onSubmit={(e) => void find(e)} className="flex flex-col gap-2 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:flex-row tablet:items-end tablet:p-5">
+          <form
+            onSubmit={(e) => void find(e)}
+            className="flex flex-col gap-2 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:flex-row tablet:items-end tablet:p-5"
+          >
             <Field label="Game" className="tablet:w-44">
               <Input size="l" value="Double Side" readOnly aria-readonly />
             </Field>
@@ -586,7 +741,13 @@ export function CoinflipFairnessPage() {
                 />
               </InputGroup>
             </Field>
-            <Button type="submit" variant="secondary" size="l" loading={looking} className="min-h-12">
+            <Button
+              type="submit"
+              variant="secondary"
+              size="l"
+              loading={looking}
+              className="min-h-12"
+            >
               Load flip
             </Button>
           </form>
@@ -595,7 +756,8 @@ export function CoinflipFairnessPage() {
             <div className={CARD}>
               <CardTitle icon={ShieldCheck} title="Verify a result" />
               <p className="text-body-s text-text-secondary">
-                No flips yet. Play Double Side and come back — every flip can be recomputed here from the seeds.
+                No flips yet. Play Double Side and come back — every flip can be recomputed here
+                from the seeds.
               </p>
               <Button asChild className="w-fit">
                 <Link href={COINFLIP_ROUTES.play}>Play Double Side</Link>

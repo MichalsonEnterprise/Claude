@@ -17,7 +17,8 @@
 //             infinite skeleton (runs on TIMEOUT_ROUTES only — every visit takes ~TIMEOUT_WAIT_MS)
 //   validation  form scenarios (client-side + server 400 VALIDATION_FAILED); see VALIDATION below
 // "Data requests" = every API call except the auth bootstrap (dev token, /auth/session, GET /me, /auth/config,
-// /admin/auth/*), so the identity stays signed in while the page's own data fails. `down` fails everything.
+// /admin/auth/*) and the geo gate (GET /compliance/geo), so the identity stays signed in while the page's own data
+// fails. `down` fails everything. The PUB-22 age gate is pre-confirmed in every context (gates.spec.ts tests it).
 //
 // Per visit it flags: crash (page error / "Application error"), blank (no content, no skeleton, no message),
 // raw (raw error strings: "Failed to fetch", "502 Bad Gateway", HTTP_ERROR, TypeError, [object Object], NaN,
@@ -38,7 +39,7 @@
 // Env:
 //   STATES   comma list (default ok,empty,down,500,502,429,503,slow,timeout,validation)
 //   WIDTHS   (1440,390) · ONLY regex on the route path · CONCURRENCY parallel pages (4) · SHOTS=false
-//   SKELETON_MS (12000) · SLOW_MS (4000) · TIMEOUT_WAIT_MS (40000) · TIMEOUT_ROUTES regex (representative set)
+//   SKELETON_MS (15000) · SLOW_MS (4000) · TIMEOUT_WAIT_MS (65000) · TIMEOUT_ROUTES regex (representative set)
 //   BASELINE=path/to/report.json → cells that failed there and pass now are marked "fixed" in the matrix
 //   OUT (default apps/web/test-results/visual/qa-states)
 // Output: <OUT>/<state>/<route-slug>_<w>.png (+ _early for slow), report.json, matrix.md (route × state),
@@ -75,9 +76,11 @@ const STATES = (process.env.STATES ?? ALL_STATES.join(',')).split(',').filter(Bo
 const WIDTHS = (process.env.WIDTHS ?? '1440,390').split(',').map(Number);
 const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null;
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 4);
-const SKELETON_MS = Number(process.env.SKELETON_MS ?? 12_000);
+const SKELETON_MS = Number(process.env.SKELETON_MS ?? 15_000);
 const SLOW_MS = Number(process.env.SLOW_MS ?? 4_000);
-const TIMEOUT_WAIT_MS = Number(process.env.TIMEOUT_WAIT_MS ?? 40_000);
+// > 2 × the 20 s client timeout: with more than 6 requests to a hung API the browser queues the rest (HTTP/1.1
+// per-host limit) until the first ones time out, so a busy page's last error appears after ~2 × 20 s.
+const TIMEOUT_WAIT_MS = Number(process.env.TIMEOUT_WAIT_MS ?? 65_000);
 const TIMEOUT_ROUTES = new RegExp(
   process.env.TIMEOUT_ROUTES ??
     '^/(pool|wallet|wallet/history|dashboard|account|history/transactions|responsible-gaming|notifications|admin|admin/users|admin/finance/withdrawals|admin/pool/rounds)$',
@@ -127,6 +130,8 @@ const ROUTES = walk(APP_DIR)
   })
   .filter((r) => !EXCLUDED.test(r.pattern))
   .sort((a, b) => a.pattern.localeCompare(b.pattern));
+/** Steps that are their own screen but share a route (URL state): audited like routes. */
+const EXTRA_URLS = ['/wallet/deposit?step=address', '/wallet/withdraw?step=address'];
 
 // ── API helpers ──────────────────────────────────────────────────────────────────────────────────────────────
 async function api(p, { token, method = 'GET', body } = {}) {
@@ -156,7 +161,8 @@ const usedCodes = new Set();
 async function adminLogin(roleKey) {
   const who = admins.find((a) => (a.roles ?? []).includes(roleKey));
   if (!who) throw new Error(`No DEMO admin with role ${roleKey}`);
-  for (let attempt = 0; attempt < 5; attempt++) {
+  // every accepted TOTP step is single-use, so parallel workers each wait for a fresh 30 s window
+  for (let attempt = 0; attempt < 14; attempt++) {
     const code = totp(who.totpSecret);
     const key = `${who.email}:${code}`;
     if (!usedCodes.has(key)) {
@@ -266,6 +272,9 @@ const BOOTSTRAP = [
   /^GET \/me$/,
   /^GET \/auth\/config$/,
   /^(GET|POST) \/admin\/auth\//,
+  // PUB-21 geo gate (app/(app)/layout.tsx): fails open on an error (the API enforces), but it holds the page while
+  // pending — kept answering so a page's own states are measured, not the gate's sequencing (gates.spec.ts owns it).
+  /^GET \/compliance\/geo$/,
 ];
 /** Requests made by the shell chrome on every page (balance pill, pool tile, entries count, unread count). */
 const SHELL_DATA = [
@@ -274,14 +283,19 @@ const SHELL_DATA = [
   /^GET \/pool\/rounds\/[^/]+\/my-entries$/,
   /^GET \/notifications$/,
   /^GET \/auth\/new-device-alerts$/,
+  // region banner + per-page region notes (RegionCheck / onboarding show a readable fallback when it fails)
+  /^GET \/compliance\/region$/,
   /^(GET|POST) \/responsible-gaming\/(session|play-heartbeat|reality-check)/,
 ];
+/** Admin console chrome (nav badges, environment label) — page data only on the pages that show it. */
+const ADMIN_SHELL_DATA = /^GET \/admin\/(dashboard|system\/health|alerts|approvals\/inbox)$/;
+const ADMIN_SHELL_OWNERS = /^\/admin(\/alerts|\/approvals)?$/;
 const envelope = (code, message, statusCode, details) =>
   JSON.stringify({
     error: { code, message, statusCode, requestId: `qa-states-${statusCode}`, details },
   });
 
-async function installRoutes(page, state, counters) {
+async function installRoutes(page, state, counters, pageUrl = '') {
   await page.route(
     (u) => u.href.startsWith(API),
     async (route) => {
@@ -295,7 +309,10 @@ async function installRoutes(page, state, counters) {
       const socket = u.pathname.startsWith('/socket.io');
       if (!bootstrap && !socket) {
         counters.data += 1;
-        if (!SHELL_DATA.some((re) => re.test(key))) counters.page += 1;
+        const shell =
+          SHELL_DATA.some((re) => re.test(key)) ||
+          (ADMIN_SHELL_DATA.test(key) && !ADMIN_SHELL_OWNERS.test(pageUrl));
+        if (!shell) counters.page += 1;
       }
       if (state === 'down') return route.abort('connectionrefused');
       if (state === 'slow') {
@@ -437,7 +454,7 @@ async function visit(page, state, url, width) {
   const onErr = (e) => pageErrors.push(String(e?.message ?? e).slice(0, 300));
   page.on('pageerror', onErr);
   await page.unroute('**/*').catch(() => undefined);
-  await installRoutes(page, state, counters);
+  await installRoutes(page, state, counters, url);
   const rec = { state, url, width, problems: [] };
   try {
     await page.goto(`${BASE}${url}`, { waitUntil: 'domcontentloaded', timeout: 90_000 });
@@ -506,7 +523,8 @@ const VALIDATION = [
     url: '/responsible-gaming/deposit-limits',
     identity: 'fresh',
     name: 'deposit limit: server answers 400 VALIDATION_FAILED',
-    intercept: { method: 'POST', path: /\/responsible-gaming\/limits/ },
+    // limits are saved with PUT /responsible-gaming/limits (rgApi.setLimit)
+    intercept: { method: 'PUT', path: /\/responsible-gaming\/limits$/ },
     run: async (page) => {
       const input = page.locator('input[inputmode="decimal"], input[type="text"]').first();
       await input.fill('250');
@@ -521,14 +539,17 @@ const VALIDATION = [
           .click()
           .catch(() => undefined);
     },
-    expect: /amount|limit|valid|check/i,
+    expect: /Amount must be at most 1,000,000\.00/,
   },
   {
     url: '/wallet/withdraw?step=address',
     identity: 'nova',
     name: 'withdraw: malformed address',
     run: async (page) => {
-      const input = page.getByRole('textbox').first();
+      // a player with saved addresses picks "Use a new address" first (WAL-12)
+      const fresh = page.getByText('Use a new address').first();
+      if (await fresh.count()) await fresh.click();
+      const input = page.locator('main input[type="text"], main input:not([type])').first();
       await input.fill('0x123-not-an-address');
       await input.blur();
     },
@@ -550,7 +571,11 @@ async function runValidation(page, scenario, width) {
         route.request().method() === scenario.intercept.method
           ? route.fulfill({
               status: 400,
-              headers: { 'access-control-allow-origin': BASE },
+              // credentialed requests: without allow-credentials the browser hides the response (a network error)
+              headers: {
+                'access-control-allow-origin': BASE,
+                'access-control-allow-credentials': 'true',
+              },
               contentType: 'application/json',
               body: JSON.stringify({
                 error: {
@@ -571,9 +596,18 @@ async function runValidation(page, scenario, width) {
     await page.waitForTimeout(1500);
     const info = await inspect(page);
     rec.alerts = info.alerts;
+    // field errors: the message an invalid control points at (Field wires aria-describedby → `${id}-message`)
     const messages = await page
-      .locator('[aria-invalid="true"], [role="alert"], [id$="-error"], [data-slot="field-error"]')
-      .allInnerTexts()
+      .evaluate(() => {
+        const out = [];
+        for (const el of document.querySelectorAll('[aria-invalid="true"]')) {
+          for (const id of (el.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean))
+            out.push(document.getElementById(id)?.innerText ?? '');
+        }
+        for (const el of document.querySelectorAll('[role="alert"], [data-slot="field-error"]'))
+          out.push(el.innerText);
+        return out;
+      })
       .catch(() => []);
     rec.messages = messages
       .map((m) => m.trim())
@@ -601,6 +635,18 @@ async function newContext(browser, identity, sessions) {
     viewport: { width: 1440, height: 900 },
     reducedMotion: 'reduce',
   });
+  // PUB-22 age gate (tested by e2e/gates.spec.ts): confirmed up front so its modal doesn't cover every state shot.
+  await ctx.addInitScript((key) => {
+    try {
+      if (!localStorage.getItem(key))
+        localStorage.setItem(
+          key,
+          JSON.stringify({ confirmedAt: new Date().toISOString(), country: 'PT' }),
+        );
+    } catch {
+      /* ignore */
+    }
+  }, 'gp.ageGate');
   if (identity === 'nova' || identity === 'fresh' || identity === 'fresh-unonboarded') {
     let who;
     if (identity === 'nova') who = { did: NOVA_DID, email: 'nova.k@example.com' };
@@ -668,9 +714,10 @@ async function reseedAdmin(slot) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────────────────────────────────────
 const ids = await resolveIds();
-const urls = ROUTES.map((r) => ({ pattern: r.pattern, url: urlFor(r.pattern, ids) })).filter(
-  (r) => r.url && (!ONLY || ONLY.test(r.url)),
-);
+const urls = [
+  ...ROUTES.map((r) => ({ pattern: r.pattern, url: urlFor(r.pattern, ids) })),
+  ...EXTRA_URLS.map((u) => ({ pattern: u, url: u })),
+].filter((r) => r.url && (!ONLY || ONLY.test(r.url)));
 console.info(
   `qa-states: ${urls.length} routes · states ${STATES.join(',')} · widths ${WIDTHS.join(',')}`,
 );
@@ -718,11 +765,42 @@ await Promise.all(
         results.push({ ...job, scenario: job.scenario?.name, problems: [`identity-error:${e}`] });
         continue;
       }
-      await slot.page.setViewportSize({ width: job.width, height: job.width < 768 ? 844 : 900 });
-      if (identity === 'admin') await reseedAdmin(slot);
-      const rec = job.scenario
-        ? await runValidation(slot.page, job.scenario, job.width)
-        : await visit(slot.page, job.state, job.url, job.width);
+      let rec;
+      try {
+        await slot.page.setViewportSize({ width: job.width, height: job.width < 768 ? 844 : 900 });
+        if (identity === 'admin') await reseedAdmin(slot);
+        rec = job.scenario
+          ? await runValidation(slot.page, job.scenario, job.width)
+          : await visit(slot.page, job.state, job.url, job.width);
+        if (
+          rec.problems.some((p) =>
+            /Target crashed|Target page, context or browser has been closed/.test(p),
+          )
+        )
+          throw new Error(rec.problems.join(' · '));
+      } catch (e) {
+        // A crashed tab (memory pressure) is not a finding: drop this context and retry the visit once.
+        const [k] = [...ctxs.entries()].find(([, v]) => v === slot) ?? [];
+        if (k !== undefined) {
+          await slot.ctx.close().catch(() => undefined);
+          ctxs.delete(k);
+        }
+        if (!job.retried) {
+          job.retried = true;
+          jobs.unshift(job);
+          console.info(
+            `[w${worker} ${job.state} ${job.width}] ${job.url ?? job.scenario?.url} ↻ retry (${String(e).slice(0, 80)})`,
+          );
+          continue;
+        }
+        rec = {
+          state: job.state,
+          url: job.url ?? job.scenario?.url,
+          width: job.width,
+          name: job.scenario?.name,
+          problems: [`visit-error:${String(e).slice(0, 160)}`],
+        };
+      }
       rec.pattern = job.pattern ?? job.scenario?.url;
       rec.identity = identity;
       results.push(rec);
@@ -730,12 +808,14 @@ await Promise.all(
         `[w${worker} ${job.state} ${job.width}] ${rec.url} (${identity}) ${rec.problems.length ? `✗ ${rec.problems.join(' · ')}` : '✓'}`,
       );
       if (identity === 'fresh-unonboarded') {
-        const [k, v] = [...ctxs.entries()].find(([, s]) => s === slot);
-        await v.ctx.close();
-        ctxs.delete(k);
+        const found = [...ctxs.entries()].find(([, v]) => v === slot);
+        if (found) {
+          await found[1].ctx.close().catch(() => undefined);
+          ctxs.delete(found[0]);
+        }
       }
     }
-    for (const { ctx } of ctxs.values()) await ctx.close();
+    for (const { ctx } of ctxs.values()) await ctx.close().catch(() => undefined);
   }),
 );
 await browser.close();

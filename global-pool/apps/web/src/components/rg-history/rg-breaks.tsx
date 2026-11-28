@@ -59,6 +59,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
 import { ApiRequestError } from '@/lib/api/client';
+import { writeErrorText } from '@/lib/api/errors';
 import {
   rgApi,
   useActiveRounds,
@@ -96,8 +97,16 @@ const label = (d: string) => SELF_EXCLUSION_DURATION_LABEL[d as CoolingOffDurati
 const breakTitle = (d: CoolingOffDuration) =>
   d === '24h' ? '24-hour' : d === '7d' ? '7-day' : '30-day';
 
+/**
+ * ERR-02 copy for a failed break / self-exclusion request. A definite refusal keeps the API's message; when no
+ * definite answer came back (timeout, dropped connection, 5xx) the break MAY have started, so we never say
+ * "nothing was changed" — the player is told to check their status first.
+ */
 function errorText(e: unknown) {
-  return e instanceof ApiRequestError ? e.message : 'Something went wrong — nothing was changed.';
+  return writeErrorText(
+    e,
+    'We couldn’t confirm whether it was applied — check your status on this page before you try again.',
+  );
 }
 
 /** Radio rows used by the break / self-exclusion choosers (none pre-selected). */

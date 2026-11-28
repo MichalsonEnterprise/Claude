@@ -30,7 +30,12 @@ describe('published Double Side rules (identical for every player)', () => {
   it('pays 1.96× with a 2.00 % edge, 0.10 – 1,000.00 DEMO per flip', () => {
     expect(MULTIPLIER).toBe('1.96');
     expect(HOUSE_EDGE).toBe('2.00');
-    expect(INFO).toMatchObject({ minBet: '0.10', maxBet: '1000.00', rtpPercent: '98.00', refPrefix: 'CF' });
+    expect(INFO).toMatchObject({
+      minBet: '0.10',
+      maxBet: '1000.00',
+      rtpPercent: '98.00',
+      refPrefix: 'CF',
+    });
   });
   it('payout on a win is stake × 1.96 truncated (decimal strings, never floats)', () => {
     expect(payoutOnWin('10.00')).toBe('19.60');
@@ -98,12 +103,18 @@ describe('history helpers', () => {
     expect(landedCounts([])).toEqual({ heads: 0, tails: 0 });
   });
   it('describes an outcome for the verifier', () => {
-    expect(describeFlipOutcome({ side: 'heads', pick: 'heads', u32: 982_630_642, win: true, multiplier: '1.96' })).toBe(
-      'x = 0.2287 → Heads · picked Heads → Win · 1.96×',
-    );
-    expect(describeFlipOutcome({ side: 'tails', pick: 'heads', u32: 3_000_000_000, win: false })).toBe(
-      'x = 0.6984 → Tails · picked Heads → Lose',
-    );
+    expect(
+      describeFlipOutcome({
+        side: 'heads',
+        pick: 'heads',
+        u32: 982_630_642,
+        win: true,
+        multiplier: '1.96',
+      }),
+    ).toBe('x = 0.2287 → Heads · picked Heads → Win · 1.96×');
+    expect(
+      describeFlipOutcome({ side: 'tails', pick: 'heads', u32: 3_000_000_000, win: false }),
+    ).toBe('x = 0.6984 → Tails · picked Heads → Lose');
   });
 });
 
@@ -126,7 +137,13 @@ describe('browser verification of a Double Side flip (@gp/shared/fair)', () => {
       fee: '0.00',
       params: { pick: 'heads' },
       outcome: { ...settled.outcome, win: settled.win },
-      fairness: { seedPairId: 's', serverSeedHash: sha256Hex(serverSeed), clientSeed: seed.clientSeed, nonce: 418, revealed: true },
+      fairness: {
+        seedPairId: 's',
+        serverSeedHash: sha256Hex(serverSeed),
+        clientSeed: seed.clientSeed,
+        nonce: 418,
+        revealed: true,
+      },
       rulesVersion: 'double-side/1',
       currency: 'DEMO',
       createdAt: '2026-11-28T00:00:00Z',

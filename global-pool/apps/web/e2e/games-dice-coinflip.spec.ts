@@ -57,9 +57,14 @@ async function createPlayer(request: APIRequestContext): Promise<Player> {
 
 async function signIn(page: Page, p: Player) {
   const base = new URL(process.env.E2E_BASE_URL ?? 'http://localhost:3000');
-  await page.context().addCookies([{ name: 'privy-token', value: p.token, domain: base.hostname, path: '/' }]);
+  await page
+    .context()
+    .addCookies([{ name: 'privy-token', value: p.token, domain: base.hostname, path: '/' }]);
   await page.addInitScript((did) => {
-    window.localStorage.setItem('gp.devMockSession', JSON.stringify({ did, email: null, wallet: null }));
+    window.localStorage.setItem(
+      'gp.devMockSession',
+      JSON.stringify({ did, email: null, wallet: null }),
+    );
   }, p.did);
   await page.route('**/auth/new-device-alerts', (r) =>
     r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
@@ -71,34 +76,54 @@ const sideWord = (s: 'heads' | 'tails') => (s === 'heads' ? 'Heads' : 'Tails');
 test.describe('Double Side — flip → history → verify (DEMO credits only)', () => {
   test.setTimeout(300_000);
 
-  test('a new player flips Double Side with DEMO credits and verifies the flip in the browser', async ({ page, request }) => {
+  test('a new player flips Double Side with DEMO credits and verifies the flip in the browser', async ({
+    page,
+    request,
+  }) => {
     const player = await createPlayer(request);
     const headers = { authorization: `Bearer ${player.token}` };
-    const walletBefore: unknown = await (await request.get(`${API}/wallet/balances`, { headers })).json();
+    const walletBefore: unknown = await (
+      await request.get(`${API}/wallet/balances`, { headers })
+    ).json();
     const bets = async () =>
-      ((await (await request.get(`${API}/games/double-side/bets?pageSize=50`, { headers })).json()) as { items: FlipBet[] })
-        .items;
+      (
+        (await (
+          await request.get(`${API}/games/double-side/bets?pageSize=50`, { headers })
+        ).json()) as { items: FlipBet[] }
+      ).items;
 
     // Server-side guard: a real-money currency is impossible (REAL_MONEY_ENABLED=false).
     const realMoney = await request.post(`${API}/games/double-side/bets`, {
       headers,
-      data: { stake: '1.00', currency: 'USDT', params: { pick: 'heads' }, idempotencyKey: `e2e-rm-${uniq()}` },
+      data: {
+        stake: '1.00',
+        currency: 'USDT',
+        params: { pick: 'heads' },
+        idempotencyKey: `e2e-rm-${uniq()}`,
+      },
     });
     expect(realMoney.status()).toBe(403);
-    expect(((await realMoney.json()) as { error: { code: string } }).error.code).toBe('REAL_MONEY_DISABLED');
+    expect(((await realMoney.json()) as { error: { code: string } }).error.code).toBe(
+      'REAL_MONEY_DISABLED',
+    );
     expect(await bets()).toHaveLength(0);
 
     await signIn(page, player);
 
     // lobby → Double Side tile
     await page.goto('/games');
-    await page.getByRole('link', { name: /^Double Side — / }).first().click();
+    await page
+      .getByRole('link', { name: /^Double Side — / })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/games\/double-side$/);
 
     // CF-01 bet interface
     await expect(page.getByRole('heading', { level: 1, name: 'Double Side' })).toBeVisible();
     const visible = (text: string | RegExp) => page.getByText(text).locator('visible=true').first();
-    await expect(page.getByTestId('demo-credits-balance').locator('visible=true').first()).toContainText('1,000.00');
+    await expect(
+      page.getByTestId('demo-credits-balance').locator('visible=true').first(),
+    ).toContainText('1,000.00');
     await expect(visible('DEMO credits · no cash value')).toBeVisible();
     await expect(page.getByTestId('coinflip-fees')).toContainText('Fees 0.00 DEMO');
     await expect(visible('You can lose your stake.')).toBeVisible();
@@ -137,7 +162,9 @@ test.describe('Double Side — flip → history → verify (DEMO credits only)',
     expect(bet!.currency).toBe('DEMO');
     expect(bet!.win).toBe(bet!.outcome.side === 'tails');
     await expect(banner).toHaveAttribute('data-result', bet!.win ? 'win' : 'lose');
-    await expect(page.getByTestId('coin-title')).toHaveText(`Landed ${sideWord(bet!.outcome.side)}`);
+    await expect(page.getByTestId('coin-title')).toHaveText(
+      `Landed ${sideWord(bet!.outcome.side)}`,
+    );
     await expect(page.getByTestId('coin')).toHaveAttribute('data-side', bet!.outcome.side);
     const credits = (await (await request.get(`${API}/games/credits`, { headers })).json()) as {
       balance: string;
@@ -146,12 +173,14 @@ test.describe('Double Side — flip → history → verify (DEMO credits only)',
     };
     expect(credits).toMatchObject({ currency: 'DEMO', cashValue: false });
     expect(credits.balance).toBe(bet!.win ? '1009.60' : '990.00');
-    await expect(page.getByTestId('demo-credits-balance').locator('visible=true').first()).toContainText(
-      bet!.win ? '1,009.60' : '990.00',
-    );
+    await expect(
+      page.getByTestId('demo-credits-balance').locator('visible=true').first(),
+    ).toContainText(bet!.win ? '1,009.60' : '990.00');
 
     // USDT wallet untouched by game play
-    expect(await (await request.get(`${API}/wallet/balances`, { headers })).json()).toEqual(walletBefore);
+    expect(await (await request.get(`${API}/wallet/balances`, { headers })).json()).toEqual(
+      walletBefore,
+    );
 
     // CF-06 connection lost: the response is dropped once → the retry reuses the SAME idempotency key → one bet
     const keys: string[] = [];
@@ -169,6 +198,10 @@ test.describe('Double Side — flip → history → verify (DEMO credits only)',
     await page.locator('h1').click();
     await page.keyboard.press('h');
     await flip.click();
+    // CF-06 inline banner while the retry waits (stage stays visible, no result guessed)
+    await expect(page.getByTestId('coinflip-reconnect')).toContainText(
+      'Connection lost — reconnecting',
+    );
     await expect(page.getByTestId('result-banner')).toBeVisible({ timeout: 30_000 });
     expect(keys.length).toBeGreaterThanOrEqual(2);
     expect(new Set(keys).size).toBe(1);
@@ -214,5 +247,130 @@ test.describe('Double Side — flip → history → verify (DEMO credits only)',
     await page.getByRole('link', { name: 'Rules & payouts' }).first().click();
     await expect(page).toHaveURL(/\/games\/double-side\/details$/);
     await expect(page.getByText(/1\.96×/).first()).toBeVisible();
+  });
+});
+
+test.describe('Double Side — the coin animation reveals the result, nothing else does (motion on)', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test.setTimeout(180_000);
+
+  test('the coin flips for ~1.6 s; balance, history and result stay hidden until it lands', async ({
+    page,
+    request,
+  }) => {
+    const player = await createPlayer(request);
+    await signIn(page, player);
+    await page.goto('/games/double-side');
+    const balance = page.getByTestId('demo-credits-balance').locator('visible=true').first();
+    await expect(balance).toContainText('1,000.00');
+    await expect(page.getByText('no flips yet').first()).toBeVisible();
+
+    let answeredAt = 0;
+    page.on('response', (r) => {
+      if (r.request().method() === 'POST' && r.url().endsWith('/games/double-side/bets'))
+        answeredAt = Date.now();
+    });
+    await page.getByTestId('coinflip-flip').locator('visible=true').first().click();
+    await expect.poll(() => answeredAt, { timeout: 30_000 }).toBeGreaterThan(0);
+
+    // mid-flip (the server already settled it): stake shown as locked, outcome not revealed anywhere yet
+    await expect(page.getByTestId('coin')).toHaveAttribute('data-phase', 'flipping');
+    await expect(page.getByTestId('coin-title')).toHaveText('Flipping…');
+    await expect(balance).toContainText('990.00');
+    await expect(page.getByTestId('result-banner')).toHaveCount(0);
+    await expect(page.getByText('no flips yet').first()).toBeVisible();
+
+    // landed: banner, real balance and the new disc appear together
+    await expect(page.getByTestId('result-banner')).toBeVisible({ timeout: 10_000 });
+    const elapsed = Date.now() - answeredAt;
+    expect(elapsed).toBeGreaterThanOrEqual(1_200); // coin-flip motion token = 1 600 ms
+    const won = (await page.getByTestId('result-banner').getAttribute('data-result')) === 'win';
+    await expect(balance).toContainText(won ? '1,009.60' : '990.00');
+    await expect(page.getByText('no flips yet')).toHaveCount(0);
+  });
+});
+
+test.describe('Double Side — responsible gaming and error states', () => {
+  test.setTimeout(180_000);
+
+  test('a break (cooling-off) blocks new flips on the server and in the game; history stays readable', async ({
+    page,
+    request,
+  }) => {
+    const player = await createPlayer(request);
+    const headers = { authorization: `Bearer ${player.token}` };
+    const place = (key: string) =>
+      request.post(`${API}/games/double-side/bets`, {
+        headers,
+        data: { stake: '1.00', params: { pick: 'heads' }, idempotencyKey: key },
+      });
+    const before = await place(`e2e-cf-pre-${uniq()}`);
+    expect(before.ok()).toBeTruthy();
+    const ref = ((await before.json()) as FlipBet).ref;
+
+    const brk = await request.post(`${API}/responsible-gaming/cooling-off`, {
+      headers,
+      data: { duration: '24h', confirm: true },
+    });
+    expect(brk.ok()).toBeTruthy();
+    const refused = await place(`e2e-cf-post-${uniq()}`);
+    expect(refused.status()).toBe(403);
+    expect(((await refused.json()) as { error: { code: string } }).error.code).toBe(
+      'SELF_EXCLUDED',
+    );
+
+    await signIn(page, player);
+    await page.goto('/games/double-side');
+    await expect(page.getByText('You’re on a break from play').first()).toBeVisible();
+    await expect(page.getByTestId('coinflip-flip').locator('visible=true').first()).toBeDisabled();
+    await page.goto('/games/double-side/my-flips');
+    await expect(page.getByRole('button', { name: `Verify ${ref}` })).toBeVisible();
+  });
+
+  test('DEMO credits that fail to load pause flipping until a retry succeeds (5xx and other errors)', async ({
+    page,
+    request,
+  }) => {
+    const player = await createPlayer(request);
+    await signIn(page, player);
+    let mode: 'down' | 'forbidden' | 'ok' = 'down';
+    await page.route('**/games/credits', (r) =>
+      mode === 'ok'
+        ? r.continue()
+        : r.fulfill({
+            status: mode === 'down' ? 503 : 403,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              error:
+                mode === 'down'
+                  ? { code: 'SERVICE_UNAVAILABLE', message: 'Service unavailable', statusCode: 503 }
+                  : { code: 'FORBIDDEN_CREDITS', message: 'Not allowed', statusCode: 403 },
+            }),
+          }),
+    );
+    const flip = page.getByTestId('coinflip-flip').locator('visible=true').first();
+
+    // server down → the kit's "Connection lost" notice over the stage, nothing can be staked
+    await page.goto('/games/double-side');
+    await expect(page.getByRole('heading', { name: 'Connection lost' })).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(flip).toBeDisabled();
+    mode = 'ok';
+    await page.getByRole('button', { name: 'Retry now' }).click();
+    await expect(flip).toBeEnabled({ timeout: 30_000 });
+    await expect(flip).toHaveText(/Flip for Heads · 10.00 DEMO/);
+
+    // any other failure → "Couldn't load your DEMO credits" in the panel (never a silent, playable state)
+    mode = 'forbidden';
+    await page.reload();
+    await expect(page.getByText('Couldn’t load your DEMO credits')).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(flip).toBeDisabled();
+    await expect(flip).toHaveText('DEMO credits unavailable');
+    mode = 'ok';
+    await page.getByRole('button', { name: 'Try again' }).click();
+    await expect(flip).toBeEnabled({ timeout: 30_000 });
   });
 });

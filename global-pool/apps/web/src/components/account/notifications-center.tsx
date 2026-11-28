@@ -16,6 +16,7 @@ import { ROUTES } from '@/components/shell/nav-config';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/components/ui/sonner';
@@ -359,7 +360,16 @@ function DeliveryRail() {
           In-app always; email for the ones you keep on.
         </p>
       </div>
-      {!prefs.data ? (
+      {!prefs.data && prefs.isError ? (
+        // ERR-03: a failed request is never an endless skeleton.
+        <ErrorState
+          variant="inline"
+          error={prefs.error}
+          onRetry={() => void prefs.refetch()}
+          retrying={prefs.isFetching}
+          what="your notification settings"
+        />
+      ) : !prefs.data ? (
         <Skeleton className="h-48 w-full" />
       ) : (
         <ul className="flex flex-col gap-3">

@@ -246,8 +246,8 @@ fee ledgers; no fee on game bets). Provably fair (commit–reveal seeds, HMAC-SH
 | GET/POST | `/games/twenty-one/hands[/current]` · `/hands/{id}/action` | player | Twenty-One: deal, `hit|stand|double|split|insurance`, reconnect |
 | GET/POST | `/games/vault-sweeper/rounds[/current]` · `/{id}/reveal` · `/{id}/cashout` | player | Vault Sweeper (mines) |
 | GET/POST | `/games/high-card/rounds[/current]` · `/{id}/action` · `/{id}/cashout` | player | High Card (hi-lo) |
-| GET    | `/games/orbit-rush/state` · `/rounds` · `/rounds/{number}` · `/rounds/{number}/verify` | public | Orbit Rush live state (no crash point before the crash), history, public verification |
-| POST   | `/games/orbit-rush/bets` · `/bets/{id}/cashout` · GET `/bets` · `/bets/current` | player | Crash bets (betting window only), manual cash-out; auto cash-out runs server-side |
+| GET    | `/games/orbit-rush/state` · `/rounds` · `/rounds/{number}` · `/rounds/{number}/verify` · `/stats` | public | Orbit Rush live state (no crash point before the crash), history (`/rounds` items add `players`, `wagered`, `paidOut` in DEMO credits; optional `from`, `search=CR-55102`), public verification, statistics (`/stats?period=24h\|7d\|30d`: rounds, median, share reaching 2.00×, highest crash, distribution vs the published 0.99 ÷ m) |
+| POST   | `/games/orbit-rush/bets` · `/bets/{id}/cashout` · GET `/bets` · `/bets/current` | player | Crash bets (betting window only), manual cash-out; auto cash-out runs server-side. GET `/bets` adds `summary { bets, wagered, returned, net, wins, losses, bestCashOut }` and optional `from` / `result=win\|lose` filters |
 | GET    | `/admin/games/overview` · `/admin/games/bets` · `/admin/games/orbit-rush/rounds` | admin `games.read` | Read-only monitoring: measured vs published RTP, bets, rounds — no outcome controls |
 
 New bets use the gaming policy (onboarded, permitted region, not self-excluded / on a break, no `gaming_blocked`), RG
@@ -321,6 +321,13 @@ DEMO simulation game history for @nova.k (idempotent, never touches the ledger):
 | Method | Path                 | Auth   | Description                                                                       |
 | ------ | -------------------- | ------ | --------------------------------------------------------------------------------- |
 | GET    | `/compliance/region` | public | Is the platform available from the current location? (no bypass hints, by design) |
+| GET    | `/compliance/geo`    | public | PUB-21 / ERR-05 gate decision: `decision` permitted · restricted, country + name, `source`, optional `?declared=PT` check, `minAge`, `stillAvailable`, `paused` (no reason codes, no bypass hints) |
+
+Location source, in order: DEV ONLY (`NODE_ENV=development`, ignored by every other build) `X-GP-Dev-Country: US` or
+`?devCountry=US` per request; the CDN header `GEO_COUNTRY_HEADER` (default `cf-ipcountry`, e.g. `x-country`) only with
+`TRUST_PROXY=true`; `DEV_COUNTRY_OVERRIDE` outside production; else unknown (fail-closed in production). Decided against
+`geo_rules` (explicit allow / block) then `RESTRICTED_COUNTRIES`; every new-stake / new-deposit route enforces the same
+answer (`test/gates.e2e-spec.ts` checks every such route from the route inventory).
 
 ### kyc
 
@@ -420,7 +427,7 @@ clients connected to every replica.
 | `crash:phase` · `crash:tick` · `crash:bet` · `crash:cashout` · `crash:crashed` | server → client | phase changes, 100 ms multiplier frames, bets, cash-outs, crash (crash point + revealed seed) |
 | `crash:bet` · `crash:cashout` | client → server (handshake `auth.token`) | place a bet / cash out; ack `{ ok, bet }` or `{ ok: false, error }` (same policy as REST) |
 
-The crash loop runs only with `JOBS_ENABLED=true` (one replica, Redis lease); see [GAMES.md](./GAMES.md#4-orbit-rush-crash).
+The crash loop runs with `JOBS_ENABLED=true`, or alone with `CRASH_LOOP_ENABLED=true` (no BullMQ workers — e.g. a QA / game instance; unset = follows `JOBS_ENABLED`), on one replica (Redis lease); see [GAMES.md](./GAMES.md#4-orbit-rush-crash).
 
 ### Capabilities that deliberately do not exist
 

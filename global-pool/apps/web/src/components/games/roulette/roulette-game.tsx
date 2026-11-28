@@ -26,6 +26,8 @@ import {
   useGameGate,
   useReducedMotion,
   GAME_MOTION,
+  type DemoLossLimit,
+  type GameGate,
   type GameNoticeKind,
   type HistoryColumn,
 } from '@/components/games/kit';
@@ -152,6 +154,25 @@ const describeOutcome = (o: Record<string, unknown>) => {
 
 type SpinState = { id: number; pocket: number } | null;
 
+/**
+ * Everything shown while a spin is in flight / the wheel turns, frozen when Spin is pressed. `/games/credits` keeps
+ * polling (and the RG heartbeat refreshes it after a bet), so live values would already carry the settled spin: the
+ * balance, the loss-limit meter and the gate (a spin that reaches the loss limit) must not change before the wheel stops.
+ */
+interface LockedSpin {
+  slip: Slip;
+  total: string;
+  /** Pre-spin credits minus the stake. */
+  credits: DemoCreditsView | undefined;
+  /** Pre-spin balance (slip pre-checks stay as they were when Spin was pressed). */
+  balance: string | null;
+  lossLimit: DemoLossLimit | null;
+  gate: GameGate;
+  /** Nonce + commitment this spin uses (the seeds query may already show the next nonce). */
+  nonce: number | null;
+  hash: string | null;
+}
+
 /** Pool Roulette (RL-01 … RL-09) — European single zero, DEMO credits only (no cash value), provably fair. */
 export function RouletteGame() {
   const auth = useAuth();
@@ -169,7 +190,7 @@ export function RouletteGame() {
   const [hover, setHover] = React.useState<Spot | null>(null);
   const [spin, setSpin] = React.useState<SpinState>(null);
   const [animating, setAnimating] = React.useState(false);
-  const [locked, setLocked] = React.useState<{ slip: Slip; total: string; credits: DemoCreditsView | undefined } | null>(null);
+  const [locked, setLocked] = React.useState<LockedSpin | null>(null);
   const [settled, setSettled] = React.useState<{ bet: RouletteBetView; slip: Slip } | null>(null);
   const [restPocket, setRestPocket] = React.useState<number | null>(null);
   const [tableNote, setTableNote] = React.useState<string | null>(null);
@@ -182,7 +203,10 @@ export function RouletteGame() {
   const sendSlip = React.useRef<Slip>([]);
   const release = React.useRef<(() => void) | null>(null);
 
-  const balance = gate.credits?.balance ?? null;
+  // while a spin is locked, every gate-derived value is the pre-spin snapshot (no early reveal of the result)
+  const shownGate: GameGate = locked ? locked.gate : gate.gate;
+  const shownLossLimit = locked ? locked.lossLimit : gate.lossLimit;
+  const balance = locked ? locked.balance : (gate.credits?.balance ?? null);
   const total = slipTotal(slip);
   const problems = React.useMemo(() => slipProblems(slip, balance), [slip, balance]);
   const blocking = problems.filter((p) => p.kind !== 'insufficient');
@@ -261,11 +285,16 @@ export function RouletteGame() {
       slip,
       total,
       credits: c ? { ...c, balance: money(c.balance).minus(money(total)).toFixed(2) } : undefined,
+      balance: c?.balance ?? null,
+      lossLimit: gate.lossLimit,
+      gate: gate.gate,
+      nonce: seeds.data?.active.nonce ?? null,
+      hash: seeds.data?.active.serverSeedHash ?? null,
     });
     release.current?.();
     release.current = holdRealityCheck(); // reality checks only between spins: hold until the wheel stops
     void runner.run();
-  }, [canSpin, slip, total, gate.credits, runner]);
+  }, [canSpin, slip, total, gate.credits, gate.lossLimit, gate.gate, seeds.data, runner]);
 
   // ── slip editing (an undo snapshot per change) ───────────────────────────────────────────
   const edit = React.useCallback(
@@ -354,11 +383,12 @@ export function RouletteGame() {
   }, [settled]);
   const shownCredits = locked?.credits ?? gate.credits;
   const shownBalance = shownCredits?.balance ?? null;
-  const kind: GameNoticeKind | null = reconnecting ? 'reconnecting' : noticeKindOf(gate.gate);
+  const kind: GameNoticeKind | null = reconnecting ? 'reconnecting' : noticeKindOf(shownGate);
   const blocked = kind !== null && kind !== 'reconnecting';
-  const tableOff = busy || blocked || gate.gate === 'loading';
-  const nextNonce = seeds.data?.active.nonce ?? null;
-  const hash = seeds.data?.active.serverSeedHash ?? null;
+  const tableOff = busy || blocked || shownGate === 'loading';
+  // while a spin is locked: the nonce + commitment THIS spin uses (not the next pair state)
+  const nextNonce = locked && locked.nonce !== null ? locked.nonce : (seeds.data?.active.nonce ?? null);
+  const hash = locked && locked.hash !== null ? locked.hash : (seeds.data?.active.serverSeedHash ?? null);
 
   // ── refusals / pre-checks shown in the slip ──────────────────────────────────────────────
   const e = runner.phase === 'failed' ? runner.error : null;
@@ -433,18 +463,19 @@ export function RouletteGame() {
       ? ['Waiting for connection…', 'Reconnecting…']
       : animating || runner.phase === 'placing'
         ? ['Spinning…', 'Spinning…']
-        : gate.gate === 'loss_limit'
-          ? ['Paused — loss limit reached', 'Paused · loss limit']
+        : // short labels fit the 390 sticky bar next to Undo / Clear / Repeat (the notice above explains why)
+          gate.gate === 'loss_limit'
+          ? ['Paused — loss limit reached', 'Limit reached']
           : gate.gate === 'region'
-            ? ['Not available in your region', 'Not available here']
+            ? ['Not available in your region', 'Unavailable']
             : gate.gate !== 'ok' && gate.gate !== 'loading'
               ? ['Play paused', 'Play paused']
               : !slip.length
                 ? ['Place a bet to spin', 'Place a bet']
                 : blocking.length
-                  ? ['Fix the highlighted bet', 'Fix your bets']
+                  ? ['Fix the highlighted bet', 'Fix bets']
                   : insufficient
-                    ? ['Not enough DEMO credits', 'Not enough credits']
+                    ? ['Not enough DEMO credits', 'Low credits']
                     : [`Spin · ${formatAmount(total)} DEMO`, `Spin · ${formatAmount(total)}`];
 
   const cta = (className?: string, short = false) =>
@@ -789,7 +820,7 @@ export function RouletteGame() {
         />
         <GameTabs />
         {gate.gate !== 'guest' && (
-          <GameSessionBar data={shownCredits} lossLimit={gate.lossLimit} loading={gate.gate === 'loading'} />
+          <GameSessionBar data={shownCredits} lossLimit={shownLossLimit} loading={shownGate === 'loading'} />
         )}
         {gate.gate !== 'guest' && (
           <DemoCreditsChip data={shownCredits} loading={gate.gate === 'loading'} disabled={busy} compact className="tablet:hidden" />

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { ShellOverride } from '@/components/shell/shell-overrides';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/lib/auth';
 import {
@@ -67,6 +68,25 @@ export function HomePage({
     />
   );
 
+  if (!snapshot && snapshotQuery.isError) {
+    // ERR-03: the server prefetch and the client fetch both failed (API down) — an error with Try again, never an
+    // endless skeleton.
+    return (
+      <div className="flex flex-col gap-4">
+        {shellOverride}
+        <div className="rounded-xl border border-border-subtle bg-surface-default">
+          <ErrorState
+            error={snapshotQuery.error}
+            onRetry={() => void snapshotQuery.refetch()}
+            retrying={snapshotQuery.isFetching}
+            what="the live pool"
+            note="Your balance and entries are safe."
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (!snapshot) {
     return (
       <div className="flex flex-col gap-4" aria-busy="true">
@@ -96,6 +116,23 @@ export function HomePage({
   return (
     <HomeViewProvider value={view}>
       {shellOverride}
+      {snapshotQuery.isError && (
+        // ERR-02: the figures below come from the last successful load — say that live updates are paused instead
+        // of keeping a silent "LIVE" badge on stale numbers.
+        <ErrorState
+          variant="inline"
+          error={snapshotQuery.error}
+          onRetry={() => void snapshotQuery.refetch()}
+          retrying={snapshotQuery.isFetching}
+          title="Live pool updates are paused"
+          description={`We couldn’t refresh the live pool${
+            snapshotQuery.dataUpdatedAt
+              ? ` — figures below are from ${new Date(snapshotQuery.dataUpdatedAt).toISOString().slice(11, 16)} UTC`
+              : ''
+          }. We’ll keep trying.`}
+          className="mb-6"
+        />
+      )}
       <div className="flex flex-col gap-14 laptop:gap-16">
         <HeroSection />
         <PoolLiveSection />

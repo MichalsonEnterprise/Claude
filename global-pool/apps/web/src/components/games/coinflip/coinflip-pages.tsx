@@ -5,7 +5,13 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { GameArt, TILE_GRADIENT_CLASS } from '@/components/brand/game-art';
-import { GameSessionBar, LicenceLine, PromptCard, useGameGate, GAMES_ROUTES } from '@/components/games/kit';
+import {
+  GameSessionBar,
+  LicenceLine,
+  PromptCard,
+  useGameGate,
+  GAMES_ROUTES,
+} from '@/components/games/kit';
 import { ShellOverride } from '@/components/shell/shell-overrides';
 import { Button } from '@/components/ui/button';
 import { useGameBets } from '@/lib/api/games';
@@ -28,7 +34,10 @@ export function CoinflipTabs({ active, className }: { active: CoinflipTab; class
     { id: 'rules', label: 'Rules & payouts', href: COINFLIP_ROUTES.details },
   ];
   return (
-    <nav aria-label="Double Side" className={cn('no-scrollbar -mx-4 overflow-x-auto px-4 tablet:mx-0 tablet:px-0', className)}>
+    <nav
+      aria-label="Double Side"
+      className={cn('no-scrollbar -mx-4 overflow-x-auto px-4 tablet:mx-0 tablet:px-0', className)}
+    >
       <ul className="flex min-w-max gap-6 border-b border-border-subtle">
         {tabs.map((t) => (
           <li key={t.id}>
@@ -81,7 +90,12 @@ export function CoinflipSubpage({
       <ShellOverride collapseSidebar restricted={gate.gate === 'region'} />
       <header className="flex flex-col gap-4 laptop:flex-row laptop:items-center laptop:justify-between">
         <div className="flex min-w-0 items-center gap-4">
-          <span className={cn('flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg tablet:size-16', TILE_GRADIENT_CLASS.amber)}>
+          <span
+            className={cn(
+              'flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg tablet:size-16',
+              TILE_GRADIENT_CLASS.amber,
+            )}
+          >
             <GameArt game="double-side" className="size-14 tablet:size-16" />
           </span>
           <div className="flex min-w-0 flex-col gap-1.5">
@@ -112,14 +126,22 @@ export function CoinflipSubpage({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {actions}
-          <Button asChild className="min-h-11 tablet:min-h-10" leadingIcon={<ArrowLeft aria-hidden />}>
+          <Button
+            asChild
+            className="min-h-11 tablet:min-h-10"
+            leadingIcon={<ArrowLeft aria-hidden />}
+          >
             <Link href={COINFLIP_ROUTES.play}>Back to game</Link>
           </Button>
         </div>
       </header>
 
       {gate.gate !== 'guest' && (
-        <GameSessionBar data={gate.credits} lossLimit={gate.lossLimit} loading={gate.gate === 'loading'} />
+        <GameSessionBar
+          data={gate.credits}
+          lossLimit={gate.lossLimit}
+          loading={gate.gate === 'loading'}
+        />
       )}
 
       <CoinflipTabs active={tab} />
@@ -132,7 +154,11 @@ export function CoinflipSubpage({
             body="Your Double Side flips, seeds and verification live in your account. DEMO credits have no cash value."
             note="18+ · permitted jurisdictions only · you can lose your stake."
             actions={
-              <Button className="min-h-11 tablet:min-h-10" onClick={() => auth.signIn()} leadingIcon={<LogIn aria-hidden />}>
+              <Button
+                className="min-h-11 tablet:min-h-10"
+                onClick={() => auth.signIn()}
+                leadingIcon={<LogIn aria-hidden />}
+              >
                 Sign in
               </Button>
             }

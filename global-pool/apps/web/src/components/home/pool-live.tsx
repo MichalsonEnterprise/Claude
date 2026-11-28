@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ROUTES } from '@/components/shell/nav-config';
 import { useEntriesFeed, usePoolHistory } from '@/lib/data/hooks';
@@ -183,7 +184,17 @@ function LatestEntriesCard() {
         {round && <StatusBadge status="live" uppercase />}
         {snapshot.isDemo && <DemoBadge size="s" className="ml-auto" />}
       </header>
-      {round ? (
+      {round && !feed.data && feed.isError ? (
+        // ERR-03: a failed feed is an error with Try again, never five endless skeleton rows.
+        <ErrorState
+          variant="inline"
+          error={feed.error}
+          onRetry={() => void feed.refetch()}
+          retrying={feed.isFetching}
+          what="the latest entries"
+          className="mt-3"
+        />
+      ) : round ? (
         <ul className="mt-2 flex flex-col">
           {feed.data
             ? feed.data

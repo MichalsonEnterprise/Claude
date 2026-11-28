@@ -1,7 +1,18 @@
 'use client';
 
 import { formatDateTimeUTC, formatTimeUTC } from '@gp/shared/format';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Copy, Download, Info, Search, ShieldCheck, X } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Copy,
+  Download,
+  Info,
+  Search,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -10,7 +21,13 @@ import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { InputControl, InputGroup } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
 import { classifyGameError, useGameBets, type GameBetsFilters } from '@/lib/api/games';
@@ -43,7 +60,15 @@ const PERIODS: { id: FlipPeriod; label: string; caption: string }[] = [
 type PickFilter = 'all' | 'heads' | 'tails';
 type ResultFilter = 'all' | 'win' | 'lose';
 
-function Chip({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: React.ReactNode }) {
+function Chip({
+  pressed,
+  onClick,
+  children,
+}: {
+  pressed: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="button"
@@ -84,12 +109,22 @@ function detailText(b: CoinflipBet): string {
 
 function FlipDetail({ b, className }: { b: CoinflipBet; className?: string }) {
   const kv: [string, React.ReactNode, boolean][] = [
-    ['Server seed hash (committed before the flip)', shortHash(b.fairness.serverSeedHash, 16, 16), true],
+    [
+      'Server seed hash (committed before the flip)',
+      shortHash(b.fairness.serverSeedHash, 16, 16),
+      true,
+    ],
     ['Client seed', b.fairness.clientSeed, true],
     ['Nonce', String(b.fairness.nonce), true],
     ['Result', mappingLine(b.outcome.u32), false],
     ['Settled', formatDateTimeUTC(b.settledAt ?? b.createdAt, { seconds: true }), false],
-    ['Server seed', b.fairness.revealed ? 'Revealed — recompute it now' : 'Still secret — rotate your seed pair to reveal', false],
+    [
+      'Server seed',
+      b.fairness.revealed
+        ? 'Revealed — recompute it now'
+        : 'Still secret — rotate your seed pair to reveal',
+      false,
+    ],
   ];
   return (
     <div className={cn('flex flex-col gap-4', className)} data-testid={`flip-detail-${b.ref}`}>
@@ -97,12 +132,25 @@ function FlipDetail({ b, className }: { b: CoinflipBet; className?: string }) {
         {kv.map(([k, v, mono]) => (
           <div key={k} className="flex min-w-0 flex-col gap-1">
             <dt className="text-caption text-text-tertiary">{k}</dt>
-            <dd className={cn('break-all text-text-primary', mono ? 'font-mono text-mono-s' : 'text-body-s-strong')}>{v}</dd>
+            <dd
+              className={cn(
+                'break-all text-text-primary',
+                mono ? 'font-mono text-mono-s' : 'text-body-s-strong',
+              )}
+            >
+              {v}
+            </dd>
           </div>
         ))}
       </dl>
       <div className="flex flex-wrap items-center gap-2">
-        <Button variant="secondary" size="s" asChild className="min-h-11 tablet:min-h-8" leadingIcon={<ShieldCheck aria-hidden />}>
+        <Button
+          variant="secondary"
+          size="s"
+          asChild
+          className="min-h-11 tablet:min-h-8"
+          leadingIcon={<ShieldCheck aria-hidden />}
+        >
           <Link href={COINFLIP_ROUTES.verify(b.id)}>Verify this flip</Link>
         </Button>
         <Button
@@ -121,7 +169,8 @@ function FlipDetail({ b, className }: { b: CoinflipBet; className?: string }) {
         </Button>
         <DemoBadge size="xs" />
         <p className="text-caption text-text-tertiary">
-          The server seed is revealed when you rotate your seed pair — after that anyone can recompute this flip.
+          The server seed is revealed when you rotate your seed pair — after that anyone can
+          recompute this flip.
         </p>
       </div>
     </div>
@@ -176,10 +225,21 @@ export function MyFlipsPage() {
     setExporting(true);
     try {
       const csv = await historyApi.exportGameRounds({ game: SLUG, ...(from ? { from } : {}) });
-      saveCsv(typeof csv === 'string' ? csv : String(csv), `globalpool_double-side_${period}_${new Date().toISOString().slice(0, 10)}.csv`);
-      toast({ type: 'success', title: 'CSV exported', description: 'Seeds and nonces included · DEMO credits (no cash value).' });
+      saveCsv(
+        typeof csv === 'string' ? csv : String(csv),
+        `globalpool_double-side_${period}_${new Date().toISOString().slice(0, 10)}.csv`,
+      );
+      toast({
+        type: 'success',
+        title: 'CSV exported',
+        description: 'Seeds and nonces included · DEMO credits (no cash value).',
+      });
     } catch (err) {
-      toast({ type: 'error', title: 'Could not export', description: classifyGameError(err).message });
+      toast({
+        type: 'error',
+        title: 'Could not export',
+        description: classifyGameError(err).message,
+      });
     } finally {
       setExporting(false);
     }
@@ -187,8 +247,16 @@ export function MyFlipsPage() {
 
   const kpis: { label: string; value: React.ReactNode; sub: string; tone?: string }[] = s
     ? [
-        { label: `Flips · ${periodInfo.label}`, value: String(s.bets), sub: `${periodInfo.caption} · Double Side only` },
-        { label: 'Wagered', value: <CreditsAmount value={s.wagered} />, sub: `${s.bets} flip${s.bets === 1 ? '' : 's'} · Fees 0.00` },
+        {
+          label: `Flips · ${periodInfo.label}`,
+          value: String(s.bets),
+          sub: `${periodInfo.caption} · Double Side only`,
+        },
+        {
+          label: 'Wagered',
+          value: <CreditsAmount value={s.wagered} />,
+          sub: `${s.bets} flip${s.bets === 1 ? '' : 's'} · Fees 0.00`,
+        },
         {
           label: 'Net result',
           value: <CreditsAmount value={s.net} signed />,
@@ -231,7 +299,11 @@ export function MyFlipsPage() {
     >
       {/* filters */}
       <div className="flex flex-col gap-3 laptop:flex-row laptop:items-center">
-        <div role="radiogroup" aria-label="Period" className="inline-flex w-fit shrink-0 gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1">
+        <div
+          role="radiogroup"
+          aria-label="Period"
+          className="inline-flex w-fit shrink-0 gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1"
+        >
           {PERIODS.map((p) => (
             <button
               key={p.id}
@@ -248,25 +320,45 @@ export function MyFlipsPage() {
             </button>
           ))}
         </div>
-        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 tablet:mx-0 tablet:flex-wrap tablet:px-0" role="group" aria-label="Filter flips">
+        <div
+          className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 tablet:mx-0 tablet:flex-wrap tablet:px-0"
+          role="group"
+          aria-label="Filter flips"
+        >
           <Chip pressed={pick === 'all'} onClick={() => reset(() => setPick('all'))}>
             All picks
           </Chip>
-          <Chip pressed={pick === 'heads'} onClick={() => reset(() => setPick(pick === 'heads' ? 'all' : 'heads'))}>
+          <Chip
+            pressed={pick === 'heads'}
+            onClick={() => reset(() => setPick(pick === 'heads' ? 'all' : 'heads'))}
+          >
             Picked Heads
           </Chip>
-          <Chip pressed={pick === 'tails'} onClick={() => reset(() => setPick(pick === 'tails' ? 'all' : 'tails'))}>
+          <Chip
+            pressed={pick === 'tails'}
+            onClick={() => reset(() => setPick(pick === 'tails' ? 'all' : 'tails'))}
+          >
             Picked Tails
           </Chip>
-          <Chip pressed={result === 'win'} onClick={() => reset(() => setResult(result === 'win' ? 'all' : 'win'))}>
+          <Chip
+            pressed={result === 'win'}
+            onClick={() => reset(() => setResult(result === 'win' ? 'all' : 'win'))}
+          >
             Wins
           </Chip>
-          <Chip pressed={result === 'lose'} onClick={() => reset(() => setResult(result === 'lose' ? 'all' : 'lose'))}>
+          <Chip
+            pressed={result === 'lose'}
+            onClick={() => reset(() => setResult(result === 'lose' ? 'all' : 'lose'))}
+          >
             Losses
           </Chip>
         </div>
         <div className="flex flex-col gap-1 laptop:ml-auto laptop:w-72">
-          <InputGroup size="m" state={searchInvalid ? 'error' : 'default'} className="min-h-11 tablet:min-h-10">
+          <InputGroup
+            size="m"
+            state={searchInvalid ? 'error' : 'default'}
+            className="min-h-11 tablet:min-h-10"
+          >
             <Search aria-hidden className="size-4 text-icon-muted" />
             <InputControl
               value={searchText}
@@ -288,21 +380,39 @@ export function MyFlipsPage() {
               </button>
             )}
           </InputGroup>
-          {searchInvalid && <p className="text-caption text-text-danger">Use a flip ID like CF-52107 or a nonce like 418.</p>}
+          {searchInvalid && (
+            <p className="text-caption text-text-danger">
+              Use a flip ID like CF-52107 or a nonce like 418.
+            </p>
+          )}
         </div>
       </div>
 
       {/* KPIs */}
-      <dl className="grid grid-cols-2 gap-3 laptop:grid-cols-4 tablet:gap-4" aria-busy={q.isPending}>
+      <dl
+        className="grid grid-cols-2 gap-3 laptop:grid-cols-4 tablet:gap-4"
+        aria-busy={q.isPending}
+      >
         {q.isPending
-          ? Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-[120px] rounded-xl" />)
+          ? Array.from({ length: 4 }, (_, i) => (
+              <Skeleton key={i} className="h-[120px] rounded-xl" />
+            ))
           : kpis.map((k) => (
-              <div key={k.label} className="flex min-w-0 flex-col gap-1.5 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-5">
+              <div
+                key={k.label}
+                className="flex min-w-0 flex-col gap-1.5 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-5"
+              >
                 <div className="flex items-center justify-between gap-2">
                   <dt className="text-overline text-text-tertiary uppercase">{k.label}</dt>
                   <DemoBadge size="xs" />
                 </div>
-                <dd className={cn('text-h4 break-words text-text-primary laptop:text-number-l', k.label === 'Landed' && 'laptop:text-h4', k.tone)}>
+                <dd
+                  className={cn(
+                    'text-h4 break-words text-text-primary laptop:text-number-l',
+                    k.label === 'Landed' && 'laptop:text-h4',
+                    k.tone,
+                  )}
+                >
                   {k.value}
                 </dd>
                 <dd className="text-caption text-text-tertiary">{k.sub}</dd>
@@ -311,7 +421,10 @@ export function MyFlipsPage() {
       </dl>
 
       {/* list */}
-      <section aria-label="Flips" className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border-subtle bg-surface-default">
+      <section
+        aria-label="Flips"
+        className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border-subtle bg-surface-default"
+      >
         {q.isPending ? (
           <div className="flex flex-col gap-2 p-4">
             {Array.from({ length: 5 }, (_, i) => (
@@ -332,7 +445,11 @@ export function MyFlipsPage() {
         ) : !items.length ? (
           <EmptyState
             type={search || pick !== 'all' || result !== 'all' ? 'no-results' : 'no-data'}
-            title={search ? `No flip matches “${searchText.trim()}”` : `No flips ${period === 'all' ? 'yet' : `in this period`}`}
+            title={
+              search
+                ? `No flip matches “${searchText.trim()}”`
+                : `No flips ${period === 'all' ? 'yet' : `in this period`}`
+            }
             description={
               search || pick !== 'all' || result !== 'all'
                 ? 'Change the filters or search for another flip ID or nonce.'
@@ -349,18 +466,32 @@ export function MyFlipsPage() {
             <caption className="sr-only">My Double Side flips, newest first</caption>
             <thead className="bg-bg-secondary">
               <tr className="text-overline text-text-tertiary uppercase">
-                <th scope="col" className="h-11 px-4 font-semibold">Flip</th>
+                <th scope="col" className="h-11 px-4 font-semibold">
+                  Flip
+                </th>
                 <th scope="col" className="px-4 font-semibold" aria-sort="descending">
                   <span className="inline-flex items-center gap-1">
                     Time (UTC) <ChevronDown aria-hidden className="size-3.5" />
                   </span>
                 </th>
-                <th scope="col" className="px-4 font-semibold">Pick</th>
-                <th scope="col" className="px-4 font-semibold">Landed</th>
-                <th scope="col" className="px-4 text-right font-semibold">Bet</th>
-                <th scope="col" className="px-4 text-right font-semibold">Payout</th>
-                <th scope="col" className="px-4 text-right font-semibold">Profit</th>
-                <th scope="col" className="px-4 font-semibold">Fairness</th>
+                <th scope="col" className="px-4 font-semibold">
+                  Pick
+                </th>
+                <th scope="col" className="px-4 font-semibold">
+                  Landed
+                </th>
+                <th scope="col" className="px-4 text-right font-semibold">
+                  Bet
+                </th>
+                <th scope="col" className="px-4 text-right font-semibold">
+                  Payout
+                </th>
+                <th scope="col" className="px-4 text-right font-semibold">
+                  Profit
+                </th>
+                <th scope="col" className="px-4 font-semibold">
+                  Fairness
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -368,7 +499,12 @@ export function MyFlipsPage() {
                 const expanded = open === b.id;
                 return (
                   <React.Fragment key={b.id}>
-                    <tr className={cn('border-t border-border-subtle', expanded && 'bg-surface-selected')}>
+                    <tr
+                      className={cn(
+                        'border-t border-border-subtle',
+                        expanded && 'bg-surface-selected',
+                      )}
+                    >
                       <td className="h-[52px] px-4">
                         <span className="inline-flex items-center gap-2">
                           <span className="font-mono text-mono-s text-text-primary">{b.ref}</span>
@@ -385,10 +521,17 @@ export function MyFlipsPage() {
                         <SideCell side={b.outcome.side} />
                       </td>
                       <td className="px-4 text-right">
-                        <CreditsAmount value={b.stake} className="text-body-s-strong text-text-primary" />
+                        <CreditsAmount
+                          value={b.stake}
+                          className="text-body-s-strong text-text-primary"
+                        />
                       </td>
                       <td className="px-4 text-right text-body-s-strong tabular-nums">
-                        {b.win ? <span className="text-text-primary">{MULTIPLIER}×</span> : <span className="text-text-tertiary">—</span>}
+                        {b.win ? (
+                          <span className="text-text-primary">{MULTIPLIER}×</span>
+                        ) : (
+                          <span className="text-text-tertiary">—</span>
+                        )}
                       </td>
                       <td className={cn('px-4 text-right text-body-s-strong', toneOfNet(b.net))}>
                         <CreditsAmount value={b.net} signed />
@@ -400,7 +543,9 @@ export function MyFlipsPage() {
                           aria-expanded={expanded}
                           aria-controls={`detail-${b.id}`}
                           onClick={() => setOpen(expanded ? null : b.id)}
-                          leadingIcon={expanded ? <ChevronUp aria-hidden /> : <ShieldCheck aria-hidden />}
+                          leadingIcon={
+                            expanded ? <ChevronUp aria-hidden /> : <ShieldCheck aria-hidden />
+                          }
                         >
                           {expanded ? 'Hide' : 'Verify'}
                           <span className="sr-only"> {b.ref}</span>
@@ -408,7 +553,10 @@ export function MyFlipsPage() {
                       </td>
                     </tr>
                     {expanded && (
-                      <tr id={`detail-${b.id}`} className="border-t border-border-subtle bg-surface-raised">
+                      <tr
+                        id={`detail-${b.id}`}
+                        className="border-t border-border-subtle bg-surface-raised"
+                      >
                         <td colSpan={8} className="px-6 py-5">
                           <FlipDetail b={b} />
                         </td>
@@ -450,7 +598,9 @@ export function MyFlipsPage() {
                       <span className={cn('text-body-s-strong', toneOfNet(b.net))}>
                         <CreditsAmount value={b.net} signed />
                       </span>
-                      <span className="text-caption text-text-tertiary">bet {credits(b.stake)}</span>
+                      <span className="text-caption text-text-tertiary">
+                        bet {credits(b.stake)}
+                      </span>
                     </span>
                     {expanded ? (
                       <ChevronUp aria-hidden className="size-4 shrink-0 text-icon-muted" />
@@ -458,7 +608,12 @@ export function MyFlipsPage() {
                       <ChevronDown aria-hidden className="size-4 shrink-0 text-icon-muted" />
                     )}
                   </button>
-                  {expanded && <FlipDetail b={b} className="border-t border-border-subtle bg-surface-raised p-4" />}
+                  {expanded && (
+                    <FlipDetail
+                      b={b}
+                      className="border-t border-border-subtle bg-surface-raised p-4"
+                    />
+                  )}
                 </li>
               );
             })}
@@ -505,11 +660,16 @@ export function MyFlipsPage() {
               </Button>
               {pages.map((n, i) => (
                 <React.Fragment key={n}>
-                  {i > 0 && n - pages[i - 1]! > 1 && <span className="px-1 text-text-tertiary">…</span>}
+                  {i > 0 && n - pages[i - 1]! > 1 && (
+                    <span className="px-1 text-text-tertiary">…</span>
+                  )}
                   <Button
                     variant={n === page ? 'secondary' : 'ghost'}
                     size="s"
-                    className={cn('size-11 px-0 tablet:size-8', n === page && 'border-border-brand text-text-brand')}
+                    className={cn(
+                      'size-11 px-0 tablet:size-8',
+                      n === page && 'border-border-brand text-text-brand',
+                    )}
                     aria-current={n === page ? 'page' : undefined}
                     onClick={() => setPage(n)}
                   >
@@ -534,8 +694,8 @@ export function MyFlipsPage() {
 
       <p className="flex items-start gap-2 text-body-s text-text-secondary">
         <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-icon-muted" />
-        History is a record, not a strategy: past flips never predict the next one. Every flip is {WIN_CHANCE}% Heads /{' '}
-        {WIN_CHANCE}% Tails, payout {MULTIPLIER}×.
+        History is a record, not a strategy: past flips never predict the next one. Every flip is{' '}
+        {WIN_CHANCE}% Heads / {WIN_CHANCE}% Tails, payout {MULTIPLIER}×.
       </p>
     </CoinflipSubpage>
   );

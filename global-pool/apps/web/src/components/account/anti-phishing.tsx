@@ -16,6 +16,7 @@ import { Card } from '@/components/ui/card';
 import { Field, Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
 import { accountApi, accountKeys, useMe, useTwoFactor } from '@/lib/api/account';
+import { failedQueries } from '@/lib/api/errors';
 
 import { ACCOUNT_ROUTES } from './nav';
 import { DashboardPage } from './page-shell';
@@ -74,6 +75,8 @@ export function AntiPhishingPage() {
       ]}
       title="Anti-phishing code"
       description="A private word we put in every email and every 2FA prompt. If a message claims to be from GLOBAL POOL without it, it isn’t from us."
+      // A failed profile load must never read as "Not set" (ERR-02): show the error with Try again instead.
+      failure={{ ...failedQueries(me, tfa), what: 'your anti-phishing code' }}
     >
       <div className="grid gap-6 laptop:grid-cols-2">
         <Card padding="l" className="gap-4">

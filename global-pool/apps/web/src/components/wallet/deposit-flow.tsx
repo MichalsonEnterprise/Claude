@@ -27,16 +27,21 @@ import * as React from 'react';
 import { ChainMark, TokenMark } from '@/components/brand/chain-mark';
 import { Amount } from '@/components/domain/amount';
 import { sanitizeAmount } from '@/components/domain/amount-input';
+import { regulatoryFromError } from '@/components/compliance/regulatory-copy';
+import { RegulatoryGuard } from '@/components/compliance/regulatory-state';
 import { NetworkPill } from '@/components/domain/network-pill';
 import { Alert } from '@/components/ui/alert';
 import { AgeBadge, StatusBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { ErrorState } from '@/components/ui/error-state';
 import { Field, InputControl, InputGroup } from '@/components/ui/input';
+import { SecurityWarning } from '@/components/ui/security-warning';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
 import { ApiRequestError, newIdempotencyKey } from '@/lib/api/client';
+import { describeError, failedQueries } from '@/lib/api/errors';
 import {
   useBalances,
   useCurrentRound,
@@ -284,12 +289,23 @@ function NetworkStep({ onNext }: { onNext: () => void }) {
   const rg = useRg();
   const isNew = balances.data && money(balances.data.total).isZero();
   const paused = status.data && !status.data.depositsEnabled;
+  // Deposit status / limits couldn't be checked: say so (never silently skip a paused-deposits or limit notice).
+  const unchecked = failedQueries(status, rg);
   return (
     <>
       <FlowHeading title="Choose a network">
         Pick the network your wallet or exchange will send from. The sender and GLOBAL POOL must use
         the same network, otherwise funds can be lost.
       </FlowHeading>
+      {unchecked.failed && (
+        <ErrorState
+          variant="inline"
+          error={unchecked.error}
+          onRetry={unchecked.retry}
+          retrying={unchecked.retrying}
+          title="We couldn’t check your deposit status and limits"
+        />
+      )}
       <WalletStatusBanners status={status.data} rg={rg.data} context="deposit" />
       {isNew && (
         <Alert type="info" title="First deposit? Set a deposit limit first (optional)">
@@ -494,26 +510,35 @@ function AddressStep({
     }
   };
 
-  if (addr.isError) {
-    const paused =
-      addr.error instanceof ApiRequestError && addr.error.code === 'SERVICE_UNAVAILABLE';
+  // ERR-05 module guard: a regulatory refusal (region, self-exclusion / break, KYC) gets the shared state, not
+  // "Something went wrong" — withdrawals stay the primary action.
+  if (addr.isError && regulatoryFromError(addr.error)) {
     return (
       <>
-        <FlowHeading title="We couldn’t load your deposit address" />
-        <Alert
-          type={paused ? 'maintenance' : 'security'}
-          title={paused ? 'Deposits are paused for maintenance' : 'Something went wrong'}
-        >
-          {addr.error.message}
-        </Alert>
-        <FlowFooter
-          onBack={onBack}
-          primary={
-            <NextButton onClick={() => void addr.refetch()} icon={<RefreshCw />}>
-              Try again
-            </NextButton>
+        <RegulatoryGuard error={addr.error} />
+        <FlowFooter onBack={onBack} />
+      </>
+    );
+  }
+  if (addr.isError) {
+    // ERR-02: readable copy per error kind (offline, timeout, 429 countdown, maintenance, 5xx) — never a raw
+    // message, and not styled as a security warning. Retry lives in the ErrorState (disabled during a 429 wait).
+    const paused = describeError(addr.error).kind === 'maintenance';
+    return (
+      <>
+        <FlowHeading
+          title={
+            paused ? 'Deposits are paused for maintenance' : 'We couldn’t load your deposit address'
           }
         />
+        <ErrorState
+          variant="inline"
+          error={addr.error}
+          onRetry={() => void addr.refetch()}
+          retrying={addr.isFetching}
+          what="your deposit address"
+        />
+        <FlowFooter onBack={onBack} />
       </>
     );
   }
@@ -526,19 +551,23 @@ function AddressStep({
           : 'Copy the address or scan the code with your wallet. We detect the transfer automatically — no need to paste a transaction hash.'}
       </FlowHeading>
       {wrongNetwork && (
-        <Alert
-          type="security"
-          title="Your wallet is on a different network"
+        <SecurityWarning
+          kind="wrong-network"
+          networkName={c.testnet.name}
+          currentChainId={preview === 'wrong-network' ? null : walletChain}
           actions={
             <Button variant="secondary" size="s" onClick={() => void switchToArbitrumSepolia()}>
               Switch to {c.testnet.name}
             </Button>
           }
-        >
-          Switch your wallet to {c.testnet.name} before you send. A transfer on another network
-          can’t be credited and may be lost.
-        </Alert>
+        />
       )}
+      {/* ERR-07: only the configured test-USDT contract is credited (the deposit watcher ignores other tokens). */}
+      <SecurityWarning
+        kind="unverified-contract"
+        tokenLabel={`${c.testnet.tokenLabel} on ${c.testnet.name}`}
+      />
+
       <Alert type="warning" title={`Send only ${c.testnet.tokenLabel} on ${c.testnet.name}.`}>
         Other tokens or networks may be lost. TESTNET / DEMO — never send real funds.
       </Alert>
@@ -1502,6 +1531,15 @@ function DepositSide({
               ))}
             </ul>
           )
+        ) : recent.isError ? (
+          // ERR-03: a failed list is an error with Try again, never an endless skeleton.
+          <ErrorState
+            variant="inline"
+            error={recent.error}
+            onRetry={() => void recent.refetch()}
+            retrying={recent.isFetching}
+            what="your recent deposits"
+          />
         ) : (
           <Skeleton className="h-16 w-full" />
         )}

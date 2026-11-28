@@ -1,0 +1,53 @@
+const F = {
+  key: 'PRO-04', name: 'PRO-04 Mobile — Wallet → Withdrawal → Confirmation', flowName: 'PRO-04 (390) Wallet → Withdrawal → Confirmation',
+  title: 'Mobile 390 — Wallet → Withdrawal → Confirmation',
+  desc: 'Mobile version of PRO-04 (MOB-07 + WAL-15…19 at 390): 1,500.00 USDT to the whitelisted Arbitrum address — asset → network → address → amount → review → risk checks → 2FA sheet → processing → sent. The 390 “below minimum”, “flagged”, “2FA wrong code” and “queued” states exist only at 1440 (see desktop PRO-04). All values are DEMO.',
+  stack: 'V', gap: 320, bgap: 420, boxOff: 210, subMax: 40, textW: 600, logoFb: [16, 40, 120, 40],
+  pages: ['1:11'],
+  steps: [
+    { k: 'WAL', src: '33:319559', t: 'Wallet overview', sub: 'MOB-05 · WAL-01 Default', cta: 'Tap “Withdraw”' },
+    { k: 'ASSET', src: '152:66271', t: 'Withdraw 1 — asset', sub: 'WAL-10 · sheet', cta: '“Continue with USDT”' },
+    { k: 'NETW', src: '152:66557', t: 'Withdraw 2 — network', sub: 'WAL-11 · sheet', cta: '“Continue with Arbitrum”' },
+    { k: 'ADDR', src: '152:66808', t: 'Withdraw 3 — address', sub: 'WAL-12 · Default', cta: '“Continue to amount”' },
+    { k: 'AMT', src: '157:68981', t: 'Withdraw 4 — amount', sub: 'WAL-13 · Default', cta: '“Review fees”' },
+    { k: 'FEES', src: '160:69533', t: 'Withdraw 5 — review', sub: 'WAL-14 · review sheet', cta: '“Continue to security checks”' },
+    { k: 'RISK', src: '109:50782', t: 'Withdraw 6 — checks passed', sub: 'WAL-15 · Pass', cta: '“Continue to 2FA”' },
+    { k: 'TFA', src: '109:51244', t: 'Withdraw 7 — 2FA', sub: 'WAL-16 · 2FA sheet', cta: '“Confirm withdrawal”' },
+    { k: 'PROC', src: '110:51357', t: 'Withdraw 8 — processing', sub: 'WAL-17 · Processing', cta: 'Auto after 4 s' },
+    { k: 'DONE', src: '110:51788', t: 'Withdraw 9 — sent', sub: 'WAL-18 · Successful' }
+  ],
+  branches: [
+    { k: 'INV', src: '157:68503', from: 'ADDR', t: 'Invalid address', state: 'WAL-12 · Invalid', cond: 'the address format does not match the network', trig: 'tap the address field on step 4', ret: '“Switch network” → step 3 · tap the field again → step 4' },
+    { k: 'COOL', src: '157:68755', from: 'ADDR', t: 'New-address cooldown', state: 'WAL-12 · Cooldown sheet', cond: 'the address is new and not yet whitelisted (24 h)', trig: 'press 1 on step 4', ret: '“Use cold wallet” → step 4' },
+    { k: 'OVER', src: '160:69089', from: 'AMT', t: 'Over available balance', state: 'WAL-13 · Over balance', cond: 'the amount is above Available 9,215.30 USDT', trig: 'tap the amount field on step 5', ret: '“Withdraw max” → step 5' },
+    { k: 'LIM', src: '160:69318', from: 'AMT', t: 'Daily limit reached', state: 'WAL-13 · Limit reached', cond: '25,000.00 USDT already withdrawn today (separate DEMO scenario)', trig: 'press 1 on step 5', ret: 'Back → step 4' },
+    { k: 'KYC', src: '109:50998', from: 'RISK', t: 'KYC required', state: 'WAL-15 · KYC required', cond: 'the account is only KYC Level 1 (separate DEMO scenario)', trig: 'press 1 on step 7', ret: '“Cancel withdrawal” → step 1' },
+    { k: 'LOCK', src: '109:51440', from: 'TFA', t: '2FA locked (15 min)', state: 'WAL-16 · Locked', cond: 'too many wrong 2FA codes', trig: 'tap the authenticator field on step 8', ret: '“Try again at 18:58 UTC” → step 8' },
+    { k: 'MAN', src: '110:51566', from: 'PROC', t: 'Manual review', state: 'WAL-17 · Manual review', cond: 'AML screening needs a compliance review (ETA < 4 h)', trig: 'press 1 on step 9', ret: '“Back to wallet” → step 1' },
+    { k: 'SANC', src: '111:52935', from: 'PROC', under: 'DONE', t: 'Rejected — sanctions', state: 'WAL-19 · Rejected', cond: 'destination flagged by sanctions screening; funds return to Available', trig: 'press 2 on step 9', ret: '“Start a new withdrawal” → step 2' },
+    { k: 'NETF', src: '111:53169', from: 'PROC', under: 'DONE', t: 'Failed — network', state: 'WAL-19 · Network failure', cond: 'the broadcast fails on the network', trig: 'press 3 on step 9', ret: '“Retry withdrawal” → step 9' }
+  ],
+  links: [
+    ['WAL', 'Withdraw (quick action)', { text: 'Withdraw', minY: 120, up: 1 }, null, 'ASSET'],
+    ['ASSET', 'Continue with USDT', 17, 694, 356, 48, 'NETW'], ['ASSET', 'Cancel', 17, 750, 356, 48, 'WAL'],
+    ['NETW', 'Continue with Arbitrum', 17, 750, 356, 48, 'ADDR'], ['NETW', 'Back', 16, 108, 48, 48, 'ASSET'],
+    ['ADDR', 'Continue to amount', 16, 975, 358, 48, 'AMT'], ['ADDR', 'Back', 16, 108, 48, 48, 'NETW'], ['ADDR', 'Branch — address field (invalid input)', 16, 516, 358, 122, 'INV'],
+    ['INV', 'Switch network', 65, 787, 235, 40, 'NETW'], ['INV', 'Address field — paste valid address', 16, 516, 358, 122, 'ADDR'], ['INV', 'Back', 16, 108, 48, 48, 'NETW'],
+    ['COOL', 'Use cold wallet', 30, 637, 330, 48, 'ADDR'], ['COOL', 'Add to whitelist', 30, 483, 330, 48, 'ADDR'], ['COOL', 'Cancel', 17, 750, 356, 48, 'NETW'],
+    ['AMT', 'Review fees', 16, 1186, 358, 48, 'FEES'], ['AMT', 'Back', 16, 108, 48, 48, 'ADDR'], ['AMT', 'Branch — amount field (over balance)', 16, 332, 358, 124, 'OVER'],
+    ['OVER', 'Withdraw max', 65, 783, 202, 40, 'AMT'], ['OVER', 'Back', 16, 108, 48, 48, 'ADDR'],
+    ['LIM', 'Back', 16, 108, 48, 48, 'ADDR'],
+    ['FEES', 'Continue to security checks', 17, 751, 356, 48, 'RISK'], ['FEES', 'Close sheet', 333, 65, 40, 40, 'AMT'],
+    ['RISK', 'Continue to 2FA', 16, 1412, 358, 48, 'TFA'], ['RISK', 'Back', 16, 108, 48, 48, 'FEES'],
+    ['KYC', 'Cancel withdrawal', 16, 1738, 358, 48, 'WAL'], ['KYC', 'Back', 16, 108, 48, 48, 'FEES'],
+    ['TFA', 'Confirm withdrawal', 17, 694, 356, 48, 'PROC'], ['TFA', 'Cancel', 17, 750, 356, 48, 'RISK'], ['TFA', 'Branch — authenticator field (locks)', 17, 520, 356, 106, 'LOCK'],
+    ['LOCK', 'Try again at 18:58 UTC', 16, 1455, 358, 48, 'TFA'], ['LOCK', 'Back', 16, 108, 48, 48, 'WAL'],
+    ['PROC', 'Back to wallet', 16, 1203, 358, 48, 'WAL'],
+    ['MAN', 'Back to wallet', 16, 1571, 358, 48, 'WAL'], ['MAN', 'Cancel withdrawal', 16, 1627, 358, 48, 'WAL'],
+    ['SANC', 'Start a new withdrawal', 16, 1565, 358, 48, 'ASSET'], ['SANC', 'Back to wallet', 16, 1621, 358, 48, 'WAL'],
+    ['NETF', 'Retry withdrawal', 16, 1557, 358, 48, 'PROC'], ['NETF', 'Back to wallet', 16, 1613, 358, 48, 'WAL'], ['NETF', 'Change network', 45, 991, 300, 32, 'NETW'],
+    ['DONE', 'Back to wallet', 16, 1168, 358, 48, 'WAL']
+  ],
+  keys: [['ADDR', 1, 'COOL'], ['AMT', 1, 'LIM'], ['RISK', 1, 'KYC'], ['PROC', 1, 'MAN'], ['PROC', 2, 'SANC'], ['PROC', 3, 'NETF']],
+  timeouts: [['PROC', 4, 'DONE']]
+};

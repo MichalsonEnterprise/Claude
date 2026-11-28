@@ -102,6 +102,12 @@ sha256(seed[i])`; `seed[0]` is the public chain commitment. Round i uses `seed[i
   (also after a disconnect); at the 1,000.00× cap every open bet is cashed out at the cap.
 - **Loop**: `CrashEngineService.tick(now)` is the only state transition. With `JOBS_ENABLED=true` it runs every 100 ms
   on one replica (Redis lease `gp:crash:leader`); tests pin `GameClock` and call `tick()` manually.
+  `CRASH_LOOP_ENABLED=true` runs the loop without the BullMQ workers (unset = follows `JOBS_ENABLED`).
+- **History & statistics (read-only, CR-05)**: `GET /games/orbit-rush/rounds` items carry `players`, `wagered`,
+  `paidOut` (DEMO credits) with optional `from` / `search` (round "CR-55102"); `GET /games/orbit-rush/stats?period=`
+  `24h|7d|30d` returns count, median (expected 1.98×), share reaching 2.00× (expected 49.50 %), highest crash and the
+  distribution in 6 buckets next to the published expectation (34.00 · 16.50 · 29.70 · 9.90 · 8.91 · 0.99 %);
+  `GET /games/orbit-rush/bets` adds `summary` (bets, wagered, returned, net, wins, losses, best cash-out).
 
 ## 5. API contract
 

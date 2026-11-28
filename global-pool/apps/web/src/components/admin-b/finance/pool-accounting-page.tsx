@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import { StatusBadge } from '@/components/ui/badge';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { usePoolAccounting, type PoolAccountingResponse } from '@/lib/api/admin-b';
 
 import { ExportCsvButton } from '../export-dialog';
@@ -284,6 +285,12 @@ export function PoolAccountingPage() {
                 columns={columns}
                 rows={d.rounds}
                 rowKey={(r) => String(r.number)}
+                empty={
+                  <EmptyState
+                    title="No rounds in this period"
+                    description="Pool postings appear once a round takes entries."
+                  />
+                }
                 mobileCard={(r) => (
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between">

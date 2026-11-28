@@ -5,6 +5,7 @@
  * lawful), what is paused, what to do next, human support. Never a workaround: no VPN / proxy / location hints,
  * no "play now" or "end early" shortcuts during a break or self-exclusion.
  */
+import { countryName } from '@/components/auth/countries';
 import { ApiRequestError } from '@/lib/api/client';
 
 import { GATE_ROUTES, LEAVE_URL } from './routes';
@@ -87,6 +88,10 @@ const SUPPORT: RegulatoryAction = {
   role: 'support',
 };
 
+/** Age state: the note for parents and carers (the exit page shows it under its own heading). */
+export const PARENTS_NOTE =
+  'Free blocking tools such as BetBlocker (betblocker.org) and the parental controls on your devices can keep gambling sites off shared phones and computers.';
+
 export function regulatoryCopy(kind: RegulatoryKind, ctx: RegulatoryContext = {}): RegulatoryCopy {
   switch (kind) {
     case 'region': {
@@ -101,7 +106,8 @@ export function regulatoryCopy(kind: RegulatoryKind, ctx: RegulatoryContext = {}
           : 'We couldn’t confirm that you’re in a country our licence covers, so games, Global Pool entries, deposits and promotions are paused. Your account and funds are not affected.',
         stillWorks: [
           {
-            title: ctx.signedIn === false ? 'Log in to withdraw' : 'Withdraw your Available balance',
+            title:
+              ctx.signedIn === false ? 'Log in to withdraw' : 'Withdraw your Available balance',
             body: 'To your whitelisted address, unless local law prevents it where you are.',
           },
           {
@@ -271,10 +277,8 @@ export function regulatoryCopy(kind: RegulatoryKind, ctx: RegulatoryContext = {}
             body: 'Only available to adults 18+ in permitted jurisdictions.',
           },
         ],
-        actions: [
-          { label: 'Leave GLOBAL POOL', href: LEAVE_URL, role: 'leave', external: true },
-        ],
-        note: 'Parents and carers: free blocking tools such as BetBlocker (betblocker.org) and the parental controls on your devices can keep gambling sites off shared phones and computers.',
+        actions: [{ label: 'Leave GLOBAL POOL', href: LEAVE_URL, role: 'leave', external: true }],
+        note: PARENTS_NOTE,
       };
   }
 }
@@ -287,8 +291,17 @@ export function regulatoryFromError(
   const d = err.details ?? {};
   const str = (v: unknown) => (typeof v === 'string' ? v : null);
   switch (err.code) {
-    case 'GEO_RESTRICTED':
-      return { kind: 'region', ctx: { countryName: str(d.countryName) ?? str(d.country) } };
+    case 'GEO_RESTRICTED': {
+      // The API sends the ISO code (`details.country`); show the country's name, never a reason or a workaround.
+      const code = str(d.country);
+      return {
+        kind: 'region',
+        ctx: {
+          countryName:
+            str(d.countryName) ?? (code && /^[A-Z]{2}$/.test(code) ? countryName(code) : null),
+        },
+      };
+    }
     case 'SELF_EXCLUDED':
       return {
         kind: d.kind === 'cooling_off' ? 'cooling_off' : 'self_excluded',
@@ -297,7 +310,10 @@ export function regulatoryFromError(
     case 'KYC_REQUIRED':
       return {
         kind: 'kyc_required',
-        ctx: { currentLevel: str(d.kycLevel), requiredLevel: str(d.requiredLevel) },
+        ctx: {
+          currentLevel: str(d.kycLevel),
+          requiredLevel: str(d.requiredLevel) ?? (d.kycLevel === 'none' ? 'level_1' : null),
+        },
       };
     case 'REAL_MONEY_DISABLED':
       return { kind: 'licence', ctx: { product: 'Real-money play' } };

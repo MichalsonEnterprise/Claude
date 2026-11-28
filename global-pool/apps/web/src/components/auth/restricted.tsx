@@ -28,11 +28,13 @@ import {
 import Link from 'next/link';
 import * as React from 'react';
 
+import { regulatoryCopy } from '@/components/compliance/regulatory-copy';
 import { ShellOverride } from '@/components/shell/shell-overrides';
 import { ROUTES } from '@/components/shell/nav-config';
 import { AgeBadge, StatusBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   authApi,
@@ -253,14 +255,21 @@ function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
       };
     case 'self-excluded': {
       const ends = s.selfExclusion.endsAt;
+      // ERR-05 shared copy for a cooling-off break (24 h / 7 d / 30 d): it is not a self-exclusion.
+      const coolingOff =
+        s.selfExclusion.kind === 'cooling_off'
+          ? regulatoryCopy('cooling_off', { endsAt: ends, signedIn: true })
+          : null;
       return {
         tone: 'brand',
-        icon: HeartHandshake,
+        icon: coolingOff ? Hourglass : HeartHandshake,
         accent: 'bg-brand',
-        badge: { status: 'restricted', label: 'Self-excluded' },
-        overline: 'Self-exclusion',
-        title: 'You’re taking a break from gambling',
-        body: (
+        badge: { status: 'restricted', label: coolingOff ? 'On a break' : 'Self-excluded' },
+        overline: coolingOff ? coolingOff.overline : 'Self-exclusion',
+        title: coolingOff ? coolingOff.title : 'You’re taking a break from gambling',
+        body: coolingOff ? (
+          coolingOff.body
+        ) : (
           <>
             You chose to self-exclude
             {s.selfExclusion.startsAt
@@ -487,16 +496,7 @@ export function RestrictedScreen({ variant }: { variant: RestrictedVariant }) {
   }
   if (auth.status === 'loading' || status.isPending) return <RestrictedSkeleton />;
   if (status.isError) {
-    return (
-      <StateCard icon={Info} title="We couldn’t load your account status">
-        <p className="text-body-s text-text-secondary">
-          {status.error instanceof Error ? status.error.message : 'Try again in a moment.'}
-        </p>
-        <Button variant="secondary" size="l" onClick={() => void status.refetch()}>
-          Try again
-        </Button>
-      </StateCard>
-    );
+    return <AccountStatusError error={status.error} onRetry={() => void status.refetch()} />;
   }
   const s = status.data;
   if (s.gate !== GATE_FOR[variant]) {
@@ -887,7 +887,25 @@ function RestrictedSkeleton() {
   );
 }
 
-/** /restricted → the page matching the current account gate. */
+/** ERR-02 account-status failure: readable copy per error kind + Try again (429 waits for Retry-After). */
+function AccountStatusError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
+  return (
+    <section className="flex flex-col gap-4 rounded-xl border border-border-subtle bg-surface-default p-2">
+      <ErrorState
+        error={error}
+        onRetry={onRetry}
+        what="your account status"
+        note="Withdrawals and your balance are not affected."
+      />
+    </section>
+  );
+}
+
+/**
+ * /restricted → the page matching the current account gate. Guests get a sign-in prompt, a failed status an
+ * error with Try again, and an account that still has to finish onboarding a link there — never an endless
+ * skeleton (ERR-03).
+ */
 export function RestrictedIndex() {
   const auth = useAuth();
   const status = useQuery({
@@ -899,6 +917,33 @@ export function RestrictedIndex() {
   React.useEffect(() => {
     if (target && target !== '/onboarding') window.location.replace(target);
   }, [target]);
+  if (auth.status === 'guest') {
+    return (
+      <StateCard icon={Lock} title="Sign in to see your account status">
+        <Button
+          size="l"
+          onClick={() => auth.openAuth?.('sign-in', { next: '/restricted' }) ?? auth.signIn()}
+        >
+          Sign in
+        </Button>
+      </StateCard>
+    );
+  }
+  if (status.isError) {
+    return <AccountStatusError error={status.error} onRetry={() => void status.refetch()} />;
+  }
+  if (target === '/onboarding') {
+    return (
+      <StateCard icon={Info} title="Finish setting up your account">
+        <p className="text-body-s text-text-secondary">
+          Confirm your details and consents first — then you can see your account status here.
+        </p>
+        <Button asChild size="l">
+          <Link href="/onboarding?next=/restricted">Continue setup</Link>
+        </Button>
+      </StateCard>
+    );
+  }
   if (status.data && !target) {
     return (
       <StateCard icon={CircleCheck} tone="success" title="No restrictions on your account">

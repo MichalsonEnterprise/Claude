@@ -58,11 +58,23 @@ function WithdrawButton({
 }) {
   const cta = useWithdrawCta();
   return cta.member ? (
-    <Button asChild size={size} block={block} leadingIcon={<ArrowUpFromLine />} className={className}>
+    <Button
+      asChild
+      size={size}
+      block={block}
+      leadingIcon={<ArrowUpFromLine />}
+      className={className}
+    >
       <Link href={GATE_ROUTES.withdraw}>{cta.label}</Link>
     </Button>
   ) : (
-    <Button size={size} block={block} leadingIcon={<LogIn />} className={className} onClick={cta.open}>
+    <Button
+      size={size}
+      block={block}
+      leadingIcon={<LogIn />}
+      className={className}
+      onClick={cta.open}
+    >
       {cta.label}
     </Button>
   );
@@ -74,7 +86,11 @@ export function GateTopbar({ restricted = false }: { restricted?: boolean }) {
   const member = auth.status === 'member';
   return (
     <header className="sticky top-[var(--gp-shell-top,0px)] z-30 flex h-topbar shrink-0 items-center gap-3 border-b border-border-subtle bg-bg-base/95 px-4 backdrop-blur-md laptop:px-8">
-      <Link href="/" aria-label="GLOBAL POOL — lobby" className="flex shrink-0 items-center rounded-sm">
+      <Link
+        href="/"
+        aria-label="GLOBAL POOL — lobby"
+        className="flex shrink-0 items-center rounded-sm"
+      >
         <Logo height={28} className="hidden tablet:block" />
         <Logo variant="mark" height={28} className="tablet:hidden" />
       </Link>
@@ -219,8 +235,8 @@ export function GeoBlockInterstitial({ decision }: { decision: GeoDecision }) {
           </Button>
         }
       >
-        GLOBAL POOL games are not available in your region{where ? ` (${where})` : ''}. You can still
-        view your account and withdraw funds.
+        GLOBAL POOL games are not available in your region{where ? ` (${where})` : ''}. You can
+        still view your account and withdraw funds.
       </Alert>
       <GateTopbar restricted />
       <main
@@ -247,7 +263,8 @@ export function GeoBlockInterstitial({ decision }: { decision: GeoDecision }) {
                   </dd>
                   {utcTime(decision.checkedAt) && (
                     <dd className="flex items-center gap-1.5 text-caption text-text-tertiary">
-                      <Clock aria-hidden className="size-3.5" /> Checked at {utcTime(decision.checkedAt)}
+                      <Clock aria-hidden className="size-3.5" /> Checked at{' '}
+                      {utcTime(decision.checkedAt)}
                     </dd>
                   )}
                 </dl>
@@ -328,7 +345,10 @@ export function GeoBlockInterstitial({ decision }: { decision: GeoDecision }) {
                   <Link className="text-text-brand hover:underline" href={GATE_ROUTES.terms}>
                     Terms
                   </Link>
-                  <Link className="text-text-brand hover:underline" href={GATE_ROUTES.responsibleGaming}>
+                  <Link
+                    className="text-text-brand hover:underline"
+                    href={GATE_ROUTES.responsibleGaming}
+                  >
                     Responsible gaming
                   </Link>
                 </p>
@@ -342,7 +362,8 @@ export function GeoBlockInterstitial({ decision }: { decision: GeoDecision }) {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border-subtle bg-bg-base/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] backdrop-blur-md tablet:hidden">
         <WithdrawButton block />
         <p className="mt-2 flex items-center justify-center gap-1.5 text-caption text-text-tertiary">
-          <Info aria-hidden className="size-3.5" /> Withdrawals stay open in every region where the law allows.
+          <Info aria-hidden className="size-3.5" /> Withdrawals stay open in every region where the
+          law allows.
         </p>
       </div>
     </div>
@@ -357,10 +378,15 @@ export function RegionUnavailablePage({
   decision,
   loading,
   error,
+  onRetry,
+  retrying = false,
 }: {
   decision: GeoDecision | undefined;
   loading: boolean;
   error: boolean;
+  /** ERR-02: re-run the region check after a failure. */
+  onRetry?: () => void;
+  retrying?: boolean;
 }) {
   if (decision && !decision.permitted) return <GeoBlockInterstitial decision={decision} />;
   return (
@@ -383,6 +409,11 @@ export function RegionUnavailablePage({
                 Try again in a moment. The check also runs on our servers for every game, entry and
                 deposit.
               </p>
+              {onRetry && (
+                <Button variant="secondary" size="m" onClick={onRetry} loading={retrying}>
+                  Try again
+                </Button>
+              )}
             </>
           ) : (
             <>

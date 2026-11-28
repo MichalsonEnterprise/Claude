@@ -3,7 +3,16 @@
 import type { CoinSide } from '@gp/shared/fair';
 import { formatAmount, money } from '@gp/shared/money';
 import { useQueryClient } from '@tanstack/react-query';
-import { BookOpen, ChevronRight, Coins, Info, LogIn, RotateCcw, ShieldCheck, Wallet } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronRight,
+  Coins,
+  Info,
+  LogIn,
+  RotateCcw,
+  ShieldCheck,
+  Wallet,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -41,7 +50,15 @@ import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { authKeys } from '@/lib/api/auth';
-import { gameKeys, useGameBets, usePlaceBet, useResetCredits, useSeeds } from '@/lib/api/games';
+import {
+  applySettledBet,
+  gameKeys,
+  gamesApi,
+  useGameBets,
+  useResetCredits,
+  useSeeds,
+  type DemoCreditsView,
+} from '@/lib/api/games';
 import { rgKeys } from '@/lib/api/rg-history';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -97,7 +114,9 @@ function RecentFlips({ onVerify }: { onVerify: (b: CoinflipBet) => void }) {
           <h2 id="recent-flips" className="text-body-m-strong text-text-primary">
             Recent results
           </h2>
-          <p className="text-caption text-text-tertiary">Your last {items.length || 12} flips · newest first</p>
+          <p className="text-caption text-text-tertiary">
+            Your last {items.length || 12} flips · newest first
+          </p>
         </div>
         <DemoBadge size="s" className="mt-0.5" />
         <Link
@@ -110,7 +129,10 @@ function RecentFlips({ onVerify }: { onVerify: (b: CoinflipBet) => void }) {
       {q.isPending ? (
         <Skeleton className="h-9 w-full" />
       ) : items.length ? (
-        <ul className="no-scrollbar flex gap-2 overflow-x-auto py-1" aria-label="Your last flips, newest first">
+        <ul
+          className="no-scrollbar flex gap-2 overflow-x-auto py-1"
+          aria-label="Your last flips, newest first"
+        >
           {items.map((b, i) => (
             <li key={b.id}>
               <button
@@ -125,7 +147,9 @@ function RecentFlips({ onVerify }: { onVerify: (b: CoinflipBet) => void }) {
           ))}
         </ul>
       ) : (
-        <p className="text-body-s text-text-tertiary">No flips yet — your results appear here with the seeds to verify them.</p>
+        <p className="text-body-s text-text-tertiary">
+          No flips yet — your results appear here with the seeds to verify them.
+        </p>
       )}
       <p className="flex items-start gap-1.5 text-caption text-text-tertiary">
         <Info aria-hidden className="mt-px size-3.5 shrink-0" />
@@ -168,17 +192,26 @@ function HowDoubleSideWorks() {
       </ol>
       <div className="flex flex-col gap-1.5 border-t border-border-subtle pt-3">
         <KvRow label="House edge" value={`${INFO.houseEdgePercent}% · RTP ${INFO.rtpPercent}%`} />
-        <KvRow label="Bet limits" value={`${formatAmount(INFO.minBet)} – ${formatAmount(INFO.maxBet)} DEMO per flip`} />
+        <KvRow
+          label="Bet limits"
+          value={`${formatAmount(INFO.minBet)} – ${formatAmount(INFO.maxBet)} DEMO per flip`}
+        />
         <KvRow label="Fees" value="0.00 DEMO" />
       </div>
       <p className="flex items-center gap-2 text-caption text-text-tertiary">
         <AgeBadge /> Simulation · DEMO credits only · no cash value · permitted regions only
       </p>
       <div className="flex flex-wrap gap-x-5 gap-y-1">
-        <Link href={COINFLIP_ROUTES.details} className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-primary hover:text-text-brand tablet:min-h-0">
+        <Link
+          href={COINFLIP_ROUTES.details}
+          className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-primary hover:text-text-brand tablet:min-h-0"
+        >
           <BookOpen aria-hidden className="size-4" /> Rules & payouts
         </Link>
-        <Link href={COINFLIP_ROUTES.fairness} className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-primary hover:text-text-brand tablet:min-h-0">
+        <Link
+          href={COINFLIP_ROUTES.fairness}
+          className="inline-flex min-h-11 items-center gap-1.5 text-label-m text-text-primary hover:text-text-brand tablet:min-h-0"
+        >
           <ShieldCheck aria-hidden className="size-4" /> Verify a flip
         </Link>
       </div>
@@ -193,7 +226,6 @@ export function CoinflipGame() {
   const qc = useQueryClient();
   const gate = useGameGate();
   const seeds = useSeeds(SLUG);
-  const place = usePlaceBet<CoinflipBet>(SLUG);
   const reset = useResetCredits();
   const reduced = useReducedMotion();
   const recent = useGameBets<CoinflipBet>(SLUG, 1, 12);
@@ -211,12 +243,33 @@ export function CoinflipGame() {
   const [verifyId, setVerifyId] = React.useState<string | null>(null);
   /** Reality checks only between flips: hold the reminder while the coin is still revealing the settled side. */
   const revealHold = React.useRef<(() => void) | null>(null);
+  /**
+   * The settled flip whose balance / history / nonce update waits until the coin lands, so the side is never revealed
+   * early by the balance chip, the session bar or the recent-results strip (same pattern as Pool Roulette).
+   */
+  const pending = React.useRef<CoinflipBet | null>(null);
+  /** Shown while a flip is in flight: the pre-flip balance minus the locked stake (frozen snapshot). */
+  const [lockedCredits, setLockedCredits] = React.useState<DemoCreditsView | null>(null);
+  const syncSettled = React.useCallback(() => {
+    const bet = pending.current;
+    pending.current = null;
+    if (bet) applySettledBet(qc, SLUG, bet);
+    setLockedCredits(null);
+  }, [qc]);
   const endReveal = React.useCallback(() => {
     setAnimating(false);
+    syncSettled();
     revealHold.current?.();
     revealHold.current = null;
-  }, []);
-  React.useEffect(() => () => revealHold.current?.(), []);
+  }, [syncSettled]);
+  React.useEffect(
+    () => () => {
+      revealHold.current?.();
+      // left the page mid-flip: the flip is settled on the server — sync balance + history now
+      if (pending.current) applySettledBet(qc, SLUG, pending.current);
+    },
+    [qc],
+  );
 
   const balance = gate.credits?.balance ?? null;
   const limits = { min: INFO.minBet, max: INFO.maxBet, balance };
@@ -228,12 +281,22 @@ export function CoinflipGame() {
 
   // ── bet runner: one idempotency key per flip; network failures retry with the SAME key ──────────
   const runner = useBetRunner<CoinflipBet>(
-    (idempotencyKey) => place.mutateAsync({ stake: stakeOk ?? stake, params: { pick }, idempotencyKey }),
+    (idempotencyKey) =>
+      gamesApi.placeBet<CoinflipBet>(SLUG, {
+        stake: stakeOk ?? stake,
+        params: { pick },
+        idempotencyKey,
+      }),
     {
       onSettled: (bet) => {
         setLastBet(bet);
         setShowResult(true);
-        if (!reduced) {
+        if (reduced) {
+          // instant result: nothing to hide
+          applySettledBet(qc, SLUG, bet);
+          setLockedCredits(null);
+        } else {
+          pending.current = bet;
           revealHold.current?.();
           revealHold.current = holdRealityCheck();
           setAnimating(true);
@@ -242,23 +305,46 @@ export function CoinflipGame() {
         setFlipId((n) => n + 1);
       },
       onError: (e) => {
+        setLockedCredits(null);
         if (['loss_limit', 'time_limit', 'self_excluded', 'region', 'blocked'].includes(e.kind)) {
           void qc.invalidateQueries({ queryKey: rgKeys.all });
           void qc.invalidateQueries({ queryKey: authKeys.accountStatus });
-          void qc.invalidateQueries({ queryKey: gameKeys.credits });
         }
+        // a refused flip may still have changed state elsewhere (another tab): resync the balance
+        void qc.invalidateQueries({ queryKey: gameKeys.credits });
       },
     },
   );
 
   const busy = runner.busy || animating;
-  const canBet = gate.gate === 'ok' && sProblem === null && !busy;
+  /** The credits request failed with a server error (a network failure is the kit's "offline" gate). */
+  const creditsDown = gate.gate === 'ok' && gate.creditsError && !gate.credits;
+  const canBet = gate.gate === 'ok' && !creditsDown && sProblem === null && !busy;
+  /** What the balance chip and session bar show: the frozen in-flight snapshot while a flip is on its way / landing. */
+  const shownCredits = (busy && lockedCredits) || gate.credits;
+  const shownGate = shownCredits === gate.credits ? gate : { ...gate, credits: shownCredits };
+
+  /** Lock the stake on screen and place ONE flip (manual or auto-play). */
+  const startFlip = React.useCallback(() => {
+    const prev = pending.current;
+    if (prev) syncSettled(); // a previous reveal never finished (throttled tab): apply it first
+    const c = gate.credits;
+    const base = prev?.balance ?? c?.balance;
+    setLockedCredits(
+      c && base !== undefined && stakeOk
+        ? { ...c, balance: money(base).minus(money(stakeOk)).toFixed() }
+        : null,
+    );
+    return runner.run();
+  }, [gate.credits, stakeOk, runner, syncSettled]);
 
   const auto = useAutoPlay(
     async () => {
-      const bet = await runner.run();
+      const bet = await startFlip();
       if (bet) return { net: bet.net };
-      return runner.lastError()?.kind === 'reality_check' ? { stop: 'reality_check' as const } : null;
+      return runner.lastError()?.kind === 'reality_check'
+        ? { stop: 'reality_check' as const }
+        : null;
     },
     reduced ? 400 : FLIP_MS + 500,
   );
@@ -266,8 +352,8 @@ export function CoinflipGame() {
   const flip = React.useCallback(() => {
     if (!canBet || auto.running) return;
     setShowResult(false);
-    void runner.run();
-  }, [canBet, auto.running, runner]);
+    void startFlip();
+  }, [canBet, auto.running, startFlip]);
 
   const choose = React.useCallback(
     (s: CoinSide) => {
@@ -307,22 +393,42 @@ export function CoinflipGame() {
             : 'idle';
 
   const nextNonce = seeds.data?.active.nonce ?? null;
-  const ctaLabel =
-    sProblem?.kind === 'above_max'
-      ? 'Lower your bet to flip'
-      : sProblem?.kind === 'insufficient'
-        ? 'Not enough DEMO credits'
-        : sProblem?.kind === 'below_min' || sProblem?.kind === 'empty'
-          ? 'Enter a bet to flip'
-          : runner.phase === 'reconnecting'
-            ? 'Reconnecting…'
-            : busy
-              ? 'Flipping…'
-              : `${lastBet ? 'Flip again' : 'Flip'} for ${sideLabel(pick)} · ${formatAmount(stakeOk ?? '0')} DEMO`;
+  /** Why new flips are paused (the notice over the stage explains it; the CTA never invites a bet it can't take). */
+  const pausedLabel: string | null =
+    {
+      onboarding: 'Finish sign-up to play',
+      region: 'Not available in your region',
+      self_excluded: 'On a break — flipping paused',
+      blocked: 'Play is paused on your account',
+      time_limit: 'Play-time limit reached',
+      loss_limit: 'Loss limit reached',
+      offline: 'Offline — flipping paused',
+    }[gate.gate as string] ?? null;
+  const ctaLabel = pausedLabel
+    ? pausedLabel
+    : creditsDown
+      ? 'DEMO credits unavailable'
+      : sProblem?.kind === 'above_max'
+        ? 'Lower your bet to flip'
+        : sProblem?.kind === 'insufficient'
+          ? 'Not enough DEMO credits'
+          : sProblem?.kind === 'below_min' || sProblem?.kind === 'empty'
+            ? 'Enter a bet to flip'
+            : runner.phase === 'reconnecting'
+              ? 'Reconnecting…'
+              : busy
+                ? 'Flipping…'
+                : `${lastBet ? 'Flip again' : 'Flip'} for ${sideLabel(pick)} · ${formatAmount(stakeOk ?? '0')} DEMO`;
 
   const cta = (className?: string) =>
     gate.gate === 'guest' ? (
-      <Button size="l" block className={className} onClick={() => auth.signIn()} leadingIcon={<LogIn aria-hidden />}>
+      <Button
+        size="l"
+        block
+        className={className}
+        onClick={() => auth.signIn()}
+        leadingIcon={<LogIn aria-hidden />}
+      >
         Sign in to play
       </Button>
     ) : (
@@ -347,7 +453,12 @@ export function CoinflipGame() {
     return (
       <>
         {minOk && instead && (
-          <Button variant="secondary" size="s" className="min-h-11 tablet:min-h-8" onClick={() => setStake(instead)}>
+          <Button
+            variant="secondary"
+            size="s"
+            className="min-h-11 tablet:min-h-8"
+            onClick={() => setStake(instead)}
+          >
             Bet {formatAmount(instead)} DEMO instead
           </Button>
         )}
@@ -378,7 +489,10 @@ export function CoinflipGame() {
         Answer the reminder to keep playing — it only appears between flips.
       </PanelNotice>
     ) : (
-      <PanelNotice tone={e.kind === 'loss_limit' || e.kind === 'self_excluded' ? 'warning' : 'danger'} title="This flip wasn’t placed">
+      <PanelNotice
+        tone={e.kind === 'loss_limit' || e.kind === 'self_excluded' ? 'warning' : 'danger'}
+        title="This flip wasn’t placed"
+      >
         {e.message}
         {e.requestId ? ` · ref ${e.requestId}` : ''}
       </PanelNotice>
@@ -386,21 +500,31 @@ export function CoinflipGame() {
 
   const stakeNotice =
     sProblem?.kind === 'insufficient' && gate.gate === 'ok' ? (
-      <PanelNotice tone="warning" title="Not enough DEMO credits for this flip" actions={resetActions()}>
-        {insufficientCopy(balance)} Your pick stays on {sideLabel(pick)} and nothing has been charged.
+      <PanelNotice
+        tone="warning"
+        title="Not enough DEMO credits for this flip"
+        actions={resetActions()}
+      >
+        {insufficientCopy(balance)} Your pick stays on {sideLabel(pick)} and nothing has been
+        charged.
       </PanelNotice>
     ) : sProblem?.kind === 'above_max' ? (
       <PanelNotice
         tone="danger"
         title={`Max bet is ${formatAmount(INFO.maxBet)} DEMO per flip`}
         actions={
-          <Button variant="secondary" size="s" className="min-h-11 tablet:min-h-8" onClick={() => setStake(money(INFO.maxBet).toFixed(2))}>
+          <Button
+            variant="secondary"
+            size="s"
+            className="min-h-11 tablet:min-h-8"
+            onClick={() => setStake(money(INFO.maxBet).toFixed(2))}
+          >
             Set to {formatAmount(INFO.maxBet)} DEMO
           </Button>
         }
       >
-        Double Side accepts {formatAmount(INFO.minBet)} – {formatAmount(INFO.maxBet)} DEMO per flip. Your bet is never
-        changed for you — lower it or use the button.
+        Double Side accepts {formatAmount(INFO.minBet)} – {formatAmount(INFO.maxBet)} DEMO per flip.
+        Your bet is never changed for you — lower it or use the button.
       </PanelNotice>
     ) : null;
 
@@ -433,16 +557,30 @@ export function CoinflipGame() {
     stageTitle && sProblem?.kind === 'insufficient' && balance ? (
       <>
         You have <CreditsAmount value={balance} /> available.{' '}
-        {canBetBalance ? 'Lower the bet or reset your DEMO credits' : 'Reset your DEMO credits (once per hour) to keep playing'}{' '}
-        — your pick stays on {sideLabel(pick)} and nothing has been charged. DEMO credits can’t be bought.
+        {canBetBalance
+          ? 'Lower the bet or reset your DEMO credits'
+          : 'Reset your DEMO credits (once per hour) to keep playing'}{' '}
+        — your pick stays on {sideLabel(pick)} and nothing has been charged. DEMO credits can’t be
+        bought.
       </>
     ) : stageTitle ? (
       `Double Side accepts ${formatAmount(INFO.minBet)} – ${formatAmount(INFO.maxBet)} DEMO per flip. Your pick stays on ${sideLabel(pick)}.`
     ) : undefined;
 
-  const tiles: { id: string; label: React.ReactNode; value: React.ReactNode; sub: React.ReactNode; tone?: string }[] = [
+  const tiles: {
+    id: string;
+    label: React.ReactNode;
+    value: React.ReactNode;
+    sub: React.ReactNode;
+    tone?: string;
+  }[] = [
     { id: 'chance', label: 'Win chance', value: `${WIN_CHANCE}%`, sub: 'Same for Heads and Tails' },
-    { id: 'payout', label: 'Payout', value: `${MULTIPLIER}×`, sub: `House edge ${HOUSE_EDGE}% · RTP ${INFO.rtpPercent}%` },
+    {
+      id: 'payout',
+      label: 'Payout',
+      value: `${MULTIPLIER}×`,
+      sub: `House edge ${HOUSE_EDGE}% · RTP ${INFO.rtpPercent}%`,
+    },
     {
       id: 'profit',
       label: (
@@ -463,7 +601,11 @@ export function CoinflipGame() {
   ];
 
   const modeSwitch = (
-    <div role="radiogroup" aria-label="Bet mode" className="inline-grid grid-cols-2 gap-1 rounded-md border border-border-subtle bg-surface-default p-1">
+    <div
+      role="radiogroup"
+      aria-label="Bet mode"
+      className="inline-grid grid-cols-2 gap-1 rounded-md border border-border-subtle bg-surface-default p-1"
+    >
       {(['manual', 'auto'] as const).map((m) => (
         <button
           key={m}
@@ -489,7 +631,7 @@ export function CoinflipGame() {
         {modeSwitch}
         {gate.gate !== 'guest' && (
           <DemoCreditsChip
-            data={gate.credits}
+            data={shownCredits}
             loading={gate.gate === 'loading'}
             disabled={busy || auto.running}
             compact
@@ -504,7 +646,7 @@ export function CoinflipGame() {
             setStake(v);
             if (runner.phase === 'failed') runner.reset();
           }}
-          limits={limits}
+          limits={{ ...limits, balance: shownCredits?.balance ?? null }}
           error={amountError}
           disabled={disabledInputs}
           helper={`Min ${formatAmount(INFO.minBet)} · Max ${formatAmount(INFO.maxBet)} DEMO per flip`}
@@ -512,25 +654,44 @@ export function CoinflipGame() {
         <div className="flex min-w-0 flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <p className="text-label-m text-text-secondary">
-              {busy ? 'This flip — locked' : lastBet && phase === 'settled' ? 'Next flip' : 'This flip'}
+              {busy
+                ? 'This flip — locked'
+                : lastBet && phase === 'settled'
+                  ? 'Next flip'
+                  : 'This flip'}
               <span className="text-text-tertiary"> · {sideLabel(pick)}</span>
             </p>
             <DemoBadge size="s" />
           </div>
           <dl className="grid grid-cols-3 gap-2 tablet:gap-3">
             {tiles.map((t) => (
-              <div key={t.id} className="flex min-w-0 flex-col gap-1 rounded-lg border border-border-subtle bg-surface-default p-2.5 tablet:bg-surface-raised tablet:p-3.5">
-                <dt className="text-[10px] font-semibold tracking-[0.06em] text-text-tertiary uppercase tablet:text-overline">{t.label}</dt>
-                <dd className={cn('text-body-m-strong break-words text-text-primary tablet:text-number-m', t.tone)}>{t.value}</dd>
+              <div
+                key={t.id}
+                className="flex min-w-0 flex-col gap-1 rounded-lg border border-border-subtle bg-surface-default p-2.5 tablet:bg-surface-raised tablet:p-3.5"
+              >
+                <dt className="text-[10px] font-semibold tracking-[0.06em] text-text-tertiary uppercase tablet:text-overline">
+                  {t.label}
+                </dt>
+                <dd
+                  className={cn(
+                    'text-body-m-strong break-words text-text-primary tablet:text-number-m',
+                    t.tone,
+                  )}
+                >
+                  {t.value}
+                </dd>
                 <dd className="hidden text-caption text-text-tertiary tablet:block">{t.sub}</dd>
               </div>
             ))}
           </dl>
-          <p className="flex items-start gap-1.5 text-caption text-text-tertiary" data-testid="coinflip-fees">
+          <p
+            className="flex items-start gap-1.5 text-caption text-text-tertiary"
+            data-testid="coinflip-fees"
+          >
             <Info aria-hidden className="mt-px size-3.5 shrink-0" />
             <span>
-              <span className="text-text-secondary">Fees 0.00 DEMO</span> — no platform or network fee on game bets; the{' '}
-              {HOUSE_EDGE}% house edge is already in the {MULTIPLIER}× payout.
+              <span className="text-text-secondary">Fees 0.00 DEMO</span> — no platform or network
+              fee on game bets; the {HOUSE_EDGE}% house edge is already in the {MULTIPLIER}× payout.
             </span>
           </p>
         </div>
@@ -539,8 +700,9 @@ export function CoinflipGame() {
       {mode === 'auto' && (
         <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface-default p-4">
           <p className="text-caption text-text-secondary">
-            Auto-play calls <strong className="text-text-primary">{sideLabel(pick)}</strong> on every flip ({WIN_CHANCE}% ·{' '}
-            {MULTIPLIER}×) with the same stake. Switch to Manual to change the side.
+            Auto-play calls <strong className="text-text-primary">{sideLabel(pick)}</strong> on
+            every flip ({WIN_CHANCE}% · {MULTIPLIER}×) with the same stake. Switch to Manual to
+            change the side.
           </p>
           <AutoPlayPanel
             stake={stakeOk ?? ''}
@@ -554,7 +716,28 @@ export function CoinflipGame() {
         </div>
       )}
 
-      {stakeNotice ?? refusal}
+      {creditsDown ? (
+        <PanelNotice
+          tone="danger"
+          title="Couldn’t load your DEMO credits"
+          actions={
+            <Button
+              variant="secondary"
+              size="s"
+              className="min-h-11 tablet:min-h-8"
+              onClick={gate.refetch}
+              leadingIcon={<RotateCcw aria-hidden />}
+            >
+              Try again
+            </Button>
+          }
+        >
+          The game server didn’t answer, so flipping is paused. Nothing has been charged — try again
+          in a moment.
+        </PanelNotice>
+      ) : (
+        (stakeNotice ?? refusal)
+      )}
 
       <div className="flex flex-col gap-3 laptop:flex-row laptop:items-center laptop:gap-6">
         <StakeRiskNote
@@ -570,7 +753,9 @@ export function CoinflipGame() {
         {mode === 'manual' && (
           <div className="hidden flex-col gap-1.5 tablet:flex laptop:w-[340px] laptop:shrink-0">
             {cta()}
-            <p className="text-center text-caption text-text-tertiary">H / T pick a side · Space flips</p>
+            <p className="text-center text-caption text-text-tertiary">
+              H / T pick a side · Space flips
+            </p>
           </div>
         )}
       </div>
@@ -608,12 +793,23 @@ export function CoinflipGame() {
       payout={payout}
       nonce={nextNonce}
       serverSeedHash={seeds.data?.active.serverSeedHash ?? null}
-      bet={phase === 'flipping' && runner.phase === 'placing' ? null : lastBet}
+      bet={runner.phase === 'placing' || runner.phase === 'reconnecting' ? null : lastBet}
       last={last}
       locked={disabledInputs}
       title={stageTitle}
       body={stageBody}
       result={result}
+      reconnect={
+        runner.phase === 'reconnecting'
+          ? {
+              attempt: runner.attempt,
+              max: runner.maxAttempts,
+              stake: stakeOk ?? undefined,
+              sentAt: runner.sentAt,
+              onRetry: runner.retryNow,
+            }
+          : undefined
+      }
     />
   );
 
@@ -624,7 +820,7 @@ export function CoinflipGame() {
         title="Double Side"
         mechanic="Coinflip · Heads or Tails"
         icon={Coins}
-        gate={gate}
+        gate={shownGate}
         busy={busy || auto.running}
         arrangement="stacked"
         sessionBarPosition="above"
@@ -638,29 +834,18 @@ export function CoinflipGame() {
           </>
         }
         onFairness={() => router.push(COINFLIP_ROUTES.fairness)}
-        notice={
-          runner.phase === 'reconnecting'
-            ? {
-                kind: 'reconnecting',
-                reconnect: {
-                  attempt: runner.attempt,
-                  max: runner.maxAttempts,
-                  stake: stakeOk ?? undefined,
-                  sentAt: runner.sentAt,
-                  onRetry: runner.retryNow,
-                },
-              }
-            : undefined
-        }
         panel={panel}
         stage={stage}
         mobileBar={
           mode === 'manual' ? (
             <MobileBetBar
               summary={
-                profit ? (
+                pausedLabel || creditsDown ? (
+                  'New flips are paused'
+                ) : profit ? (
                   <>
-                    {sideLabel(pick)} · profit on win <CreditsAmount value={profit} signed tone="net" />
+                    {sideLabel(pick)} · profit on win{' '}
+                    <CreditsAmount value={profit} signed tone="net" />
                   </>
                 ) : (
                   'Set a valid bet'

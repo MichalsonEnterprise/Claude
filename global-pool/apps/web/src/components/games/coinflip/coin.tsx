@@ -14,7 +14,15 @@ import { faceAngle, landingAngle } from './coinflip-math';
  * pool glyph. Never gold (gold is reserved for the jackpot). Pure CSS / inline SVG — concrete object, no glow or
  * orbit rings.
  */
-export function CoinFace({ side, size, className }: { side: CoinSide; size: number; className?: string }) {
+export function CoinFace({
+  side,
+  size,
+  className,
+}: {
+  side: CoinSide;
+  size: number;
+  className?: string;
+}) {
   const heads = side === 'heads';
   const rim = Math.max(2, Math.round(size * 0.035));
   const medallion = Math.round(size * (heads ? 0.36 : 0.3));
@@ -30,7 +38,10 @@ export function CoinFace({ side, size, className }: { side: CoinSide; size: numb
     >
       {/* reeded edge + inner ring */}
       <span
-        className={cn('absolute rounded-full border border-dashed', heads ? 'border-mint-800/45' : 'border-ink-500/45')}
+        className={cn(
+          'absolute rounded-full border border-dashed',
+          heads ? 'border-mint-800/45' : 'border-ink-500/45',
+        )}
         style={{ inset: size * 0.045 }}
       />
       <span
@@ -52,13 +63,24 @@ export function CoinFace({ side, size, className }: { side: CoinSide; size: numb
         {heads ? (
           <LogoMark height={Math.round(medallion * 0.46)} title="" />
         ) : (
-          <Waves className="text-ink-600" style={{ width: medallion * 0.5, height: medallion * 0.5 }} strokeWidth={2.4} />
+          <Waves
+            className="text-ink-600"
+            style={{ width: medallion * 0.5, height: medallion * 0.5 }}
+            strokeWidth={2.4}
+          />
         )}
       </span>
       {size >= 40 && (
         <span
-          className={cn('relative font-extrabold leading-none', heads ? 'text-ink-950' : 'text-ink-700')}
-          style={{ fontSize: Math.max(7, size * 0.115), letterSpacing: size * 0.012, marginTop: size * 0.045 }}
+          className={cn(
+            'relative font-extrabold leading-none',
+            heads ? 'text-ink-950' : 'text-ink-700',
+          )}
+          style={{
+            fontSize: Math.max(7, size * 0.115),
+            letterSpacing: size * 0.012,
+            marginTop: size * 0.045,
+          }}
         >
           {heads ? 'HEADS' : 'TAILS'}
         </span>
@@ -85,7 +107,9 @@ export function SideDisc({
       aria-hidden
       className={cn(
         'inline-flex shrink-0 items-center justify-center rounded-full border font-semibold',
-        heads ? 'border-border-brand bg-brand-tint text-text-brand' : 'border-border-default bg-surface-raised text-text-secondary',
+        heads
+          ? 'border-border-brand bg-brand-tint text-text-brand'
+          : 'border-border-default bg-surface-raised text-text-secondary',
         newest && 'ring-2 ring-border-focus ring-offset-2 ring-offset-surface-default',
         className,
       )}
@@ -115,7 +139,16 @@ export interface FlipCoinProps {
  * 3D coin (CF-02 flipping → CF-03 result). The side is fixed by the seeds before the flip; the animation only reveals
  * the side the server settled (`side`). Web Animations API; instant under reduced motion or without WAAPI.
  */
-export function FlipCoin({ side, flipId, size, durationMs, instant = false, pending = false, onFlipEnd, className }: FlipCoinProps) {
+export function FlipCoin({
+  side,
+  flipId,
+  size,
+  durationMs,
+  instant = false,
+  pending = false,
+  onFlipEnd,
+  className,
+}: FlipCoinProps) {
   const spinRef = React.useRef<HTMLDivElement>(null);
   const tossRef = React.useRef<HTMLDivElement>(null);
   const shadowRef = React.useRef<HTMLDivElement>(null);
@@ -147,12 +180,16 @@ export function FlipCoin({ side, flipId, size, durationMs, instant = false, pend
       return;
     }
     const easing = 'cubic-bezier(0.2, 0.65, 0.25, 1)';
-    const spin = el.animate([{ transform: `rotateY(${from}deg)` }, { transform: `rotateY(${to}deg)` }], {
-      duration: durationMs,
-      easing,
-      fill: 'forwards',
-    });
-    const lift = Math.round(size * 0.32);
+    const spin = el.animate(
+      [{ transform: `rotateY(${from}deg)` }, { transform: `rotateY(${to}deg)` }],
+      {
+        duration: durationMs,
+        easing,
+        fill: 'forwards',
+      },
+    );
+    // a short toss: it stays inside the free space above the coin (never over the stage's top line)
+    const lift = Math.round(size * 0.14);
     const toss = tossRef.current?.animate(
       [
         { transform: 'translateY(0)' },
@@ -196,10 +233,13 @@ export function FlipCoin({ side, flipId, size, durationMs, instant = false, pend
       commit(to);
       return;
     }
-    const a = el.animate([{ transform: `rotateY(${angle.current}deg)` }, { transform: `rotateY(${to}deg)` }], {
-      duration: 240,
-      easing: 'ease-out',
-    });
+    const a = el.animate(
+      [{ transform: `rotateY(${angle.current}deg)` }, { transform: `rotateY(${to}deg)` }],
+      {
+        duration: 240,
+        easing: 'ease-out',
+      },
+    );
     commit(to);
     return () => a.cancel();
   }, [side, instant]);
@@ -210,12 +250,20 @@ export function FlipCoin({ side, flipId, size, durationMs, instant = false, pend
         <div
           ref={spinRef}
           className="relative"
-          style={{ width: size, height: size, transformStyle: 'preserve-3d', transform: initialTransform }}
+          style={{
+            width: size,
+            height: size,
+            transformStyle: 'preserve-3d',
+            transform: initialTransform,
+          }}
         >
           <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
             <CoinFace side="heads" size={size} />
           </div>
-          <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+          <div
+            className="absolute inset-0"
+            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          >
             <CoinFace side="tails" size={size} />
           </div>
         </div>

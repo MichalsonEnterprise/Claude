@@ -20,6 +20,7 @@ import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { usePoolOverview, type RoundRow } from '@/lib/api/admin-b';
 import { money } from '@gp/shared/money';
 
@@ -424,6 +425,12 @@ export function PoolOverviewPage() {
                   columns={roundColumns}
                   rows={d.recent}
                   rowKey={(x) => x.id}
+                  empty={
+                    <EmptyState
+                      title="No rounds yet"
+                      description="Rounds appear here once the first one opens."
+                    />
+                  }
                   rowHref={(x) =>
                     x.status === 'cancelled'
                       ? `/admin/pool/refunds?round=${x.number}`

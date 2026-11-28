@@ -1,0 +1,15 @@
+{
+ "_note": "Agent err-b — ERR-04..07 (page '12 — Empty & Error States', section 'ERR-04..07 Permission, regulatory, maintenance & security' 275:2409 at X=3000, Y=0 — X=2000 would overlap err-a's 'ERR-01/02/03' section 272:962 at X 0, w 1680). Mobile: page '10 — Mobile Experience', section 'ERR — Mobile' 281:97573 at X=253000 (shared with err-a; ERR-04..07 frames are row 2 at y 1124, err-a's ERR-01..03 row 1 at y 120). NO new library components: boards and screens are composed from library instances (Alert/Banner, Toast, Modal/2FA, Modal/Connect Wallet, Input/Address, Input/Text, Input/Password, User/KYC Status Chip, Nav/Admin Item, Admin/Role Chip, Tile/Game, Notice/Licence, RG/Help Resources, Jackpot/VRF Stepper, Wallet/Confirmations Progress, Wallet/Network Pill, Wallet/Address Chip, Select/Network Option, User/Notification Item, Button/*, Badge/*, Shell/Topbar Mobile, Nav/Mobile Tab Bar). IDs below are sections and frames. Scripts: pending/err-b.",
+ "Section/ERR-04..07 (page 12)": { "id": "275:2409" },
+ "[ERR-04] Permission, session & offline states / 1440 / Board": { "id": "275:2410" },
+ "[ERR-05] Regulatory states — region, licence, self-exclusion, age gate / 1440 / Board": { "id": "278:3108" },
+ "[ERR-06] Service status — maintenance, degraded chain, VRF delayed, entries paused / 1440 / Board": { "id": "280:4065" },
+ "[ERR-07] Security warnings library — wrong network, new address, phishing, suspicious sign-in / 1440 / Board": { "id": "281:101532" },
+ "Section/ERR — Mobile (page 10, shared with err-a)": { "id": "281:97573" },
+ "[ERR-04] Offline — reconnecting / 390 / Global Pool round": { "id": "282:97947" },
+ "[ERR-05] Licence required / 390 / Global Pool entries off": { "id": "282:98104" },
+ "[ERR-06] New entries paused / 390 / Circuit breaker": { "id": "282:98272" },
+ "[ERR-06] Wallet maintenance / 390 / BNB Chain paused": { "id": "283:98246" },
+ "[ERR-07] Wrong network / 390 / Bottom sheet": { "id": "283:98464" },
+ "[ERR-07] Suspicious sign-in / 390 / New device alert": { "id": "283:98610" }
+}

@@ -38,6 +38,7 @@ import { OtpInput } from '@/components/ui/otp-input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ApiRequestError, apiRequest } from '@/lib/api/client';
+import { describeError } from '@/lib/api/errors';
 import { statePreviewEnabled } from '@/lib/home-preview';
 import { cn } from '@/lib/utils';
 
@@ -173,8 +174,22 @@ function PolicyPanel() {
           <>
             <TriangleAlert aria-hidden className="size-[18px] text-status-warning" />
             <span className="text-label-l text-text-primary">
-              {health.isError ? 'API unreachable' : 'Admin console degraded'}
+              {!health.isError
+                ? 'Admin console degraded'
+                : ['network', 'timeout'].includes(describeError(health.error).kind)
+                  ? 'API unreachable'
+                  : 'Status check failed'}
             </span>
+            {health.isError && (
+              <Button
+                variant="ghost"
+                size="s"
+                onClick={() => void health.refetch()}
+                loading={health.isFetching}
+              >
+                Try again
+              </Button>
+            )}
           </>
         )}
         {health.data && (

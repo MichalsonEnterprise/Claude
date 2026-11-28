@@ -22,6 +22,7 @@ import { CheckboxField } from '@/components/ui/checkbox';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Field } from '@/components/ui/input';
 import { OtpInput } from '@/components/ui/otp-input';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
 import { ApiRequestError } from '@/lib/api/client';
@@ -294,9 +295,15 @@ export function TwoFactorSetup() {
             your camera at the code.
           </PaneHeader>
           {enroll.isError ? (
-            <Callout tone="danger" title="We couldn’t start the setup">
-              {enroll.error instanceof Error ? enroll.error.message : 'Try again.'}
-            </Callout>
+            // ERR-02: readable copy per error kind + Try again (starting enrolment again is safe).
+            <ErrorState
+              variant="inline"
+              error={enroll.error}
+              onRetry={() => enroll.mutate()}
+              retrying={enroll.isPending}
+              what="the setup"
+              title="We couldn’t start the setup"
+            />
           ) : !enrollment ? (
             <div className="flex gap-6" aria-busy>
               <Skeleton className="size-48" />

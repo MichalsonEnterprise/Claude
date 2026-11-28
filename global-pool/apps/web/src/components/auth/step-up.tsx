@@ -19,10 +19,12 @@ import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { ErrorState } from '@/components/ui/error-state';
 import { Field, Input } from '@/components/ui/input';
 import { OtpInput } from '@/components/ui/otp-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiRequestError } from '@/lib/api/client';
+import { describeError } from '@/lib/api/errors';
 import { authApi, authKeys, type StepUpToken } from '@/lib/api/auth';
 import { useAuth } from '@/lib/auth/context';
 import { cn } from '@/lib/utils';
@@ -186,6 +188,7 @@ export function StepUpBody({
   const lockedUntilMs = state.kind === 'locked' ? Date.parse(state.lockedUntil) : 0;
   const locked = state.kind === 'locked' && lockedUntilMs > now;
   const antiPhishing = auth.profile?.security.antiPhishingCode ?? null;
+  const profileUnknown = !previewState && auth.status === 'member' && !auth.profile;
   const notEnrolled = !previewState && status.data !== undefined && !status.data.enabled;
   const purposeLabel = STEP_UP_PURPOSE_LABEL[request.purpose];
 
@@ -222,7 +225,8 @@ export function StepUpBody({
         const left = err.details?.attemptsRemaining;
         setState({ kind: 'wrong', attemptsRemaining: typeof left === 'number' ? left : null });
       } else {
-        setFailure(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+        // ERR-02 copy per error kind (offline, timeout, 429, 5xx) — never raw transport text.
+        setFailure(describeError(err, 'this confirmation').description);
       }
     } finally {
       setBusy(false);
@@ -301,13 +305,20 @@ export function StepUpBody({
           <span className="font-mono text-mono-m text-text-brand">{antiPhishing}</span>
           {auth.profile?.isDemo && <DemoBadge size="xs" />}
         </p>
+      ) : profileUnknown ? (
+        // ERR-07: an unknown code is never shown as "Not set" (the profile failed or is still loading).
+        <p className="text-body-s text-text-secondary">
+          {auth.sessionError ? 'Couldn’t load your code right now' : 'Loading…'}
+        </p>
       ) : (
         <p className="text-body-s text-text-secondary">Not set yet</p>
       )}
       <p className="text-caption text-text-secondary">
         {antiPhishing
           ? 'Only GLOBAL POOL shows this code. If it’s missing or different, close this window and contact support.'
-          : 'Set one in Security settings — we show it in every email and here, so fakes are easy to spot.'}
+          : profileUnknown
+            ? 'If you set a code, it appears here once your profile loads. Only continue if you opened this page on GLOBAL POOL yourself.'
+            : 'Set one in Security settings — we show it in every email and here, so fakes are easy to spot.'}
       </p>
     </div>
   );
@@ -342,6 +353,16 @@ export function StepUpBody({
         }}
       >
         {request.summary}
+        {status.isError && !status.data && !previewState && (
+          <ErrorState
+            variant="inline"
+            error={status.error}
+            onRetry={() => void status.refetch()}
+            retrying={status.isFetching}
+            what="your 2FA status"
+            title="We couldn’t check your two-step sign-in"
+          />
+        )}
         {locked && (
           <div
             className="flex flex-col gap-3 rounded-lg border border-status-danger bg-status-danger-tint p-4"

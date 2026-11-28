@@ -1,0 +1,12 @@
+{
+ "_note": "Agent err-a (ERR-01/02/03 + mobile examples). No new library components — boards are composed from existing instances (Table/Empty State, Table/Skeleton Row, Table/Toolbar, Table/Header Cell, Toast, Alert/Banner, Tx/Status Timeline, Tx/Hash, Wallet/Fee Estimator, Wallet/Confirmations Progress, Wallet/Network Pill, Input/Address, Input/Amount, Input/Search, Input/File Upload, Drawer/Detail, Chart/Line-Area, Table/Live Bets, Jackpot/VRF Stepper, Card/Draw Countdown, User/Device Row, Tabs/Segmented, Nav/Stepper Mobile, Shell/Topbar Mobile, Nav/Mobile Tab Bar, Button/*, Badge/*). Scripts: pending/err-a.",
+ "Section/ERR-01/02/03 Empty, error & loading matrices (page 12, X 0, Y 0)": { "id": "272:962" },
+ "[ERR-01] Empty-state matrix / 1440 / Board": { "id": "272:963", "note": "E-01…E-12" },
+ "[ERR-02] Error matrix / 1440 / Board": { "id": "273:1292", "note": "X-01…X-13" },
+ "[ERR-03] Loading matrix / 1440 / Board": { "id": "277:2501", "note": "L-01…L-13" },
+ "Section/ERR — Mobile (page 10, X 253000, Y 0)": { "id": "281:97573" },
+ "[ERR-01 · MOB] Transactions / 390 / Empty — new account": { "id": "281:97574" },
+ "[ERR-02 · MOB] Withdraw — Step 4 Amount / 390 / Validation errors": { "id": "281:97695" },
+ "[ERR-02 · MOB] Withdrawal WD-20931 / 390 / Failed to broadcast — bottom sheet": { "id": "281:97831" },
+ "[ERR-03 · MOB] Wallet / 390 / Loading (skeleton)": { "id": "281:98012" }
+}

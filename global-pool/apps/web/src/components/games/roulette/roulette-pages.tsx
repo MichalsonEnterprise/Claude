@@ -57,7 +57,7 @@ import { useAuth } from '@/lib/auth';
 import { MQ, useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 
-import { RouletteFelt } from './roulette-felt';
+import { RouletteFelt, RouletteFeltVertical } from './roulette-felt';
 import {
   PAYOUTS,
   RULES,
@@ -530,9 +530,9 @@ function PayTable({ title, rows, foot }: { title: string; rows: [string, string,
         <thead className="text-left text-overline uppercase text-text-tertiary">
           <tr>
             <th scope="col" className="py-2 font-medium">Bet</th>
-            <th scope="col" className="py-2 text-right font-medium">Covers</th>
-            <th scope="col" className="py-2 text-right font-medium">Pays</th>
-            <th scope="col" className="py-2 text-right font-medium">Chance</th>
+            <th scope="col" className="py-2 pl-3 text-right font-medium whitespace-nowrap tablet:pl-5">Covers</th>
+            <th scope="col" className="py-2 pl-3 text-right font-medium whitespace-nowrap tablet:pl-5">Pays</th>
+            <th scope="col" className="py-2 pl-3 text-right font-medium whitespace-nowrap tablet:pl-5">Chance</th>
           </tr>
         </thead>
         <tbody>
@@ -544,9 +544,9 @@ function PayTable({ title, rows, foot }: { title: string; rows: [string, string,
                   <span className="block text-body-s-strong text-text-primary">{l}</span>
                   <span className="block text-caption text-text-tertiary">{how}</span>
                 </td>
-                <td className="py-2.5 text-right tabular-nums">{n}</td>
-                <td className="py-2.5 text-right tabular-nums">{PAYOUTS[s.type]}:1</td>
-                <td className="py-2.5 text-right tabular-nums">{chanceOfCount(n)}%</td>
+                <td className="py-2.5 pl-3 text-right whitespace-nowrap tabular-nums tablet:pl-5">{n}</td>
+                <td className="py-2.5 pl-3 text-right whitespace-nowrap tabular-nums tablet:pl-5">{PAYOUTS[s.type]}:1</td>
+                <td className="py-2.5 pl-3 text-right whitespace-nowrap tabular-nums tablet:pl-5">{chanceOfCount(n)}%</td>
               </tr>
             );
           })}
@@ -573,10 +573,12 @@ export function RouletteRulesPage() {
     >
       <Card title="Where each bet goes" icon={CircleDot}>
         <div className="grid items-center gap-6 laptop:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="no-scrollbar -mx-4 overflow-x-auto px-4 tablet:mx-0 tablet:px-0">
-            <div className="min-w-[640px]" inert aria-hidden>
-              <RouletteFelt bets={MAP_BETS} onPlace={() => undefined} onRemove={() => undefined} hover={null} onHover={() => undefined} />
-            </div>
+          {/* ≥ 768 the horizontal table; below, the same vertical felt the 390 table uses (no clipped side-scroller) */}
+          <div className="hidden tablet:block" inert aria-hidden>
+            <RouletteFelt bets={MAP_BETS} onPlace={() => undefined} onRemove={() => undefined} hover={null} onHover={() => undefined} />
+          </div>
+          <div className="mx-auto w-full max-w-[340px] tablet:hidden" inert aria-hidden>
+            <RouletteFeltVertical bets={MAP_BETS} onNumber={() => undefined} onPlace={() => undefined} onRemove={() => undefined} />
           </div>
           <ul className="flex flex-col gap-2.5">
             {[
@@ -679,7 +681,7 @@ function Step({ n, title, ok, children, mono }: { n: number; title: string; ok: 
         </p>
         <div className="text-body-s text-text-secondary">{children}</div>
         {mono && (
-          <code className="w-fit max-w-full break-all whitespace-pre-wrap rounded-sm border border-border-subtle bg-bg-secondary px-2.5 py-1.5 font-mono text-mono-s text-text-primary">
+          <code className="w-fit max-w-full whitespace-pre-wrap [overflow-wrap:anywhere] rounded-sm border border-border-subtle bg-bg-secondary px-2.5 py-1.5 font-mono text-mono-s text-text-primary">
             {mono}
           </code>
         )}

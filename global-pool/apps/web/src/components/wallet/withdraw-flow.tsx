@@ -35,8 +35,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckboxField } from '@/components/ui/checkbox';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiRequestError, isOutcomeUnknown, newIdempotencyKey } from '@/lib/api/client';
+import { failedQueries } from '@/lib/api/errors';
 import {
   useBalances,
   useInvalidateWallet,
@@ -217,7 +219,11 @@ export function WithdrawFlow() {
     >
       {!ref && <WalletStatusBanners status={status.data} rg={undefined} context="withdraw" />}
       {step === 'asset' && (
-        <AssetStep available={balances.data?.available} onNext={() => go('network')} />
+        <AssetStep
+          available={balances.data?.available}
+          failure={balances.isError && !balances.data ? balances : undefined}
+          onNext={() => go('network')}
+        />
       )}
       {step === 'network' && (
         <NetworkStep
@@ -304,7 +310,16 @@ export function WithdrawFlow() {
 
 // ── step 1 · asset (WAL-10) ────────────────────────────────────────────────────────────────────
 
-function AssetStep({ available, onNext }: { available: string | undefined; onNext: () => void }) {
+function AssetStep({
+  available,
+  failure,
+  onNext,
+}: {
+  available: string | undefined;
+  /** Balances failed with nothing cached: an error with Try again instead of an endless skeleton (ERR-03). */
+  failure?: { error: unknown; refetch: () => unknown; isFetching: boolean };
+  onNext: () => void;
+}) {
   const empty = available !== undefined && isZero(available);
   return (
     <>
@@ -327,12 +342,24 @@ function AssetStep({ available, onNext }: { available: string | undefined; onNex
                 <Amount value={available} className="text-body-s-strong" />
                 <DemoBadge size="xs" />
               </span>
+            ) : failure ? (
+              <span className="text-caption text-text-tertiary">—</span>
             ) : (
               <Skeleton className="h-4 w-24" />
             )
           }
         />
       </div>
+      {failure && (
+        <ErrorState
+          variant="inline"
+          error={failure.error}
+          onRetry={() => void failure.refetch()}
+          retrying={failure.isFetching}
+          what="your Available balance"
+          note="Nothing has been sent."
+        />
+      )}
       {empty && (
         <Alert
           type="info"
@@ -499,6 +526,16 @@ function AddressStep({
       </FlowHeading>
       <div role="radiogroup" aria-label="Destination" className="flex flex-col gap-2">
         {wallets.isPending && <Skeleton className="h-16 w-full" />}
+        {wallets.isError && !wallets.data && (
+          // ERR-02: saved addresses couldn't be loaded — say so (a new address can still be entered below).
+          <ErrorState
+            variant="inline"
+            error={wallets.error}
+            onRetry={() => void wallets.refetch()}
+            retrying={wallets.isFetching}
+            what="your saved addresses"
+          />
+        )}
         {saved.map((w) => (
           <OptionRow
             key={w.id}
@@ -673,10 +710,11 @@ function AmountStep({
   const remaining = s?.remainingToday ?? '0.00';
   const min = s?.minWithdrawal ?? CHAINS[draft.network].minWithdrawal;
   const limitReached = s ? isZero(remaining) : false;
+  const unchecked = failedQueries(balances, status);
   const quote = useQuote(draft.amount, draft.network);
   const v = draft.amount;
   const valid = v !== '' && isUSDTAmount(v) && !v.endsWith('.');
-  const over = valid && gt(v, available);
+  const over = valid && balances.data !== undefined && gt(v, available);
   const overLimit = valid && s && gt(v, remaining);
   const below = valid && lt(v, min);
   const ok = valid && !over && !overLimit && !below && quote.data?.meetsMinimum !== false;
@@ -695,6 +733,17 @@ function AmountStep({
         Enter the amount in USDT. The network fee is taken from this amount, so you always see
         exactly what arrives before you confirm.
       </FlowHeading>
+      {unchecked.failed && (
+        // ERR-02: never read a failed balance / limit as 0.00 — say it couldn't be loaded.
+        <ErrorState
+          variant="inline"
+          error={unchecked.error}
+          onRetry={unchecked.retry}
+          retrying={unchecked.retrying}
+          what="your balance and limits"
+          note="Nothing has been sent."
+        />
+      )}
       {limitReached && s && (
         <Alert type="warning" title="Daily limit reached">
           You’ve withdrawn {formatUSDT(s.usedToday)} today (KYC{' '}
@@ -748,10 +797,14 @@ function AmountStep({
       <ul className="grid grid-cols-1 gap-2 tablet:grid-cols-3">
         {[
           ['Minimum', formatUSDT(min), 'per withdrawal'],
-          ['Available now', formatUSDT(available), 'your withdrawable balance'],
+          [
+            'Available now',
+            balances.data ? formatUSDT(available) : '—',
+            'your withdrawable balance',
+          ],
           [
             'Left today',
-            formatUSDT(remaining),
+            s ? formatUSDT(remaining) : '—',
             s ? `KYC ${status.data?.kycLevel.replace('level_', 'Level ')} daily limit` : '',
           ],
         ].map(([label, value, hint]) => (
@@ -871,6 +924,8 @@ function FeesStep({
         <p className="text-overline text-text-tertiary uppercase">You receive</p>
         {quote.data ? (
           <Amount value={quote.data.youReceive} className="text-number-l text-text-success" />
+        ) : quote.isError ? (
+          <span className="text-number-l text-text-tertiary">—</span>
         ) : (
           <Skeleton className="h-10 w-40" />
         )}
@@ -885,7 +940,8 @@ function FeesStep({
             label: 'Network fee',
             value: quote.data ? `−${formatUSDT(quote.data.networkFee)}` : '…',
           },
-          { label: 'Platform fee', value: formatUSDT(quote.data?.platformFee ?? '0.00') },
+          // A fee is never shown as 0.00 while the quote is unknown.
+          { label: 'Platform fee', value: quote.data ? formatUSDT(quote.data.platformFee) : '…' },
           { label: 'Asset', value: 'USDT · Tether USD' },
           { label: 'Network', value: `${c.testnet.name} · ${c.usdtStandard}` },
           { label: 'Destination', value: <AddressChip address={draft.address} size="s" /> },
@@ -895,6 +951,17 @@ function FeesStep({
           },
         ]}
       />
+      {quote.isError && !quote.data && (
+        <ErrorState
+          variant="inline"
+          error={quote.error}
+          onRetry={() => void quote.refetch()}
+          retrying={quote.isFetching}
+          what="the network fee"
+          title="We couldn’t get the fee quote"
+          note="Nothing has been sent."
+        />
+      )}
       <Alert type="warning" title="Crypto withdrawals can’t be reversed once sent">
         Make sure the address belongs to you and supports USDT on {c.testnet.name}.
       </Alert>
@@ -1418,6 +1485,15 @@ function WithdrawSide({ draft, step }: { draft: Draft; step: StepKey }) {
               Resets {formatDateTimeUTC(s.resetsAt)} · minimum {formatUSDT(s.minWithdrawal)}.
             </p>
           </>
+        ) : status.isError ? (
+          // ERR-03: a failed status is an error with Try again, never an endless skeleton.
+          <ErrorState
+            variant="inline"
+            error={status.error}
+            onRetry={() => void status.refetch()}
+            retrying={status.isFetching}
+            what="your daily limit"
+          />
         ) : (
           <Skeleton className="h-12 w-full" />
         )}

@@ -3194,7 +3194,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "11 frames at 1440 (7 happy-path steps, 4 branches: validation, sign-up error, resend cooldown, code expired). Mobile 390 version has 7 frames. Every frame has hotspots, the logo restarts the flow, and there is a flow starting point and a flow map. Read-back of the reactions found 0 broken destinations, 0 unreachable frames and 0 dead ends. Screenshots passed.",
+  "by": "proto-a"
  },
  {
   "id": "PRO-02",
@@ -3204,7 +3206,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "11 frames at 1440 (6 steps, 5 branches: WalletConnect QR, connection rejected, wrong network, signature rejected, nonce expired). Mobile 390 version has 6 frames. The 390 AUTH-09 connecting/connected and AUTH-10 success screens don't exist, so signing returns to the dashboard. Reaction read-back is clean.",
+  "by": "proto-a"
  },
  {
   "id": "PRO-03",
@@ -3214,7 +3218,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "14 frames at 1440 (8 steps, 6 branches: wrong network, address expired, below minimum, delayed, failed, unrecognised token). Pending screens auto-advance after 4 s and 6 s. Mobile 390 version has 12 frames. Reaction read-back is clean.",
+  "by": "proto-a"
  },
  {
   "id": "PRO-04",
@@ -3224,7 +3230,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "23 frames at 1440 (10 steps, 13 branches including the 2FA wrong code → locked chain, KYC required, flagged, queued, manual review, network failure, sanctions). Mobile 390 version has 19 frames. Reaction read-back is clean.",
+  "by": "proto-a"
  },
  {
   "id": "PRO-05",
@@ -3234,7 +3242,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "13 frames at 1440 (6 steps, 7 branches: restricted region, wallet disconnected, insufficient funds, limit reached, wrong network, VRF delayed, illustrative win). The canonical result is 'not selected'. Mobile 390 version has 12 frames. Reaction read-back is clean.",
+  "by": "proto-a"
  },
  {
   "id": "PRO-06",
@@ -3244,7 +3254,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "11 frames: 6 happy-path steps (PUB-03 lobby → CR-01 → CR-02 → CR-03 → CR-04 → CR-07 verify) and 5 branches (restricted region US, insufficient balance, crash before target, connection lost, daily loss limit). 36 navigate reactions, Smart Animate between Orbit Rush states, flow start registered. Flow map card, numbered headers and arrows are on the canvas. Checked with screenshots and the dead-end audit; presentation-mode playback cannot be run through the API.",
+  "by": "proto-b"
  },
  {
   "id": "PRO-07",
@@ -3254,7 +3266,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "16 frames: USR-A4 not started → AUTH-11 → 12 → 13 requirements → 13 preview → 14 → 15 → 16 → USR-A4 approved. Branches: validation, upload error, liveness retake, camera denied, and the rejected path (AUTH-17 reasons → resubmit → back to review; USR-A4 rejected → retake). 56 navigate reactions, flow start registered, screenshots checked.",
+  "by": "proto-b"
  },
  {
   "id": "PRO-08",
@@ -3264,7 +3278,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "10 frames: ADM-02 → U1 → U2 → U8 default → U8 apply (reason + 2FA + four-eyes) → U8 restriction active → U8 lift → back to default. Branches: Support L2 restricted role, 2FA locked after 5 wrong codes, session expired → re-authenticate. 33 navigate reactions. The second approval is shown through the 'Second approver approves' chip; no restriction-specific approver frame exists.",
+  "by": "proto-b"
  },
  {
   "id": "PRO-09",
@@ -3274,7 +3290,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "13 frames: F2 queue → WD-20931 detail → X1 release dialog (empty → ready) → request submitted → F2 awaiting 2nd approver → X1 second-approver review (K. Osei) → fresh 2FA → approved/released → F2 broadcasting. Branches: reject with reason (validation error, Cancel goes back), wrong 2FA code, self-approval blocked. 41 navigate reactions.",
+  "by": "proto-b"
  },
  {
   "id": "PRO-10",
@@ -3284,7 +3302,9 @@
   "sizes": "",
   "page": "11",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "9 frames: P1 → P3 round #1,248 → P7 VRF fulfilled → P8 settlement. Branches: P9 refund for round #1,245; P10 circuit breaker (pause request → second approval → new entries paused); P7 VRF delayed. 30 navigate reactions, flow start registered.",
+  "by": "proto-b"
  },
  {
   "id": "ERR-01",
@@ -3294,7 +3314,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Board 272:963. 12 cells in 8 rows, each with module tag + ID + kind chip, a preview built from library instances (Table/Empty State No data/No results, User/Device Row, Tabs/Segmented, Input/Search, Table/Header Cell, Buttons, Badges), and Trigger/Copy/Recovery/Dev spec rows. Mobile example 281:97574. Every row was checked in an in-script screenshot; nothing is clipped or overlapping.",
+  "by": "err-a"
  },
  {
   "id": "ERR-02",
@@ -3304,7 +3326,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Board 273:1292. 13 cells in 8 rows covering network error, 4xx (message map), 5xx, timeout, validation (Input/Address Invalid + Input/Amount Error), chain congestion (Alert/Banner + Fee Estimator Congested + Confirmations Delayed + Network Pills), tx failed (Tx/Status Timeline Failed, deposit and withdrawal versions), dropped, replaced, toasts and the game connection case. Mobile examples 281:97695 and 281:97831. All rows screenshot-verified after two targeted fixes (X-02 toast labels, the 422 cross-reference).",
+  "by": "err-a"
  },
  {
   "id": "ERR-03",
@@ -3314,7 +3338,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Board 277:2501. 13 cells in 8 rows: skeletons (Table/Skeleton Row ×5 + Table/Toolbar, cards, lobby tiles + Table/Live Bets Loading, Chart/Line-Area Loading + Drawer/Detail Loading), spinners (Button Loading states, inline check), progress (Confirmations Progress + Toast Tx pending, Jackpot/VRF Stepper Pending, Input/File Upload Uploading, route bar), optimistic UI with rollback, and a do/don't cell showing money is never optimistic. Mobile example 281:98012. Screenshot-verified; L-07 copy was corrected to match the chart variant.",
+  "by": "err-a"
  },
  {
   "id": "ERR-04",
@@ -3324,7 +3350,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 board with 6 cells: 04.1 KYC level required (player 403), 04.2 admin role denied (Nav/Admin Item No access + Role Chips), 04.3 session expired, 04.4 step-up re-auth (Modal/2FA with AURORA-27), 04.5 offline/reconnecting, 04.6 back online / check before retry. Each cell has trigger, exact copy, actions and notes. Added a 390 offline frame. Session-expired 390 already exists in AUTH-20. Checked by screenshot, and the clip/off-frame audit found 0 flags after fixes.",
+  "by": "err-b"
  },
  {
   "id": "ERR-05",
@@ -3334,7 +3362,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 board: 05.1 restricted-region banner + locked tiles, 05.2 blocked-action interstitial, 05.3 licence required (Ontario DEMO scenario), 05.4 self-excluded + RG/Help Resources, 05.5 age-gate fail. Also has an availability matrix: withdrawals, history, RG tools and support stay open in every state. No VPN, proxy or mirror-domain hint anywhere. New 390 frame for licence required; 390 versions of geo-block (PUB-21), self-excluded (AUTH-18) and age gate (PUB-22) already exist. No 1280/768 variants because these are documentation boards; the full-screen tablet states belong to those slices. Audit found 0 flags.",
+  "by": "err-b"
  },
  {
   "id": "ERR-06",
@@ -3344,7 +3374,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 board: 06.1 scheduled maintenance (AN-88, 1 Dec 2026 02:00–02:30 UTC), 06.2 maintenance in progress (BNB Chain), 06.3 degraded chain (Ethereum congested), 06.4 network outage (alternative WD-20931 outcome), 06.5 VRF delayed (Jackpot/VRF Stepper Delayed), 06.6 new entries paused (EntriesPaused, AR-1039). Includes the banner priority/stacking rules. Two 390 frames: entries paused and wallet maintenance. Audit found 0 flags; the 06.1 toast title was shortened after the screenshot check.",
+  "by": "err-b"
  },
  {
   "id": "ERR-07",
@@ -3354,7 +3386,9 @@
   "sizes": "",
   "page": "12",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "1440 board: 07.1 wrong network (Modal/Connect Wallet + Button/Wallet), 07.2 wrong network/token on deposit, 07.3 new address with 24 h hold (Input/Address New address), 07.4 anti-phishing code AURORA-27 in an email preview, 07.5 leaving GLOBAL POOL / unverified link, 07.6 suspicious sign-in (Alert/Banner Security + User/Notification Item). Also a 'We will never ask you to…' list. Two 390 frames: wrong-network bottom sheet over a 390×844 viewport, and suspicious sign-in. Audit found 0 flags; network-option labels were shortened on mobile after the screenshot check.",
+  "by": "err-b"
  },
  {
   "id": "GM-02",

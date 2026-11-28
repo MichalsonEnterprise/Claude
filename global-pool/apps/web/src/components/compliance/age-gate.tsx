@@ -20,7 +20,13 @@ import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox';
 import { DemoBadge, DemoBar } from '@/components/ui/demo-badge';
 import { Field } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Sheet,
   SheetBody,
@@ -110,6 +116,8 @@ export interface AgeGateFormProps {
   onSignIn: () => void;
   /** Where the footer buttons go: inline (page / preview) or a sticky sheet footer (rendered by the caller). */
   renderFooter: (footer: React.ReactNode) => React.ReactNode;
+  /** Scroll container for the questions (sheet body / modal body); default: rendered as is. */
+  renderBody?: (body: React.ReactNode) => React.ReactNode;
 }
 
 /**
@@ -117,7 +125,14 @@ export interface AgeGateFormProps {
  * detected country, checked by the API), the jurisdiction checkbox (never pre-checked), licence notice and legal
  * links. Enter stays disabled until "Yes" + the box are answered.
  */
-export function AgeGateForm({ detected, onEnter, onUnderAge, onSignIn, renderFooter }: AgeGateFormProps) {
+export function AgeGateForm({
+  detected,
+  onEnter,
+  onUnderAge,
+  onSignIn,
+  renderFooter,
+  renderBody = (body) => body,
+}: AgeGateFormProps) {
   const [age, setAge] = React.useState<AgeAnswer>(null);
   const [confirmed, setConfirmed] = React.useState(false);
   const [country, setCountry] = React.useState<string>('');
@@ -133,9 +148,15 @@ export function AgeGateForm({ detected, onEnter, onUnderAge, onSignIn, renderFoo
     : sameAsDetected
       ? (detected?.permitted ?? null)
       : (declared.data?.permitted ?? null);
+  // The check failed (API unreachable): say so and offer a retry — never an endless "Checking…" (Enter stays off).
+  const declaredFailed = Boolean(country) && !sameAsDetected && declared.isError;
 
   const action = ageGateAction({ age, jurisdictionConfirmed: confirmed, declaredPermitted });
-  const name = country ? (declared.data?.name ?? (sameAsDetected ? detected?.countryName : null) ?? countryName(country)) : null;
+  const name = country
+    ? (declared.data?.name ??
+      (sameAsDetected ? detected?.countryName : null) ??
+      countryName(country))
+    : null;
 
   const footer = (
     <>
@@ -160,116 +181,140 @@ export function AgeGateForm({ detected, onEnter, onUnderAge, onSignIn, renderFoo
 
   return (
     <>
-      <div className="flex flex-col gap-5">
-        <RadioPrimitive.Root
-          aria-label="Are you 18 or older?"
-          value={age ?? ''}
-          onValueChange={(v) => setAge(v === 'yes' || v === 'no' ? v : null)}
-          className="grid gap-2 tablet:grid-cols-2"
-        >
-          <AgeOption value="yes" title="Yes, I’m 18 or older" body="I’m an adult where I live" />
-          <AgeOption value="no" title="No, I’m under 18" body="I’m not old enough to gamble" />
-        </RadioPrimitive.Root>
-
-        {age === 'no' ? (
-          <p
-            role="status"
-            className="flex gap-3 rounded-md border border-status-danger/60 bg-status-danger-tint px-4 py-3.5 text-body-s text-text-secondary"
+      {renderBody(
+        <div className="flex flex-col gap-5">
+          <RadioPrimitive.Root
+            aria-label="Are you 18 or older?"
+            value={age ?? ''}
+            onValueChange={(v) => setAge(v === 'yes' || v === 'no' ? v : null)}
+            className="grid gap-2 tablet:grid-cols-2"
           >
-            <ShieldX aria-hidden className="mt-0.5 size-5 shrink-0 text-text-danger" />
-            <span>
-              <span className="block text-body-s-strong text-text-primary">You must be 18+</span>
-              GLOBAL POOL is for adults only. Continue to see where you can find help.
-            </span>
-          </p>
-        ) : (
-          <>
-            <Field label="Country of residence">
-              <Select value={country} onValueChange={setCountry}>
-                <SelectTrigger size="l">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <MapPin aria-hidden className="size-4 shrink-0 text-icon-muted" />
-                    <SelectValue placeholder="Choose your country" />
-                  </span>
-                </SelectTrigger>
-                <SelectContent className="max-h-72">
-                  {countryOptions().map((c) => (
-                    <SelectItem key={c.code} value={c.code}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-            {country ? (
-              declaredPermitted === null ? (
-                <StatusLine icon={MapPin} tone="muted">
-                  Checking {name}…
-                </StatusLine>
-              ) : declaredPermitted ? (
-                <StatusLine icon={CircleCheck} tone="success">
-                  {sameAsDetected ? 'Detected from your connection: ' : ''}
-                  <span className="text-text-primary">{name}</span> · permitted jurisdiction
-                  {detected?.isDemo && <DemoBadge size="xs" className="ml-1.5 align-middle" />}
-                </StatusLine>
+            <AgeOption value="yes" title="Yes, I’m 18 or older" body="I’m an adult where I live" />
+            <AgeOption value="no" title="No, I’m under 18" body="I’m not old enough to gamble" />
+          </RadioPrimitive.Root>
+
+          {age === 'no' ? (
+            <p
+              role="status"
+              className="flex gap-3 rounded-md border border-status-danger/60 bg-status-danger-tint px-4 py-3.5 text-body-s text-text-secondary"
+            >
+              <ShieldX aria-hidden className="mt-0.5 size-5 shrink-0 text-text-danger" />
+              <span>
+                <span className="block text-body-s-strong text-text-primary">You must be 18+</span>
+                GLOBAL POOL is for adults only. Continue to see where you can find help.
+              </span>
+            </p>
+          ) : (
+            <>
+              <Field label="Country of residence">
+                <Select value={country} onValueChange={setCountry}>
+                  <SelectTrigger size="l">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <MapPin aria-hidden className="size-4 shrink-0 text-icon-muted" />
+                      <SelectValue placeholder="Choose your country" />
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {countryOptions().map((c) => (
+                      <SelectItem key={c.code} value={c.code}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              {country ? (
+                declaredFailed ? (
+                  <StatusLine icon={TriangleAlert} tone="warning">
+                    We couldn’t check <span className="text-text-primary">{name}</span> right now.{' '}
+                    <button
+                      type="button"
+                      onClick={() => void declared.refetch()}
+                      className="text-text-brand hover:underline"
+                    >
+                      Try again
+                    </button>
+                  </StatusLine>
+                ) : declaredPermitted === null ? (
+                  <StatusLine icon={MapPin} tone="muted">
+                    Checking {name}…
+                  </StatusLine>
+                ) : declaredPermitted ? (
+                  <StatusLine icon={CircleCheck} tone="success">
+                    {sameAsDetected ? 'Detected from your connection: ' : ''}
+                    <span className="text-text-primary">{name}</span> · permitted jurisdiction
+                    {detected?.isDemo && <DemoBadge size="xs" className="ml-1.5 align-middle" />}
+                  </StatusLine>
+                ) : (
+                  <StatusLine icon={TriangleAlert} tone="warning">
+                    GLOBAL POOL isn’t available in <span className="text-text-primary">{name}</span>
+                    .{' '}
+                    <Link
+                      href={GATE_ROUTES.restrictedCountries}
+                      className="text-text-brand hover:underline"
+                    >
+                      Restricted countries
+                    </Link>
+                  </StatusLine>
+                )
               ) : (
-                <StatusLine icon={TriangleAlert} tone="warning">
-                  GLOBAL POOL isn’t available in <span className="text-text-primary">{name}</span>.{' '}
-                  <Link href={GATE_ROUTES.restrictedCountries} className="text-text-brand hover:underline">
-                    Restricted countries
-                  </Link>
+                <StatusLine icon={MapPin} tone="muted">
+                  Choose the country you live in.
                 </StatusLine>
-              )
-            ) : (
-              <StatusLine icon={MapPin} tone="muted">
-                Choose the country you live in.
-              </StatusLine>
-            )}
-            <CheckboxField
-              checked={confirmed}
-              onCheckedChange={(v) => setConfirmed(v === true)}
-              label="I confirm online gambling is legal for me where I live, and I’m not in a restricted country."
-              description="We check your location on our servers too — for every game, entry and deposit."
-            />
-          </>
-        )}
+              )}
+              <CheckboxField
+                checked={confirmed}
+                onCheckedChange={(v) => setConfirmed(v === true)}
+                label="I confirm online gambling is legal for me where I live, and I’m not in a restricted country."
+                description="We check your location on our servers too — for every game, entry and deposit."
+              />
+            </>
+          )}
 
-        <section
-          aria-label="Licence notice"
-          className="flex flex-col gap-2 rounded-lg border border-border-subtle bg-bg-secondary/60 p-4"
-        >
-          <p className="flex items-center gap-2 text-label-l text-text-primary">
-            <ShieldCheck aria-hidden className="size-4 text-icon-brand" /> Licence notice
-          </p>
-          <p className="text-body-s text-text-secondary">
-            GLOBAL POOL is offered only where an applicable gaming licence permits it. This is a
-            DEMO / testnet build: test funds and DEMO credits only — no real money. Outcomes come
-            from verifiable randomness; you can lose your stake.
-          </p>
-          <p className="flex flex-wrap gap-x-4 gap-y-1 text-label-s">
-            <Link className="text-text-brand hover:underline" href={GATE_ROUTES.terms}>
-              Terms
-            </Link>
-            <Link className="text-text-brand hover:underline" href={GATE_ROUTES.privacy}>
-              Privacy
-            </Link>
-            <Link className="text-text-brand hover:underline" href={GATE_ROUTES.responsibleGaming}>
-              Responsible gaming
-            </Link>
-            <Link className="text-text-brand hover:underline" href={GATE_ROUTES.restrictedCountries}>
-              Restricted countries
-            </Link>
-          </p>
-        </section>
+          <section
+            aria-label="Licence notice"
+            className="flex flex-col gap-2 rounded-lg border border-border-subtle bg-bg-secondary/60 p-4"
+          >
+            <p className="flex items-center gap-2 text-label-l text-text-primary">
+              <ShieldCheck aria-hidden className="size-4 text-icon-brand" /> Licence notice
+            </p>
+            <p className="text-body-s text-text-secondary">
+              GLOBAL POOL is offered only where an applicable gaming licence permits it. This is a
+              DEMO / testnet build: test funds and DEMO credits only — no real money. Outcomes come
+              from verifiable randomness; you can lose your stake.
+            </p>
+            <p className="flex flex-wrap gap-x-4 gap-y-1 text-label-s">
+              <Link className="text-text-brand hover:underline" href={GATE_ROUTES.terms}>
+                Terms
+              </Link>
+              <Link className="text-text-brand hover:underline" href={GATE_ROUTES.privacy}>
+                Privacy
+              </Link>
+              <Link
+                className="text-text-brand hover:underline"
+                href={GATE_ROUTES.responsibleGaming}
+              >
+                Responsible gaming
+              </Link>
+              <Link
+                className="text-text-brand hover:underline"
+                href={GATE_ROUTES.restrictedCountries}
+              >
+                Restricted countries
+              </Link>
+            </p>
+          </section>
 
-        <button
-          type="button"
-          onClick={onSignIn}
-          className="inline-flex items-center gap-2 self-start rounded-sm text-label-m text-text-brand hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus"
-        >
-          <LogIn aria-hidden className="size-4" /> Already a member? Sign in — your sign-up confirmation applies
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={onSignIn}
+            className="inline-flex items-center gap-2 self-start rounded-sm text-label-m text-text-brand hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus"
+          >
+            <LogIn aria-hidden className="size-4" /> Already a member? Sign in — your sign-up
+            confirmation applies
+          </button>
+        </div>,
+      )}
       {renderFooter(footer)}
     </>
   );
@@ -309,7 +354,10 @@ export function AgeGateDialog({
           </SheetHeader>
           <AgeGateForm
             {...form}
-            renderFooter={(footer) => <SheetFooter className="flex-col-reverse">{footer}</SheetFooter>}
+            renderBody={(body) => <SheetBody>{body}</SheetBody>}
+            renderFooter={(footer) => (
+              <SheetFooter className="flex-col-reverse">{footer}</SheetFooter>
+            )}
           />
         </SheetContent>
       </Sheet>
@@ -331,13 +379,18 @@ export function AgeGateDialog({
               <Logo variant="mark" height={24} title="" />
               <AgeBadge />
             </div>
-            <DialogPrimitive.Title className="text-h3 text-text-primary">{TITLE}</DialogPrimitive.Title>
+            <DialogPrimitive.Title className="text-h3 text-text-primary">
+              {TITLE}
+            </DialogPrimitive.Title>
             <DialogPrimitive.Description className="text-body-s text-text-secondary">
               {DESCRIPTION}
             </DialogPrimitive.Description>
           </div>
           <AgeGateForm
             {...form}
+            renderBody={(body) => (
+              <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-4 pb-6">{body}</div>
+            )}
             renderFooter={(footer) => (
               <div className="flex flex-col-reverse gap-3 border-t border-border-subtle px-6 py-4 tablet:flex-row tablet:justify-end">
                 {footer}
@@ -371,7 +424,11 @@ export function AgeRestrictedPage() {
   const copy = regulatoryCopy('age');
   return (
     <FocusedGateFrame>
-      <main id="main" className="flex-1 px-4 pt-8 pb-16 tablet:px-6 laptop:px-8" data-gate="age-restricted">
+      <main
+        id="main"
+        className="flex-1 px-4 pt-8 pb-16 tablet:px-6 laptop:px-8"
+        data-gate="age-restricted"
+      >
         <div className="mx-auto flex w-full max-w-[720px] flex-col gap-6">
           <section className="flex flex-col items-start gap-4 rounded-xl border border-border-subtle bg-surface-default p-6 tablet:p-10">
             <span className="inline-flex size-12 items-center justify-center rounded-lg bg-status-danger-tint text-text-danger [&_svg]:size-6">

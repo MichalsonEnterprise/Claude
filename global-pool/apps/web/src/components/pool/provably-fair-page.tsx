@@ -40,6 +40,7 @@ import {
   LicenceCard,
   POOL_ROUTES,
   PoolPageHeader,
+  QueryError,
   RiskLine,
   Steps,
   cardCls,
@@ -233,9 +234,20 @@ function VrfVerifier() {
         <CardHeading title="Recent draws" demo={recent.data?.items.some((r) => r.isDemo)} as="h3" />
         {recent.isPending ? (
           <Skeleton className="h-40 w-full" />
+        ) : recent.isError ? (
+          <QueryError
+            error={recent.error}
+            onRetry={() => void recent.refetch()}
+            title="We couldn’t load recent draws"
+            className="border-0 p-0"
+          />
+        ) : recent.data.items.length === 0 ? (
+          <p className="text-body-s text-text-secondary">
+            No completed draws yet — settled and cancelled rounds appear here.
+          </p>
         ) : (
           <ul className="flex flex-col divide-y divide-border-subtle">
-            {(recent.data?.items ?? []).map((r) => (
+            {recent.data.items.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-3 py-2.5">
                 <span className="flex flex-col">
                   <span className="text-label-m text-text-primary">

@@ -30,6 +30,8 @@ import * as React from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
+import { regulatoryFromError } from '@/components/compliance/regulatory-copy';
+import { RegulatoryNotice } from '@/components/compliance/regulatory-state';
 import { EntryTicket } from '@/components/home/art';
 import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox';
@@ -337,6 +339,7 @@ function PreviewStep({
   const check = checkParticipation({ entries, available, limits });
   const odds = oddsAfter(round, myEntries, entries);
   const serverCode = error instanceof ApiRequestError ? error.code : null;
+  const regulatory = regulatoryFromError(error);
   const blocked =
     check.insufficient ||
     check.limitReached ||
@@ -383,8 +386,13 @@ function PreviewStep({
             ) : null}
           </Callout>
         )}
+        {/* ERR-05: a regulatory refusal (region, self-exclusion / break) gets the shared notice with its next step. */}
+        {error !== null && !unknownOutcome && regulatory && (
+          <RegulatoryNotice kind={regulatory.kind} ctx={regulatory.ctx} />
+        )}
         {error !== null &&
           !unknownOutcome &&
+          !regulatory &&
           serverCode !== 'INSUFFICIENT_FUNDS' &&
           serverCode !== 'RG_LIMIT_EXCEEDED' && (
             <Callout tone="danger" icon={<TriangleAlert />} title="Your entries were not placed">

@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Field, Input, Textarea } from '@/components/ui/input';
 import { OtpInput } from '@/components/ui/otp-input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -57,6 +58,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { SecurityWarning } from '@/components/ui/security-warning';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToastCard, toast } from '@/components/ui/sonner';
 import { SwitchField } from '@/components/ui/switch';
@@ -68,7 +70,53 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+import { ApiNetworkError, ApiRequestError, ApiTimeoutError } from '@/lib/api/client';
+
 import { DsSection, Specimen } from './ds';
+
+/** ERR-02 specimens: one error per kind (offline, timeout, 429 with Retry-After, maintenance 503, 5xx). */
+const ERROR_SPECIMENS: { label: string; error: unknown }[] = [
+  { label: 'Network / offline', error: new ApiNetworkError('/wallet/balances') },
+  { label: 'Timeout', error: new ApiTimeoutError('/wallet/balances', 20_000) },
+  {
+    label: '429 rate limited',
+    error: new ApiRequestError(
+      429,
+      '/x',
+      'Too many requests',
+      'RATE_LIMITED',
+      'req-4291',
+      undefined,
+      {
+        retryAfterSeconds: 20,
+      },
+    ),
+  },
+  {
+    label: '503 maintenance',
+    error: new ApiRequestError(
+      503,
+      '/x',
+      'Deposits is temporarily paused',
+      'SERVICE_UNAVAILABLE',
+      'req-5031',
+      undefined,
+      undefined,
+    ),
+  },
+  {
+    label: '5xx server',
+    error: new ApiRequestError(
+      500,
+      '/x',
+      'Something went wrong',
+      'INTERNAL_ERROR',
+      'req-5001',
+      undefined,
+      undefined,
+    ),
+  },
+];
 
 /** DEMO clock for countdowns: the demo sheet's "03:17:42 before the 20:00 UTC close". */
 const DEMO_NOW = '2026-11-27T16:42:18Z';
@@ -697,6 +745,65 @@ export function FeedbackSection() {
           />
         </div>
       </div>
+      <Specimen label="ErrorState (ERR-02) — copy per error kind, request id, Try again (429 waits)">
+        <div className="grid grid-cols-1 gap-4 laptop:grid-cols-3">
+          {ERROR_SPECIMENS.map((s) => (
+            <div key={s.label} className="flex flex-col gap-2">
+              <p className="text-caption text-text-tertiary">{s.label}</p>
+              <div className="rounded-lg border border-border-subtle bg-surface-default">
+                <ErrorState error={s.error} onRetry={() => undefined} what="your balances" />
+              </div>
+            </div>
+          ))}
+          <div className="flex flex-col gap-2">
+            <p className="text-caption text-text-tertiary">Inline (cards, widgets, flows)</p>
+            <ErrorState
+              variant="inline"
+              error={new ApiNetworkError('/wallet/lifetime')}
+              onRetry={() => undefined}
+              what="your lifetime totals"
+            />
+          </div>
+        </div>
+      </Specimen>
+      <Specimen label="SecurityWarning (ERR-07) — never dismissible">
+        <div className="grid grid-cols-1 gap-3 laptop:grid-cols-2">
+          <SecurityWarning
+            kind="wrong-network"
+            currentChainId={1}
+            actions={
+              <Button size="s" variant="secondary">
+                Switch to Arbitrum
+              </Button>
+            }
+          />
+          <SecurityWarning
+            kind="new-address"
+            address="0x71C4…9A2f"
+            unlocksAt="2026-11-29T10:00:00.000Z"
+            actions={
+              <Button size="s" variant="ghost">
+                Remove it
+              </Button>
+            }
+          />
+          <SecurityWarning
+            kind="new-device"
+            device="Chrome on macOS"
+            location="Lisbon, PT"
+            at="2026-11-28T08:12:00.000Z"
+            actions={
+              <Button size="s" variant="secondary">
+                Review devices
+              </Button>
+            }
+          />
+          <SecurityWarning kind="suspicious-login" location="Unknown location" />
+          <SecurityWarning kind="phishing" />
+          <SecurityWarning kind="anti-phishing" code="AURORA-27" />
+          <SecurityWarning kind="unverified-contract" tokenLabel="Test USDT on Arbitrum Sepolia" />
+        </div>
+      </Specimen>
     </DsSection>
   );
 }

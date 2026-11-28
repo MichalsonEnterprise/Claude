@@ -33,8 +33,9 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
-import { ApiRequestError } from '@/lib/api/client';
+import { ApiRequestError, isOutcomeUnknown } from '@/lib/api/client';
 import { authApi, authKeys } from '@/lib/api/auth';
+import { describeError } from '@/lib/api/errors';
 import { useAuth } from '@/lib/auth/context';
 
 import {
@@ -322,6 +323,9 @@ function OnboardingFormView({ next, onDone }: { next?: string; onDone: () => voi
         ) : (
           <p className="flex gap-2 text-caption text-text-tertiary">
             <Globe2 aria-hidden className="mt-px size-4 shrink-0" />
+            {region.isError
+              ? 'We couldn’t check your location right now — choose your country of residence. '
+              : ''}
             We check your location when you deposit or play. You must be {MIN_AGE} or older.
           </p>
         )}
@@ -402,8 +406,11 @@ function OnboardingFormView({ next, onDone }: { next?: string; onDone: () => voi
             ['CONFLICT', 'VALIDATION_FAILED'].includes(mutation.error.code)
           ) && (
             <Callout tone="danger" title="We couldn’t save your details">
-              {mutation.error instanceof Error ? mutation.error.message : 'Try again in a moment.'}{' '}
-              Nothing was saved.
+              {/* ERR-02: readable copy per error kind; "nothing was saved" only when that is certain. */}
+              {describeError(mutation.error, 'your details').description}
+              {isOutcomeUnknown(mutation.error)
+                ? ' We can’t tell yet whether they were saved — reload this page to check before you try again.'
+                : ' Nothing was saved.'}
             </Callout>
           )}
 

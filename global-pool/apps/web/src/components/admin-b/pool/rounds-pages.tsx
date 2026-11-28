@@ -33,6 +33,7 @@ import {
   PageSkeleton,
   PageStack,
   Pill,
+  QueryError,
   QueryView,
   Timeline,
   count,
@@ -230,6 +231,9 @@ export function ParticipantsPage() {
       {round === null ? (
         overview.isPending ? (
           <PageSkeleton />
+        ) : overview.isError ? (
+          // ERR-02: a failed overview is not "choose a round" (no default round could be loaded).
+          <QueryError error={overview.error} onRetry={() => void overview.refetch()} />
         ) : (
           <Panel>
             <EmptyState type="no-data" title="Choose a round" />
@@ -396,6 +400,12 @@ function WinnersTable({ d }: { d: PrizesResponse }) {
       ]}
       rows={d.winners}
       rowKey={(w) => String(w.place)}
+      empty={
+        <EmptyState
+          title="No winners recorded yet"
+          description="Winners are recorded from the fulfilled random word when the round settles."
+        />
+      }
       mobileCard={(w) => (
         <div className="flex items-center justify-between gap-2">
           <span className="flex flex-col">
@@ -426,7 +436,16 @@ export function PrizeDistributionPage() {
         actions={<RoundPicker value={round} onChange={setRound} />}
       />
       {round === null ? (
-        <PageSkeleton />
+        // ERR-03: skeleton only while the default round loads — then an error or "choose a round".
+        overview.isPending ? (
+          <PageSkeleton />
+        ) : overview.isError ? (
+          <QueryError error={overview.error} onRetry={() => void overview.refetch()} />
+        ) : (
+          <Panel>
+            <EmptyState type="no-data" title="Choose a round" />
+          </Panel>
+        )
       ) : (
         <QueryView query={q}>
           {(d) => (
@@ -522,6 +541,9 @@ export function SettlementPage() {
       {round === null ? (
         history.isPending ? (
           <PageSkeleton />
+        ) : history.isError ? (
+          // ERR-02: a failed history is not "no settled round yet".
+          <QueryError error={history.error} onRetry={() => void history.refetch()} />
         ) : (
           <Panel>
             <EmptyState type="no-data" title="No settled round yet" />

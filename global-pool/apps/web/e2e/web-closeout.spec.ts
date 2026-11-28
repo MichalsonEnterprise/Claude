@@ -54,7 +54,15 @@ async function expectOnSite(page: Page) {
 test.describe('web close-out', () => {
   test.setTimeout(180_000);
 
-  test('R11 · legal, support and promotions targets render', async ({ page }) => {
+  test('R11 · legal, support and promotions targets render', async ({ page, context }) => {
+    // /promotions is a gambling surface: a guest confirms 18+ first (PUB-22) — start as a visitor who already did.
+    await context.addCookies([
+      {
+        name: 'gp_age_ok',
+        value: `${Math.floor(Date.now() / 1000)}.PT`,
+        url: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
+      },
+    ]);
     for (const [path, heading] of [
       ['/legal/terms', 'Terms of service'],
       ['/legal/privacy', 'Privacy policy'],

@@ -30,6 +30,8 @@ import { AgeBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
 import {
@@ -41,6 +43,7 @@ import {
   type KycView,
 } from '@/lib/api/account';
 import { ApiRequestError } from '@/lib/api/client';
+import { useAuth } from '@/lib/auth/context';
 import { publicEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
 
@@ -106,6 +109,7 @@ function viewFor(k: KycView, local: View | null): View {
  */
 export function KycFlowDialog() {
   const router = useRouter();
+  const auth = useAuth();
   const kyc = useKyc();
   const me = useMe();
   const qc = useQueryClient();
@@ -403,7 +407,32 @@ export function KycFlowDialog() {
             )}
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 tablet:px-8">
-              {!k ? (
+              {/* ERR-03: skeleton only while the KYC status loads — guests get a sign-in prompt, failures an
+                  error with Try again (never an endless skeleton). */}
+              {!k && auth.status === 'guest' ? (
+                <EmptyState
+                  title="Sign in to verify your identity"
+                  description="Verification is saved to your account, so you can resume on any device."
+                  actions={
+                    <Button
+                      onClick={() =>
+                        auth.openAuth?.('sign-in', { next: ACCOUNT_ROUTES.kycVerify }) ??
+                        auth.signIn()
+                      }
+                    >
+                      Sign in
+                    </Button>
+                  }
+                />
+              ) : !k && kyc.isError ? (
+                <ErrorState
+                  error={kyc.error}
+                  onRetry={() => void kyc.refetch()}
+                  retrying={kyc.isFetching}
+                  what="your verification"
+                  note="Nothing you saved is lost."
+                />
+              ) : !k ? (
                 <div className="flex flex-col gap-4">
                   <Skeleton className="h-8 w-2/3" />
                   <Skeleton className="h-48 w-full" />

@@ -36,6 +36,12 @@ async function createPlayer(request: APIRequestContext): Promise<Player> {
     },
   });
   expect(onboard.ok()).toBeTruthy();
+  // a daily loss limit (DEMO credits) so the session bar shows its meter — it must not move before the wheel stops
+  const limit = await request.put(`${API}/responsible-gaming/limits`, {
+    headers,
+    data: { type: 'loss', period: 'day', amount: '200.00' },
+  });
+  expect(limit.ok()).toBeTruthy();
   return { did, token };
 }
 
@@ -96,7 +102,11 @@ test.describe('Pool Roulette — chips → spin → settle → verify (DEMO cred
     await expect(page.getByTestId('demo-credits-balance').locator('visible=true').first()).toContainText('1,000.00');
     await expect(visible('DEMO credits · no cash value')).toBeVisible();
     await expect(visible('You can lose your stake.')).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Your session' })).toBeVisible();
+    const session = page.getByRole('region', { name: 'Your session' }).locator('visible=true').first();
+    await expect(session).toBeVisible();
+    await expect(session).toContainText('0.00 / 200.00 DEMO'); // daily loss limit meter (DEMO credits)
+    // textContent (what toHaveText compares), not innerText (which adds line breaks around hidden labels)
+    const netBefore = (await session.getByTestId('session-net').textContent()) ?? '';
     const slip = page.getByTestId('bet-slip').locator('visible=true').first();
     await expect(slip.getByText('No bets yet')).toBeVisible();
     await expect(slip.getByText('0.00 DEMO').first()).toBeVisible(); // Fees 0.00
@@ -111,6 +121,8 @@ test.describe('Pool Roulette — chips → spin → settle → verify (DEMO cred
     await page.getByTestId('felt-dozen:2').click();
     await expect(slip.getByTestId('slip-total')).toContainText('20.00');
     await expect(slip.getByRole('listitem')).toHaveCount(3);
+    // the status column describes the hovered spot; with the pointer off the felt it shows the slip's outcome preview
+    await slip.getByTestId('slip-total').hover();
     await expect(page.getByTestId('outcome-preview')).toContainText('+195.00');
     await expect(slip.getByText('215.00')).toBeVisible(); // max potential payout if 19 wins
 
@@ -137,10 +149,24 @@ test.describe('Pool Roulette — chips → spin → settle → verify (DEMO cred
     // RL-04 spin: stake locked, "No more bets", the wheel reveals the server's pocket
     const spin = page.getByTestId('roulette-spin').locator('visible=true').first();
     await expect(spin).toHaveText(/Spin · 20.00 DEMO/);
+    // the first settled bet sends the RG heartbeat, which refetches /games/credits while the wheel still turns
+    const refetched = page.waitForResponse(
+      (r) => r.request().method() === 'GET' && new URL(r.url()).pathname.endsWith('/games/credits'),
+      { timeout: 4_000 },
+    );
     await spin.click();
+    const wheelEl = page.locator('[data-testid="roulette-wheel"]').first();
     await expect(page.locator('[data-testid="roulette-wheel"][data-phase="spinning"]').first()).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText('No more bets').locator('visible=true').first()).toBeVisible();
     await expect(page.getByTestId('demo-credits-balance').locator('visible=true').first()).toContainText('980.00'); // locked
+    // no early reveal: the live credits already carry the settled spin, the screen keeps the pre-spin snapshot
+    await refetched;
+    await page.waitForTimeout(300); // let React render the refetched query
+    await expect(wheelEl).toHaveAttribute('data-phase', 'spinning');
+    await expect(page.getByTestId('demo-credits-balance').locator('visible=true').first()).toContainText('980.00');
+    await expect(session.getByTestId('session-net')).toHaveText(netBefore);
+    await expect(session).toContainText('0.00 / 200.00 DEMO');
+    await expect(page.getByTestId('result-banner')).toHaveCount(0);
     const banner = page.getByTestId('result-banner').first();
     await expect(banner).toBeVisible({ timeout: 20_000 });
 

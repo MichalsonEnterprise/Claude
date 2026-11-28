@@ -1,11 +1,13 @@
 'use client';
 
 import type { CoinSide } from '@gp/shared/fair';
-import { formatDateTimeUTC } from '@gp/shared/format';
-import { CircleCheck, Loader2, Lock } from 'lucide-react';
+import { formatDateTimeUTC, formatTimeUTC } from '@gp/shared/format';
+import { CircleCheck, History, Loader2, Lock, RefreshCw, WifiOff } from 'lucide-react';
+import Link from 'next/link';
 import * as React from 'react';
 
 import { CreditsAmount, shortHash } from '@/components/games/kit';
+import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MQ, useMediaQuery } from '@/lib/hooks/use-media-query';
@@ -13,6 +15,7 @@ import { cn } from '@/lib/utils';
 
 import { CoinFace, FlipCoin, SideDisc } from './coin';
 import { MULTIPLIER, SIDES, WIN_CHANCE, other, sideLabel, type CoinflipBet } from './coinflip-math';
+import { COINFLIP_ROUTES } from './routes';
 
 export type FlipPhase = 'loading' | 'idle' | 'flipping' | 'reconnecting' | 'settled';
 
@@ -43,6 +46,70 @@ export interface CoinflipStageProps {
   body?: React.ReactNode;
   /** Result banner (settled only). */
   result?: React.ReactNode;
+  /** CF-06 connection lost: the flip is retried with the SAME idempotency key (shown inline, the stage stays visible). */
+  reconnect?: {
+    attempt: number;
+    max: number;
+    stake?: string;
+    sentAt?: string | null;
+    onRetry: () => void;
+  };
+}
+
+/** CF-06 "Connection lost — reconnecting" banner above the picks (no result is shown or guessed while it is up). */
+function ReconnectBanner({
+  r,
+  nonce,
+}: {
+  r: NonNullable<CoinflipStageProps['reconnect']>;
+  nonce: number | null;
+}) {
+  return (
+    <div
+      role="alert"
+      className="flex flex-col gap-3 rounded-lg border border-status-warning bg-status-warning-tint p-4 tablet:flex-row tablet:items-start"
+      data-testid="coinflip-reconnect"
+    >
+      <WifiOff aria-hidden className="size-5 shrink-0 text-text-warning" />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <p className="text-body-m-strong text-text-primary">
+          Connection lost — reconnecting (attempt {r.attempt} of {r.max})
+        </p>
+        <p className="text-body-s text-text-secondary">
+          Your flip is held with one request key: if it reached the server it settles exactly once
+          {r.stake ? (
+            <>
+              {' '}
+              (stake <CreditsAmount value={r.stake} /> locked
+              {nonce !== null ? <>, side fixed by nonce {nonce} before the flip</> : null})
+            </>
+          ) : null}
+          , otherwise it is sent again — never charged twice. It settles even if you close this tab.
+          {r.sentAt ? ` Sent ${formatTimeUTC(r.sentAt, { seconds: true })}.` : ''}
+        </p>
+        <div className="mt-1 flex flex-wrap gap-2">
+          <Button
+            variant="secondary"
+            size="s"
+            className="min-h-11 tablet:min-h-8"
+            onClick={r.onRetry}
+            leadingIcon={<RefreshCw aria-hidden />}
+          >
+            Retry now
+          </Button>
+          <Button
+            variant="ghost"
+            size="s"
+            asChild
+            className="min-h-11 tablet:min-h-8"
+            leadingIcon={<History aria-hidden />}
+          >
+            <Link href={COINFLIP_ROUTES.myFlips}>Open my flips</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function PickCard({
@@ -129,11 +196,15 @@ function PickCard({
       <CoinFace side={side} size={40} className="lg:hidden tablet:hidden" />
       <CoinFace side={side} size={52} className="hidden tablet:flex lg:hidden" />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5 lg:flex-none lg:items-center lg:gap-1">
-        <span className="text-h5 tracking-[0.02em] text-text-primary uppercase lg:text-h3">{sideLabel(side)}</span>
+        <span className="text-h5 tracking-[0.02em] text-text-primary uppercase lg:text-h3">
+          {sideLabel(side)}
+        </span>
         <span className="whitespace-nowrap text-caption text-text-secondary lg:hidden">
           {WIN_CHANCE}% · {MULTIPLIER}×
         </span>
-        <span className="hidden text-body-s text-text-secondary lg:block">Win chance {WIN_CHANCE}%</span>
+        <span className="hidden text-body-s text-text-secondary lg:block">
+          Win chance {WIN_CHANCE}%
+        </span>
         <span className="hidden text-body-s-strong text-text-primary lg:block">
           Pays {MULTIPLIER}×
           {stake && payout ? (
@@ -165,11 +236,17 @@ function PickCard({
 export function CoinflipStage(p: CoinflipStageProps) {
   const lg = useMediaQuery(MQ.lg, true);
   const tablet = useMediaQuery(MQ.tablet, true);
-  const refs = React.useRef<Record<CoinSide, HTMLButtonElement | null>>({ heads: null, tails: null });
+  const refs = React.useRef<Record<CoinSide, HTMLButtonElement | null>>({
+    heads: null,
+    tails: null,
+  });
 
   if (p.phase === 'loading') {
     return (
-      <div className="flex flex-col items-center gap-6 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:border-0 tablet:bg-transparent tablet:p-0" aria-busy="true">
+      <div
+        className="flex flex-col items-center gap-6 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:border-0 tablet:bg-transparent tablet:p-0"
+        aria-busy="true"
+      >
         <div className="flex w-full justify-between">
           <Skeleton className="h-8 w-56" />
           <Skeleton className="h-7 w-48 rounded-full" />
@@ -220,15 +297,33 @@ export function CoinflipStage(p: CoinflipStageProps) {
       'The flip keeps settling on the server. When you reconnect, the result is shown here and in My flips.'
     ) : flipping ? (
       <>
-        Your{p.stake ? <> <CreditsAmount value={p.stake} /></> : ''} stake is locked. {sideLabel(p.pick)} pays
-        {p.payout ? <> <CreditsAmount value={p.payout} /></> : ` ${MULTIPLIER}×`}; {sideLabel(other(p.pick))} returns nothing.
+        Your
+        {p.stake ? (
+          <>
+            {' '}
+            <CreditsAmount value={p.stake} />
+          </>
+        ) : (
+          ''
+        )}{' '}
+        stake is locked. {sideLabel(p.pick)} pays
+        {p.payout ? (
+          <>
+            {' '}
+            <CreditsAmount value={p.payout} />
+          </>
+        ) : (
+          ` ${MULTIPLIER}×`
+        )}
+        ; {sideLabel(other(p.pick))} returns nothing.
       </>
     ) : (
       <>
         Flip to reveal the side. {sideLabel(p.pick)} pays{' '}
         {p.payout && p.stake ? (
           <>
-            <CreditsAmount value={p.payout} /> on a <CreditsAmount value={p.stake} unit={false} /> bet
+            <CreditsAmount value={p.payout} /> on a <CreditsAmount value={p.stake} unit={false} />{' '}
+            bet
           </>
         ) : (
           `${MULTIPLIER}× your bet`
@@ -255,19 +350,29 @@ export function CoinflipStage(p: CoinflipStageProps) {
           <p
             className={cn(
               'text-overline uppercase',
-              p.phase === 'reconnecting' ? 'text-text-warning' : flipping ? 'text-text-brand' : 'text-text-tertiary',
+              p.phase === 'reconnecting'
+                ? 'text-text-warning'
+                : flipping
+                  ? 'text-text-brand'
+                  : 'text-text-tertiary',
             )}
           >
             {label}
           </p>
           <p className="text-caption text-text-secondary">{meta}</p>
         </div>
-        <div className="flex items-center justify-center gap-1.5" aria-label={`Last ${p.last.length} flips, newest first`} role="group">
+        <div
+          className="flex items-center justify-center gap-1.5"
+          aria-label={`Last ${p.last.length} flips, newest first`}
+          role="group"
+        >
           <span className="mr-1 whitespace-nowrap text-caption text-text-tertiary">
             {p.last.length ? `Last ${Math.min(p.last.length, 6)}` : 'Last flips'}
           </span>
           {p.last.length ? (
-            p.last.slice(0, 6).map((s, i) => <SideDisc key={i} side={s} size={24} newest={i === 0} />)
+            p.last
+              .slice(0, 6)
+              .map((s, i) => <SideDisc key={i} side={s} size={24} newest={i === 0} />)
           ) : (
             <span className="text-caption text-text-tertiary">no flips yet</span>
           )}
@@ -275,6 +380,10 @@ export function CoinflipStage(p: CoinflipStageProps) {
           <DemoBadge size="s" className="ml-1" />
         </div>
       </div>
+
+      {p.phase === 'reconnecting' && p.reconnect ? (
+        <ReconnectBanner r={p.reconnect} nonce={p.nonce} />
+      ) : null}
 
       <div
         role="radiogroup"
@@ -297,7 +406,10 @@ export function CoinflipStage(p: CoinflipStageProps) {
             }}
           />
         ))}
-        <div className="flex min-w-0 flex-col items-center gap-3 pb-2 text-center lg:pb-0" style={{ gridArea: 'coin' }}>
+        <div
+          className="flex min-w-0 flex-col items-center gap-3 pb-2 text-center lg:pb-0"
+          style={{ gridArea: 'coin' }}
+        >
           <div data-testid="coin" data-side={p.coinSide} data-phase={p.phase}>
             <FlipCoin
               side={p.coinSide}
@@ -305,7 +417,7 @@ export function CoinflipStage(p: CoinflipStageProps) {
               size={coinSize}
               durationMs={p.flipMs}
               instant={p.instant}
-              pending={p.phase === 'flipping' && !p.bet}
+              pending={flipping && !p.bet}
               onFlipEnd={p.onFlipEnd}
             />
           </div>

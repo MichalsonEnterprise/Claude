@@ -9,6 +9,8 @@ import * as React from 'react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { DemoBar } from '@/components/ui/demo-badge';
+import { SecurityWarning } from '@/components/ui/security-warning';
+import { toast } from '@/components/ui/sonner';
 import { accountApi, accountKeys } from '@/lib/api/account';
 import { useApiConnectivity } from '@/lib/api/connectivity';
 import { getCurrentRound, getMyRoundEntries } from '@/lib/api/pool';
@@ -18,6 +20,7 @@ import { DATA_SOURCE } from '@/lib/data/source';
 import { publicEnv } from '@/lib/env';
 import { MQ } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
+import { isWrongNetwork, switchToMvpChain, useInjectedWallet } from '@/lib/wallet/injected';
 
 import { FooterMega } from './footer-mega';
 import { MobileDrawer, MobileTabBar, MobileTopbar } from './mobile';
@@ -51,7 +54,12 @@ export interface AppShellFrameProps {
   onSignIn: () => void;
   onSignUp: () => void;
   onSignOut: () => void;
+  /** ERR-07: the member's linked wallet is connected on another chain (topbar button ≥ 768, banner below). */
   wrongNetwork?: boolean;
+  /** "Switch to Arbitrum" on the wrong-network button / banner. */
+  onSwitchNetwork?: () => void;
+  /** Chain id the wallet is on (named in the wrong-network banner). */
+  walletChainId?: number | null;
   restricted?: boolean;
   /** Country named in the region banner (from the page's region check); omitted → no country is named. */
   regionName?: string | null;
@@ -78,6 +86,8 @@ export function AppShellFrame({
   onSignUp,
   onSignOut,
   wrongNetwork = false,
+  onSwitchNetwork,
+  walletChainId = null,
   restricted = false,
   regionName = null,
   demoBar = publicEnv.demoMode,
@@ -180,9 +190,24 @@ export function AppShellFrame({
             </Button>
           }
         >
-          Check your internet connection. Figures on this page may be out of date until we reconnect —
-          your balance and entries are safe.
+          Check your internet connection. Figures on this page may be out of date until we reconnect
+          — your balance and entries are safe.
         </Alert>
+      )}
+      {wrongNetwork && (
+        <SecurityWarning
+          kind="wrong-network"
+          currentChainId={walletChainId}
+          layout="full"
+          className="tablet:hidden"
+          actions={
+            onSwitchNetwork ? (
+              <Button size="s" variant="secondary" onClick={onSwitchNetwork}>
+                Switch to Arbitrum
+              </Button>
+            ) : undefined
+          }
+        />
       )}
       <div className="flex flex-1">
         <Sidebar
@@ -204,6 +229,7 @@ export function AppShellFrame({
             onSignUp={onSignUp}
             onSignOut={onSignOut}
             wrongNetwork={wrongNetwork}
+            onSwitchNetwork={onSwitchNetwork}
             restricted={restricted}
             className="hidden tablet:flex"
           />
@@ -344,6 +370,19 @@ function ConnectedShell({
   const signedIn = Boolean(user);
   const live = useLiveShell(signedIn && !overrides.previewGuest);
   const connection = useApiConnectivity();
+  // ERR-07: the member's own linked wallet, connected to this site, is on another chain (read-only, no prompt).
+  const injected = useInjectedWallet(signedIn);
+  const autoWrongNetwork = signedIn && isWrongNetwork(injected, user?.walletAddress);
+  const onSwitchNetwork = React.useCallback(() => {
+    void switchToMvpChain().then((ok) => {
+      if (!ok)
+        toast({
+          type: 'error',
+          title: 'Couldn’t switch the network',
+          description: 'Open your wallet app and switch to Arbitrum Sepolia.',
+        });
+    });
+  }, []);
   // API mode: the member's real data. Mock data source: the DEMO profile (with DEMO markers), like every mock view.
   const member: ShellMember | null = overrides.previewGuest
     ? null
@@ -379,7 +418,9 @@ function ConnectedShell({
       onSignIn={auth.signIn}
       onSignUp={auth.signUp}
       onSignOut={() => void auth.signOut()}
-      wrongNetwork={wrongNetwork}
+      wrongNetwork={wrongNetwork ?? autoWrongNetwork}
+      onSwitchNetwork={onSwitchNetwork}
+      walletChainId={autoWrongNetwork ? injected.chainId : null}
       restricted={restricted ?? overrides.restricted}
       regionName={overrides.regionName}
       poolAmount={live.poolAmount}
