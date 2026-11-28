@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 06:05 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 05:58 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
