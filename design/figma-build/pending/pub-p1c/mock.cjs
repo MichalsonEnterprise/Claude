@@ -16,7 +16,7 @@ function node(type, extra = {}) {
   n.setBoundVariable = function (p, v) { if (!v) throw new Error('setBoundVariable null var for ' + p); };
   n.setExplicitVariableModeForCollection = function () { };
   n.findAll = function (fn) { const out = []; const walk = m => { for (const c of m.children || []) { if (!fn || fn(c)) out.push(c); walk(c); } }; walk(this); return out; };
-  n.screenshot = async function () { return null; };
+  n.screenshot = async function () { return null; }; n.findAllWithCriteria = function (o) { return this.findAll(c => o.types.includes(c.type)); }; n.absoluteBoundingBox = { x: 0, y: 0, width: 100, height: 40 }; n.visible = true;
   n.setTextStyleIdAsync = async function () { }; n.setEffectStyleIdAsync = async function () { }; n.setFillStyleIdAsync = async function () { }; n.setGridStyleIdAsync = async function () { };
   n.getRangeAllFontNames = function () { return [{ family: 'Inter', style: 'Regular' }]; };
   n.getStyledTextSegments = function () { return [{ fontName: { family: 'Inter', style: 'Regular' } }]; }; n.swapComponent = function () { };

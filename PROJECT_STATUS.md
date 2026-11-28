@@ -28,17 +28,19 @@ Ledger (306 rows incl. 12 added for catalogue/promotions): **128 verified · 18 
 - **10 Mobile:** MOB-03 ✅, MOB-05 ✅, MOB-04 🟠, MOB-06 🟠
 
 ## 3. Development status
+Verified by the orchestrator on 28 Nov 2026 ~03:40 UTC: `pnpm -r typecheck`, `pnpm -r lint` and `pnpm -r build` are green. **304 tests pass:** tokens 82, shared 56, contracts 67, web 35, API 34 unit + 30 e2e.
+
 | Workstream | Status | Notes |
 |---|---|---|
-| Monorepo + tooling (pnpm, TS, ESLint, CI, docker-compose, .env.example) | 🟡 | workflow `gp-dev-foundation` (agent dev:shared) |
-| `@gp/tokens` (Figma tokens → CSS vars + Tailwind v4 theme) | 🟡 | `global-pool/packages/tokens/tokens.json` written from the Figma variables |
-| `@gp/shared` (decimal money, fees, chains, zod schemas, DEMO data) | 🟡 | |
-| Web: design system + casino shell | 🟡 | agent dev:web-design-system |
-| Web: Homepage (PUB-01) | ⬜→🟡 | agent dev:web-homepage (after design system) |
-| API: NestJS core, Prisma schema, auth, ledger, wallet, pool, admin, audit | 🟡 | agent dev:api-core |
-| Smart contracts (Foundry, VRF v2.5) | ✅ (testnet-ready, unaudited) | `packages/contracts`: GlobalPoolRounds — verifiable round registry and VRF v2.5 consumer. It holds no funds, cannot re-roll, and admins have no say over results; coordinator locked. 67/67 tests incl. fuzz and invariants (re-run by the orchestrator). Deploy dry-run on an Arbitrum Sepolia fork OK, not broadcast. TODO: VRF subscription, Slither, external audit. |
-| Auth, Dashboard, Wallet, Pool, Admin frontends | ⬜ | next batch after foundation |
-| Games (5) as simulations | ⬜ | P1 |
+| Monorepo + tooling | ✅ | pnpm workspace, strict TS, ESLint flat config, Prettier, CI `.github/workflows/global-pool-ci.yml`, docker-compose (not built here: no Docker daemon), `.env.example` |
+| `@gp/tokens` | ✅ | tokens.json → CSS variables, Tailwind v4 `@theme`, text styles (82 tests) |
+| `@gp/shared` | ✅ | decimal money, fees, pool maths and odds, chains (Arbitrum Sepolia enabled), enums, Zod schemas, DEMO data (56 tests) |
+| Contracts | ✅ testnet-ready, unaudited | GlobalPoolRounds plus VRF v2.5; 67 tests; not deployed |
+| API core | ✅ foundation | NestJS 11, 46 tables, append-only ledger enforced by DB triggers, Privy auth with DEV MOCK, admin auth with TOTP, wallet/deposits/withdrawals, pool/rounds/entries (idempotent), VRF-matching winner derivation, admin RBAC + four-eyes + hash-chained audit, WebSocket /pool, BullMQ, Swagger (83 operations). Gaps: on-chain mirroring writes, withdrawal broadcaster, real Privy, deposit watcher against a real RPC |
+| Web foundation | ✅ | Next 15, Tailwind v4, shadcn restyled, casino shell, design system with a /design-system page, Privy provider and DEV MOCK, shared API client `src/lib/api/client.ts` |
+| Homepage PUB-01 | ✅ implemented | H1–H12, 4 states, mobile; close to the Figma render. TODO: countdown uses the frozen DEMO clock (fix assigned to the pool agent) |
+| P0 batch (running) | 🟡 | workflow `dev-p0-batch` (script `global-pool/scripts/workflows/dev-p0-batch.js`), 8 agents: auth (Privy custom flow, onboarding, step-up 2FA), account (dashboard, account, KYC), rg-history (responsible gaming, history), wallet (deposit/withdraw/history), pool (hub, entry, draw, results, verification), admin-a (admin shell, users, audit, roles), admin-b (finance, pool monitoring, KYC/AML queues), api-gaps (on-chain mirroring + Anvil e2e, deposit watcher, broadcaster, RG time, email, Redis adapter) |
+| Games (P1) | ⬜ | after P0 |
 
 ## 4. Decisions
 Answered 28 Nov 2026 (details in `global-pool/docs/DEV_CONVENTIONS.md` → Owner decisions):
