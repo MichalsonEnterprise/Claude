@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 06:05 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 06:20 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
@@ -43,7 +43,8 @@ Verified by the orchestrator on 28 Nov 2026 ~03:40 UTC: `pnpm -r typecheck`, `pn
 | Global Pool (P0) | ✅ implemented (dev-verified by agent) | 13/16 rows IMPLEMENTED, 3 PARTIAL (GP-06, GP-13, PUB-07: one state each not screenshot-checked). Hub + live socket feed, participation (separate 0.05 fee line, odds rounded down, RG check, unchecked consent, idempotent), round page draw→results→refunds, in-browser VRF re-derivation (4/4 checks), history/entries/prizes, /provably-fair. Homepage countdown now uses the real clock ✅ |
 | Responsible gaming + history (P0) | ✅ implemented (dev-verified by agent) | 20/21 rows IMPLEMENTED (USR-RG1–RG6, F1–F6, G1–G7, MOB-10); USR-RG7 PARTIAL (authenticator code instead of a password under Privy; open entries stay in their round — owner question). Server-side: limits with 24 h cool-down on increases, daily/session time limits, quiet hours (UTC), reality checks app-wide, cooling-off, self-exclusion (blocks entries + deposits, never withdrawals; can be extended, never shortened). History API `/history/*` + CSV export (formula-injection safe, audited) |
 | On-chain + chain ops (P0) | ✅ on Anvil, ⛔ not on Arbitrum Sepolia | GlobalPoolRounds mirroring via viem (open → commit Merkle root of salted entries → requestDraw → VRF watcher → DB winners must equal contract winners → recordSettlement), reorg-safe deposit watcher, outbox withdrawal broadcaster with DB nonces and refunds on failure, email adapter, socket.io Redis adapter, OpenAPI response schemas, compose `--profile dev`. Not deployed: no Sepolia contract, VRF subscription or funded testnet keys yet |
-| P0 batch (running) | 🟡 | workflow `dev-p0-batch` (script `global-pool/scripts/workflows/dev-p0-batch.js`), still running: auth (Privy custom flow, onboarding, step-up 2FA), account (dashboard, account, KYC), admin-a (admin shell, users, audit, roles), admin-b (finance, pool monitoring, KYC/AML queues) |
+| Admin console (P0) | ✅ implemented (dev-verified by agent) | admin-a: 16/18 rows IMPLEMENTED (ADM-00, 02, U1–U10 except U3, S1–S3, X1, MOB-11); PARTIAL ADM-01 (no WebAuthn / trusted device / IP allow-list), ADM-U3. Own admin session, restrictions with reason + 2FA + four-eyes (frozen withdrawals and suspension need a second admin), PII reveal audited, role changes as requests, audit-chain viewer. admin-b: 18/21 IMPLEMENTED (F1–F5, F7, F9, P1–P7, P9, P10, C1, C2); PARTIAL F6 (reconciliation investigation), F8 (scheduled reports), P8 (batch auto-claim). Circuit breaker pauses only NEW entries, dual approval. e2e: two-admin four-eyes flow passes; PATCH ledger / POST winners / manual refund return 404 (tested) |
+| P0 batch (running) | 🟡 | workflow `dev-p0-batch` (script `global-pool/scripts/workflows/dev-p0-batch.js`), still running: auth (Privy custom flow, onboarding, step-up 2FA), account (dashboard, account, KYC) (both in final verification) |
 | Games (P1) | ⬜ prepared | workflow `global-pool/scripts/workflows/dev-p1-games.js` (engine with commit–reveal + DEMO credits with no cash value → game kit + lobby + Pool Dice → Double Side, Pool Roulette, Orbit Rush, Twenty-One); starts after P0 |
 
 ## 4. Decisions
@@ -53,7 +54,7 @@ Answered 28 Nov 2026 (details in `global-pool/docs/DEV_CONVENTIONS.md` → Owner
 3. ✅ Player auth = **Privy** (email OTP, social, wallets/embedded). Admins use their own auth with mandatory TOTP. Players have no passwords; step-up TOTP protects withdrawals. ⚠ This changes Figma AUTH-01/03 (email+password) to a code-based flow — the screens need a design update.
 4. ✅ Code in `global-pool/` in this repo.
 
-Asked 28 Nov 06:05 UTC (current behaviour in brackets): (a) self-exclusion/cooling-off with open entries — refund or keep in the round? [kept in the round; Figma says refunded]; (b) cancelled round — refund the 0.05 platform fee? [not refunded; Figma F3/F5 show a fee reversal]; (c) games currency — DEMO credits without cash value vs USDT in Figma [DEMO credits].
+Asked 28 Nov 06:05 UTC (current behaviour in brackets): (a) self-exclusion/cooling-off with open entries — refund or keep in the round? [kept in the round; Figma says refunded]; (b) cancelled round — refund the 0.05 platform fee? [not refunded; Figma F3/F5 show a fee reversal]; (c) games currency — DEMO credits without cash value vs USDT in Figma [DEMO credits]. Lower priority (agent assumptions to confirm later): AML risk score model (rule-based placeholder), which restrictions need four-eyes (now: frozen withdrawals + suspension), who may send refund reminders (now: Super Admin + Marketing).
 
 Still open (not blocking yet): KYC provider, AML/chain-analytics provider, e-mail provider, hosting, licensed jurisdictions/restricted-country list, Privy app credentials (dev runs on a mock until provided).
 
