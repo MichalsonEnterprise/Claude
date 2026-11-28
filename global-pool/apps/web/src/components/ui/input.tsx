@@ -66,9 +66,11 @@ export function Field({
     <FieldContext.Provider value={ctx}>
       <div data-slot="field" className={cn('flex min-w-0 flex-col gap-2', className)}>
         {(label ?? labelAside) && (
-          <div className={cn('flex min-h-5 items-center justify-between gap-3', hideLabel && 'sr-only')}>
+          <div className={cn('flex min-h-5 flex-wrap items-center justify-between gap-x-3 gap-y-1', hideLabel && 'sr-only')}>
             {label && <Label htmlFor={id}>{label}</Label>}
-            {labelAside && <div className="flex items-center gap-1.5 text-body-s text-text-secondary">{labelAside}</div>}
+            {labelAside && (
+              <div className="flex items-center gap-1.5 whitespace-nowrap text-body-s text-text-secondary">{labelAside}</div>
+            )}
           </div>
         )}
         {children}

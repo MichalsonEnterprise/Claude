@@ -46,7 +46,7 @@ function normalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(normalize);
   if (typeof value === 'object') {
     if (typeof (value as { toFixed?: unknown }).toFixed === 'function' && 'd' in value) {
-      return (value as { toFixed(): string }).toFixed(); // Prisma.Decimal
+      return (value as unknown as { toFixed(): string }).toFixed(); // Prisma.Decimal
     }
     const out: Record<string, unknown> = {};
     for (const key of Object.keys(value).sort()) {

@@ -23,3 +23,30 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Swit
     </SwitchPrimitive.Root>
   );
 }
+
+/** Toggle + label (+ description); the label is bound with htmlFor so the whole row is clickable. */
+export function SwitchField({
+  id,
+  label,
+  description,
+  className,
+  ...props
+}: React.ComponentProps<typeof SwitchPrimitive.Root> & { label: React.ReactNode; description?: React.ReactNode }) {
+  const auto = React.useId();
+  const sid = id ?? auto;
+  return (
+    <div className={cn('flex items-start gap-3 py-1', className)}>
+      <Switch id={sid} aria-describedby={description ? `${sid}-d` : undefined} {...props} />
+      <div className="flex flex-col gap-0.5">
+        <label htmlFor={sid} className="text-body-s text-text-primary peer-disabled:text-text-tertiary">
+          {label}
+        </label>
+        {description && (
+          <p id={`${sid}-d`} className="text-caption text-text-tertiary">
+            {description}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}

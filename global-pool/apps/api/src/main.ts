@@ -1,23 +1,21 @@
 import 'reflect-metadata';
 
+import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+
+import { AppModule } from './app.module';
+import { configureApp } from './app.setup';
+import { AppConfig } from './config/app-config';
 import { loadEnvFiles } from './config/load-env';
 
-loadEnvFiles();
-
 async function bootstrap(): Promise<void> {
-  // Imported after the env files are loaded (modules read process.env at import time).
-  const { NestFactory } = await import('@nestjs/core');
-  const { AppModule } = await import('./app.module');
-  const { configureApp } = await import('./app.setup');
-  const { AppConfig } = await import('./config/app-config');
-
-  const app = await NestFactory.create<import('@nestjs/platform-express').NestExpressApplication>(AppModule, {
-    bufferLogs: true,
-  });
+  // Env files are read before Nest builds the DI graph (nothing reads process.env at import time).
+  loadEnvFiles();
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
   configureApp(app);
   const config = app.get(AppConfig);
   await app.listen(config.env.API_PORT, '0.0.0.0');
-  const url = await app.getUrl();
+  const url = (await app.getUrl()).replace('[::1]', 'localhost').replace('0.0.0.0', 'localhost');
   console.info(`GLOBAL POOL API (DEMO / testnet) listening on ${url} — docs at ${url}/docs`);
 }
 

@@ -72,7 +72,7 @@ export function Countdown({
   className,
 }: CountdownProps) {
   const p = useCountdown(closesAt, demoNow);
-  const absolute = `${formatDateTimeUTC(closesAt)} UTC`;
+  const absolute = formatDateTimeUTC(closesAt);
   const units: [number, string, string][] = [
     [p.hours, 'h', 'hours'],
     [p.minutes, 'm', 'minutes'],
@@ -97,7 +97,7 @@ export function Countdown({
             <span
               aria-hidden
               className={cn(
-                'flex flex-1 items-baseline justify-center gap-0.5 rounded-md border border-border-default bg-bg-secondary tabular-nums',
+                'flex flex-1 items-center justify-center rounded-md border border-border-default bg-bg-secondary tabular-nums',
                 size === 's' && 'h-9 min-w-11 px-2 text-number-s',
                 size === 'm' && 'h-12 min-w-16 px-3 text-number-m',
                 size === 'l' && 'h-14 min-w-20 px-4 text-number-l',
@@ -105,8 +105,10 @@ export function Countdown({
               )}
               title={long}
             >
-              <span suppressHydrationWarning>{pad(value)}</span>
-              <span className="text-caption text-text-tertiary">{short}</span>
+              <span className="flex items-baseline gap-0.5">
+                <span suppressHydrationWarning>{pad(value)}</span>
+                <span className="text-caption text-text-tertiary">{short}</span>
+              </span>
             </span>
           </React.Fragment>
         ))}

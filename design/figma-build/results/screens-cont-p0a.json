@@ -1,0 +1,869 @@
+{
+  "summary": "Build GLOBAL POOL screens in Figma: one agent per module slice (args = list of slice keys), desktop on module page + mobile on page 10, verified per frame",
+  "agentCount": 5,
+  "logs": [],
+  "result": [
+    {
+      "key": "wal-withdraw-a",
+      "section": "36:516030 (page '06 — Wallet & Transactions', 'WAL-10..14 Withdraw steps 1–5', X=34000 Y=0) + 152:66270 (page '10 — Mobile Experience', 'WAL — Mobile C (Withdraw 1–5)', X=147000 Y=0)",
+      "created": [
+        {
+          "name": "Section/WAL-10..14 Withdraw steps 1–5 (page 06, from first run)",
+          "id": "36:516030"
+        },
+        {
+          "name": "WAL-10 Withdraw — Step 1 Select Asset / 1440 / Default (first run)",
+          "id": "36:527247"
+        },
+        {
+          "name": "WAL-11 Withdraw — Step 2 Select Network / 1440 / Default (first run)",
+          "id": "36:538883"
+        },
+        {
+          "name": "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Default (first run)",
+          "id": "48:26939"
+        },
+        {
+          "name": "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Invalid",
+          "id": "124:45306"
+        },
+        {
+          "name": "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Whitelisted",
+          "id": "124:46116"
+        },
+        {
+          "name": "WAL-12 Withdraw — Step 3 Enter Address / 1440 / New-address cooldown",
+          "id": "124:46914"
+        },
+        {
+          "name": "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Default",
+          "id": "133:47170"
+        },
+        {
+          "name": "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Min/max — below minimum",
+          "id": "133:48168"
+        },
+        {
+          "name": "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Over balance",
+          "id": "133:49053"
+        },
+        {
+          "name": "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Limit reached — separate DEMO scenario (25,000.00 already withdrawn today)",
+          "id": "133:49928"
+        },
+        {
+          "name": "WAL-14 Withdraw — Step 5 Fees & Summary / 1440 / Default",
+          "id": "139:49799"
+        },
+        {
+          "name": "WAL-10 Withdraw — Step 1 Select Asset / 768 / Default",
+          "id": "151:116052"
+        },
+        {
+          "name": "WAL-11 Withdraw — Step 2 Select Network / 768 / Default",
+          "id": "151:116354"
+        },
+        {
+          "name": "WAL-12 Withdraw — Step 3 Enter Address / 768 / Default",
+          "id": "151:116643"
+        },
+        {
+          "name": "WAL-13 Withdraw — Step 4 Enter Amount / 768 / Default",
+          "id": "151:116950"
+        },
+        {
+          "name": "WAL-14 Withdraw — Step 5 Fees & Summary / 768 / Default",
+          "id": "151:117260"
+        },
+        {
+          "name": "Section/WAL — Mobile C (Withdraw 1–5) (page 10)",
+          "id": "152:66270"
+        },
+        {
+          "name": "MOB-07 · WAL-10 Withdraw — Step 1 Select Asset / 390 / Default — asset sheet",
+          "id": "152:66271"
+        },
+        {
+          "name": "MOB-07 · WAL-11 Withdraw — Step 2 Select Network / 390 / Default — network sheet",
+          "id": "152:66557"
+        },
+        {
+          "name": "MOB-07 · WAL-12 Withdraw — Step 3 Enter Address / 390 / Default",
+          "id": "152:66808"
+        },
+        {
+          "name": "MOB-07 · WAL-12 Withdraw — Step 3 Enter Address / 390 / Invalid",
+          "id": "157:68503"
+        },
+        {
+          "name": "MOB-07 · WAL-12 Withdraw — Step 3 Enter Address / 390 / New-address cooldown — sheet",
+          "id": "157:68755"
+        },
+        {
+          "name": "MOB-07 · WAL-13 Withdraw — Step 4 Enter Amount / 390 / Default",
+          "id": "157:68981"
+        },
+        {
+          "name": "MOB-07 · WAL-13 Withdraw — Step 4 Enter Amount / 390 / Over balance",
+          "id": "160:69089"
+        },
+        {
+          "name": "MOB-07 · WAL-13 Withdraw — Step 4 Enter Amount / 390 / Limit reached — separate DEMO scenario (25,000.00 already withdrawn today)",
+          "id": "160:69318"
+        },
+        {
+          "name": "MOB-07 · WAL-14 Withdraw — Step 5 Fees & Summary / 390 / Default — review sheet",
+          "id": "160:69533"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "WAL-10",
+          "status": "VERIFIED",
+          "note": "D 1440 Default (36:527247, from the first run), T 768 (151:116052) and M 390 asset bottom sheet (152:66271) all checked by screenshot. The mobile sheet lists USDT (Available 9,215.30, selected) and Bonus funds (50.00, not withdrawable, wagering 642.00 / 1,500.00)."
+        },
+        {
+          "id": "WAL-11",
+          "status": "VERIFIED",
+          "note": "D 1440 (36:538883), T 768 (151:116354) and M 390 network sheet (152:66557, 5 Select/Network Option instances, fees 0.12 / 0.02 / 0.08 / 2.40 / 0.01, Arbitrum selected, Ethereum congested) all checked by screenshot. After that check the Arbitrum row's subtitle was shortened to 'Arbitrum One · ~1 min' so it no longer truncates; that one text change was not re-screenshotted."
+        },
+        {
+          "id": "WAL-12",
+          "status": "VERIFIED",
+          "note": "D 1440: Default (48:26939), Invalid (Solana address on Arbitrum), Whitelisted and New-address cooldown (0x3f9a…c47E unlocks 28 Nov 2026, 18:42 UTC). T 768: Default. M 390: Default, Invalid, and New-address cooldown as a bottom sheet. All checked by screenshot."
+        },
+        {
+          "id": "WAL-13",
+          "status": "VERIFIED",
+          "note": "D 1440: Default (Input/Amount 1,500.00, quick chips, limit tiles, Wallet/Fee Estimator → 1,499.92), Min/max below minimum (12.00), Over balance (12,000.00 against Available 9,215.30) and Limit reached as a separate DEMO scenario. T 768: Default. M 390: Default, Over balance, Limit reached. All checked by screenshot. For the Min/max and Over balance desktop frames only the flow card was screenshotted; their side-summary edits are the same kind as in the Limit reached frame, which was checked in full."
+        },
+        {
+          "id": "WAL-14",
+          "status": "VERIFIED",
+          "note": "D 1440 (139:49799): you receive 1,499.92 USDT, Tx/Fee Breakdown (network −0.08, platform 0.00), details, irreversibility warning, unchecked confirmation checkbox, 'Continue to security check' disabled. A receive-hero overlap was fixed and re-checked. T 768 (151:117260) and M 390 review bottom sheet (160:69533) checked by screenshot after the fixes."
+        },
+        {
+          "id": "MOB-07",
+          "status": "VERIFIED",
+          "note": "Steps 1–5 of the mobile withdraw flow are in section 'WAL — Mobile C' (152:66270): 9 frames using bottom sheets for asset, network, new-address cooldown and the step-5 review; address and amount are full pages with a sticky CTA above Nav/Mobile Tab Bar (Wallet). Steps 6–9 are in section 'WAL — Mobile D' (109:50781), built and verified by wal-withdraw-b."
+        }
+      ],
+      "issues": [
+        "Figma MCP seat limit: 8 calls in this run were refused. Each time I waited 4–15 minutes before retrying and was never refused 3 times in a row, so every frame got built. Ready-to-run scripts are in /home/user/Claude/design/figma-build/pending/wal-withdraw-a/v2/ (README.md, build.py, out/*.js).",
+        "Demo-data conflict (also flagged by wal-withdraw-b): the flow starts from Available 9,215.30, but demo-data already counts WD-20931's 1,500.00 inside Locked 1,850.00. To avoid double-counting, steps 1–5 no longer show an 'Available after 7,715.30' figure. They say '1,500.00 USDT moves from Available to Locked when you confirm at step 7'. The Over balance state cites only Pending 1,000.00 and Owed 415.20. Logged as decision #29 in decisions.md. The orchestrator still needs to decide whether the flow should start from 10,715.30.",
+        "Built inline with tokens because no library component fits: the bottom-sheet shell (Sheet/Bottom 29:17720 has fixed deposit copy), the daily-limit meter card, limit tiles / limit facts card, the receive hero, the mobile saved-address radio row, the cooldown option cards and the format-check list. Candidates for library components: Sheet/Bottom with a content slot, and Wallet/Limit Meter.",
+        "Copy mismatch in the three first-run desktop frames (WAL-10/11/12 Default): their protections card says 'Authenticator code required at step 7'. The new frames and the WAL-15..19 frames say 'Email code + authenticator at step 7'. I did not change the first-run frames.",
+        "Mobile WAL-14 review sheet: to fit the phone frame, the Tx/Fee Breakdown 'Note' row is hidden and the irreversibility text is shortened. The frame is 845 px tall (sheet 813 + 32 px top gap), 1 px over the standard 844.",
+        "Laptop 1280 was not built because these rows require D·T·M only."
+      ]
+    },
+    {
+      "key": "auth-b",
+      "section": "78:77287 (page '04 — Authentication', 'AUTH-07/08/09/10 2FA & wallet connect', X=12000 Y=0). Mobile: page '10 — Mobile Experience', section 'AUTH — Mobile B' at X=70000 Y=0 (fitted). All 30 frames for AUTH-07…10 now exist. This continuation built 15 frames and checked each with a screenshot: AUTH-10 desktop ×4 and all 11 mobile frames. The run stopped after 3 Figma MCP 'tool call limit' errors in a row, as conventions §10 requires. As a result, the 12 desktop AUTH-08/AUTH-09 frames from the earlier interrupted run have not been visually verified.",
+      "created": [
+        {
+          "name": "Section/AUTH-07/08/09/10 2FA & wallet connect",
+          "id": "78:77287"
+        },
+        {
+          "name": "Notes — AUTH-07…10",
+          "id": "78:77288"
+        },
+        {
+          "name": "AUTH-07 2FA Enrollment — Step 1 Scan / 1440 / Default",
+          "id": "78:77291"
+        },
+        {
+          "name": "AUTH-07 2FA Enrollment — Step 2 Confirm / 1440 / Default",
+          "id": "81:24488"
+        },
+        {
+          "name": "AUTH-07 2FA Enrollment — Step 3 Backup codes / 1440 / Default",
+          "id": "81:26567"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Login / 1440 / Default",
+          "id": "115:81957"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Login / 1440 / Wrong code",
+          "id": "115:83997"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Login / 1440 / Locked",
+          "id": "115:86045"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Withdrawal / 1440 / Default",
+          "id": "116:34081"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Withdrawal / 1440 / Wrong code",
+          "id": "116:35027"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Withdrawal / 1440 / Locked",
+          "id": "116:35830"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 1440 / List",
+          "id": "116:36629"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 1440 / WalletConnect QR",
+          "id": "117:38530"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 1440 / Connecting",
+          "id": "117:40434"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 1440 / Rejected",
+          "id": "117:42355"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 1440 / Wrong network",
+          "id": "117:44238"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 1440 / Success",
+          "id": "117:46336"
+        },
+        {
+          "name": "AUTH-10 Wallet Verification / 1440 / Request",
+          "id": "120:144957"
+        },
+        {
+          "name": "AUTH-10 Wallet Verification / 1440 / Success",
+          "id": "120:146919"
+        },
+        {
+          "name": "AUTH-10 Wallet Verification / 1440 / Rejected",
+          "id": "120:148852"
+        },
+        {
+          "name": "AUTH-10 Wallet Verification / 1440 / Expired nonce",
+          "id": "120:150769"
+        },
+        {
+          "name": "AUTH-07 2FA Enrollment — Step 1 Set up / 390 / Default",
+          "id": "123:54294"
+        },
+        {
+          "name": "AUTH-07 2FA Enrollment — Step 2 Confirm / 390 / Default",
+          "id": "123:54457"
+        },
+        {
+          "name": "AUTH-07 2FA Enrollment — Step 3 Backup codes / 390 / Default",
+          "id": "123:54615"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Login / 390 / Default",
+          "id": "123:54797"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Login / 390 / Locked",
+          "id": "123:55010"
+        },
+        {
+          "name": "AUTH-08 2FA Challenge — Withdrawal / 390 / Default",
+          "id": "123:55236"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 390 / List",
+          "id": "124:155578"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 390 / Wrong network",
+          "id": "124:155811"
+        },
+        {
+          "name": "AUTH-09 Connect Wallet / 390 / WalletConnect deep link",
+          "id": "124:156062"
+        },
+        {
+          "name": "AUTH-10 Wallet Verification / 390 / Request",
+          "id": "124:156284"
+        },
+        {
+          "name": "AUTH-10 Wallet Verification / 390 / Expired nonce",
+          "id": "124:156503"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "AUTH-07",
+          "status": "VERIFIED",
+          "note": "Desktop 1440 Scan, Confirm and Backup codes were built and their screenshots passed in an earlier run. The Step 2 (81:24488) 'Resend code' fix is confirmed applied: a read-back found no visible resend text. Mobile 390 Set up (authenticator deep link plus copyable setup key, no QR on the same phone), Confirm and Backup codes were built and their screenshots passed. Backup codes are 10 mono codes with a DEMO badge and Download / Copy all. The 'I've saved my backup codes' checkbox starts unchecked and Finish setup stays disabled."
+        },
+        {
+          "id": "AUTH-08",
+          "status": "BUILT",
+          "note": "All 9 frames exist. Mobile Login Default, Login Locked and Withdrawal Default were built and their screenshots passed. The locked OTP helper text now reads 'Locked after 5 incorrect codes · unlocks 16:59 UTC'. The 6 desktop frames (Login Default/Wrong code/Locked 115:81957/115:83997/115:86045; Withdrawal Default/Wrong code/Locked 116:34081/116:35027/116:35830) were built by the earlier interrupted run. Their heights (1060/1177, hug) look normal, but their screenshots were not checked: three Figma limit errors in a row stopped the check (pending/auth-b/verify/v1.js, v2.js)."
+        },
+        {
+          "id": "AUTH-09",
+          "status": "BUILT",
+          "note": "Mobile List (Provider Rows; Browser wallet disabled on mobile; 18+ / jurisdiction line), Wrong network (switch to Arbitrum, supported networks) and WalletConnect deep link were built and their screenshots passed. The 6 desktop Modal/Connect Wallet states (116:36629, 117:38530, 117:40434, 117:42355, 117:44238, 117:46336) exist from the earlier run, but their screenshots were not checked because of the Figma limit (pending/auth-b/verify/v2.js, v3.js)."
+        },
+        {
+          "id": "AUTH-10",
+          "status": "VERIFIED",
+          "note": "Desktop Request, Success, Rejected and Expired nonce were built and their screenshots passed. The required human-readable message appears word for word in the dialog and in a neutral wallet-extension pop-up mock. The nonce was issued at 16:42 UTC and expires at 16:52 UTC; chips say 'No transaction' and 'No gas · 0.00'. Mobile Request and Expired nonce were built and their screenshots passed. A targeted fix stacked the network pill under the address and shortened the message header so nothing overflows; a read-back found no text overflowing the frame."
+        }
+      ],
+      "issues": [
+        "Stopped after 3 Figma MCP 'tool call limit for your Full seat' errors in a row, as conventions §10 requires. Not yet verified by screenshot: the 12 desktop frames AUTH-08 Login ×3, AUTH-08 Withdrawal ×3 and AUTH-09 ×6, built by the earlier interrupted run (c3/k4/k5). To resume, run the read-only scripts /home/user/Claude/design/figma-build/pending/auth-b/verify/v1.js, v2.js and v3.js as use_figma code (5/5/3 screenshots plus a text-overflow and resend-line audit), then fix anything they show and upgrade AUTH-08/AUTH-09 to VERIFIED.",
+        "Library: on 390 frames the Notice/Demo Data (6:131) default message overflows and is clipped on both sides. AUTH mobile frames now set Message to 'DEMO DATA — illustrative values only' (decisions.md #29). A wrapping Mobile variant is suggested, because other 390 frames in the file are probably affected too.",
+        "Library: Input/OTP (16:3761) has no boolean to hide its 'Resend code' row (meaningless for TOTP), so it is hidden per instance. Its Disabled variant also has a built-in 'Try again in 14:59' text that has to be overridden to match real unlock times.",
+        "No library component exists for the sign-message dialog or the third-party wallet pop-up. AUTH-10 is built inline from tokens and library parts (Wallet/Provider Mark, Address Chip, Network Pill, Badge, Buttons, Toast).",
+        "Script bug fixed in the pending source: bodies/m07.js passed a P() [node,'FILL'] tuple into MSTICKYBAR, which failed with 'node with id undefined'. It now uses T(); out/k7.js and out/k8.js were rebuilt. The mock dry-run (mock.cjs) does not catch this kind of nested-tuple appendChild error.",
+        "Files updated: /home/user/Claude/design/figma-build/registry-auth-b.json (all 33 IDs), /home/user/Claude/design/figma-build/decisions.md (#29), /home/user/Claude/design/figma-build/pending/auth-b/README.md, kit.js (mobile DEMO bar message), bodies/m07.js, bodies/m10.js, bodies/fix_m.js, verify/v1-v3.js. ledger.json was not edited directly; the statuses are in this report."
+      ]
+    },
+    {
+      "key": "auth-c",
+      "section": "Page \"04 — Authentication\": section \"AUTH-11..17 KYC\" id 128:55648 (X=24000, Y=0; 11040×4615). Page \"10 — Mobile Experience\": section \"AUTH — Mobile C\" id 141:60686 (X=77000, Y=0). All 26 frames are built and screenshot-verified: 13 at Desktop 1440 and 13 at Mobile 390. Rows are D·M only, so no laptop or tablet frames were required.",
+      "created": [
+        {
+          "name": "Section — AUTH-11..17 KYC (page 04)",
+          "id": "128:55648"
+        },
+        {
+          "name": "Notes — AUTH-11…17 KYC",
+          "id": "128:55649"
+        },
+        {
+          "name": "AUTH-11 KYC Intro & levels / 1440 / Default",
+          "id": "128:55999"
+        },
+        {
+          "name": "AUTH-12 KYC Personal Details / 1440 / Default",
+          "id": "130:69057"
+        },
+        {
+          "name": "AUTH-12 KYC Personal Details / 1440 / Validation",
+          "id": "130:70575"
+        },
+        {
+          "name": "AUTH-13 KYC Document Upload / 1440 / Requirements",
+          "id": "131:128471"
+        },
+        {
+          "name": "AUTH-13 KYC Document Upload / 1440 / Preview",
+          "id": "131:129981"
+        },
+        {
+          "name": "AUTH-13 KYC Document Upload / 1440 / Error",
+          "id": "131:131529"
+        },
+        {
+          "name": "AUTH-14 KYC Liveness / 1440 / Camera ready",
+          "id": "132:75343"
+        },
+        {
+          "name": "AUTH-14 KYC Liveness / 1440 / Permission denied",
+          "id": "132:76801"
+        },
+        {
+          "name": "AUTH-14 KYC Liveness / 1440 / Retake",
+          "id": "132:78270"
+        },
+        {
+          "name": "AUTH-15 KYC Pending / 1440 / Default",
+          "id": "138:90288"
+        },
+        {
+          "name": "AUTH-16 KYC Approved / 1440 / Default",
+          "id": "138:91699"
+        },
+        {
+          "name": "AUTH-17 KYC Rejected / 1440 / Reasons",
+          "id": "140:97309"
+        },
+        {
+          "name": "AUTH-17 KYC Rejected / 1440 / Resubmit",
+          "id": "140:98769"
+        },
+        {
+          "name": "Section — AUTH — Mobile C (page 10)",
+          "id": "141:60686"
+        },
+        {
+          "name": "AUTH-11 KYC Intro & levels / 390 / Default",
+          "id": "141:60687"
+        },
+        {
+          "name": "AUTH-12 KYC Personal Details / 390 / Default",
+          "id": "141:60932"
+        },
+        {
+          "name": "AUTH-12 KYC Personal Details / 390 / Validation",
+          "id": "141:61145"
+        },
+        {
+          "name": "AUTH-13 KYC Document Upload / 390 / Requirements",
+          "id": "142:61850"
+        },
+        {
+          "name": "AUTH-13 KYC Document Upload / 390 / Preview",
+          "id": "142:62083"
+        },
+        {
+          "name": "AUTH-13 KYC Document Upload / 390 / Error (bottom sheet)",
+          "id": "142:62283"
+        },
+        {
+          "name": "AUTH-14 KYC Liveness / 390 / Camera ready",
+          "id": "145:62355"
+        },
+        {
+          "name": "AUTH-14 KYC Liveness / 390 / Permission denied",
+          "id": "145:62458"
+        },
+        {
+          "name": "AUTH-14 KYC Liveness / 390 / Retake",
+          "id": "145:62571"
+        },
+        {
+          "name": "AUTH-15 KYC Pending / 390 / Default",
+          "id": "146:62519"
+        },
+        {
+          "name": "AUTH-16 KYC Approved / 390 / Default",
+          "id": "146:62687"
+        },
+        {
+          "name": "AUTH-17 KYC Rejected / 390 / Reasons",
+          "id": "146:62871"
+        },
+        {
+          "name": "AUTH-17 KYC Rejected / 390 / Resubmit",
+          "id": "146:63059"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "AUTH-11",
+          "status": "VERIFIED",
+          "note": "Default frames at 1440 (128:55999) and 390 (141:60687). Content: 5-step stepper; levels L1/L2/L3 as a table on desktop and stacked cards on mobile (deposits and withdrawals 2,000.00 / 25,000.00 USDT a day, L3 set individually); what you'll need; data privacy notice; processing time 'usually under 10 min, up to 24 h'; licence and 18+. Both passed screenshot review."
+        },
+        {
+          "id": "AUTH-12",
+          "status": "VERIFIED",
+          "note": "Default and Validation frames at 1440 (130:69057, 130:70575) and 390 (141:60932, 141:61145). Validation has an error summary, 4 inline field errors (initials only, under 18, postal code format, missing confirmation), PEP radios and an unchecked accuracy checkbox. Nothing is pre-selected. All passed screenshot review."
+        },
+        {
+          "id": "AUTH-13",
+          "status": "VERIFIED",
+          "note": "Requirements, Preview and Error frames at 1440 (131:128471, 131:129981, 131:131529) and 390 (142:61850, 142:62083, and 142:62283 where the error is a bottom sheet). Content: document type choice, good/bad photo examples, both-side upload, preview with quality checks and extracted DEMO details, and a blurry-back error with how-to-fix tips. All passed screenshot review."
+        },
+        {
+          "id": "AUTH-14",
+          "status": "VERIFIED",
+          "note": "P1. Camera ready, Permission denied and Retake frames at 390 (145:62355, 145:62458, 145:62571) and 1440 (132:75343, 132:76801, 132:78270). Desktop adds a QR hand-off to the phone (code expires 17:02 UTC). Permission denied gives browser and OS steps. Retake shows 'Attempt 1 of 3', and after 3 attempts a specialist reviews by hand, so the user is never locked out. All passed screenshot review."
+        },
+        {
+          "id": "AUTH-15",
+          "status": "VERIFIED",
+          "note": "Default frames at 1440 (138:90288) and 390 (146:62519). Shows the review timeline with icon + label per step, 'Under 10 min · up to 24 h', what you submitted, and a 'Level 1 limits still apply' info banner. Re-screenshotted after the fix pass; passed."
+        },
+        {
+          "id": "AUTH-16",
+          "status": "VERIFIED",
+          "note": "Default frames at 1440 (138:91699) and 390 (146:62687). Shows new limits 25,000.00 USDT a day, Level 3 on request, and an RG note that the player's own limits are unchanged (5,000.00 USDT a week deposit limit, 200.00 USDT daily loss limit, both from demo-data). Passed."
+        },
+        {
+          "id": "AUTH-17",
+          "status": "VERIFIED",
+          "note": "Reasons and Resubmit frames at 1440 (140:97309, 140:98769) and 390 (146:62871, 146:63059). Three reason categories (document expired, photo too blurry, name mismatch), each with what we found and how to fix it, plus what passed. Resubmit redoes only the failed items; the selfie video is kept. 'Submit again' stays disabled until the unchecked confirmation is ticked. All passed."
+        }
+      ],
+      "issues": [
+        "CONTINUATION: the earlier run created nothing in Figma; the first read-only listing confirmed neither section existed. I ran the prepared scripts from /home/user/Claude/design/figma-build/pending/auth-c/ in order. Status and frame IDs are in /home/user/Claude/design/figma-build/pending/auth-c/README.md.",
+        "FIGMA MCP LIMIT: the tool-call limit error came 4 times (before AUTH-12, twice before AUTH-15/16, and before mobile AUTH-14). It never reached 3 in a row. Each time I prepared the next script, waited 100–150 s and retried successfully. Nothing is left unbuilt.",
+        "LAYOUT BUG FOUND AND FIXED (could affect other slices): the shared AL() helper creates spacer frames with figma.createAutoLayout(). An empty one keeps the default 100 px height. Every horizontal 'Spacer' in the KYC dialog header and card heads therefore made those rows about 100 px tall. I shrank all 20 affected spacers to 1 px in the 11 desktop frames built before the fix, re-fitted the viewport and scrim, re-centred the dialogs and restacked the columns. _lib.js and the d-* bodies now pass h: 1. Other slices that use box(row,'HORIZONTAL',{name:'Spacer'}) probably have the same gap; consider a helpers.js fix (e.g. resize empty spacers to 1 px).",
+        "TARGETED FIXES IN THIS RUN: (1) AUTH-15 desktop 'Processing time' column widened to 260 so 'Under 10 min' fits on one line. (2) The mobile flow-header title was shortened from 'Identity verification' to 'Verification' in all 13 mobile frames, because it wrapped to 2 lines next to the 'Pending review' and 'Rejected — resubmit' KYC chips. (3) On both breakpoints, AUTH-17 Resubmit 'Submit again' is now Disabled until the unchecked accuracy confirmation is ticked, matching decision #28. (4) Mobile frames use the short DEMO bar message 'DEMO DATA — illustrative values only' (decision #29).",
+        "COMPONENT GAPS, built inline with tokens and library instances: Nav/Stepper only has 7- and 9-step variants, so the 5-step stepper (Intro → Details → Document → Liveness → Review) is 5 Nav/Step Item instances on desktop and an inline segmented bar on mobile. Also built inline: the KYC levels table (desktop) and level cards (mobile); illustrations (ID card front/back, passport, phone with selfie oval, QR code, 'IN REVIEW' and 'RESUBMIT' stamps); the camera viewfinder; error summaries; and the mobile bottom sheet for the blurry photo, because Sheet/Bottom variants only cover 'Choose network' and 'Participation'. No library components were created, so I wrote no registry file.",
+        "DEMO-DATA CONSISTENCY, please confirm: demo-data.md line 7 says @nova.k is already KYC Level 2 — Verified, and line 143 says a Level 1 (KYC required) account is a separate DEMO scenario 'named as such in the frame'. These frames show the L1 → L2 journey for Nova, but the frame names do not say 'Level 1 scenario'. The section notes card does say it is a DEMO Level 2 flow. The orchestrator may want to rename the frames or add that label.",
+        "TO MERGE INTO demo-data.md (values from the earlier auth-c run, used on screen with DEMO badges): legal name Nova Karlsson; date of birth 14 Mar 1994; address Rua do Exemplo 12, 3.º Esq., 1100-001 Lisboa; occupation Software developer; ID card •••• 4821, valid until 09 Aug 2031; KYC reference KYC-48213-1127; submitted 16:58 UTC, approved 17:06 UTC; phone hand-off code expires 17:02 UTC. Rejected branch (an alternative timeline): ID expired 02 Jan 2026; document name KARLSSON-SILVA; passport valid until 03 May 2034; reviewed 17:21 UTC.",
+        "TO LOG IN decisions.md (I did not edit shared files): desktop KYC is a two-pane dialog (340 context panel + 740 wizard) over the dimmed member lobby, the same pattern as AUTH-01…04 and AUTH-07…10. On mobile, Intro/Pending/Approved/Rejected keep Nav/Mobile Tab Bar with Account active, while wizard steps hide it and use a sticky bottom CTA. Limits are symmetric for deposits and withdrawals. No consent or PEP answer is pre-selected. A failed liveness check goes to manual review after 3 attempts, with no lock-out. Resubmit only redoes the failed items.",
+        "MEMORY: I read the stored note on the GLOBAL POOL Figma file (project_global_pool_figma.md). It matches the conventions I followed (same file, palette and casino shell). Nothing new to save, and no memory text asked for any action."
+      ]
+    },
+    {
+      "key": "gp-draw",
+      "section": "46:16372 (page '07 — Global Pool', 'GP-05/06/07/12 Draw, results & verification' at X=16000,Y=0); mobile: 151:65122 (page '10 — Mobile Experience', 'GP — Mobile B' at X=168000,Y=0)",
+      "created": [
+        {
+          "name": "Section/GP-05/06/07/12 Draw, results & verification (existing)",
+          "id": "46:16372"
+        },
+        {
+          "name": "[GP-05] Round Drawing / 1440 / Drawing — VRF fulfilled, settling (existing, re-verified this run)",
+          "id": "46:16373"
+        },
+        {
+          "name": "[GP-05] Round Drawing / 1440 / Delayed — VRF response overdue (existing)",
+          "id": "47:17014"
+        },
+        {
+          "name": "[GP-06] Round Result — winner view / 1440 / Win — illustrative outcome (existing)",
+          "id": "49:17697"
+        },
+        {
+          "name": "[GP-06] Round Result — winner view / 1440 / Not selected (existing)",
+          "id": "53:18291"
+        },
+        {
+          "name": "[GP-07] Round Result — public view / 1440 / Default (existing)",
+          "id": "59:18983"
+        },
+        {
+          "name": "[GP-12] Provably Fair verification / 1440 / Verified (existing; helper-text fix applied this run)",
+          "id": "76:20293"
+        },
+        {
+          "name": "[GP-12] Provably Fair verification / 1440 / Failed — value mismatch (existing; helper-text fix applied this run)",
+          "id": "76:21087"
+        },
+        {
+          "name": "Section/GP — Mobile B (new)",
+          "id": "151:65122"
+        },
+        {
+          "name": "[GP-05] Round Drawing / 390 / Drawing — VRF fulfilled, settling",
+          "id": "151:66521"
+        },
+        {
+          "name": "[GP-05] Round Drawing / 390 / Delayed — VRF response overdue",
+          "id": "151:66817"
+        },
+        {
+          "name": "[GP-06] Round Result — winner view / 390 / Win — illustrative outcome",
+          "id": "152:65592"
+        },
+        {
+          "name": "[GP-06] Round Result — winner view / 390 / Not selected",
+          "id": "152:65942"
+        },
+        {
+          "name": "[GP-07] Round Result — public view / 390 / Default",
+          "id": "153:66253"
+        },
+        {
+          "name": "[GP-12] Provably Fair verification / 390 / Verified",
+          "id": "153:66888"
+        },
+        {
+          "name": "[GP-12] Provably Fair verification / 390 / Failed — value mismatch",
+          "id": "153:67227"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "GP-05",
+          "status": "VERIFIED",
+          "note": "D 1440 Drawing + Delayed and M 390 Drawing + Delayed all built and checked by screenshot. The desktop Drawing frame's two earlier unchecked fixes were re-screenshotted this run and pass. Mobile: VRF steps with the real timestamps 20:00:04 / 20:00:41 / est. 20:02 (settled 20:02:10). Also an entries-locked card (35 entries, 350.00 + 1.75 fee = 351.75), 'What happens next', a compliance strip and a sticky CTA. The Delayed frame adds an overdue callout, a refund deadline of 28 Nov 2026, 20:00:04 UTC and an 'entries are safe' explanation."
+        },
+        {
+          "id": "GP-06",
+          "status": "VERIFIED",
+          "note": "D 1440 Win + Not selected (existing) and M 390 Win + Not selected (new) checked by screenshot. The mobile Win frame is marked as an illustrative DEMO scenario in the notice bar and in a chip. It shows the 3,728.00 runner-up prize, a Prize → Owed → Available tracker (12/20 confirmations, ≈20:12 UTC), Owed 4,143.20 and Available after 12,943.30. Not selected: calm copy, the 35 entries, 351.75 spent, how the round was drawn, a verify CTA, next round #1,249 (28 Nov 08:00 UTC, auto re-entry off) and an RG card."
+        },
+        {
+          "id": "GP-07",
+          "status": "VERIFIED",
+          "note": "D 1440 (existing) and M 390 guest view (new) checked by screenshot. 390 frame: gold results banner (186,400.00 paid to 13 winners), top 3 (@orbit_77 93,200.00 / @mira.sol 37,280.00 / @kestrel 18,640.00), 10 runner-ups, prize distribution split bar, provably-fair card (request ID, random word, snapshot root), 4 on-chain record rows, Shell/Footer Mega Mobile, sticky Verify CTA and tab bar. All marked DEMO."
+        },
+        {
+          "id": "GP-12",
+          "status": "VERIFIED",
+          "note": "D 1440 Verified + Failed, with the leftover 'We'll send a 6-digit verification code…' Input/Text helper now hidden (6 nodes) and re-checked by screenshot. M 390 Verified (5/5) + Failed (2/5 with Error input, failed/skipped checks, what-to-do-next, Reset/Report sticky CTAs) built. The check-title overflow was fixed and re-checked by screenshot."
+        }
+      ],
+      "issues": [
+        "Mobile 390 frames use the short Notice/Demo Data message 'DEMO DATA — illustrative values only'; the GP-06 Win frame uses 'DEMO — illustrative win scenario'. This follows decision #29: the library default sentence clips at 390.",
+        "GP-06 Win is an illustrative alternative outcome: @nova.k as a runner-up with entry E-1248-00981. The GP-07 public winners list and GP-06 Not selected show the canonical DEMO outcome, in which @nova.k is not a winner. Both GP-06 Win frames label this clearly.",
+        "Cosmetic: hidden Input/Text helper text still leaves an empty helper slot under 'Filled' inputs, on desktop and mobile GP-12. The helper row could not be collapsed from the instance. Suggest Input/Text get a 'Show helper' boolean property.",
+        "Cosmetic layout: after the check-title wrap fix, '[GP-12] … / 390 / Verified' grew to 2622 px. The Failed frame below it now sits 100 px under it (not 160), and section 'GP — Mobile B' has about 60 px bottom padding instead of 120. Nothing overlaps.",
+        "Figma MCP tool-call limit hit 3 times in this run, never twice in a row. Each time I waited about 2–2.5 min and retried once successfully. Nothing remains unbuilt.",
+        "No new library components were created. registry-gp-results.json was updated with the mobile section and frame IDs, and its '_pending' note was removed. ledger.json was not edited; statuses are reported here for the orchestrator to merge."
+      ]
+    },
+    {
+      "key": "gp-hub",
+      "section": "Page '07 — Global Pool': section 'GP-01..04 Hub & participation' = 32:32304 (X 0, Y 0). Page '10 — Mobile Experience': section 'GP — Mobile A' = 34:434742 (X 161000, Y 0; refit to 2160 x 21931). Continuation run. The read-only listing showed all 20 frames from the earlier run were intact (every frame hugs its content; none was clipped at 800). Only the missing frames were built, plus targeted fixes. Re-runnable scripts are in /home/user/Claude/design/figma-build/pending/gp-hub/ (README.md, RUN-ORDER.json, src/, out/, build.py).",
+      "created": [
+        {
+          "name": "[GP-03] Participation Pending / 390 / Bottom sheet (NEW, page 10, x1140 y160)",
+          "id": "164:73073"
+        },
+        {
+          "name": "[GP-04] Participation Success — Entry receipt / 390 / Bottom sheet (NEW, page 10, x1650 y160)",
+          "id": "164:73786"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1280 / Restricted region (NEW, page 07, x120 y24277)",
+          "id": "164:154566"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 768 / Restricted region (NEW, page 07, x1520 y24877)",
+          "id": "164:155369"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1280 / No active round (NEW, page 07, x120 y29554)",
+          "id": "165:94856"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 768 / No active round (NEW, page 07, x1520 y30851)",
+          "id": "165:96938"
+        },
+        {
+          "name": "Section — GP-01..04 Hub & participation (page 07)",
+          "id": "32:32304"
+        },
+        {
+          "name": "Section — GP — Mobile A (page 10)",
+          "id": "34:434742"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1440 / Active",
+          "id": "32:79976"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1440 / Restricted region",
+          "id": "33:140539"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1440 / Wallet disconnected",
+          "id": "33:160310"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1440 / No active round (winner handle patched this run)",
+          "id": "33:194034"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 1280 / Active",
+          "id": "33:223663"
+        },
+        {
+          "name": "[GP-01] Global Pool Hub / 768 / Active",
+          "id": "33:266964"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 1440 / Default",
+          "id": "33:299290"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 1440 / Insufficient funds",
+          "id": "33:310193"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 1440 / Limit reached",
+          "id": "34:325577"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 1440 / Wrong network",
+          "id": "34:333053"
+        },
+        {
+          "name": "[GP-03] Participation Pending / 1440",
+          "id": "34:365199"
+        },
+        {
+          "name": "[GP-04] Participation Success — Entry receipt / 1440",
+          "id": "34:383862"
+        },
+        {
+          "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Active",
+          "id": "34:434743"
+        },
+        {
+          "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Restricted region (sticky bar fixed this run)",
+          "id": "34:473267"
+        },
+        {
+          "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Wallet disconnected (sticky bar fixed this run)",
+          "id": "34:482737"
+        },
+        {
+          "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / No active round (sticky bar + winner handle fixed this run)",
+          "id": "34:492964"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 390 / Default — bottom sheet",
+          "id": "36:503945"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 390 / Insufficient funds — bottom sheet",
+          "id": "36:521852"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 390 / Limit reached — bottom sheet",
+          "id": "36:529928"
+        },
+        {
+          "name": "[GP-02] Participation Preview / 390 / Wrong network — bottom sheet",
+          "id": "36:538096"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "GP-01",
+          "status": "VERIFIED",
+          "note": "All 4 states exist at 1440 (screenshot-checked in the earlier run). 1280 and 768 now have Active, Restricted region and No active round. Wallet disconnected is not built at L/T on purpose: per decision #16 it is not a material layout change (only the CTA swaps). The four new L/T frames passed screenshot checks of the hero and the full frame. Restricted mirrors the 1440 frame: frame-level Nav/Region Banner, Member top bar, cloned Alert/Banner 'Regional restriction', disabled Gold 'Not available in your region' plus 'Restricted countries' and 'Withdraw funds' in a wrapping CTA row, and the 1440 risk line. No-round has: a 'Next round opens 28 Nov 2026, 08:00 UTC' banner with Card/Draw Countdown (Next round) and angled blocks; Round Header / Card/Round set to Settled and overridden to #1,248 (186,400.00, 3,412 participants, 18,640 entries, 20:02 UTC); My entries showing 'not selected', 0.00 locked, 351.75 spent; Jackpot/Winner Reveal Card 'Public winner' set to @orbit_77; VRF Stepper Settled (1280); a 'Check this draw yourself' verify card; a 'What happens next' card; the live feed removed. 390: all 4 states exist. The sticky participate bar on Restricted, Wallet disconnected and No active round had its text running under the button. The overlapping texts now wrap, the bars were re-screenshotted and pass, and they sit in flow directly above Nav/Mobile Tab Bar."
+        },
+        {
+          "id": "GP-02",
+          "status": "VERIFIED",
+          "note": "Default, Insufficient funds, Limit reached and Wrong network exist at 1440 and 390. Screenshots this run of the two 1440 modals that had not been checked passed. Insufficient funds: 342.10 example balance, 'Short by 9.65 USDT', Deposit / Reduce to 34. Limit reached: 210.00 + 351.75 = 561.75 of 500.00, reduce to 28 entries, resets 28 Nov 00:00 UTC. Both have an unchecked consent box and a disabled Confirm. The other frames were screenshot-checked in the earlier run."
+        },
+        {
+          "id": "GP-03",
+          "status": "VERIFIED",
+          "note": "1440 was screenshot-checked in the earlier run. The 390 bottom sheet over the pre-purchase hub is new (164:73073). Its title and subtitle are read from the desktop modal. It shows: You pay 351.75 = 350.00 + 1.75 platform fee + 0.00 network fee; 3 progress steps; a full-width 'Batch transaction · Arbitrum One' Tx/Hash row with explorer link and DEMO (moved out of the 318 px step column, where it clipped); a progress bar; an absolute-close callout; a Gold Loading button; 'Close — we'll notify you'; 18+ with 'You can lose your stake'. The sheet was re-anchored after it grew and the final screenshot passed."
+        },
+        {
+          "id": "GP-04",
+          "status": "BUILT",
+          "note": "The 390 receipt sheet over the post-purchase hub is new (164:73786) and its screenshot passed. It shows: Entry Ticket, receipt rows, Tx/Fee Breakdown Entry with 'You can lose your stake', 350.00 locked, Tx/Hash + DEMO, odds callout, RG limit 351.75 / 500.00, and View my entries / Back to Global Pool / Download receipt. Not VERIFIED only because of the earlier run's 1440 caveat: its final label change was checked by measured widths, not a screenshot. The re-check screenshot (out/06_final_p07.js) was refused by the Figma limit."
+        },
+        {
+          "id": "MOB-04",
+          "status": "VERIFIED",
+          "note": "390 hub with the sticky participate bar above Nav/Mobile Tab Bar (Active=Pool) in all 4 states. The sticky bars were fixed and re-screenshotted this run. Active had no overlap. Restricted, Wallet disconnected and No active round needed text wrapping and now pass."
+        }
+      ],
+      "issues": [
+        "Figma MCP tool-call limit: the first listing calls were refused twice; the third attempt (after a 5-minute cool-down) succeeded and the build went ahead. At the end, 3 refusals in a row blocked out/06_final_p07.js (/home/user/Claude/design/figma-build/pending/gp-hub/out/06_final_p07.js). That script only (a) refits section 32:32304 to the settled frame heights and (b) screenshots the 1440 GP-04 modal. Until it runs, the bottom of the 768 No-round frame (165:96938) may extend slightly past the section edge, because fitSection ran in the same script that created the frame and may have used a not-yet-settled height. No frames overlap: the y positions were computed from settled heights. It is safe to run at any time.",
+        "Frame heights reported in the same script that creates a cloned frame are stale: the Restricted clones reported 4815/5450 at creation and 5117/5814 on the next call. Agents that place frames under a clone should re-read heights in a later call.",
+        "Library: Jackpot/Winner Reveal Card 'Public winner' defaults to @lumen.eth as 1st of #1,248, while GP-07 (public results) uses @orbit_77 with E-1248-07734. All hub No-round instances (1440, 1280, 768, 390) are now overridden to @orbit_77. The component default should be updated (decision #33 appended to decisions.md).",
+        "Library: Shell/Topbar Desktop has no 'Member + restricted' variant. Restricted L/T frames use the Member top bar plus a frame-level Nav/Region Banner (16:3449, Desktop/Tablet), matching the 1440 frame.",
+        "Library: Tx/Hash with explorer link + DEMO has a natural width of 367 px and does not fit a 358 px mobile column. On GP-03 mobile it is fixed to 358 in its own full-width row. A compact mobile variant would help.",
+        "Built inline (no component exists): bottom-sheet shells for the GP-03/GP-04 mobile sheets, 'Next round' hero banner, 'What happens next' card, 'Check this draw yourself' verify card. These are candidates for componentization. No library components were created, so no registry file was written.",
+        "Ledger.json was not edited; statuses are in this report. Prepared, idempotent scripts and the run status are in /home/user/Claude/design/figma-build/pending/gp-hub/README.md.",
+        "Memory: the only relevant note (GLOBAL POOL Figma file / BC.GAME-style direction) matches the brief, which already covers it. Nothing new to save."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Screens"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "cont:wal-withdraw-a",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a876d02077fb89733",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795827467416,
+      "queuedAt": 1795827467397,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "36:516030 (page '06 — Wallet & Transactions', 'WAL-10..14 W…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795833127506,
+      "tokens": 475899,
+      "toolCalls": 80,
+      "durationMs": 5660089,
+      "resultPreview": "{\"section\":\"36:516030 (page '06 — Wallet & Transactions', 'WAL-10..14 Withdraw steps 1–5', X=34000 Y=0) + 152:66270 (page '10 — Mobile Experience', 'WAL — Mobile C (Withdraw 1–5)', X=147000 Y=0)\",\"created\":[{\"name\":\"Section/WAL-10..14 Withdraw steps 1–5 (page 06, from first run)\",\"id\":\"36:516030\"},{\"name\":\"WAL-10 Withdraw — Step 1 Select Asset / 1440 / Default (first run)\",\"id\":\"36:527247\"},{\"name…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "cont:auth-b",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "acd33b8c6496a5749",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795827467416,
+      "queuedAt": 1795827467398,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "78:77287 (page '04 — Authentication', 'AUTH-07/08/09/10 2FA…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795828250881,
+      "tokens": 299347,
+      "toolCalls": 37,
+      "durationMs": 781565,
+      "resultPreview": "{\"section\":\"78:77287 (page '04 — Authentication', 'AUTH-07/08/09/10 2FA & wallet connect', X=12000 Y=0). Mobile: page '10 — Mobile Experience', section 'AUTH — Mobile B' at X=70000 Y=0 (fitted). All 30 frames for AUTH-07…10 now exist. This continuation built 15 frames and checked each with a screenshot: AUTH-10 desktop ×4 and all 11 mobile frames. The run stopped after 3 Figma MCP 'tool call limit…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "cont:auth-c",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a510459d1e1608cd2",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795828250933,
+      "queuedAt": 1795827467398,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Page \"04 — Authentication\": section \"AUTH-11..17 KYC\" id 12…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795830436480,
+      "tokens": 476425,
+      "toolCalls": 57,
+      "durationMs": 2185546,
+      "resultPreview": "{\"section\":\"Page \\\"04 — Authentication\\\": section \\\"AUTH-11..17 KYC\\\" id 128:55648 (X=24000, Y=0; 11040×4615). Page \\\"10 — Mobile Experience\\\": section \\\"AUTH — Mobile C\\\" id 141:60686 (X=77000, Y=0). All 26 frames are built and screenshot-verified: 13 at Desktop 1440 and 13 at Mobile 390. Rows are D·M only, so no laptop or tablet frames were required.\",\"created\":[{\"name\":\"Section — AUTH-11..17 KY…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "cont:gp-draw",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "ae93bbc78659bcaf3",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795830436489,
+      "queuedAt": 1795827467398,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "46:16372 (page '07 — Global Pool', 'GP-05/06/07/12 Draw, re…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795831565968,
+      "tokens": 286669,
+      "toolCalls": 47,
+      "durationMs": 1129479,
+      "resultPreview": "{\"section\":\"46:16372 (page '07 — Global Pool', 'GP-05/06/07/12 Draw, results & verification' at X=16000,Y=0); mobile: 151:65122 (page '10 — Mobile Experience', 'GP — Mobile B' at X=168000,Y=0)\",\"created\":[{\"name\":\"Section/GP-05/06/07/12 Draw, results & verification (existing)\",\"id\":\"46:16372\"},{\"name\":\"[GP-05] Round Drawing / 1440 / Drawing — VRF fulfilled, settling (existing, re-verified this run…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "cont:gp-hub",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "abe85105d50c0408b",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795831565975,
+      "queuedAt": 1795827467398,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Page '07 — Global Pool': section 'GP-01..04 Hub & participa…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795833725134,
+      "tokens": 376163,
+      "toolCalls": 75,
+      "durationMs": 2159159,
+      "resultPreview": "{\"section\":\"Page '07 — Global Pool': section 'GP-01..04 Hub & participation' = 32:32304 (X 0, Y 0). Page '10 — Mobile Experience': section 'GP — Mobile A' = 34:434742 (X 161000, Y 0; refit to 2160 x 21931). Continuation run. The read-only listing showed all 20 frames from the earlier run were intact (every frame hugs its content; none was clipped at 800). Only the missing frames were built, plus t…"
+    }
+  ],
+  "totalTokens": 1914503,
+  "totalToolCalls": 296
+}

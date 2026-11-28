@@ -28,9 +28,20 @@ export interface AuthAdmin {
 }
 
 export interface GpRequest extends Request {
-  id?: string;
   user?: AuthUser;
   admin?: AuthAdmin;
+}
+
+/** pino-http request id (string). */
+export function requestIdOf(req: Request): string | null {
+  const id: unknown = (req as { id?: unknown }).id;
+  return typeof id === 'string' || typeof id === 'number' ? String(id) : null;
+}
+
+/** First value of a route param (Express 5 types allow string[]). */
+export function paramOf(req: Request, name: string): string | null {
+  const v: unknown = (req.params as Record<string, unknown> | undefined)?.[name];
+  return typeof v === 'string' ? v : Array.isArray(v) && typeof v[0] === 'string' ? v[0] : null;
 }
 
 export const CurrentUser = createParamDecorator((_: unknown, ctx: ExecutionContext): AuthUser => {
@@ -56,7 +67,7 @@ export const ReqMeta = createParamDecorator((_: unknown, ctx: ExecutionContext):
   return {
     ip: req.ip ?? null,
     userAgent: req.get('user-agent') ?? null,
-    requestId: typeof req.id === 'string' ? req.id : null,
+    requestId: requestIdOf(req),
   };
 });
 

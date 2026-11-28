@@ -37,7 +37,7 @@ export function Amount({ value, tone = 'neutral', unit = true, decimals = 2, cla
       {...props}
     >
       <span>{text}</span>
-      {unit && <span className="text-[0.7em] font-medium text-text-secondary">USDT</span>}
+      {unit && <span className="text-[length:max(11px,0.5em)] font-medium text-text-secondary">USDT</span>}
     </span>
   );
 }

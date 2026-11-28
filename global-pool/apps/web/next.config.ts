@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import type { NextConfig } from 'next';
 
 /**
@@ -7,10 +9,18 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // The repo root has an unrelated package-lock.json; pin tracing to the pnpm workspace root
+  // (next build always runs with cwd = apps/web).
+  outputFileTracingRoot: path.join(process.cwd(), '../..'),
   // Lint runs as its own step (`pnpm --filter @gp/web lint`) with the shared flat config.
   eslint: { ignoreDuringBuilds: true },
   experimental: {
     optimizePackageImports: ['lucide-react', 'radix-ui'],
+  },
+  webpack(config: { resolve: { alias: Record<string, string | false> } }) {
+    // Optional Privy peer (Farcaster mini-app Solana bridge) that this app never uses.
+    config.resolve.alias['@farcaster/mini-app-solana'] = false;
+    return config;
   },
   headers() {
     return Promise.resolve([

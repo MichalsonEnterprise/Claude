@@ -35,10 +35,11 @@ function StaticGlyph({ ch }: { ch: string }) {
   );
 }
 
+/** Font size is capped by the container width (cqi) so the number never overflows its plaque. */
 const SIZE = {
-  m: 'text-[32px] tracking-[-0.02em]',
-  l: 'text-[44px] tracking-[-0.025em]',
-  xl: 'text-[64px] tracking-[-0.03em] max-tablet:text-[40px]',
+  m: 'text-[length:min(32px,10.5cqi)] tracking-[-0.02em]',
+  l: 'text-[length:min(44px,11cqi)] tracking-[-0.025em]',
+  xl: 'text-[length:min(64px,11.5cqi)] tracking-[-0.03em]',
 } as const;
 
 export interface JackpotMeterProps {
@@ -73,7 +74,7 @@ export function JackpotMeter({
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-2 text-center',
+        '@container flex w-full flex-col items-center gap-2 text-center',
         !bare && 'rounded-lg border border-border-gold bg-gold-900/60 bg-gradient-gold-tint px-5 py-4 shadow-inner-hairline',
         className,
       )}

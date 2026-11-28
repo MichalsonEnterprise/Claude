@@ -142,14 +142,15 @@ export class TotpService {
         epochTolerance: EPOCH_TOLERANCE_SECONDS,
         ...(row.lastUsedStep !== null ? { afterTimeStep: row.lastUsedStep } : {}),
       });
-      if (result.valid) {
+      const step = result.valid && 'timeStep' in result ? (result.timeStep as number) : null;
+      if (step !== null) {
         // Conditional update = atomic replay protection under concurrency.
         const claimed = await this.prisma.totpSecret.updateMany({
           where: {
             id: row.id,
-            OR: [{ lastUsedStep: null }, { lastUsedStep: { lt: result.timeStep } }],
+            OR: [{ lastUsedStep: null }, { lastUsedStep: { lt: step } }],
           },
-          data: { lastUsedStep: result.timeStep, failedAttempts: 0, lockedUntil: null },
+          data: { lastUsedStep: step, failedAttempts: 0, lockedUntil: null },
         });
         if (claimed.count === 1) method = 'totp';
       }

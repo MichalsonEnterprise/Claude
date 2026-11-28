@@ -96,7 +96,7 @@ function NavLink({
           <CountBadge
             count={count}
             tone="neutral"
-            className="ml-auto rail:absolute rail:top-0.5 rail:right-1.5 rail:ml-0"
+            className="ml-auto rail:absolute rail:top-0 rail:right-0 rail:ml-0"
           />
         )}
       </Link>
@@ -142,7 +142,7 @@ function NavGroup({
       <div className="hidden rail:block">
         <NavLink item={item} activeHref={activeHref} counts={counts} rail={rail} density={density} onNavigate={onNavigate} />
       </div>
-      <ul id={listId} hidden={!open} className="mt-0.5 flex flex-col gap-0.5 rail:hidden">
+      <ul id={listId} hidden={!open} className="flex flex-col rail:hidden">
         {item.children?.map((c) => (
           <li key={c.id}>
             <NavLink
@@ -199,9 +199,9 @@ export function SidebarNav({
     );
   return (
     <>
-      <ul className="flex flex-col gap-0.5">{PRIMARY_NAV.map(render)}</ul>
-      <div role="separator" className="my-3 h-px bg-border-subtle" />
-      <ul className="flex flex-col gap-0.5" aria-label="Account">
+      <ul className="flex flex-col">{PRIMARY_NAV.map(render)}</ul>
+      <div role="separator" className="my-2.5 h-px bg-border-subtle" />
+      <ul className="flex flex-col" aria-label="Account">
         {ACCOUNT_NAV.filter((i) => member || !i.memberOnly).map(render)}
       </ul>
     </>
@@ -229,10 +229,10 @@ export function SidebarPromoTiles({ poolAmount, demo }: { poolAmount: string; de
         </Link>
         <Link
           href={ROUTES.vip}
-          className="flex w-[84px] flex-col gap-0.5 rounded-md border border-border-default bg-surface-raised p-2.5 transition-colors hover:border-border-strong"
+          className="flex w-[84px] flex-col gap-0.5 rounded-md border border-border-default bg-surface-raised px-2 py-2.5 transition-colors hover:border-border-strong"
         >
-          <span className="flex items-center gap-1 text-label-s text-text-primary">
-            <Crown aria-hidden className="size-3.5 text-icon-gold" /> VIP Club
+          <span className="flex items-center gap-1 whitespace-nowrap text-label-s text-text-primary">
+            <Crown aria-hidden className="size-3.5 shrink-0 text-icon-gold" /> VIP Club
           </span>
           <span className="text-caption text-text-tertiary">29 levels · 5 tiers</span>
         </Link>
@@ -311,7 +311,7 @@ export function Sidebar({
       <nav aria-label="Main" className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
         <SidebarNav auth={auth} activeHref={activeHref} counts={counts} rail={rail} />
       </nav>
-      <div className="flex flex-col gap-3 border-t border-border-subtle p-3">
+      <div className="flex flex-col gap-2.5 border-t border-border-subtle p-3">
         <div className="rail:hidden">
           <LanguageMenu />
         </div>

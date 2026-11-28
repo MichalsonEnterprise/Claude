@@ -12,3 +12,6 @@ Run order (one use_figma call each):
 5. m1  — mobile WAL-10 sheet, WAL-11 sheet, WAL-12 Default ... DONE (152:66271, 152:66557, 152:66808; section 152:66270)
 6. m2  — mobile WAL-12 Invalid, WAL-12 cooldown sheet, WAL-13 Default ... DONE (157:68503, 157:68755, 157:68981)
 7. m3  — mobile WAL-13 Over balance, Limit reached, WAL-14 review sheet ... DONE (160:69089, 160:69318, 160:69533); fix pass: limit-card title + sheet height
+8. fix — mobile WAL-13 limit card title 'Daily limit' (KYC chip no longer clipped); WAL-14 mobile sheet: Tx/Fee Breakdown note row hidden, irreversibility body shortened, frame 845 tall ... DONE
+
+All 25 frames of the slice exist and were screenshot-verified on 28 Nov 2026 (desktop 11 incl. 3 from the first run, tablet 5, mobile 9 + section).

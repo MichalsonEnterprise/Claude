@@ -22,6 +22,7 @@ import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 
 import { AppError } from './errors';
+import { requestIdOf } from './request';
 
 const STATUS_CODE: Partial<Record<number, ErrorCode>> = {
   400: 'BAD_REQUEST',
@@ -52,9 +53,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return;
     }
     const ctx = host.switchToHttp();
-    const req = ctx.getRequest<Request & { id?: string }>();
+    const req = ctx.getRequest<Request>();
     const res = ctx.getResponse<Response>();
-    const requestId = typeof req.id === 'string' ? req.id : undefined;
+    const requestId = requestIdOf(req) ?? undefined;
 
     const envelope = this.toEnvelope(exception, req);
     envelope.error.requestId = requestId;

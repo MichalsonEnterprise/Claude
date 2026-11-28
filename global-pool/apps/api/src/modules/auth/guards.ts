@@ -11,7 +11,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import type { RestrictionType } from '@prisma/client';
 
 import { AppError } from '../../common/errors';
-import type { GpRequest } from '../../common/request';
+import { requestIdOf, type GpRequest } from '../../common/request';
 import { GeoService } from '../compliance/geo.service';
 import { ResponsibleGamingService } from '../compliance/responsible-gaming.service';
 import { RestrictionsService } from '../compliance/restrictions.service';
@@ -72,7 +72,7 @@ export class PrivyAuthGuard implements CanActivate {
     const { user } = await this.identity.authenticate(token, {
       ip: req.ip ?? null,
       userAgent: req.get('user-agent') ?? null,
-      requestId: typeof req.id === 'string' ? req.id : null,
+      requestId: requestIdOf(req),
     });
     req.user = user;
     return true;

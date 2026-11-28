@@ -18,6 +18,14 @@
   "[ADM-P7] VRF Status / 1280 / Fulfilled — round #1,248": "80:63106",
   "[ADM-P8] Settlement Status / 1440 / Crediting — batch 3 of 4": "80:63898",
   "[ADM-P8] Settlement Status / 1280 / Crediting — batch 3 of 4": "80:64936",
-  "script cache (temporary)": "78:57471"
+  "script cache (temporary)": "78:57471",
+  "[ADM-P9] Refund Status / 1440 / Default": "171:67227",
+  "[ADM-P9] Refund Status / 1280 / Default": "171:68123",
+  "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Default — entries open": "171:68868",
+  "[ADM-P10] Immutable by Design & Circuit Breaker / 1280 / Default — entries open": "171:69583",
+  "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Pause request — reason + 2FA + four-eyes": "171:70215",
+  "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / Second approval — approver view": "171:70991",
+  "[ADM-P10] Immutable by Design & Circuit Breaker / 1440 / New entries paused — after dual approval": "171:71700",
+  "[ADM-P7] VRF Status / 1440 / Delayed — no fulfilment after 12 min (scenario)": "171:72535"
  }
 }

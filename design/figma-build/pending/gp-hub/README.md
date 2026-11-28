@@ -7,3 +7,8 @@ Remaining frames after the 27 Nov run (see results/screens-3-auth-gp.json, key g
    region banner + alert + CTAs mirrored from the 1440 Restricted frame); screenshots the 1440 GP-02 Insufficient / Limit modals.
 3. out/03_d_noround_1280_768.js — page 07: [GP-01] Global Pool Hub / 1280|768 / No active round; patches the 1440 No-round winner handle.
 All scripts are idempotent (skip frames that already exist). Rebuild with `python3 build.py` after editing src/.
+
+## Status 28 Nov 2026 (continuation run)
+- DONE: 01 (164:73073, 164:73786), 02 (164:154566, 164:155369), 03 (165:94856, 165:96938), 04 (hash row + sticky bars), 05 (GP-03 sheet re-anchored, section refit).
+- NOT RUN (Figma MCP limit, 3 refusals in a row): out/06_final_p07.js — refits section 'GP-01..04 Hub & participation' on page 07 to the settled frame heights
+  and screenshots the 1440 GP-04 receipt modal (34:383862). Safe to run any time (read + section resize only).

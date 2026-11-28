@@ -23,7 +23,7 @@ export const buttonVariants = cva(
       variant: {
         primary: [
           'bg-brand text-text-on-primary hover:bg-brand-hover active:bg-brand-pressed',
-          'disabled:bg-brand-disabled disabled:text-text-disabled aria-disabled:bg-brand-disabled aria-disabled:text-text-disabled',
+          'disabled:bg-brand-disabled disabled:text-text-disabled',
         ],
         secondary: [
           'border border-border-default bg-surface-raised text-text-primary hover:border-border-strong hover:bg-ink-600 active:bg-ink-550',
@@ -55,6 +55,16 @@ export const buttonVariants = cva(
   },
 );
 
+/** While loading the button is disabled (no double submit) but keeps its colour, with a spinner. */
+const LOADING_KEEPS_COLOUR: Record<NonNullable<VariantProps<typeof buttonVariants>['variant']>, string> = {
+  primary: 'disabled:bg-brand disabled:text-text-on-primary',
+  secondary: 'disabled:border-border-default disabled:bg-surface-raised disabled:text-text-primary',
+  ghost: 'disabled:text-text-primary',
+  danger: 'disabled:bg-status-danger-strong disabled:text-text-on-danger',
+  gold: 'disabled:bg-gold disabled:text-text-on-gold',
+  link: '',
+};
+
 export type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>['variant']>;
 export type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>['size']>;
 
@@ -83,7 +93,11 @@ export function Button({
   type,
   ...props
 }: ButtonProps) {
-  const classes = cn(buttonVariants({ variant, size, block }), className);
+  const classes = cn(
+    buttonVariants({ variant, size, block }),
+    loading && LOADING_KEEPS_COLOUR[variant ?? 'primary'],
+    className,
+  );
   if (asChild) {
     return (
       <Slot.Root data-slot="button" className={classes} {...props}>

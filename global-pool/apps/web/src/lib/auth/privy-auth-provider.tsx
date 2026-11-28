@@ -3,7 +3,7 @@
 import { PrivyProvider, usePrivy } from '@privy-io/react-auth';
 import { colors } from '@gp/tokens';
 import { useMemo, type ReactNode } from 'react';
-import { arbitrumSepolia } from 'viem/chains';
+import { defineChain } from 'viem';
 
 import { publicEnv } from '@/lib/env';
 
@@ -14,6 +14,19 @@ import { initialsFrom, type AuthContextValue } from './types';
  * Privy (owner decision #3): email OTP, social and wallet login (WalletConnect + embedded wallets), styled to
  * the GLOBAL POOL palette. MVP chain = Arbitrum Sepolia (421614). The API verifies the access token (ES256).
  */
+/**
+ * Arbitrum Sepolia (421614), defined inline so the bundle doesn't pull viem's whole chain registry.
+ * The RPC here is only Privy's default public endpoint; server-side reads use ARBITRUM_SEPOLIA_RPC_URL.
+ */
+const arbitrumSepolia = defineChain({
+  id: 421614,
+  name: 'Arbitrum Sepolia',
+  nativeCurrency: { name: 'Sepolia Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: { default: { http: ['https://sepolia-rollup.arbitrum.io/rpc'] } },
+  blockExplorers: { default: { name: 'Arbiscan', url: 'https://sepolia.arbiscan.io' } },
+  testnet: true,
+});
+
 export default function PrivyAuthProvider({ children }: { children: ReactNode }) {
   return (
     <PrivyProvider

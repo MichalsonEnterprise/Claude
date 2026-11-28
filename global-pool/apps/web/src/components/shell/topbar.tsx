@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -89,6 +89,11 @@ export function Topbar({
       </form>
 
       <div className="ml-auto flex shrink-0 items-center gap-2 laptop:gap-3">
+        <IconButton label="Search games and rounds" asChild className="lg:hidden">
+          <Link href="/search">
+            <Search aria-hidden />
+          </Link>
+        </IconButton>
         {auth === 'loading' && (
           <>
             <Skeleton className="h-10 w-24 rounded-md" />

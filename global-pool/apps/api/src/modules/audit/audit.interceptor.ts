@@ -10,6 +10,7 @@ import type { Request } from 'express';
 import { catchError, from, mergeMap, type Observable, throwError } from 'rxjs';
 
 import { AppError } from '../../common/errors';
+import { paramOf, requestIdOf } from '../../common/request';
 import { AuditService } from './audit.service';
 
 export const AUDIT_ACTION = 'gp:audit-action';
@@ -25,7 +26,6 @@ export interface AuditOptions {
 export const Audit = (options: AuditOptions) => SetMetadata(AUDIT_ACTION, options);
 
 interface AuditedRequest extends Request {
-  id?: string;
   admin?: { id: string; name: string };
   user?: { id: string; handle: string | null };
 }
@@ -48,11 +48,11 @@ export class AuditInterceptor implements NestInterceptor {
       actorLabel: req.admin?.name ?? req.user?.handle ?? null,
       action: options.action,
       targetType: options.targetType ?? null,
-      targetId: req.params?.[options.targetParam ?? 'id'] ?? null,
+      targetId: paramOf(req, options.targetParam ?? 'id'),
       reason: typeof body.reason === 'string' ? body.reason : null,
       ip: req.ip ?? null,
       userAgent: req.get('user-agent') ?? null,
-      requestId: req.id ?? null,
+      requestId: requestIdOf(req),
     };
     return next.handle().pipe(
       mergeMap((result: unknown) =>

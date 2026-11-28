@@ -29,6 +29,8 @@ export interface GameTileProps {
   /** Region restriction: scrim + lock, no Play, no players badge. */
   restricted?: boolean;
   size?: 'm' | 's';
+  /** Static preview of the hover/focus state (design-system QA only). */
+  previewHover?: boolean;
   className?: string;
 }
 
@@ -47,6 +49,7 @@ export function GameTile({
   tag,
   restricted = false,
   size = 'm',
+  previewHover = false,
   className,
 }: GameTileProps) {
   const gradient = TILE_GRADIENT_CLASS[GAME_TILE_GRADIENT[game]];
@@ -95,31 +98,37 @@ export function GameTile({
       <div className={cn('absolute inset-x-0 bottom-0 text-center', small ? 'px-1.5 pb-2' : 'px-2 pb-3')}>
         <p
           className={cn(
-            'font-extrabold uppercase leading-tight tracking-[-0.01em] text-text-primary [text-wrap:balance]',
-            small ? 'text-[11px]' : 'text-[17px] tablet:text-[19px]',
+            'font-bold uppercase leading-tight tracking-[-0.01em] text-text-primary [text-wrap:balance]',
+            small ? 'text-[11px]' : 'text-[18px]',
           )}
         >
           {name}
         </p>
         {!small && subtitle && (
-          <p className="mt-1 truncate text-[10px] font-semibold uppercase tracking-[0.1em] text-text-secondary">
+          <p className="mt-1 truncate text-[10px] font-semibold uppercase tracking-[0.05em] text-text-secondary">
             {subtitle}
           </p>
         )}
       </div>
 
       {restricted ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-scrim-overlay px-3 text-center">
-          <span className="flex size-10 items-center justify-center rounded-full bg-ink-950/80 text-icon-default">
-            <Lock aria-hidden className="size-5" />
-          </span>
-          {!small && <p className="text-label-s text-text-primary">Not available in your region</p>}
-        </div>
+        <>
+          <div className="absolute inset-0 bg-scrim-strong" />
+          <div className="absolute inset-x-0 top-0 flex flex-col items-center justify-center gap-2 px-3 text-center bottom-[30%]">
+            <span className="flex size-10 items-center justify-center rounded-full bg-ink-950/80 text-icon-default">
+              <Lock aria-hidden className="size-5" />
+            </span>
+            {!small && <p className="text-label-s text-text-primary">Not available in your region</p>}
+          </div>
+        </>
       ) : (
         !small && (
           <div
             aria-hidden
-            className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-ink-950/55 opacity-0 transition-opacity duration-150 group-hover/tile:opacity-100 group-focus-visible/tile:opacity-100"
+            className={cn(
+              'absolute inset-0 flex flex-col items-center justify-center gap-2 bg-ink-950/55 opacity-0 transition-opacity duration-150 group-hover/tile:opacity-100 group-focus-visible/tile:opacity-100',
+              previewHover && 'opacity-100',
+            )}
           >
             <span className="inline-flex h-10 items-center gap-1.5 rounded-md bg-brand px-5 text-label-m text-text-on-primary">
               <Play aria-hidden className="size-4 fill-current" />
@@ -139,6 +148,7 @@ export function GameTile({
     'aspect-[3/4] transition-[border-color,box-shadow] duration-150 ease-standard',
     small ? 'w-[100px] rounded-md' : 'w-40',
     !restricted && 'hover:border-brand focus-visible:border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus',
+    previewHover && 'border-brand',
     className,
   );
 

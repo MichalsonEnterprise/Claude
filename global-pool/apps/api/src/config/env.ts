@@ -125,6 +125,8 @@ export const envSchema = z.object({
   JOBS_ENABLED: bool.default(true),
   /** DEMO convenience: automatically open the next daily round (08:00–20:00 UTC) when none is open. */
   ROUND_AUTO_SCHEDULE: bool.default(true),
+  /** DEMO rounds are a frozen snapshot: they close at their real time but are not drawn unless this is true. */
+  DEMO_ROUNDS_AUTO_SETTLE: bool.default(false),
 });
 
 export type Env = z.infer<typeof envSchema>;

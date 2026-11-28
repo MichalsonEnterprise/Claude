@@ -88,14 +88,14 @@ function Wordmark() {
       {GLYPHS.map((g) => {
         const wave = Math.sin(g.index * 0.85) * 1.6;
         const tilt = g.index % 2 === 0 ? -9 : 9;
-        const y = 15.5 + wave;
+        const y = 14.8 + wave;
         return (
           <text
             key={`d${g.index}`}
             x={g.center}
             y={y}
             textAnchor="middle"
-            fontSize="9"
+            fontSize="11"
             className="fill-gold"
             transform={`rotate(${tilt} ${g.center} ${y - 3})`}
           >

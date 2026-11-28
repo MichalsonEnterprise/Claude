@@ -1,6 +1,14 @@
 import { Body, Controller, Get, HttpCode, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { realityCheckSchema, rgLimitUpdateSchema, selfExclusionSchema } from '@gp/shared/schemas';
+import {
+  realityCheckSchema,
+  rgLimitUpdateSchema,
+  selfExclusionSchema,
+  type RgLimitUpdate,
+} from '@gp/shared/schemas';
+import { ZodValidationPipe } from 'nestjs-zod';
+
+import { ZodBody } from '../../common/zod';
 
 import { CurrentUser, type AuthUser } from '../../common/request';
 import { createZodDto } from '../../common/zod';
@@ -8,7 +16,6 @@ import { AuditService } from '../audit/audit.service';
 import { PlayerAuth } from '../auth/guards';
 import { ResponsibleGamingService } from './responsible-gaming.service';
 
-class RgLimitDto extends createZodDto(rgLimitUpdateSchema) {}
 class SelfExclusionDto extends createZodDto(selfExclusionSchema) {}
 class RealityCheckDto extends createZodDto(realityCheckSchema) {}
 
@@ -28,8 +35,12 @@ export class ResponsibleGamingController {
   }
 
   @Put('limits')
+  @ZodBody(rgLimitUpdateSchema)
   @ApiOperation({ summary: 'Set a limit — decreases apply now, increases after a 24 h cool-down' })
-  async setLimit(@CurrentUser() user: AuthUser, @Body() body: RgLimitDto) {
+  async setLimit(
+    @CurrentUser() user: AuthUser,
+    @Body(new ZodValidationPipe(rgLimitUpdateSchema)) body: RgLimitUpdate,
+  ) {
     const state = await this.rg.updateLimit(user.id, body);
     await this.audit.record({
       actorType: 'user',

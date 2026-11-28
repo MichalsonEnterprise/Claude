@@ -219,7 +219,7 @@ export function FooterMega({ className }: { className?: string }) {
           ))}
           <div className="mt-6 flex flex-col gap-3 tablet:mt-0">
             <h2 className="text-label-m text-text-primary">Community</h2>
-            <ul className="flex gap-2">
+            <ul className="flex flex-wrap gap-2">
               {COMMUNITY.map((c) => (
                 <li key={c}>
                   <span
