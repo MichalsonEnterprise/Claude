@@ -296,6 +296,16 @@
    "file": "apps/api/src/modules/compliance/responsible-gaming.service.ts; docs/API.md responsible-gaming table",
    "scenario": "WHERE: POST /responsible-gaming/cooling-off\nROLE: player VIEWPORT: n/a (API)\nSYMPTOM: Repeating a 24h cooling-off while an equal 24h break is active returns 200 and moves endsAt later. docs/API.md says it should answer 409 when an equal or longer exclusion is active. The behaviour is safe (it extends), but it contradicts the docs.\nEVIDENCE: probe 05:58 UTC: first 200 endsAt 2026-11-29T05:58:36.834Z, repeat 200 endsAt 05:58:36.920Z",
    "fix": "Observed on a code snapshot from ~05:56 UTC; the review close-out (items R11, R26, R30, R37, R57 etc.) may already have fixed part of it — first check current code and mark ALREADY_OK where so. Otherwise fix the root cause and add a test."
+  },
+  {
+   "id": "Q28",
+   "source": "qa",
+   "severity": "low",
+   "area": "web",
+   "title": "Pool Dice reveals the outcome early: the balance chip/session bar show the post-roll balance during the 800 ms roll (usePlaceBet applies the settled bet immediately)",
+   "file": "apps/web/src/components/games/dice/dice-game.tsx",
+   "scenario": "Reported by the dice-coinflip agent (games UI report). On a win the balance jumps before the marker lands. Double Side and Pool Roulette already defer applySettledBet until the animation lands — use the same pattern for Pool Dice and add an e2e/unit check (motion on: balance shows pre-roll minus locked stake until landing).",
+   "fix": "Defer applySettledBet until the roll animation completes (or on unmount); reduced motion = immediate."
   }
  ]
 }
