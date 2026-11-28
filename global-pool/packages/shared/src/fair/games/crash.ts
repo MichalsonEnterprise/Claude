@@ -19,7 +19,7 @@
  * computed with decimal.js (no binary floats).
  */
 import { MoneyDecimal, money, type Money } from '../../money';
-import { creditString, multiplierString, payoutOf } from '../credits';
+import { creditString, payoutOf, percentString } from '../credits';
 import { ByteStream, FairError, sha256Hex, uniformInt, type SeedInput } from '../stream';
 
 const E = 1n << 52n;
@@ -177,7 +177,7 @@ export function playLimbo(seed: SeedInput, params: LimboParams): LimboOutcome {
   return {
     result,
     target,
-    winChance: multiplierString(limboWinChance(target), 2),
+    winChance: percentString(limboWinChance(target)),
     win: money(result).gte(target),
     multiplier: target,
   };

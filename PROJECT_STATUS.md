@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 05:55 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 06:05 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
@@ -46,7 +46,7 @@ Verified by the orchestrator on 28 Nov 2026 ~03:40 UTC: `pnpm -r typecheck`, `pn
 | Admin console (P0) | ✅ implemented (dev-verified by agent) | admin-a: 16/18 rows IMPLEMENTED (ADM-00, 02, U1–U10 except U3, S1–S3, X1, MOB-11); PARTIAL ADM-01 (no WebAuthn / trusted device / IP allow-list), ADM-U3. Own admin session, restrictions with reason + 2FA + four-eyes (frozen withdrawals and suspension need a second admin), PII reveal audited, role changes as requests, audit-chain viewer. admin-b: 18/21 IMPLEMENTED (F1–F5, F7, F9, P1–P7, P9, P10, C1, C2); PARTIAL F6 (reconciliation investigation), F8 (scheduled reports), P8 (batch auto-claim). Circuit breaker pauses only NEW entries, dual approval. e2e: two-admin four-eyes flow passes; PATCH ledger / POST winners / manual refund return 404 (tested) |
 | Auth (P0) | ✅ implemented (dev-verified by agent) | 7 IMPLEMENTED (AUTH-04, 07, 09, 10, 20, 21 + flows), 5 PARTIAL by design under Privy (AUTH-01/02/03 no passwords — register fields moved to /onboarding; AUTH-08 login variant n/a; AUTH-18 uses the normal shell); AUTH-05/06 n/a. One custom Privy dialog (email code, Google/Apple, SIWE wallet; WalletConnect etc. via Privy's themed modal), DEV MOCK offline, onboarding with unchecked consents + DOB 18+, TOTP enrol + backup codes, reusable `useStepUp()`, restricted pages, 30-min idle sign-out (assumed from Figma #29), new-device alerts. e2e 3/3 |
 | Account (P0) | ✅ implemented (dev-verified by agent) | 21/21 rows IMPLEMENTED (USR-00/01/02, A1–A10, AUTH-11…17 KYC flow with mock provider, MOB-09). New API /me/* + /kyc/application. e2e: new player → KYC L1 → L2 with reject/resubmit → approve |
-| **P0 total** | ✅ all 8 modules built | Integration check by the orchestrator (28 Nov 05:50 UTC): `pnpm -r typecheck` ✅, `pnpm -r lint` ✅, tests running; independent review workflow `p0-review` and integration QA workflow `p0-integration-qa` (route crawl per role + 6 cross-module journeys) running |
+| **P0 total** | ✅ all 8 modules built | Integration check by the orchestrator (28 Nov 05:50 UTC): `pnpm -r typecheck` ✅, `pnpm -r lint` ✅, `pnpm -r test` ✅ **463 tests** (contracts 67, shared 60, tokens 82, API 59 unit + 100 e2e, web 95), `pnpm -r build` ✅ (Next production build of all routes, 2 min 22 s); independent review workflow `p0-review` and integration QA workflow `p0-integration-qa` (route crawl per role + 6 cross-module journeys) running |
 | Games (P1) | ⬜ prepared | workflow `global-pool/scripts/workflows/dev-p1-games.js` (engine with commit–reveal + DEMO credits with no cash value → game kit + lobby + Pool Dice → Double Side, Pool Roulette, Orbit Rush, Twenty-One); starts after P0 |
 
 ## 4. Decisions

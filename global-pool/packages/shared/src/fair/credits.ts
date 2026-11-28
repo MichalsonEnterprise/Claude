@@ -57,3 +57,8 @@ export function creditString(value: MoneyInput): string {
 export function multiplierString(value: MoneyInput, dp: number): string {
   return money(value).toDecimalPlaces(dp, Decimal.ROUND_DOWN).toFixed(dp);
 }
+
+/** Chance in percent for display, rounded half-up to 2 decimals ('30.77'). */
+export function percentString(value: MoneyInput): string {
+  return money(value).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2);
+}

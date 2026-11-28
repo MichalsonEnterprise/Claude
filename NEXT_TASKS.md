@@ -3,7 +3,7 @@
 _Updated 28 Nov 2026, 06:00 UTC._
 
 ## Running now
-- **Integration check (orchestrator):** `pnpm -r typecheck` ✅, `pnpm -r lint` ✅, `pnpm -r test` ✅ (463 tests), `pnpm -r build` running (log in the session scratchpad).
+- **Integration check (orchestrator):** `pnpm -r typecheck` ✅, `pnpm -r lint` ✅, `pnpm -r test` ✅ (463 tests), `pnpm -r build` ✅.
 - **`p0-review`** (`global-pool/scripts/workflows/p0-review.js`): 7 read-only reviewers (money, authz, fairness/admin, RG/compliance, chain, web, tests), each finding verified by skeptics (3 for critical/high).
 - **`p0-integration-qa`** (`global-pool/scripts/workflows/p0-integration-qa.js`): route crawl for every page × role at 1440/390, plus 6 cross-module Playwright journeys in `apps/web/e2e/integration/`.
 - **`dev-p1-games` engine** (`global-pool/scripts/workflows/dev-p1-games.js`, key `engine`): `@gp/shared/fair`, DEMO credits, games API + crash WS + tests + `docs/GAMES.md`.

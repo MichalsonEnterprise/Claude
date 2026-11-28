@@ -7,7 +7,7 @@
  * (tile = row × 5 + column, top-left = 0). The board is fixed before the first pick.
  */
 import { money, type Money } from '../../money';
-import { creditString, multiplierString, payoutOf } from '../credits';
+import { creditString, multiplierString, payoutOf, percentString } from '../credits';
 import { ByteStream, FairError, shuffle, type SeedInput } from '../stream';
 
 export const MINES_RULES = {
@@ -55,7 +55,7 @@ export function minesMultiplier(mines: number, gems: number): string {
 export function minesNextChance(mines: number, gems: number): string {
   const left = MINES_RULES.tiles - gems;
   const safeLeft = MINES_RULES.tiles - mines - gems;
-  return multiplierString(money(safeLeft).times(100).div(left), 2);
+  return percentString(money(safeLeft).times(100).div(left));
 }
 
 export interface MinesState {
