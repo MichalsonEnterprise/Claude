@@ -15,6 +15,8 @@ async function shellT(name, n, x, y, label, next, err) {
   const stp = await I('15:3270', { Steps: '9' }); add(ct, [stp, 'FILL']); setStepM(stp, n, label, next, err);
   return { f, ct };
 }
+// fix WAL-18 desktop footer overflow (explorer link already sits next to the tx hash)
+{ const f = await figma.getNodeByIdAsync('106:42078'); if (f) { const ft = f.findOne(x => x.name === 'Flow footer'); const g = ft && ft.children.find(x => x.name === 'Button/Ghost — View on explorer'); if (g) g.remove(); } }
 const D = 'WAL-15 Withdraw — Step 6 Risk Validation / ';
 const TT = [
   [D + '1440 / Pass', D + '768 / Pass', 6, 'Risk check', '2FA confirmation', 0, false, 2],

@@ -19,6 +19,7 @@
   "gp-history"
  ],
  "blocked_or_partial": [
+  "wal-withdraw-a",
   "auth-c",
   "auth-b",
   "gp-draw",
@@ -32,5 +33,17 @@
   "proto-b",
   "err-a",
   "err-b"
+ ],
+ "continuation_order_P0_first": [
+  "wal-withdraw-a",
+  "auth-b",
+  "auth-c",
+  "gp-draw",
+  "gp-hub",
+  "auth-d",
+  "adm-pool",
+  "adm-chain-comp",
+  "mob-patterns",
+  "adm-finance"
  ]
 }

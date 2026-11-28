@@ -124,7 +124,7 @@ function setStepM(s, n, label, next, err) { const t = k => s.findOne(x => x.type
 async function shellM(name, n, x, label, next, o = {}) {
   const y = colY(x);
   const f = await screen(name, 390, o.sheet ? { h: 844 } : {}); sec.appendChild(f); f.x = x; f.y = y;
-  add(f, [await DEMOBAR(), 'FILL']);
+  add(f, [await DEMOBAR('DEMO DATA — all figures are illustrative, not real.'), 'FILL']);
   add(f, [await I('23:12908', { State: 'Member' }), 'FILL']);
   const ct = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [ct, 'FILL']);
   const bh = hrow('Page header', 8); add(ct, [bh, 'FILL']);
@@ -180,13 +180,13 @@ async function flow18(fc, M) {
   await stHead(fc, await B('Confirmed', 'Completed'), { M, right: 'Completed 27 Nov 2026, 20:34 UTC' });
   await fhead(fc, 'Withdrawal complete', 'Your USDT has arrived. The transaction is final on Arbitrum One with 20 of 20 confirmations.', M);
   await bigAmt(fc, 'YOU RECEIVED', '1,499.92 USDT', 'at ' + AD + ' on Arbitrum One · 27 Nov 2026, 20:34 UTC', { M, color: 'text/success' });
-  const hb = AL('VERTICAL', { name: 'Transaction hash', gap: 6, p: [12, 16, 12, 16], fill: 'surface/raised', r: 10 }); add(fc, [hb, 'FILL']); await tx(hb, 'Transaction hash', 'Caption', 'text/tertiary'); const th = await I('20:5893', { State: 'Default' }, { Hash: '0xb7d4…2c91', 'Show DEMO': true, 'Show explorer link': true }); hb.appendChild(th);
+  const hb = AL('VERTICAL', { name: 'Transaction hash', gap: 6, p: [12, 16, 12, 16], fill: 'surface/raised', r: 10 }); add(fc, [hb, 'FILL']); await tx(hb, 'Transaction hash', 'Caption', 'text/tertiary'); const th = await I('20:5893', { State: 'Default' }, { Hash: '0xb7d4…2c91', 'Show DEMO': true, 'Show explorer link': !M }); hb.appendChild(th); if (M) hb.appendChild(await BTN('Ghost', 'View on explorer', { size: 'S', lead: 'external-link' }));
   const rc = card('Receipt', { gap: 0, p: M ? [4, 16, 4, 16] : [8, 20, 8, 20], fill: 'surface/raised' }); add(fc, [rc, 'FILL']);
   const rh = hrow('Receipt header', 8, { p: [8, 0, 8, 0] }); add(rc, [rh, 'FILL']); rh.appendChild(await IC('receipt', 18, 'icon/muted')); await tx(rh, 'Receipt · WD-20931', 'Body/M Strong', 'text/primary', { hug: true }); rh.appendChild(await DEMO('XS'));
   const R = [['Amount withdrawn', '1,500.00 USDT', 'Number/S'], ['Network fee', '−0.08 USDT', 'Number/S'], ['Platform fee', '0.00 USDT', 'Number/S'], ['You received', '1,499.92 USDT', 'Number/S', 'text/success'], ['Requested', '27 Nov 2026, 18:44 UTC'], ['AML review cleared', '27 Nov 2026, 20:31 UTC'], ['Sent', '27 Nov 2026, 20:32 UTC'], ['Confirmed', '27 Nov 2026, 20:34 UTC · 20 / 20']];
   for (let i = 0; i < R.length; i++) await kv(rc, R[i][0], R[i][1], { vs: R[i][2], vc: R[i][3], last: i === R.length - 1 });
   await tx(fc, 'A copy of this receipt was emailed to n•••@example.com — genuine emails show your anti-phishing code AURORA-27.', 'Caption', 'text/tertiary');
-  return { alt: [['Secondary', 'Download receipt (PDF)', 'download'], ['Ghost', 'View on explorer', 'external-link']], next: 'Back to wallet', trail: null };
+  return { alt: [['Secondary', 'Download receipt (PDF)', 'download']], next: 'Back to wallet', trail: null };
 }
 async function flow19(fc, st, M) {
   const san = st === 'Sanctions';
@@ -217,6 +217,15 @@ for (const [st, nm] of [['Processing', names[0]], ['Manual review', names[1]]]) 
   await footM(S.f, { next: 'Download receipt (PDF)', lead: 'download', trail: null, alt: [['Secondary', 'Back to wallet', 'wallet']] });
   out[names[2]] = S.f.id; }
 fitSection(sec);
+// fix m1 frames: shorter DEMO bar copy for 390 width, authenticator description no longer clipped
+const fixm1 = {};
+for (const id of ['109:50782', '109:50998', '109:51244', '109:51440']) {
+  const f = await figma.getNodeByIdAsync(id); if (!f) continue;
+  const bar = f.children[0]; if (bar && bar.type === 'INSTANCE') { const k = Object.keys(bar.componentProperties).find(x => x.split('#')[0] === 'Message'); if (k) bar.setProperties({ [k]: 'DEMO DATA — all figures are illustrative, not real.' }); }
+  const au = f.findOne(x => x.type === 'INSTANCE' && x.name === 'Input/OTP — Authenticator code'); if (au) { const k = Object.keys(au.componentProperties).find(x => x.split('#')[0] === 'Description'); if (k) au.setProperties({ [k]: 'From your authenticator app · new code every 30 s' }); }
+  fixm1[id] = true;
+}
+{ const f = await figma.getNodeByIdAsync('109:51244'); const sh = f && f.findOne(x => x.name === 'Bottom sheet — 2FA'); if (sh) { sh.y = 844 - sh.height; await f.screenshot({ scale: 0.6 }); } }
 const sizes = {}; for (const [nm, id] of Object.entries(out)) { const f = await figma.getNodeByIdAsync(id); sizes[nm] = [f.x, f.y, f.width, f.height]; }
 for (const id of Object.values(out)) { const f = await figma.getNodeByIdAsync(id); await f.screenshot({ scale: 0.6 }); }
-return { section: sec.id, out, sizes };
+return { section: sec.id, out, sizes, fixm1 };

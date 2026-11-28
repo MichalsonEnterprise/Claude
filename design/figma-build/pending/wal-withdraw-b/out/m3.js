@@ -123,7 +123,7 @@ function setStepM(s, n, label, next, err) { const t = k => s.findOne(x => x.type
 async function shellM(name, n, x, label, next, o = {}) {
   const y = colY(x);
   const f = await screen(name, 390, o.sheet ? { h: 844 } : {}); sec.appendChild(f); f.x = x; f.y = y;
-  add(f, [await DEMOBAR(), 'FILL']);
+  add(f, [await DEMOBAR('DEMO DATA — all figures are illustrative, not real.'), 'FILL']);
   add(f, [await I('23:12908', { State: 'Member' }), 'FILL']);
   const ct = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [ct, 'FILL']);
   const bh = hrow('Page header', 8); add(ct, [bh, 'FILL']);
@@ -157,13 +157,13 @@ async function flow18(fc, M) {
   await stHead(fc, await B('Confirmed', 'Completed'), { M, right: 'Completed 27 Nov 2026, 20:34 UTC' });
   await fhead(fc, 'Withdrawal complete', 'Your USDT has arrived. The transaction is final on Arbitrum One with 20 of 20 confirmations.', M);
   await bigAmt(fc, 'YOU RECEIVED', '1,499.92 USDT', 'at ' + AD + ' on Arbitrum One · 27 Nov 2026, 20:34 UTC', { M, color: 'text/success' });
-  const hb = AL('VERTICAL', { name: 'Transaction hash', gap: 6, p: [12, 16, 12, 16], fill: 'surface/raised', r: 10 }); add(fc, [hb, 'FILL']); await tx(hb, 'Transaction hash', 'Caption', 'text/tertiary'); const th = await I('20:5893', { State: 'Default' }, { Hash: '0xb7d4…2c91', 'Show DEMO': true, 'Show explorer link': true }); hb.appendChild(th);
+  const hb = AL('VERTICAL', { name: 'Transaction hash', gap: 6, p: [12, 16, 12, 16], fill: 'surface/raised', r: 10 }); add(fc, [hb, 'FILL']); await tx(hb, 'Transaction hash', 'Caption', 'text/tertiary'); const th = await I('20:5893', { State: 'Default' }, { Hash: '0xb7d4…2c91', 'Show DEMO': true, 'Show explorer link': !M }); hb.appendChild(th); if (M) hb.appendChild(await BTN('Ghost', 'View on explorer', { size: 'S', lead: 'external-link' }));
   const rc = card('Receipt', { gap: 0, p: M ? [4, 16, 4, 16] : [8, 20, 8, 20], fill: 'surface/raised' }); add(fc, [rc, 'FILL']);
   const rh = hrow('Receipt header', 8, { p: [8, 0, 8, 0] }); add(rc, [rh, 'FILL']); rh.appendChild(await IC('receipt', 18, 'icon/muted')); await tx(rh, 'Receipt · WD-20931', 'Body/M Strong', 'text/primary', { hug: true }); rh.appendChild(await DEMO('XS'));
   const R = [['Amount withdrawn', '1,500.00 USDT', 'Number/S'], ['Network fee', '−0.08 USDT', 'Number/S'], ['Platform fee', '0.00 USDT', 'Number/S'], ['You received', '1,499.92 USDT', 'Number/S', 'text/success'], ['Requested', '27 Nov 2026, 18:44 UTC'], ['AML review cleared', '27 Nov 2026, 20:31 UTC'], ['Sent', '27 Nov 2026, 20:32 UTC'], ['Confirmed', '27 Nov 2026, 20:34 UTC · 20 / 20']];
   for (let i = 0; i < R.length; i++) await kv(rc, R[i][0], R[i][1], { vs: R[i][2], vc: R[i][3], last: i === R.length - 1 });
   await tx(fc, 'A copy of this receipt was emailed to n•••@example.com — genuine emails show your anti-phishing code AURORA-27.', 'Caption', 'text/tertiary');
-  return { alt: [['Secondary', 'Download receipt (PDF)', 'download'], ['Ghost', 'View on explorer', 'external-link']], next: 'Back to wallet', trail: null };
+  return { alt: [['Secondary', 'Download receipt (PDF)', 'download']], next: 'Back to wallet', trail: null };
 }
 async function flow19(fc, st, M) {
   const san = st === 'Sanctions';
@@ -190,6 +190,8 @@ for (const [st, nm] of [['Sanctions', names[0]], ['Network', names[1]]]) {
   out[nm] = S.f.id;
 }
 fitSection(sec);
+// fix WAL-18 mobile: Tx/Hash with explorer link overflowed the 358 column — hide the inline link, add a Ghost button under it
+{ const f = await figma.getNodeByIdAsync('110:51788'); const hb = f && f.findOne(x => x.name === 'Transaction hash'); if (hb && !hb.findOne(x => x.name === 'Button/Ghost — View on explorer')) { const th = hb.children.find(x => x.type === 'INSTANCE'); if (th) { const k = Object.keys(th.componentProperties).find(x => x.split('#')[0] === 'Show explorer link'); if (k) th.setProperties({ [k]: false }); } hb.appendChild(await BTN('Ghost', 'View on explorer', { size: 'S', lead: 'external-link' })); await hb.screenshot({ scale: 1 }); } }
 const sizes = {}; for (const [nm, id] of Object.entries(out)) { const f = await figma.getNodeByIdAsync(id); sizes[nm] = [f.x, f.y, f.width, f.height]; }
 for (const id of Object.values(out)) { const f = await figma.getNodeByIdAsync(id); await f.screenshot({ scale: 0.6 }); }
 return { section: sec.id, out, sizes };

@@ -816,7 +816,9 @@
   "sizes": "D·L·T·M",
   "page": "05",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "6 frames, all checked by screenshot. Desktop 1440: sidebar expanded with the user menu open (Dashboard selected), and sidebar collapsed with the Wallet/Balance Breakdown popover open. Laptop 1280: 72px rail, and the 240px sidebar opens as an overlay over a scrim. Tablet 768: sidebar as a left drawer over a scrim. Mobile 390: top app bar plus a 'Dashboard sections' bottom sheet; also Shell/Mobile Drawer open. A notes frame (33:277260) records shell behaviour for developers at each breakpoint.",
+  "by": "usr-core"
  },
  {
   "id": "USR-01",
@@ -826,7 +828,9 @@
   "sizes": "D·L·T·M",
   "page": "05",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "12 frames: Active, New user and Restricted at each of 1440, 1280, 768 and 390, all checked by screenshot. Active: 5× Card/Balance (12,480.50 / 9,215.30 / 1,850.00 / 1,000.00 / 415.20) and a Lifetime card (1,284 entries, 1,842.60 rewards). Active Pool: Card/Draw Countdown with a real close time of 20:00 UTC, plus my entries (35, 351.75 incl. 1.75 fee, ≈2.44%), Threshold Bar, Entry Ticket and 'You can lose your stake'. Also active games (Tile/Game), notifications preview, recent activity (Tx/Row, DP-77412 shown as confirming), RG limits module, licence + 18+, and a VIP/rakeback promo strip using an angled block and a cropped crown object (no glow or rings). New user: checklist email ✓ → 2FA → KYC → deposit at 1 of 4, an opt-in welcome offer (checkbox unchecked, key terms shown), zero balances, a 'how it works' explainer with Enter round disabled, and empty states. Restricted: region banner over the member topbar, an inline alert, gaming nav items disabled, Deposit and new entries disabled, Restricted game tiles. Withdraw, limits and support stay available; no VPN hint. Wallet/Balance Breakdown appears in the shell popover and on mobile; desktop and tablet use the 5 Card/Balance.",
+  "by": "usr-core"
  },
  {
   "id": "USR-02",
@@ -836,7 +840,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "4 frames, checked by screenshot. 1440 Unread: filter chips (All 12 / Unread 3 / Security 2 / Transactions 4 / Rounds 4 / Promotions 2), Today and Earlier groups of User/Notification Item, a delivery-preferences rail (Security always on, Promotions off/opt-in) and an anti-phishing code card (AURORA-27). 1440 Empty: shown for a new user, with one clear next action. 390 Unread and 390 Empty: mobile list with scrolling chips, a settings row and the tab bar.",
+  "by": "usr-core"
  },
  {
   "id": "USR-G1",
@@ -1236,7 +1242,9 @@
   "sizes": "D·L·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440: Default, Empty, Loading (Gradient/Skeleton + Table/Skeleton Row), plus a Glossary open state (Tooltip/Balance Glossary anchored to the breakdown link). Laptop 1280 Default (breakdown switched to the Compact variant), Tablet 768 Default (collapsed sidebar, mobile topbar, single column). Balances follow demo-data: 12,480.50 = 9,215.30 + 1,850.00 + 1,000.00 + 415.20. Every frame was checked on a screenshot after its fixes.",
+  "by": "wal-overview"
  },
  {
   "id": "WAL-02",
@@ -1246,7 +1254,9 @@
   "sizes": "D·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop: Default, Add wallet modal, Remove wallet modal (2FA), Set primary modal (2FA), Error (Wallet/Connected Wallet Row Error variant, inline alert, toast, log entry). Mobile: Default, Add sheet, Remove sheet, Error. No separate mobile 'Set primary' sheet: it would reuse the Remove sheet pattern, per decision 16.",
+  "by": "wal-overview"
  },
  {
   "id": "WAL-03",
@@ -1256,7 +1266,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D Default + D Empty (no deposits yet, separate DEMO account at 0.00 with an unchecked welcome-offer opt-in and key terms, a 'set a deposit limit' RG card, and the CTA disabled until a network is chosen), T, M sheet. 5 Select/Network Option instances, Ethereum selected and flagged Congested. Screenshots checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-04",
@@ -1266,7 +1278,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/T/M. Select/Token Open re-pointed to Ethereum (ERC-20) with the chain mark swapped; DEMO contract placeholder. Overlapping caption fixed in D and T. Screenshots checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-05",
@@ -1276,7 +1290,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D Default, Wrong-network warning (topbar 'Member wrong network' plus a danger alert with Switch wallet and Deposit on BNB Chain instead), Below minimum (6.50 of 10.00 USDT held; top up 3.50), Expired session edge state (Deposit Address Block Expired). T Default. M Default + Expired. The wrong-network and min-deposit alerts are inline and do not change the layout, so they are desktop-only. Screenshots checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-06",
@@ -1286,7 +1302,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/T/M. Original illustrative QR art built inline and marked DEMO, optional amount-request Input/Text, address card with copy and session timer, 'waiting for your transfer' row. Tablet summary grid squeezed its text; switched it to a stacked layout and re-checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-07",
@@ -1296,7 +1314,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D Confirming 7/12 + Delayed (congested, est. 9 min, contact support after 19:40 UTC), T Confirming, M Confirming + Delayed. Uses Wallet/Confirmations Progress, Tx/Status Timeline and Tx/Hash. On mobile the Tx/Hash explorer link is hidden so it fits 358 px. Screenshots checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-08",
@@ -1306,7 +1326,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/T/M. Balance before/after: Available 9,215.30→10,215.30, Pending 1,000.00→0.00, Total 12,480.50 unchanged. Topbar shows 10,215.30 after the credit. Gold Global Pool round card with the real 20:00 UTC close (in 1 h 16 min), the 0.05 USDT fee line and 'You can lose your stake'. Screenshots checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-09",
@@ -1316,7 +1338,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D Successful receipt (Tx/Receipt Card re-pointed to DP-77412: 1,000.00 USDT, Ethereum, 0x5e1f…c0a8, 12/12, platform fee 0.00), D Failed (reverted; stepper step 7 set to Error), D Unrecognised token (250.00 USDC, UR-1093, recovery request disabled until an unchecked confirmation is ticked, fee disclosed), T Successful + Failed, M Successful + Failed. Screenshots checked.",
+  "by": "wal-deposit"
  },
  {
   "id": "WAL-10",
@@ -1326,7 +1350,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 Default built and checked by screenshot (36:527247). Layout: casino shell with the Wallet item active, Withdraw tab, Nav/Stepper 9 (step 1), USDT selected, bonus funds shown as not withdrawable (wagering 642.00 / 1,500.00), Wallet/Balance Breakdown, side summary, limits and protections cards. Not built: Tablet 768 and Mobile 390. Reason: Figma MCP rate limit.",
+  "by": "wal-withdraw-a"
  },
  {
   "id": "WAL-11",
@@ -1336,7 +1362,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 Default built and checked by screenshot (36:538883). 5 Select/Network Option rows with withdrawal fees 0.12 / 0.02 / 0.08 / 2.40 / 0.01; Arbitrum selected; Ethereum shown as congested; network-match info and wrong-network irreversibility warning. Not built: Tablet 768 and Mobile 390 (Sheet/Bottom). Reason: rate limit.",
+  "by": "wal-withdraw-a"
  },
  {
   "id": "WAL-12",
@@ -1346,7 +1374,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 Default built and checked by screenshot (48:26939): whitelisted Arbitrum cold wallet row, Input/Address Default, format checks, clipboard and irreversibility warning, Continue disabled until an address is chosen. The script for the Invalid, Whitelisted and New-address cooldown states is ready but was refused by the rate limit; it is saved at design/figma-build/pending/wal-withdraw-a/d03-wal12-states.js. Not built: Tablet 768 and Mobile 390.",
+  "by": "wal-withdraw-a"
  },
  {
   "id": "WAL-13",
@@ -1356,7 +1386,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the Figma MCP rate limit. Full spec (Default + Min/max, Over balance, Limit reached as a separate DEMO scenario; T and M) is in pending/wal-withdraw-a/_remaining.js.",
+  "by": "wal-withdraw-a"
  },
  {
   "id": "WAL-14",
@@ -1366,7 +1398,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Blocked by the Figma MCP rate limit. Spec (Tx/Fee Breakdown Withdrawal 1,500.00 − 0.08 network − 0.00 platform → 1,499.92, irreversibility warning, unchecked confirmation checkbox, D/T/M) is in pending/wal-withdraw-a/_remaining.js.",
+  "by": "wal-withdraw-a"
  },
  {
   "id": "WAL-15",
@@ -1376,7 +1410,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Pass / KYC required (separate DEMO Level-1 scenario) / Flagged. Each shows a list of 6 automatic checks with an icon and a label (KYC chip, limits, account security, AML, address risk via Table/Risk Cell, network pill). The Flagged state does not block the user: it shows the plain-language reason 'Routine AML screening for new destinations — usually under 4 h' and explains that the 1,500.00 is held in Locked and can be cancelled. T: Pass. M: Pass + KYC required (sticky CTA 'Verify identity', tab bar). All checked against screenshots.",
+  "by": "wal-withdraw-b"
  },
  {
   "id": "WAL-16",
@@ -1386,7 +1422,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Default (email code + authenticator, both complete) / Wrong code (3 of 5 attempts left) / Locked until 18:58 UTC. All three show the anti-phishing code AURORA-27 above the code fields, plus recap, irreversibility notice, backup-code and lost-device links. After the first build, the Input/OTP built-in helper texts and spinner were rewritten or hidden, and the overflowing recap and footer were fixed; then re-checked against screenshots. T: Default. M: Default as a bottom sheet over a scrim + Locked full page.",
+  "by": "wal-withdraw-b"
  },
  {
   "id": "WAL-17",
@@ -1396,7 +1434,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Processing / Queued (Arbitrum batch at 18:50 UTC, #4 of 9) / Manual review (reason as specified, decision expected by 22:44 UTC). Each has the large 1,499.92 figure, fact tiles, a vertical timeline, a Locked-balance explainer, and Cancel withdrawal before broadcast. Side panel: summary + Wallet/Balance Breakdown Compact (Locked 1,850.00 includes WD-20931). The footer overflow on Manual review was fixed. T: Processing. M: Processing + Manual review.",
+  "by": "wal-withdraw-b"
  },
  {
   "id": "WAL-18",
@@ -1406,7 +1446,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D/T/M Default: Completed badge, 1,499.92 USDT received, Tx/Hash 0xb7d4…2c91 (DEMO) with explorer link, receipt list (fees 0.08 / 0.00, times 18:44 → 20:31 review cleared → 20:32 sent → 20:34 confirmed 20/20), and balance after (Available 9,215.30, Locked 350.00). Desktop footer and mobile hash overflows fixed and re-checked. No halo or glow hero.",
+  "by": "wal-withdraw-b"
  },
  {
   "id": "WAL-19",
@@ -1416,7 +1458,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "D: Rejected by sanctions screening + Network failure, both named '(alternative outcome)' of WD-20931. Each shows 1,500.00 returned to Available (now 10,715.30), no fee charged, the reason in plain language, what you can do (new withdrawal / appeal AML-58214 / history; or retry / change network / status page), and a timeline. Step 9 of the stepper is set to Error. T: sanctions. M: both.",
+  "by": "wal-withdraw-b"
  },
  {
   "id": "WAL-20",
@@ -1426,7 +1470,9 @@
   "sizes": "D·T·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop: Default (Table/Example Transactions + lifetime tiles + type chips), Filters (filtered toolbar showing 1 result, Menu/Filter popover open with matching selections), No results, Empty, Loading. Tablet 768: table turned into Tx/Row list + Load more. Mobile: Default (stacked cards grouped by date), Filters bottom sheet, Empty. No mobile Loading frame: skeleton pattern is the same as MOB-05 Loading.",
+  "by": "wal-overview"
  },
  {
   "id": "WAL-21",
@@ -1436,7 +1482,9 @@
   "sizes": "D·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop right drawer over the history page with the matching row Selected: Pending DP-77412 (confirmations, congestion alert, Tx/Status Timeline, Tx/Hash), Failed WD-20850 (sanctions rejection, inline timeline, no tx hash), Successful WD-20877 (Tx/Receipt Card). Mobile: the same three as bottom sheets.",
+  "by": "wal-overview"
  },
  {
   "id": "WAL-22",
@@ -1446,7 +1494,9 @@
   "sizes": "D·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "WD-20931 under AML review. Desktop: breadcrumb, plain-language status, ETA by 21:55 UTC, 5-step tracker, Tx/Fee Breakdown (you receive 1,499.92), destination, outcomes, activity log. Mobile: vertical tracker and sticky Cancel / Contact support buttons.",
+  "by": "wal-overview"
  },
  {
   "id": "WAL-23",
@@ -1456,7 +1506,9 @@
   "sizes": "D·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop: Default (whitelist toggle on, 2 addresses), Add address modal (Input/Address 'New address' with 24 h cooldown callout, unchecked consent, OTP), Cooldown (new row 0x3f9a…c47E 'Cooling down · 23 h 59 m', unlocks 28 Nov 2026 18:42 UTC, plus success alert with a Remove escape), Remove address modal. Mobile: Default, Add sheet, Remove sheet.",
+  "by": "wal-overview"
  },
  {
   "id": "WAL-24",
@@ -1466,7 +1518,9 @@
   "sizes": "D·M",
   "page": "06",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop: Banners in context (maintenance, congestion, participation limit 351.75/500.00, pending deposit-limit increase), Insufficient-funds modal (separate DEMO account, Available 342.10, named as such per demo-data), Weekly deposit-limit modal (3,500.00/5,000.00), Ethereum maintenance modal. Mobile: the same four, with bottom sheets.",
+  "by": "wal-overview"
  },
  {
   "id": "GP-01",
@@ -2874,7 +2928,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "390 Default (Balance Breakdown Compact, Deposit/Withdraw/History action tiles, in-progress items, stacked transaction cards, Nav/Mobile Tab Bar on Wallet), Empty (sticky Deposit button, welcome offer with its terms), Loading (skeletons). Checked on screenshots.",
+  "by": "wal-overview"
  },
  {
   "id": "MOB-06",
@@ -2884,7 +2940,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Bottom-sheet pattern for all 7 deposit steps plus the expired, delayed and failed states in section 105:49686: scrim over the wallet page, grabber, title + close, Nav/Stepper Mobile, sticky L CTA, home-indicator padding. Other agents may own the rest of this row.",
+  "by": "wal-deposit"
  },
  {
   "id": "MOB-07",
@@ -2894,7 +2952,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Section 'WAL — Mobile C (Withdraw 1–5)' on page 10 not created yet. Rate limit.",
+  "by": "wal-withdraw-a"
  },
  {
   "id": "MOB-08",

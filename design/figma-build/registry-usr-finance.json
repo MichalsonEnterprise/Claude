@@ -35,5 +35,13 @@
  "[USR-F6] Complete Transaction History / 1440 / Default": {
   "id": "90:114727",
   "type": "FRAME"
+ },
+ "[USR-F6] Complete Transaction History / 1440 / Export": {
+  "id": "109:103285",
+  "type": "FRAME"
+ },
+ "[USR-F6] Complete Transaction History / 768 / Default": {
+  "id": "109:104557",
+  "type": "FRAME"
  }
 }

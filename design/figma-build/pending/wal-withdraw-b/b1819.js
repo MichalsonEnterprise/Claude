@@ -3,13 +3,13 @@ async function flow18(fc, M) {
   await stHead(fc, await B('Confirmed', 'Completed'), { M, right: 'Completed 27 Nov 2026, 20:34 UTC' });
   await fhead(fc, 'Withdrawal complete', 'Your USDT has arrived. The transaction is final on Arbitrum One with 20 of 20 confirmations.', M);
   await bigAmt(fc, 'YOU RECEIVED', '1,499.92 USDT', 'at ' + AD + ' on Arbitrum One · 27 Nov 2026, 20:34 UTC', { M, color: 'text/success' });
-  const hb = AL('VERTICAL', { name: 'Transaction hash', gap: 6, p: [12, 16, 12, 16], fill: 'surface/raised', r: 10 }); add(fc, [hb, 'FILL']); await tx(hb, 'Transaction hash', 'Caption', 'text/tertiary'); const th = await I('20:5893', { State: 'Default' }, { Hash: '0xb7d4…2c91', 'Show DEMO': true, 'Show explorer link': true }); hb.appendChild(th);
+  const hb = AL('VERTICAL', { name: 'Transaction hash', gap: 6, p: [12, 16, 12, 16], fill: 'surface/raised', r: 10 }); add(fc, [hb, 'FILL']); await tx(hb, 'Transaction hash', 'Caption', 'text/tertiary'); const th = await I('20:5893', { State: 'Default' }, { Hash: '0xb7d4…2c91', 'Show DEMO': true, 'Show explorer link': !M }); hb.appendChild(th); if (M) hb.appendChild(await BTN('Ghost', 'View on explorer', { size: 'S', lead: 'external-link' }));
   const rc = card('Receipt', { gap: 0, p: M ? [4, 16, 4, 16] : [8, 20, 8, 20], fill: 'surface/raised' }); add(fc, [rc, 'FILL']);
   const rh = hrow('Receipt header', 8, { p: [8, 0, 8, 0] }); add(rc, [rh, 'FILL']); rh.appendChild(await IC('receipt', 18, 'icon/muted')); await tx(rh, 'Receipt · WD-20931', 'Body/M Strong', 'text/primary', { hug: true }); rh.appendChild(await DEMO('XS'));
   const R = [['Amount withdrawn', '1,500.00 USDT', 'Number/S'], ['Network fee', '−0.08 USDT', 'Number/S'], ['Platform fee', '0.00 USDT', 'Number/S'], ['You received', '1,499.92 USDT', 'Number/S', 'text/success'], ['Requested', '27 Nov 2026, 18:44 UTC'], ['AML review cleared', '27 Nov 2026, 20:31 UTC'], ['Sent', '27 Nov 2026, 20:32 UTC'], ['Confirmed', '27 Nov 2026, 20:34 UTC · 20 / 20']];
   for (let i = 0; i < R.length; i++) await kv(rc, R[i][0], R[i][1], { vs: R[i][2], vc: R[i][3], last: i === R.length - 1 });
   await tx(fc, 'A copy of this receipt was emailed to n•••@example.com — genuine emails show your anti-phishing code AURORA-27.', 'Caption', 'text/tertiary');
-  return { alt: [['Secondary', 'Download receipt (PDF)', 'download'], ['Ghost', 'View on explorer', 'external-link']], next: 'Back to wallet', trail: null };
+  return { alt: [['Secondary', 'Download receipt (PDF)', 'download']], next: 'Back to wallet', trail: null };
 }
 async function flow19(fc, st, M) {
   const san = st === 'Sanctions';

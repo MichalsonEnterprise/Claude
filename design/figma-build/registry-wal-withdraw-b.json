@@ -39,5 +39,77 @@
  "WAL-17 Withdraw — Step 8 Pending / 1440 / Manual review": {
   "id": "102:40262",
   "type": "FRAME"
+ },
+ "WAL-18 Withdraw — Step 9 Successful / 1440 / Default": {
+  "id": "106:42078",
+  "type": "FRAME"
+ },
+ "WAL-19 Withdraw — Step 9 Failed / 1440 / Rejected by sanctions screening (alternative outcome)": {
+  "id": "106:42965",
+  "type": "FRAME"
+ },
+ "WAL-19 Withdraw — Step 9 Failed / 1440 / Network failure — retry (alternative outcome)": {
+  "id": "106:43781",
+  "type": "FRAME"
+ },
+ "WAL-15 Withdraw — Step 6 Risk Validation / 768 / Pass": {
+  "id": "107:43927",
+  "type": "FRAME"
+ },
+ "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 768 / Default": {
+  "id": "107:44258",
+  "type": "FRAME"
+ },
+ "WAL-17 Withdraw — Step 8 Pending / 768 / Processing": {
+  "id": "107:44556",
+  "type": "FRAME"
+ },
+ "WAL-18 Withdraw — Step 9 Successful / 768 / Default": {
+  "id": "107:45009",
+  "type": "FRAME"
+ },
+ "WAL-19 Withdraw — Step 9 Failed / 768 / Rejected by sanctions screening": {
+  "id": "107:45350",
+  "type": "FRAME"
+ },
+ "Section/WAL — Mobile D (Withdraw 6–9)": {
+  "id": "109:50781",
+  "type": "SECTION"
+ },
+ "WAL-15 Withdraw — Step 6 Risk Validation / 390 / Pass": {
+  "id": "109:50782",
+  "type": "FRAME"
+ },
+ "WAL-15 Withdraw — Step 6 Risk Validation / 390 / KYC required — separate DEMO scenario (Level 1 account)": {
+  "id": "109:50998",
+  "type": "FRAME"
+ },
+ "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 390 / Default — 2FA bottom sheet": {
+  "id": "109:51244",
+  "type": "FRAME"
+ },
+ "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 390 / Locked (15 min)": {
+  "id": "109:51440",
+  "type": "FRAME"
+ },
+ "WAL-17 Withdraw — Step 8 Pending / 390 / Processing": {
+  "id": "110:51357",
+  "type": "FRAME"
+ },
+ "WAL-17 Withdraw — Step 8 Pending / 390 / Manual review": {
+  "id": "110:51566",
+  "type": "FRAME"
+ },
+ "WAL-18 Withdraw — Step 9 Successful / 390 / Default": {
+  "id": "110:51788",
+  "type": "FRAME"
+ },
+ "WAL-19 Withdraw — Step 9 Failed / 390 / Rejected by sanctions screening (alternative outcome)": {
+  "id": "111:52935",
+  "type": "FRAME"
+ },
+ "WAL-19 Withdraw — Step 9 Failed / 390 / Network failure — retry (alternative outcome)": {
+  "id": "111:53169",
+  "type": "FRAME"
  }
 }

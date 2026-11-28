@@ -2418,5 +2418,674 @@
    "Layout decision (not yet logged in decisions.md): Laptop 1280 frames are clones of the desktop masters with Breakpoint=Laptop 1280 and FILL reflow. Low-priority table columns are hidden through a '{hideL:…}' tag on the table name and '[hideL]' layers. Bands inside the section use fixed rows (section-local y): Compliance desktop 160, Compliance laptop 3000, Blockchain desktop 6000, Blockchain laptop 9000, Compliance tablet 12000; columns are placed at x = 120 + i·(width+120).",
    "Registry written: /home/user/Claude/design/figma-build/registry-adm-bc.json. It lists the frames built so far; no new library components were created. New DEMO IDs introduced (KYC-30352…30440, AML-55xx, STR-0086…0094, RS-3312, SCR-77xx, CH-0042, CFG-0088, AC-0017, INC-0457, WD-20918/20924, SW-1179, IN-0093) are listed in that file and are consistent with demo-data.md, AML-3317/WD-20931 and WD-20952 @kestrel (risk 86) from ADM-F2."
   ]
+ },
+ "usr-core": {
+  "section": "32:27881 (page '05 — User Dashboard', section 'USR-00/01/02 Shell, Overview, Notifications' at 0,0) + 33:193315 (page '10 — Mobile Experience', section 'USR — Mobile A' at 91000,0)",
+  "created": [
+   {
+    "name": "Section — USR-00/01/02 Shell, Overview, Notifications (page 05)",
+    "id": "32:27881"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 1440 / Active",
+    "id": "32:27882"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 1440 / New user (empty)",
+    "id": "32:57885"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 1440 / Restricted region",
+    "id": "32:37734"
+   },
+   {
+    "name": "[USR-00] Dashboard shell / 1440 / Sidebar expanded · user menu open",
+    "id": "32:69615"
+   },
+   {
+    "name": "[USR-00] Dashboard shell / 1440 / Sidebar collapsed · balance breakdown open",
+    "id": "32:71093"
+   },
+   {
+    "name": "Notes — Dashboard shell behaviour (dev handoff)",
+    "id": "33:277260"
+   },
+   {
+    "name": "[USR-02] Notification Center / 1440 / Unread",
+    "id": "33:148541"
+   },
+   {
+    "name": "[USR-02] Notification Center / 1440 / Empty",
+    "id": "33:168201"
+   },
+   {
+    "name": "[USR-00] Dashboard shell / 1280 / Rail collapsed · sidebar expanded as overlay",
+    "id": "32:85986"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 1280 / Active",
+    "id": "32:78469"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 1280 / New user (empty)",
+    "id": "33:296244"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 1280 / Restricted region",
+    "id": "33:297520"
+   },
+   {
+    "name": "[USR-00] Dashboard shell / 768 / Drawer navigation open",
+    "id": "33:122540"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 768 / Active",
+    "id": "32:89084"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 768 / New user (empty)",
+    "id": "33:304752"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 768 / Restricted region",
+    "id": "33:305670"
+   },
+   {
+    "name": "Section — USR — Mobile A (page 10)",
+    "id": "33:193315"
+   },
+   {
+    "name": "[USR-00] Dashboard shell / 390 / App bar + tab bar · sections sheet open",
+    "id": "33:260076"
+   },
+   {
+    "name": "[USR-00] Dashboard shell / 390 / Drawer open",
+    "id": "33:260473"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 390 / Active",
+    "id": "33:193316"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 390 / New user (empty)",
+    "id": "33:216685"
+   },
+   {
+    "name": "[USR-01] Dashboard Overview / 390 / Restricted region",
+    "id": "33:228302"
+   },
+   {
+    "name": "[USR-02] Notification Center / 390 / Unread",
+    "id": "33:244851"
+   },
+   {
+    "name": "[USR-02] Notification Center / 390 / Empty",
+    "id": "33:245140"
+   }
+  ],
+  "issues": [
+   "Components I needed but that don't exist, built inline from tokens: VIP & rewards strip, Lifetime activity card, My entries panel, new-user checklist, welcome-offer card, zero-balance strip, RG limits module, inline Restricted-region alert, notification delivery-preferences panel, anti-phishing card, mobile transaction cards, mobile 'Dashboard sections' bottom sheet. Good candidates for the component library.",
+   "Shell/Sidebar has no 'Dashboard' / 'My account' item. On dashboard pages I left every global item inactive; the breadcrumb, in-page sub-nav tabs and the avatar menu (Dashboard selected) show where the user is. Recommend adding a 'Dashboard' item to the Member group of Shell/Sidebar.",
+   "Shell/Topbar Desktop 'Restricted region' variant is a guest bar (Sign in / Sign up), so it doesn't work for logged-in members. Restricted frames use the Member topbar with Nav/Region Banner pinned above it. Recommend a 'Member · Restricted' variant.",
+   "Shell/Topbar Desktop overflows at 1280 next to the expanded 240px sidebar (the logo overlaps search). Laptop frames therefore default to the 72px rail and open the sidebar as an overlay. The topbar needs proper min-widths or a compact laptop variant.",
+   "Tx/Row (1000px, fixed columns) breaks below about 700px. On tablet I hid the Date column and merged the date into the sub-line; mobile uses inline transaction cards. Recommend a Tx/Row Compact or Tx/Card component.",
+   "Tile/Game Small has no Restricted variant. The mobile Restricted frame shows those tiles at 35% opacity with the caption 'Paused in region'.",
+   "Notice/Demo Data's default message is cut off at 390. Mobile frames use the shorter message 'DEMO DATA — all values are illustrative'.",
+   "Values I added that are not in demo-data.md, all with DEMO badges: Pool Roulette players 518 (so it doesn't repeat Orbit Rush's 1,062); weekly deposit limit 3,500.00 / 5,000.00 USDT (equal to DP-77380 + DP-77412 this week); tournament rank #148; mission progress 32/50; reality check every 60 min with next reminder in 17 min (from session 00:42:18); notification counts 12 total = Security 2, Transactions 4, Rounds 4, Promotions 2. Please add them to demo-data.md.",
+   "registry-catalog.json (Tile/Game Art) doesn't exist yet, so tiles use Tile/Game and Tile/Game Small. They already show the original names: Orbit Rush, Pool Roulette, Twenty-One, Pool Dice, Double Side, Global Pool.",
+   "Responsive rule I applied, which could go in decisions.md: laptop 1280 defaults to the 72px rail; tablet uses a drawer; mobile uses the tab bar with Account active plus a sections bottom sheet. Laptop, tablet and mobile frames exist for Active, New user and Restricted.",
+   "No components were created, so no registry-<agent>.json was written. Frame IDs are listed in 'created'.",
+   "Hit the Figma MCP per-minute tool-call limit once. It cleared after about 2 minutes and no work was lost.",
+   "No memory notes were used. Nothing new is worth saving, except maybe that the Figma MCP limit on this Pro plan is per-minute and clears after a short wait (seen in this session)."
+  ]
+ },
+ "wal-overview": {
+  "section": "32:19457 (page '06 — Wallet & Transactions', 'WAL-01/02/20..24 Wallet, history & details' at X=0,Y=0); mobile section 33:319558 (page '10 — Mobile Experience', 'WAL — Mobile A' at X=133000,Y=0)",
+  "created": [
+   {
+    "name": "Section — WAL-01/02/20..24 Wallet, history & details",
+    "id": "32:19457"
+   },
+   {
+    "name": "Section — WAL — Mobile A",
+    "id": "33:319558"
+   },
+   {
+    "name": "WAL-01 Wallet Overview / 1440 / Default",
+    "id": "32:19458"
+   },
+   {
+    "name": "WAL-01 Wallet Overview / 1440 / Empty",
+    "id": "32:30717"
+   },
+   {
+    "name": "WAL-01 Wallet Overview / 1440 / Loading",
+    "id": "32:34105"
+   },
+   {
+    "name": "WAL-01 Wallet Overview / 1440 / Glossary open",
+    "id": "32:34777"
+   },
+   {
+    "name": "WAL-01 Wallet Overview / 1280 / Default",
+    "id": "33:291054"
+   },
+   {
+    "name": "WAL-01 Wallet Overview / 768 / Default",
+    "id": "33:292011"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 1440 / Default",
+    "id": "32:45900"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 1440 / Add wallet",
+    "id": "32:52943"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 1440 / Remove wallet",
+    "id": "32:64701"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 1440 / Set primary",
+    "id": "32:76338"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 1440 / Error",
+    "id": "32:88305"
+   },
+   {
+    "name": "WAL-20 Transaction History / 1440 / Default",
+    "id": "32:94724"
+   },
+   {
+    "name": "WAL-20 Transaction History / 1440 / Filters",
+    "id": "32:118309"
+   },
+   {
+    "name": "WAL-20 Transaction History / 1440 / No results",
+    "id": "32:119418"
+   },
+   {
+    "name": "WAL-20 Transaction History / 1440 / Empty",
+    "id": "32:120391"
+   },
+   {
+    "name": "WAL-20 Transaction History / 1440 / Loading",
+    "id": "32:121360"
+   },
+   {
+    "name": "WAL-20 Transaction History / 768 / Default",
+    "id": "33:293124"
+   },
+   {
+    "name": "WAL-21 Transaction Detail drawer / 1440 / Pending",
+    "id": "33:162154"
+   },
+   {
+    "name": "WAL-21 Transaction Detail drawer / 1440 / Failed",
+    "id": "33:163212"
+   },
+   {
+    "name": "WAL-21 Transaction Detail drawer / 1440 / Successful",
+    "id": "33:164222"
+   },
+   {
+    "name": "WAL-22 Withdrawal Status tracker / 1440 / Under review",
+    "id": "33:196138"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 1440 / Default",
+    "id": "33:217501"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 1440 / Add address",
+    "id": "33:240026"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 1440 / Cooldown",
+    "id": "33:240767"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 1440 / Remove address",
+    "id": "33:241439"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 1440 / Banners in context",
+    "id": "33:270662"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 1440 / Insufficient funds modal — separate DEMO account (Available 342.10)",
+    "id": "33:271672"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 1440 / Deposit limit modal",
+    "id": "33:272415"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 1440 / Maintenance modal",
+    "id": "33:273429"
+   },
+   {
+    "name": "MOB-05 · WAL-01 Wallet Overview / 390 / Default",
+    "id": "33:319559"
+   },
+   {
+    "name": "MOB-05 · WAL-01 Wallet Overview / 390 / Empty",
+    "id": "33:319947"
+   },
+   {
+    "name": "MOB-05 · WAL-01 Wallet Overview / 390 / Loading",
+    "id": "33:320136"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 390 / Default",
+    "id": "34:336899"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 390 / Add wallet (sheet)",
+    "id": "34:337124"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 390 / Remove wallet (sheet)",
+    "id": "34:337367"
+   },
+   {
+    "name": "WAL-02 Connected Wallets / 390 / Error",
+    "id": "34:337623"
+   },
+   {
+    "name": "WAL-20 Transaction History / 390 / Default",
+    "id": "34:363188"
+   },
+   {
+    "name": "WAL-20 Transaction History / 390 / Filters (sheet)",
+    "id": "34:363482"
+   },
+   {
+    "name": "WAL-20 Transaction History / 390 / Empty",
+    "id": "34:363900"
+   },
+   {
+    "name": "WAL-21 Transaction Detail / 390 / Pending (sheet)",
+    "id": "34:364079"
+   },
+   {
+    "name": "WAL-21 Transaction Detail / 390 / Failed (sheet)",
+    "id": "34:364432"
+   },
+   {
+    "name": "WAL-21 Transaction Detail / 390 / Successful (sheet)",
+    "id": "34:364763"
+   },
+   {
+    "name": "WAL-22 Withdrawal Status tracker / 390 / Under review",
+    "id": "34:387001"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 390 / Default",
+    "id": "34:387261"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 390 / Add address (sheet)",
+    "id": "34:387466"
+   },
+   {
+    "name": "WAL-23 Whitelisted Addresses / 390 / Remove address (sheet)",
+    "id": "34:387720"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 390 / Banners in context",
+    "id": "34:408478"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 390 / Insufficient funds (sheet) — separate DEMO account (Available 342.10)",
+    "id": "34:408717"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 390 / Deposit limit (sheet)",
+    "id": "34:408836"
+   },
+   {
+    "name": "WAL-24 Banners & modals / 390 / Maintenance (sheet)",
+    "id": "34:409054"
+   },
+   {
+    "name": "Frame index file /home/user/Claude/design/figma-build/registry-wal-screens.json",
+    "id": "file"
+   }
+  ],
+  "issues": [
+   "Your feedback ('to w tle wygląda jak AI') was applied: no orbit rings, radial glows, particles or logo-halo heroes on these screens. The only illustration is the Art/Spot 'Coin' object on the empty states, cropped by the card edge. That component also contains two thin 'Motion arc' ellipses that read as the banned orbit rings; I hid them on my instances. Recommend deleting them from Art/Spot Motif=Coin (23:10035) in the library.",
+   "HELPER BUG, likely affects other agents: helpers.js screen() calls resize(), which leaves the primary axis FIXED at 800 px, so 'hug height' screens are clipped at 800. I set fr.primaryAxisSizingMode='AUTO' after screen(). Other modules' screens should be checked for frames stuck at 800 px.",
+   "Helper gotcha: an empty AL() frame used as a spacer keeps a 100 px height and inflates rows. Spacers need resize(1,1) before FILL.",
+   "Missing components: CMP-06 (modals, drawers, bottom sheets) and CMP-08 (toasts, alerts, banners) are NOT STARTED in the ledger. I built a modal shell, right drawer, bottom sheet with grabber, alert/banner and toast inline from tokens (surface/overlay, scrim/overlay|strong, status/*-tint, Elevation/3–4, radius/xl). They should become library components.",
+   "Figma MCP quota: the plan allows 10 calls per minute and 200 per day, shared by all agents on the account. I hit the per-minute limit once. To save calls, I built some states as clones of their default frame (2–6 frames per use_figma call) instead of one state per call. Each frame was still screenshot-checked.",
+   "Data reconciliation: WD-20877 went to 0x12ab…9f3C on 20 Nov while the whitelist has been on since 14 Oct, so 0x12ab…9f3C must be whitelisted too. WAL-23 therefore shows 2 whitelisted addresses (Main wallet, added 2 Sep 2026; Arbitrum payouts, added 14 Oct 2026). Card/Security Score (23:17143) says 'whitelist On · 1 address' and should say 2.",
+   "Data reconciliation: WD-20931 (1,500.00, requested today) counts toward today's withdrawal limit. WAL-01 and WAL-22 show '1,500.00 / 25,000.00 USDT used today'.",
+   "New DEMO values not in demo-data.md (all DEMO-badged), please add: WD-20850 went to 0xa41c…0D2e on Polygon (requested 18 Nov 2026 16:02, rejected 16:21, returned 16:22 UTC); WD-20931 timeline: security checks 17:56, AML review from 17:58, ETA by 21:55 UTC, automatic-approval threshold 1,000.00 USDT; Solana wallet verification failed 27 Nov 2026 18:31 UTC; wallet log: Solana connected 25 Nov 21:07, Arbitrum whitelisted 14 Oct 09:31, primary set 2 Sep 17:12 UTC; label 'Cold storage' for 0x3f9a…c47E; Ethereum maintenance 27 Nov 2026 22:00–23:30 UTC; weekly deposit usage 3,500.00 (DP-77380 + DP-77412), resets Mon 30 Nov 00:00 UTC; deposit attempt 2,000.00; insufficient-funds request 500.00 on the separate DEMO account (Available 342.10).",
+   "Policy assumptions needing compliance sign-off: (a) a withdrawal under manual review can be cancelled and the funds return to Available immediately; (b) turning the whitelist off takes effect after 24 h with 2FA; (c) losing the authenticator pauses whitelist changes for 48 h; (d) manual reviewers can only approve or reject, never change amount or destination; (e) deposits during Ethereum maintenance are credited after it ends; (f) for the weekly deposit limit, copy only says 1,500.00 USDT is left — there is no policy yet for funds sent above the limit.",
+   "Responsive limits of existing components: Strip/Networks is a fixed 1136 px instance, so its network pills are hidden at 1280 and 768 (a responsive variant is needed). Table/Example Transactions is 1120 px, so tablet uses a Tx/Row list instead. The tablet Wallet sub-nav clips as a horizontally scrolling tab bar.",
+   "Wallet/Address Chip always shows the BNB Chain mark. I swapped the nested chain mark per network on every chip (Arbitrum, Polygon, Solana). Recommend a Chain instance-swap property on the component.",
+   "Badge/Status has no Active, Whitelisted, Primary, Completed, Cooling down, Protected or Confirming variants; I relabelled Confirmed, Pending and Processing instances through text overrides. Nav/Mobile Tab Bar's first tab still says 'Home', not 'Lobby' (inherited).",
+   "Rendering quirk: node.screenshot() in plugin scripts sometimes draws chip and button labels faint or missing (seen on the WAL-20 No-results toolbar). get_screenshot shows them correctly.",
+   "Intentional overlaps: the WAL-02 Error toast floats at the viewport's bottom-right over a card, and the WAL-01 Glossary popover overlays the lifetime and activity cards. Both are open-state overlays.",
+   "Not changed: decisions.md (other agents edit it concurrently). Proposed new decision for the orchestrator: wallet sub-pages use a 6-tab in-page sub-nav (Overview, Deposit, Withdraw, Transaction history, Connected wallets, Address whitelist) inside the casino shell. Notes from memory: none were relevant to this task."
+  ]
+ },
+ "wal-deposit": {
+  "section": "34:432756 (page \"06 — Wallet & Transactions\", section \"WAL-03..09 Deposit flow\" at X=16000,Y=0, 22 frames) + 105:49686 (page \"10 — Mobile Experience\", section \"WAL — Mobile B (Deposit)\" at X=140000,Y=0, 10 frames)",
+  "created": [
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 1440 / Default",
+    "id": "34:432757"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 1440 / Empty — no deposits yet (new DEMO account, balance 0.00)",
+    "id": "103:40514"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 1440 / Default",
+    "id": "34:465213"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Default",
+    "id": "34:496874"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Wrong-network warning",
+    "id": "36:515243"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Below minimum deposit",
+    "id": "91:30409"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 1440 / Expired address session (edge state)",
+    "id": "36:536299"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 1440 / Default",
+    "id": "91:31216"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 1440 / Confirming 7 of 12",
+    "id": "97:33583"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 1440 / Delayed — Ethereum congested (7 of 12)",
+    "id": "97:34460"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 1440 / Credited (12 of 12)",
+    "id": "99:34694"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Successful — receipt",
+    "id": "99:35635"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Failed — transfer reverted",
+    "id": "101:36554"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 1440 / Unrecognised token — not credited",
+    "id": "101:37387"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 768 / Default",
+    "id": "103:41289"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 768 / Default",
+    "id": "103:41779"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 768 / Default",
+    "id": "103:42250"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 768 / Default",
+    "id": "91:32157"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 768 / Confirming 7 of 12",
+    "id": "97:35284"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 768 / Credited (12 of 12)",
+    "id": "99:36518"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 768 / Successful — receipt",
+    "id": "101:38134"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 768 / Failed — transfer reverted",
+    "id": "101:38576"
+   },
+   {
+    "name": "WAL-03 Deposit — Step 1 Select Network / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:49687"
+   },
+   {
+    "name": "WAL-04 Deposit — Step 2 Select Token / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:50056"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Default — MOB-06 bottom sheet",
+    "id": "105:50420"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Expired address session (edge state) — MOB-06 bottom sheet",
+    "id": "105:50851"
+   },
+   {
+    "name": "WAL-06 Deposit — Step 4 QR Code / 390 / Default — MOB-06 bottom sheet",
+    "id": "111:51709"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 390 / Confirming 7 of 12 — MOB-06 bottom sheet",
+    "id": "111:52133"
+   },
+   {
+    "name": "WAL-07 Deposit — Step 5 Transaction Pending / 390 / Delayed — Ethereum congested (7 of 12) — MOB-06 bottom sheet",
+    "id": "111:52536"
+   },
+   {
+    "name": "WAL-08 Deposit — Step 6 Confirmation / 390 / Credited (12 of 12) — MOB-06 bottom sheet",
+    "id": "112:52888"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 390 / Successful — receipt — MOB-06 bottom sheet",
+    "id": "112:53217"
+   },
+   {
+    "name": "WAL-09 Deposit — Step 7 Successful / 390 / Failed — transfer reverted — MOB-06 bottom sheet",
+    "id": "112:53630"
+   },
+   {
+    "name": "SECTION WAL-03..09 Deposit flow (page 06)",
+    "id": "34:432756"
+   },
+   {
+    "name": "SECTION WAL — Mobile B (Deposit) (page 10)",
+    "id": "105:49686"
+   }
+  ],
+  "issues": [
+   "Figma MCP quota: the Pro Full seat allows 200 calls/day and 10/min, shared with the parallel agents. It ran out mid-run and blocked me for about 70 minutes; after that, calls only succeeded intermittently. To stay within it, I built 2–4 frames per use_figma call (every script under 50k characters) instead of strictly one per call. Probing with cheap calls uses up the free slots, so retrying the real call after a wait works better.",
+   "Components too wide for 358 px mobile: Tx/Hash (367), Tx/Status Timeline (420), Wallet/Deposit Address Block (600) and Tx/Receipt Card (480). Workarounds on mobile: Tx/Hash 'Show explorer link' turned off (frames 111:52133, 111:52536, 112:53217, 112:53630); timeline 'Show DEMO' off on 112:53630, where the hash keeps its own DEMO badge; the mobile address step is built from tokens (QR panel + address card) instead of the Address Block. These components need compact/mobile variants.",
+   "No library components exist for: the QR code (an original illustrative pattern built inline, marked DEMO); the persistent 'Send only USDT on Ethereum (ERC-20). Other tokens or networks may be lost.' alert; the 'waiting for your transfer' row; the balance before/after table; the unrecognised-deposit recovery card; the welcome-offer opt-in card. All built inline with tokens. Candidates for components.",
+   "Copy mismatch inside the library: Wallet/Deposit Address Block shows the Ethereum status as 'Degraded', while Select/Network and my screens say 'Congested' / 'Slower than usual'.",
+   "Demo-data mismatch: the shared countdown 03:17:42 to 20:00 UTC implies it is 16:42 UTC, but other screens say 'Updated 18:42 UTC'. My deposit timeline runs 18:38–18:43 UTC (from the Tx/Status Timeline component), so the round card says 'closes 20:00 UTC · in 1 h 16 min' and I left out the fixed 03:17:42.",
+   "New DEMO values to add to demo-data.md: weekly deposit limit use for Mon 23–Sun 29 Nov = DP-77380 2,500.00 + DP-77412 1,000.00 = 3,500.00 of 5,000.00 (2,500.00 before DP-77412; failed or unrecognised deposits don't count); deposit address 0xDE3001A7c4E9b2F6d18053cA9e7B41f2D6a0c9F3 (taken from the Address Block component); session issued 18:38 UTC, 28:52/29:41 left; expired-session example 18:12 UTC; below-minimum example 6.50 USDT, tx 0x2c4d…91fa, 18:31 UTC; unrecognised example 250.00 USDC, tx 0x9b07…e4d1, ref UR-1093, return fee ≈2.40 USD; receipt ref RC-77412, credited 27 Nov 2026 18:43 UTC.",
+   "Desktop WAL-03 Empty: the topbar balance is overridden to 0.00 and the sidebar 'My entries' count badge is hidden for the new DEMO account; the rest of the shell is the standard Member shell.",
+   "Mobile frames for steps 6 and 7: the wallet page behind the scrim still shows the pre-credit Wallet/Balance Breakdown (Pending 1,000.00). The topbar balance was updated to 10,215.30. Minor, and mostly hidden by the scrim.",
+   "Notice/Demo Data (DEMOBAR) truncates its message at 390 px. This is the component's own behaviour, not something in these frames.",
+   "Tablet layout follows the sibling WAL-01 768 frames: Shell/Sidebar Collapsed + Shell/Topbar Mobile, 4 wallet sub-tabs, Nav/Stepper Mobile (segment colours set per step), full-width flow card, summary cards stacked.",
+   "Visual direction, per the user's 'looks like AI' complaint: no glows, rings, particles or halo heroes. Solid charcoal surfaces, hairline borders, mint CTAs, gold only on the Global Pool round card and the 'Enter round #1,248' CTA.",
+   "No new components were created, so there is no registry-<agent>.json. Working scripts and kits (rerunnable) are in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/dep/ (kit.js, kit2.js, kit3.js, kitm.js, mkit.js, f_s*.js, m1–m3.js, asm.js).",
+   "Possible memory note for the main session (learned from the tool errors and the Figma rate-limit docs page, not from stored memory): the Figma MCP Pro Full seat quota of 200/day and 10/min is shared by all parallel agents on the account, so workflow scripts should batch frames per call. No stored memory notes were used for this task."
+  ]
+ },
+ "wal-withdraw-a": {
+  "section": "36:516030",
+  "created": [
+   {
+    "name": "Section/WAL-10..14 Withdraw steps 1–5 (page 06, X=34000 Y=0)",
+    "id": "36:516030"
+   },
+   {
+    "name": "WAL-10 Withdraw — Step 1 Select Asset / 1440 / Default",
+    "id": "36:527247"
+   },
+   {
+    "name": "WAL-11 Withdraw — Step 2 Select Network / 1440 / Default",
+    "id": "36:538883"
+   },
+   {
+    "name": "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Default",
+    "id": "48:26939"
+   }
+  ],
+  "issues": [
+   "STOPPED EARLY under conventions §10: the Figma MCP limit for the Pro Full seat (200 calls per day and 10 per minute, shared by every agent in this run) refused 4 calls in a row: the WAL-12 states build at about 23:05 UTC, probes at 23:18 and 23:27, and a retry at 00:02 UTC after midnight. Earlier, a 15-minute wait had cleared it once.",
+   "Frames still to build, 25 in total. Desktop 1440: WAL-12 Invalid, Whitelisted and New-address cooldown (script ready in pending/wal-withdraw-a/d03-wal12-states.js); WAL-13 Default, Min/max below minimum, Over balance, and Limit reached (separate DEMO scenario); WAL-14 Default. Tablet 768: Default for WAL-10, 11, 12, 13 and 14. Mobile 390 (MOB-07, page 10, section 'WAL — Mobile C (Withdraw 1–5)' at 147000,0): WAL-10 asset sheet, WAL-11 network sheet, WAL-12 Default, Invalid and New-address cooldown, WAL-13 Default, Over balance and Limit reached, WAL-14 review sheet.",
+   "To resume: prefix each body with helpers.js (current version, with the hug-height screen()) and pending/wal-withdraw-a/_lib.js. Layout and specs are in pending/wal-withdraw-a/_lib.js and _remaining.js.",
+   "Demo-data conflict: the task's example (1,500.00 → 0x7c4e…a21D on Arbitrum, starting from Available 9,215.30) is withdrawal WD-20931. But demo-data.md already counts WD-20931's 1,500.00 inside Locked 1,850.00, and the Wallet/Balance Breakdown component shown in WAL-10 says so. If WD-20931 is created from Available 9,215.30, Available afterwards would be 7,715.30, which the planned WAL-13 and WAL-14 frames show. The orchestrator should decide whether the flow should start from 10,715.30 Available, or present WD-20931 as already pending.",
+   "The 'Limit reached' state cannot fit the demo user's own history (lifetime withdrawals are only 11,950.00), so the spec labels it '(separate DEMO scenario: 25,000.00 withdrawn today)'. This follows the rule used for insufficient-funds frames.",
+   "Visual direction: the built frames use only solid charcoal surfaces, hairline borders and real product UI: stepper, network rows, address input, balance breakdown. There are no glow blobs, orbit rings or particles, in line with the user's 'looks like AI' feedback (decision 23).",
+   "Possible memory item (learned from the Figma whoami call and the rate-limit docs page, not from stored memory): the Figma account behind this file is on a Pro plan with a Full seat, limited to 200 MCP calls per day and 10 per minute, shared by all agents. Parallel agent workflows run out of quota quickly."
+  ]
+ },
+ "wal-withdraw-b": {
+  "section": "91:27627",
+  "created": [
+   {
+    "name": "Section/WAL-15..19 Withdraw steps 6–9 (page 06, X=52000 Y=0)",
+    "id": "91:27627"
+   },
+   {
+    "name": "WAL-15 Withdraw — Step 6 Risk Validation / 1440 / Pass",
+    "id": "91:27628"
+   },
+   {
+    "name": "WAL-15 Withdraw — Step 6 Risk Validation / 1440 / KYC required — separate DEMO scenario (Level 1 account)",
+    "id": "91:28512"
+   },
+   {
+    "name": "WAL-15 Withdraw — Step 6 Risk Validation / 1440 / Flagged — manual review",
+    "id": "91:29357"
+   },
+   {
+    "name": "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 1440 / Default — email code + authenticator",
+    "id": "97:31028"
+   },
+   {
+    "name": "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 1440 / Wrong code",
+    "id": "97:31941"
+   },
+   {
+    "name": "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 1440 / Locked (15 min)",
+    "id": "97:32764"
+   },
+   {
+    "name": "WAL-17 Withdraw — Step 8 Pending / 1440 / Processing",
+    "id": "102:38421"
+   },
+   {
+    "name": "WAL-17 Withdraw — Step 8 Pending / 1440 / Queued",
+    "id": "102:39385"
+   },
+   {
+    "name": "WAL-17 Withdraw — Step 8 Pending / 1440 / Manual review",
+    "id": "102:40262"
+   },
+   {
+    "name": "WAL-18 Withdraw — Step 9 Successful / 1440 / Default",
+    "id": "106:42078"
+   },
+   {
+    "name": "WAL-19 Withdraw — Step 9 Failed / 1440 / Rejected by sanctions screening (alternative outcome)",
+    "id": "106:42965"
+   },
+   {
+    "name": "WAL-19 Withdraw — Step 9 Failed / 1440 / Network failure — retry (alternative outcome)",
+    "id": "106:43781"
+   },
+   {
+    "name": "WAL-15 Withdraw — Step 6 Risk Validation / 768 / Pass",
+    "id": "107:43927"
+   },
+   {
+    "name": "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 768 / Default",
+    "id": "107:44258"
+   },
+   {
+    "name": "WAL-17 Withdraw — Step 8 Pending / 768 / Processing",
+    "id": "107:44556"
+   },
+   {
+    "name": "WAL-18 Withdraw — Step 9 Successful / 768 / Default",
+    "id": "107:45009"
+   },
+   {
+    "name": "WAL-19 Withdraw — Step 9 Failed / 768 / Rejected by sanctions screening",
+    "id": "107:45350"
+   },
+   {
+    "name": "Section/WAL — Mobile D (Withdraw 6–9) (page 10, X=154000 Y=0)",
+    "id": "109:50781"
+   },
+   {
+    "name": "WAL-15 Withdraw — Step 6 Risk Validation / 390 / Pass",
+    "id": "109:50782"
+   },
+   {
+    "name": "WAL-15 Withdraw — Step 6 Risk Validation / 390 / KYC required — separate DEMO scenario (Level 1 account)",
+    "id": "109:50998"
+   },
+   {
+    "name": "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 390 / Default — 2FA bottom sheet",
+    "id": "109:51244"
+   },
+   {
+    "name": "WAL-16 Withdraw — Step 7 Two-Factor Confirmation / 390 / Locked (15 min)",
+    "id": "109:51440"
+   },
+   {
+    "name": "WAL-17 Withdraw — Step 8 Pending / 390 / Processing",
+    "id": "110:51357"
+   },
+   {
+    "name": "WAL-17 Withdraw — Step 8 Pending / 390 / Manual review",
+    "id": "110:51566"
+   },
+   {
+    "name": "WAL-18 Withdraw — Step 9 Successful / 390 / Default",
+    "id": "110:51788"
+   },
+   {
+    "name": "WAL-19 Withdraw — Step 9 Failed / 390 / Rejected by sanctions screening (alternative outcome)",
+    "id": "111:52935"
+   },
+   {
+    "name": "WAL-19 Withdraw — Step 9 Failed / 390 / Network failure — retry (alternative outcome)",
+    "id": "111:53169"
+   }
+  ],
+  "issues": [
+   "User request (relayed): 'to w tle wyglada jak AI' — these screens have no background decoration at all. They use solid charcoal surfaces, hairline cards, real product UI (checks list, timeline, receipt) and bold numbers. There are no glow blobs, orbit rings, particles or logo-in-halo heroes, per conventions §4.",
+   "Data conflict for the orchestrator: the steps 1–5 frames (wal-withdraw-a) say 'Available after 7,715.30'. In demo-data, Available 9,215.30 already excludes the 1,500.00 held in Locked for WD-20931, so steps 1–5 count it twice. Steps 6–9 follow demo-data: Locked 1,850.00 while pending, Locked 350.00 after sending, and 10,715.30 after the funds are returned. Logged as decisions.md #28.",
+   "Component gap, Input/OTP (16:3761): each variant has its own built-in helper text ('Verifying code…' + spinner, 'Resend code in 0:42', '4 attempts left', 'Try again in 14:59'), and these conflict with the screen copy. I rewrote or hid them per instance with fixOtp(). It would help to expose them as TEXT/BOOLEAN props.",
+   "Component gap, Notice/Demo Data (6:131): the default message does not wrap and gets clipped at 390 px. Mobile frames here use the shorter Message 'DEMO DATA — all figures are illustrative, not real.' Other agents' mobile frames may have the same clipping.",
+   "Component gap, Tx/Hash (20:5893): with 'Show explorer link' on, it is wider than a 326 px mobile card. On mobile I hide the inline link and put a Ghost 'View on explorer' button below it.",
+   "Built inline because no matching component exists: automatic-check list rows, the vertical withdrawal timeline (Tx/Status Timeline is fixed to deposit DP-77412), the anti-phishing code block, the receipt list (Tx/Receipt Card is fixed to WD-20877), option rows, and the mobile bottom-sheet shell (Sheet/Bottom variants have fixed content).",
+   "Scope per decisions #16: mobile does not include WAL-15 Flagged, WAL-16 Wrong code or WAL-17 Queued, and tablet has default states only. Their layouts match the default and they exist at 1440.",
+   "The sanctions failure uses the same whitelisted address 0x7c4e…a21D as the happy path, so it is labelled '(alternative outcome)'. The canonical sanctions example in demo-data is still WD-20850. New DEMO values (tx hash 0xb7d4…2c91, AML-58214, timeline times) were added to demo-data.md.",
+   "Figma MCP seat rate limit was hit 4 times (never 3 in a row). Each time I prepared the next script and then retried. The use_figma runtime skips invisible instance children: touching a node after hiding it throws 'node does not exist'. This is documented in pending/wal-withdraw-b/README.md.",
+   "Files written: /home/user/Claude/design/figma-build/registry-wal-withdraw-b.json, /home/user/Claude/design/figma-build/pending/wal-withdraw-b/ (build.py, _common.js, _desk.js, _mob.js, builders, bodies, README.md), appended sections to demo-data.md and decisions.md (#28). ledger.json was not edited; it is left for the orchestrator to merge. No memory notes were used or bear on this task."
+  ]
  }
 }

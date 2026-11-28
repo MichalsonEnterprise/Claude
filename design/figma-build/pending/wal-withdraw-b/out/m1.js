@@ -116,7 +116,7 @@ function setStepM(s, n, label, next, err) { const t = k => s.findOne(x => x.type
 async function shellM(name, n, x, label, next, o = {}) {
   const y = colY(x);
   const f = await screen(name, 390, o.sheet ? { h: 844 } : {}); sec.appendChild(f); f.x = x; f.y = y;
-  add(f, [await DEMOBAR(), 'FILL']);
+  add(f, [await DEMOBAR('DEMO DATA — all figures are illustrative, not real.'), 'FILL']);
   add(f, [await I('23:12908', { State: 'Member' }), 'FILL']);
   const ct = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [ct, 'FILL']);
   const bh = hrow('Page header', 8); add(ct, [bh, 'FILL']);
