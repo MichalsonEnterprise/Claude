@@ -12,8 +12,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   // The repo root has an unrelated package-lock.json; pin tracing to the pnpm workspace root
-  // (next build always runs with cwd = apps/web).
-  outputFileTracingRoot: path.join(process.cwd(), '../..'),
+  // (next build always runs with cwd = apps/web). On Vercel the traced paths are resolved against the
+  // git repository root (this workspace lives in its global-pool/ sub-folder), so trace from there.
+  outputFileTracingRoot: path.join(process.cwd(), process.env.VERCEL ? '../../..' : '../..'),
   // Lint runs as its own step (`pnpm --filter @gp/web lint`) with the shared flat config.
   eslint: { ignoreDuringBuilds: true },
   experimental: {
