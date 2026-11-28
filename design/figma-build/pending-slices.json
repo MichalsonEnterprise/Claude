@@ -22,7 +22,10 @@
   "auth-c",
   "auth-b",
   "gp-draw",
-  "gp-hub"
+  "gp-hub",
+  "adm-pool",
+  "adm-chain-comp",
+  "adm-finance"
  ],
  "after_screens": [
   "proto-a",
