@@ -1,5 +1,5 @@
 {
- "_note": "AUTH-07/08/09/10 (agent auth-b) — screen frames, not components. Page '04 — Authentication', section 'AUTH-07/08/09/10 2FA & wallet connect' 78:77287 at X=12000,Y=0 (notes frame at 120,120; columns x=120+col*1560: AUTH-07 Scan/Confirm/Codes = col 0-2, AUTH-08 Login col 3, AUTH-08 Withdrawal col 4, AUTH-09 col 5, AUTH-10 col 6). Mobile: page '10 — Mobile Experience', section 'AUTH — Mobile B' at X=70000,Y=0 (not yet created). Remaining frames are ready-to-run scripts in pending/auth-b/out (c3, k4..k8; run order in pending/auth-b/build.py).",
+ "_note": "AUTH-07/08/09/10 (agent auth-b) — screen frames, not components. Page '04 — Authentication', section 'AUTH-07/08/09/10 2FA & wallet connect' 78:77287 at X=12000,Y=0 (notes frame at 120,120; columns x=120+col*1560: AUTH-07 Scan/Confirm/Codes = col 0-2, AUTH-08 Login col 3, AUTH-08 Withdrawal col 4, AUTH-09 col 5, AUTH-10 col 6; states stacked below the default). Mobile: page '10 — Mobile Experience', section 'AUTH — Mobile B' at X=70000,Y=0 (columns x=120+col*510: AUTH-07 cols 0-2, AUTH-08 Login col 3, Withdrawal col 4, AUTH-09 col 5-6, AUTH-10 col 7). All 30 frames built; source scripts in pending/auth-b (out/c3,k4..k8).",
  "Section/AUTH-07/08/09/10 2FA & wallet connect": {
   "id": "78:77287"
  },
@@ -11,5 +11,89 @@
  },
  "[AUTH-07] 2FA Enrollment — Step 3 Backup codes / 1440 / Default": {
   "id": "81:26567"
+ },
+ "AUTH-08 2FA Challenge — Login / 1440 / Default": {
+  "id": "115:81957"
+ },
+ "AUTH-08 2FA Challenge — Login / 1440 / Wrong code": {
+  "id": "115:83997"
+ },
+ "AUTH-08 2FA Challenge — Login / 1440 / Locked": {
+  "id": "115:86045"
+ },
+ "AUTH-08 2FA Challenge — Withdrawal / 1440 / Default": {
+  "id": "116:34081"
+ },
+ "AUTH-08 2FA Challenge — Withdrawal / 1440 / Wrong code": {
+  "id": "116:35027"
+ },
+ "AUTH-08 2FA Challenge — Withdrawal / 1440 / Locked": {
+  "id": "116:35830"
+ },
+ "AUTH-09 Connect Wallet / 1440 / List": {
+  "id": "116:36629"
+ },
+ "AUTH-09 Connect Wallet / 1440 / WalletConnect QR": {
+  "id": "117:38530"
+ },
+ "AUTH-09 Connect Wallet / 1440 / Connecting": {
+  "id": "117:40434"
+ },
+ "AUTH-09 Connect Wallet / 1440 / Rejected": {
+  "id": "117:42355"
+ },
+ "AUTH-09 Connect Wallet / 1440 / Wrong network": {
+  "id": "117:44238"
+ },
+ "AUTH-09 Connect Wallet / 1440 / Success": {
+  "id": "117:46336"
+ },
+ "AUTH-10 Wallet Verification / 1440 / Request": {
+  "id": "120:144957"
+ },
+ "AUTH-10 Wallet Verification / 1440 / Success": {
+  "id": "120:146919"
+ },
+ "AUTH-10 Wallet Verification / 1440 / Rejected": {
+  "id": "120:148852"
+ },
+ "AUTH-10 Wallet Verification / 1440 / Expired nonce": {
+  "id": "120:150769"
+ },
+ "AUTH-07 2FA Enrollment — Step 1 Set up / 390 / Default": {
+  "id": "123:54294"
+ },
+ "AUTH-07 2FA Enrollment — Step 2 Confirm / 390 / Default": {
+  "id": "123:54457"
+ },
+ "AUTH-07 2FA Enrollment — Step 3 Backup codes / 390 / Default": {
+  "id": "123:54615"
+ },
+ "AUTH-08 2FA Challenge — Login / 390 / Default": {
+  "id": "123:54797"
+ },
+ "AUTH-08 2FA Challenge — Login / 390 / Locked": {
+  "id": "123:55010"
+ },
+ "AUTH-08 2FA Challenge — Withdrawal / 390 / Default": {
+  "id": "123:55236"
+ },
+ "AUTH-09 Connect Wallet / 390 / List": {
+  "id": "124:155578"
+ },
+ "AUTH-09 Connect Wallet / 390 / Wrong network": {
+  "id": "124:155811"
+ },
+ "AUTH-09 Connect Wallet / 390 / WalletConnect deep link": {
+  "id": "124:156062"
+ },
+ "AUTH-10 Wallet Verification / 390 / Request": {
+  "id": "124:156284"
+ },
+ "AUTH-10 Wallet Verification / 390 / Expired nonce": {
+  "id": "124:156503"
+ },
+ "Notes — AUTH-07…10": {
+  "id": "78:77288"
  }
 }

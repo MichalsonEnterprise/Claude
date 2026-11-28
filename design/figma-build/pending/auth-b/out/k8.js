@@ -105,7 +105,7 @@ async function NUMSTEP(n, state, title, body) { const r = AL('HORIZONTAL', { nam
 async function CHIP(icon, label, tone = 'success') { const [bg, c] = TONES[tone]; return ROW('Chip — ' + label, [await IC(icon, 14, c), await T(label, 'Label/S', c === 'icon/brand' ? 'text/brand' : c)], { gap: 6, p: [4, 10, 4, 10], fill: bg, r: 9999 }); }
 function COLY(sec, x, y0) { let m = 0, f = false; for (const ch of sec.children) if (Math.abs(ch.x - x) < 2 && ch.type === 'FRAME' && !/^Notes/.test(ch.name)) { m = Math.max(m, ch.y + ch.height); f = true; } return f ? m + 160 : y0; }
 function RESTACK(sec, x, y0) { const fs = sec.children.filter(ch => Math.abs(ch.x - x) < 2 && ch.type === 'FRAME' && !/^Notes/.test(ch.name)).sort((a, b) => a.y - b.y); let y = y0; for (const f of fs) { f.y = y; y += f.height + 160; } }
-async function START(NAME, col, o = {}) { const page = figma.root.children.find(p => p.name === (o.mobile ? '10 — Mobile Experience' : '04 — Authentication')); await figma.setCurrentPageAsync(page); const sec = o.mobile ? section('AUTH — Mobile B', 70000, 0) : section('AUTH-07/08/09/10 2FA & wallet connect', 12000, 0); const W = o.mobile ? 390 : 1440; const X = 120 + col * (W + 120); const old = sec.children.find(n => n.name === NAME); let Y = null; if (old) { Y = old.y; old.remove(); } if (Y == null) Y = COLY(sec, X, o.mobile ? 160 : 440); const fr = await screen(NAME, W); sec.appendChild(fr); fr.x = X; fr.y = Y; const db = await DEMOBAR(); add(fr, [db, 'FILL']); return { sec, fr, db, X }; }
+async function START(NAME, col, o = {}) { const page = figma.root.children.find(p => p.name === (o.mobile ? '10 — Mobile Experience' : '04 — Authentication')); await figma.setCurrentPageAsync(page); const sec = o.mobile ? section('AUTH — Mobile B', 70000, 0) : section('AUTH-07/08/09/10 2FA & wallet connect', 12000, 0); const W = o.mobile ? 390 : 1440; const X = 120 + col * (W + 120); const old = sec.children.find(n => n.name === NAME); let Y = null; if (old) { Y = old.y; old.remove(); } if (Y == null) Y = COLY(sec, X, o.mobile ? 160 : 440); const fr = await screen(NAME, W); sec.appendChild(fr); fr.x = X; fr.y = Y; const db = await DEMOBAR(o.mobile ? 'DEMO DATA — illustrative values only' : undefined); add(fr, [db, 'FILL']); return { sec, fr, db, X }; }
 async function FINISH(sec, fr, X, o = {}) { RESTACK(sec, X, o.mobile ? 160 : 440); fitSection(sec); await fr.screenshot({ scale: o.mobile ? 0.75 : 0.5 }); return { frame: fr.id, name: fr.name, size: [Math.round(fr.width), Math.round(fr.height)], at: [Math.round(fr.x), Math.round(fr.y)] }; }
 function CENTER(fr, d, bg, o = {}) { let vh = bg.vp.height; const need = d.height + 2 * (o.m || 64); if (need > vh) { bg.vp.resize(bg.vp.width, need); bg.scrim.resize(bg.scrim.width, need); vh = need; } d.x = Math.round((fr.width - d.width) / 2) + (o.dx || 0); d.y = Math.round(bg.vp.y + (vh - d.height) / 2); }
 async function WALLETROW(o = {}) { const mk = await I(o.mark || '27:15872'); const id = COL('Wallet', [], { gap: 4 }); add(id, await T(o.name || 'Browser wallet', 'Label/M', 'text/primary')); add(id, await I('9:418', { Size: 'S', State: 'Default' }, { Address: '0x12ab…9f3C', 'Show DEMO': true })); const r = ROW('Wallet — ' + (o.name || 'Browser wallet'), [mk, [id, 'FILL']], { gap: 12, p: [12, 16, 12, 12], fill: 'surface/raised', stroke: 'border/subtle', r: 14 }); if (o.badge) add(r, o.badge); else add(r, await I('9:377', { Chain: 'BNB Chain', Status: 'Operational' }, { 'Show status label': false, 'Show chevron': false })); return r; }
@@ -164,8 +164,8 @@ const s = await SHEET(MODE, { gap: 16 });
 if (MODE === 'Request') {
   await SHEAD(s, 'Verify wallet ownership');
   add(s, await P('Sign a free message to prove you control this wallet. It’s not a transaction and can’t move funds.', 'Body/S', 'text/secondary'));
-  add(s, [await WALLETROW({ mark: '27:15878', name: 'Trust Wallet · WalletConnect' }), 'FILL']);
-  add(s, [await MSGBOX(), 'FILL']);
+  { const wr = await WALLETROW({ mark: '27:15878', name: 'Trust Wallet · WalletConnect' }); wr.children[1].appendChild(wr.children[2]); add(s, [wr, 'FILL']); }
+  { const mb = await MSGBOX(); const it = mb.findOne(n => n.type === 'TEXT' && n.characters === 'Issued by globalpool.example'); if (it) it.characters = 'globalpool.example'; add(s, [mb, 'FILL']); }
   add(s, [ROW('Guarantees', [await CHIP('check', 'No transaction'), await CHIP('check', 'No gas · 0.00')], { gap: 8, wrap: true, cgap: 8 }), 'FILL']);
   add(s, [ROW('Waiting', [await IC('spinner', 18, 'icon/brand'), COL('T', [await T('Waiting for your signature…', 'Body/S Strong', 'text/primary'), await T('Expires at 16:52 UTC · 09:12 left', 'Caption', 'text/tertiary')], { gap: 2 })], { gap: 10, p: [10, 12, 10, 12], fill: 'surface/raised', stroke: 'border/subtle', r: 10 }), 'FILL']);
   await STICKY(s, [await BTN('Primary', 'Open Trust Wallet to sign', { size: 'L', lead: 'external-link' }), await BTN('Ghost', 'Cancel', { size: 'L' })]);
@@ -179,5 +179,13 @@ if (MODE === 'Request') {
 }
 MPLACE(fr, db, bg, s);
 OUT.push(await FINISH(sec, fr, X, { mobile: true })); }
+
+{ const pg = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(pg); const sec = pg.children.find(n => n.type === 'SECTION' && n.name === 'AUTH — Mobile B'); const fixed = [];
+for (const f of sec.children.filter(n => n.type === 'FRAME' && /^AUTH-(0[789]|10) /.test(n.name))) { const db = f.children[0]; if (db && db.type === 'INSTANCE') { const cp = db.componentProperties; const key = Object.keys(cp).find(k => k.split('#')[0] === 'Message'); if (key && cp[key].value !== 'DEMO DATA — illustrative values only') { db.setProperties({ [key]: 'DEMO DATA — illustrative values only' }); fixed.push(f.id); } } }
+const lk = sec.children.find(n => n.name === 'AUTH-08 2FA Challenge — Login / 390 / Locked'); let otpFix = 0;
+if (lk) { for (const t of lk.findAll(n => n.type === 'TEXT' && /Too many attempts/i.test(n.characters))) { await ST(t, 'Locked after 5 incorrect codes · unlocks 16:59 UTC'); otpFix++; } }
+const wd = sec.children.find(n => n.name === 'AUTH-08 2FA Challenge — Withdrawal / 390 / Default');
+fitSection(sec);
+OUT.push({ demobarFixed: fixed, otpFix, lockedTexts: lk ? lk.findAll(n => n.type === 'TEXT' && /unlocks|Try again/i.test(n.characters)).map(n => n.characters) : null, wd: wd ? wd.id : null }); }
 
 return OUT;

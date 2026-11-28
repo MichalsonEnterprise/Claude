@@ -1,7 +1,43 @@
 {
- "_note": "Agent wal-withdraw-a — screens only (no new components). Page '06 — Wallet & Transactions', section 'WAL-10..14 Withdraw steps 1–5' (36:516030) at X=34000, Y=0. Mobile section 'WAL — Mobile C (Withdraw 1–5)' (page 10, X=147000) not created yet — blocked by the Figma MCP rate limit. Pending scripts: design/figma-build/pending/wal-withdraw-a/.",
- "Section/WAL-10..14 Withdraw steps 1–5": { "id": "36:516030" },
- "WAL-10 Withdraw — Step 1 Select Asset / 1440 / Default": { "id": "36:527247" },
- "WAL-11 Withdraw — Step 2 Select Network / 1440 / Default": { "id": "36:538883" },
- "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Default": { "id": "48:26939" }
+ "_note": "Agent wal-withdraw-a — screens only (no new components). Page '06 — Wallet & Transactions', section 'WAL-10..14 Withdraw steps 1–5' (36:516030) at X=34000, Y=0: desktop columns x = 120 / 1680 / 3240 / 4800 / 6360 (WAL-10..14), states stacked below their default (+160), tablet 768 row below all desktop frames (+240). Mobile: page '10 — Mobile Experience', section 'WAL — Mobile C (Withdraw 1–5)' at X=147000, Y=0 (columns x = 120 + i*510). Continuation scripts: design/figma-build/pending/wal-withdraw-a/v2/ (python3 build.py → out/*.js).",
+ "Section/WAL-10..14 Withdraw steps 1–5": {
+  "id": "36:516030"
+ },
+ "WAL-10 Withdraw — Step 1 Select Asset / 1440 / Default": {
+  "id": "36:527247"
+ },
+ "WAL-11 Withdraw — Step 2 Select Network / 1440 / Default": {
+  "id": "36:538883"
+ },
+ "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Default": {
+  "id": "48:26939"
+ },
+ "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Invalid": {
+  "id": "124:45306",
+  "type": "FRAME"
+ },
+ "WAL-12 Withdraw — Step 3 Enter Address / 1440 / Whitelisted": {
+  "id": "124:46116",
+  "type": "FRAME"
+ },
+ "WAL-12 Withdraw — Step 3 Enter Address / 1440 / New-address cooldown": {
+  "id": "124:46914",
+  "type": "FRAME"
+ },
+ "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Default": {
+  "id": "133:47170",
+  "type": "FRAME"
+ },
+ "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Min/max — below minimum": {
+  "id": "133:48168",
+  "type": "FRAME"
+ },
+ "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Over balance": {
+  "id": "133:49053",
+  "type": "FRAME"
+ },
+ "WAL-13 Withdraw — Step 4 Enter Amount / 1440 / Limit reached — separate DEMO scenario (25,000.00 already withdrawn today)": {
+  "id": "133:49928",
+  "type": "FRAME"
+ }
 }

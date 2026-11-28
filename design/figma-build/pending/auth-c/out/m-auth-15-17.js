@@ -111,7 +111,7 @@ async function artBanner(p, name, h, draw) { const a = figma.createFrame(); a.na
 async function mscreen(name, col, o = {}) {
   const xs = 120 + col * 510; let ys = 440; for (const c of sec.children) if (Math.abs(c.x - xs) < 2) ys = Math.max(ys, c.y + c.height + 160);
   const f = await screen(name, 390, {}); sec.appendChild(f); f.x = xs; f.y = ys;
-  const bar = await DEMOBAR(); f.appendChild(bar); bar.layoutSizingHorizontal = 'FILL';
+  const bar = await DEMOBAR('DEMO DATA — illustrative values only'); f.appendChild(bar); bar.layoutSizingHorizontal = 'FILL';
   const tb = await I('23:12908', { State: 'Member' }); f.appendChild(tb); tb.layoutSizingHorizontal = 'FILL';
   const sh = box(f, 'VERTICAL', { name: 'Flow header', gap: 10, p: [8, 16, 14, 8], fill: 'bg/secondary' }); strokeSides(sh, 'border/subtle', { b: 1 });
   const r = box(sh, 'HORIZONTAL', { name: 'Title row', gap: 4, align: 'CENTER' }); const bk = await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] }); bk.name = 'Button/Icon — Back (44)'; r.appendChild(bk);
@@ -168,7 +168,7 @@ if (MODE === 'Pending') {
   const s2 = await sect(2, 'Valid document', ['Approved', 'Fixed']); await tx(s2, 'Passport · Portugal · valid until 03 May 2034', 'Label/M', 'text/primary'); const up = await I('20:9454', { State: 'Uploaded' }, { Label: 'Passport — photo page', Description: 'All four corners visible, no glare', 'Show privacy note': false }); up.name = 'Input/File Upload — passport (Uploaded)'; await setT(up, 'File name', 'passport_photo_page.jpg'); await setT(up, 'Meta text', 'Uploaded · 2.9 MB · checks passed'); s2.appendChild(up); up.layoutSizingHorizontal = 'FILL';
   const s3 = await sect(3, 'Selfie video', ['Neutral', 'Kept']); await li(s3, 'check-circle', 'Passed on 27 Nov 2026 — no need to record again.', { ic: 'status/success', is: 16 });
   const cb = await I('20:3205', { Value: 'Unchecked', State: 'Default' }, { Label: 'I confirm these details are accurate and belong to me', 'Show description': false }); cb.name = 'Control/Checkbox — accuracy declaration (unchecked)'; body.appendChild(cb); cb.layoutSizingHorizontal = 'FILL';
-  await mfinish(f, { cta: [await BTN('Primary', 'Submit again', { size: 'L', lead: 'check' })], note: 'Review usually takes under 10 minutes, up to 24 h.' });
+  await mfinish(f, { cta: [await BTN('Primary', 'Submit again', { size: 'L', state: 'Disabled', lead: 'check' })], note: 'Tick the confirmation to submit · review usually under 10 min, up to 24 h.' });
 }
 await f.screenshot({ scale: 0.5 }); return { frame: f.id, size: [f.width, f.height] };
 

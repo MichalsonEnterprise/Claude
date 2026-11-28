@@ -41,6 +41,6 @@ if (STEP === 0) {
   add(c, [cc, 'FILL']);
   add(c, [await ALERT('warning', 'Keep them offline and private', 'Use a password manager or paper — not screenshots. We’ll never ask you for them.'), 'FILL']);
   add(c, [await I('20:3205', { Value: 'Unchecked', State: 'Default' }, { Label: 'I’ve saved my backup codes somewhere safe', 'Show description': false }), 'FILL']);
-  await MSTICKYBAR(fr, [await BTN('Primary', 'Finish setup', { size: 'L', state: 'Disabled' }), await P('Available once you tick the box above.', 'Caption', 'text/tertiary', { align: 'CENTER' })]);
+  await MSTICKYBAR(fr, [await BTN('Primary', 'Finish setup', { size: 'L', state: 'Disabled' }), await T('Available once you tick the box above.', 'Caption', 'text/tertiary', { w: 358, align: 'CENTER' })]);
 }
 OUT.push(await FINISH(sec, fr, X, { mobile: true })); }

@@ -13,7 +13,7 @@ const tb = box(main, 'VERTICAL', { name: 'Title', gap: 8 });
 await tx(tb, 'Verify your identity to raise your limits', 'Heading/H3', 'text/primary');
 await tx(tb, "You're on Level 1 — Basic. Level 2 takes about 5 minutes: confirm your details, upload one ID document and record a 10-second selfie video.", 'Body/M', 'text/secondary');
 const lt = box(main, 'VERTICAL', { name: 'Levels table', gap: 12 });
-const lh = box(lt, 'HORIZONTAL', { name: 'Table title', gap: 8, align: 'CENTER' }); lh.appendChild(await T('Verification levels and daily limits', 'Heading/H5', 'text/primary')); box(lh, 'HORIZONTAL', { name: 'Spacer' }); lh.appendChild(await DEMO('M'));
+const lh = box(lt, 'HORIZONTAL', { name: 'Table title', gap: 8, align: 'CENTER' }); lh.appendChild(await T('Verification levels and daily limits', 'Heading/H5', 'text/primary')); box(lh, 'HORIZONTAL', { name: 'Spacer', h: 1 }); lh.appendChild(await DEMO('M'));
 const tbl = box(lt, 'HORIZONTAL', { name: 'Table', fill: 'surface/default', stroke: 'border/subtle', r: 14, clip: true });
 const RW = [['', 72], ['You provide', 76], ['Deposits per day', 52], ['Withdrawals per day', 52], ['Review time', 60]];
 const lc = box(tbl, 'VERTICAL', { name: 'Row labels', w: 168 }, 'HUG');

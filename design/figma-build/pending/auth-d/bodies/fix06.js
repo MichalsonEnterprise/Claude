@@ -1,0 +1,2 @@
+{ const a = await figma.getNodeByIdAsync('130:62620'); if (a) { const t = a.findAll(n => n.type === 'TEXT' && n.characters === 'Fair — add a symbol or 2 more characters')[0]; if (t) { await ST(t, 'Fair — add a symbol'); t.parent.name = 'Chip — Fair — add a symbol'; OUT.push({ fixed: t.id }); } }
+  const b = await figma.getNodeByIdAsync('130:66682'); if (b) { const c = b.findAll(n => n.type === 'FRAME' && n.name === 'Illustration — signed-in devices (DEMO)')[0]; if (c) { c.resize(320, c.height); HUGH(c); OUT.push({ fixed: c.id, w: c.width }); } } }

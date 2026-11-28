@@ -111,7 +111,7 @@ async function artBanner(p, name, h, draw) { const a = figma.createFrame(); a.na
 async function mscreen(name, col, o = {}) {
   const xs = 120 + col * 510; let ys = 440; for (const c of sec.children) if (Math.abs(c.x - xs) < 2) ys = Math.max(ys, c.y + c.height + 160);
   const f = await screen(name, 390, {}); sec.appendChild(f); f.x = xs; f.y = ys;
-  const bar = await DEMOBAR(); f.appendChild(bar); bar.layoutSizingHorizontal = 'FILL';
+  const bar = await DEMOBAR('DEMO DATA — illustrative values only'); f.appendChild(bar); bar.layoutSizingHorizontal = 'FILL';
   const tb = await I('23:12908', { State: 'Member' }); f.appendChild(tb); tb.layoutSizingHorizontal = 'FILL';
   const sh = box(f, 'VERTICAL', { name: 'Flow header', gap: 10, p: [8, 16, 14, 8], fill: 'bg/secondary' }); strokeSides(sh, 'border/subtle', { b: 1 });
   const r = box(sh, 'HORIZONTAL', { name: 'Title row', gap: 4, align: 'CENTER' }); const bk = await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] }); bk.name = 'Button/Icon — Back (44)'; r.appendChild(bk);

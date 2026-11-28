@@ -1,0 +1,6 @@
+# pending/auth-b — AUTH-07/08/09/10 (2FA & wallet connect)
+Status 28 Nov 2026 (continuation run): ALL 30 frames exist in Figma (16 desktop on page 04 section 78:77287, 11 mobile on page 10 section 'AUTH — Mobile B', plus the 3 AUTH-07 desktop frames).
+- Ran in this continuation: out/k6.js (AUTH-10 desktop x4), out/k7.js (mobile AUTH-07 x3 + AUTH-08 x3; m07 bug fixed: P() array passed to MSTICKYBAR), out/k8.js (mobile AUTH-09 x3 + AUTH-10 x2 + fix block: short mobile DEMO bar message, OTP locked helper text), plus a targeted fix on mobile AUTH-10 Request (network pill under the address, shorter message header; also patched into bodies/m10.js).
+- c3/k4/k5 (AUTH-08 desktop x6, AUTH-09 desktop x6) were run by an earlier interrupted run; their frames exist (heights 1060/1177, hug) but were NOT screenshot-verified in this run because of the Figma MCP limit.
+- Remaining: run verify/v1.js, verify/v2.js, verify/v3.js (read-only, 5/5/3 screenshots + text-overflow audit) and fix anything they show.
+Rebuild scripts after editing bodies: python3 build.py k8:m09,m10,fix_m (etc., see build.py docstring).

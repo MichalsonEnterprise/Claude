@@ -1,0 +1,21 @@
+{
+ "slice": "auth-d",
+ "rows": ["AUTH-05", "AUTH-06", "AUTH-18", "AUTH-19", "AUTH-20", "AUTH-21"],
+ "desktop": "page '04 — Authentication', section 'AUTH-05/06/18..21 Recovery & restrictions' at X=36000,Y=0 (notes frame at 120,80; columns x=120+col*1560: AUTH-05 col 0, AUTH-06 col 1, AUTH-18 col 2, AUTH-19 steps 1-5 cols 3-7, AUTH-20 col 8, AUTH-21 col 9; frames from y=440)",
+ "mobile": "page '10 — Mobile Experience', section 'AUTH — Mobile D' at X=84000,Y=0 (columns x=120+col*510, same col numbers, frames from y=160)",
+ "build": "python3 build.py <out>:<body,...>  (assembles helpers.js + kit subset + bodies into out/<out>.js, node --check + mock dry run)",
+ "order": [
+  {"script": "out/s1.js", "bodies": "notes,d05", "frames": "Notes + AUTH-05 x3 (1440)", "status": "DONE 28 Nov (128:57102, 128:57148, 128:59149, 128:61145)"},
+  {"script": "out/s2.js", "bodies": "d06,fix05", "frames": "AUTH-06 x3 (1440) + AUTH-05 error label fix", "status": "DONE 28 Nov (130:62620, 130:64689, 130:66682)"},
+  {"script": "out/s3.js", "bodies": "d18a,d18,fix06", "frames": "AUTH-18 Suspended, Under review (1440) + AUTH-06 art fixes"},
+  {"script": "out/s4.js", "bodies": "d18b,d18", "frames": "AUTH-18 Self-excluded, Geo-restricted (1440)"},
+  {"script": "out/s5.js", "bodies": "d19a,d19", "frames": "AUTH-19 steps 1-2 (1440)"},
+  {"script": "out/s6.js", "bodies": "d19b,d19", "frames": "AUTH-19 steps 3-5 (1440)"},
+  {"script": "out/s7.js", "bodies": "d20_21", "frames": "AUTH-20 x2 + AUTH-21 (1440)"},
+  {"script": "out/m1.js", "bodies": "m05_06", "frames": "AUTH-05 x2 + AUTH-06 x3 (390)"},
+  {"script": "out/m2.js", "bodies": "m18", "frames": "AUTH-18 x4 (390)"},
+  {"script": "out/m3.js", "bodies": "m19a,m19", "frames": "AUTH-19 steps 1-3 (390)"},
+  {"script": "out/m4.js", "bodies": "m19b,m19,m20_21", "frames": "AUTH-19 steps 4-5 + AUTH-20 + AUTH-21 (390)"}
+ ],
+ "idempotent": "FRAME() skips frames whose name already exists in the section; a failing frame is removed before the error propagates."
+}

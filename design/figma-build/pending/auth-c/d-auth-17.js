@@ -43,7 +43,7 @@ if (!RS) {
   const up = await I('20:9454', { State: 'Uploaded' }, { Label: 'Passport — photo page', Description: 'All four corners visible, no glare', 'Show privacy note': false }); up.name = 'Input/File Upload — passport (Uploaded)'; await setT(up, 'File name', 'passport_photo_page.jpg'); await setT(up, 'Meta text', 'Uploaded · 2.9 MB · all quality checks passed'); s2.appendChild(up); up.layoutSizingHorizontal = 'FILL';
   const s3 = await sect(3, 'Selfie video', ['Neutral', 'Kept']); await li(s3, 'check-circle', 'Passed on 27 Nov 2026 — you don’t need to record it again.', { ic: 'status/success', is: 16 });
   const cb = await I('20:3205', { Value: 'Unchecked', State: 'Default' }, { Label: 'I confirm these details are accurate and belong to me', 'Show description': true }); cb.name = 'Control/Checkbox — accuracy declaration (unchecked)'; main.appendChild(cb); cb.layoutSizingHorizontal = 'FILL'; await setT(cb, 'Description', 'Giving false information can lead to your verification being refused and your account being closed.');
-  await footer(main, [await BTN('Secondary', 'Back', { size: 'L', lead: 'arrow-left' })], 'Review usually takes under 10 minutes, up to 24 h.', [await BTN('Primary', 'Submit again', { size: 'L', lead: 'check' })]);
+  await footer(main, [await BTN('Secondary', 'Back', { size: 'L', lead: 'arrow-left' })], 'Tick the confirmation to submit. Review usually takes under 10 minutes, up to 24 h.', [await BTN('Primary', 'Submit again', { size: 'L', state: 'Disabled', lead: 'check' })]);
 }
 const f = await shell('AUTH-17 KYC Rejected / 1440 / ' + MODE, 6, d);
 await f.screenshot({ scale: 0.5 });
