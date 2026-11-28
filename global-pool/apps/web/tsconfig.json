@@ -27,11 +27,6 @@
     "incremental": true
   },
   "include": [
-    ".next-account/types/**/*.ts",
-    ".next-admin-a/types/**/*.ts",
-    ".next-admin-b/types/**/*.ts",
-    ".next-auth/types/**/*.ts",
-    ".next-rg-history/types/**/*.ts",
     ".next/types/**/*.ts",
     "e2e/**/*.ts",
     "next-env.d.ts",
