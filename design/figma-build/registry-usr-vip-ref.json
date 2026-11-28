@@ -1,0 +1,136 @@
+{
+ "_note": "Agent usr-vip-ref (USR-V1..V4 VIP + USR-R1..R5 Referrals). NO frames built yet and NO new components: the shared Figma MCP seat was at its tool-call limit for every attempt (27 Nov 2026 22:5x–23:07 UTC, 28 Nov 2026 00:00 UTC). Ready-to-run batched scripts: design/figma-build/pending/usr-vip-ref/out/*.js (run order and details in pending/usr-vip-ref/README.md). Targets: page '05 — User Dashboard' section 'USR-V1..V4 VIP & USR-R1..R5 Referrals' at X=48000,Y=0; page '10 — Mobile Experience' section 'USR — Mobile E' at X=119000,Y=0. Fill in ids from each batch's return value R[].id after running.",
+ "status": "PENDING — scripts prepared, not run",
+ "[USR-V1] VIP — Current Level & Progress / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d1-v1-v2",
+  "status": "pending"
+ },
+ "[USR-V2] VIP — Points & History / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d1-v1-v2",
+  "status": "pending"
+ },
+ "[USR-V3] VIP — Rewards / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d2-v3-default-claimed",
+  "status": "pending"
+ },
+ "[USR-V3] VIP — Rewards / 1440 / Weekly reward claimed": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d2-v3-default-claimed",
+  "status": "pending"
+ },
+ "[USR-V4] VIP — Benefits & Tier Comparison / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d3-v4-r1",
+  "status": "pending"
+ },
+ "[USR-R1] Referrals — Link & Overview / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d3-v4-r1",
+  "status": "pending"
+ },
+ "[USR-R2] Referrals — Statistics / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d4-r2-r3",
+  "status": "pending"
+ },
+ "[USR-R3] Referrals — Invited Users / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d4-r2-r3",
+  "status": "pending"
+ },
+ "[USR-R4] Referrals — Affiliate Earnings / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d5-r4-r5",
+  "status": "pending"
+ },
+ "[USR-R5] Referrals — Payout History / 1440 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d5-r4-r5",
+  "status": "pending"
+ },
+ "[USR-R5] Referrals — Payout History / 1440 / Request payout modal": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d6-r5-modal-locked",
+  "status": "pending"
+ },
+ "[USR-R5] Referrals — Payout History / 1440 / Payout locked — KYC L1 & below minimum (separate DEMO account)": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "d6-r5-modal-locked",
+  "status": "pending"
+ },
+ "[USR-V1] VIP — Current Level & Progress / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m1-v1-v2-v3",
+  "status": "pending"
+ },
+ "[USR-V2] VIP — Points & History / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m1-v1-v2-v3",
+  "status": "pending"
+ },
+ "[USR-V3] VIP — Rewards / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m1-v1-v2-v3",
+  "status": "pending"
+ },
+ "[USR-V4] VIP — Benefits & Tier Comparison / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m2-v4-r1-r2",
+  "status": "pending"
+ },
+ "[USR-R1] Referrals — Link & Overview / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m2-v4-r1-r2",
+  "status": "pending"
+ },
+ "[USR-R2] Referrals — Statistics / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m2-v4-r1-r2",
+  "status": "pending"
+ },
+ "[USR-R3] Referrals — Invited Users / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m3-r3-r4",
+  "status": "pending"
+ },
+ "[USR-R4] Referrals — Affiliate Earnings / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m3-r3-r4",
+  "status": "pending"
+ },
+ "[USR-R5] Referrals — Payout History / 390 / Default": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m4-r5-sheet",
+  "status": "pending"
+ },
+ "[USR-R5] Referrals — Payout History / 390 / Request payout (bottom sheet)": {
+  "id": null,
+  "type": "FRAME",
+  "batch": "m4-r5-sheet",
+  "status": "pending"
+ }
+}

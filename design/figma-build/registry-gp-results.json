@@ -1,0 +1,28 @@
+{
+ "_note": "GP-05/06/07/12 Draw, results & verification (agent key: gp-results). No reusable components were created: every frame is composed from library instances (Shell/Sidebar, Shell/Topbar Desktop/Mobile, Shell/Footer Mega, Jackpot/VRF Stepper, Jackpot/Entry Ticket, Jackpot/Winner Reveal Card, Jackpot/Prize Distribution, Card/Winner, Wallet/Network Pill, Tx/Hash, Input/Text, Control/Toggle, Alert/Banner, Notice/Licence, Badge/*, Button/*, User/Avatar, Nav/Mobile Tab Bar). Entries below are SECTION/FRAME ids for navigation and ledger updates. Desktop: page '07 — Global Pool', section 'GP-05/06/07/12 Draw, results & verification' at X=16000,Y=0. Mobile: page '10 — Mobile Experience', section 'GP — Mobile B' at X=168000,Y=0. Demo-data choice: round #1,248 1st prize = @orbit_77 with entry E-1248-07734 (same entry the Winner Reveal Card uses); runner-ups @lumen.eth E-1248-11502, @atlas_q, @juno88, @sable, @pixelfox, @tidewalker, @quasar_9, @velvet.io, @ember_ray, @northwind; 2nd @mira.sol E-1248-04417; 3rd @kestrel E-1248-16033. Invented DEMO values reused across frames: random word 0x3e8a…b51f, entry snapshot root 0x8c41…d9e3, VRF request tx 0x2d7f…a90c, fulfilment tx 0x71c3…5e28, settlement tx 0x6b0e…41d2.",
+ "Section/GP-05/06/07/12 Draw, results & verification": {
+  "id": "46:16372"
+ },
+ "[GP-05] Round Drawing / 1440 / Drawing — VRF fulfilled, settling": {
+  "id": "46:16373"
+ },
+ "[GP-05] Round Drawing / 1440 / Delayed — VRF response overdue": {
+  "id": "47:17014"
+ },
+ "[GP-06] Round Result — winner view / 1440 / Win — illustrative outcome": {
+  "id": "49:17697"
+ },
+ "[GP-06] Round Result — winner view / 1440 / Not selected": {
+  "id": "53:18291"
+ },
+ "[GP-07] Round Result — public view / 1440 / Default": {
+  "id": "59:18983"
+ },
+ "[GP-12] Provably Fair verification / 1440 / Verified": {
+  "id": "76:20293"
+ },
+ "[GP-12] Provably Fair verification / 1440 / Failed — value mismatch": {
+  "id": "76:21087"
+ },
+ "_pending": "Not built (Figma MCP rate limit, stopped after 3 consecutive failures per conventions §10): page '10 — Mobile Experience' section 'GP — Mobile B' (X=168000,Y=0) frames [GP-05] 390 Drawing + Delayed, [GP-06] 390 Win + Not selected, [GP-07] 390 Default, [GP-12] 390 Verified + Failed; plus hiding the default Input/Text helper text on 76:20293 / 76:21087. Ready batched scripts: scratchpad gp0507/mb1.js, mb2.js, mb3.js."
+}

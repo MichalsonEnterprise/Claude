@@ -1,0 +1,28 @@
+const page = figma.root.children.find(p => p.name === '07 — Global Pool'); await figma.setCurrentPageAsync(page);
+const sec = section('GP-08..11/13 History & edge states', 32000, 0);
+const NAME = '[GP-09] Round Detail / 1440 / Default — settled (#1,244)';
+const old = sec.children.find(c => c.name === NAME); if (old) old.remove();
+const { f, main } = await shell(NAME, 'Global Pool', 1680, colY(1680));
+const top = row('Breadcrumb + actions', { justify: 'SPACE_BETWEEN' });
+const acts = row('Actions', { gap: 8 }); add(acts, await BTN('Primary', 'Verify this draw', { lead: 'shield-check' }), await BTN('Secondary', 'Settlement on explorer', { lead: 'external-link' }));
+add(top, await crumbs(['Global Pool', 'Round history', 'Round #1,244']), acts); add(main, [top, 'FILL']);
+add(main, [await subnav('Round history'), 'FILL']);
+const rh = await I(C.RH, { Status: 'Settled' }); await O(rh, { '~#1,248': '#1,244', '~186,400.00': '181,030.00', '~3,412': '3,287', '~18,640': '18,103', '~27 Nov 2026': '23 Nov 2026' }, 'rh'); add(main, [rh, 'FILL']);
+const ra = row('Row — distribution & winners', { gap: 24, align: 'MIN' });
+const pd = await I(C.PD); await O(pd, { '~#1,248': '#1,244', '~186,400.00': '181,030.00', '~93,200.00': '90,515.00', '~37,280.00': '36,206.00', '~18,640.00': '18,103.00', '~3,728.00': '3,620.60', '~932.00': '905.15' }, 'pd');
+const wl = card('Card — Winners', { gap: 12 }); add(wl, [await ttl('13 winning entries', { right: [await T('Drawn 23 Nov 2026, 20:00:39 UTC', 'Caption', 'text/tertiary')] }), 'FILL']);
+const W = [['1st', '@kestrel', 'E-1244-03318', '90,515.00'], ['2nd', '@lumen.eth', 'E-1244-15027', '36,206.00'], ['3rd', '@atlas_q', 'E-1244-08861', '18,103.00'], ['Runner-up', '@nova.k (you)', 'E-1244-11817', '3,620.60'], ['Runner-up', '@juno88', 'E-1244-00412', '3,620.60'], ['Runner-up', '@sable', 'E-1244-17790', '3,620.60'], ['Runner-up', '8 more runners-up', '@pixelfox, @tidewalker, @quasar_9 …', '3,620.60 each']];
+for (const [t, h, e, a] of W) { const r = row('Winner ' + h, { gap: 12, p: [8, 12, 8, 12], r: 10, fill: h.includes('you') ? 'surface/selected' : undefined }); const tag = AL('HORIZONTAL', { name: 'Tier', p: [2, 8, 2, 8], r: 9999, fill: t === 'Runner-up' ? 'surface/raised' : 'accent/gold-tint' }); add(tag, await T(t, 'Label/S', t === 'Runner-up' ? 'text/secondary' : 'text/gold')); const lc = col('Who', { gap: 2 }); add(lc, await T(h, 'Body/S Strong', 'text/primary'), await T(e, e.startsWith('E-') ? 'Mono/S' : 'Caption', 'text/tertiary')); add(r, tag, [lc, 'FILL'], await T(a + (a.includes('each') ? '' : ' USDT'), 'Number/S', 'text/gold'), await DEMO('XS')); add(wl, [r, 'FILL']); }
+add(ra, pd, [wl, 'FILL']); add(main, [ra, 'FILL']);
+const rb = row('Row — VRF & you', { gap: 24, align: 'MIN' });
+const vrf = await I(C.VRF, { Step: 'Settled' }); await O(vrf, { '~#1,248': '#1,244', '~0x9f2c…e71a': '0x51d8…a4c3', '~20:00:41': '20:00:39', '~20:02:10': '20:02:05' }, 'vrf');
+const yc = card('Card — Your result'); add(yc, [await ttl('Your result in #1,244'), 'FILL']);
+const amt = row('Prize', { gap: 8 }); const pt = await T('+3,620.60 USDT', 'Number/L', 'accent/gold'); await gfill(pt, 'Gradient/Gold Jackpot'); add(amt, pt, await badge('Confirmed', 'Settled to Available'));
+add(yc, amt);
+for (const [k, v] of [['Your entries', '20 · E-1244-11803 … E-1244-11822'], ['Winning entry', 'E-1244-11817 · runner-up (2%)'], ['Paid for entries', '201.00 USDT (200.00 + 1.00 fee)'], ['Credited', '23 Nov 2026, 20:02 UTC']]) add(yc, [await lv(k, v, { w: 400 }), 'FILL']);
+add(yc, [await T('Winners are mapped from the VRF random words by the GlobalPool contract — anyone can re-run the mapping with the verifier.', 'Body/S', 'text/secondary', { w: 440 }), 'FILL'], await BTN('Ghost', 'Open the verifier', { size: 'S', trail: 'arrow-right' }));
+add(rb, vrf, [yc, 'FILL']); add(main, [rb, 'FILL']);
+await foot(main);
+fitSection(sec);
+await f.screenshot({ scale: 0.5 });
+return { id: f.id, h: Math.round(f.height), MISS: MISS.slice(0, 30), rt: rh.findAll(x => x.type === 'TEXT').map(t => t.characters.slice(0, 40)).slice(0, 22) };

@@ -1,0 +1,27 @@
+{
+ "_note": "Agent mob-patterns (MOB-01/02/10/12). NOTHING BUILT YET: every use_figma call hit the Figma MCP seat limit (3 consecutive limit errors, 27 Nov 2026 ~23:50), so no section, frame or component ids exist. Ready-to-run scripts (helpers.js verbatim, <50k chars, idempotent, run in order 01→10): design/figma-build/pending/mob-patterns/mob-01.js … mob-10.js. Target: page '10 — Mobile Experience', section 'MOB-01/02/10/12 Mobile patterns' created at X=224000, Y=0 (X=96000 would overlap 'USR — Mobile B' at X=98000). No new library components are created by these scripts; inline pieces (mobile tx card, entry round card, tablet top bar, tab-item Pressed/Focus spec cells, mobile hero banner) are documented as component gaps.",
+ "frames_planned": [
+  "[MOB-01] Public header / 390 / Guest — menu closed",
+  "[MOB-01] Full-screen menu / 390 / Guest — menu open",
+  "[MOB-01] Public header / 390 / Member — menu closed",
+  "[MOB-01] Full-screen menu / 390 / Member — menu open",
+  "[MOB-01] Public header / 390 / Restricted region (United States)",
+  "[MOB-01] Spec — Header & full-screen menu / Board",
+  "[MOB-02] Tab bar — Home active / 390 / Member",
+  "[MOB-02] Tab bar — Pool active / 390 / Member",
+  "[MOB-02] Tab bar — Games active / 390 / Member",
+  "[MOB-02] Tab bar — Wallet active / 390 / Member",
+  "[MOB-02] Tab bar — Account active / 390 / Member",
+  "[MOB-02] Spec — Bottom tab bar states & rules / Board",
+  "[MOB-10] Transactions — cards / 390 / Default",
+  "[MOB-10] Transactions — card detail / 390 / Bottom sheet — WD-20931 under review",
+  "[MOB-10] Entries — cards / 390 / Default",
+  "[MOB-10] Entries — cards / 390 / Loading (skeleton cards)",
+  "[MOB-10] Spec — Table → card mapping / Board",
+  "[MOB-12] Tablet behaviour sheet / Board",
+  "[MOB-12] Tablet 768 — Navigation / 768 / Drawer closed (lobby)",
+  "[MOB-12] Tablet 768 — Navigation / 768 / Drawer open",
+  "[MOB-12] Tablet 768 — Tables / 768 / Horizontal scroll with pinned column",
+  "[MOB-12] Tablet 768 — Modals / 768 / Centred modal (participation preview)"
+ ]
+}

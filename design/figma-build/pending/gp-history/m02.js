@@ -1,0 +1,26 @@
+const page = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(page);
+const sec = section('GP — Mobile C', 175000, 0);
+const NAME = '[GP-08] Round History / 390 / Filters (bottom sheet)';
+const old = sec.children.find(c => c.name === NAME); if (old) old.remove();
+const { f, main } = await mshell(NAME, 120, colY(120), { h: 844 });
+add(main, [await mhead('Global Pool', 'Round history', 'Every round with its pool, result and proof.'), 'FILL']);
+add(main, [await mtabs('Round history'), 'FILL']);
+const tb = row('Search + filter', { gap: 8 }); const s = await I(C.SRCH, { Size: 'M', State: 'Default' }, { 'Show shortcut': false }); await O(s, { 'Value text': 'Round # or request ID' }, 'srch'); add(tb, [s, 'FILL']); const fb = await I(C.FBTN, { State: 'Active' }, { Label: 'Filters' }); setP(nest(fb, 'Count'), { Count: '3' }, 'fc'); add(tb, fb); add(main, [tb, 'FILL']);
+add(main, [await I(C.CR, { Status: 'Settled' }), 'FILL']);
+const scrim = rect(390, 844, 'scrim/overlay', 0, 'Scrim'); f.appendChild(scrim); scrim.layoutPositioning = 'ABSOLUTE'; scrim.x = 0; scrim.y = 0;
+const sh = AL('VERTICAL', { name: 'Bottom sheet — Filter rounds (inline; Sheet/Bottom content is fixed)', fill: 'surface/overlay', stroke: 'border/subtle', w: 390 }); sh.primaryAxisSizingMode = 'AUTO'; for (const c of ['topLeftRadius', 'topRightRadius']) sh.setBoundVariable(c, VAR['radius/2xl']); await fx(sh, 'Elevation/4 — Modal');
+const gr = AL('HORIZONTAL', { name: 'Grabber', p: [8, 0, 4, 0], justify: 'CENTER' }); add(gr, rect(36, 4, 'border/strong', 9999, 'Handle')); add(sh, [gr, 'FILL']);
+const hd = row('Sheet header', { p: [8, 16, 8, 16] }); add(hd, await T('Filter rounds', 'Heading/H5', 'text/primary'), [spacer(), 'FILL'], await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS.x })); add(sh, [hd, 'FILL']);
+const bd = col('Sheet body', { gap: 20, p: [8, 16, 16, 16] });
+async function grp(label, kids, wrap) { const g = col('Group ' + label, { gap: 8 }); add(g, await T(label, 'Overline', 'text/tertiary')); const k = AL(wrap ? 'HORIZONTAL' : 'VERTICAL', { name: 'Options', gap: wrap ? 8 : 12, wrap: !!wrap, cgap: 8 }); for (const x of kids) add(k, x); add(g, [k, 'FILL']); add(bd, [g, 'FILL']); }
+await grp('Status', [await I(C.CHIP, { State: 'Default' }, { Label: 'Open', 'Show icon': false }), await I(C.CHIP, { State: 'Default' }, { Label: 'Drawing', 'Show icon': false }), await I(C.CHIP, { State: 'Selected' }, { Label: 'Settled', 'Show icon': false }), await I(C.CHIP, { State: 'Selected' }, { Label: 'Cancelled', 'Show icon': false })], true);
+await grp('My participation', [await I(C.RAD, { Selected: 'No', State: 'Default' }, { Label: 'All rounds', 'Show description': false }), await I(C.RAD, { Selected: 'Yes', State: 'Default' }, { Label: 'Rounds I entered', 'Show description': false }), await I(C.RAD, { Selected: 'No', State: 'Default' }, { Label: 'Rounds I won a prize in', 'Show description': false })]);
+const dr = await I(C.DR, { State: 'Default' }, { Label: 'Round date' }); await O(dr, { '~20–27 Nov 2026': '23–25 Nov 2026' }, 'dr');
+await grp('Round date', [dr]); dr.layoutSizingHorizontal = 'FILL';
+add(sh, [bd, 'FILL']);
+const ft = AL('HORIZONTAL', { name: 'Sheet footer (sticky)', p: [12, 16, 12, 16], gap: 8 }); strokeSides(ft, 'border/subtle', { t: 1 }); const r1 = await BTN('Secondary', 'Reset', { size: 'L' }); const r2 = await BTN('Primary', 'Show 3 rounds', { size: 'L' }); add(ft, r1, [r2, 'FILL']); add(sh, [ft, 'FILL']);
+const hi = AL('HORIZONTAL', { name: 'Home indicator', p: [8, 0, 8, 0], justify: 'CENTER' }); add(hi, rect(134, 5, 'text/primary', 9999, 'Indicator')); add(sh, [hi, 'FILL']);
+f.appendChild(sh); sh.layoutPositioning = 'ABSOLUTE'; sh.x = 0; sh.y = 844 - sh.height;
+fitSection(sec);
+await f.screenshot({ scale: 0.5 });
+return { id: f.id, h: Math.round(f.height), sheetH: Math.round(sh.height), MISS: MISS.slice(0, 30) };

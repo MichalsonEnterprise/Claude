@@ -1,0 +1,31 @@
+{
+ "_note": "USR-F1..F6 Financial history (agent key: usr-finance). No new library components were created: every screen is composed from existing instances (Shell/Sidebar Expanded/Member with 'Transactions' active, Shell/Topbar Desktop Member, Nav/Breadcrumb, Tabs/Underline, Card/Balance, Card/Stat (sparkline + delta chip hidden, used as a KPI tile), Table/Toolbar, Table/Header Cell, Table/Cell, Table/Empty State, Pagination, Tx/Hash, Wallet/Confirmations Progress, Nav/Step Item, Alert/Banner, Banner/Promo, Strip/Networks, Widget/Rakeback, Widget/Cashback, Card/Mission, Card/Round, Chart/Timeline, Menu/Filter, Notice/Licence, Badge/18+). Entries below are SCREEN FRAMES (type FRAME). Desktop: page '05 — User Dashboard', section 'USR-F1..F6 Financial history' (56:44838) at X=36000, Y=0 — flow columns F1..F6 at x = 120 + i*1560, states stacked below. Mobile: page '10 — Mobile Experience', section 'USR — Mobile D' at X=112000, Y=0.",
+ "Section/USR-F1..F6 Financial history": {
+  "id": "56:44838",
+  "type": "SECTION"
+ },
+ "[USR-F1] Deposits / 1440 / Default": {
+  "id": "56:44839",
+  "type": "FRAME"
+ },
+ "[USR-F1] Deposits / 1440 / Filters": {
+  "id": "62:45877",
+  "type": "FRAME"
+ },
+ "[USR-F1] Deposits / 1440 / Empty — new DEMO account (no deposits)": {
+  "id": "69:104709",
+  "type": "FRAME"
+ },
+ "[USR-F2] Withdrawals / 1440 / Default": {
+  "id": "72:48152",
+  "type": "FRAME"
+ },
+ "[USR-F3] Fees / 1440 / Default": {
+  "id": "74:49145",
+  "type": "FRAME"
+ },
+ "[USR-F4] Rewards / 1440 / Default": {
+  "id": "86:49985",
+  "type": "FRAME"
+ }
+}

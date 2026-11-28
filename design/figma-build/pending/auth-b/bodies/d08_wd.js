@@ -1,0 +1,5 @@
+for (const [MODE, ST2] of [['Default', 'Default'], ['Wrong code', 'Error'], ['Locked', 'Locked']]) { const { sec, fr, db, X } = await START('AUTH-08 2FA Challenge — Withdrawal / 1440 / ' + MODE, 4);
+const bg = await LOBBYBG(fr, db, { label: 'withdraw page (step 7 of 9) behind Modal/2FA', content: WDPAGE });
+const m = await MODAL(fr, bg, '25:16745', { State: ST2 }, { dx: 120 });
+if (MODE === 'Locked') { const n = COL('Context — what happens to the withdrawal', [], { gap: 10, p: [16, 18, 16, 18], fill: 'surface/overlay', stroke: 'border/subtle', r: 14, w: 300 }); await fx(n, 'Elevation/3 — Popover'); add(n, [ROW('Head', [await IC('lock', 16, 'balance/locked'), await T('WD-20931 is on hold, not cancelled', 'Label/M', 'text/primary')], { gap: 8 }), 'FILL']); add(n, await P('1,500.00 USDT stays in Locked until you confirm or cancel. Nothing is sent without a valid code. Cancelling returns it to Available straight away.', 'Caption', 'text/secondary')); add(n, await DEMO('XS')); await FLOAT(fr, n, m.x - 300 - 24, m.y + 24); }
+OUT.push(await FINISH(sec, fr, X)); }

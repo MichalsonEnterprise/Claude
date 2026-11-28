@@ -1,0 +1,21 @@
+const NAME = '[USR-RG5] Reality Checks / 390 / Settings';
+const old = byName(sec, NAME); if (old) old.remove();
+const S = await shellM(NAME, 'Reality checks', { title: 'Reality checks', sub: 'A regular reminder of your time played and net result.' });
+const C = S.C; const W = 358;
+const iv = card('Card — Interval', { gap: 12, p: 16 }); add(C, [iv, 'FILL']);
+const ivh = AL('HORIZONTAL', { name: 'Header', gap: 12, align: 'CENTER' }); add(iv, [ivh, 'FILL']); add(ivh, [await T('Remind me every', 'Heading/H5', 'text/primary'), 'FILL']); ivh.appendChild(await chip('check-circle', 'On', 'success'));
+const chips = AL('HORIZONTAL', { name: 'Interval options', gap: 8, wrap: true, cgap: 8 }); add(iv, [chips, 'FILL']);
+for (const v of ['15 min', '30 min', '45 min', '60 min', '90 min', '120 min']) { const c = await I('17:2766', { State: v === '60 min' ? 'Selected' : 'Default' }, { Label: v }); c.name = 'Interval — ' + v; chips.appendChild(c); }
+const nx = AL('HORIZONTAL', { name: 'Next', gap: 8, align: 'CENTER', p: 12, fill: 'surface/raised', r: 10 }); add(iv, [nx, 'FILL']); nx.appendChild(await IC('clock', 16, 'icon/muted')); add(nx, [await T('Next reminder 17:00 UTC (session began 16:00 UTC)', 'Caption', 'text/secondary', { w: 260 }), 'FILL']); nx.appendChild(await DEMO('XS'));
+const sh = card('Card — Shows', { gap: 12, p: 16 }); add(C, [sh, 'FILL']); sh.appendChild(await T('Each reminder shows', 'Heading/H5', 'text/primary'));
+add(sh, [await bullet('timer', 'Time played this session', null, W - 32), 'FILL']);
+add(sh, [await bullet('activity', 'Net result this session (always shown)', null, W - 32), 'FILL']);
+add(sh, [await bullet('pause-circle', 'Continue · View history · Take a break — equal choices', null, W - 32), 'FILL']);
+const t1 = await I('20:3309', { On: 'Yes', State: 'Default' }, { Label: 'Pause the game until I respond', Description: 'The round in progress finishes first.', 'Show description': true }); add(sh, [t1, 'FILL']);
+const t2 = await I('20:3309', { On: 'No', State: 'Default' }, { Label: 'Also send a push notification', Description: 'Only when the app is in the background.', 'Show description': true }); add(sh, [t2, 'FILL']);
+const help = await I('24:14743'); add(C, [help, 'FILL']);
+await licM(C);
+await endM(S, { cta: [await BTN('Secondary', 'Preview a reminder', { size: 'L', lead: 'eye' })] });
+await placeM(S.f, sec, 2160, 160);
+await S.f.screenshot({ scale: 0.5 });
+return { frame: S.f.id, name: NAME, h: Math.round(S.f.height) };

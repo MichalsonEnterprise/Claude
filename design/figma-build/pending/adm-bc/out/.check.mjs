@@ -57,7 +57,7 @@ async function I(id, variant = {}, props = {}) {
 function tint(node, color) { for (const v of node.findAll(x => x.type === 'VECTOR' || x.type === 'ELLIPSE' || x.type === 'RECTANGLE' || x.type === 'BOOLEAN_OPERATION')) { if (v.strokes && v.strokes.length) v.strokes = [paint(color)]; if (v.fills && v.fills.length) v.fills = [paint(color)]; } return node; }
 // screen(name, width, {x, y, mode:'Dark', bp:'Desktop 1440'|..., grid:true, fill}) -> vertical auto-layout frame, fixed width, hug height
 async function screen(name, w, o = {}) {
-  const f = figma.createAutoLayout('VERTICAL'); f.name = name; f.resize(w, o.h || 800); f.counterAxisSizingMode = 'FIXED'; if (o.h) f.primaryAxisSizingMode = 'FIXED';
+  const f = figma.createAutoLayout('VERTICAL'); f.name = name; f.resize(w, o.h || 800); f.counterAxisSizingMode = 'FIXED'; f.primaryAxisSizingMode = o.h ? 'FIXED' : 'AUTO'; // AUTO = hug content height (resize() resets it to FIXED)
   fill(f, o.fill || 'bg/base'); f.clipsContent = true;
   const bpName = o.bp || (w >= 1440 ? 'Desktop 1440' : w >= 1280 ? 'Laptop 1280' : w >= 768 ? 'Tablet 768' : 'Mobile 390');
   const bc = __COLS['Breakpoint']; const bm = bc.modes.find(m => m.name === bpName); if (bm) f.setExplicitVariableModeForCollection(bc, bm.modeId);
@@ -100,7 +100,6 @@ async function setTany(r, names, v) { for (const nm of names) { const t = r.find
 async function setTs(r, m) { for (const [k, v] of Object.entries(m)) await setT(r, k, v); }
 function setP(inst, base, val) { if (!inst || inst.type !== 'INSTANCE') return false; try { const k = Object.keys(inst.componentProperties).find(x => x.split('#')[0] === base); if (!k) { MISS.push('P:' + base); return false; } inst.setProperties({ [k]: val }); return true; } catch (e) { MISS.push('P:' + base + ' ' + String(e.message).slice(0, 40)); return false; } }
 async function ST(status, label, size = 'S') { const b = await BADGE(status, size); if (label) await setT(b, 'Label', label); return b; }
-async function TX(s, style = 'Body/S', color = 'text/primary', w) { return await T(s, style, color, w ? { w } : {}); }
 async function WT(parent, s, style = 'Body/S', color = 'text/secondary', w = 400) { const t = await T(s, style, color, { w }); add(parent, [t, 'FILL']); return t; }
 // ---------- admin shell ----------
 const GROUPS = [['Overview', 'dashboard'], ['User Management', 'users'], ['Finance', 'coins'], ['Game Management', 'games'], ['Global Pool Management', 'pool'], ['Blockchain Management', 'layers'], ['Compliance', 'shield-check'], ['Affiliate Management', 'percent'], ['Marketing', 'megaphone'], ['System', 'settings']];
@@ -154,12 +153,13 @@ async function HEAD(c, crumbs, title, sub, o = {}) {
   if (sub) await WT(top, sub, 'Body/S', 'text/secondary', 900);
   add(c, [top, 'FILL']); return top;
 }
-function CARD(name, o = {}) { return AL(o.dir || 'VERTICAL', { name, gap: o.gap ?? 16, p: o.p ?? 20, fill: o.fill || 'surface/default', stroke: o.stroke || 'border/subtle', r: o.r ?? 14, align: o.align }); }
+function ALW(dir, o) { const f = AL(dir, o); if (o.w && !o.h) { if (dir === 'VERTICAL') f.primaryAxisSizingMode = 'AUTO'; else f.counterAxisSizingMode = 'AUTO'; } if (o.h && !o.w) { if (dir === 'VERTICAL') f.counterAxisSizingMode = 'AUTO'; else f.primaryAxisSizingMode = 'AUTO'; } return f; }
+function CARD(name, o = {}) { return ALW(o.dir || 'VERTICAL', { name, gap: o.gap ?? 16, p: o.p ?? 20, fill: o.fill || 'surface/default', stroke: o.stroke || 'border/subtle', r: o.r ?? 14, align: o.align, w: o.w }); }
 async function CHEAD(card, title, o = {}) { const r = AL('HORIZONTAL', { name: 'Card header', gap: 8, align: 'CENTER' }); if (o.icon) add(r, await IC(o.icon, 20, o.ic || 'icon/muted')); add(r, await T(title, o.style || 'Heading/H5', 'text/primary')); for (const b of (o.badges || [])) add(r, b); add(r, [SPC(), 'FILL']); if (o.demo !== false) add(r, await DEMO(o.demoSize || 'S')); for (const b of (o.right || [])) add(r, b); add(card, [r, 'FILL']); if (o.sub) await WT(card, o.sub, 'Caption', 'text/tertiary', 300); return r; }
 async function KV(parent, k, v, o = {}) { const r = AL('HORIZONTAL', { name: 'KV ' + k, gap: 12, align: 'CENTER', p: o.line ? [8, 0, 8, 0] : 0 }); add(r, await T(k, 'Body/S', 'text/tertiary')); add(r, [SPC(), 'FILL']); if (o.node) add(r, o.node); else add(r, await T(v, o.style || 'Body/S Strong', o.color || 'text/primary')); add(parent, [r, 'FILL']); if (o.line) strokeSides(r, 'border/subtle', { b: 1 }); return r; }
 const TONE = { warning: ['status/warning-tint', 'status/warning'], danger: ['status/danger-tint', 'status/danger'], info: ['status/info-tint', 'status/info'], success: ['status/success-tint', 'status/success'], neutral: ['surface/raised', 'icon/muted'], brand: ['brand/tint-subtle', 'icon/brand'] };
 async function NOTE(parent, icon, tone, text, o = {}) { const F = TONE[tone]; const r = AL('HORIZONTAL', { name: 'Callout — ' + (o.title || tone), gap: 12, p: [12, 16, 12, 16], fill: F[0], r: 10, align: o.actions ? 'CENTER' : undefined }); add(r, await IC(icon, 18, F[1])); const col = AL('VERTICAL', { name: 'Text', gap: 2 }); if (o.title) add(col, await T(o.title, 'Body/S Strong', 'text/primary')); await WT(col, text, 'Body/S', 'text/secondary', o.w || 400); add(r, [col, 'FILL']); for (const b of (o.actions || [])) add(r, b); add(parent, [r, 'FILL']); return r; }
-async function KPI(trend, label, value, unit, delta, def) { const k = await I('23:15270', { Trend: trend }); await setTs(k, { Label: label, Value: value, Unit: unit, 'Delta value': delta, Definition: def }); k.name = 'Admin/KPI Tile — ' + label; return k; }
+async function KPI(trend, label, value, unit, delta, def, ctx) { const k = await I('23:15270', { Trend: trend }); await setTs(k, { Label: label, Value: value, Unit: unit, 'Delta value': delta, Definition: def }); if (ctx) { const t = k.findOne(n => n.type === 'TEXT' && /^vs /.test(n.characters)); if (t) await setText(t, ctx); } k.name = 'Admin/KPI Tile — ' + label; return k; }
 async function ROW(parent, kids, o = {}) { const r = AL('HORIZONTAL', { name: o.name || 'Row', gap: o.gap ?? 16, align: o.align }); for (const k of kids) { if (Array.isArray(k)) add(r, k); else add(r, [k, 'FILL']); if (o.spark) { const kk = Array.isArray(k) ? k[0] : k; const sp = kk.findOne && kk.findOne(n => n.name === 'Sparkline'); if (sp) { try { sp.layoutSizingHorizontal = 'FILL'; } catch (e) { MISS.push('spark'); } } } } add(parent, [r, 'FILL']); return r; }
 async function TABS(parent, tabs, active) { const r = AL('HORIZONTAL', { name: 'Tabs', gap: 0 }); strokeSides(r, 'border/subtle', { b: 1 }); for (const [l, cnt] of tabs) { const t = await I('20:6831', { State: l === active ? 'Active' : 'Default' }, { Label: l, 'Show count': !!cnt }); if (cnt) { const c = findI(t, 'Count') || byMain(t, 'Badge/Count'); if (c) setP(c, 'Count', cnt); } add(r, t); } add(parent, [r, 'FILL']); return r; }
 async function CHIP(l, sel, icon) { const p = { Label: l, 'Show icon': !!icon }; if (icon) p.Icon = ICONS[icon] || CHAINS[icon]; return await I('17:2766', { State: sel ? 'Selected' : 'Default' }, p); }
@@ -209,46 +209,84 @@ async function TABLE(parent, name, cols, rows, o = {}) {
 function C(...n) { return { T: 'custom', n }; }
 function CR(...n) { return { T: 'custom', n, right: 1 }; }
 async function TH(title, o = {}) { const h = AL('HORIZONTAL', { name: 'Table title', gap: 8, p: [14, 16, 14, 16], align: 'CENTER' }); strokeSides(h, 'border/subtle', { b: 1 }); add(h, await T(title, 'Heading/H5', 'text/primary')); for (const b of (o.badges || [])) add(h, b); add(h, [SPC(), 'FILL']); if (o.meta) add(h, await T(o.meta, 'Caption', 'text/tertiary')); add(h, await DEMO('M')); for (const b of (o.right || [])) add(h, b); return h; }
-async function PAGER(type, range) { const p = await I('23:16756', { Type: type }); if (range) await setT(p, 'Range', range); return p; }
+function PAGEFIX(p, per, last) { if (!p) return; if (per) { const b = p.findOne(n => n.type === 'INSTANCE' && n.name.startsWith('Button/Secondary')); if (b) setP(b, 'Label', String(per)); } if (last) { for (let k = 1; k <= 5; k++) { const it = findI(p, 'Page ' + k); if (it && k > last) it.visible = false; } const g = p.findOne(n => n.name === 'Gap'); if (g) g.visible = last > 6; const lp = findI(p, 'Page 65'); if (lp) { if (last > 5) setP(lp, 'Page', String(last)); else lp.visible = false; } } }
+async function PAGER(type, range, per, last) { const p = await I('23:16756', { Type: type }); if (range) await setT(p, 'Range', range); PAGEFIX(p, per, last); return p; }
 async function MONO(s, c = 'text/primary') { return await T(s, 'Mono/S', c); }
 async function ICT(icon, color, s, tc = 'text/primary', st = 'Body/S') { const r = AL('HORIZONTAL', { name: 'Icon text — ' + String(s).slice(0, 24), gap: 6, align: 'CENTER' }); add(r, await IC(icon, 16, color), await T(s, st, tc)); return r; }
 async function PILL(chain, status, label) { const p = await I('9:377', { Chain: chain, Status: status }, { 'Show status label': label !== false, 'Show chevron': false }); return p; }
 async function BAR(pct, color = 'brand/primary', w = 120) { const r = AL('HORIZONTAL', { name: 'Bar ' + pct + '%', w, h: 6, fill: 'surface/hover', r: 9999, clip: true }); const b = rect(Math.max(2, Math.round(w * pct / 100)), 6, color, 9999, 'Fill'); add(r, b); return r; }
 async function STEPS(parent, steps) { const r = AL('VERTICAL', { name: 'Timeline', gap: 0 }); for (let i = 0; i < steps.length; i++) { const [state, t1, t2] = steps[i]; const row = AL('HORIZONTAL', { name: 'Step ' + (i + 1), gap: 12 }); const rail = AL('VERTICAL', { name: 'Rail', gap: 4, align: 'CENTER' }); const col = { done: 'status/success', now: 'status/info', next: 'border/strong', bad: 'status/danger', warn: 'status/warning' }[state]; add(rail, await IC(state === 'done' ? 'check-circle' : state === 'bad' ? 'x-circle' : state === 'warn' ? 'alert-triangle' : state === 'now' ? 'clock' : 'hourglass', 18, col)); if (i < steps.length - 1) { const ln = rect(2, 24, 'border/default', 0, 'Line'); add(rail, ln); } add(row, rail); const tx = AL('VERTICAL', { name: 'Text', gap: 2, p: [0, 0, 12, 0] }); add(tx, await T(t1, 'Body/S Strong', state === 'next' ? 'text/tertiary' : 'text/primary')); if (t2) await WT(tx, t2, 'Caption', 'text/tertiary', 300); add(row, [tx, 'FILL']); add(r, [row, 'FILL']); } add(parent, [r, 'FILL']); return r; }
+async function RISKM(lv, user, factors, outcome) { const m = await I('23:18374', { Level: lv }); for (const t of m.findAll(n => n.type === 'TEXT')) if (t.characters.includes('@nova.k')) await setText(t, t.characters.replace('@nova.k', user)); if (factors) await setT(m, 'Factors text', factors); if (outcome) await setT(m, 'Outcome', outcome); return m; }
+async function TAREA(label, ph, helper) { const ta = await I('16:3858', { State: 'Default' }, { Label: label, 'Show counter': true }); for (const t of ta.findAll(n => n.type === 'TEXT')) { if (t.characters.startsWith('Tell us')) await setText(t, ph); else if (helper && t.characters.startsWith('Never share')) await setText(t, helper); } return ta; }
 async function DONE(f, extra = {}) { fitSection(sec); await f.screenshot({ scale: 0.5 }); return { frame: f.id, name: f.name, w: f.width, h: Math.round(f.height), x: f.x, y: f.y, miss: [...new Set(MISS)].slice(0, 40), ...extra }; }
 // ===== END ADM-BC LIB =====
 
+// ===== ADM-BC tablet + mobile shells =====
+async function TSHELL(name, key, activeLabel) {
+  GUARD(name); const pos = POS('C-768', key);
+  const f = await screen(name, 768, {}); sec.appendChild(f); f.x = pos.x; f.y = pos.y;
+  add(f, [await DEMOBAR(), 'FILL']);
+  const bar = AL('HORIZONTAL', { name: 'Admin Topbar — Tablet (inline)', gap: 8, p: [10, 24, 10, 16], fill: 'bg/secondary', align: 'CENTER' }); strokeSides(bar, 'border/subtle', { b: 1 });
+  add(bar, await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS.menu }));
+  const lm = await I('4:792'); lm.rescale(28 / lm.width); add(bar, lm);
+  const pr = AL('VERTICAL', { name: 'Product', gap: 0 }); add(pr, await T('Admin console', 'Label/L', 'text/primary'), await T('Compliance', 'Caption', 'text/tertiary')); add(bar, pr);
+  const env = AL('HORIZONTAL', { name: 'PROD', p: [2, 8, 2, 8], stroke: 'border/danger', r: 6 }); add(env, await T('PROD', 'Label/S', 'text/danger')); add(bar, env);
+  add(bar, [SPC(), 'FILL']);
+  for (const [ic, cnt] of [['search'], ['user-check', '4'], ['bell', '5']]) { const g = AL('HORIZONTAL', { name: 'Btn ' + ic, gap: 0, align: 'CENTER' }); add(g, await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS[ic] })); if (cnt) { const b = await I('6:216', { Size: 'S' }); setP(b, 'Count', cnt); add(g, b); } add(bar, g); }
+  add(bar, await I('9:238', { Size: 'S' }, { Initials: 'KO' }));
+  add(f, [bar, 'FILL']);
+  const sn = AL('HORIZONTAL', { name: 'Compliance sub-nav (scrolls)', gap: 0, p: [0, 16, 0, 16], fill: 'bg/secondary', clip: true }); strokeSides(sn, 'border/subtle', { b: 1 });
+  for (const [l, cnt] of MODS.C.items) { const t = await I('20:6831', { State: l === activeLabel ? 'Active' : 'Default' }, { Label: l, 'Show count': !!cnt }); if (cnt) { const cc = findI(t, 'Count') || byMain(t, 'Badge/Count'); if (cc) setP(cc, 'Count', cnt); } add(sn, t); }
+  add(f, [sn, 'FILL']);
+  const c = AL('VERTICAL', { name: 'Content', gap: 20, p: [24, 32, 48, 32] }); add(f, [c, 'FILL']);
+  return { f, c };
+}
+function MPOS() { const mine = sec.children.filter(n => /^\[ADM-C[12]\]/.test(n.name)); if (mine.length) return { x: Math.max(...mine.map(n => n.x + n.width)) + 120, y: 160 }; return { x: nextX(sec), y: 160 }; }
+async function MSHELL(name, back) {
+  GUARD(name); const p = MPOS(); const f = await screen(name, 390, {}); sec.appendChild(f); f.x = p.x; f.y = p.y;
+  add(f, [await DEMOBAR(), 'FILL']);
+  const bar = AL('HORIZONTAL', { name: 'Admin Topbar — Mobile', gap: 8, p: [8, 12, 8, 12], fill: 'bg/secondary', align: 'CENTER' }); strokeSides(bar, 'border/subtle', { b: 1 });
+  if (back) { add(bar, await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['arrow-left'] })); add(bar, await T(back, 'Label/L', 'text/primary')); }
+  else { const lm = await I('4:792'); lm.rescale(28 / lm.width); add(bar, lm); add(bar, await T('Admin', 'Label/L', 'text/primary')); const env = AL('HORIZONTAL', { name: 'PROD', p: [2, 8, 2, 8], stroke: 'border/danger', r: 6 }); add(env, await T('PROD', 'Label/S', 'text/danger')); add(bar, env); }
+  add(bar, [SPC(), 'FILL']);
+  const ap = AL('HORIZONTAL', { name: 'Approvals', gap: 2, align: 'CENTER' }); add(ap, await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS['user-check'] })); const bc = await I('6:216', { Size: 'S' }); setP(bc, 'Count', '4'); add(ap, bc); add(bar, ap);
+  add(bar, await I('9:238', { Size: 'S' }, { Initials: 'KO' }));
+  add(f, [bar, 'FILL']);
+  const c = AL('VERTICAL', { name: 'Content', gap: 16, p: [16, 16, 24, 16] }); add(f, [c, 'FILL']);
+  return { f, c };
+}
+async function MTABS(f, active) { const tb = AL('VERTICAL', { name: 'Admin Tab Bar — Mobile', fill: 'bg/secondary' }); strokeSides(tb, 'border/subtle', { t: 1 }); const row = AL('HORIZONTAL', { name: 'Tabs', p: [4, 4, 0, 4] }); for (const [ic, lab, cnt] of [['dashboard', 'Overview'], ['user-check', 'Approvals', '4'], ['id-card', 'KYC', '214'], ['shield-alert', 'Alerts', '23'], ['menu', 'More']]) { const on = lab === active; const t = AL('VERTICAL', { name: 'Tab ' + lab, gap: 4, p: [8, 0, 6, 0], align: 'CENTER' }); const ir = AL('HORIZONTAL', { name: 'Icon', gap: 2, align: 'CENTER' }); add(ir, await IC(ic, 24, on ? 'icon/brand' : 'icon/muted')); if (cnt) { const b = await I('6:216', { Size: 'S' }); setP(b, 'Count', cnt); add(ir, b); } add(t, ir); add(t, await T(lab, 'Label/S', on ? 'text/brand' : 'text/tertiary')); add(row, [t, 'FILL']); } add(tb, [row, 'FILL']); const hi = AL('HORIZONTAL', { name: 'Home indicator', h: 34, align: 'CENTER', justify: 'CENTER' }); add(hi, rect(134, 5, 'text/primary', 9999, 'Indicator')); add(tb, [hi, 'FILL']); add(f, [tb, 'FILL']); return tb; }
+async function STICKY(f, kids, cap) { const s = AL('VERTICAL', { name: 'Sticky action bar', gap: 8, p: [12, 16, 0, 16], fill: 'surface/overlay' }); strokeSides(s, 'border/subtle', { t: 1 }); const r = AL('HORIZONTAL', { name: 'Actions', gap: 8 }); for (const k of kids) add(r, k); add(s, [r, 'FILL']); if (cap) await WT(s, cap, 'Caption', 'text/tertiary', 358); const hi = AL('HORIZONTAL', { name: 'Home indicator', h: 34, align: 'CENTER', justify: 'CENTER' }); add(hi, rect(134, 5, 'text/primary', 9999, 'Indicator')); add(s, [hi, 'FILL']); add(f, [s, 'FILL']); return s; }
+// ===== END ADM-BC tablet + mobile shells =====
+
 const PG = figma.root.children.find(p => p.name === '09 — Admin Panel'); await figma.setCurrentPageAsync(PG);
 const sec = section('ADM-B1..B8 Blockchain & ADM-C1..C7 Compliance', 70000, 0);
-const NAME = '[ADM-C1] KYC Queue / 1440 / Default';
-const { f, c } = await SHELL(NAME, POS('C-1440', 'C1Q'), 'C', 0, 'KO', 'Search KYC ID, user, document number…');
-await HEAD(c, ['Admin', 'Compliance', 'KYC queue'], 'KYC queue', 'Identity checks waiting for a reviewer, ordered by time left on the 48 h SLA. Provider results are advisory — a person makes every decision, and each decision is written to the immutable audit log. All times UTC.', { badges: [await ST('Live', 'Live'), await DEMO('M')], actions: [await BTN('Secondary', 'Review policy KYC-1.4', { size: 'S', lead: 'book' }), await BTN('Primary', 'Start next review', { size: 'S', lead: 'play' })] });
-const qc = await I('23:15571', { Queue: 'KYC', SLA: 'At risk' }); await setT(qc, 'Count', '214');
-await ROW(c, [[qc], await KPI('Up', 'Decisions today', '95', 'cases', '+12%', 'Approved 86 · rejected 9 · since 00:00 UTC'), await KPI('Flat', 'Median time to decision', '6 h 12 min', '', '−18 min', 'Submitted → decision, last 7 days · SLA 48 h')], { spark: 1 });
-await TABS(c, [['All open', '214'], ['Assigned to me', '12'], ['L2 · ID + liveness', '171'], ['L3 · enhanced / source of funds', '31'], ['Restricted country', '12'], ['Decided today', '95']], 'All open');
-await TOOLBAR(c, 'Search KYC ID, user or document number', [['SLA under 12 h · 4', true], ['Provider: needs review', false], ['Risk: medium +', false]], { date: 'Submitted: last 7 days', summary: '214 open cases · showing 10 · sorted by SLA left (ascending)', sort: 'Sort: SLA left ↑' });
-async function checks(a, b, cc) { const r = AL('HORIZONTAL', { name: 'Checks', gap: 8, align: 'CENTER' }); for (const [lab, s] of [['Doc', a], ['Face', b], ['Lists', cc]]) { const ic = s === 1 ? ['check-circle', 'status/success'] : s === 0 ? ['x-circle', 'status/danger'] : s === 2 ? ['alert-triangle', 'status/warning'] : ['minus', 'icon/muted']; const g = AL('HORIZONTAL', { name: lab, gap: 3, align: 'CENTER' }); add(g, await IC(ic[0], 14, ic[1]), await T(lab, 'Caption', 'text/secondary')); add(r, g); } return r; }
-async function sla(s, tone, who) { const st = AL('VERTICAL', { name: 'SLA + assignee', gap: 2 }); const l1 = AL('HORIZONTAL', { name: 'SLA', gap: 4, align: 'CENTER' }); add(l1, await IC('clock', 14, tone === 'danger' ? 'status/danger' : tone === 'warning' ? 'status/warning' : 'icon/muted'), await T(s, 'Body/S Strong', tone === 'danger' ? 'text/danger' : tone === 'warning' ? 'text/warning' : 'text/primary')); add(st, l1, await T(who, 'Caption', who === 'Unassigned' ? 'text/tertiary' : 'text/secondary')); return C(st); }
-async function lvl(l, st = 'Pending') { return C(await I('23:5565', { Status: st, Level: l })); }
-const R = [
-  ['KYC-30365', 'LV', '@lyra_v', 'GP-50604 · Poland', 'L2', [1, 1, 1], 'Low', 8, ['0 h 26 min', 'danger'], 'Unassigned', ['Pending', 'Pending']],
-  ['KYC-30352', 'VI', '@velvet.io', 'GP-49870 · Japan', 'L3', [1, 1, 2], 'Medium', 38, ['1 h 12 min', 'danger'], 'M. Achebe', ['Under review', 'Sanctions check']],
-  ['KYC-30377', 'J8', '@juno88', 'GP-50233 · Brazil', 'L2', [1, 2, 1], 'Medium', 44, ['3 h 05 min', 'warning'], 'Unassigned', ['Pending', 'Pending']],
-  ['KYC-30395', 'CK', '@cobalt.k', 'GP-50961 · Portugal', 'L3', [1, 1, 2], 'High', 71, ['8 h 20 min', 'warning'], 'K. Osei', ['Under review', 'PEP review']],
-  ['KYC-30401', 'RE', '@rook.eth', 'GP-51203 · Austria', 'L2', [1, 1, 1], 'Low', 14, ['13 h 40 min'], 'P. Novak', ['Under review', 'In review']],
-  ['KYC-30412', 'Z2', '@zephyr21', 'GP-51644 · Mexico', 'L2', [0, 1, 1], 'Low', 20, ['22 h 10 min'], 'Unassigned', ['Pending', 'Awaiting user']],
-  ['KYC-30418', 'AQ', '@atlas_q', 'GP-51907 · Germany', 'L2', [1, 1, 2], 'Low', 18, ['26 h 30 min'], 'K. Osei', ['Under review', 'In review']],
-  ['KYC-30426', 'HA', '@halcyon', 'GP-51980 · Spain', 'L2', [1, 1, 1], 'Low', 11, ['27 h 55 min'], 'Unassigned', ['Pending', 'Pending']],
-  ['KYC-30431', 'ER', '@ember_ray', 'GP-52114 · Canada', 'L2', [1, 1, 1], 'Low', 9, ['29 h 48 min'], 'Unassigned', ['Pending', 'Pending']],
-  ['KYC-30440', 'NW', '@northwind', 'GP-52230 · United States', 'L1', [1, 3, 1], 'Low', 15, ['Auto-hold'], 'System', ['Restricted', 'Restricted country']]];
-const rows = [];
-for (const r of R) rows.push([{ T: 'Text', p: r[0], mono: 1 }, { T: 'User', i: r[1], p: r[2], s: r[3] }, await lvl(r[4]), C(await checks(...r[5])), { T: 'Risk', lv: r[6], sc: r[7] }, await sla(r[8][0], r[8][1], r[9]), { T: 'Status', st: r[10][0], p: r[10][1] }, { T: 'Actions' }]);
-await TABLE(c, 'KYC queue', [{ k: 'case', l: 'Case', w: 112 }, { k: 'user', l: 'User · country', w: 'FILL' }, { k: 'level', l: 'Requested', w: 156 }, { k: 'checks', l: 'Provider checks', w: 176 }, { k: 'risk', l: 'Risk', w: 136 }, { k: 'sla', l: 'SLA left · assignee', w: 148, sort: 'Asc' }, { k: 'status', l: 'Status', w: 148 }, { k: 'act', l: '', w: 48 }], rows, { density: 'Comfortable', sel: [6], hideL: ['checks'], head: await TH('Open cases', { meta: 'Updated 18:44 UTC · refreshes every 30 s' }), foot: await PAGER('Numbered', '1–10 of 214') });
-const rules = CARD('Decision rules'); await CHEAD(rules, 'Decision rules · policy KYC-1.4', { icon: 'scale', demo: false });
-for (const [ic, tone, t] of [['check-circle', 'success', 'L2 can be approved by one reviewer when the document is authentic, face match ≥ 90 %, liveness passes and no watchlist hit is open.'], ['users', 'info', 'L3 (enhanced due diligence / source of funds) and any PEP or sanctions hit need a second reviewer from Compliance — four-eyes.'], ['globe', 'warning', 'Residence in a restricted country blocks onboarding automatically. The user keeps withdraw-only access and is told why.']]) await NOTE(rules, ic, tone, t, { w: 420 });
-const rec = CARD('Recent decisions'); await CHEAD(rec, 'Recent decisions', { icon: 'history', right: [await BTN('Ghost', 'Audit log', { size: 'S', trail: 'arrow-right' })] });
-for (const [t, a, who, st, lab] of [['18:31', 'KYC-30409 · @maple.q', 'K. Osei', 'Approved', 'Approved L2'], ['18:12', 'KYC-30388 · @fenwick', 'P. Novak', 'Rejected', 'Rejected — document expired'], ['17:58', 'KYC-30402 · @sora_v', 'M. Achebe + K. Osei', 'Approved', 'Approved L3 · four-eyes']]) { const r = AL('HORIZONTAL', { name: 'Decision ' + a, gap: 12, align: 'CENTER', p: [10, 0, 10, 0] }); strokeSides(r, 'border/subtle', { b: 1 }); add(r, await T(t, 'Mono/S', 'text/tertiary')); const col = AL('VERTICAL', { name: 'Who', gap: 2 }); add(col, await T(a, 'Body/S Strong', 'text/primary'), await T('by ' + who, 'Caption', 'text/tertiary')); add(r, [col, 'FILL']); add(r, await ST(st, lab)); add(rec, [r, 'FILL']); }
-await ROW(c, [rules, rec], { gap: 24 });
+const NAME = '[ADM-C2] AML Alerts / 768 / Default';
+const { f, c } = await TSHELL(NAME, 'C2', 'AML alerts');
+const tr = AL('HORIZONTAL', { name: 'Title row', gap: 8, align: 'CENTER' }); add(tr, await T('AML alerts', 'Heading/H3', 'text/primary'), await ST('Live', 'Live'), await DEMO('M')); add(tr, [SPC(), 'FILL']); add(tr, await BTN('Primary', 'Take next alert', { size: 'S', lead: 'play' })); add(c, [tr, 'FILL']);
+await WT(c, 'Rules raise alerts; a person decides. Closing needs a written reason, escalation opens a suspicious-transaction case, and holds go through Account restrictions (reason + 2FA + four-eyes).', 'Body/S', 'text/secondary', 704);
+await ROW(c, [await KPI('Flat', 'Open alerts', '23', 'alerts', '+3 today', 'High 4 · medium 11 · low 8 · 1 past SLA', 'vs yesterday'), await KPI('Up', 'Alerts closed (7 days)', '142', 'alerts', '+9.2%', 'Median time to close 9 h 40 min', 'vs previous 7 d')], { spark: 1 });
+const tb = AL('HORIZONTAL', { name: 'Controls', gap: 8, align: 'CENTER' }); add(tb, [await SEARCH('Search alert, user, WD-/DP- ID or hash', 'M'), 'FILL']); add(tb, await I('23:5397', { State: 'Default' }, { Label: 'Filters' })); add(c, [tb, 'FILL']);
+const chips = AL('HORIZONTAL', { name: 'Quick filters (scroll)', gap: 8, clip: true }); for (const [l, s] of [['Open · 23', 1], ['Assigned to me · 6', 0], ['High · 4', 0], ['Past SLA · 1', 0], ['Escalated · 2', 0]]) add(chips, await CHIP(l, s)); add(c, [chips, 'FILL']);
+const grid = AL('HORIZONTAL', { name: 'Alert cards (2 columns)', gap: 16, wrap: 1, cgap: 16 }); add(c, [grid, 'FILL']);
+const A = [['AML-5509', 'KE', '@kestrel', 'Sanctions proximity · 1 hop', 'WD-20952', 'High', 86, '12,400.00', ['Under review', 'Escalated · STR-0093'], ['Case open', null]], ['AML-5530', 'SA', '@sable', 'Mixer exposure · 2 hops', 'WD-20960', 'High', 72, '4,800.00', ['Under review', 'In review'], ['2 h 10 min left', 'warning']], ['AML-5528', 'TW', '@tidewalker', 'Rapid in-out · 96 % out in 3 h', 'WD-20957', 'High', 69, '9,600.00', ['Pending', 'New'], ['5 h 30 min left', null]], ['AML-5519', 'Q9', '@quasar_9', 'Structuring · 6 deposits < 1,000', 'DP-77301…77366', 'Medium', 58, '5,820.00', ['Under review', 'In review'], ['11 h 05 min left', null]], ['AML-5521', 'DS', '@drift.sol', 'Shared device · 3 accounts', '3 accounts', 'Medium', 52, '2,140.00', ['Pending', 'New'], ['Past SLA', 'danger']], ['AML-3317', 'NK', '@nova.k', 'New address · 3× median payout', 'WD-20931', 'Medium', 41, '1,500.00', ['Under review', 'In review'], ['19 h 15 min left', null]]];
+for (const a of A) {
+  const k = CARD('Alert ' + a[0], { gap: 10, p: 16, w: 344, stroke: a[0] === 'AML-5530' ? 'border/brand' : 'border/subtle', fill: a[0] === 'AML-5530' ? 'surface/selected' : 'surface/default' });
+  const l1 = AL('HORIZONTAL', { name: 'L1', gap: 8, align: 'CENTER' }); add(l1, await T(a[0], 'Mono/S', 'text/primary')); add(l1, [SPC(), 'FILL']); add(l1, await ST(a[8][0], a[8][1])); add(k, [l1, 'FILL']);
+  await WT(k, a[3], 'Body/M Strong', 'text/primary', 300);
+  const l2 = AL('HORIZONTAL', { name: 'L2', gap: 8, align: 'CENTER' }); add(l2, await I('9:238', { Size: 'XS' }, { Initials: a[1] }), await T(a[2] + ' · ' + a[4], 'Body/S', 'text/secondary')); add(k, [l2, 'FILL']);
+  const l3 = AL('HORIZONTAL', { name: 'L3', gap: 8, align: 'CENTER' }); const rk = await I('23:5378', { Level: a[5], Density: 'Compact' }); await setT(rk, 'Score', '· ' + a[6]); add(l3, rk); add(l3, [SPC(), 'FILL']); add(l3, await T(a[7], 'Number/S', 'text/primary'), await T('USDT', 'Caption', 'text/tertiary')); add(k, [l3, 'FILL']);
+  const l4 = AL('HORIZONTAL', { name: 'SLA', gap: 6, align: 'CENTER' }); add(l4, await IC('clock', 14, a[9][1] === 'danger' ? 'status/danger' : a[9][1] === 'warning' ? 'status/warning' : 'icon/muted'), await T(a[9][0], 'Caption', a[9][1] === 'danger' ? 'text/danger' : a[9][1] === 'warning' ? 'text/warning' : 'text/tertiary')); add(k, [l4, 'FILL']);
+  add(grid, k);
+}
+add(c, [await PAGER('Cursor'), 'FILL']);
+const pv = CARD('Selected alert — AML-5530', { stroke: 'border/brand', gap: 16 }); add(c, [pv, 'FILL']);
+await CHEAD(pv, 'AML-5530 · @sable', { icon: 'shield-alert', ic: 'status/danger', badges: [await ST('Under review', 'In review')] });
+const cols = AL('HORIZONTAL', { name: 'Columns', gap: 16 }); add(pv, [cols, 'FILL']);
+const rm = await RISKM('High', '@sable', 'Destination 2 hops from a mixer-linked cluster · Arbitrum in, BNB Chain out · 2.4 % played', 'Policy AML-3.2: hold and escalate if confirmed'); add(cols, rm);
+const act = AL('VERTICAL', { name: 'Actions', gap: 8 }); add(cols, [act, 'FILL']);
+for (const [ty, l, ic] of [['Primary', 'Escalate to STR case', 'shield-alert'], ['Secondary', 'Request info from user', 'mail'], ['Secondary', 'Request withdrawal hold', 'lock'], ['Ghost', 'Close — no issue', 'check']]) add(act, [await BTN(ty, l, { size: 'M', lead: ic }), 'FILL']);
+await WT(act, 'Reason required for every action · hold also needs 2FA + second approver · WD-20960 stays “Under review” for the user.', 'Caption', 'text/tertiary', 300);
 return await DONE(f);
 
 }

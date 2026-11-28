@@ -1,0 +1,21 @@
+const page = figma.root.children.find(p => p.name === '05 — User Dashboard'); await figma.setCurrentPageAsync(page);
+const sec = section('USR-RG1..RG7 Responsible gaming', 60000, 0);
+const NAME = '[USR-RG5] Reality Checks / 1440 / Popup — 60 minutes reached';
+const old = byName(sec, NAME); if (old) old.remove();
+const S = await shellD(NAME, 'Reality checks', { bare: true, sbLabel: null });
+const C = S.C;
+const sbar = await I('23:24937', { State: 'Normal' }); add(C, [sbar, 'FILL']); await txt(sbar, '00:42:18', '01:00:00');
+const h1 = await I('23:17672', {}, { Title: 'GLOBAL POOL Originals', 'Show live dot': true }); add(C, [h1, 'FILL']);
+const c1 = await I('23:18243', { Layout: 'Overflow' }); add(C, [c1, 'FILL']);
+const h2 = await I('23:17672', {}, { Title: 'Table games', 'Show live dot': false }); add(C, [h2, 'FILL']);
+const c2 = await I('23:18243', { Layout: 'Fits' }); add(C, [c2, 'FILL']);
+await footD(C);
+// overlay
+scrimOver(S.f, 'scrim/strong');
+const rc = await I('23:24938'); floatIn(S.f, rc, 240 + Math.round((1200 - rc.width) / 2), 300); rc.name = 'RG/Reality Check (open)';
+const ann = AL('HORIZONTAL', { name: 'Annotation', gap: 8, p: [8, 12, 8, 12], fill: 'surface/overlay', stroke: 'border/subtle', r: 10, align: 'CENTER' }); ann.appendChild(await IC('info', 16, 'status/info')); ann.appendChild(await T('Opens every 60 min of play. Game paused, round in progress settled first. No close icon — one of three equal choices is required.', 'Caption', 'text/secondary', { w: 440 }));
+floatIn(S.f, ann, 240 + Math.round((1200 - 492) / 2), 300 + Math.round(rc.height) + 24);
+const top = byName(sec, '[USR-RG5] Reality Checks / 1440 / Settings');
+await placeD(S.f, sec, 6360, top ? top.y + top.height + 160 : nextY(sec));
+await S.f.screenshot({ scale: 0.5 });
+return { frame: S.f.id, name: NAME, h: Math.round(S.f.height) };

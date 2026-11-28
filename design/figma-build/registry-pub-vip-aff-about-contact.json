@@ -1,0 +1,5 @@
+{
+ "_note": "PUB-10/11/12/15 agent. PARTIAL — Figma MCP tool-call limit reached. Pending build scripts (body only; prepend helpers.js verbatim, then the matching prelude) in design/figma-build/pending/pub-10-11-12-15/.",
+ "Section/PUB-10/11/12/15 VIP, Affiliates, About, Contact (page 03)": {"id": "36:530715", "note": "page 03 — Public Website, at X=80000, Y=0"},
+ "[PUB-10] VIP Program / 1440 / Default (logged out)": {"id": "36:530716", "note": "PARTIAL: part A only (DEMOBAR, Shell/Sidebar Expanded Guest with VIP Club active, Shell/Topbar Desktop Guest, breadcrumb, hero with Card/VIP Tier Gold preview, facts strip, tier bento grid with 5 Card/VIP Tier + points ladder + weekly reward example, Shell/Footer Mega). Frame height is still FIXED 800 (content clipped) and the hero mint stripe overlaps the copy; run pending/vip-d-b.js to fix both and add the remaining sections. Content frame 36:531074, hero 36:531321, tier grid 36:531488, footer 36:531075."}
+}

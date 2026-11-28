@@ -1,0 +1,1 @@
+{ const f = await figma.getNodeByIdAsync('81:24488'); if (f) { const o = f.findAll(n => n.type === 'INSTANCE' && n.mainComponent && n.mainComponent.parent && n.mainComponent.parent.id === '16:3761'); for (const x of o) { NORESEND(x); x.name = 'Input/OTP — Authenticator code (Complete)'; } OUT.push({ fixed: '81:24488', otp: o.length }); } }

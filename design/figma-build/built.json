@@ -1696,5 +1696,335 @@
    "Wrote /home/user/Claude/design/figma-build/registry-pub-07-21-22.json. I built no reusable components, so it lists only the section and frame IDs. I also added decision #26 to /home/user/Claude/design/figma-build/decisions.md: the Empty default for PUB-07, the geo-block rules (no VPN hint, no tab bar on mobile), and the age-gate consent pattern.",
    "On the user's 'looks like AI' complaint: none of the banned patterns are used — no orbit rings, radial glow backgrounds, particles or logo halos. Heroes and art use concrete objects (Game/Die, Game/Playing Card, locked Tile/Game Generic art), product-UI preview cards and solid angled colour blocks cropped by the banner edges."
   ]
+ },
+ "auth-a": {
+  "section": "32:29287",
+  "created": [
+   {
+    "name": "Section — AUTH-01/02/03/04 Register, Login, Email verification (page 04, X=0 Y=0, 6360x7170)",
+    "id": "32:29287"
+   },
+   {
+    "name": "Notes — AUTH-01…04 (behaviour/validation notes for dev handoff)",
+    "id": "32:29288"
+   },
+   {
+    "name": "AUTH-01 Register / 1440 / Default",
+    "id": "32:29451"
+   },
+   {
+    "name": "AUTH-01 Register / 1440 / Validation",
+    "id": "32:36004"
+   },
+   {
+    "name": "AUTH-01 Register / 1440 / Loading",
+    "id": "32:46780"
+   },
+   {
+    "name": "AUTH-01 Register / 1440 / Error",
+    "id": "32:59805"
+   },
+   {
+    "name": "AUTH-01 Register / 1440 / Success",
+    "id": "32:75071"
+   },
+   {
+    "name": "AUTH-02 Register wallet-first / 1440 / Default",
+    "id": "32:92201"
+   },
+   {
+    "name": "AUTH-03 Login / 1440 / Default",
+    "id": "33:139271"
+   },
+   {
+    "name": "AUTH-03 Login / 1440 / Error",
+    "id": "33:169113"
+   },
+   {
+    "name": "AUTH-03 Login / 1440 / Locked",
+    "id": "33:200497"
+   },
+   {
+    "name": "AUTH-03 Login / 1440 / Loading",
+    "id": "33:220570"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 1440 / Sent",
+    "id": "33:237908"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 1440 / Code entry",
+    "id": "33:261299"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 1440 / Resend cooldown",
+    "id": "33:278409"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 1440 / Expired",
+    "id": "33:300536"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 1440 / Success",
+    "id": "33:312337"
+   },
+   {
+    "name": "Section — AUTH — Mobile A (page 10, X=63000 Y=0, 2160x3448)",
+    "id": "34:336608"
+   },
+   {
+    "name": "AUTH-01 Register / 390 / Default",
+    "id": "34:336738"
+   },
+   {
+    "name": "AUTH-01 Register / 390 / Validation",
+    "id": "34:359317"
+   },
+   {
+    "name": "AUTH-02 Register wallet-first / 390 / Default",
+    "id": "34:380477"
+   },
+   {
+    "name": "AUTH-03 Login / 390 / Default",
+    "id": "34:397424"
+   },
+   {
+    "name": "AUTH-03 Login / 390 / Locked",
+    "id": "34:411128"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 390 / Code entry",
+    "id": "34:420291"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 390 / Expired",
+    "id": "34:436332"
+   },
+   {
+    "name": "AUTH-04 Email Verification / 390 / Success",
+    "id": "34:453454"
+   }
+  ],
+  "issues": [
+   "The SCREEN HELPER HAS A BUG that likely affects other agents. helpers.js screen() calls f.resize(w, 800), which leaves the frame's primary axis FIXED at 800 px, so frames do not hug their content and anything below 800 px is clipped. My first frame came out 800 high. I fixed it by setting f.primaryAxisSizingMode = 'AUTO' right after every screen() call. The orchestrator should check other modules for frames that are exactly 800 px tall and clipped.",
+   "Auto-layout gotcha: adding a child set to FILL height inside a hug-height auto-layout turned the parent into a fixed height, which clipped the form content. I removed every spacer frame and re-hugged the forms. No frame has this problem now.",
+   "The registry has no Modal, Alert, Toast or Callout components (CMP-06/08 do not exist yet). I built these inline from tokens instead: the dialog container, alert banners (danger/warning/info/success tints with icon + label), the 3-step progress bar, the 'what happens next' step list, wallet provider rows, wallet quick-connect tiles, and caption notes with an icon. They are good candidates to become library components, and AUTH-05 to AUTH-21 will need the same dialog pattern.",
+   "registry-catalog.json, which the task points to, does not exist. It was not needed for auth, but other modules may expect it.",
+   "Brand panel artwork is a Jackpot/Pool Visual (Frame=3) instance, edited so it is not a card: fill, stroke, effects and radius removed; the 'Keyframe label' doc layer hidden; anchored to the bottom so the coins and tickets are cropped by the divider above the trust points. When the panel is too short to show the jackpot meter whole, the instance's Header, Jackpot meter, Caption and DEMO layers are hidden rather than cut in half. This happens on the short dialogs: login, email verification, AUTH-01 Default/Success and wallet-first. The 186,400.00 meter is therefore visible only on the taller Register states. Per the user's complaint about an AI look in the background, there are no orbit rings, glow blobs, particles or logo halos. The backdrop is the real dimmed lobby (Shell/Sidebar, Shell/Topbar Desktop, Banner/Hero Carousel, Strip/Recent Wins, Row/Game Carousel) under scrim/overlay.",
+   "Desktop dialog heights vary by state, from 670 to 1298 px. When a dialog is taller than 928 px the frame's lobby viewport grows to dialog height + 96 (so frames run 1060–1430 px tall), and the modal stays centred. Production should scroll the modal content instead.",
+   "On mobile, auth opens as a full-height bottom sheet over the dimmed Shell/Topbar Mobile, with a grabber, a 48 px close button and a sticky CTA bar with home indicator. Nav/Mobile Tab Bar is deliberately covered by the sheet and does not appear. Short sheets get a filler frame so the sheet reaches the 844 px viewport.",
+   "Mobile frames shorten the DEMO bar message to 'DEMO DATA — everything on this screen is illustrative.' because the default message is cut off at 390 px.",
+   "Notice/Licence Compact text is overridden to 'Licence required · Permitted regions only' because a Badge/18+ sits beside it. This matches what the casino shell sidebar does.",
+   "Observation, not changed: the library Brand/Logo shows small '$' marks above the GLOBAL POOL wordmark. That may itself read as clip-art, so the orchestrator may want to review the logo.",
+   "Welcome offer content in the brand panel and on the Register success screen (100% up to 500 USDT, min deposit 20, 30× wagering, 14 days, 'Terms apply' link, DEMO) comes from demo-data.md. It has no countdown and creates no urgency.",
+   "No components were created, so no registry-auth-a.json was written. I did not edit decisions.md or any other shared file. Two design choices to log there if the orchestrator agrees: (1) desktop auth is a split dialog over the dimmed Guest lobby; (2) mobile auth is a full-height bottom sheet with a sticky CTA.",
+   "Memory: the only stored note (Figma file for the LegalTechAnalyses website) is unrelated and was not opened or used."
+  ]
+ },
+ "gp-hub": {
+  "section": "32:32304",
+  "created": [
+   {
+    "name": "Section — GP-01..04 Hub & participation (page 07)",
+    "id": "32:32304"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / Active",
+    "id": "32:79976"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / Restricted region",
+    "id": "33:140539"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / Wallet disconnected",
+    "id": "33:160310"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1440 / No active round",
+    "id": "33:194034"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 1280 / Active",
+    "id": "33:223663"
+   },
+   {
+    "name": "[GP-01] Global Pool Hub / 768 / Active",
+    "id": "33:266964"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Default",
+    "id": "33:299290"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Insufficient funds",
+    "id": "33:310193"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Limit reached",
+    "id": "34:325577"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 1440 / Wrong network",
+    "id": "34:333053"
+   },
+   {
+    "name": "[GP-03] Participation Pending / 1440",
+    "id": "34:365199"
+   },
+   {
+    "name": "[GP-04] Participation Success — Entry receipt / 1440",
+    "id": "34:383862"
+   },
+   {
+    "name": "Section — GP — Mobile A (page 10)",
+    "id": "34:434742"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Active",
+    "id": "34:434743"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Restricted region",
+    "id": "34:473267"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / Wallet disconnected",
+    "id": "34:482737"
+   },
+   {
+    "name": "[GP-01 · MOB-04] Global Pool Hub / 390 / No active round",
+    "id": "34:492964"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Default — bottom sheet",
+    "id": "36:503945"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Insufficient funds — bottom sheet",
+    "id": "36:521852"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Limit reached — bottom sheet",
+    "id": "36:529928"
+   },
+   {
+    "name": "[GP-02] Participation Preview / 390 / Wrong network — bottom sheet",
+    "id": "36:538096"
+   }
+  ],
+  "issues": [
+   "BLOCKER: The Figma MCP plan limit ('tool call limit for your Full seat on the Professional plan') was hit, and one retry also failed. Not built: '[GP-03] Participation Pending / 390 — bottom sheet' (x=1140, page 10, section 34:434742) and '[GP-04] Participation Success — Entry receipt / 390' (x=1650). Ready code (modalShell with sheet=true, pendingBody/successBody with a mobile flag, overlayM) is in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/gp01/modals.js and msheet.js. Resume state is in .../scratchpad/gp01/state.json.",
+   "Also not built: 1280 and 768 versions of Restricted and No active round. Decision #16 lists restricted and empty states as material layout changes.",
+   "helpers.js bug affecting every agent: screen() calls f.resize(w, 800), which leaves the primary axis FIXED, so every screen is clipped at 800 px. I set f.primaryAxisSizingMode='AUTO' after screen(). Separately, createAutoLayout frames count strokes in layout, which made a sidebar wrapper 241 wide; fixed with strokesIncludedInLayout=false. Other agents' screens may be clipped at 800 px.",
+   "Library limits found: resizing nested layers inside instances is silently ignored. Jackpot/Threshold Bar and Jackpot/Prize Distribution therefore cannot stretch (their bars are fixed at 472 px) and are used at their native 520 width with flexible companion cards (Your odds, VRF explainer, Where the money goes). Other minimum widths: Jackpot/Round Header needs at least 669 (Card/Round Open used on tablet); Table/Live Bets columns squeeze below 1136 (fixed with FILL overrides on the Game/Player/Payout columns; horizontal-scroll container on tablet); Jackpot/Counter XL needs 781 (Counter L used at 1280/768, M on mobile).",
+   "Components that overflow at 358/390 so are not used on mobile: RG/Session Bar (inline compact RG strip instead), Notice/Licence Card (Alert/Banner Regulatory notice instead) and Jackpot/VRF Stepper. Notice/Demo Data does not wrap at 390, so its Message is shortened on mobile frames. The library Participation Preview modal at 390 needed overrides: 16 px padding, wrapped action/link rows, confirm label shortened to 'Confirm · 351.75 USDT'.",
+   "Library data conflict: Card/Round Cancelled shows round #1,245 with a 29,640.00 USDT pool and 2,964 entries. Round Header and Threshold Bar say 41,200.00 / 412. I overrode my instances to 41,200.00 / 4,120 entries; the component should be fixed.",
+   "Demo-data conflict: Modal/Participation Preview shows 'Available after 8,863.55 from 9,215.30'. That only works if the 35 entries are bought now, but demo-data says 9,215.30 is already net of those entries. So GP-02 and GP-03 backgrounds show the hub before purchase (0 entries, sidebar count hidden, limit 0.00/500), and GP-04 shows the hub after purchase.",
+   "Response to 'looks like AI' (user feedback): no orbs, rings, glows or particles anywhere in these frames. I removed the Glow/Gold text glow from every Jackpot/Counter instance (noGlow), and the component itself should drop it. Hero banners use solid charcoal, an angled gold-tint block with a mint stripe, and real Jackpot/Entry Ticket instances cropped by the banner edge (the 'Next round' hero uses Card/Draw Countdown instead). Separately, the lobby kit's Banner/Hero (Global Pool slide) still has a floating orb and dots; that component belongs to another agent and should be rebuilt.",
+   "Shell gaps: the Shell/Topbar Desktop 'Restricted region' variant is guest-only (Sign in/Sign up). For the restricted member state I used the Member topbar plus a pinned Nav/Region Banner, so a 'Member restricted' topbar variant would help. On tablet I used Shell/Topbar Desktop with search and network pill hidden, and the drawer replaces the sidebar; no tablet topbar exists. Shell/Topbar Desktop has no 'wallet disconnected' variant, so I swapped the nested Network Pill for Button/Wallet S Disconnected.",
+   "Built inline because no component exists (token-bound, built from library instances): Participation Pending modal, Participation Success receipt modal, My entries card, Your odds card, VRF explainer card, Where-the-money-goes card, What-happens-next card, mobile prize list, mobile compact RG strip, mobile recent-entries cards, mobile sticky participate bar. Candidates for componentization. No library components were created, so I wrote no registry file.",
+   "Copy and data I added that demo-data.md does not cover (all DEMO-badged): round #1,246 participants 3,071 and 16,842 entries; pending timestamps 16:42:20/16:42:41 UTC; wallet session ended 16:40 UTC; 'Round #1,249 opens 28 Nov 2026 08:00 / closes 20:00 UTC'; odds ≈2.44% / ≈0.188% taken from the demo sheet.",
+   "Memory: the only stored note (LegalTechAnalyses Figma landing page) is unrelated to this task and was not used. Nothing new to save."
+  ]
+ },
+ "auth-c": {
+  "section": "AUTH-11..17 KYC — NOT CREATED. Page \"04 — Authentication\" (planned X=24000, Y=0) and \"AUTH — Mobile C\" on page 10 (planned X=77000, Y=0) do not exist yet. The Figma MCP quota blocked every call, so nothing was written to the file.",
+  "created": [],
+  "issues": [
+   "BLOCKER — Figma MCP quota. Every Figma call after my first read calls was rejected with 'You've reached the Figma MCP tool call limit for your Full seat on the Professional plan'. The limit is 200 calls per day and 10 per minute, shared by all agents; whoami confirmed the Pro / Full seat. The failures were the first AUTH-11 build (around 22:53 UTC), a get_metadata probe, and probes at 23:01 and 23:19 UTC. Conventions §10 says to stop after 3 failures in a row, so I stopped. No section, frame or node was created in the file, so there is nothing to clean up.",
+   "READY-TO-RUN SCRIPTS: /home/user/Claude/design/figma-build/pending/auth-c/ contains _lib.js (desktop library), _mlib.js (mobile library), 10 screen scripts, build.py and _mock-run.cjs. Running `python3 build.py` writes out/*.js by joining helpers.js (copied unchanged and read fresh, so it includes the 23:39 screen() fix that makes frames hug their content height), the library and the screen script.",
+   "SCRIPT CHECKS: all 10 scripts are 27.9k–33.3k characters. All pass `node --check` and a dry run against _mock-run.cjs. The mock checks that every variable, text-style and effect-style name exists, and that FILL, HUG and ABSOLUTE are only used where the Plugin API allows them.",
+   "RUN ORDER: 10 calls build all 26 frames. d-auth-11, d-auth-12, d-auth-13, d-auth-14, d-auth-15-16 and d-auth-17 go to page 04. m-auth-11-12, m-auth-13, m-auth-14 and m-auth-15-17 go to page 10.",
+   "SAFE TO RE-RUN: each script skips any frame whose name already exists in the section, so it can be run again after a partial failure. Each frame ends with `await f.screenshot({scale:0.5})` so it can be checked by eye. Each script returns the new frame ids.",
+   "FRAMES STILL TO BUILD (all 26). Desktop 1440: 'AUTH-11 KYC Intro & levels / 1440 / Default'; 'AUTH-12 KYC Personal Details / 1440 / Default' and '/ Validation'; 'AUTH-13 KYC Document Upload / 1440 / Requirements', '/ Preview', '/ Error'; 'AUTH-14 KYC Liveness / 1440 / Camera ready', '/ Permission denied', '/ Retake'; 'AUTH-15 KYC Pending / 1440 / Default'; 'AUTH-16 KYC Approved / 1440 / Default'; 'AUTH-17 KYC Rejected / 1440 / Reasons', '/ Resubmit'. Mobile 390: the same set; the AUTH-13 error frame is named 'Error (bottom sheet)'.",
+   "LAYOUT CHOICE: the KYC flow is a 1080-wide dialog over the dimmed member lobby (Shell/Sidebar Expanded Member, Shell/Topbar Desktop Member, lobby instances and scrim/overlay), the same pattern as AUTH-01…04. The dialog has a 340 context panel on the left and the wizard on the right. Desktop frames go in columns at x = 120 + n × 1560, with states stacked below each default.",
+   "STEPPER: Nav/Stepper only offers 7- and 9-step variants. The 5-step stepper (Intro → Details → Document → Liveness → Review) is therefore built from 5 Nav/Step Item instances. On mobile it is an inline segmented progress bar, because Nav/Stepper Mobile also only offers 7 or 9 steps.",
+   "BUILT INLINE WITH TOKENS (no library component exists): the KYC levels table on desktop and stacked level cards on mobile; the illustrations (ID card front and back, passport, phone with selfie guide, QR code, 'IN REVIEW' and 'RESUBMIT' stamps); the camera viewfinder; the error summary; the mobile bottom sheet for the blurry-photo error (Sheet/Bottom variants only cover 'Choose network' and 'Participation').",
+   "USER'S 'LOOKS LIKE AI' FEEDBACK: the art uses angled mint colour blocks with concrete objects cropped by the frame edges, plus Art/Spot Shield on the Approved screen. There are no orbit rings, glow backgrounds, particles or logo-in-halo compositions.",
+   "COMPLIANCE CHOICES: limits are the same for deposits and withdrawals (L1 2,000.00 and L2 25,000.00 USDT per day; L3 set individually), so withdrawing is never harder than depositing. Consent and PEP answers are never pre-selected. Status is always shown as icon plus label. The data privacy notice covers encryption, the verification partner (DEMO placeholder), 5-year AML retention and face-data deletion within 30 days. Processing time reads 'usually under 10 minutes, up to 24 h'. The Rejected screen shows 3 reason categories (document expired, blurry, name mismatch), each with how to fix it, and Resubmit only redoes what failed. A failed liveness check never locks the user out (manual review after 3 attempts).",
+   "MOBILE CHOICE: the wizard steps (Details, Document, Liveness, Resubmit) use a sticky bottom CTA and hide the tab bar, because the flow is focused. Intro, Pending, Approved and Rejected keep Nav/Mobile Tab Bar with Account active. Back and close targets use Button/Icon size L. Please log this and the layout choice in decisions.md.",
+   "NEW DEMO VALUES to add to demo-data.md: legal name Nova Karlsson; date of birth 14 Mar 1994; address Rua do Exemplo 12, 3.º Esq., 1100-001 Lisboa; occupation Software developer; ID card •••• 4821, valid until 09 Aug 2031; KYC reference KYC-48213-1127; submitted 16:58 UTC, approved 17:06 UTC; L1 limit 2,000.00 USDT per day; L3 review up to 3 business days; phone hand-off code expires 17:02 UTC.",
+   "REJECTED-BRANCH DEMO VALUES (also for demo-data.md): ID card expired 02 Jan 2026; the document shows KARLSSON-SILVA, so in Resubmit the profile is updated to Karlsson-Silva; passport valid until 03 May 2034; rejected at 17:21 UTC. This is an alternative branch to the approved path, not the same timeline.",
+   "LIBRARY QUIRKS FOUND: in this flow, Badge/Status labels are overridden through the 'Label' text layer ('Completed', 'Next step', 'On request', 'Looks good', 'Too blurry to read', 'Needs fixing', 'Fixed', 'Kept'). Input/File Upload text is overridden through the 'File name', 'Meta text', 'Prompt text' and 'Browse link' layers."
+  ]
+ },
+ "gp-draw": {
+  "section": "46:16372",
+  "created": [
+   {
+    "name": "Section/GP-05/06/07/12 Draw, results & verification (page 07, X=16000 Y=0)",
+    "id": "46:16372"
+   },
+   {
+    "name": "[GP-05] Round Drawing / 1440 / Drawing — VRF fulfilled, settling",
+    "id": "46:16373"
+   },
+   {
+    "name": "[GP-05] Round Drawing / 1440 / Delayed — VRF response overdue",
+    "id": "47:17014"
+   },
+   {
+    "name": "[GP-06] Round Result — winner view / 1440 / Win — illustrative outcome",
+    "id": "49:17697"
+   },
+   {
+    "name": "[GP-06] Round Result — winner view / 1440 / Not selected",
+    "id": "53:18291"
+   },
+   {
+    "name": "[GP-07] Round Result — public view / 1440 / Default",
+    "id": "59:18983"
+   },
+   {
+    "name": "[GP-12] Provably Fair verification / 1440 / Verified",
+    "id": "76:20293"
+   },
+   {
+    "name": "[GP-12] Provably Fair verification / 1440 / Failed — value mismatch",
+    "id": "76:21087"
+   }
+  ],
+  "issues": [
+   "Stopped early: the 'Figma MCP tool call limit' error came back 3 times in a row, so I stopped as conventions §10 requires. Frames still to build, all on page '10 — Mobile Experience', section 'GP — Mobile B' at X=168000, Y=0 (the section does not exist yet): [GP-05] Round Drawing / 390 / Drawing — VRF fulfilled, settling; [GP-05] Round Drawing / 390 / Delayed — VRF response overdue; [GP-06] Round Result — winner view / 390 / Win — illustrative outcome; [GP-06] Round Result — winner view / 390 / Not selected; [GP-07] Round Result — public view / 390 / Default; [GP-12] Provably Fair verification / 390 / Verified; [GP-12] Provably Fair verification / 390 / Failed — value mismatch.",
+   "Ready-to-run batched use_figma scripts (syntax-checked, < 37k chars each, current helpers.js pasted verbatim). mb1.js builds the two GP-05 mobile frames and also hides the leftover Input/Text helper text on 76:20293 and 76:21087. mb2.js builds the two GP-06 mobile frames. mb3.js builds GP-07 mobile plus both GP-12 mobile frames. Paths: /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/gp0507/mb1.js, /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/gp0507/mb2.js, /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/gp0507/mb3.js. Run them in that order (the scratchpad is temporary).",
+   "Demo-data choice to reconcile: the task brief puts @orbit_77 in 1st place for round #1,248, while Jackpot/Winner Reveal Card 'Public winner' has @lumen.eth. I kept @orbit_77 and gave him that card's winning entry, E-1248-07734, and made @lumen.eth a runner-up (E-1248-11502). demo-data.md also lists @orbit_77 as the #1,247 winner. Either update the component default or add the #1,248 winners to demo-data.md.",
+   "New DEMO values I introduced, to be added to demo-data.md: random word 0x3e8a…b51f; entry snapshot root 0x8c41…d9e3; VRF request tx 0x2d7f…a90c; fulfilment tx 0x71c3…5e28; settlement tx 0x6b0e…41d2. Winners: 2nd @mira.sol E-1248-04417; 3rd @kestrel E-1248-16033; runner-ups @lumen.eth, @atlas_q, @juno88, @sable, @pixelfox, @tidewalker, @quasar_9, @velvet.io, @ember_ray, @northwind. Rules: VRF-delay refund deadline 24 h after the request (28 Nov 2026, 20:00:04 UTC), with entry amounts going to Owed; Owed → Available after 20 Arbitrum confirmations. Win-scenario balances: Owed 4,143.20, Available 12,943.30.",
+   "Component gaps: Jackpot/VRF Stepper exists only at a fixed 560 width, so the mobile scripts build an inline compact stepper with the same data. Tx/Hash defaults to the deposit hash 0x5e1f…c0a8 and has no TEXT prop. Alert/Banner Warning Inline ships with a 'Switch network' action, which I hid in GP-05 Delayed. Input/Text Filled shows an email helper text by default. Card/Winner 'Global Pool' variant is hard-coded to round #1,247 and 26 Nov, so I overrode those texts.",
+   "Conventions changed during the run: §10 now forbids get_metadata/get_screenshot. I had used get_metadata twice as a cheap rate-limit probe before I saw the new rule. helpers.js v1 now makes screen() hug its height; all calls after the change used the new version.",
+   "Memory: the only stored note (a LegalTechAnalyses Figma file) is unrelated to this task and was not used."
+  ]
+ },
+ "auth-b": {
+  "section": "78:77287 — page '04 — Authentication', section 'AUTH-07/08/09/10 2FA & wallet connect' at X=12000, Y=0. The mobile section 'AUTH — Mobile B' (page 10, X=70000) has not been created yet. Stopped after 3 consecutive Figma MCP rate-limit errors (conventions §10). Only the 3 AUTH-07 desktop frames exist so far. The remaining 27 frames are ready-to-run, syntax-checked and mock-dry-run scripts in /home/user/Claude/design/figma-build/pending/auth-b/out.",
+  "created": [
+   {
+    "name": "Section/AUTH-07/08/09/10 2FA & wallet connect",
+    "id": "78:77287"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 1 Scan / 1440 / Default",
+    "id": "78:77291"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 2 Confirm / 1440 / Default",
+    "id": "81:24488"
+   },
+   {
+    "name": "AUTH-07 2FA Enrollment — Step 3 Backup codes / 1440 / Default",
+    "id": "81:26567"
+   },
+   {
+    "name": "Notes — AUTH-07…10 (section notes frame, at 120,120 in 78:77287)",
+    "id": "inside 78:77287"
+   }
+  ],
+  "issues": [
+   "Figma MCP rate limit: 3 consecutive 'tool call limit for your Full seat' errors on the same script (c3). I stopped as conventions §10 requires. Frames still missing: desktop AUTH-08 Login (Default, Wrong code, Locked), AUTH-08 Withdrawal (Default, Wrong code, Locked), AUTH-09 (List, WalletConnect QR, Connecting, Rejected, Wrong network, Success), AUTH-10 (Request, Success, Rejected, Expired nonce). Mobile 390, page 10 'AUTH — Mobile B' at X=70000: AUTH-07 (Set up, Confirm, Backup codes), AUTH-08 (Login Default, Login Locked, Withdrawal Default), AUTH-09 (List, Wrong network, WalletConnect deep link), AUTH-10 (Request, Expired nonce).",
+   "To resume: run /home/user/Claude/design/figma-build/pending/auth-b/out/{c3,k4,k5,k6,k7,k8}.js in that order, as-is, as use_figma code (fileKey QHF8iRUMFgGMcEn3bD25jl, sessionId 55ee4abe-3cf3-4b8a-9391-56f6bca3e3ce, skillNames figma-use,figma-generate-design). Each is under 34k chars and replaces a same-named frame in place, so retries are safe. Each frame ends with a screenshot that should be checked. To regenerate after edits: python3 pending/auth-b/build.py <name>:<bodies>.",
+   "Known defect in a built frame: AUTH-07 Step 2 (81:24488) shows 'Resend code in 0:42' from the Input/OTP Complete variant, which is meaningless for authenticator (TOTP) codes. The first block of c3 hides it. Library suggestion: Input/OTP could get a boolean to hide the resend row.",
+   "No library component for the sign-message dialog or for a third-party wallet pop-up. AUTH-10 dialogs and the 'browser wallet pop-up (neutral mock)' are built inline with tokens and library parts (Wallet/Provider Mark, Address Chip, Network Pill, Badge, Buttons).",
+   "Registry: /home/user/Claude/design/figma-build/registry-auth-b.json (frame ids and column layout). Decision #28 added to decisions.md (pattern choices, exact sign message, nonce expiry, mobile deep links, no SMS 2FA, hidden OTP resend line)."
+  ]
  }
 }

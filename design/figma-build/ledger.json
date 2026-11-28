@@ -576,7 +576,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440: Default, Validation, Loading, Error, Success. Mobile 390: Default, Validation. The split sign-up dialog sits over the dimmed Guest lobby: left brand panel, right form. Fields are email, password with strength meter, country (Portugal, detected and permitted), date of birth, and 3 consents that are never pre-checked (Terms & Privacy, 18+ & jurisdiction, optional marketing). Wallet-first link included. Each frame passed its screenshot check.",
+  "by": "auth-a"
  },
  {
   "id": "AUTH-02",
@@ -586,7 +588,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440 Default and Mobile 390 Default. Consents come first and are unchecked. Wallet list uses neutral letter marks (MetaMask, WalletConnect, Coinbase Wallet, Phantom/Solana) plus a note that signing is not a transaction and costs no gas. 'Sign up with email instead' and a seed-phrase warning are included.",
+  "by": "auth-a"
  },
  {
   "id": "AUTH-03",
@@ -596,7 +600,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440: Default, Error, Locked, Loading. Mobile 390: Default, Locked. The error message is generic so it does not reveal whether an account exists. Locked state reads 'Too many attempts — try again in 14:52 or reset password', gives the absolute unlock time 17:07 UTC, makes Reset password the primary action and disables Sign in. Wallet quick-connect tiles serve as 'Connect wallet instead'. A note says 2FA comes next, and an anti-phishing note is included.",
+  "by": "auth-a"
  },
  {
   "id": "AUTH-04",
@@ -606,7 +612,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440: Sent, Code entry, Resend cooldown (0:42), Expired, Success (continues to 2FA setup). Mobile 390: Code entry (default), Expired, Success. Uses the Input/OTP library states. A 'Step 2 of 3' progress bar is shown. Code sent 16:42 UTC, expires 16:52 UTC (DEMO). Success lists the next steps (2FA now, KYC later).",
+  "by": "auth-a"
  },
  {
   "id": "AUTH-05",
@@ -636,7 +644,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Desktop 1440 Scan / Confirm / Backup codes are built and their screenshots passed. Two-pane dialog over the dimmed member lobby: a phone-with-authenticator illustration instead of glow art, an illustrative QR (DEMO), a mono setup key, 10 mono backup codes (DEMO) with Download/Copy/Print, the confirmation checkbox unchecked and Finish disabled. Open issue: Step 2 (81:24488) still shows the Input/OTP line 'Resend code in 0:42'; the fix is the first block of pending script c3. Not built: mobile 390 Set up / Confirm / Backup codes (script k7).",
+  "by": "auth-b"
  },
  {
   "id": "AUTH-08",
@@ -646,7 +656,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Scripts ready but never ran (rate limit). c3 builds the login challenge (Default, Wrong code, Locked) as a two-pane dialog with anti-phishing code AURORA-27; the lock lasts 15 minutes, 16:44 to 16:59 UTC. k4 builds the withdrawal challenge: Modal/2FA Default/Error/Locked over withdraw step 7 (WD-20931). k7 builds the mobile Login Default/Locked and Withdrawal bottom sheets.",
+  "by": "auth-b"
  },
  {
   "id": "AUTH-09",
@@ -656,7 +668,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Scripts ready. k4 and k5 build Modal/Connect Wallet List, WalletConnect QR, Connecting (plus a neutral wallet-extension pop-up mock), Rejected, Wrong network (topbar variant 'Member wrong network') and Success (plus a Toast). k8 builds the mobile List sheet (Provider Rows; Browser wallet is disabled on mobile), Wrong network and a WalletConnect deep-link state.",
+  "by": "auth-b"
  },
  {
   "id": "AUTH-10",
@@ -666,7 +680,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Scripts ready. k6 builds desktop Request (exact human-readable message plus a wallet pop-up showing the same text), Success, Rejected and Expired nonce (issued 16:42, expires 16:52 UTC). k8 builds mobile Request and Expired nonce. No Modal/Sign component exists, so these are built inline with Modal/Base anatomy.",
+  "by": "auth-b"
  },
  {
   "id": "AUTH-11",
@@ -676,7 +692,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready in pending/auth-c: d-auth-11.js (1440 Default) and m-auth-11-12.js (390 Default). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-12",
@@ -686,7 +704,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready: d-auth-12.js (1440 Default + Validation) and m-auth-11-12.js (390 Default + Validation). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-13",
@@ -696,7 +716,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready: d-auth-13.js (1440 Requirements, Preview, Error) and m-auth-13.js (390 Requirements, Preview, Error as a bottom sheet). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-14",
@@ -706,7 +728,9 @@
   "sizes": "M·D",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready: m-auth-14.js (390 Camera ready, Permission denied, Retake) and d-auth-14.js (1440, same 3 states; webcam or QR hand-off to phone). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-15",
@@ -716,7 +740,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready: d-auth-15-16.js (1440 Default) and m-auth-15-17.js (390 Default). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-16",
@@ -726,7 +752,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready: d-auth-15-16.js (1440 Default) and m-auth-15-17.js (390 Default). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-17",
@@ -736,7 +764,9 @@
   "sizes": "D·M",
   "page": "04",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "NOT STARTED",
+  "note": "Build script is ready: d-auth-17.js (1440 Reasons + Resubmit) and m-auth-15-17.js (390 Reasons + Resubmit). Not run: Figma MCP quota.",
+  "by": "auth-c"
  },
  {
   "id": "AUTH-18",
@@ -1446,7 +1476,9 @@
   "sizes": "D·L·T·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "All 4 states exist at 1440 (Active, Restricted region, Wallet disconnected, No active round) and at 390. 1280 and 768 exist for Active only. All 1440 frames, 1280, 768 and the 390 Active and No-round frames passed screenshot checks after fixes. Not VERIFIED for two reasons: 1280/768 Restricted and No-round variants are not built, and the 390 Restricted and Wallet-disconnected clones were not re-screenshotted after the last sticky-bar fix.",
+  "by": "gp-hub"
  },
  {
   "id": "GP-02",
@@ -1456,7 +1488,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Default, Insufficient funds, Limit reached and Wrong network exist at 1440 (Modal/Participation Preview over a dimmed hub) and at 390 (Default = Sheet/Bottom Participation; error states = library modal inside a sheet wrapper). All 390 sheets and the 1440 Default and Wrong-network frames passed screenshots. The 1440 Insufficient-funds and Limit-reached frames were not individually screenshotted.",
+  "by": "gp-hub"
  },
  {
   "id": "GP-03",
@@ -1466,7 +1500,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 pending modal built inline (steps, Tx/Hash, progress, callout, Gold Loading button) and verified by screenshot. The 390 bottom sheet is NOT built: the Figma MCP tool-call limit was hit. The script is ready.",
+  "by": "gp-hub"
  },
  {
   "id": "GP-04",
@@ -1476,7 +1512,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "1440 entry-receipt modal built and verified (Entry Ticket, receipt rows, Tx/Fee Breakdown Entry, Tx/Hash, odds, RG limit, actions). The final 'PDF receipt' label change was checked by measured widths only. The 390 version is NOT built because of the tool-call limit.",
+  "by": "gp-hub"
  },
  {
   "id": "GP-05",
@@ -1486,7 +1524,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Two desktop 1440 frames are built: 'Drawing — VRF fulfilled, settling' and 'Delayed'. Both use the casino shell (Shell/Sidebar with Global Pool active, Shell/Topbar Member), an angled-block banner with cropped Jackpot/Entry Ticket instances, Jackpot/VRF Stepper (Fulfilled / Delayed) with the real timestamps 20:00:04 / 20:00:41 / 20:02:10 UTC, an entries-locked card (35 entries, 351.75 USDT), a 'What happens next' (or 'What this means for you') card and a licence/18+/RG strip. The Delayed frame was screenshot-checked after its fixes. On the default frame two fixes were applied after its last screenshot and were not re-checked by screenshot: a redundant Tx/Hash row that showed the wrong default hash was removed, and the banner was set to hug its content. The Mobile 390 frames are not built (rate limit).",
+  "by": "gp-draw"
  },
  {
   "id": "GP-06",
@@ -1496,7 +1536,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Two desktop 1440 frames are built and screenshot-checked. Win: the DEMOBAR says it is an illustrative outcome and there is an 'Illustrative outcome — DEMO scenario' chip. It shows a 3,728.00 runner-up prize, a Prize → Owed → Available tracker (12/20 Arbitrum confirmations, ≈20:12 UTC), the balance impact (Owed 4,143.20, Available after credit 12,943.30, Locked 1,850.00 → 1,500.00), an entries table, Winner Reveal Card 'You won', a proof card and a calm RG card. Not selected: calm copy, 35-entry table, 351.75 spent, VRF Stepper Settled with the random word, snapshot root and settlement tx, Verify CTA, Winner Reveal Card 'Not selected', next round #1,249 (28 Nov 08:00 UTC, auto re-entry off) and an RG card. The Mobile 390 frames are not built.",
+  "by": "gp-draw"
  },
  {
   "id": "GP-07",
@@ -1506,7 +1548,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "The desktop 1440 guest view is built and screenshot-checked, including the winner-card label fix. It has a gold results banner (186,400.00 paid to 13 winners), a top-3 row of Card/Winner instances (@orbit_77 93,200.00 · @mira.sol 37,280.00 · @kestrel 18,640.00), a 13-row winners table with DEMO badges, Jackpot/Prize Distribution, round facts (thresholds, 932.00 platform fees not in the pool, chance per entry), a provably fair card (VRF Stepper Settled, random word, request ID, snapshot root, Verify CTA), a 6-row on-chain records grid and Shell/Footer Mega. The Mobile 390 frame is not built.",
+  "by": "gp-draw"
  },
  {
   "id": "GP-08",
@@ -1556,7 +1600,9 @@
   "sizes": "D·M",
   "page": "07",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "IN PROGRESS",
+  "note": "Two desktop 1440 frames are built and screenshot-checked: Verified (5/5) and Failed — value mismatch (2/5, with an Input/Text error on the random word, failed and skipped checks, what-to-do-next steps and a Report path). Known residual defect: under the Filled inputs the default Input/Text helper text 'We'll send a 6-digit verification code to this address.' is still visible. The script that hides it is ready (included in mb1.js) but was not applied. The Mobile 390 frames are not built.",
+  "by": "gp-draw"
  },
  {
   "id": "GP-13",
@@ -2728,7 +2774,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "BUILT",
+  "note": "Mobile hub 390 with sticky participate bar (Gold L, fee line, 18+ risk line) pinned above Nav/Mobile Tab Bar (Active=Pool). Restricted, Wallet-disconnected and No-round variants exist. The last sticky-helper fix (restored 18+ badge, wrapped text) was confirmed by reading the nodes back, not by a fresh screenshot.",
+  "by": "gp-hub"
  },
  {
   "id": "MOB-05",

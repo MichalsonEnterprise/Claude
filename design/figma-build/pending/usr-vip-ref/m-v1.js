@@ -1,0 +1,24 @@
+const NAME = '[USR-V1] VIP — Current Level & Progress / 390 / Default';
+const { f, content } = await MOB(NAME, 120, 160, { title: 'VIP Club', sub: 'Gold III · Level 14 of 29', tabs: MVT('Level') });
+const sc = CARD({ name: 'Status card — Gold III', gap: 12, p: 20, r: 20, clip: true }); add(content, [sc, 'FILL']);
+const cr = await I('23:10035', { Motif: 'Crown' }); cr.resize(120, 120); sc.appendChild(cr); cr.layoutPositioning = 'ABSOLUTE'; cr.x = 262; cr.y = -6;
+const tr = ROW({ gap: 8 }); add(tr, await I('6:211', { Tier: 'Gold', Size: 'M' })); add(tr, await T('Level 14 of 29', 'Label/S', 'text/secondary')); add(tr, await DEMO('XS')); add(sc, tr);
+add(sc, await T('Gold III', 'Heading/H2'));
+const pt = ROW({ gap: 6, align: 'MAX' }); add(pt, await T('12,840', 'Number/L')); add(pt, await T('/ 20,000 pts', 'Body/S', 'text/tertiary')); add(sc, pt);
+add(sc, BAR(318, 0.642, 'vip/gold', 10)); add(sc, [await T('1,160 pts to Gold IV · 7,160 to Platinum. Next roll-off 410 pts on 1 Dec 2026 — you stay Gold.', 'Caption', 'text/secondary', { w: 318 }), 'FILL']);
+const wr = CARD({ name: 'Weekly reward — 115.20 owed', gap: 10, p: 16 }); add(content, [wr, 'FILL']);
+const o1 = ROW({ gap: 8 }); add(o1, await T("THIS WEEK'S VIP REWARD", 'Overline', 'text/tertiary')); add(o1, await DEMO('XS')); add(wr, o1);
+const am = ROW({ gap: 8 }); add(am, await IC('coins', 24, 'balance/owed')); add(am, await T('115.20', 'Number/L', 'balance/owed')); add(am, await T('USDT', 'Body/S', 'text/tertiary')); add(wr, am);
+add(wr, [await CHK('Settles to Available automatically Mon 30 Nov 2026, 10:00 UTC', 'clock', 300, 'Caption'), 'FILL']);
+add(wr, [await BTN('Primary', 'Claim 115.20 USDT now', { size: 'L' }), 'FILL']); add(wr, await T('Optional — no wagering, nothing expires.', 'Caption', 'text/tertiary'));
+const lv = CARD({ name: 'Gold levels', gap: 0, p: 0, clip: true }); add(content, [lv, 'FILL']);
+const lh = ROW({ gap: 8, p: [16, 16, 8, 16] }); add(lh, await T('Your path through Gold', 'Heading/H5')); add(lh, await DEMO('XS')); add(lv, lh);
+for (const [n, nm, th, rw, st] of [[13, 'Gold II', '10,000', '3.00', 'done'], [14, 'Gold III', '12,000', '5.00', 'now'], [15, 'Gold IV', '14,000', '8.00', 'next'], [16, 'Gold V', '16,000', '10.00', 'lock'], [18, 'Platinum I', '20,000', '25.00', 'lock']]) { const ok = st === 'done' || st === 'now';
+  const r = ROW({ name: 'Level ' + n, gap: 12, p: [12, 16, 12, 16], fill: st === 'now' ? 'surface/selected' : null }); strokeSides(r, 'border/subtle', { t: 1 }); add(r, await IC(ok ? 'check-circle' : st === 'next' ? 'target' : 'lock', 20, ok ? 'status/success' : st === 'next' ? 'icon/brand' : 'icon/muted'));
+  const c = COL({ gap: 2 }); add(c, await T(nm + ' · Level ' + n, 'Body/S Strong', st === 'lock' ? 'text/secondary' : 'text/primary')); add(c, await T(st === 'now' ? 'You are here · ' + th + ' pts' : st === 'next' ? '840 / 2,000 pts' : th + ' pts', 'Caption', st === 'now' ? 'text/brand' : 'text/tertiary')); if (st === 'next') add(c, BAR(160, 0.42, 'brand/primary', 6)); add(r, [c, 'FILL']); add(r, await AMT(rw, { c: ok ? 'text/primary' : 'text/secondary' })); add(lv, [r, 'FILL']); }
+const rg = CARD({ name: 'Play within your limits', gap: 10, p: 16 }); add(content, [rg, 'FILL']);
+const rgh = ROW({ gap: 8 }); add(rgh, await IC('shield', 18, 'icon/brand')); add(rgh, await T('Never chase a level', 'Heading/H5')); add(rg, rgh);
+add(rg, [await KV('Daily participation limit', '351.75 / 500.00', { demo: true }), 'FILL']); add(rg, BAR(326, 0.7, 'brand/primary', 6)); add(rg, [await BTN('Secondary', 'Set limits', { size: 'L' }), 'FILL']);
+await MFOOT(content, 'VIP status never changes odds or outcomes. DEMO values. 18+ · Terms apply.');
+await MEND(f); fitSection(sec); await f.screenshot({ scale: 0.5 });
+R.push({ id: f.id, name: NAME, h: Math.round(f.height) });

@@ -1,0 +1,25 @@
+const page = figma.root.children.find(p => p.name === '10 — Mobile Experience'); await figma.setCurrentPageAsync(page);
+const sec = section('GP — Mobile C', 175000, 0);
+const NAME = '[GP-13] Edge state — Round closed / 390 / Entries arrived after close (sheet)';
+const old = sec.children.find(c => c.name === NAME); if (old) old.remove();
+const { f, main } = await mshell(NAME, 2160, 160, { h: 844 });
+add(main, [await mhead(null, 'Round #1,248', 'Entries closed at 20:00:00 UTC · draw running on Chainlink VRF.', await badge('Processing', 'Entries closed')), 'FILL']);
+add(main, [await I(C.CR, { Status: 'Drawing' }), 'FILL']);
+const scrim = rect(390, 844, 'scrim/overlay', 0, 'Scrim'); f.appendChild(scrim); scrim.layoutPositioning = 'ABSOLUTE'; scrim.x = 0; scrim.y = 0;
+const sh = AL('VERTICAL', { name: 'Bottom sheet — Round closed (inline)', fill: 'surface/overlay', stroke: 'border/subtle', w: 390 }); sh.primaryAxisSizingMode = 'AUTO'; for (const c of ['topLeftRadius', 'topRightRadius']) sh.setBoundVariable(c, VAR['radius/2xl']); await fx(sh, 'Elevation/4 — Modal');
+const gr = AL('HORIZONTAL', { name: 'Grabber', p: [8, 0, 4, 0], justify: 'CENTER' }); add(gr, rect(36, 4, 'border/strong', 9999, 'Handle')); add(sh, [gr, 'FILL']);
+const bd = col('Sheet body', { gap: 16, p: [12, 16, 16, 16] });
+const hh = row('Head', { gap: 12, align: 'MIN' }); const it = AL('HORIZONTAL', { name: 'Icon tile', p: 10, fill: 'status/warning-tint', r: 10 }); add(it, await IC('clock', 20, 'status/warning'));
+add(hh, it, [await T('Round #1,248 closed before your entries were placed', 'Heading/H5', 'text/primary', { w: 260 }), 'FILL'], await I('7:774', { Type: 'Ghost', Size: 'M', State: 'Default' }, { Icon: ICONS.x }));
+add(bd, [hh, 'FILL'], [await T('Entries closed at 20:00:00 UTC. Your confirmation reached us at 20:00:02 UTC, so nothing was placed and nothing was charged.', 'Body/S', 'text/secondary', { w: 358 }), 'FILL']);
+const box = AL('VERTICAL', { name: 'Summary', p: 12, gap: 8, fill: 'surface/raised', r: 10 });
+for (const [k, v, c] of [['Not placed', '10 entries', 'text/primary'], ['Would have cost', '100.50 USDT', 'text/primary'], ['Charged', '0.00 USDT', 'text/success'], ['Available', '9,215.30 · unchanged', 'text/primary']]) add(box, [await kv(k, v, { vc: c, demo: true }), 'FILL']);
+add(bd, [box, 'FILL']);
+for (const [ic, c, t] of [['check-circle', 'status/success', 'Your 35 earlier entries are in the draw (VRF requested 20:00:04 UTC).'], ['calendar', 'icon/muted', 'Round #1,249 opens 28 Nov 2026, 08:00 UTC. Entries are never moved to the next round automatically.']]) { const r = row('Info', { gap: 8, align: 'MIN' }); add(r, await IC(ic, 16, c), await T(t, 'Body/S', 'text/secondary', { w: 300 })); add(bd, [r, 'FILL']); }
+add(sh, [bd, 'FILL']);
+const ft = AL('VERTICAL', { name: 'Sheet footer (sticky)', p: [12, 16, 12, 16], gap: 8 }); strokeSides(ft, 'border/subtle', { t: 1 }); add(ft, [await BTN('Primary', 'Watch the draw', { size: 'L' }), 'FILL'], [await BTN('Secondary', 'Remind me at 08:00 UTC', { size: 'L', lead: 'bell' }), 'FILL']); add(sh, [ft, 'FILL']);
+const hi = AL('HORIZONTAL', { name: 'Home indicator', p: [8, 0, 8, 0], justify: 'CENTER' }); add(hi, rect(134, 5, 'text/primary', 9999, 'Indicator')); add(sh, [hi, 'FILL']);
+f.appendChild(sh); sh.layoutPositioning = 'ABSOLUTE'; sh.x = 0; sh.y = 844 - sh.height;
+fitSection(sec);
+await f.screenshot({ scale: 0.5 });
+return { id: f.id, h: Math.round(f.height), sheetH: Math.round(sh.height), MISS: MISS.slice(0, 30) };
