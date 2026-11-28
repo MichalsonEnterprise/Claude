@@ -14,15 +14,18 @@ import {
   bearer,
   currentRound,
   json,
+  type Player,
   psql,
   shot,
   uniq,
   watch,
+  VIEWPORT,
 } from './_journey';
 
 const J = 'j1';
 
 test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 100.00 → 3 entries → wallet + history', () => {
+  test.use({ viewport: VIEWPORT });
   test.setTimeout(300_000);
 
   test('fresh player completes the first-session journey with exact balances and fee lines', async ({
@@ -85,7 +88,7 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
         return raw ? ((JSON.parse(raw) as { token?: string }).token ?? null) : null;
       });
       expect(token, 'DEV MOCK token cached in localStorage gp.devMockToken').toBeTruthy();
-      const player = { did, token: token!, handle: '', userId: '' };
+      const player: Player = { did, token: token!, handle: '', userId: '' };
       const me = await json<{ id: string; onboardingRequired: boolean }>(
         await request.get(`${API}/me`, { headers: bearer(player.token) }),
       );
@@ -140,7 +143,7 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
         await demo.getByRole('button', { name: 'Simulate testnet deposit' }).click();
         await expect(page.getByRole('heading', { name: 'Deposit detected' })).toBeVisible();
         await expect(page.getByText('0 / 20 confirmations').first()).toBeVisible();
-        const mid = await balances(request, player as never);
+        const mid = await balances(request, player);
         expect(mid).toMatchObject({ available: '0.00', pending: '100.00' });
         const advance = page.getByTestId('demo-advance').getByRole('button', { name: 'Add 5 confirmations' });
         for (const n of [5, 10, 15]) {
@@ -157,7 +160,7 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
           .soft(page.getByRole('link', { name: /^Available balance 100\.00 USDT/ }).first(), 'top-bar balance pill = player Available')
           .toBeVisible({ timeout: 15_000 });
         await shot(page, J, '05_topbar_after_deposit');
-        expect(await balances(request, player as never)).toMatchObject({
+        expect(await balances(request, player)).toMatchObject({
           available: '100.00',
           locked: '0.00',
           pending: '0.00',
@@ -206,7 +209,7 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
 
       // ── 7. wallet: Available 69.85, Locked 30.00 ────────────────────────────────────────────
       await test.step('wallet shows Available 69.85 and Locked 30.00', async () => {
-        expect(await balances(request, player as never)).toMatchObject({
+        expect(await balances(request, player)).toMatchObject({
           available: '69.85',
           locked: '30.00',
           pending: '0.00',
@@ -254,10 +257,20 @@ test.describe('J1 — new player: sign-up → onboarding → KYC L1 → deposit 
       });
 
       // ── 9. dashboard checklist moved on ─────────────────────────────────────────────────────
-      await test.step('dashboard checklist reflects KYC + deposit', async () => {
+      await test.step('dashboard + lobby reflect THIS player (KYC + deposit + entries)', async () => {
         await page.goto('/dashboard');
         await expect(page.locator('main')).toBeVisible();
+        await expect
+          .soft(page.getByText('3 of 4 complete'), 'checklist: email + KYC + first deposit done, 2FA open')
+          .toBeVisible({ timeout: 20_000 });
         await shot(page, J, '09_dashboard_after');
+        await page.goto('/');
+        await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible({ timeout: 60_000 });
+        await page.waitForTimeout(2_000);
+        await shot(page, J, '09_lobby_member');
+        // The lobby must not show the seeded @nova.k figures (35 entries · 351.75 USDT · 9,215.30) to this player.
+        await expect.soft(page.getByText(/Your 35 entries/).filter({ visible: true }), 'lobby shows another player’s entries').toHaveCount(0);
+        await expect.soft(page.getByText('9,215.30').filter({ visible: true }), 'lobby/top bar shows another player’s balance').toHaveCount(0);
       });
     } finally {
       signals.flush(testInfo);

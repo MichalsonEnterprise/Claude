@@ -45,6 +45,8 @@ export interface AppShellFrameProps {
   restricted?: boolean;
   demoBar?: boolean;
   poolAmount?: string;
+  /** Game pages: start with the 72 px rail (≥ 1024); the burger expands it for this visit only. */
+  collapseSidebar?: boolean;
   children: React.ReactNode;
 }
 
@@ -64,10 +66,19 @@ export function AppShellFrame({
   restricted = false,
   demoBar = publicEnv.demoMode,
   poolAmount = DEMO_CURRENT_ROUND.poolBalance ?? '0.00',
+  collapseSidebar = false,
   children,
 }: AppShellFrameProps) {
   const [mode, setMode] = React.useState<SidebarMode>('auto');
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  // Game pages: rail by default; the burger toggles a per-visit expansion (the saved preference is untouched).
+  const [gameExpanded, setGameExpanded] = React.useState(false);
+  React.useEffect(() => setGameExpanded(false), [collapseSidebar]);
+  const sidebarMode: SidebarMode = collapseSidebar
+    ? gameExpanded
+      ? 'expanded'
+      : 'collapsed'
+    : mode;
   const activeHref = resolveActiveHref(pathname);
   const counts = { entries: member?.activeEntries, notifications: member?.notifications };
 
@@ -85,6 +96,10 @@ export function AppShellFrame({
   const onMenuClick = () => {
     if (!window.matchMedia(MQ.lg).matches) {
       setDrawerOpen(true);
+      return;
+    }
+    if (collapseSidebar) {
+      setGameExpanded((v) => !v);
       return;
     }
     const laptop = window.matchMedia(MQ.laptop).matches;
@@ -134,7 +149,7 @@ export function AppShellFrame({
       <div className="flex flex-1">
         <Sidebar
           auth={auth}
-          mode={mode}
+          mode={sidebarMode}
           activeHref={activeHref}
           counts={counts}
           poolAmount={poolAmount}
@@ -146,7 +161,7 @@ export function AppShellFrame({
             auth={auth}
             member={member}
             onMenuClick={onMenuClick}
-            menuExpanded={drawerOpen || mode === 'expanded'}
+            menuExpanded={drawerOpen || sidebarMode === 'expanded'}
             onSignIn={onSignIn}
             onSignUp={onSignUp}
             onSignOut={onSignOut}
@@ -256,6 +271,7 @@ function ConnectedShell({
       onSignOut={() => void auth.signOut()}
       wrongNetwork={wrongNetwork}
       restricted={restricted ?? overrides.restricted}
+      collapseSidebar={overrides.collapseSidebar}
     >
       {children}
     </AppShellFrame>

@@ -115,6 +115,50 @@ export function isPlayRoute(pathname: string | null): boolean {
   return !!pathname && PLAY_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
+// ── game integration (GM-01): reminders only BETWEEN bets / rounds ──────────────────────────────
+
+let holds = 0;
+const holdListeners = new Set<() => void>();
+const REALITY_CHECK_REQUEST = 'gp:reality-check-request';
+
+function emitHolds() {
+  for (const l of holdListeners) l();
+}
+
+/**
+ * A game calls this while a bet / round is in progress (rolling, dealing, a crash round with an open bet…). A due
+ * reminder waits until every hold is released, so it never interrupts a round. Returns the release function.
+ */
+export function holdRealityCheck(): () => void {
+  holds += 1;
+  emitHolds();
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    holds = Math.max(0, holds - 1);
+    emitHolds();
+  };
+}
+
+/** Ask the host to re-check the session now (e.g. after a bet was refused with 409 REALITY_CHECK_DUE). */
+export function requestRealityCheck(): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(REALITY_CHECK_REQUEST));
+}
+
+function useRealityCheckHeld(): boolean {
+  return React.useSyncExternalStore(
+    (cb) => {
+      holdListeners.add(cb);
+      return () => {
+        holdListeners.delete(cb);
+      };
+    },
+    () => holds > 0,
+    () => false,
+  );
+}
+
 export function RealityCheckHost() {
   const { status } = useAuth();
   const enabled = status === 'member' && DATA_SOURCE === 'api';
@@ -125,6 +169,8 @@ export function RealityCheckHost() {
   const [session, setSession] = React.useState<RgSessionView | null>(null);
   const [open, setOpen] = React.useState(false);
   const [busy, setBusy] = React.useState<RealityCheckAction | null>(null);
+  // A game round in progress holds the reminder until the round has settled (never mid-round).
+  const held = useRealityCheckHeld();
 
   const playing = isPlayRoute(pathname);
   const playingRef = React.useRef(playing);
@@ -170,15 +216,18 @@ export function RealityCheckHost() {
     void check();
     const id = window.setInterval(() => void beat(), 60_000);
     const onVis = () => void check();
+    const onRequest = () => void check();
     const opts = { passive: true, capture: true } as const;
     for (const ev of INPUT_EVENTS) window.addEventListener(ev, onInput, opts);
     document.addEventListener('visibilitychange', onVis);
+    window.addEventListener(REALITY_CHECK_REQUEST, onRequest);
     return () => {
       stopped = true;
       window.clearInterval(id);
       window.clearTimeout(dueTimer);
       for (const ev of INPUT_EVENTS) window.removeEventListener(ev, onInput, opts);
       document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener(REALITY_CHECK_REQUEST, onRequest);
     };
   }, [enabled, qc]);
 
@@ -222,8 +271,9 @@ export function RealityCheckHost() {
     e.preventDefault();
     (e.currentTarget as HTMLElement | null)?.focus();
   };
+  const shown = open && !held;
   return desktop ? (
-    <Dialog open={open}>
+    <Dialog open={shown}>
       <DialogContent
         size="m"
         showClose={false}
@@ -237,7 +287,7 @@ export function RealityCheckHost() {
       </DialogContent>
     </Dialog>
   ) : (
-    <Sheet open={open}>
+    <Sheet open={shown}>
       <SheetContent
         side="bottom"
         showClose={false}

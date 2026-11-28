@@ -333,3 +333,39 @@ Dev-only previews (`next dev` or `NEXT_PUBLIC_STATE_PREVIEW=true`): `/wallet/dep
 `?step=pending&ref=…&preview=delayed`. e2e: `E2E_BASE_URL=http://localhost:3104 E2E_API_URL=http://localhost:4104
 pnpm --filter @gp/web test:e2e -- e2e/wallet.spec.ts`. `Button asChild` now renders `leadingIcon` / `trailingIcon` inside the
 child (Radix `Slottable`); without icons it is unchanged.
+
+## Games kit (P1) — `src/components/games/kit/*` (import from `@/components/games/kit`)
+
+**NON-MONETARY SIMULATION.** Every game uses **DEMO credits only** (label `CREDITS_LABEL` = "DEMO credits · no cash value",
+unit `DEMO`), never USDT; bet panels always show **"Fees 0.00"** and **"You can lose your stake"**. Outcomes come only from
+the server (commit–reveal seeds); the browser verifier re-derives them with `verifyBet()` from `@gp/shared/fair`.
+API wrappers + hooks: **`src/lib/api/games.ts`** (`gamesApi`, `gameKeys`, `useGameCatalogue`, `useCatalogueGame`,
+`useDemoCredits`, `useSeeds`, `useGameBets`, `useBetVerification`, `usePlaceBet`, `useResetCredits`, `useRotateSeed`,
+`applySettledBet(qc, slug, bet)` for stateful games, `classifyGameError(err)` → `{ kind, message, details }`).
+
+Routes: `/games` lobby (PUB-03 + GM-02 catalogue, `?category=`), `/games/<slug>` = the game's **static play route**
+(pool-dice, double-side, pool-roulette, orbit-rush, twenty-one) — any other slug falls through to the details page
+(PUB-04) via `app/(app)/games/[slug]`; **`/games/<slug>/details`** is the details page for every game (link "Rules &
+payouts" there). When your play page lands, keep its slug in `PLAY_SCREENS` (`registry.ts`).
+
+| Export | What it does |
+| --- | --- |
+| `GameLayout` | Whole game screen: `ShellOverride collapseSidebar` (72 px rail ≥ 1024, burger expands for the visit), `GameHeader` (breadcrumb, title, mechanic / Provably fair / House edge chips, favourite, Provably fair, Rules & payouts), `DemoCreditsChip`, `[panel 340 \| stage]` card, **GM-01** `GameSessionBar`, `below` / `aside` columns, `children` (history, seeds, rail), licence line, `mobileBar`. Props: `slug, title, mechanic, icon, gate, busy, notice, panel, stage, mobileBar, below, aside, onFairness`. Blocking states render `GameNotice` over the dimmed, `inert` stage. |
+| `useGameGate()` | `{ gate: loading·guest·onboarding·region·self_excluded·blocked·time_limit·loss_limit·offline·ok, credits, lossLimit (DEMO, daily used from /games/credits), regionName, exclusionEndsAt, online, refetch }` — mirrors the server's GAMING_POLICY (server re-checks every bet). |
+| `useBetRunner(send, { maxAttempts, onSettled, onError })` | One idempotency key per intent; network/5xx failures **retry with the same key** (DI-07 "Connection lost — bet held on the server"; `phase` placing·reconnecting·settled·failed, `attempt`, `retryNow`); holds the reality check while in flight; a `409 REALITY_CHECK_DUE` refusal asks the RG host to show the reminder. |
+| `BetPanel` (Manual/Auto radiogroup) · `BetAmountField` (½ · 2× · Min · Max; Max ≤ balance and table max) · `BeforeYouBet` (house edge, rows, **Fees 0.00 DEMO**, `StakeRiskNote`) · `AutoPlayPanel` + `useAutoPlay(placeOne)` | Auto-play: required stop-loss, **unticked** confirmation, constant stake (never raised after a loss), stops on stop-loss / profit / count / error / reality check / tab hidden (`autoplay.ts` pure rules, unit-tested). |
+| `amount.ts` | `sanitizeStakeInput`, `parseStake`, `applyPreset`, `stakeCeiling`, `stakeProblem` + `stakeProblemMessage`, `payoutPreview`, `profitPreview` (decimal.js via @gp/shared/money). |
+| `DemoCreditsChip` | Balance + "DEMO credits · no cash value" + Reset dialog (once per hour, audited server-side; disabled while `busy`). |
+| `GameSessionBar` | GM-01: session time (real clock), net this session + loss-limit meter in DEMO credits, normal / approaching (≥ 80 %) / reached, 18+, Responsible gaming, Take a break, Session details popover (desktop) / bottom sheet (mobile). |
+| `SeedDisplay` · `SeedsDialog` · `SeedLine` · `CopyValue` · `shortHash` | Commitment (server seed hash), client seed, next nonce; change client seed / rotate (reveals the server seed); revealed pairs. |
+| `VerifyDrawer` (`betId, open, onOpenChange, describeOutcome, formula, noun`) · `verifyInBrowser()` | DI-06: commitment → revealed seed → inputs → result recomputed **in the browser** with `@gp/shared/fair` (editable seeds show the mismatch state; "Rotate seeds & reveal" while the seed is secret). Right drawer ≥ 768, bottom sheet below. |
+| `BetHistory` (`slug, columns, summary, onVerify, noun`) · `RecentResults` | DI-05: KPIs (bets / wagered / returned / net), All·Wins·Losses, table ≥ 1024 / cards below, pagination, Verify per row; pill strip of the last 10 results. Give the section `id="my-bets"` via a wrapper `div`. |
+| `ResultBanner` · `HowItWorksCard` · `MoreGamesRail` | Win/lose banner (icon + label, ref, nonce, Verify) from the settled bet only; published rules/edge/limits; tile rail. |
+| `GameNotice` · `PromptCard` · `PanelNotice` · `GameSkeleton` · `insufficientCopy` | guest, onboarding, region (no bypass hints; withdraw stays primary), self-excluded, blocked, time limit, loss limit, offline, reconnecting; insufficient DEMO credits / bet limits in the panel. |
+| `MobileBetBar` | < 768 sticky bar above the tab bar: summary + "You can lose your stake" + CTA (render the panel CTA with `hidden tablet:flex`). |
+| `registry.ts` | `PLAY_SCREENS`, `GAMES_ROUTES`, `playStateOf(slug)`, `GAME_MOTION` (wheel-spin 4500, coin-flip 1600, card-deal 350, crash-frame 100 from `@gp/tokens`), `GAME_COPY`. |
+
+Reality checks: `holdRealityCheck()` / `requestRealityCheck()` were added (additively) to
+`components/rg-history/reality-check.tsx` — hold the reminder while a round is in progress (stateful games: hold from deal
+to settle) so it only appears between bets. Reduced motion: the kit's `useReducedMotion()` → show the result instantly
+(no roll / spin / flip animation).

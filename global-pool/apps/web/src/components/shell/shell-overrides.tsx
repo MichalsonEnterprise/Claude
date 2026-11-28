@@ -14,6 +14,11 @@ export interface ShellOverrides {
   previewMember?: boolean;
   /** Preview the shell as a guest even when signed in (dev-only state preview). */
   previewGuest?: boolean;
+  /**
+   * Game pages (BC.GAME-style casino shell): the sidebar starts in its 72 px rail on every width ≥ 1024 so the
+   * game gets the room. The burger still expands it for this visit (not saved).
+   */
+  collapseSidebar?: boolean;
 }
 
 interface Ctx {
@@ -37,12 +42,17 @@ const useIsomorphicLayoutEffect =
   typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 /** Declarative override; cleared when the page unmounts. Renders nothing. */
-export function ShellOverride({ restricted, previewMember, previewGuest }: ShellOverrides) {
+export function ShellOverride({
+  restricted,
+  previewMember,
+  previewGuest,
+  collapseSidebar,
+}: ShellOverrides) {
   const set = React.useContext(ShellOverridesContext)?.setOverrides;
   useIsomorphicLayoutEffect(() => {
     if (!set) return;
-    set({ restricted, previewMember, previewGuest });
+    set({ restricted, previewMember, previewGuest, collapseSidebar });
     return () => set({});
-  }, [set, restricted, previewMember, previewGuest]);
+  }, [set, restricted, previewMember, previewGuest, collapseSidebar]);
   return null;
 }

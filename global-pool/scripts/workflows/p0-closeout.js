@@ -8,7 +8,7 @@ export const meta = {
   ],
 }
 
-// args: { items: [{ id, source: 'review'|'qa', severity, area: 'api'|'web'|'chain'|'tests', title, file, scenario, fix }] }
+// args: { items: [{ id, source: 'review'|'qa', severity, area: 'api-a'|'api-b'|'web', title, file, scenario, fix }], skipGates?: boolean }
 const items = (args && Array.isArray(args.items)) ? args.items : []
 
 const BASE = `You are a senior engineer on GLOBAL POOL (Web3 jackpot + crypto gaming platform, DEMO/testnet only) in /home/user/Claude/global-pool. All P0 modules exist; an independent review and an integration QA run produced the items below. MANDATORY FIRST: read docs/DEV_CONVENTIONS.md (guardrails + owner decisions), docs/API.md, docs/ARCHITECTURE.md, docs/WEB_COMPONENTS.md.
@@ -20,12 +20,13 @@ VERIFY before reporting (exact commands + results): the typecheck/lint/test of e
 const SCHEMA = { type: 'object', properties: { report: { type: 'string' }, items: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, status: { type: 'string', enum: ['FIXED', 'NOT_FIXED', 'ALREADY_OK', 'IMPLEMENTED', 'PARTIAL'] }, files: { type: 'array', items: { type: 'string' } }, test: { type: 'string' }, note: { type: 'string' } }, required: ['id', 'status'] } }, verified: { type: 'array', items: { type: 'string' } }, failing: { type: 'array', items: { type: 'string' } }, decisions: { type: 'array', items: { type: 'string' } } }, required: ['report', 'items', 'verified', 'failing', 'decisions'] }
 
 const list = xs => xs.map(i => `- [${i.id}] (${i.source}, ${i.severity}) ${i.title}\n  file: ${i.file || '?'}\n  scenario: ${i.scenario || ''}\n  suggested fix: ${i.fix || ''}`).join('\n')
-const apiItems = items.filter(i => ['api', 'chain', 'tests'].includes(i.area))
-const webItems = items.filter(i => i.area === 'web')
-
-const fixers = []
-if (apiItems.length) fixers.push({ key: 'api', ports: 'web 3311, API 4311', scope: 'apps/api (except src/modules/games), packages/shared (except src/fair), packages/contracts, apps/api/test, .github/workflows, docker files', list: apiItems })
-if (webItems.length) fixers.push({ key: 'web', ports: 'web 3312, API 4312', scope: 'apps/web (except components/games and app/(app)/games); API changes only if an item strictly needs one — then additive and tested', list: webItems })
+const SCOPES = {
+  'api-a': { ports: 'web 3311, API 4311', scope: 'chain, money, deposits, withdrawals, pool lifecycle, randomness, contracts: apps/api/src/modules/{blockchain,onchain-rounds,deposits,withdrawals,pool,randomness,ledger}, packages/contracts, packages/shared money/pool helpers (not src/fair), their tests' },
+  'api-b': { ports: 'web 3316, API 4316', scope: 'auth, admin, RG/compliance, config, test infra, CI and docker: apps/api/src/modules/{auth,security,admin,admin-ops,compliance,kyc,aml,audit,users}, apps/api/src/config, apps/api/test/helpers + setup, apps/api/scripts, .github/workflows, docker-compose.yml, Dockerfile, packages/contracts/foundry.toml — when an item needs a change in another area, make it minimal and additive' },
+  web: { ports: 'web 3312, API 4312', scope: 'apps/web (except components/games and app/(app)/games); API changes only if an item strictly needs one — then additive and tested' },
+}
+const fixers = Object.keys(SCOPES).map(k => ({ key: k, ...SCOPES[k], list: items.filter(i => i.area === k) })).filter(f => f.list.length)
+const skipGates = !!(args && args.skipGates)
 
 phase('Fix')
 const fixed = await parallel(fixers.map(f => () => agent(`${BASE}\n\nYOUR KEY: ${f.key} — ports ${f.ports}. You own: ${f.scope}.\nITEMS (${f.list.length}):\n${list(f.list)}`, { label: 'fix:' + f.key, phase: 'Fix', schema: SCHEMA }).then(r => ({ key: f.key, ...r }))))
@@ -39,7 +40,7 @@ const GATES = {
 Own: apps/web/src/components/compliance/**, new routes under apps/web/src/app/(app)/(gates)/** or as the existing layout requires (edit app/(app)/layout.tsx additively), apps/api geo endpoint + guard in the compliance module (additive). Tests: API e2e for geo decisions; web unit + Playwright e2e (age gate first visit, under-18 exit, restricted country interstitial) — apps/web/e2e/gates.spec.ts. Screenshots 1440/390 to apps/web/test-results/visual/gates/. Report ledger IDs PUB-21, PUB-22, ERR-05 as IMPLEMENTED/PARTIAL.`,
   states: `YOUR KEY: states — ports web 3314, API 4314. Cross-module state audit for ERR-01 (empty states), ERR-02 (errors: network, 4xx/5xx, timeout, validation, rate-limited 429, maintenance), ERR-03 (loading: skeletons, progress, optimistic), ERR-07 (security warnings: wrong network, new address cooldown, new device, phishing/anti-phishing code, unverified contract) across every P0 route (player + admin; not games). Figma specs: grep ERR-01/02/03/07 in /home/user/Claude/design/figma-build/results/*.json. Method: for each route, force each state (API down / 500 / 429 / slow 3G / empty fresh player / validation) with Playwright request interception and screenshot 1440 + 390; fix every route that crashes, shows a blank page, a raw error string, an infinite skeleton, or no retry; use the shared EmptyState/ErrorState/Skeleton components (create them additively in apps/web/src/components/ui if missing and document in docs/WEB_COMPONENTS.md). Own: apps/web/src/components/ui (additive), per-module components only for state handling (small edits, re-read the file right before editing; other agents may edit nearby). Write the audit as apps/web/scripts/qa-states.mjs + a matrix in docs/STATES.md (route × state → OK/fixed/gap). Report ERR-01, ERR-02, ERR-03, ERR-07 as IMPLEMENTED/PARTIAL with the matrix summary.`,
 }
-const gates = await parallel(Object.keys(GATES).map(k => () => agent(`${BASE}\n\n${GATES[k]}`, { label: 'gates:' + k, phase: 'Gates', schema: SCHEMA }).then(r => ({ key: k, ...r }))))
+const gates = skipGates ? [] : await parallel(Object.keys(GATES).map(k => () => agent(`${BASE}\n\n${GATES[k]}`, { label: 'gates:' + k, phase: 'Gates', schema: SCHEMA }).then(r => ({ key: k, ...r }))))
 
 phase('Verify')
 const fixedItems = fixed.filter(Boolean).flatMap(r => (r.items || []).filter(i => i.status === 'FIXED').map(i => ({ ...i, original: items.find(x => x.id === i.id) })))

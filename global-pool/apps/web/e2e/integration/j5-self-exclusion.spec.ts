@@ -19,11 +19,13 @@ import {
   startWithdrawal,
   uniq,
   watch,
+  VIEWPORT,
 } from './_journey';
 
 const J = 'j5';
 
 test.describe('J5 — self-exclusion 6 months: blocks play + deposits, never withdrawals, cannot be shortened', () => {
+  test.use({ viewport: VIEWPORT });
   test.setTimeout(300_000);
 
   test('fresh player self-excludes and every module honours it', async ({ page, request }, testInfo) => {
@@ -160,7 +162,7 @@ test.describe('J5 — self-exclusion 6 months: blocks play + deposits, never wit
       });
 
       await test.step('signing in again lands on the self-excluded restricted page', async () => {
-        const ctx = await page.context().browser()!.newContext({ viewport: { width: 1440, height: 1024 } });
+        const ctx = await page.context().browser()!.newContext({ viewport: VIEWPORT });
         const p2 = await ctx.newPage();
         const s2 = watch(p2, `${J}_signin`);
         await p2.route('**/auth/new-device-alerts', (r) =>

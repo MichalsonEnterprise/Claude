@@ -32,11 +32,16 @@ export const SHOTS = path.join(HERE, '../../test-results/e2e-journeys-shots');
 
 export const uniq = () => Math.random().toString(36).slice(2, 10);
 
+/** E2E_VIEWPORT=390 runs the journeys on the mobile layout (390 × 844); default desktop 1440 × 1024. */
+export const MOBILE = process.env.E2E_VIEWPORT === '390';
+export const VIEWPORT = MOBILE ? { width: 390, height: 844 } : { width: 1440, height: 1024 };
+const VP_TAG = MOBILE ? '_390' : '';
+
 // ── screenshots + integration signals ─────────────────────────────────────────────────────────
 
 export async function shot(page: Page, journey: string, name: string) {
   mkdirSync(SHOTS, { recursive: true });
-  const file = path.join(SHOTS, `${journey}_${name}.png`);
+  const file = path.join(SHOTS, `${journey}${VP_TAG}_${name}.png`);
   await page.screenshot({ path: file, fullPage: false });
   return file;
 }
@@ -83,7 +88,7 @@ export function watch(page: Page, journey: string) {
     events,
     flush(testInfo: TestInfo) {
       mkdirSync(SHOTS, { recursive: true });
-      writeFileSync(path.join(SHOTS, `${journey}_signals.json`), JSON.stringify(events, null, 2));
+      writeFileSync(path.join(SHOTS, `${journey}${VP_TAG}_signals.json`), JSON.stringify(events, null, 2));
       void testInfo.attach('signals', { body: JSON.stringify(events, null, 2), contentType: 'application/json' });
     },
   };

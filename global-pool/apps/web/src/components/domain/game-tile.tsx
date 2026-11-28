@@ -7,15 +7,23 @@ import {
   GAME_TILE_GRADIENT,
   GameArt,
   TILE_GRADIENT_CLASS,
+  isGameArtKey,
   type GameArtKey,
+  type TileGradient,
 } from '@/components/brand/game-art';
 import { Tag } from '@/components/ui/badge';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { cn } from '@/lib/utils';
 
 export interface GameTileProps {
-  /** Art key / slug of an original game (see GameArt). */
-  game: GameArtKey;
+  /** Art key / slug of an original game (see GameArt). Other slugs need `art` (+ `gradient`). */
+  game: GameArtKey | (string & {});
+  /** Custom tile art for games without a GameArt key (120×120 SVG drawn like GameArt). */
+  art?: React.ReactNode;
+  /** Tile gradient when `game` is not a GameArt key (default sky). */
+  gradient?: TileGradient;
+  /** Honest "Coming soon" state: tag + hover "Coming soon · Details" instead of Play (no engine / play screen yet). */
+  comingSoon?: boolean;
   name: string;
   /** Line under the name, e.g. "GLOBAL POOL ORIGINAL", "JACKPOT ROUNDS". */
   subtitle?: string;
@@ -40,6 +48,9 @@ export interface GameTileProps {
  */
 export function GameTile({
   game,
+  art,
+  gradient: gradientProp,
+  comingSoon = false,
   name,
   subtitle = 'GLOBAL POOL ORIGINAL',
   href,
@@ -52,7 +63,8 @@ export function GameTile({
   previewHover = false,
   className,
 }: GameTileProps) {
-  const gradient = TILE_GRADIENT_CLASS[GAME_TILE_GRADIENT[game]];
+  const artKey = isGameArtKey(game) ? game : null;
+  const gradient = TILE_GRADIENT_CLASS[artKey ? GAME_TILE_GRADIENT[artKey] : (gradientProp ?? 'sky')];
   const small = size === 's';
   const accessibleName = [
     name,
@@ -61,6 +73,7 @@ export function GameTile({
       ? `${formatCount(players)} players${demo ? ' (demo)' : ''}`
       : null,
     restricted ? 'Not available in your region' : null,
+    comingSoon && !restricted ? 'Coming soon' : null,
   ]
     .filter(Boolean)
     .join(' — ');
@@ -68,24 +81,44 @@ export function GameTile({
   const body = (
     <>
       <div className={cn('absolute inset-0', gradient)} />
-      <GameArt
-        game={game}
-        className={cn(
-          'absolute left-1/2 -translate-x-1/2 transition-transform duration-200 ease-standard',
-          small ? 'top-1 w-[88%]' : 'top-3 w-[86%]',
-          !restricted && 'group-hover/tile:-translate-y-1 group-hover/tile:scale-[1.03]',
-          restricted && 'opacity-35',
-        )}
-      />
+      {artKey ? (
+        <GameArt
+          game={artKey}
+          className={cn(
+            'absolute left-1/2 -translate-x-1/2 transition-transform duration-200 ease-standard',
+            small ? 'top-1 w-[88%]' : 'top-3 w-[86%]',
+            !restricted && 'group-hover/tile:-translate-y-1 group-hover/tile:scale-[1.03]',
+            restricted && 'opacity-35',
+          )}
+        />
+      ) : (
+        <div
+          aria-hidden
+          className={cn(
+            'absolute left-1/2 -translate-x-1/2 transition-transform duration-200 ease-standard [&>svg]:h-auto [&>svg]:w-full',
+            small ? 'top-1 w-[88%]' : 'top-3 w-[86%]',
+            !restricted && 'group-hover/tile:-translate-y-1 group-hover/tile:scale-[1.03]',
+            (restricted || comingSoon) && 'opacity-50',
+          )}
+        >
+          {art}
+        </div>
+      )}
       {/* legibility shade for the title */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink-950/85 via-ink-950/45 to-transparent" />
 
-      {!small && (tag || (players != null && !restricted)) && (
+      {!small && (tag || comingSoon || (players != null && !restricted)) && (
         <div className="absolute inset-x-2 top-2 flex items-center gap-1">
-          {tag && (
-            <Tag tone={tag === 'hot' ? 'danger' : 'brand'} className="h-[18px]">
-              {tag}
+          {comingSoon && !restricted ? (
+            <Tag tone="neutral" className="h-[18px]">
+              Soon
             </Tag>
+          ) : (
+            tag && (
+              <Tag tone={tag === 'hot' ? 'danger' : 'brand'} className="h-[18px]">
+                {tag}
+              </Tag>
+            )
           )}
           {players != null && !restricted && (
             <span className="ml-auto inline-flex h-[18px] items-center gap-1 rounded-xs bg-ink-950/70 pr-0.5 pl-1.5 text-[11px] font-semibold text-text-primary tabular-nums">
@@ -139,10 +172,16 @@ export function GameTile({
               previewHover && 'opacity-100',
             )}
           >
-            <span className="inline-flex h-10 items-center gap-1.5 rounded-md bg-brand px-5 text-label-m text-text-on-primary">
-              <Play aria-hidden className="size-4 fill-current" />
-              {game === 'global-pool' ? 'Enter' : 'Play'}
-            </span>
+            {comingSoon ? (
+              <span className="inline-flex h-10 items-center gap-1.5 rounded-md border border-border-strong bg-ink-950/80 px-4 text-label-m text-text-primary">
+                Coming soon · Details
+              </span>
+            ) : (
+              <span className="inline-flex h-10 items-center gap-1.5 rounded-md bg-brand px-5 text-label-m text-text-on-primary">
+                <Play aria-hidden className="size-4 fill-current" />
+                {game === 'global-pool' ? 'Enter' : 'Play'}
+              </span>
+            )}
             <span className="rounded-full bg-ink-950/80 px-2 py-0.5 text-[11px] font-medium text-text-secondary">
               {edgeLabel}
             </span>

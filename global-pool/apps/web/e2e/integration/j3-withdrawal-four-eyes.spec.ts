@@ -24,6 +24,7 @@ import {
   signIn,
   startWithdrawal,
   watch,
+  VIEWPORT,
 } from './_journey';
 
 const J = 'j3';
@@ -31,6 +32,7 @@ const WHITELISTED = '0x2222222222222222222222222222222222222222';
 const DESTINATION = '0x3333333333333333333333333333333333333333';
 
 test.describe('J3 — withdrawal flagged for review → four-eyes approval → final state + ledger', () => {
+  test.use({ viewport: VIEWPORT });
   test.setTimeout(420_000);
 
   test('player withdrawal under review is released by two different admins', async ({ page, browser, request }, testInfo) => {
@@ -135,7 +137,7 @@ test.describe('J3 — withdrawal flagged for review → four-eyes approval → f
       // ── admins ─────────────────────────────────────────────────────────────────────────────
       const marin = admin('a.marin');
       const osei = admin('k.osei');
-      const a = await browser.newContext({ viewport: { width: 1440, height: 1024 } });
+      const a = await browser.newContext({ viewport: VIEWPORT });
       const ap = await a.newPage();
       const aSignals = watch(ap, `${J}_finance`);
 
@@ -144,7 +146,7 @@ test.describe('J3 — withdrawal flagged for review → four-eyes approval → f
         await ap.goto(`/admin/finance/withdrawals/${withdrawalId}`);
         await expect(ap.getByText(reference).first()).toBeVisible({ timeout: 60_000 });
         await shot(ap, J, '05_finance_review');
-        await ap.getByRole('button', { name: 'Approve · step 1 of 2' }).first().click();
+        await ap.getByRole('button', { name: /^Approve · (step )?1 of 2$/ }).filter({ visible: true }).first().click();
         const dialog = ap.getByRole('dialog');
         await expect(dialog.getByText('This action is recorded in the audit log', { exact: false })).toBeVisible();
         await dialog.getByLabel('Reason (required)').fill('QA J3: destination checked against chain analytics, no hits');
@@ -160,7 +162,7 @@ test.describe('J3 — withdrawal flagged for review → four-eyes approval → f
 
       await test.step('self-approval is blocked (UI disabled + API 403)', async () => {
         await ap.reload();
-        const again = ap.getByRole('button', { name: /Approve · step 2 of 2|Approve/ }).first();
+        const again = ap.getByRole('button', { name: /^Approve/ }).filter({ visible: true }).first();
         await expect(again).toBeDisabled({ timeout: 30_000 });
         const token = await adminToken(request, marin);
         const res = await request.post(`${API}/admin/withdrawals/${withdrawalId}/approve`, {
@@ -174,14 +176,14 @@ test.describe('J3 — withdrawal flagged for review → four-eyes approval → f
       aSignals.flush(testInfo);
       await a.close();
 
-      const b = await browser.newContext({ viewport: { width: 1440, height: 1024 } });
+      const b = await browser.newContext({ viewport: VIEWPORT });
       const bp = await b.newPage();
       const bSignals = watch(bp, `${J}_compliance`);
       await test.step('second admin (K. Osei, Compliance) approves → queued', async () => {
         await adminSignIn(bp, osei);
         await bp.goto(`/admin/finance/withdrawals/${withdrawalId}`);
         await expect(bp.getByText(reference).first()).toBeVisible({ timeout: 60_000 });
-        await bp.getByRole('button', { name: 'Approve · step 2 of 2' }).first().click();
+        await bp.getByRole('button', { name: /^Approve · (step )?2 of 2$/ }).filter({ visible: true }).first().click();
         const dialog = bp.getByRole('dialog');
         await dialog.getByLabel('Reason (required)').fill('QA J3: second review — evidence matches, release');
         await dialog.getByLabel('Authenticator code').fill(await adminCode(osei));
@@ -233,10 +235,10 @@ test.describe('J3 — withdrawal flagged for review → four-eyes approval → f
         expect(txt).toContain('A. Marin');
         expect(txt).toContain('K. Osei');
         const sToken = await adminToken(request, admin('s.iyer'));
-        const rec = await json<{ ok?: boolean; status?: string; totalIsZero?: boolean }>(
+        const rec = await json<Record<string, unknown>>(
           await request.get(`${API}/admin/ledger/reconciliation`, { headers: bearer(sToken) }),
         );
-        expect(JSON.stringify(rec)).not.toMatch(/"ok":false|mismatch/i);
+        expect(rec).toMatchObject({ ok: true, ledgerTotal: '0.00', unbalancedPostings: 0, poolMismatches: [] });
       });
       bSignals.flush(testInfo);
       await b.close();
