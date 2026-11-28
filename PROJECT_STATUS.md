@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 01:40 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 05:50 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
@@ -38,9 +38,11 @@ Verified by the orchestrator on 28 Nov 2026 ~03:40 UTC: `pnpm -r typecheck`, `pn
 | Contracts | ✅ testnet-ready, unaudited | GlobalPoolRounds plus VRF v2.5; 67 tests; not deployed |
 | API core | ✅ foundation | NestJS 11, 46 tables, append-only ledger enforced by DB triggers, Privy auth with DEV MOCK, admin auth with TOTP, wallet/deposits/withdrawals, pool/rounds/entries (idempotent), VRF-matching winner derivation, admin RBAC + four-eyes + hash-chained audit, WebSocket /pool, BullMQ, Swagger (83 operations). Gaps: on-chain mirroring writes, withdrawal broadcaster, real Privy, deposit watcher against a real RPC |
 | Web foundation | ✅ | Next 15, Tailwind v4, shadcn restyled, casino shell, design system with a /design-system page, Privy provider and DEV MOCK, shared API client `src/lib/api/client.ts` |
-| Homepage PUB-01 | ✅ implemented | H1–H12, 4 states, mobile; close to the Figma render. TODO: countdown uses the frozen DEMO clock (fix assigned to the pool agent) |
-| P0 batch (running) | 🟡 | workflow `dev-p0-batch` (script `global-pool/scripts/workflows/dev-p0-batch.js`), 8 agents: auth (Privy custom flow, onboarding, step-up 2FA), account (dashboard, account, KYC), rg-history (responsible gaming, history), wallet (deposit/withdraw/history), pool (hub, entry, draw, results, verification), admin-a (admin shell, users, audit, roles), admin-b (finance, pool monitoring, KYC/AML queues), api-gaps (on-chain mirroring + Anvil e2e, deposit watcher, broadcaster, RG time, email, Redis adapter) |
-| Games (P1) | ⬜ | after P0 |
+| Homepage PUB-01 | ✅ implemented | H1–H12, 4 states, mobile; close to the Figma render; countdowns use the real clock (fixed by the pool agent) |
+| Wallet (P0) | ✅ implemented (dev-verified by agent) | 21/27 rows IMPLEMENTED, 6 PARTIAL (WAL-02 set-primary/unlink missing, WAL-05/09/16/17/24 details in `global-pool/docs/reports-p0-wallet-pool.json`). Routes /wallet, /deposit, /withdraw (+ tracker), /history (+ detail drawer), /connected, /whitelist; mobile bottom sheets MOB-05/06/07. New API: /wallet/status, /withdrawals/precheck, /withdrawals/ref/:ref, /deposits/ref/:ref, DEMO progressive deposit sim. Playwright e2e deposit→credited, withdraw→review→cancel passes |
+| Global Pool (P0) | ✅ implemented (dev-verified by agent) | 13/16 rows IMPLEMENTED, 3 PARTIAL (GP-06, GP-13, PUB-07: one state each not screenshot-checked). Hub + live socket feed, participation (separate 0.05 fee line, odds rounded down, RG check, unchecked consent, idempotent), round page draw→results→refunds, in-browser VRF re-derivation (4/4 checks), history/entries/prizes, /provably-fair. Homepage countdown now uses the real clock ✅ |
+| P0 batch (running) | 🟡 | workflow `dev-p0-batch` (script `global-pool/scripts/workflows/dev-p0-batch.js`), still running: auth (Privy custom flow, onboarding, step-up 2FA), account (dashboard, account, KYC), rg-history (responsible gaming, history), admin-a (admin shell, users, audit, roles), admin-b (finance, pool monitoring, KYC/AML queues), api-gaps (on-chain mirroring + Anvil e2e, deposit watcher, broadcaster, RG time, email, Redis adapter) |
+| Games (P1) | ⬜ prepared | workflow `global-pool/scripts/workflows/dev-p1-games.js` (engine with commit–reveal + DEMO credits with no cash value → game kit + lobby + Pool Dice → Double Side, Pool Roulette, Orbit Rush, Twenty-One); starts after P0 |
 
 ## 4. Decisions
 Answered 28 Nov 2026 (details in `global-pool/docs/DEV_CONVENTIONS.md` → Owner decisions):
