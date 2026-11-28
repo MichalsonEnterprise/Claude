@@ -1,0 +1,50 @@
+export const meta = {
+  name: 'gp-p0-closeout',
+  description: 'GLOBAL POOL P0 close-out: fix confirmed review findings + QA issues by area, build compliance gates (PUB-21/22, ERR-05) and the state audit (ERR-01/02/03/07), then verify every fix independently',
+  phases: [
+    { title: 'Fix', detail: 'api fixer + web fixer (non-overlapping ownership)' },
+    { title: 'Gates', detail: 'compliance gates + cross-module states audit' },
+    { title: 'Verify', detail: 'full checks + crawler rerun + one skeptic per fixed item' },
+  ],
+}
+
+// args: { items: [{ id, source: 'review'|'qa', severity, area: 'api'|'web'|'chain'|'tests', title, file, scenario, fix }] }
+const items = (args && Array.isArray(args.items)) ? args.items : []
+
+const BASE = `You are a senior engineer on GLOBAL POOL (Web3 jackpot + crypto gaming platform, DEMO/testnet only) in /home/user/Claude/global-pool. All P0 modules exist; an independent review and an integration QA run produced the items below. MANDATORY FIRST: read docs/DEV_CONVENTIONS.md (guardrails + owner decisions), docs/API.md, docs/ARCHITECTURE.md, docs/WEB_COMPONENTS.md.
+GUARDRAILS (non-negotiable): DEMO/testnet only, REAL_MONEY_ENABLED=false; decimal-safe money (never JS floats); append-only double-entry ledger; idempotency on financial writes; no admin path to choose winners, edit results, edit ledger rows, adjust balances or pay out arbitrarily; sensitive admin actions = RBAC + reason + MFA (+ four-eyes) + hash-chained audit; RG/self-exclusion/geo/age enforced server-side; consent never pre-checked; no dark patterns or VPN/geo-bypass hints; never commit secrets.
+PARALLEL-WORK RULES: other agents (games engine/kit in apps/api/src/modules/games, packages/shared/src/fair, apps/web/src/components/games, apps/web/src/app/(app)/games) work at the same time — never touch those paths. Own dist dir/ports: NEXT_DIST_DIR=.next-co-<key>, web 33<nn>, API 43<nn> (given below); serialize builds with "flock /tmp/gp-web-build.lock"; installs with "flock /tmp/gp-pnpm.lock"; kill only your own processes by PID; remove your .next-co-<key> and .dev/dist-co-<key> when done; remove any ".next-co-<key>/types/**/*.ts" line Next adds to apps/web/tsconfig.json. Do not git commit.
+FIX RULES: fix the root cause, smallest correct change, keep existing behaviour and APIs unless the item says they are wrong; add or adjust a test that fails before and passes after for every behavioural fix (API e2e against globalpool_test, unit, web unit or Playwright). If an item is not reproducible or would need an owner business decision, do not guess: mark it NOT_FIXED with the reason. Report each item with status FIXED / NOT_FIXED / ALREADY_OK, the files changed and the test that proves it.
+VERIFY before reporting (exact commands + results): the typecheck/lint/test of every package you touched; "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-co-<key> pnpm --filter @gp/web build" if you touched web.`
+
+const SCHEMA = { type: 'object', properties: { report: { type: 'string' }, items: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, status: { type: 'string', enum: ['FIXED', 'NOT_FIXED', 'ALREADY_OK', 'IMPLEMENTED', 'PARTIAL'] }, files: { type: 'array', items: { type: 'string' } }, test: { type: 'string' }, note: { type: 'string' } }, required: ['id', 'status'] } }, verified: { type: 'array', items: { type: 'string' } }, failing: { type: 'array', items: { type: 'string' } }, decisions: { type: 'array', items: { type: 'string' } } }, required: ['report', 'items', 'verified', 'failing', 'decisions'] }
+
+const list = xs => xs.map(i => `- [${i.id}] (${i.source}, ${i.severity}) ${i.title}\n  file: ${i.file || '?'}\n  scenario: ${i.scenario || ''}\n  suggested fix: ${i.fix || ''}`).join('\n')
+const apiItems = items.filter(i => ['api', 'chain', 'tests'].includes(i.area))
+const webItems = items.filter(i => i.area === 'web')
+
+const fixers = []
+if (apiItems.length) fixers.push({ key: 'api', ports: 'web 3311, API 4311', scope: 'apps/api (except src/modules/games), packages/shared (except src/fair), packages/contracts, apps/api/test, .github/workflows, docker files', list: apiItems })
+if (webItems.length) fixers.push({ key: 'web', ports: 'web 3312, API 4312', scope: 'apps/web (except components/games and app/(app)/games); API changes only if an item strictly needs one — then additive and tested', list: webItems })
+
+phase('Fix')
+const fixed = await parallel(fixers.map(f => () => agent(`${BASE}\n\nYOUR KEY: ${f.key} — ports ${f.ports}. You own: ${f.scope}.\nITEMS (${f.list.length}):\n${list(f.list)}`, { label: 'fix:' + f.key, phase: 'Fix', schema: SCHEMA }).then(r => ({ key: f.key, ...r }))))
+
+phase('Gates')
+const GATES = {
+  gates: `YOUR KEY: gates — ports web 3313, API 4313. Build the P0 compliance gates (Figma page 03/12: exact copy, states and node ids in /home/user/Claude/design/figma-build/results/*.json — grep PUB-21, PUB-22, ERR-05; component specs in registry*.json):
+- PUB-21 Geo-block interstitial: the API decides the visitor's country (trusted proxy header such as CF-IPCountry / X-Country configured by env, with a DEV override header or query only when NODE_ENV=development) against the GeoRule table; restricted visitors get the interstitial before any gaming/financial page, can still sign in to withdraw, see licence info and support, and get NO VPN/proxy/bypass hint. Server-side: every gaming/deposit endpoint already/also refuses restricted countries (add tests).
+- PUB-22 Age gate + licence notice modal: first visit to any gambling surface shows an 18+ confirmation and the licence/jurisdiction notice; the checkbox is never pre-checked; "I am under 18" leads to an exit page with RG help resources; the confirmation is remembered per browser (cookie/localStorage, try/catch) and, for members, the onboarding ageConfirmed consent is authoritative.
+- ERR-05 Regulatory states: restricted region, licence required/unavailable product in this jurisdiction, KYC level required, self-excluded, cooling-off — one shared component set used by the existing restricted pages and module guards (reuse what the auth and rg-history modules built; extend additively).
+Own: apps/web/src/components/compliance/**, new routes under apps/web/src/app/(app)/(gates)/** or as the existing layout requires (edit app/(app)/layout.tsx additively), apps/api geo endpoint + guard in the compliance module (additive). Tests: API e2e for geo decisions; web unit + Playwright e2e (age gate first visit, under-18 exit, restricted country interstitial) — apps/web/e2e/gates.spec.ts. Screenshots 1440/390 to apps/web/test-results/visual/gates/. Report ledger IDs PUB-21, PUB-22, ERR-05 as IMPLEMENTED/PARTIAL.`,
+  states: `YOUR KEY: states — ports web 3314, API 4314. Cross-module state audit for ERR-01 (empty states), ERR-02 (errors: network, 4xx/5xx, timeout, validation, rate-limited 429, maintenance), ERR-03 (loading: skeletons, progress, optimistic), ERR-07 (security warnings: wrong network, new address cooldown, new device, phishing/anti-phishing code, unverified contract) across every P0 route (player + admin; not games). Figma specs: grep ERR-01/02/03/07 in /home/user/Claude/design/figma-build/results/*.json. Method: for each route, force each state (API down / 500 / 429 / slow 3G / empty fresh player / validation) with Playwright request interception and screenshot 1440 + 390; fix every route that crashes, shows a blank page, a raw error string, an infinite skeleton, or no retry; use the shared EmptyState/ErrorState/Skeleton components (create them additively in apps/web/src/components/ui if missing and document in docs/WEB_COMPONENTS.md). Own: apps/web/src/components/ui (additive), per-module components only for state handling (small edits, re-read the file right before editing; other agents may edit nearby). Write the audit as apps/web/scripts/qa-states.mjs + a matrix in docs/STATES.md (route × state → OK/fixed/gap). Report ERR-01, ERR-02, ERR-03, ERR-07 as IMPLEMENTED/PARTIAL with the matrix summary.`,
+}
+const gates = await parallel(Object.keys(GATES).map(k => () => agent(`${BASE}\n\n${GATES[k]}`, { label: 'gates:' + k, phase: 'Gates', schema: SCHEMA }).then(r => ({ key: k, ...r }))))
+
+phase('Verify')
+const fixedItems = fixed.filter(Boolean).flatMap(r => (r.items || []).filter(i => i.status === 'FIXED').map(i => ({ ...i, original: items.find(x => x.id === i.id) })))
+const checks = await parallel([
+  () => agent(`${BASE}\n\nYOUR KEY: verify — ports web 3315, API 4315. Do NOT change application code. Run from a clean state: "pnpm -r typecheck", "pnpm -r lint", "pnpm -r --workspace-concurrency=1 test" (Foundry: PATH=$HOME/.foundry/bin:$PATH), "flock /tmp/gp-web-build.lock env NEXT_DIST_DIR=.next-co-verify pnpm -r --workspace-concurrency=1 build". Then build the web for the API data source on your ports and rerun the integration crawler apps/web/scripts/qa-crawler.mjs (read its header for usage) and every spec in apps/web/e2e (including e2e/integration/*) with --output test-results/e2e-verify. Report exact pass/fail counts, every failure with its error, and whether failures are in games paths (owned by other agents — report them but they do not block P0).`, { label: 'verify:all', phase: 'Verify', schema: SCHEMA }),
+  ...fixedItems.map(i => () => agent(`${BASE}\n\nYou are an independent skeptic. Do NOT change code. An engineer claims this item is FIXED. Read the original problem, the changed files and the proving test; check the fix addresses the root cause on every path (other callers, other endpoints, UI and API), and run the proving test. Default to fixed=false if you cannot confirm.\nORIGINAL: ${JSON.stringify(i.original || {})}\nCLAIM: ${JSON.stringify({ id: i.id, files: i.files, test: i.test, note: i.note })}`, { label: 'check:' + i.id, phase: 'Verify', schema: { type: 'object', properties: { id: { type: 'string' }, fixed: { type: 'boolean' }, reason: { type: 'string' } }, required: ['id', 'fixed', 'reason'] } })),
+])
+return { fixed: fixed.filter(Boolean), gates: gates.filter(Boolean), verify: checks[0], skeptics: checks.slice(1).filter(Boolean) }
