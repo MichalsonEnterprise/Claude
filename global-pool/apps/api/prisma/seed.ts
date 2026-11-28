@@ -6,11 +6,14 @@
  * - @nova.k with balances posted as real, balanced ledger postings:
  *     Available 9,215.30 · Locked 1,850.00 (350.00 entries #1,248 + 1,500.00 WD-20931) · Pending 1,000.00 (DP-77412)
  *     · Owed 415.20 (300.00 refund #1,245 + 115.20 VIP reward) = Total 12,480.50
- * - round #1,248 OPEN with 3,412 participants / 18,640 entries / pool 186,400.00 / fees 932.00 (DEMO crowd users),
- *   history #1,244–#1,247 (snapshots + listed winners), games, VIP levels, geo rules, feature flags, affiliates.
+ * - round #1,248 with 3,412 participants / 18,640 entries / pool 186,400.00 / fees 932.00 (DEMO crowd users; open in
+ *   its window, else closed + #1,249 scheduled), history #1,244–#1,247 (snapshots: 13 prizes each, DEMO participant
+ *   counts), games, VIP levels, geo rules, feature flags, affiliates.
  *
- * Every seeded record is flagged is_demo. Timestamps are the demo-data dates shifted by whole days so the current
- * round closes at the NEXT 20:00 UTC (countdowns stay real). Set DEMO_SEED_SHIFT_DAYS=0 for the exact snapshot.
+ * Every seeded record is flagged is_demo. Timestamps are the demo-data dates shifted by whole days onto the latest
+ * daily window that has already opened: seeded 08:00–20:00 UTC round #1,248 is open and closes at 20:00 today;
+ * seeded between rounds it closed at the last 20:00 (awaiting its draw) and #1,249 is scheduled for the next 08:00.
+ * No seeded purchase lies in the future. Set DEMO_SEED_SHIFT_DAYS=0 for the exact snapshot.
  * Dev credentials (admin passwords + TOTP secrets, @nova.k TOTP) are written to apps/api/.dev/ (git-ignored).
  */
 import {
@@ -56,7 +59,11 @@ import {
   type AccountRef,
   type PostingLineInput,
 } from '../src/modules/ledger/posting';
-import { demoPurchaseClock, demoRoundSeedStatus } from '../src/modules/pool/demo-round-clock';
+import {
+  demoPurchaseClock,
+  demoRoundSeedStatus,
+  demoSeedShiftDays,
+} from '../src/modules/pool/demo-round-clock';
 import { DEFAULT_PRIZE_SPLIT_BPS } from '../src/modules/randomness/selection';
 import type { PrismaService } from '../src/infra/prisma/prisma.service';
 import { findApiRoot, loadEnvFiles } from '../src/config/load-env';
@@ -71,24 +78,29 @@ type Tx = Prisma.TransactionClient;
 // ── time shift ─────────────────────────────────────────────────────────────────────────────────
 
 const DAY = 86_400_000;
-const BASE_CLOSE = Date.parse(DEMO.currentRound.closesAt); // 2026-11-27T20:00:00Z
+const SEED_NOW = new Date();
+const BASE_OPEN = Date.parse(DEMO.currentRound.openedAt); // 2026-11-27T08:00:00Z
+// Whole days onto the latest daily window that has already opened (Q20): round #1,248 is open during 08:00–20:00 UTC
+// and, seeded between rounds, is the round that closed at the last 20:00 UTC (#1,249 is then scheduled for 08:00).
 const SHIFT_DAYS =
   process.env.DEMO_SEED_SHIFT_DAYS !== undefined && process.env.DEMO_SEED_SHIFT_DAYS !== ''
     ? Number(process.env.DEMO_SEED_SHIFT_DAYS)
-    : Math.max(0, Math.ceil((Date.now() + 60_000 - BASE_CLOSE) / DAY));
+    : demoSeedShiftDays(BASE_OPEN, SEED_NOW.getTime());
 const T = (iso: string) => new Date(Date.parse(iso) + SHIFT_DAYS * DAY);
 
-// Round #1,248 follows the real clock (Q20 / Q07): `open` only once its 08:00 UTC opening has passed (else `scheduled`,
-// opened by the regular tick), and no seeded purchase lies in the future.
-const SEED_NOW = new Date();
 const CURRENT_OPENS = T(DEMO.currentRound.openedAt);
-const CURRENT_STATUS = demoRoundSeedStatus(CURRENT_OPENS, SEED_NOW);
+const CURRENT_CLOSES = T(DEMO.currentRound.closesAt);
+const CURRENT_STATUS = demoRoundSeedStatus(CURRENT_OPENS, CURRENT_CLOSES, SEED_NOW);
+if (CURRENT_STATUS === 'scheduled') {
+  // Entries (and stakes) can never exist before a round opens.
+  throw new Error(
+    `DEMO_SEED_SHIFT_DAYS=${SHIFT_DAYS} puts round #1,248's opening (${CURRENT_OPENS.toISOString()}) in the future — use a smaller shift`,
+  );
+}
+// No seeded purchase lies in the future (Q07).
 const purchaseAt = demoPurchaseClock(
   CURRENT_OPENS.getTime(),
-  Math.max(
-    T('2026-11-27T18:42:00Z').getTime(),
-    ...DEMO.entriesFeed.map((f) => T(f.at).getTime()),
-  ),
+  Math.max(T('2026-11-27T18:42:00Z').getTime(), ...DEMO.entriesFeed.map((f) => T(f.at).getTime())),
   SEED_NOW.getTime(),
 );
 
@@ -920,18 +932,34 @@ async function seedNovaLedger(tx: Tx) {
 }
 
 /**
- * Round #1,248: 3,412 participants, 18,640 entries — @nova.k's 35 at E-1248-00981 … 01015. OPEN once its opening time
- * has passed, else SCHEDULED (the tick opens it); purchase times are mapped by `purchaseAt` (never in the future).
+ * Round #1,248: 3,412 participants, 18,640 entries — @nova.k's 35 at E-1248-00981 … 01015. OPEN during its window;
+ * seeded between rounds it is CLOSED (thresholds frozen, awaiting its draw — DEMO rounds are drawn only with
+ * DEMO_ROUNDS_AUTO_SETTLE or the /dev/pool/rounds helper) and #1,249 is SCHEDULED for the next 08:00 UTC (empty; the
+ * regular tick opens it). Purchase times are mapped by `purchaseAt` (never in the future).
  */
 async function seedCurrentRound(tx: Tx) {
   const r = DEMO.currentRound;
+  const closed = CURRENT_STATUS === 'closed';
   await tx.round.create({
     data: {
       ...roundData(r),
       status: CURRENT_STATUS,
-      openedAt: CURRENT_STATUS === 'open' ? CURRENT_OPENS : null,
+      ...(closed ? { closedAt: CURRENT_CLOSES, thresholdsMet: r.thresholds.met } : {}),
     },
   });
+  if (closed) {
+    const next = {
+      ...roundData(r),
+      id: demoId('round', 1249),
+      number: 1249,
+      opensAt: new Date(CURRENT_OPENS.getTime() + DAY),
+      closesAt: new Date(CURRENT_CLOSES.getTime() + DAY),
+      openedAt: null,
+      onchainRoundId: 1249n,
+    };
+    await tx.round.create({ data: { ...next, status: 'scheduled' } });
+    await ledger.ensureAccounts(tx, [{ type: 'pool', roundId: next.id }]);
+  }
   const opens = T(r.openedAt).getTime();
   const novaAt = T(DEMO.myEntries.purchasedAt).getTime();
   const lastAt = T('2026-11-27T18:42:00Z').getTime();
@@ -1169,7 +1197,8 @@ async function seedNotifications(tx: Tx) {
       title: n.title,
       body: n.body,
       isDemo: true,
-      createdAt: n.type === 'round.entries_confirmed' ? new Date(purchaseAt(T(n.at).getTime())) : T(n.at),
+      createdAt:
+        n.type === 'round.entries_confirmed' ? new Date(purchaseAt(T(n.at).getTime())) : T(n.at),
     })),
   });
 }

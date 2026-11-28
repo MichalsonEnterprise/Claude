@@ -24,7 +24,8 @@ export const GATE_ROUTES = {
   withdraw: '/wallet/withdraw',
   wallet: '/wallet',
   history: '/history/transactions',
-  entries: '/history/entries',
+  /** USR-G2 My entries — under /history (always open), not /pool/entries (geo-gated like the rest of /pool). */
+  entries: '/history/games/entries',
   kyc: '/account/kyc/verify',
   amlKyc: '/legal/aml-kyc',
   games: '/games',

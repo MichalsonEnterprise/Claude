@@ -106,7 +106,8 @@ via Privy's link-wallet modal. After a successful link the session is re-synced 
 `GET /auth/account-status` (`authApi.accountStatus()`) → `{ gate: ok|onboarding|suspended|self_excluded|region|
 under_review, restrictions[{type, since, reference}], paused{gaming,deposits,withdrawals}, selfExclusion, region }`.
 `routeForGate(gate)` and `restrictedRouteFor(apiError)` map to **`/restricted/suspended · under-review ·
-self-excluded · region`** (`/restricted` picks the right one). Withdrawals stay available unless an AML freeze applies.
+self-excluded · region`** (`/restricted` picks the right one). Withdrawals stay available unless an AML freeze applies
+(`withdrawals_frozen` → gate `under_review`: the page lists withdrawals as paused and leads with Contact support).
 
 QA: `/auth-preview?show=<state>` (dev / `NEXT_PUBLIC_STATE_PREVIEW=true` only) renders every dialog state with DEMO
 fixtures; `node scripts/auth-qa.mjs` screenshots them at 1440 / 390; e2e: `e2e/auth.spec.ts`.
@@ -120,7 +121,8 @@ control. No VPN / proxy / bypass hints anywhere (Figma decision #26 keeps one ex
 - **`<ComplianceGate>` + `<GateContent>`** (mounted in `app/(app)/layout.tsx` around / inside `AppShell`) — per render
   `gateView()` (pure, unit-tested) picks: `geo` → **PUB-21 `<GeoBlockInterstitial>`** INSTEAD of shell + page (no
   sidebar / tab bar) on gaming & financial pages (`isGeoGated`: `/games`, `/pool`, `/promotions`, `/favourites`,
-  `/recently-played`, `/wallet/deposit`); `hold` → skeleton while the decision loads on such a page (no gaming UI first;
+  `/recently-played`, `/wallet/deposit` — NEW deposits only: the `?ref=DP-…` tracker of a deposit already sent stays open,
+  read from the query string by a Suspense-wrapped probe); `hold` → skeleton while the decision loads on such a page (no gaming UI first;
   an unreachable API shows the page — the server still refuses); `age` → **PUB-22 `<AgeGateDialog>`** (modal ≥ 768,
   bottom sheet < 768; no close icon, Esc / outside ignored) for guests on gambling surfaces (`isAgeGated` = `/` + the
   geo-gated pages) without a valid confirmation; `exit` → `/age-restricted` after "I am under 18" (this browser session).
@@ -396,8 +398,9 @@ round detail, cancelled → refunds, GP-13) · `/pool/rounds/[number]/verify` (G
 | `round-page.tsx` · `verify-page.tsx` · `history-page.tsx` · `entries-page.tsx` · `prizes-page.tsx` · `provably-fair-page.tsx` | one page component each |
 | `preview.ts`             | dev `?state=` flags for `/pool`: `guest`, `restricted`, `no-round`, `wrong-network`, `participate`                              |
 
-Countdowns run on the real clock against the round's real `closesAt` (the API seed and the mock are both shifted by whole
-days to the next 20:00 UTC — `src/lib/data/demo-clock.ts`; the homepage uses the same clock). e2e:
+Countdowns run on the real clock against the round's real `closesAt` (the mock is shifted by whole days to the next
+20:00 UTC — `src/lib/data/demo-clock.ts`; the homepage uses the same clock. The API seed shifts onto the latest window
+that has already opened: between rounds #1,248 is `closed` and #1,249 `scheduled` for 08:00 — docs/API.md → DEMO seed). e2e:
 `E2E_BASE_URL=http://localhost:3105 E2E_API_URL=http://localhost:4105 pnpm --filter @gp/web test:e2e -- e2e/pool.spec.ts`
 (needs a round that is open right now).
 

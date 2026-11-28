@@ -174,7 +174,8 @@
   "page": "02",
   "group": "",
   "status": "VERIFIED",
-  "by": "menus"
+  "by": "final-qa-a11y",
+  "note": "Tabs/Segmented 20:6978 now has a Size axis. Size=M is the default (42 px; 20:6959, 20:6967, 20:6977), so desktop instances do not change. Size=L is a 48 px track with 38 px segments (368:20328, 368:20333, 368:20340) for every 390 layout; labels stay centred. The description documents when to use each size. The 3 nodes below the set moved down to keep the 48 px gap. Checked by screenshot."
  },
  {
   "id": "CMP-08",
@@ -1791,8 +1792,8 @@
   "page": "08",
   "group": "Roulette",
   "status": "VERIFIED",
-  "note": "An earlier run built all frames and its report was lost. This run checked every frame with a screenshot. D 1440: Bets placed (32:77137) and Empty table (33:125557). T 768 (34:382585). M 390 (34:413030): 844 viewport with a vertical felt that scrolls, a sticky chip tray with Undo and Spin, and the tab bar. All frames have the casino shell, RG/Session Bar, sound toggle, house edge 2.70%, licence and 18+. The mobile tray note now includes 'permitted regions only'.",
-  "by": "g-roulette"
+  "note": "D 1440 32:77137 + Empty 33:125557, T 768 34:382585, M 390 34:413030. 28 Nov: the 390 header subtitle now runs to two lines, 'European · edge 2.70%' and '0.10–1,000.00 per spot', at FILL width with HEIGHT auto-resize, so it no longer runs under the Sound button. The header grew from 64 to 76 px and the Felt viewport (scrolls) shrank by 12 px, so the chip tray and tab bar stay inside the 844 viewport. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "RL-02",
@@ -1803,8 +1804,8 @@
   "page": "08",
   "group": "Roulette",
   "status": "VERIFIED",
-  "note": "D 1440 Corner preview (33:126472): hover tooltip on the 17·18·20·21 corner and a slip with Straight 19 + Split 19|22. M 390 'Bets around 19' bottom sheet (34:452338). Both passed screenshots.",
-  "by": "g-roulette"
+  "note": "D 1440 Corner preview 33:126472; M 390 'Bets around 19' sheet 34:452338. 28 Nov: the 390 header subtitle wraps to two lines and the felt is 12 px shorter, so the frame still ends at 844. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "RL-03",
@@ -1815,8 +1816,8 @@
   "page": "08",
   "group": "Roulette",
   "status": "VERIFIED",
-  "note": "D 1440 Dozen preview (33:127360): 3rd 12 hover with the numbers it covers highlighted. M 390 Outside bets quick-bet sheet (34:452805). Both passed screenshots.",
-  "by": "g-roulette"
+  "note": "D 1440 Dozen preview 33:127360; M 390 Outside-bets quick-bet sheet 34:452805. 28 Nov: the 390 header subtitle wraps to two lines and the felt is 12 px shorter, so the frame still ends at 844.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "RL-04",
@@ -1827,8 +1828,8 @@
   "page": "08",
   "group": "Roulette",
   "status": "VERIFIED",
-  "note": "D 1440 (33:202885) and M 390 (34:484576): 'No more bets', stake locked (Available 9,195.30), felt and chips disabled. Fixed this run: the mobile Spinning button had both a spinner and a play icon; it now shows the spinner only.",
-  "by": "g-roulette"
+  "note": "D 1440 33:202885, M 390 34:484576: No more bets, stake locked (Available 9,195.30), spinner-only Spinning button. 28 Nov: the 390 header subtitle wraps to two lines; felt viewport 396 → 384; frame ends at 844.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "RL-05",
@@ -1839,8 +1840,8 @@
   "page": "08",
   "group": "Roulette",
   "status": "VERIFIED",
-  "note": "D 1440 Win +195.00 (33:203859) and Lose −20.00 (33:204841). M 390 Win (34:485123) and Lose (34:485646). Numbers reconcile: balance 9,410.30 / 9,195.30, session net +170.40 / −44.60. Fixed this run: the meta row on the mobile result card overflowed and pushed the DEMO badge onto the card border; it now wraps.",
-  "by": "g-roulette"
+  "note": "D 1440 Win +195.00 33:203859, Lose −20.00 33:204841; M 390 Win 34:485123, Lose 34:485646 (balance 9,410.30 / 9,195.30, session net +170.40 / −44.60). 28 Nov: the 390 header subtitle wraps to two lines and the felt is 12 px shorter, so both frames still end at 844.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "RL-06",
@@ -1887,8 +1888,8 @@
   "page": "08",
   "group": "Roulette",
   "status": "VERIFIED",
-  "note": "D 1440 has 5 states: connection lost 34:337937, insufficient balance DEMO 4.20 34:338888, table limit exceeded 34:339796, daily loss limit reached 34:340764, region restricted US 34:341753. M 390 has 4 states: 36:508774, 36:509304, 36:509810, 36:510320. Fixed this run: the desktop daily-loss banner countdown read 04:07:20, which contradicted '5 h 17 m'; it now reads 05:17:20. The mobile daily-loss session time was aligned to 01:52:40. All states passed screenshots.",
-  "by": "g-roulette"
+  "note": "D 1440: 34:337937, 34:338888, 34:339796, 34:340764, 34:341753. M 390: 36:508774, 36:509304, 36:509810, 36:510320. 28 Nov: on all four 390 states the header subtitle wraps to two lines and the felt is 12 px shorter, so each frame still ends at 844. Connection lost was checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-01",
@@ -1899,8 +1900,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 32:90238, 768 34:350701 and 390 34:386552 all passed screenshots. This run checked the 768 frame at 0.75× and ran a clipped-text audit: 0 clipped texts. The audit's only truncation flag is the short '2.00×' value in the input instance, which displays in full.",
-  "by": "g-crash"
+  "note": "1440 32:90238, 768 34:350701, 390 34:386552. 28 Nov a11y fix on the 390 frame: quick amounts ½ · 2× · Min · Max are Button/Secondary L (75 × 48); Back plus Sound, Rules and Fairness are Button/Icon L (48 × 48); Manual | Auto is Tabs/Segmented L (48); See all bets is Ghost L. The header gap is now 6 px, so the 116 px Title fits ORIGINAL · CRASH (113 px). No Button or Tabs instance is under 44 px. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-02",
@@ -1911,8 +1912,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 33:124526, 768 34:351583 and 390 34:410457 all passed screenshots. This run checked the 768 frame at 0.75× and ran a clipped-text audit: 0 clipped texts.",
-  "by": "g-crash"
+  "note": "1440 33:124526, 768 34:351583, 390 34:410457. The 390 frame now uses L controls: disabled presets 75 × 48, header icons 48 × 48, Manual | Auto 48, See all bets 48. Header gap 6. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-03",
@@ -1923,8 +1924,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 33:156588 and 390 34:420337 passed screenshots.",
-  "by": "g-crash"
+  "note": "1440 33:156588, 390 34:420337. The 390 frame now uses L controls (presets, header icons, Manual | Auto, See all bets). Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-04",
@@ -1935,8 +1936,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 Result: cashed out at 2.00× (33:191216). 1440 Stake lost, 5.00× target not reached (33:209124). 390 cashed out (34:420839). All passed. The stake-lost state has the same layout, so it is not built at 390.",
-  "by": "g-crash"
+  "note": "1440: cashed out at 2.00× (33:191216) and stake lost, 5.00× target not reached (33:209124). 390: cashed out (34:420839); stake-lost has the same layout, so it is not built at 390. On 28 Nov the 390 frame moved to L controls (presets 75 × 48, header icons 48, Manual | Auto 48). Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-05",
@@ -1947,8 +1948,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 33:284530 and 390 34:446321 passed screenshots.",
-  "by": "g-crash"
+  "note": "1440 33:284530, 390 34:446321. The 390 Back and header tools are now Button/Icon L (48 × 48), header gap 6. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-06",
@@ -1959,8 +1960,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 dialog 33:311252 and 390 bottom sheet 34:480272 passed. The consent box is unticked, a stop-loss is required and the bet size is fixed.",
-  "by": "g-crash"
+  "note": "1440 dialog 33:311252, 390 bottom sheet 34:480272. 390: the consent row (Control/Checkbox 34:480691) has a 44 px minimum height. The fixed frame grew from 1209 to 1211 px so the sheet footer stays whole. The bet panel behind the sheet uses L controls. Consent is unticked, a stop-loss is required and the bet size is fixed. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-07",
@@ -1971,8 +1972,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "1440 34:331972 and 390 34:492427 (round CR-55102 verified) passed screenshots.",
-  "by": "g-crash"
+  "note": "1440 34:331972, 390 34:492427 (round CR-55102 verified). The 390 header icons, the verifier links (Open-source verifier, Published spec) and the Verify buttons on each round are now L (48 px). Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "CR-08",
@@ -1983,8 +1984,8 @@
   "page": "08",
   "group": "Crash",
   "status": "VERIFIED",
-  "note": "All 8 states passed. 1440: connection lost 33:227442, insufficient balance 33:239177, daily loss limit 33:258312, region 33:259170. 390: connection lost 36:511112, insufficient balance 198:77380, daily loss limit 36:519473, region 36:511527. This run applied out/06 to the 390 Region frame: it hides the duplicate 'Restricted countries' link in the Notice/Licence row, because the same button sits directly above the card. The row now reads 'Responsible gaming · Licence details' (219 px) and nothing is clipped; checked by screenshot.",
-  "by": "g-crash"
+  "note": "1440: connection lost 33:227442, insufficient balance 33:239177, daily loss limit 33:258312, region 33:259170. 390: connection lost 36:511112, insufficient balance 198:77380, daily loss limit 36:519473, region 36:511527. 28 Nov: all four 390 states use L controls. In the Daily-loss-limit alert, View limits and Take a break (36:519933) are now stacked full-width 48 px buttons, because side by side the labels ran into the button padding. The Region frame keeps 'Responsible gaming · Licence details'. Checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "DI-01",
@@ -3206,8 +3207,8 @@
   "page": "10",
   "group": "",
   "status": "VERIFIED",
-  "note": "(a) 390 lobby exists: [PUB-03] Games Lobby / 390 / All games 36:531732 (Topbar Mobile, Input/Search, Tabs/Pill category pills, 21 Tile/Game Generic, Nav/Mobile Tab Bar Active=Games) and [GM-02] Game catalogue / 390 / Default 34:497645, so no lobby was rebuilt. (b) All five playable originals have 390 default + result frames: Pool Dice DI-01 33:288624 / DI-04 Win 33:315363, Lose 33:315810; Double Side CF-01 104:48933 / CF-03 Win 104:49572, Lose 104:49901; Pool Roulette RL-01 34:413030 / RL-05 Win 34:485123, Lose 34:485646; Orbit Rush CR-01 34:386552 / CR-04 34:420839; Twenty-One BJ-01 34:362883 / BJ-05 Win 34:389351. (c) New annotation frame 315:111233 (390 × 13,628, hug height) in section 315:111229. It shows the thumb-reach pattern on dice, roulette and crash using cropped clones of the real 390 frames, with numbered status/info callouts and a tinted bottom-third band. It covers: sticky bet bar with the primary action, 44 px minimum targets, amount presets above the bar, seeds/history/rules/sound behind a top-right button opening a top sheet, bottom sheets for bet slip, auto-play and verify, and the risk line. It also has a target-size audit, a coverage list and dev notes. Every block was checked in screenshots; fixes applied: same-slot strip made full-bleed, 2 callouts moved off the controls they described, demo values removed from coverage labels. Frame IDs are in design/figma-build/registry-mob-08.json; decision #62 added to decisions.md.",
-  "by": "mob-games"
+  "note": "Annotation 315:111233 (section 315:111229) updated 28 Nov by final-qa-a11y. The crops mirror the fixes: the DI-01 and DI-05 tabs are L; the CR-01 crop now scrolls 400 px and its caption says so; the CR-01/CR-02 sticky-bar strips and the CR-06 footer crop were re-offset so the same element stays in view; the CR-06 consent row is 44 px; the RL-01 and RL-02 header subtitle wraps. Callouts and secondary-zone outlines were re-anchored to their controls, and the Block 05 top sheet and scrim moved down with the taller header. Block 03 legends 2, 4 and 6 give the L sizes. Block 06: all four rows are Pass (new pills 372:121846 and 372:121849); 'Library — 42 px controls' is now 'Library — mobile sizes'. Coverage is unchanged: lobby 36:531732, GM-02 34:497645, and the default + result 390 frames of all five originals. Blocks 02, 03, 04, 05 and 06 were checked by screenshot.",
+  "by": "final-qa-a11y"
  },
  {
   "id": "MOB-09",

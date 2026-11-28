@@ -18,7 +18,12 @@ export function safeNext(raw: string | null | undefined): string | undefined {
     return undefined;
   }
   if (url.origin !== BASE) return undefined;
-  return `${url.pathname}${url.search}${url.hash}`;
+  // Dot segments can turn a path that passed every check into a protocol-relative URL once normalised
+  // ('/.//evil.example' → '//evil.example', also '/..//x', '/pool/..//x', '/%2e//x'): the result must itself still be
+  // a same-origin path, or a browser resolving it later leaves the site (R36).
+  const path = `${url.pathname}${url.search}${url.hash}`;
+  if (!path.startsWith('/') || path.startsWith('//') || path.startsWith('/\\')) return undefined;
+  return path;
 }
 
 /** Admin variant: a safe `next` that also stays inside the admin console (`/admin`, `/admin/…`). */

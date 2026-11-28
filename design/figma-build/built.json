@@ -7743,5 +7743,39 @@
    "NOT IN THIS ASSIGNMENT, STILL OPEN (from results/*.json) — Notice/Demo Data has no wrapping mobile variant. Toast titles are auto-width and push the DEMO badge out. Tx/Hash, Tx/Status Timeline, Tx/Receipt Card and Wallet/Deposit Address Block need compact versions for 358 px. The Notice/Licence links row cannot wrap. Input/Textarea has a fixed 128 px field. RG/Session Bar 'Limit reached' renders at disabled contrast. Card/VIP Tier benefit copy is outdated. Some component defaults disagree with demo-data (Card/Round Cancelled, Card/Balance Owed, Alert/Banner Security/Maintenance, Input/Password placeholder, Wallet/Deposit Address Block 'Degraded'). Select/Network Option truncates at 358 px. Game/Provably Fair Verifier has no VRF mode. Modal/Participation Preview has no max-height variant. Shell/Topbar has no 768 variant.",
    "Memory: I used the repo note on the GLOBAL POOL Figma project (file key, BC.GAME-style palette, casino layout) only as background; it matched conventions.md. There is nothing new to save to memory."
   ]
+ },
+ "final-qa-a11y": {
+  "section": "MOB-08 Mobile games 315:111229 (page 10). Edits also in Games — Mobile Crash 34:386551, Games — Mobile Roulette 34:413029, Games — Mobile Dice 33:288623, Games — Mobile Catalogue (page 10) and CMP-03/07 13:473 (page 02)",
+  "created": [
+   {
+    "name": "Tabs/Segmented — Segments=2, Size=L (48 px track, 38 px segments)",
+    "id": "368:20328"
+   },
+   {
+    "name": "Tabs/Segmented — Segments=3, Size=L",
+    "id": "368:20333"
+   },
+   {
+    "name": "Tabs/Segmented — Segments=4, Size=L",
+    "id": "368:20340"
+   },
+   {
+    "name": "MOB-08 Block 06 — Orbit Rush status pill (Pass)",
+    "id": "372:121846"
+   },
+   {
+    "name": "MOB-08 Block 06 — Library status pill (Pass)",
+    "id": "372:121849"
+   }
+  ],
+  "issues": [
+   "Not applicable as briefed: Pool Roulette 390 has no 'Numbers | Outside bets' toggle (the felt shows both, and outside bets also open in the RL-03 quick-bet sheet). Double Side picks Heads/Tails with 174 × 72 cards, not Tabs/Segmented. Neither had anything to switch.",
+   "Tabs/Segmented L was also applied to the other 390 game frames that use it (19 instances): Pool Dice Roll over | Roll under on DI-01/02/03/04 ×2/07 ×3 and GM-01 ×2; DI-05 All | Wins | No wins; and the catalogue games' Manual | Auto and Low | Medium | High (GM-03 36:522771, GM-04 36:529627 + 36:529660, GM-05 36:548191, GM-06 42:45805 + 42:45836, GM-07 44:46003, GM-08 49:63316). Checked by screenshot: DI-01, DI-05, GM-04.",
+   "Follow-up, not in scope: non-game 390 frames still use Tabs/Segmented M (42 px). These are PUB-05 (34:424074, 34:448337, 34:464823), PUB-06 (216:81156, 216:82517), PUB-07 (36:519206, 36:526077, 36:526607, 242:82273), USR-G4 34:503289, USR-G6 229:241740, USR-R2 353:121012, ADM-02 226:80695, MOB-11 226:81131 and ERR-01 281:97613. USR-RG2/3/4 hold it inside a nested component, so that one needs the change in its source component. Three of these sit in fixed 844 frames (34:448337, 229:241740, 281:97613), so check them for clipping when switching.",
+   "Follow-up, not in scope: Double Side 390 frames (e.g. CF-01 104:48933) use Button/Icon M (40 × 40) for the 3 header actions and the session-row button, which is below 44 px. Catalogue games GM-03…08 were not audited for icon-button sizes. RG/Session Bar component internals were not audited.",
+   "Older nits from a text-overflow audit, untouched: text runs 2–10 px into the tile padding but is not clipped. Cases: Orbit Rush stat tile 'Payout at 2.00×' (CR-01/06/08), the CR-07 'SHA-256(revealed seed)' hash row, Pool Dice 'WIN CHANCE' odds tiles, the roulette tray 'Max payout 215.00 USDT', and catalogue stat tiles on GM-04/05/06.",
+   "One page-10 run failed partway: a nested-instance node went stale after a swap. Figma rolled the whole run back (verified), and the corrected rerun applied cleanly.",
+   "Bookkeeping: /home/user/Claude/design/figma-build/registry-final-qa-a11y.json (Tabs/Segmented Size=L variant ids and usage) and decision #66 appended to /home/user/Claude/design/figma-build/decisions.md. ledger.json was not edited; merge this report. Its notes replace the existing notes on the reported rows. Nothing committed. From memory (note project_global_pool_figma.md): file QHF8iRUMFgGMcEn3bD25jl and the casino palette direction; no new memory items."
+  ]
  }
 }

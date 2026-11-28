@@ -101,7 +101,8 @@ pnpm --filter @gp/api start:dev                     # http://localhost:4000 · /
 ## Endpoints
 
 `player` = Privy / DEV MOCK bearer token, `admin` = admin bearer token. Player routes also apply a policy: onboarding
-complete (all money and gaming routes); permitted region and not self-excluded (entries, deposits); admin restrictions
+complete (all money and gaming routes — not RG tools, 2FA, account status or the profile); permitted region and not
+self-excluded (entries, NEW deposits; deposit history and tracking stay open); admin restrictions
 (`gaming_blocked`, `deposits_blocked`, `withdrawals_frozen`, `account_suspended`). Withdrawals stay available while a
 player is self-excluded or abroad (no obstruction of withdrawals).
 
@@ -127,7 +128,7 @@ player is self-excluded or abroad (no obstruction of withdrawals).
 | POST   | `/auth/logout`                                | player | Revoke the current session for this API (call Privy logout on the client too)                                                                                                                                              |
 | POST   | `/auth/onboarding`                            | player | First-login onboarding: consents (never pre-checked) + country + handle                                                                                                                                                    |
 | POST   | `/auth/session`                               | player | Call after Privy login: verifies the token, upserts the user (privy_user_id), syncs linked email/wallets                                                                                                                   |
-| GET    | `/auth/account-status`                        | player | Account gate for the web (AUTH-18): `ok · onboarding · suspended · self_excluded · region · under_review`, restrictions (type, since, case reference — never the internal reason), paused features, self-exclusion, region |
+| GET    | `/auth/account-status`                        | player | Account gate for the web (AUTH-18): `ok · onboarding · suspended · self_excluded · region · under_review` (`under_review` = `gaming_blocked`, `deposits_blocked` or `withdrawals_frozen`; never `ok` while any restriction is active), restrictions (type, since, case reference — never the internal reason), paused features, self-exclusion, region |
 | GET    | `/auth/new-device-alerts`                     | player | AUTH-21: sign-ins from a device label this player never used, shown on their OTHER sessions (14 days)                                                                                                                      |
 | POST   | `/auth/new-device-alerts/{sessionId}/confirm` | player | “Yes, it was me” — clears the flag (audited)                                                                                                                                                                               |
 | POST   | `/auth/new-device-alerts/{sessionId}/secure`  | player | “No, secure my account” — revokes every other session (audited)                                                                                                                                                            |
@@ -257,6 +258,8 @@ credits. Any currency other than `DEMO` or a non-simulation game → `403 REAL_M
 ### responsible-gaming
 
 All limits and breaks are enforced server-side (entries, game stakes and deposits); nothing here can block a withdrawal.
+These routes are open from the first sign-in, **before onboarding** (protective tools: a new player can set limits, take
+a break or self-exclude before ever playing); money and gaming routes still answer `403 ONBOARDING_REQUIRED`.
 Every change is written to the hash-chained audit log, which also feeds the player's limit history.
 
 | Method | Path                                         | Auth   | Description                                                                                                                         |
@@ -273,7 +276,7 @@ Every change is written to the hash-chained audit log, which also feeds the play
 | GET    | `/responsible-gaming/session`                | player | Session: started, played today, sessions today, net session / today, next reality check (`due`), `blockedReason`                   |
 | POST   | `/responsible-gaming/session/heartbeat`      | player | Activity heartbeat (web: every 60 s while playing) — drives time limits; a session ends after 15 min idle                          |
 | GET    | `/responsible-gaming/history`                | player | `?kind=limits\|reality_checks\|all` — your RG changes and reminder answers (from the audit log)                                     |
-| POST   | `/responsible-gaming/cooling-off`            | player | Break of 24 h / 7 d / 30 d, immediate; cannot be shortened (409 when an equal or longer exclusion is active)                        |
+| POST   | `/responsible-gaming/cooling-off`            | player | Break of 24 h / 7 d / 30 d, immediate; cannot be shortened — 409 while a break or self-exclusion of the same or a longer length is running (a repeat never restarts it) or one already ends later; a longer break or a self-exclusion extends it |
 | POST   | `/responsible-gaming/self-exclusion`         | player | Self-exclude immediately. 6m / 1y / 5y / permanent need `phrase: "SELF-EXCLUDE"` + `acknowledged: true` (+ `totpCode` when 2FA is on: authenticator **or backup code**) |
 | POST   | `/responsible-gaming/self-exclusion/reopen`  | player | After a 6m / 1y / 5y self-exclusion ended: ask to reopen — starts a 24 h cool-down (idempotent; 409 while it is still running or permanent) |
 | POST   | `/responsible-gaming/self-exclusion/reopen/confirm` | player | After the cool-down and with a deposit limit + a loss limit set: reopen (409 before / 400 `missingLimits`) |
@@ -369,9 +372,10 @@ SHA-256 and check results in `kyc_records.details` — never the files.
 | Method | Path                                     | Auth   | Description                                                                                        |
 | ------ | ---------------------------------------- | ------ | -------------------------------------------------------------------------------------------------- |
 | POST   | `/dev/deposits/simulate`                 | player | DEMO only: simulate a confirmed test-USDT deposit (same ledger postings as a real one; idempotent) |
-| POST   | `/dev/deposits/{reference}/confirmations` | player | DEMO only: add simulated confirmations to a `mode: "progressive"` DEMO deposit; credited by the regular posting at N |
+| POST   | `/dev/deposits/{reference}/confirmations` | player | DEMO only: add simulated confirmations to a `mode: "progressive"` DEMO deposit; credited by the regular posting at N — or kept in Pending by the same holds as an on-chain deposit (restriction, break, kill switch, RG limit; advance again once lifted) |
 | POST   | `/dev/kyc/approve`                       | player | DEMO only: mock-provider approval of your KYC level                                                |
 | POST   | `/dev/withdrawals/{id}/simulate-confirm` | player | DEMO only: simulate broadcast + on-chain confirmation of a QUEUED withdrawal                       |
+| POST   | `/dev/pool/rounds/{number}/close` · `/draw` · `/settle` | player | DEMO only, DEMO rounds only (QA): run the next REAL lifecycle step now — close (freeze entries + thresholds) → draw (mock VRF request, or cancel with refunds below the thresholds) → settle (winners = `selectWinners(word, entries)`, prizes to Owed). Refused for real rounds (403), on-chain-mirrored rounds and a non-mock provider (409); audited (`dev.round.*`) |
 
 ### admin · auth
 
@@ -389,7 +393,7 @@ SHA-256 and check results in `kyc_records.details` — never the files.
 | GET    | `/admin/affiliates`                                   | admin | Affiliates (STUB)                                                                             |
 | GET    | `/admin/aml/alerts`                                   | admin |                                                                                               |
 | POST   | `/admin/aml/alerts/{id}/resolve`                      | admin | Resolve / dismiss / escalate an open / under-review (or escalated) alert (reason + MFA; decision + audit in one transaction; a closed alert → 409) |
-| GET    | `/admin/approvals`                                    | admin | Four-eyes approvals awaiting a second admin                                                   |
+| GET    | `/admin/approvals`                                    | admin | Four-eyes approvals awaiting a second admin — only requests of modules you may read (same rule as the inbox) |
 | GET    | `/admin/audit-logs`                                   | admin | Hash-chained audit log (newest first)                                                         |
 | GET    | `/admin/audit-logs/verify`                            | admin | Recompute the audit hash chain end-to-end                                                     |
 | GET    | `/admin/dashboard`                                    | admin | KPIs (30 d) computed from the ledger + reconciliation status                                  |
@@ -433,7 +437,9 @@ The crash loop runs with `JOBS_ENABLED=true`, or alone with `CRASH_LOOP_ENABLED=
 
 No endpoint, admin or otherwise, sets results, chooses winners, settles a round by hand, credits or debits a balance,
 or edits or deletes ledger rows. `POST /admin/rounds/:id/winner`, `PATCH /admin/ledger/entries/:id` and similar paths
-return `404` (covered by e2e tests). Settlement runs only inside the round lifecycle, from a fulfilled random word.
+return `404` (covered by e2e tests). Settlement runs only inside the round lifecycle, from a fulfilled random word. The
+DEMO-only `/dev/pool/rounds/{number}/close|draw|settle` helper (404 in production / with real money; DEMO rounds only)
+merely triggers those same lifecycle steps early — it takes no input that could influence winners or amounts.
 
 ### admin · console (admin-a)
 
@@ -540,7 +546,8 @@ reads test-USDT `Transfer` logs to assigned addresses (block cursor in `chain_cu
 `DEPOSIT_CONFIRMATIONS_ARBITRUM` (20) confirmations (`deposit_credited`, PENDING → AVAILABLE). Without an RPC URL or
 token address it skips. DEMO: `POST /dev/deposits/simulate` posts the same two postings at once; with
 `mode: "progressive"` it records the deposit as detected (0 / 20) and `POST /dev/deposits/:reference/confirmations`
-adds simulated blocks until it is credited (wallet deposit-flow QA).
+adds simulated blocks until it is credited (wallet deposit-flow QA); at N the same holds as for an on-chain deposit
+apply, so a held DEMO deposit stays in Pending until it is advanced again after the hold ends.
 
 **Re-org safety.** Idempotent by `(network, txHash, logIndex)` (unique index + posting event keys). Each pass first
 re-checks every unconfirmed deposit against the canonical chain through its receipt, then scans; the scan always
@@ -553,7 +560,7 @@ re-reads the last N blocks (N = required confirmations).
 | still missing N blocks after that            | `deposit_reversed` posting (PENDING → CHAIN_CLEARING), status `rejected`, transaction `failed`, notified  |
 | receipt reverted / matching Transfer missing | reversed the same way                                                                                     |
 | a reversed deposit's transfer is back        | the SAME deposit is reopened (`confirming`, `deposit_detected` posted again under a new event key) — never a second deposit |
-| several identical Transfers in one tx        | one deposit per `(txHash, logIndex)`; a re-org that shifts the indices re-indexes all deposits of the tx together |
+| several identical Transfers in one tx        | one deposit per `(txHash, logIndex)`; a re-org that shifts the indices re-indexes all deposits of the tx together (a sibling whose transfer is gone is moved out of the way, then reversed); a batch of reversed deposits re-included at shifted indices is reopened in one pass |
 | N confirmations, but a hold applies          | stays in Pending (`under_review`, "On hold — …"), player notified (`deposit.held`), re-checked every pass |
 
 Credit happens only from a fresh receipt with ≥ N confirmations. Credited deposits are final (that is what N is for).
@@ -589,7 +596,11 @@ requested → risk_check → queued ──────────────�
 
 AML screening (mock, 6 checks): a sanctioned destination is rejected; a new destination, a large amount or high
 velocity goes to `under_review` with **four eyes** (two different admins, each with reason and MFA); otherwise the
-withdrawal is `queued`. The first approval expires after `FOUR_EYES_EXPIRY_HOURS` (4) like every four-eyes request: a
+withdrawal is `queued`. **New destinations vs the whitelist cool-down (platform rule, independent of the AML
+provider):** a whitelisted address is usable 24 h after it was added (`422 ADDRESS_NOT_WHITELISTED` before); a
+destination that is not a whitelisted address already used for a confirmed withdrawal is never sent without four-eyes
+review, even if the screening provider would approve it — so a brand-new address cannot bypass the cool-down
+unreviewed. The first approval expires after `FOUR_EYES_EXPIRY_HOURS` (4) like every four-eyes request: a
 second approval on an expired one expires it (system audit row) and starts a new first approval instead, and a first
 approval withdrawn concurrently is never completed (status-guarded claim, `409`).
 
@@ -616,7 +627,8 @@ thresholds met → randomness requested → `drawing`; fulfilled → **settle**;
 returned to Owed. A round that was never mirrored while the Chainlink provider is active cannot get randomness: it is
 alerted and cancelled with refunds `VRF_TIMEOUT_HOURS` after its close (never left `closed`). `ROUND_AUTO_SCHEDULE` opens the next daily round
 (08:00–20:00 UTC). DEMO rounds are a frozen snapshot: they close at their real time but are drawn only with
-`DEMO_ROUNDS_AUTO_SETTLE=true`.
+`DEMO_ROUNDS_AUTO_SETTLE=true` or on demand with the DEMO-only `POST /dev/pool/rounds/{number}/close|draw|settle`
+(mock VRF; same lifecycle code, audited).
 
 **Winner selection** (`src/modules/randomness/selection.ts`, a mirror of `DrawMath.sol`):
 `candidate_k = keccak256(abi.encode(keccak256("GLOBAL_POOL_WINNERS_V1"), roundId, randomWord, k))`; reject candidates
@@ -694,7 +706,8 @@ categories always send.
 (one generic error message — also when the admin's TOTP factor is locked) and locks the account for
 `ADMIN_LOCKOUT_MINUTES` (15) after `ADMIN_LOGIN_MAX_ATTEMPTS` (5) failures. Attempts are counted under a row lock before
 anything is checked (parallel guesses each count; a lock can never be cleared by a stale request), and an email with
-no active admin gets the same 401 / 403 sequence (counted per email hash in Redis), so responses never reveal which
+no active admin gets the same 401 / 403 sequence (counted per email hash in Redis by one atomic Lua step, so parallel
+guesses match the row-locked admin path; the counter has a sliding 30-day expiry), so responses never reveal which
 emails exist. It returns an access JWT (`ADMIN_ACCESS_TTL`) and an opaque refresh token; refreshing rotates the token,
 and reusing a rotated token revokes the whole family. **Idle timeout server-side:** a session with no admin request
 for `ADMIN_IDLE_TIMEOUT` (15 min) is revoked on its next refresh or request (`401`, `details.reason = idle_timeout`).
@@ -730,13 +743,19 @@ Tables: `users`, `user_profiles`, `user_wallets`, `deposit_addresses`, `sessions
   **balances posted as balanced ledger postings**: Available 9,215.30 · Locked 1,850.00 · Pending 1,000.00 ·
   Owed 415.20 = **12,480.50** (WD-20850 / 20877 / 20931, DP-77380 / 77412, round #1,245 refund, VIP reward, plus one
   aggregated "DEMO history" opening posting).
-- **Round #1,248** open with 3,412 participants, 18,640 entries, pool 186,400.00 and fees 932.00 (DEMO crowd players;
-  @nova.k holds E-1248-00981 … E-1248-01015). History #1,244–#1,247 is seeded as snapshots with their listed winners.
+- **Round #1,248** with 3,412 participants, 18,640 entries, pool 186,400.00 and fees 932.00 (DEMO crowd players;
+  @nova.k holds E-1248-00981 … E-1248-01015): `open` when seeded during its 08:00–20:00 UTC window; seeded between
+  rounds it is the round that closed at the last 20:00 (`closed`, awaiting its draw) and an empty #1,249 is
+  `scheduled` for the next 08:00. No seeded purchase lies in the future. History #1,244–#1,247 is seeded as snapshots:
+  settled rounds carry all 13 prizes of the split (Σ = pool; 1st prize and @nova.k's #1,244 runner-up from demo-data,
+  the other handles fictional) and a DEMO participant count derived at #1,248's entries-per-participant ratio. They
+  have no entry list or VRF word, so they cannot be re-verified — draw #1,248 with the `/dev/pool/rounds` helper for a
+  fully verifiable settled round.
 - **RBAC + 6 DEMO admins:** S. Iyer (Super Admin), A. Marin (Finance Lead), K. Osei (Compliance Officer), R. Duarte
   (Support L2), L. Moreau (Marketing Lead), E. Lindqvist (read-only auditor).
 - Games, VIP levels, geo rules, feature flags, affiliates, notifications.
 
-DEMO dates are shifted by whole days so round #1,248 closes at the next 20:00 UTC (`DEMO_SEED_SHIFT_DAYS=0` keeps the
+DEMO dates are shifted by whole days onto the latest daily window that has already opened (`DEMO_SEED_SHIFT_DAYS=0` keeps the
 exact snapshot). The seed checks the 12,480.50 total and the ledger reconciliation before it finishes.
 
 ## Admin back-office: Finance · Global Pool · Compliance (`admin-ops`, admin-b)

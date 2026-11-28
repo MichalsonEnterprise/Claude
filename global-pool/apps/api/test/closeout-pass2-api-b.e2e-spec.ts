@@ -115,7 +115,10 @@ describe('Q18 a withdrawals freeze is never "no restrictions"', () => {
       paused: { gaming: false, deposits: false, withdrawals: true },
     });
     expect(res.body.restrictions).toEqual([
-      expect.objectContaining({ type: 'withdrawals_frozen', reference: expect.stringMatching(/^FRZ-/) }),
+      expect.objectContaining({
+        type: 'withdrawals_frozen',
+        reference: expect.stringMatching(/^FRZ-/),
+      }),
     ]);
     expect(JSON.stringify(res.body)).not.toContain('e2e pass-2 check');
   });
@@ -386,12 +389,15 @@ describe('R50b an unknown admin email gives the same sequence as a real one, als
 
   it('parallel reservations for one unknown email are atomic: exactly one locks, the rest wait', async () => {
     // Straight at the bookkeeping, so the requests really overlap (over HTTP the DB lookup spreads them out).
-    const auth = t.app.get(AdminAuthService) as unknown as {
-      reserveUnknownEmailAttempt: (
-        hash: string,
-        now: Date,
-      ) => Promise<{ lockedUntil: Date | null; lockedNow: boolean }>;
-    };
+    const auth = t.app.get<
+      AdminAuthService,
+      {
+        reserveUnknownEmailAttempt: (
+          hash: string,
+          now: Date,
+        ) => Promise<{ lockedUntil: Date | null; lockedNow: boolean }>;
+      }
+    >(AdminAuthService);
     const hash = sha256Hex(`nobody-${uid()}@globalpool.test`);
     const now = new Date();
     const slots = await Promise.all(

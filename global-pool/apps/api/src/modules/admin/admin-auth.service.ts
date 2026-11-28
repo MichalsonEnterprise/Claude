@@ -158,9 +158,13 @@ export class AdminAuthService {
   }
 
   private lockedError(lockedUntil: Date) {
-    return new AppError('FORBIDDEN', 'This admin account is temporarily locked after failed sign-ins', {
-      lockedUntil: lockedUntil.toISOString(),
-    });
+    return new AppError(
+      'FORBIDDEN',
+      'This admin account is temporarily locked after failed sign-ins',
+      {
+        lockedUntil: lockedUntil.toISOString(),
+      },
+    );
   }
 
   /** One login attempt against an admin row (see login). The 5th attempt sets the lock and still gets checked. */

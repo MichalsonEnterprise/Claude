@@ -1,18 +1,26 @@
 /**
- * DEMO seed clock for the current round (prisma/seed.ts). The DEMO snapshot is shifted by whole days so round #1,248
- * closes at the next 20:00 UTC; seeded before 08:00 UTC its window has not opened yet.
+ * DEMO seed clock for the current round (prisma/seed.ts, Q20 / Q07). The DEMO snapshot (round #1,248, 08:00–20:00 UTC
+ * with 18,640 entries bought during the day) is shifted by WHOLE days onto the real clock:
  *
- * - Status follows the real clock (Q20): `open` only once `opensAt` has passed, otherwise `scheduled` — the regular
- *   lifecycle tick opens it at `opensAt`, exactly like any other round. A round is never `open` while it refuses
- *   entries.
- * - Purchase times never lie in the future (Q07): when the snapshot's purchase timeline (08:00 … 18:42) is not over
- *   yet, it is compressed, in order, into [opensAt, now − 1 min]. Before `opensAt` (scheduled) it is kept as is: a
- *   DEMO snapshot of a round that has not opened yet.
+ * - The shift picks the latest daily window that has already OPENED, so the seeded entries never precede their
+ *   round's opening (a round is never `open` while it refuses entries, and no round holds stakes before it opens).
+ * - Seeded during the window (08:00–20:00 UTC) the round is `open`; seeded between rounds it is the round that closed
+ *   at the last 20:00 UTC (`closed`, awaiting its draw) and the next round is `scheduled` for the next 08:00 UTC.
+ * - Purchase times never lie in the future: while the snapshot's purchase timeline (08:00 … 18:44) is not over yet it
+ *   is compressed, in order, into [opensAt, now − 1 min].
  */
-export type DemoRoundSeedStatus = 'open' | 'scheduled';
+export const DAY_MS = 86_400_000;
 
-export function demoRoundSeedStatus(opensAt: Date, now: Date): DemoRoundSeedStatus {
-  return opensAt.getTime() <= now.getTime() ? 'open' : 'scheduled';
+export type DemoRoundSeedStatus = 'scheduled' | 'open' | 'closed';
+
+/** Whole days that move the snapshot's opening onto the latest daily opening at or before `nowMs`. */
+export function demoSeedShiftDays(snapshotOpensAtMs: number, nowMs: number): number {
+  return Math.max(0, Math.floor((nowMs - snapshotOpensAtMs) / DAY_MS));
+}
+
+export function demoRoundSeedStatus(opensAt: Date, closesAt: Date, now: Date): DemoRoundSeedStatus {
+  if (now.getTime() < opensAt.getTime()) return 'scheduled';
+  return now.getTime() < closesAt.getTime() ? 'open' : 'closed';
 }
 
 /** Maps a planned DEMO purchase time (ms) to a seeded one that is not in the future (order preserved). */

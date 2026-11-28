@@ -16,7 +16,7 @@ import type { VipTierView } from '@/lib/data/types';
 import { cn } from '@/lib/utils';
 
 import { AffiliateArt, ChipStackArt, CrownArt } from './art';
-import { useHomeView } from './home-context';
+import { useHomeView, viewerIsDemoPlayer } from './home-context';
 import { HomeSection, SectionHeader } from './primitives';
 
 const card = 'rounded-xl border border-border-subtle bg-surface-default';
@@ -169,7 +169,7 @@ export function VipSection() {
       <ul className="no-scrollbar relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 tablet:mx-0 tablet:grid tablet:gap-4 tablet:overflow-visible tablet:px-0 tablet:grid-cols-3 laptop:grid-cols-5">
         {tiers.data
           ? tiers.data.map((t) => (
-              <TierCard key={t.tier} t={t} current={viewer === 'member' && t.tier === 'gold'} />
+              <TierCard key={t.tier} t={t} current={viewerIsDemoPlayer(viewer) && t.tier === 'gold'} />
             ))
           : Array.from({ length: 5 }, (_, i) => (
               <li key={i} className="w-[64%] shrink-0 tablet:w-auto">

@@ -44,7 +44,7 @@ import {
   ShieldCheckArt,
   TicketGlyph,
 } from './art';
-import { useHomeView } from './home-context';
+import { useHomeView, viewerIsDemoPlayer } from './home-context';
 import { ArrowLink, GoldText } from './primitives';
 
 // ── hero slides ─────────────────────────────────────────────────────────────────────────────────
@@ -578,7 +578,22 @@ function PromoRow() {
         link={<ArrowLink href={ROUTES.vip}>See VIP tiers</ArrowLink>}
         art={<CrownArt className="absolute top-5 right-2 w-[112px]" />}
       />
-      {viewer === 'member' ? (
+      {viewer === 'member' && !viewerIsDemoPlayer(viewer) ? (
+        // API data source: rakeback is not live, so no amount is shown as this member's (R37 / Q02).
+        <PromoCard
+          className="bg-surface-default"
+          demo={false}
+          overline={<span className="text-text-brand">Rakeback</span>}
+          title="Rakeback isn’t live in this build yet"
+          extra={
+            <p className="mt-1 text-caption text-text-secondary">
+              5% of house edge back · nothing to claim yet
+            </p>
+          }
+          link={<ArrowLink href={ROUTES.vip}>See VIP tiers</ArrowLink>}
+          art={<WelcomeArt />}
+        />
+      ) : viewer === 'member' ? (
         <PromoCard
           className="bg-surface-default"
           demo={false}

@@ -500,10 +500,12 @@ export function RestrictedScreen({ variant }: { variant: RestrictedVariant }) {
     queryFn: authApi.accountStatus,
     enabled: member,
   });
+  // Balances are readable under every restriction (GET /wallet/balances has no restriction policy); a withdrawals
+  // hold only disables the withdraw button — it must never leave the balance card loading forever.
   const balances = useQuery({
     queryKey: authKeys.balances,
     queryFn: authApi.balances,
-    enabled: member && status.data !== undefined && !status.data.paused.withdrawals,
+    enabled: member && status.data !== undefined,
     retry: false,
   });
 

@@ -148,15 +148,17 @@ function settledRound(
   const prizes = prizeBreakdown(pool).tiers;
   const handles = PRIZE_HANDLES.filter((h) => h !== firstHandle);
   const offset = n % handles.length;
-  const ranked: RoundWinner[] = prizes.flatMap((t) =>
-    Array.from({ length: t.winners }, () => ({ tier: t.tier, amount: t.amountEach })),
-  ).map((p, i) => ({
-    place: i + 1,
-    tier: p.tier,
-    handle: i === 0 ? firstHandle : handles[(offset + i - 1) % handles.length]!,
-    entryId: null,
-    amount: p.amount,
-  }));
+  const ranked: RoundWinner[] = prizes
+    .flatMap((t) =>
+      Array.from({ length: t.winners }, () => ({ tier: t.tier, amount: t.amountEach })),
+    )
+    .map((p, i) => ({
+      place: i + 1,
+      tier: p.tier,
+      handle: i === 0 ? firstHandle : handles[(offset + i - 1) % handles.length]!,
+      entryId: null,
+      amount: p.amount,
+    }));
   const winners = ranked.map((w) => extra.find((x) => x.place === w.place) ?? w);
   return demo({
     id: demoId('round', n),
@@ -166,7 +168,9 @@ function settledRound(
     closesAt: `${day}T20:00:00Z`,
     entryPrice: ENTRY_PRICE,
     platformFeePerEntry: PLATFORM_FEE_PER_ENTRY,
-    participants: Math.round((entries * (DEMO_CURRENT_ROUND.participants ?? 0)) / DEMO_CURRENT_ROUND.entries),
+    participants: Math.round(
+      (entries * (DEMO_CURRENT_ROUND.participants ?? 0)) / (DEMO_CURRENT_ROUND.entries ?? 1),
+    ),
     entries,
     poolBalance: pool,
     platformFees: feesForEntries(entries),

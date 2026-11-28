@@ -314,6 +314,20 @@ export function shellValue<T>(
 }
 
 /**
+ * The member's public handle as the shell shows it: always with the leading "@" (`@nova.k`), from the API profile's
+ * `displayHandle` when it is loaded; "Player" before onboarding (no handle yet).
+ */
+export function shellHandle(
+  profile: { displayHandle?: string | null; handle?: string | null } | null | undefined,
+  handle: string | null | undefined,
+): string {
+  if (profile?.displayHandle) return profile.displayHandle;
+  const raw = profile?.handle ?? handle;
+  if (!raw) return 'Player';
+  return raw.startsWith('@') ? raw : `@${raw}`;
+}
+
+/**
  * The signed-in member's own shell data in API mode — Available (GET /wallet/balances, shared with the wallet
  * pages), entries in the open round, unread notifications — and the live pool amount for everyone. Keys are the
  * modules' own, so every financial write that refreshes them (player-cache.ts) refreshes the shell too.
@@ -389,7 +403,7 @@ function ConnectedShell({
     : user
       ? live.api
         ? {
-            handle: user.handle ?? 'Player',
+            handle: shellHandle(auth.profile, user.handle),
             initials: user.initials,
             publicId: auth.profile?.publicId,
             available: live.available,
@@ -399,7 +413,7 @@ function ConnectedShell({
           }
         : {
             ...DEMO_SHELL_MEMBER,
-            handle: user.handle ?? DEMO_SHELL_MEMBER.handle,
+            handle: user.handle ? shellHandle(auth.profile, user.handle) : DEMO_SHELL_MEMBER.handle,
             initials: user.isDemo ? DEMO_SHELL_MEMBER.initials : user.initials,
           }
       : overrides.previewMember

@@ -63,7 +63,9 @@ describe('Q18 /restricted/under-review with an AML withdrawals freeze', () => {
     gate: 'under_review',
     onboarded: true,
     status: 'active',
-    restrictions: [{ type: 'withdrawals_frozen', since: '2026-11-28T06:10:00Z', reference: 'FRZ-1A2B3C' }],
+    restrictions: [
+      { type: 'withdrawals_frozen', since: '2026-11-28T06:10:00Z', reference: 'FRZ-1A2B3C' },
+    ],
     paused: { gaming: false, deposits: false, withdrawals: true },
     selfExclusion: { active: false, startsAt: null, endsAt: null, kind: null },
     region: {
@@ -83,17 +85,23 @@ describe('Q18 /restricted/under-review with an AML withdrawals freeze', () => {
     expect(t).toMatch(/Paused during the review.*Withdrawals/);
     expect(t).toContain('FRZ-1A2B3C');
     // The first call to action is support; the withdraw button is shown as unavailable, never as a link.
-    expect(html.indexOf('Contact support')).toBeLessThan(html.indexOf('Withdraw available balance'));
+    expect(html.indexOf('Contact support')).toBeLessThan(
+      html.indexOf('Withdraw available balance'),
+    );
     expect(html).not.toMatch(/<a[^>]*href="\/wallet"[^>]*>Withdraw available balance/);
   });
 
   it('a review without a freeze still says withdrawals stay open', () => {
     const blocked: AccountStatus = {
       ...frozen,
-      restrictions: [{ type: 'gaming_blocked', since: '2026-11-28T06:10:00Z', reference: 'REV-9Z8Y7X' }],
+      restrictions: [
+        { type: 'gaming_blocked', since: '2026-11-28T06:10:00Z', reference: 'REV-9Z8Y7X' },
+      ],
       paused: { gaming: true, deposits: false, withdrawals: false },
     };
-    const t = text(render(<RestrictedView variant="under-review" status={blocked} balances={null} />));
+    const t = text(
+      render(<RestrictedView variant="under-review" status={blocked} balances={null} />),
+    );
     expect(t).toMatch(/withdrawals stay open/i);
     expect(t).not.toContain('Withdrawals are on hold');
   });
@@ -136,7 +144,13 @@ describe('R27b /wallet "In progress" never hides a failed deposits list', () => 
     pending: '40.00',
     owed: '0.00',
     total: '40.00',
-    breakdown: { lockedWithdrawals: '0.00', lockedEntries: '0.00', locked: [], pending: [], owed: [] },
+    breakdown: {
+      lockedWithdrawals: '0.00',
+      lockedEntries: '0.00',
+      locked: [],
+      pending: [],
+      owed: [],
+    },
   };
 
   it('a refused GET /deposits shows the error, not "Nothing in progress"', () => {

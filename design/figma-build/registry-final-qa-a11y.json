@@ -1,0 +1,16 @@
+{
+ "_note": "Agent final-qa-a11y (28 Nov 2026): mobile accessibility follow-ups from the final QA. No new screens. Library: Tabs/Segmented gets a Size axis (M = original 42 px, still the default; L = 48 px for 390 touch layouts). Page 10: Orbit Rush 390 controls at Size L, Tabs/Segmented L on every 390 game frame, CR-06 consent row min 44 px, Pool Roulette 390 header subtitle wraps to two lines, MOB-08 annotation updated. See decisions.md #66.",
+ "Tabs/Segmented": {
+  "id": "20:6978",
+  "variants": { "Segments": ["2", "3", "4"], "Size": ["M", "L"] },
+  "variantIds": {
+   "Segments=2, Size=M": "20:6959", "Segments=3, Size=M": "20:6967", "Segments=4, Size=M": "20:6977",
+   "Segments=2, Size=L": "368:20328", "Segments=3, Size=L": "368:20333", "Segments=4, Size=L": "368:20340"
+  },
+  "note": "Size=M (default, first in the set): 42 px track, 32 px segments, for desktop, laptop and tablet. Size=L: 48 px track (1 px border + 4 px padding + 38 px segments + 4 + 1), for every 390 layout. I('20:6978', {Segments:'2'}) still returns M; use I('20:6978', {Segments:'2', Size:'L'}) on mobile. To swap an existing instance: inst.swapComponent(L variant); nested Tabs/Segment label and Active-state overrides are kept."
+ },
+ "Control/Checkbox": {
+  "id": "20:3205",
+  "note": "No library change. On mobile consent rows, set instance.minHeight = 44 (done on CR-06 390 34:480691 and its 2 MOB-08 crop clones). Instances accept minHeight directly; no wrapper frame is needed."
+ }
+}

@@ -531,7 +531,8 @@ export function roundResultOf(rows: readonly EntryHistoryItem[]): {
   const total = (xs: EntryHistoryItem[], pick: (r: EntryHistoryItem) => string | null) =>
     toUSDTString(sum(xs.map((r) => pick(r) ?? '0')));
   const won = of('won');
-  if (won.length > 0) return { kind: 'won', prize: total(won, (r) => r.result.prize), refund: null };
+  if (won.length > 0)
+    return { kind: 'won', prize: total(won, (r) => r.result.prize), refund: null };
   for (const kind of ['refund_owed', 'refunded'] as const) {
     const refunds = of(kind);
     if (refunds.length > 0)

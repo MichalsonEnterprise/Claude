@@ -119,22 +119,22 @@ describe('DEMO round #1,248', () => {
     for (const r of DEMO.previousRounds.filter((x) => x.status === 'settled')) {
       expect(r.participants).not.toBeNull();
       expect(r.thresholds.met).toBe(true);
-      expect(meetsThreshold({ participants: r.participants!, poolBalance: r.poolBalance })).toBe(
+      expect(meetsThreshold({ participants: r.participants!, poolBalance: r.poolBalance! })).toBe(
         true,
       );
       expect(r.winners.map((w) => w.place)).toEqual(Array.from({ length: 13 }, (_, i) => i + 1));
       expect(toUSDTString(sum(r.winners.map((w) => w.amount)))).toBe(r.poolBalance);
       expect(new Set(r.winners.map((w) => w.handle)).size).toBe(13);
-      expect(r.winners[0]!.amount).toBe(prizeBreakdown(r.poolBalance).tiers[0]!.amountEach);
+      expect(r.winners[0]!.amount).toBe(prizeBreakdown(r.poolBalance!).tiers[0]!.amountEach);
     }
-    expect(DEMO.previousRounds.map((x) => [x.number, x.participants, x.winners[0]?.handle])).toEqual(
-      [
-        [1247, 3166, 'orbit_77'],
-        [1246, 3083, 'mira.sol'],
-        [1245, 412, undefined],
-        [1244, 3314, 'kestrel'],
-      ],
-    );
+    expect(
+      DEMO.previousRounds.map((x) => [x.number, x.participants, x.winners[0]?.handle]),
+    ).toEqual([
+      [1247, 3166, 'orbit_77'],
+      [1246, 3083, 'mira.sol'],
+      [1245, 412, undefined],
+      [1244, 3314, 'kestrel'],
+    ]);
     expect(DEMO.previousRounds[3]!.winners[3]).toMatchObject({
       place: 4,
       tier: 'runner_up',

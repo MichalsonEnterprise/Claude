@@ -303,18 +303,30 @@ export class WithdrawalsService {
       }),
     ]);
     const whitelisted = Boolean(wallet?.whitelistedAt);
+    const newDestination = !whitelisted || priorConfirmed === 0;
     const result = await this.prisma.tx(async (tx) => {
-      const screening = await this.aml.screenWithdrawal(tx, {
+      const screened = await this.aml.screenWithdrawal(tx, {
         withdrawalId: w.id,
         userId: w.userId,
         network: w.network,
         address: w.toAddress,
         amount: w.amount.toFixed(),
-        newDestination: !whitelisted || priorConfirmed === 0,
+        newDestination,
         whitelisted,
         withdrawalsLast24h: last24h,
         accountAgeDays: (Date.now() - w.user.createdAt.getTime()) / 86_400_000,
       });
+      // Platform rule (Q25), independent of the AML provider: a destination that is not a whitelisted address already
+      // used for a confirmed withdrawal never leaves without FOUR-EYES review. A brand-new address therefore cannot
+      // bypass the 24 h whitelist cool-down unreviewed (the cool-down itself applies to whitelisted addresses).
+      const screening =
+        newDestination && screened.decision === 'approve'
+          ? {
+              ...screened,
+              decision: 'review' as const,
+              reason: screened.reason ?? 'New destination — manual four-eyes review before sending',
+            }
+          : screened;
       const current = await tx.withdrawal.findUniqueOrThrow({ where: { id: w.id } });
       await tx.withdrawal.update({
         where: { id: w.id },

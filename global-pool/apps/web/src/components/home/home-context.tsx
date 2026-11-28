@@ -2,7 +2,17 @@
 
 import * as React from 'react';
 
+import { DATA_SOURCE } from '@/lib/data/source';
 import type { HomeScenario, MyEntriesView, PoolSnapshot, ViewerBalance } from '@/lib/data/types';
+
+/**
+ * True when the member figures that are still mock-only (live-bets "YOU" row, rakeback amount, VIP tier) describe this
+ * viewer: only in the mock data source, where the signed-in viewer IS the DEMO player @nova.k. With the API those
+ * feeds are not the member's own, so they are never shown as theirs (R37 / Q02).
+ */
+export function viewerIsDemoPlayer(viewer: 'guest' | 'member'): boolean {
+  return viewer === 'member' && DATA_SOURCE !== 'api';
+}
 
 /** Resolved homepage view state shared by every section (viewer, region gate, round scenario, clock). */
 export interface HomeView {

@@ -26,7 +26,7 @@ import { useLiveBets, useRecentWins } from '@/lib/data/hooks';
 import type { LiveBet, LiveBetTab, RecentWin } from '@/lib/data/types';
 import { cn } from '@/lib/utils';
 
-import { useHomeView } from './home-context';
+import { useHomeView, viewerIsDemoPlayer } from './home-context';
 import { HomeSection, LiveDot, PlayerTag, TokenAmount } from './primitives';
 
 // ── recent wins strip (Strip/Recent Wins) ───────────────────────────────────────────────────────
@@ -240,7 +240,7 @@ function LiveBetsTable() {
             <tbody>
               {bets.data
                 ? data.map((b, i) => {
-                    const mine = viewer === 'member' && b.handle === 'nova.k';
+                    const mine = viewerIsDemoPlayer(viewer) && b.handle === 'nova.k';
                     const lost = b.result.type === 'payout' && !b.result.win;
                     return (
                       <tr

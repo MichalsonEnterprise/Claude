@@ -68,15 +68,22 @@ async function fetchPoolSnapshot(scenario: HomeScenario): Promise<PoolSnapshot> 
   if (!api) return mockResolve(mockPoolSnapshot(scenario));
   // The endpoint returns the open round, else the next scheduled one, else the latest.
   const round = await apiGet<RoundView & { opensAt?: string }>('/pool/rounds/current');
-  const open = round.status === 'open';
-  const scheduled = round.status === 'scheduled';
+  const serverNow = new Date();
+  // A round accepts entries only once `opensAt` has passed (EntriesService.enter, pool logic `not_open_yet`): an
+  // `open` status with a future opensAt is still the NEXT round — never "Closes in … / Enter round" (Q03).
+  const notOpenYet =
+    round.status === 'open' &&
+    round.opensAt !== undefined &&
+    Date.parse(round.opensAt) > serverNow.getTime();
+  const open = round.status === 'open' && !notOpenYet;
+  const scheduled = round.status === 'scheduled' || notOpenYet;
   const previous = open
     ? null
     : ((await apiGet<{ items: RoundView[] }>('/pool/rounds?pageSize=1')).items[0] ?? null);
   const DAY = 24 * 3600_000;
   const plusDay = (iso: string) => new Date(new Date(iso).getTime() + DAY).toISOString();
   return {
-    serverNow: new Date().toISOString(),
+    serverNow: serverNow.toISOString(),
     current: open ? round : null,
     last: previous ?? round,
     next: scheduled

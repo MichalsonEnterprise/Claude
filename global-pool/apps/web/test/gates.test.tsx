@@ -231,7 +231,7 @@ describe('gateView — what one render shows', () => {
     for (const pathname of [
       '/wallet/withdraw',
       '/wallet',
-      '/history/entries',
+      '/history/games/entries',
       '/support',
       '/account',
     ]) {
