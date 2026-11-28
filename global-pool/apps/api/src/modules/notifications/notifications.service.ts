@@ -19,7 +19,42 @@ export type NotificationType =
   | 'round.prize_won'
   | 'round.cancelled'
   | 'security.2fa'
+  | 'kyc.submitted'
+  | 'kyc.approved'
+  | 'kyc.resubmission_required'
   | 'account.restriction';
+
+export const NOTIFICATION_CATEGORY_FILTERS = [
+  'security',
+  'transactions',
+  'rounds',
+  'promotions',
+  'account',
+] as const;
+export type NotificationCategoryFilter = (typeof NOTIFICATION_CATEGORY_FILTERS)[number];
+
+const CATEGORY_PREFIXES: Record<NotificationCategoryFilter, string[]> = {
+  security: ['security.'],
+  transactions: ['deposit.', 'withdrawal.'],
+  rounds: ['round.'],
+  promotions: ['promo.', 'vip.', 'reward.'],
+  account: ['account.', 'kyc.'],
+};
+
+/** Category of a notification type (prefix before the first dot). */
+export function categoryOf(type: string): NotificationCategoryFilter {
+  for (const [cat, prefixes] of Object.entries(CATEGORY_PREFIXES) as [
+    NotificationCategoryFilter,
+    string[],
+  ][]) {
+    if (prefixes.some((p) => type.startsWith(p))) return cat;
+  }
+  return 'account';
+}
+
+function categoryWhere(category: NotificationCategoryFilter): Prisma.NotificationWhereInput {
+  return { OR: CATEGORY_PREFIXES[category].map((p) => ({ type: { startsWith: p } })) };
+}
 
 @Injectable()
 export class NotificationsService {
@@ -48,12 +83,16 @@ export class NotificationsService {
     });
   }
 
-  async list(userId: string, query: PaginationQuery & { unread?: boolean }) {
+  async list(
+    userId: string,
+    query: PaginationQuery & { unread?: boolean; category?: NotificationCategoryFilter },
+  ) {
     const where: Prisma.NotificationWhereInput = {
       userId,
       ...(query.unread ? { readAt: null } : {}),
+      ...(query.category ? categoryWhere(query.category) : {}),
     };
-    const [rows, total, unread] = await Promise.all([
+    const [rows, total, unread, counts] = await Promise.all([
       this.prisma.notification.findMany({
         where,
         orderBy: { createdAt: 'desc' },
@@ -62,12 +101,14 @@ export class NotificationsService {
       }),
       this.prisma.notification.count({ where }),
       this.prisma.notification.count({ where: { userId, readAt: null } }),
+      this.categoryCounts(userId),
     ]);
     return {
       ...paginate(
         rows.map((n) => ({
           id: n.id,
           type: n.type,
+          category: categoryOf(n.type),
           title: n.title,
           body: n.body,
           data: n.data,
@@ -79,7 +120,30 @@ export class NotificationsService {
         query,
       ),
       unread,
+      counts,
     };
+  }
+
+  /** Per-category totals for the USR-02 filter chips (All / Unread / Security / Transactions / Rounds / Promotions). */
+  private async categoryCounts(userId: string) {
+    const rows = await this.prisma.notification.groupBy({
+      by: ['type'],
+      where: { userId },
+      _count: { _all: true },
+    });
+    const counts: Record<NotificationCategoryFilter | 'all', number> = {
+      all: 0,
+      security: 0,
+      transactions: 0,
+      rounds: 0,
+      promotions: 0,
+      account: 0,
+    };
+    for (const r of rows) {
+      counts.all += r._count._all;
+      counts[categoryOf(r.type)] += r._count._all;
+    }
+    return counts;
   }
 
   async markRead(userId: string, id: string) {

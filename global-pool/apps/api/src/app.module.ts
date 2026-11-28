@@ -12,6 +12,7 @@ import { PrismaModule } from './infra/prisma/prisma.module';
 import { QueuesModule } from './infra/queues/queues.module';
 import { RedisModule } from './infra/redis/redis.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { AdminOpsModule } from './modules/admin-ops/admin-ops.module';
 import { AffiliatesModule } from './modules/affiliates/affiliates.module';
 import { AmlModule } from './modules/aml/aml.module';
 import { AuditModule } from './modules/audit/audit.module';
@@ -22,6 +23,7 @@ import { DepositsModule } from './modules/deposits/deposits.module';
 import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
 import { GamesModule } from './modules/games/games.module';
 import { HealthModule } from './modules/health/health.module';
+import { HistoryModule } from './modules/history/history.module';
 import { IdempotencyModule } from './modules/idempotency/idempotency.module';
 import { KycModule } from './modules/kyc/kyc.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
@@ -79,7 +81,9 @@ import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
     WithdrawalsModule,
     PoolModule,
     GamesModule,
+    HistoryModule,
     AdminModule,
+    AdminOpsModule,
     PlatformModule,
     HealthModule,
   ],

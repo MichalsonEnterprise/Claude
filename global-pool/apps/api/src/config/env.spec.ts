@@ -33,3 +33,43 @@ describe('config validation', () => {
     expect(parseEnv({ ...base, PRIVY_APP_ID: '' }).PRIVY_APP_ID).toBeUndefined();
   });
 });
+
+describe('on-chain configuration (testnet only)', () => {
+  const key = `0x${'ab'.repeat(32)}`;
+  const chain = {
+    ARBITRUM_SEPOLIA_RPC_URL: 'http://127.0.0.1:8545',
+    POOL_CONTRACT_ADDRESS: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+    TEST_USDT_ADDRESS_ARBITRUM_SEPOLIA: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+  };
+
+  it('accepts only Arbitrum Sepolia and the local Anvil devnet, and never Anvil in production', () => {
+    expect(parseEnv(base).EVM_CHAIN_ID).toBe(421_614);
+    expect(parseEnv({ ...base, EVM_CHAIN_ID: '31337' }).EVM_CHAIN_ID).toBe(31_337);
+    expect(() => parseEnv({ ...base, EVM_CHAIN_ID: '42161' })).toThrow(/EVM_CHAIN_ID/); // Arbitrum One mainnet
+    expect(() => parseEnv({ ...base, EVM_CHAIN_ID: '1' })).toThrow(/EVM_CHAIN_ID/);
+    expect(() =>
+      parseEnv({ ...base, NODE_ENV: 'production', EVM_CHAIN_ID: '31337' }),
+    ).toThrow(/not allowed in production/);
+  });
+
+  it('validates signer keys and the requirements of round mirroring / withdrawal broadcasting', () => {
+    expect(() => parseEnv({ ...base, POOL_OPERATOR_PRIVATE_KEY: '0x1234' })).toThrow(
+      /POOL_OPERATOR_PRIVATE_KEY/,
+    );
+    expect(() => parseEnv({ ...base, POOL_ONCHAIN_MIRROR: 'true' })).toThrow(
+      /RANDOMNESS_PROVIDER=chainlink[\s\S]*POOL_OPERATOR_PRIVATE_KEY/,
+    );
+    const mirror = parseEnv({
+      ...base,
+      ...chain,
+      POOL_ONCHAIN_MIRROR: 'true',
+      RANDOMNESS_PROVIDER: 'chainlink',
+      POOL_OPERATOR_PRIVATE_KEY: key,
+    });
+    expect(mirror.POOL_ONCHAIN_MIRROR).toBe(true);
+    expect(() => parseEnv({ ...base, ...chain, WITHDRAWAL_BROADCASTER_ENABLED: 'true' })).toThrow(
+      /WITHDRAWAL_SIGNER_PRIVATE_KEY/,
+    );
+    expect(() => parseEnv({ ...base, EMAIL_TRANSPORT: 'smtp' })).toThrow(/SMTP_HOST/);
+  });
+});

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma, RestrictionType, WithdrawalStatus } from '@prisma/client';
-import { paginate, type PaginationQuery } from '@gp/shared/schemas';
+import { RESTRICTION_REQUIRES_FOUR_EYES } from '@gp/shared/enums';
+import { paginate, type AdminUsersQuery, type PaginationQuery } from '@gp/shared/schemas';
 
 import { AppError, notFound } from '../../common/errors';
 import { usdt } from '../../common/money';
@@ -12,6 +13,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { maskEmail } from '../users/users.service';
 import { WithdrawalsService } from '../withdrawals/withdrawals.service';
 import { AdminSecurityService } from './admin-security.service';
+import { FourEyesService } from './four-eyes.service';
 
 /**
  * Admin back-office. By design there is NO capability to edit round results, choose winners, move funds
@@ -26,30 +28,53 @@ export class AdminService {
     private readonly security: AdminSecurityService,
     private readonly withdrawals: WithdrawalsService,
     private readonly notifications: NotificationsService,
+    private readonly fourEyes: FourEyesService,
   ) {}
 
-  async listUsers(query: PaginationQuery & { q?: string }) {
-    const where: Prisma.UserWhereInput = query.q
-      ? {
-          OR: [
-            { handle: { contains: query.q.toLowerCase() } },
-            { publicId: { equals: query.q.toUpperCase() } },
-            { email: { contains: query.q.toLowerCase() } },
-          ],
-        }
-      : {};
+  async listUsers(query: PaginationQuery & Partial<Omit<AdminUsersQuery, 'page' | 'pageSize'>>) {
+    const and: Prisma.UserWhereInput[] = [];
+    if (query.q) {
+      and.push({
+        OR: [
+          { handle: { contains: query.q.toLowerCase().replace(/^@/, '') } },
+          { publicId: { equals: query.q.toUpperCase() } },
+          { email: { contains: query.q.toLowerCase() } },
+        ],
+      });
+    }
+    if (query.status) and.push({ status: query.status });
+    if (query.kycLevel) {
+      and.push(
+        query.kycLevel === 'none'
+          ? { OR: [{ profile: { is: null } }, { profile: { kycLevel: 'none' } }] }
+          : { profile: { kycLevel: query.kycLevel } },
+      );
+    }
+    if (query.restricted === 'yes') and.push({ restrictions: { some: { liftedAt: null } } });
+    if (query.restricted === 'no') and.push({ restrictions: { none: { liftedAt: null } } });
+    const where: Prisma.UserWhereInput = and.length > 0 ? { AND: and } : {};
     const [rows, total] = await Promise.all([
       this.prisma.user.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip: (query.page - 1) * query.pageSize,
         take: query.pageSize,
-        include: { profile: true, restrictions: { where: { liftedAt: null } } },
+        include: {
+          profile: true,
+          restrictions: { where: { liftedAt: null } },
+          amlAlerts: {
+            where: { status: { in: ['open', 'under_review', 'escalated'] } },
+            select: { riskLevel: true },
+          },
+        },
       }),
       this.prisma.user.count({ where }),
     ]);
+    // Ledger-derived totals (read-only) for the page — one query per row, page size ≤ 100.
+    const balances = await Promise.all(rows.map((u) => this.ledger.userBalances(u.id)));
+    const RANK = { low: 1, medium: 2, high: 3, critical: 4 } as const;
     return paginate(
-      rows.map((u) => ({
+      rows.map((u, i) => ({
         id: u.id,
         publicId: u.publicId,
         handle: u.handle,
@@ -62,6 +87,13 @@ export class AdminService {
         restrictions: u.restrictions.map((r) => r.type),
         createdAt: u.createdAt.toISOString(),
         lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
+        totalBalance: balances[i]?.total ?? '0.00',
+        amlOpenAlerts: u.amlAlerts.length,
+        amlRiskLevel:
+          u.amlAlerts.reduce<keyof typeof RANK | null>(
+            (acc, a) => (acc === null || RANK[a.riskLevel] > RANK[acc] ? a.riskLevel : acc),
+            null,
+          ) ?? null,
         isDemo: u.isDemo,
       })),
       total,
@@ -140,10 +172,36 @@ export class AdminService {
   async applyRestriction(
     admin: AuthAdmin,
     userId: string,
-    input: { type: RestrictionType; reason: string; mfaCode: string },
+    input: { type: RestrictionType; reason: string; mfaCode: string; reasonCategory?: string },
     meta: RequestMeta,
   ) {
     await this.security.assertSensitive(admin, 'users.restrict', input);
+    if (RESTRICTION_REQUIRES_FOUR_EYES[input.type]) {
+      // Withdrawal holds and account suspensions need a second admin (ADM-X1): store a request, change nothing yet.
+      const target = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!target) throw notFound('User');
+      const active = await this.prisma.userRestriction.findFirst({
+        where: { userId, type: input.type, liftedAt: null },
+      });
+      if (active) throw new AppError('CONFLICT', `Restriction ${input.type} is already active`);
+      return this.fourEyes.request(
+        admin,
+        {
+          action: 'user.restriction.apply',
+          targetType: 'user',
+          targetId: userId,
+          reason: input.reason,
+          reasonCategory: input.reasonCategory,
+          payload: {
+            type: input.type,
+            userHandle: target.handle,
+            userPublicId: target.publicId,
+          },
+          dedupeKey: input.type,
+        },
+        meta,
+      );
+    }
     return this.prisma.tx(async (tx) => {
       const user = await tx.user.findUnique({ where: { id: userId } });
       if (!user) throw notFound('User');
@@ -166,7 +224,12 @@ export class AdminService {
           ip: meta.ip,
           userAgent: meta.userAgent,
           requestId: meta.requestId,
-          metadata: { restrictionId: restriction.id, type: input.type },
+          metadata: {
+            restrictionId: restriction.id,
+            type: input.type,
+            reasonCategory: input.reasonCategory ?? null,
+            fourEyes: false,
+          },
         },
         tx,
       );
@@ -178,6 +241,7 @@ export class AdminService {
         data: { type: input.type },
       });
       return {
+        status: 'active' as const,
         id: restriction.id,
         type: restriction.type,
         appliedAt: restriction.appliedAt.toISOString(),
@@ -189,7 +253,7 @@ export class AdminService {
     admin: AuthAdmin,
     userId: string,
     restrictionId: string,
-    input: { reason: string; mfaCode: string },
+    input: { reason: string; mfaCode: string; reasonCategory?: string },
     meta: RequestMeta,
   ) {
     await this.security.assertSensitive(admin, 'users.restrict', input);
@@ -214,7 +278,7 @@ export class AdminService {
           ip: meta.ip,
           userAgent: meta.userAgent,
           requestId: meta.requestId,
-          metadata: { restrictionId, type: r.type },
+          metadata: { restrictionId, type: r.type, reasonCategory: input.reasonCategory ?? null },
         },
         tx,
       );

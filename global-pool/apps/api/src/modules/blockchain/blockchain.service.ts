@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CHAINS, CHAIN_DISPLAY_ORDER, type ChainKey } from '@gp/shared/chains';
-import { createPublicClient, http, type Address, type PublicClient } from 'viem';
-import { arbitrumSepolia } from 'viem/chains';
+import { createPublicClient, http, type Address, type Chain, type PublicClient } from 'viem';
 
 import { AppConfig } from '../../config/app-config';
+import { evmChain } from './evm-chain';
 
 /**
- * Read-only chain access (TESTNETS ONLY). The MVP chain is Arbitrum Sepolia (421614); other networks stay
- * "coming soon" in @gp/shared/chains and have no client here. No signing keys live in this module.
+ * Read-only chain access (TESTNETS ONLY). The MVP chain is Arbitrum Sepolia (421614) — or a local Anvil devnet
+ * (31337, dev / e2e) when EVM_CHAIN_ID says so; other networks stay "coming soon" in @gp/shared/chains and have no
+ * client here. Signing lives in ChainSignerService (testnet keys from env, checked against eth_chainId).
  */
 @Injectable()
 export class BlockchainService {
@@ -24,11 +25,21 @@ export class BlockchainService {
     const rpc = this.config.env.ARBITRUM_SEPOLIA_RPC_URL;
     if (!rpc) return null;
     const client = createPublicClient({
-      chain: arbitrumSepolia,
+      chain: this.chain(),
       transport: http(rpc, { timeout: 15_000, retryCount: 2 }),
+      pollingInterval: this.config.env.EVM_CHAIN_ID === 31_337 ? 250 : 4_000,
     }) as PublicClient;
     this.clients.set(network, client);
     return client;
+  }
+
+  /** viem chain for the configured EVM_CHAIN_ID (Arbitrum Sepolia or local Anvil). */
+  chain(): Chain {
+    return evmChain(this.config.env.EVM_CHAIN_ID);
+  }
+
+  get chainId(): number {
+    return this.config.env.EVM_CHAIN_ID;
   }
 
   /** Test-USDT contract for a network (env), or null when deposits are disabled. */

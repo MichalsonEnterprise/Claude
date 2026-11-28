@@ -1,0 +1,1003 @@
+{
+  "summary": "Build GLOBAL POOL screens in Figma: one agent per module slice (args = list of slice keys), desktop on module page + mobile on page 10, verified per frame",
+  "agentCount": 8,
+  "logs": [],
+  "result": [
+    {
+      "key": "gp-history",
+      "section": "Desktop: 179:100736 ('GP-08..11/13 History & edge states', page 07, X=32000 Y=0). Mobile: 188:72141 ('GP — Mobile C', page 10, X=175000 Y=0).",
+      "created": [
+        {
+          "name": "Section/GP-08..11/13 History & edge states",
+          "id": "179:100736"
+        },
+        {
+          "name": "[GP-08] Round History / 1440 / Default",
+          "id": "179:100737"
+        },
+        {
+          "name": "[GP-08] Round History / 1440 / Filters",
+          "id": "179:101660"
+        },
+        {
+          "name": "[GP-09] Round Detail / 1440 / Cancelled → refunds (#1,245)",
+          "id": "182:109385"
+        },
+        {
+          "name": "[GP-09] Round Detail / 1440 / Default — settled (#1,244)",
+          "id": "182:110323"
+        },
+        {
+          "name": "[GP-10] Entry History / 1440 / Default",
+          "id": "186:29154"
+        },
+        {
+          "name": "[GP-11] Prize Distribution breakdown / 1440 / Default (round #1,248)",
+          "id": "186:30207"
+        },
+        {
+          "name": "[GP-13] Edge state — Round closed / 1440 / Entries arrived after close (20:00:02 UTC)",
+          "id": "187:101544"
+        },
+        {
+          "name": "[GP-13] Edge state — Round cancelled, refund owed / 1440 / Hub banner (#1,245)",
+          "id": "187:102333"
+        },
+        {
+          "name": "[GP-13] Edge state — VRF delayed / 1440 / Waiting 00:14:32 (20:14:36 UTC)",
+          "id": "187:103126"
+        },
+        {
+          "name": "Section/GP — Mobile C",
+          "id": "188:72141"
+        },
+        {
+          "name": "[GP-08] Round History / 390 / Default",
+          "id": "188:72142"
+        },
+        {
+          "name": "[GP-08] Round History / 390 / Filters (bottom sheet)",
+          "id": "188:72622"
+        },
+        {
+          "name": "[GP-09] Round Detail / 390 / Cancelled → refunds (#1,245)",
+          "id": "189:74382"
+        },
+        {
+          "name": "[GP-10] Entry History / 390 / Default",
+          "id": "189:74725"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "GP-08",
+          "status": "BUILT",
+          "note": "D 1440 Default + Filters (with a filter popover) were fixed and their screenshots then passed. The fix collapsed spacers to 1 px, shortened truncated stat and table text, set the search to 240 and corrected the date range to 23–25 Nov. M 390 Default (round cards #1,248–#1,244) and Filters (bottom sheet) screenshots passed except the clipped DEMO bar. The DEMO bar message was then switched to the short mobile text (decision #29) and not screenshotted again, so the row stays BUILT until it is."
+        },
+        {
+          "id": "GP-09",
+          "status": "VERIFIED",
+          "note": "Cancelled → refunds (#1,245) checked by screenshot at 1440 and 390. It shows: 412/500 players, 41,200.00/50,000.00, Threshold Bar 8,800.00 / 88 short, 300.00 owed + 1.50 fee to Available, network fee 0.00, RF-1245-0042 batch 2 of 3, timeline to 27 Nov 21:00 UTC, refunded Entry Ticket, sticky CTA on mobile. An extra 1440 Default (settled #1,244) frame passed its screenshot: 13 winners, @nova.k runner-up +3,620.60, VRF proof. After that, two texts in its VRF stepper were aligned to the round header (settled 20:02:10, response 35 s). That was a text-only fix and was not screenshotted again."
+        },
+        {
+          "id": "GP-10",
+          "status": "VERIFIED",
+          "note": "D 1440 checked after a fix and passed. The fix hid the explorer link on the hash in the receipt panel, removed a duplicate risk line and shortened the status badge to 'Won'. M 390 passed. Data follows demo-data: 35 entries in #1,248 (bought 18:05), 40 in #1,247 = 402.00, 24 in #1,246 = 241.20, 30 in #1,245 = 301.50 refund, 20 in #1,244 = runner-up. Also shows lifetime 1,284 entries / 64.20 fees, the RG participation limit (351.75 of 500.00) and 'You can lose your stake' (in Tx/Fee Breakdown)."
+        },
+        {
+          "id": "GP-11",
+          "status": "PARTIAL",
+          "note": "D 1440 checked after a fix and passed: past-round amount cells without per-cell DEMO, and a shorter label for the cancelled row. It shows: pool basis, Chart/Donut + Prize Distribution, a tier table (1 in 18,640 ≈ 0.0054% … 13 in 18,640 ≈ 0.070%), your chances (0.188% / 2.44%, can lose stake), 932.00 fees outside the pool, and past splits. M 390 is NOT BUILT: the Figma MCP limit blocked it."
+        },
+        {
+          "id": "GP-13",
+          "status": "PARTIAL",
+          "note": "D 1440 all three edge states passed their screenshots: Round closed (modal over a scrim, entries arrived 20:00:02, nothing charged), Round cancelled with refund owed (Alert banner on the hub, Card/Round Cancelled, where-the-money-is stepper, Owed 415.20), and VRF delayed (Delayed stepper, Arbitrum degraded, re-request at 21:00:04, cancel after 24 h at 28 Nov 20:00:04 UTC). M 390 (3 frames) NOT BUILT: the Figma MCP limit blocked it."
+        }
+      ],
+      "issues": [
+        "STOPPED: the Figma MCP tool-call limit blocked the same call 3 times in a row. Four 390 frames are NOT built: [GP-11] Prize Distribution breakdown / 390 / Default (round #1,248); [GP-13] Edge state — Round closed / 390 / Entries arrived after close (sheet); [GP-13] Edge state — Round cancelled, refund owed / 390 / Hub banner (#1,245); [GP-13] Edge state — VRF delayed / 390 / Waiting 00:14:32 (20:14:36 UTC). A ready, idempotent script (41 kB, passes the mock run) is at /home/user/Claude/design/figma-build/pending/gp-history/cont/NEXT-m34-gp11-gp13-mobile.js: one use_figma call on page 10, section 188:72141. After it, re-screenshot 188:72142 and 188:72622 (their DEMO bar message changed after the last check).",
+        "DATA CONFLICT: round #1,245 pool. These frames use 41,200.00 USDT / 4,120 entries / 206.00 fees, matching the admin frames (ADM-F3/F4/F7/P9: 38,900 claimed + 2,300 outstanding = 41,200). demo-data.md (usr-finance extras, last commit) says 46,850.00 / 50,000.00, and the USR-F mobile script m-b.js uses 46,850.00. One of the two needs correcting in demo-data.md and the frames that use it.",
+        "Data aligned to demo-data.md, which differs from the original pending scripts: @nova.k had 40 entries in #1,247 (402.00) and 24 in #1,246 (241.20); vals.json changed from 10/15. Purchase times are #1,248 18:05, #1,247 12:40, #1,246 19:12, #1,245 14:22 UTC. I could not read USR-G2's per-round counts to cross-check them.",
+        "Demo 'now' differs between modules. GP frames use 16:42 UTC (countdown 03:17:42, Card/Balance 'Updated 16:42 UTC'), while wallet/finance flows use about 18:44 UTC. The #1,248 purchase time 18:05 comes from the finance history and is shown only where no countdown appears.",
+        "Built inline because no library component fits: the 'Filter rounds' popover (desktop); the round-closed modal (the Modal/Base slot is fixed); mobile bottom sheets (Sheet/Bottom content is fixed); the mobile refund/VRF callouts (Alert/Banner minimum width is 720); vertical steppers. Library suggestions: a Notice/Demo Data mobile variant with wrapping text (decision #29), a Popover/Filter panel slot, and a Sheet/Bottom with a content slot.",
+        "Fixes to the gp-history lib that other agents may want: an empty createAutoLayout spacer hugs to 100 px tall and opens large vertical gaps in rows aligned CENTER, so spacer() now resizes to 1×1. Card/Stat 'Delta context' truncates after about 20 characters at four cards per row. Table/Cell Amount with DEMO needs about 180 px."
+      ]
+    },
+    {
+      "key": "promos",
+      "section": "32:117004 (page 03 'PROMO-01..05 Promotions'); 34:326636 (page 05 'PROMO-02/03/05 Rewards'); 71:46775 (page 10 'PROMO — Mobile')",
+      "created": [
+        {
+          "name": "[PROMO-01] Promotions hub / 390 / Member",
+          "id": "181:71623"
+        },
+        {
+          "name": "(existing) [PROMO-01] Promotions hub / 1440 / Guest",
+          "id": "33:229039"
+        },
+        {
+          "name": "(existing) [PROMO-01] Promotions hub / 1440 / Member",
+          "id": "33:247122"
+        },
+        {
+          "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 1440 / Live",
+          "id": "33:268457"
+        },
+        {
+          "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 1440 / Ended",
+          "id": "33:301803"
+        },
+        {
+          "name": "(existing) [PROMO-02] Daily rewards & missions / 1440 / Claimable",
+          "id": "34:326637"
+        },
+        {
+          "name": "(existing) [PROMO-02] Daily rewards & missions / 1440 / Claimed",
+          "id": "34:358264"
+        },
+        {
+          "name": "(existing) [PROMO-02] Daily rewards & missions / 1440 / Locked (break active)",
+          "id": "34:385670"
+        },
+        {
+          "name": "(existing) [PROMO-03] Rakeback & cashback / 1440 / Claimable",
+          "id": "34:414299"
+        },
+        {
+          "name": "(existing) [PROMO-03] Rakeback & cashback / 1440 / Empty (new period, nothing accrued)",
+          "id": "34:446815"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Offer",
+          "id": "34:480866"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Offer — bonus terms open",
+          "id": "34:491169"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Active",
+          "id": "36:514216"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 1440 / Completed",
+          "id": "63:46935"
+        },
+        {
+          "name": "(existing) [PROMO-01] Promotions hub / 390 / Guest",
+          "id": "71:46776"
+        },
+        {
+          "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 390 / Live",
+          "id": "71:47423"
+        },
+        {
+          "name": "(existing) [PROMO-04] Weekly tournament — Orbit Rush Sprint / 390 / Ended",
+          "id": "84:154017"
+        },
+        {
+          "name": "(existing) [PROMO-02] Daily rewards & missions / 390 / Claimable",
+          "id": "76:67721"
+        },
+        {
+          "name": "(existing) [PROMO-02] Daily rewards & missions / 390 / Locked (break active)",
+          "id": "76:68079"
+        },
+        {
+          "name": "(existing) [PROMO-03] Rakeback & cashback / 390 / Claimable",
+          "id": "80:115842"
+        },
+        {
+          "name": "(existing) [PROMO-03] Rakeback & cashback / 390 / Empty (new period, nothing accrued)",
+          "id": "80:116163"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 390 / Offer",
+          "id": "82:150984"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 390 / Active",
+          "id": "82:151309"
+        },
+        {
+          "name": "(existing) [PROMO-05] Welcome offer & bonus / 390 / Completed",
+          "id": "84:154339"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "PROMO-01",
+          "status": "BUILT",
+          "note": "Complete: 1440 Guest + Member and 390 Guest + Member all exist. The new 390 Member frame (181:71623) was built and VERIFIED this run. The two 1440 frames and 390 Guest come from the earlier run; they were not screenshotted again here because of the MCP limit. Their size and auto height look complete. It can be promoted to VERIFIED after one visual spot-check. No rerun needed."
+        },
+        {
+          "id": "PROMO-02",
+          "status": "BUILT",
+          "note": "Complete: 1440 Claimable / Claimed / Locked (break active) and 390 Claimable + Locked exist, all with auto height. Claimed is not built at 390 because only the state changes, not the layout (decision #16). All frames come from the earlier run and were not screenshotted again this run. No rerun needed."
+        },
+        {
+          "id": "PROMO-03",
+          "status": "BUILT",
+          "note": "Complete: 1440 + 390 Claimable and Empty (new period, nothing accrued) exist, all with auto height. All frames come from the earlier run and were not screenshotted again this run. No rerun needed."
+        },
+        {
+          "id": "PROMO-04",
+          "status": "BUILT",
+          "note": "Complete: 1440 + 390 Live and Ended (Orbit Rush Sprint, ends Sun 29 Nov 2026 23:59 UTC) exist, all with auto height. All frames come from the earlier run and were not screenshotted again this run. No rerun needed."
+        },
+        {
+          "id": "PROMO-05",
+          "status": "BUILT",
+          "note": "Complete: 1440 Offer, Offer with bonus terms open, Active and Completed, plus 390 Offer / Active / Completed, all exist with auto height. All frames come from the earlier run and were not screenshotted again this run. No rerun needed."
+        }
+      ],
+      "issues": [
+        "Figma MCP seat limit: my first two use_figma attempts this run (one inventory call per page, then a single combined inventory call) were refused. After a 4-minute pause, the third attempt succeeded, so 3 refusals in a row never happened.",
+        "Continuation inventory (28 Nov): all 23 frames from the interrupted run exist. Every one has auto height and none is stuck at 800, so nothing needed fixing. The only missing frame was [PROMO-01] Promotions hub / 390 / Member. It is now built and verified: 181:71623, page '10 — Mobile Experience', section 71:46775, x=120 y=5039, 390×5203.",
+        "Frames from the earlier run were not screenshotted again in this run, to save MCP calls. That is why PROMO rows are reported as BUILT (complete) and not VERIFIED. One low-cost visual spot-check per row would be enough to promote them.",
+        "No new components were added; the new frame uses only library instances. Two pieces were built inline with tokens: the 'Ready to claim' summary card and the mobile promotions list rows (icon tile, key terms, status, 'Terms apply', chevron). Both are candidates for a 'Card/Reward Summary' and a 'List/Promo Row' component. Banner/Promo (580 wide) and Card/Daily Reward Calendar (616 wide) do not fit a 358 mobile content column.",
+        "The new frame uses tournament rank #14 / 1,284 pts / 22.50 USDT and mission progress 25/50, as baked into Card/Tournament and Card/Mission. Another agent's decisions log uses tournament rank #148 and mission 32/50 (built.json notes). The orchestrator should reconcile these in demo-data.md.",
+        "Claimable cash on the new frame is 118.62 USDT = VIP Gold weekly 115.20 + rakeback 3.42, matching the usr-finance extras in demo-data.md. Daily streak day 4 (1.50 USDT) is shown separately as bonus funds and is not added to the cash total.",
+        "Prepared script saved for re-runs (idempotent; it also returns the 3-section inventory): /home/user/Claude/design/figma-build/pending/promos/out/m01-member.js (source src/m01-member.body.js, README.md). /home/user/Claude/design/figma-build/registry-promos.json updated with 181:71623 and a _continuation_28nov note.",
+        "Did not edit ledger.json or decisions.md (left for the orchestrator merge). No memory notes were used beyond the index; nothing new to save."
+      ]
+    },
+    {
+      "key": "catalog-screens",
+      "section": "32:99912",
+      "created": [
+        {
+          "name": "Section/GM-02..08 Catalogue & more originals (page 08)",
+          "id": "32:99912"
+        },
+        {
+          "name": "Section/Games — Mobile Catalogue (page 10)",
+          "id": "34:497641"
+        },
+        {
+          "name": "[GM-02] Game catalogue / 1440 / Default",
+          "id": "32:99916"
+        },
+        {
+          "name": "[GM-02] Game catalogue / 1440 / Hover",
+          "id": "33:134331"
+        },
+        {
+          "name": "[GM-02] Game catalogue / 1440 / Restricted region",
+          "id": "33:186210"
+        },
+        {
+          "name": "[GM-03] Vault Sweeper / 1440 / Playing",
+          "id": "33:218161"
+        },
+        {
+          "name": "[GM-03] Vault Sweeper / 1440 / Cashed out",
+          "id": "33:231778"
+        },
+        {
+          "name": "[GM-03] Vault Sweeper / 1440 / Hit (mine)",
+          "id": "33:254288"
+        },
+        {
+          "name": "[GM-04] Pinfall / 1440 / Dropping",
+          "id": "33:283189"
+        },
+        {
+          "name": "[GM-04] Pinfall / 1440 / Result",
+          "id": "33:303579"
+        },
+        {
+          "name": "[GM-05] Skyline / 1440 / Win",
+          "id": "34:334232"
+        },
+        {
+          "name": "[GM-05] Skyline / 1440 / Lose",
+          "id": "34:354573"
+        },
+        {
+          "name": "[GM-06] Fortune Ring / 1440 / Spinning",
+          "id": "34:380638"
+        },
+        {
+          "name": "[GM-06] Fortune Ring / 1440 / Result",
+          "id": "34:397670"
+        },
+        {
+          "name": "[GM-07] Pool Keno / 1440 / Picking",
+          "id": "34:416315"
+        },
+        {
+          "name": "[GM-07] Pool Keno / 1440 / Drawn",
+          "id": "34:429582"
+        },
+        {
+          "name": "[GM-08] High Card / 1440 / Playing",
+          "id": "34:462956"
+        },
+        {
+          "name": "[GM-08] High Card / 1440 / Result (wrong call)",
+          "id": "34:481572"
+        },
+        {
+          "name": "[GM-02] Game catalogue / 390 / Default",
+          "id": "34:497645"
+        },
+        {
+          "name": "[GM-02] Game catalogue / 390 / Restricted region",
+          "id": "36:504732"
+        },
+        {
+          "name": "[GM-03] Vault Sweeper / 390 / Playing",
+          "id": "36:522639"
+        },
+        {
+          "name": "[GM-04] Pinfall / 390 / Dropping",
+          "id": "36:529337"
+        },
+        {
+          "name": "[GM-05] Skyline / 390 / Win",
+          "id": "36:547984"
+        },
+        {
+          "name": "[GM-06] Fortune Ring / 390 / Spinning",
+          "id": "42:45652"
+        },
+        {
+          "name": "[GM-07] Pool Keno / 390 / Picking",
+          "id": "44:45796"
+        },
+        {
+          "name": "[GM-08] High Card / 390 / Playing",
+          "id": "49:63106"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "GM-02",
+          "status": "BUILT",
+          "note": "Desktop Default 1440x4151, Hover 1440x2358 and Restricted region 1440x4362, plus mobile Default and Restricted region, all exist and pass the read-only structural audit: hug height, no placeholder or empty text, no off-canvas text outside the scroll tracks, DEMO badges present. VERIFIED is withheld because the screenshot check was blocked 3 times in a row by the Figma MCP limit. Check during the screenshot pass: the restricted frames have fewer DEMO badges (desktop 7 vs 39, mobile 3 vs 36)."
+        },
+        {
+          "id": "GM-03",
+          "status": "BUILT",
+          "note": "Desktop Playing, Cashed out and Hit (mine), plus mobile Playing, all exist and pass the structural audit. The only 'clipped' text sits in the related-games carousel Track and the multiplier pills, which scroll sideways on purpose. No screenshot check (MCP limit)."
+        },
+        {
+          "id": "GM-04",
+          "status": "BUILT",
+          "note": "Desktop Dropping and Result, plus mobile Dropping, exist and pass the structural audit. No screenshot check (MCP limit)."
+        },
+        {
+          "id": "GM-05",
+          "status": "BUILT",
+          "note": "Desktop Win and Lose, plus mobile Win, exist and pass the structural audit. No screenshot check (MCP limit)."
+        },
+        {
+          "id": "GM-06",
+          "status": "BUILT",
+          "note": "Desktop Spinning and Result, plus mobile Spinning, exist and pass the structural audit. No screenshot check (MCP limit)."
+        },
+        {
+          "id": "GM-07",
+          "status": "BUILT",
+          "note": "Desktop Picking and Drawn, plus mobile Picking, exist and pass the structural audit. No screenshot check (MCP limit)."
+        },
+        {
+          "id": "GM-08",
+          "status": "BUILT",
+          "note": "Desktop Playing and Result (wrong call), plus mobile Playing, exist and pass the structural audit. No screenshot check (MCP limit)."
+        }
+      ],
+      "issues": [
+        "All 24 required frames (16 desktop on '08 — Games', 8 mobile on '10 — Mobile Experience') were built by the earlier run, and this run built nothing. Two read-only audits (one per page) found no incomplete frames: every frame hugs its height (primaryAxisSizingMode AUTO, none stuck at 800), with no placeholder text, no empty text and no vertical overflow.",
+        "Nothing remains to build. Only the visual screenshot check is missing, for all 24 frames. It was blocked by the Figma MCP tool-call limit 3 times in a row (after cooldowns of 200 s and 360 s), so per conventions section 10 I stopped. The ready-to-run read-only check scripts and the run order are in /home/user/Claude/design/figma-build/pending/catalog-screens/ (README.md, shot08_0..5.js, shot10_0..1.js, audit08.js, audit10.js).",
+        "Things to look at in the screenshot pass: the GM-02 Restricted region frames have far fewer DEMO badges than Default (desktop 33:186210 has 7 vs 39, mobile 36:504732 has 3 vs 36). Confirm the greyed or restricted tiles still mark illustrative numbers as DEMO.",
+        "The audit flagged text clipped or past the frame edge only inside tracks that scroll sideways on purpose: the related-games carousel 'Track' (desktop game frames), 'Pills (scroll)', 'Category pills (scroll)', 'Track (swipe)' and 'Run strip (scroll)' (mobile). This is the expected carousel peek, still to be confirmed visually.",
+        "The earlier run recorded no decisions in decisions.md for this slice. Its notes on which components it reused are in registry-catalog-screens.json: tiles are Tile/Game Generic with Tile/Game Art swaps, and the game stages are drawn inline with tokens. No new components were created."
+      ]
+    },
+    {
+      "key": "pub-game-details",
+      "section": "PUB-04 Game Details (page '03 — Public Website', planned at X=40000, Y=0) + PUB-04 — Mobile (page '10 — Mobile Experience', planned at X=21000, Y=0). Section IDs are unknown: no Figma call got through, so I could not read the canvas or confirm whether the sections exist.",
+      "created": [],
+      "ledger": [
+        {
+          "id": "PUB-04",
+          "status": "NOT STARTED",
+          "note": "Nothing was built or verified this run. Three use_figma calls in a row were blocked by the Figma MCP tool-call limit: two parallel read-only listings, then a retry, then a final retry after a 7-minute wait. Under conventions §10 I stopped there. I could not see what is on the canvas; the ledger already said NOT STARTED, and no earlier run recorded any IDs. Still to build: (1) the component set 'Template/Game Details' with Breakpoint=Desktop 1136 and Breakpoint=Mobile 358; (2) six 1440 frames named '[PUB-04] Game Details · <Game> (<Genre>) / 1440 / Default — logged out' for Global Pool (Global Jackpot), Pool Roulette (Roulette), Orbit Rush (Crash), Pool Dice (Dice), Double Side (Coinflip) and Twenty-One (Blackjack); (3) the same six as 390 frames on page 10 in the section 'PUB-04 — Mobile'."
+        }
+      ],
+      "issues": [
+        "The Figma MCP tool-call limit ('You've reached the Figma MCP tool call limit for your Full seat on the Professional plan') blocked 3 attempts in a row, including one after a 7-minute wait. No canvas read or write happened, so no frames exist from this run and none are verified.",
+        "Scripts are ready to run in /home/user/Claude/design/figma-build/pending/pub-04/out/: t1-template.js (46.2k chars), d1-gp-roulette-crash.js, d2-dice-coin-bj.js, m1-gp-roulette-crash.js, m2-dice-coin-bj.js. Each is under 50k chars and assembled by build.py from helpers.js, lib.js, tpl.js/frames.js, data/*.js and main-*.js. A mock run (_mock-run.cjs) passes t1, d1 and d2: t1 ~1,179 nodes, empty MISS list.",
+        "Required step between runs: the mobile scripts m1/m2 need the template's ID. The template lives on page 03 and the mobile frames go on page 10, and getTpl() only searches the current page, so it fails there unless tpl_id.txt is set. After t1 runs, write its returned 'set' ID to /home/user/Claude/design/figma-build/pending/pub-04/tpl_id.txt and run 'python3 build.py' in that folder. Then run d1, d2, m1, m2 in that order. I wrote the order to /home/user/Claude/design/figma-build/pending/pub-04/RUN-ORDER.json.",
+        "Content check on the prepared data: it matches demo-data.md. Round #1,248 closes 27 Nov 2026 20:00 UTC; 186,400.00 pool = 18,640 × 10.00; 0.05 platform fee shown as its own line; 932.00 fees kept out of the pool; 50/20/10/10×2% split; VRF 0x9f2c…e71a; player counts match. European single-zero payouts 35:1–1:1 with 2.70% edge; crash auto cash-out from 1.01× with a 1,000× cap; dice 0.00–99.99 over/under with multiplier = 99 ÷ chance; coinflip 1.96× with 2.00% edge; blackjack 3:2, S17, 6 decks, ≈0.50% edge. The template includes 'You can lose your stake', 18+, the licence notice, the RG card and DEMO badges.",
+        "Minor copy nit to consider: in data/dice.js the win chances use the simplified 100 − target rule (e.g. Over 50.50 → 49.50%). With 10,000 equally likely values from 0.00 to 99.99, the exact chance is 49.49%. This matches demo-data.md, so I left it."
+      ]
+    },
+    {
+      "key": "pub-p1a",
+      "section": "33:149513 (page '03 — Public Website', 'PUB-05/08/09/13 Winners, How it works, Networks, Security' at X=50000,Y=0); mobile section 34:423942 (page '10 — Mobile Experience', 'PUB-05/08/09/13 — Mobile' at X=28000,Y=0)",
+      "created": [
+        {
+          "name": "Section/PUB-05/08/09/13 (page 03)",
+          "id": "33:149513"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 1440 / Default",
+          "id": "33:149514"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 1440 / Filtered",
+          "id": "33:196810"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 1440 / Empty",
+          "id": "33:219380"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 768 / Default",
+          "id": "34:394740"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 768 / Empty",
+          "id": "34:407847"
+        },
+        {
+          "name": "[PUB-08] How It Works / 1440 / Default",
+          "id": "33:245465"
+        },
+        {
+          "name": "[PUB-09] Supported Networks / 1440 / Default — Arbitrum details",
+          "id": "33:281751"
+        },
+        {
+          "name": "[PUB-09] Supported Networks / 1440 / Ethereum details (congested)",
+          "id": "33:318074"
+        },
+        {
+          "name": "[PUB-13] Security Center / 1440 / Default",
+          "id": "34:345543"
+        },
+        {
+          "name": "Section/PUB-05/08/09/13 — Mobile (page 10)",
+          "id": "34:423942"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 390 / Default",
+          "id": "34:423943"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 390 / Filters — bottom sheet open",
+          "id": "34:448213"
+        },
+        {
+          "name": "[PUB-05] Winners Hall / 390 / Empty",
+          "id": "34:464733"
+        },
+        {
+          "name": "[PUB-08] How It Works / 390 / Default",
+          "id": "34:483545"
+        },
+        {
+          "name": "[PUB-09] Supported Networks / 390 / Default",
+          "id": "34:496159"
+        },
+        {
+          "name": "[PUB-09] Supported Networks / 390 / Ethereum details — bottom sheet",
+          "id": "36:513983"
+        },
+        {
+          "name": "[PUB-13] Security Center / 390 / Default",
+          "id": "36:523496"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "PUB-05",
+          "status": "VERIFIED",
+          "note": "All 8 frames exist and passed. Desktop 1440: Default, Filtered and Empty. Tablet 768: Default and Empty. Mobile 390: Default, Filters bottom sheet and Empty. Each was checked by a read-only audit (render bounds of every visible text node against its clipping ancestors and the frame edge: 0 flags) and by a screenshot in this run. Content: banner for latest settled round #1,247 (172,950.00 USDT, 13 winners, podium @lumen.eth / @orbit_77 / @sable). Stats strip: 522,400.00 paid by the last 3 settled rounds; biggest prize 90,515.00 @kestrel. Filters: game chips, minimum prize, period 24 h / 7 days / 30 days / All time, sort. Leaderboard of the 7-day top wins (12 rows on desktop, 8 stacked cards on mobile), each row with a Verify draw / Verify result link and DEMO badges. Filtered state shows 9 wins / 417,920.00 USDT (1st–3rd of rounds #1,244, #1,246, #1,247), with a note that round #1,245 was cancelled. Empty state: Originals, 24 h, minimum 50,000 USDT, recovery actions, and Card/Winner cards under 'Meanwhile — biggest wins'. Also: VRF / verify / privacy cards, licence and 18+."
+        },
+        {
+          "id": "PUB-08",
+          "status": "VERIFIED",
+          "note": "1440 Default (33:245465) and 390 Default (34:483545) exist and passed the audit and screenshot. Content: 5-step flow (connect & verify, deposit USDT, enter round, Chainlink VRF draw, prize settles), each step with a product-UI diagram (KYC/2FA chips, network pills, entry ticket, fee breakdown, VRF stepper, Owed → Available +3,620.60). Fee table with 0.05 USDT on its own line; round #1,248 in numbers; prize split 50/20/10/10×2%; threshold bar; round timeline. Fairness and RG sections, FAQ items, sticky 'Create account' CTA on mobile."
+        },
+        {
+          "id": "PUB-09",
+          "status": "VERIFIED",
+          "note": "Desktop 1440: Default — Arbitrum details (33:281751) and Ethereum details (congested) (33:318074). Mobile 390: Default (34:496159) and Ethereum details bottom sheet (36:513983). All passed the audit and screenshots. Content: 5 Card/Network with Ethereum shown as congested; 'Which network should I use?' guidance; comparison table (standard, confirmations, typical arrival, withdrawal fee, minimum deposit, status icon + label); per-chain tabbed detail panel with fee estimator (1,500.00 → 1,499.92 on Arbitrum, 1,497.60 on Ethereum) and 'Before you send' rules; 30-day status chart; wrong-network help."
+        },
+        {
+          "id": "PUB-13",
+          "status": "VERIFIED",
+          "note": "1440 Default (34:345543) and 390 Default (36:523496) exist and passed the audit and screenshots. Content: incident status (all operational, past incidents); custody flow (wallet → Treasury 3-of-5 multisig → GlobalPool contract → withdrawal) with hourly reconciliation; public contracts GlobalPool v1.3.0, VRFConsumer v1.1.2 and Treasury v1.0.4 marked 'Audited — DEMO placeholder'; protections you control (2FA, whitelisting with 24 h cooldown, anti-phishing code, devices); 'We will never'; Chainlink VRF stepper; bug-bounty tiers; trust strip. Fixed this run: the demo user's personal code AURORA-27 was replaced by the illustrative SUNSET-42 (decision #29). One optional copy tweak on 390 is still pending (see issues)."
+        }
+      ],
+      "issues": [
+        "Continuation run: all 16 required frames already existed from the interrupted run (9 on page 03, 7 on page 10), so nothing was rebuilt. The prepared idempotent mobile scripts in /home/user/Claude/design/figma-build/pending/pub-p1a/ (m1–m4) only ran m1, and m1 skipped all 3 Winners frames. They are kept for disaster recovery.",
+        "Compliance fix applied: the public Security Center showed the demo user's personal anti-phishing code AURORA-27, against decision #29 (public screens never show the personal code). Replaced with the illustrative SUNSET-42 in three places: desktop email-mock row 34:346290, the desktop Card/Security Score instance override I34:346378;23:17056, and mobile row 36:523783.",
+        "Pending optional polish, blocked twice by the Figma MCP rate limit: on [PUB-13] 390 the label 'Your code:' beside SUNSET-42 should read 'Example code:'. Ready-to-run script: /home/user/Claude/design/figma-build/pending/pub-p1a/out/fix-p10-label.js.",
+        "Design note for review: the desktop Security Center shows Card/Security Score (the demo user's 80/100 score) on a public, logged-out page. It is DEMO-badged and works as an in-account preview, but the orchestrator may prefer a generic preview.",
+        "Figma MCP limit errors in this run: the page-10 inventory failed 2× before succeeding, the page-03 fix call failed once before succeeding, and the final label tweak failed 2×.",
+        "Files written: /home/user/Claude/design/figma-build/registry-pub-p1a.json (frame ids), decisions.md entry #36, /home/user/Claude/design/figma-build/pending/pub-p1a/README.md + RUN-ORDER.json + audit scripts (out/audit-p03.js, out/audit-p10.js).",
+        "Memory: no stored notes were used; nothing new learned about the user that needs saving."
+      ]
+    },
+    {
+      "key": "pub-p1b",
+      "section": "33:205847",
+      "created": [
+        {
+          "name": "[PUB-14] FAQ / 1440 / Default — All questions (earlier run)",
+          "id": "33:205848"
+        },
+        {
+          "name": "[PUB-14] FAQ / 1440 / Search results — “withdraw” (earlier run)",
+          "id": "33:242174"
+        },
+        {
+          "name": "[PUB-14] FAQ / 1440 / Search — no results “bonus code” (earlier run)",
+          "id": "36:534066"
+        },
+        {
+          "name": "[PUB-18] Responsible Gaming / 1440 / Default (earlier run)",
+          "id": "33:279676"
+        },
+        {
+          "name": "[PUB-20] Restricted Countries / 1440 / Default — grouped list (earlier run)",
+          "id": "33:323120"
+        },
+        {
+          "name": "[PUB-20] Restricted Countries / 1440 / Search — “united” (earlier run)",
+          "id": "34:356600"
+        },
+        {
+          "name": "[PUB-23] Cookie Consent / 1440 / Banner — first visit (earlier run, 1440x1024 viewport)",
+          "id": "34:396216"
+        },
+        {
+          "name": "[PUB-23] Cookie Consent / 1440 / Preferences modal (earlier run, 1440x1024 viewport)",
+          "id": "34:409284"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "PUB-14",
+          "status": "PARTIAL",
+          "note": "Desktop 1440 has Default (All questions), Search “withdraw” and No results “bonus code”, all with auto height. Mobile 390 is not built: Default, Search “withdraw” and No results “bonus code” are still missing. I did not screenshot the desktop frames in this run."
+        },
+        {
+          "id": "PUB-18",
+          "status": "PARTIAL",
+          "note": "Desktop 1440 Default (resources, 1440x5491) exists. Mobile 390 Default is not built."
+        },
+        {
+          "id": "PUB-20",
+          "status": "PARTIAL",
+          "note": "Desktop 1440 has the grouped list and Search “united”. Mobile 390 is not built: grouped list and Search “united” are still missing."
+        },
+        {
+          "id": "PUB-23",
+          "status": "PARTIAL",
+          "note": "Desktop 1440 has Banner and Preferences modal as fixed 1440x1024 viewports, which looks intentional for overlay states. Mobile 390 is not built: Banner (first visit) and Preferences (bottom sheet) are still missing."
+        }
+      ],
+      "issues": [
+        "Mobile build stopped by the Figma MCP limit: the page-10 read-only inventory failed 3 times in a row with 'You've reached the Figma MCP tool call limit for your Full seat on the Professional plan', so I stopped as conventions §10 requires. No nodes were created or changed in this run. The only successful call was the read-only inventory of page 03, which found the 8 desktop frames.",
+        "8 mobile frames still need building (page '10 — Mobile Experience', section 'PUB-14/18/20/23 — Mobile', X 35000, Y 0; I could not confirm whether the section exists): [PUB-14] FAQ / 390 / Default — All questions; [PUB-14] FAQ / 390 / Search results — “withdraw”; [PUB-14] FAQ / 390 / Search — no results “bonus code”; [PUB-18] Responsible Gaming / 390 / Default; [PUB-20] Restricted Countries / 390 / Default — grouped list; [PUB-20] Restricted Countries / 390 / Search — “united”; [PUB-23] Cookie Consent / 390 / Banner — first visit; [PUB-23] Cookie Consent / 390 / Preferences — bottom sheet.",
+        "Prepared scripts for the next run are in /home/user/Claude/design/figma-build/pending/pub-14-18-20-23/ (README.md, RUN-ORDER.json). Run 00-read.js first (read-only), then out/m1-faq.js, out/m2-rg.js, out/m3-restricted.js, out/m4-cookie.js. Each is under 32k chars, safe to re-run, and ends with screenshots plus an overflow audit. All four pass the dry-run mock (_mock-run.cjs); none has run against the real file.",
+        "The mobile copy has not been checked against the desktop frames, because the read that extracts the desktop text failed. Before running the build scripts, compare 00-read.js output with these data arrays and fix any differences, then run python3 build.py: FAQ questions and result counts (CATS, RES in m1-faq.js), the illustrative country list and status-badge mapping (REG, HITS, BADGE_MAP in m3-restricted.js; currently 18 DEMO rows: 10 restricted, 4 limited, 4 permitted), and the cookie copy and categories (m4-cookie.js).",
+        "The 8 desktop frames were built by the interrupted earlier run. I judged them complete from name and size only (auto height, and the two cookie frames are deliberate 1024 viewports). Nothing was screenshotted in this run, so none of the four rows can be marked VERIFIED.",
+        "Wrote /home/user/Claude/design/figma-build/registry-pub-p1b.json with the section and desktop frame ids (no new library components)."
+      ]
+    },
+    {
+      "key": "pub-p1c",
+      "section": "54:101508 (page 03 'PUB-24/25/26 Errors & PUB-06 Leaderboard', X=70000) + 215:78629 (page 10 'PUB-06/24/25/26 — Mobile', X=42000)",
+      "created": [
+        {
+          "name": "[PUB-24] 404 Not Found / 390 / Default",
+          "id": "215:79244"
+        },
+        {
+          "name": "[PUB-25] 500 Server Error / 390 / Default",
+          "id": "215:80405"
+        },
+        {
+          "name": "[PUB-26] Maintenance / 390 / Scheduled — withdrawals available",
+          "id": "215:81600"
+        },
+        {
+          "name": "[PUB-06] Leaderboard / 390 / Weekly (default)",
+          "id": "216:81112"
+        },
+        {
+          "name": "[PUB-06] Leaderboard / 390 / Daily — not ranked yet",
+          "id": "216:82473"
+        },
+        {
+          "name": "Section/PUB-06/24/25/26 — Mobile (page 10, X=42000)",
+          "id": "215:78629"
+        },
+        {
+          "name": "[PUB-24] 404 Not Found / 1440 / Default (earlier run, kept)",
+          "id": "54:101512"
+        },
+        {
+          "name": "[PUB-25] 500 Server Error / 1440 / Default (earlier run, kept)",
+          "id": "82:102573"
+        },
+        {
+          "name": "[PUB-26] Maintenance / 1440 / Scheduled — withdrawals available (earlier run, kept)",
+          "id": "82:103376"
+        },
+        {
+          "name": "[PUB-06] Leaderboard / 1440 / Weekly (default) (earlier run, kept)",
+          "id": "84:103900"
+        },
+        {
+          "name": "[PUB-06] Leaderboard / 1440 / Daily (earlier run, kept)",
+          "id": "84:104905"
+        },
+        {
+          "name": "[PUB-06] Leaderboard / 1440 / Monthly (earlier run, kept)",
+          "id": "84:105918"
+        },
+        {
+          "name": "Doc/PUB-24-26 + PUB-06 header (earlier run, kept)",
+          "id": "54:101509"
+        },
+        {
+          "name": "Section/PUB-24/25/26 Errors & PUB-06 Leaderboard (page 03, X=70000)",
+          "id": "54:101508"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "PUB-24",
+          "status": "VERIFIED",
+          "note": "1440 Default 54:101512 (earlier run; screenshot checked) + 390 Default 215:79244 (built this run; 0 text overflow, screenshot checked). Two dice + cracked mint chip art, Back to lobby / Browse games, search + popular searches, Where to next incl. Status page, Popular-right-now tiles, licence, 18+."
+        },
+        {
+          "id": "PUB-25",
+          "status": "VERIFIED",
+          "note": "1440 Default 82:102573 (earlier run; screenshot checked, 0 overflow) + 390 Default 215:80405 (built this run). Reference ID GP-500-7F3A-9C21 with copy, Try again / Status page / Contact support, funds-safe, Global Pool schedule and mid-game reassurance, live status list; out-of-order slot machine art with reels 5 0 0 and an unplugged cable."
+        },
+        {
+          "id": "PUB-26",
+          "status": "VERIFIED",
+          "note": "1440 82:103376 (earlier run; screenshot checked, 0 overflow) + 390 215:81600 (built this run). AN-88 window 1 Dec 2026 02:00–02:30 UTC; withdrawals stay available; deposits credited after the window; games paused; progress steps; email toggle off by default; Available 9,215.30. Sticky Withdraw funds + Status page above the tab bar. Ticket-stub + wrench art."
+        },
+        {
+          "id": "PUB-06",
+          "status": "BUILT",
+          "note": "All required frames exist. 1440 Weekly (default) 84:103900, Daily 84:104905, Monthly 84:105918 (earlier run). 390 Weekly (default) 216:81112 and Daily 'not ranked yet' 216:82473 (this run, data read from the desktop frames, 0 overflow, screenshots checked). Weekly/Daily 1440 screenshots passed. Monthly 1440 passed the text-overflow check, but its screenshot was not returned, so it is not visually verified. Monthly at 390 is the same layout, switched by tab (rule #16)."
+        }
+      ],
+      "issues": [
+        "Continuation finding: the interrupted earlier run had already built all six 1440 frames plus a doc header in section 54:101508, under names that differ slightly from the assignment ('404 Not Found', '500 Server Error', 'Weekly (default)'). They were kept, not rebuilt. Desktop scripts written before the inventory are parked in pending/pub-p1c/unused-desktop. Do not run them: they would create duplicates.",
+        "The desktop 404 (54:101512) has 3 text layers outside the frame bounds. They belong to the 7th 'Popular right now' tile, which the carousel edge crops on purpose (peek pattern). Clipped by the frame, so not a defect, but the audit flags it.",
+        "Data conflict: on the desktop Weekly leaderboard (Orbit Rush Sprint, also on Card/Tournament), @nova.k is #14 with 1,284 pts = USDT wagered on Orbit Rush. Demo-data VIP points this week total +1,286 and include about 990 Global Pool entry points (rounds #1,248/#1,247/#1,246), which leaves at most about 296 for Orbit Rush. One of the two numbers needs to change.",
+        "Not yet in demo-data.md, all set by the earlier desktop run and mirrored on mobile, all DEMO-badged. Daily Originals race: 250.00 USDT, 1,906 players, top 10 paid (100/50/30/10.00 each), podium @quasar_9 4,812 · @ember_ray 3,960 · @orbit_77 3,415, ends 28 Nov 2026 00:00 UTC. Orbit Rush Sprint weekly standings: 2,318 players; rows 4–15 come from Table/Leaderboard Row props. Error reference GP-500-7F3A-9C21. Maintenance AN-88 progress steps.",
+        "Time inconsistency: the error pages and leaderboards use 16:42 UTC as 'now' (500 at 16:42:18 UTC, standings updated 16:42). Most player screens use 18:42–18:44 UTC. The 390 frames follow their desktop frames.",
+        "Component gaps: Table/Leaderboard Row is a fixed 640 px desktop row with no 390 variant, so the mobile standings rows are inline (rank chip + User/Avatar S + handle + points/prize). Notice/Demo Data on 390 uses the short message (decision #29).",
+        "The Figma MCP seat limit refused 3 calls this run (first inventory, desktop copy dump, first two desktop verification attempts), never 3 in a row. All planned frames were built.",
+        "Files: /home/user/Claude/design/figma-build/pending/pub-p1c (README.md, RUN-ORDER.json, build.py, lib-m.js, art.js, m1/m2 bodies, out/, r0–r3 read-only scripts, mock.cjs); /home/user/Claude/design/figma-build/registry-pub-p1c.json; decision appended to /home/user/Claude/design/figma-build/decisions.md."
+      ]
+    },
+    {
+      "key": "adm-games",
+      "section": "33:165240 (page '09 — Admin Panel', section 'ADM-G1..G7 Game management', X=42000 Y=0, 11040 × 8040)",
+      "created": [
+        {
+          "name": "Section/ADM-G1..G7 Game management",
+          "id": "33:165240"
+        },
+        {
+          "name": "[ADM-G1] Games List / 1440 / Default",
+          "id": "33:165241"
+        },
+        {
+          "name": "[ADM-G1] Games List / 1280 / Default",
+          "id": "33:166714"
+        },
+        {
+          "name": "[ADM-G2] Game Configuration / 1440 / Pending second approval",
+          "id": "33:215197"
+        },
+        {
+          "name": "[ADM-G2] Game Configuration / 1280 / Pending second approval",
+          "id": "33:215941"
+        },
+        {
+          "name": "[ADM-G2] Game Configuration / 1440 / Draft — out of bounds",
+          "id": "34:421433"
+        },
+        {
+          "name": "[ADM-G2] Game Configuration / 1280 / Draft — out of bounds",
+          "id": "34:421954"
+        },
+        {
+          "name": "[ADM-G3] Game Status / 1440 / Default",
+          "id": "33:250900"
+        },
+        {
+          "name": "[ADM-G3] Game Status / 1280 / Default",
+          "id": "33:252086"
+        },
+        {
+          "name": "[ADM-G4] Game Statistics / 1440 / Default",
+          "id": "33:286269"
+        },
+        {
+          "name": "[ADM-G4] Game Statistics / 1280 / Default",
+          "id": "33:287480"
+        },
+        {
+          "name": "[ADM-G5] Round Management / 1440 / Default",
+          "id": "34:328793"
+        },
+        {
+          "name": "[ADM-G5] Round Management / 1280 / Default",
+          "id": "34:329977"
+        },
+        {
+          "name": "[ADM-G6] Game History / 1440 / Filtered",
+          "id": "34:360672"
+        },
+        {
+          "name": "[ADM-G6] Game History / 1280 / Filtered",
+          "id": "34:361789"
+        },
+        {
+          "name": "[ADM-G7] Provably Fair Logs / 1440 / Default",
+          "id": "34:399536"
+        },
+        {
+          "name": "[ADM-G7] Provably Fair Logs / 1280 / Default",
+          "id": "34:400728"
+        },
+        {
+          "name": "Label — Desktop row",
+          "id": "34:428845"
+        },
+        {
+          "name": "Label — Laptop row",
+          "id": "34:428846"
+        }
+      ],
+      "ledger": [
+        {
+          "id": "ADM-G1",
+          "status": "BUILT",
+          "note": "Both required sizes exist (1440 33:165241, 1280 33:166714). The 1440 frame passed a screenshot check in this run: 33 titles across 12 rows per page, paused and maintenance states shown with icon + label, outcomes note, DEMO badges. The 1280 frame passed only the structural audit; there was no screenshot before the Figma limit."
+        },
+        {
+          "id": "ADM-G2",
+          "status": "BUILT",
+          "note": "States 'Pending second approval' and 'Draft — out of bounds' exist at 1440 and 1280. The 1440 Pending frame passed a screenshot check: the v14→v15 diff shows limits within the licence bounds; CR-0418 needs a second approver (K. Osei) and the requester cannot approve; the change takes effect from the next round; certified maths is read-only; append-only version history and an outcomes note are shown. The other 3 frames passed only the structural audit."
+        },
+        {
+          "id": "ADM-G3",
+          "status": "BUILT",
+          "note": "1440 33:250900 and 1280 33:252086 exist and pass the structural audit (16 DEMO badges, outcomes note). Not screenshot-verified: Figma MCP limit."
+        },
+        {
+          "id": "ADM-G4",
+          "status": "BUILT",
+          "note": "1440 33:286269 and 1280 33:287480 exist and pass the structural audit. 'Title' is a real column header in the per-title performance table, not placeholder copy. Not screenshot-verified: Figma MCP limit."
+        },
+        {
+          "id": "ADM-G5",
+          "status": "BUILT",
+          "note": "1440 34:328793 and 1280 34:329977 exist and pass the structural audit (read-only monitoring, outcomes note). Not screenshot-verified: Figma MCP limit."
+        },
+        {
+          "id": "ADM-G6",
+          "status": "BUILT",
+          "note": "1440 34:360672 and 1280 34:361789 (state 'Filtered') exist and pass the structural audit. Not screenshot-verified: Figma MCP limit."
+        },
+        {
+          "id": "ADM-G7",
+          "status": "BUILT",
+          "note": "1440 34:399536 and 1280 34:400728 exist and pass the structural audit. Not screenshot-verified: Figma MCP limit."
+        }
+      ],
+      "issues": [
+        "Nothing needed building: all 16 frames this slice requires were already on the canvas from the interrupted run. That is 1440 + 1280 for G1–G7 plus the extra G2 state 'Draft — out of bounds'. All of them hug height (primaryAxisSizingMode AUTO) and none was cut off at 800. The rows are sized D·L only (§2.8: M only for rows marked (M)), so no frames belong on page 10 'ADM — Mobile'.",
+        "A read-only structural audit passed for all 16 frames. It found no clipped or off-canvas text and no placeholder copy. Every frame has DEMO badges (5–16 each) and an 'Outcomes cannot be changed by admins' note. The empty text nodes are action-column Table/Header Cells, which is intended.",
+        "BLOCKED: the Figma MCP limit ('tool call limit for your Full seat') rejected 3 use_figma calls in a row (03:44–03:48 UTC 28 Nov), including after a 150 s wait. Per conventions §10 I stopped. Only 2 frames were screenshot-verified: 33:165241 (G1 1440) and 33:215197 (G2 1440 Pending). Both passed.",
+        "STILL TO VERIFY by screenshot (14 frames, read-only, no building needed): 34:421433, 33:250900, 33:286269, 34:328793, 34:360672, 34:399536 (1440) and 33:166714, 33:215941, 34:421954, 33:252086, 33:287480, 34:329977, 34:361789, 34:400728 (1280). Ready-to-run read-only scripts are in /home/user/Claude/design/figma-build/pending/adm-games/ (RUN-ORDER.json plus verify-1-desktop.js … verify-5-laptop.js). Once they pass, upgrade the rows to VERIFIED.",
+        "Time inconsistency: the Game Management screens are a ~16:42 UTC snapshot of 27 Nov 2026 (G1 'refreshed 16:42:10 UTC', CR-0418 requested 15:12 UTC, maintenance 'until 17:30 UTC'). The other admin modules use 18:44 UTC (decision #35). This is logged as decision #44 in /home/user/Claude/design/figma-build/decisions.md. Align it if one admin-wide time is wanted.",
+        "Files changed in this run: I appended decision #44 to /home/user/Claude/design/figma-build/decisions.md. /home/user/Claude/design/figma-build/registry-adm-games.json already lists every frame ID and was left unchanged. No Figma nodes were created or changed in this run."
+      ]
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Screens"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "cont:gp-history",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a152fd0eac9006b2d",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795833742846,
+      "queuedAt": 1795833742835,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Desktop: 179:100736 ('GP-08..11/13 History & edge states', …",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795835984670,
+      "tokens": 489342,
+      "toolCalls": 76,
+      "durationMs": 2241823,
+      "resultPreview": "{\"section\":\"Desktop: 179:100736 ('GP-08..11/13 History & edge states', page 07, X=32000 Y=0). Mobile: 188:72141 ('GP — Mobile C', page 10, X=175000 Y=0).\",\"created\":[{\"name\":\"Section/GP-08..11/13 History & edge states\",\"id\":\"179:100736\"},{\"name\":\"[GP-08] Round History / 1440 / Default\",\"id\":\"179:100737\"},{\"name\":\"[GP-08] Round History / 1440 / Filters\",\"id\":\"179:101660\"},{\"name\":\"[GP-09] Round Det…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "cont:promos",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a17670c948207de48",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795833742847,
+      "queuedAt": 1795833742835,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "32:117004 (page 03 'PROMO-01..05 Promotions'); 34:326636 (p…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795834368600,
+      "tokens": 220547,
+      "toolCalls": 37,
+      "durationMs": 625750,
+      "resultPreview": "{\"section\":\"32:117004 (page 03 'PROMO-01..05 Promotions'); 34:326636 (page 05 'PROMO-02/03/05 Rewards'); 71:46775 (page 10 'PROMO — Mobile')\",\"created\":[{\"name\":\"[PROMO-01] Promotions hub / 390 / Member\",\"id\":\"181:71623\"},{\"name\":\"(existing) [PROMO-01] Promotions hub / 1440 / Guest\",\"id\":\"33:229039\"},{\"name\":\"(existing) [PROMO-01] Promotions hub / 1440 / Member\",\"id\":\"33:247122\"},{\"name\":\"(existin…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "cont:catalog-screens",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a9b9ce1fc59b736c9",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795834368608,
+      "queuedAt": 1795833742835,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "32:99912",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795835400527,
+      "tokens": 185259,
+      "toolCalls": 35,
+      "durationMs": 1031918,
+      "resultPreview": "{\"section\":\"32:99912\",\"created\":[{\"name\":\"Section/GM-02..08 Catalogue & more originals (page 08)\",\"id\":\"32:99912\"},{\"name\":\"Section/Games — Mobile Catalogue (page 10)\",\"id\":\"34:497641\"},{\"name\":\"[GM-02] Game catalogue / 1440 / Default\",\"id\":\"32:99916\"},{\"name\":\"[GM-02] Game catalogue / 1440 / Hover\",\"id\":\"33:134331\"},{\"name\":\"[GM-02] Game catalogue / 1440 / Restricted region\",\"id\":\"33:186210\"},{\"n…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "cont:pub-game-details",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a8d3779ceb9075750",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795835400536,
+      "queuedAt": 1795833742836,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "PUB-04 Game Details (page '03 — Public Website', planned at…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795835937145,
+      "tokens": 184503,
+      "toolCalls": 32,
+      "durationMs": 536608,
+      "resultPreview": "{\"section\":\"PUB-04 Game Details (page '03 — Public Website', planned at X=40000, Y=0) + PUB-04 — Mobile (page '10 — Mobile Experience', planned at X=21000, Y=0). Section IDs are unknown: no Figma call got through, so I could not read the canvas or confirm whether the sections exist.\",\"created\":[],\"ledger\":[{\"id\":\"PUB-04\",\"status\":\"NOT STARTED\",\"note\":\"Nothing was built or verified this run. Three …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "cont:pub-p1a",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "a4e729b784230a699",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795835937155,
+      "queuedAt": 1795833742836,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "33:149513 (page '03 — Public Website', 'PUB-05/08/09/13 Win…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795837346497,
+      "tokens": 403181,
+      "toolCalls": 54,
+      "durationMs": 1409341,
+      "resultPreview": "{\"section\":\"33:149513 (page '03 — Public Website', 'PUB-05/08/09/13 Winners, How it works, Networks, Security' at X=50000,Y=0); mobile section 34:423942 (page '10 — Mobile Experience', 'PUB-05/08/09/13 — Mobile' at X=28000,Y=0)\",\"created\":[{\"name\":\"Section/PUB-05/08/09/13 (page 03)\",\"id\":\"33:149513\"},{\"name\":\"[PUB-05] Winners Hall / 1440 / Default\",\"id\":\"33:149514\"},{\"name\":\"[PUB-05] Winners Hall …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "cont:pub-p1b",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "ad7f98a35248af8e2",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795835984677,
+      "queuedAt": 1795833742836,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "33:205847",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795836619075,
+      "tokens": 283601,
+      "toolCalls": 38,
+      "durationMs": 634398,
+      "resultPreview": "{\"section\":\"33:205847\",\"created\":[{\"name\":\"[PUB-14] FAQ / 1440 / Default — All questions (earlier run)\",\"id\":\"33:205848\"},{\"name\":\"[PUB-14] FAQ / 1440 / Search results — “withdraw” (earlier run)\",\"id\":\"33:242174\"},{\"name\":\"[PUB-14] FAQ / 1440 / Search — no results “bonus code” (earlier run)\",\"id\":\"36:534066\"},{\"name\":\"[PUB-18] Responsible Gaming / 1440 / Default (earlier run)\",\"id\":\"33:279676\"},{\"…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "cont:pub-p1c",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "aa06014775b18ffb7",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795836619086,
+      "queuedAt": 1795833742836,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "54:101508 (page 03 'PUB-24/25/26 Errors & PUB-06 Leaderboar…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795838488123,
+      "tokens": 482380,
+      "toolCalls": 75,
+      "durationMs": 1869036,
+      "resultPreview": "{\"section\":\"54:101508 (page 03 'PUB-24/25/26 Errors & PUB-06 Leaderboard', X=70000) + 215:78629 (page 10 'PUB-06/24/25/26 — Mobile', X=42000)\",\"created\":[{\"name\":\"[PUB-24] 404 Not Found / 390 / Default\",\"id\":\"215:79244\"},{\"name\":\"[PUB-25] 500 Server Error / 390 / Default\",\"id\":\"215:80405\"},{\"name\":\"[PUB-26] Maintenance / 390 / Scheduled — withdrawals available\",\"id\":\"215:81600\"},{\"name\":\"[PUB-06] …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "cont:adm-games",
+      "phaseIndex": 1,
+      "phaseTitle": "Screens",
+      "agentId": "ad40958fa70d08c43",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1795837346506,
+      "queuedAt": 1795833742836,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "33:165240 (page '09 — Admin Panel', section 'ADM-G1..G7 Gam…",
+      "promptPreview": "You are a principal product designer AND an expert Figma Plugin API engineer, building screens in the real Figma file \"GLOBAL POOL — Product Design\" (premium dark Web3 global jackpot platform) with the Figma MCP use_figma tool. The design system, variables, styles and component library already exist — you COMPOSE screens from them.\nMANDATORY FIRST STEPS:\n1. Read /home/user/Claude/design/figma-buil…",
+      "promptFramed": true,
+      "lastProgressAt": 1795837738626,
+      "tokens": 172638,
+      "toolCalls": 31,
+      "durationMs": 392120,
+      "resultPreview": "{\"section\":\"33:165240 (page '09 — Admin Panel', section 'ADM-G1..G7 Game management', X=42000 Y=0, 11040 × 8040)\",\"created\":[{\"name\":\"Section/ADM-G1..G7 Game management\",\"id\":\"33:165240\"},{\"name\":\"[ADM-G1] Games List / 1440 / Default\",\"id\":\"33:165241\"},{\"name\":\"[ADM-G1] Games List / 1280 / Default\",\"id\":\"33:166714\"},{\"name\":\"[ADM-G2] Game Configuration / 1440 / Pending second approval\",\"id\":\"33:21…"
+    }
+  ],
+  "totalTokens": 2421451,
+  "totalToolCalls": 378
+}

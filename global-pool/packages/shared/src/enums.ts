@@ -523,3 +523,113 @@ export const ROUND_STATUS_LABEL: Readonly<Record<RoundStatus, string>> = {
   settled: 'Settled',
   cancelled: 'Cancelled — refunds owed',
 };
+
+// ── Admin restrictions & four-eyes approvals (admin-a) ──────────────────────────────────────────
+
+export const RestrictionType = {
+  ACCOUNT_SUSPENDED: 'account_suspended',
+  GAMING_BLOCKED: 'gaming_blocked',
+  DEPOSITS_BLOCKED: 'deposits_blocked',
+  WITHDRAWALS_FROZEN: 'withdrawals_frozen',
+} as const;
+export type RestrictionType = ValuesOf<typeof RestrictionType>;
+export const RESTRICTION_TYPES = valuesOf(RestrictionType);
+
+export const RESTRICTION_LABEL: Readonly<Record<RestrictionType, string>> = {
+  account_suspended: 'Account suspended',
+  gaming_blocked: 'Gaming blocked',
+  deposits_blocked: 'Deposits blocked',
+  withdrawals_frozen: 'Withdrawals on hold',
+};
+
+/** What the player can no longer do while the restriction is active (shown to admins before applying). */
+export const RESTRICTION_IMPACT: Readonly<Record<RestrictionType, string>> = {
+  account_suspended:
+    'Pool entries, games and deposits are blocked. Withdrawals stay available unless a withdrawal hold is also active.',
+  gaming_blocked: 'Pool entries and games are blocked. Deposits and withdrawals keep working.',
+  deposits_blocked: 'Deposits are blocked. Entries and withdrawals keep working.',
+  withdrawals_frozen:
+    'New withdrawals are held for review. Balances are not changed and nothing is moved.',
+};
+
+/**
+ * Restrictions that hold a player's withdrawals or suspend the whole account need FOUR EYES: the requesting admin
+ * writes a reason and confirms with 2FA, then a different admin with `users.restrict` approves (reason + 2FA).
+ * Protective restrictions (gaming / deposits blocked) apply immediately with reason + 2FA. Lifting never needs a
+ * second approver. Restrictions never touch balances or ledger rows.
+ */
+export const RESTRICTION_REQUIRES_FOUR_EYES: Readonly<Record<RestrictionType, boolean>> = {
+  account_suspended: true,
+  gaming_blocked: false,
+  deposits_blocked: false,
+  withdrawals_frozen: true,
+};
+
+/** Four-eyes requests expire (and change nothing) after this many hours. */
+export const FOUR_EYES_EXPIRY_HOURS = 4;
+
+export const ApprovalStatus = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+  CANCELLED: 'cancelled',
+  EXPIRED: 'expired',
+} as const;
+export type ApprovalStatus = ValuesOf<typeof ApprovalStatus>;
+export const APPROVAL_STATUSES = valuesOf(ApprovalStatus);
+
+/** Four-eyes request actions and the permission a SECOND admin needs to decide them. */
+export const FOUR_EYES_ACTION_PERMISSION = {
+  'withdrawal.approve': 'withdrawals.approve',
+  'user.restriction.apply': 'users.restrict',
+  'admin.role.permissions.change': 'admins.manage',
+} as const satisfies Readonly<Record<string, Permission>>;
+export type FourEyesAction = keyof typeof FOUR_EYES_ACTION_PERMISSION;
+export const FOUR_EYES_ACTIONS = Object.keys(FOUR_EYES_ACTION_PERMISSION) as [
+  FourEyesAction,
+  ...FourEyesAction[],
+];
+
+export const FOUR_EYES_ACTION_LABEL: Readonly<Record<FourEyesAction, string>> = {
+  'withdrawal.approve': 'Release flagged withdrawal',
+  'user.restriction.apply': 'Apply account restriction',
+  'admin.role.permissions.change': 'Change role permissions',
+};
+
+/** Human labels for permission keys (permissions matrix, no-permission states). */
+export const PERMISSION_LABEL: Readonly<Record<Permission, string>> = {
+  'dashboard.read': 'View overview & KPIs',
+  'users.read': 'View users',
+  'users.pii.read': 'Reveal personal data',
+  'users.restrict': 'Apply / lift restrictions',
+  'kyc.read': 'View KYC',
+  'kyc.review': 'Review KYC',
+  'aml.read': 'View AML alerts',
+  'aml.resolve': 'Resolve AML alerts',
+  'rg.read': 'View responsible gaming',
+  'compliance.geo_rules.manage': 'Manage restricted countries',
+  'deposits.read': 'View deposits',
+  'withdrawals.read': 'View withdrawals',
+  'withdrawals.approve': 'Approve withdrawals',
+  'withdrawals.reject': 'Reject withdrawals',
+  'ledger.read': 'View ledger',
+  'reconciliation.read': 'View reconciliation',
+  'rounds.read': 'View rounds',
+  'rounds.schedule': 'Schedule rounds',
+  'games.read': 'View games',
+  'games.configure': 'Configure games',
+  'marketing.promotions.read': 'View promotions',
+  'marketing.promotions.manage': 'Manage promotions',
+  'marketing.promotions.review': 'Compliance review of promotions',
+  'marketing.cms.manage': 'Manage CMS',
+  'notifications.send': 'Send notifications',
+  'affiliates.read': 'View affiliates',
+  'affiliates.manage': 'Manage affiliates',
+  'affiliates.payouts.approve': 'Approve affiliate payouts',
+  'support.tickets.manage': 'Manage support tickets',
+  'reports.export': 'Export reports',
+  'audit.read': 'View audit log',
+  'admins.manage': 'Manage admins & roles',
+  'system.feature_flags.manage': 'Manage feature flags',
+  'system.read': 'View system settings',
+};

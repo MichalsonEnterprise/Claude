@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 
 import { EntriesService } from './entries.service';
+import { EntryHistoryService } from './entry-history.service';
 import { PoolController } from './pool.controller';
 import { PoolEventsService } from './pool-events.service';
 import { PoolGateway } from './pool.gateway';
@@ -15,6 +16,7 @@ import { RoundsService } from './rounds.service';
     PoolEventsService,
     RoundsService,
     EntriesService,
+    EntryHistoryService,
     RoundLifecycleService,
     PoolGateway,
     RoundsProcessor,

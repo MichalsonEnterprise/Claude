@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma, RandomnessRequest, Round, Winner } from '@prisma/client';
+import type { Prisma, RandomnessRequest, Round, RoundStatus, Winner } from '@prisma/client';
 import { ENTRY_PRICE, PLATFORM_FEE_PER_ENTRY } from '@gp/shared/fees';
 import { ROUND_STATUS_LABEL } from '@gp/shared/enums';
 import { formatRoundNumber, truncateAddress } from '@gp/shared/format';
@@ -109,9 +109,18 @@ export class RoundsService {
     return round;
   }
 
-  async history(query: PaginationQuery) {
+  /** Past rounds. Optional filters (additive): `statuses` ⊆ closed/drawing/settled/cancelled, exact round `number`. */
+  async history(
+    query: PaginationQuery,
+    filters: { statuses?: RoundStatus[]; number?: number } = {},
+  ) {
+    const past: RoundStatus[] = ['settled', 'cancelled', 'closed', 'drawing'];
+    const statuses = filters.statuses?.length
+      ? past.filter((s) => filters.statuses!.includes(s))
+      : past;
     const where: Prisma.RoundWhereInput = {
-      status: { in: ['settled', 'cancelled', 'closed', 'drawing'] },
+      status: { in: statuses },
+      ...(filters.number !== undefined ? { number: filters.number } : {}),
     };
     const [rows, total] = await Promise.all([
       this.prisma.round.findMany({

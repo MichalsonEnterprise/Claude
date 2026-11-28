@@ -121,5 +121,8 @@
   "auth-b (verify AUTH-08/09 desktop)",
   "gp-hub (GP-04 verify)"
  ],
- "note2": "Figma MCP daily/per-minute quota is shared by design agents AND coding agents (get_screenshot). Run continuation with args [\"cont:<slice>\"]; scripts ready in pending/<slice>/out (see README/RUN-ORDER)."
+ "note2": "Figma MCP daily/per-minute quota is shared by design agents AND coding agents (get_screenshot). Run continuation with args [\"cont:<slice>\"]; scripts ready in pending/<slice>/out (see README/RUN-ORDER).",
+ "qa_fixes": [
+  "USR-F mobile frame(s) built by usr-finance used round #1,245 pool 46,850.00 \u2014 change to canonical 41,200.00 (pending/usr-finance/m-b.js fixed for future runs)"
+ ]
 }

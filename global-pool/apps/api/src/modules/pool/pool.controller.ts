@@ -19,10 +19,23 @@ import { CurrentUser, type AuthUser } from '../../common/request';
 import { createZodDto } from '../../common/zod';
 import { GAMING_POLICY, PlayerAuth } from '../auth/guards';
 import { EntriesService } from './entries.service';
+import { EntryHistoryService } from './entry-history.service';
 import { RoundsService } from './rounds.service';
 
 class EnterRoundDto extends createZodDto(enterRoundSchema.omit({ roundId: true })) {}
 class PaginationDto extends createZodDto(paginationQuerySchema) {}
+const HISTORY_STATUSES = ['closed', 'drawing', 'settled', 'cancelled'] as const;
+/** GET /pool/rounds filters (additive): ?status=settled,cancelled&number=1245 */
+class RoundHistoryDto extends createZodDto(
+  paginationQuerySchema.extend({
+    status: z
+      .string()
+      .optional()
+      .transform((v) => (v ? v.split(',').map((s) => s.trim()).filter(Boolean) : []))
+      .pipe(z.array(z.enum(HISTORY_STATUSES))),
+    number: z.coerce.number().int().min(1).optional(),
+  }),
+) {}
 class QuoteDto extends createZodDto(
   z.object({
     entries: z.coerce.number().int().min(MIN_ENTRIES_PER_PURCHASE).max(MAX_ENTRIES_PER_PURCHASE),
@@ -38,6 +51,7 @@ export class PoolController {
   constructor(
     private readonly rounds: RoundsService,
     private readonly entries: EntriesService,
+    private readonly entryHistory: EntryHistoryService,
   ) {}
 
   @Get('rounds/current')
@@ -52,8 +66,21 @@ export class PoolController {
 
   @Get('rounds')
   @ApiOperation({ summary: 'Round history (closed, drawing, settled, cancelled)' })
-  history(@Query() query: PaginationDto) {
-    return this.rounds.history(query);
+  history(@Query() query: RoundHistoryDto) {
+    return this.rounds.history(
+      { page: query.page, pageSize: query.pageSize },
+      { statuses: query.status, number: query.number },
+    );
+  }
+
+  @Get('me/entries')
+  @PlayerAuth()
+  @ApiOperation({
+    summary:
+      'Your entry history: one row per purchase (entries + separate platform fee) with its result, plus lifetime summary',
+  })
+  myEntryHistory(@CurrentUser() user: AuthUser, @Query() query: PaginationDto) {
+    return this.entryHistory.history(user.id, query);
   }
 
   @Get('quote')

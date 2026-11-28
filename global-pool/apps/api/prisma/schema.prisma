@@ -92,6 +92,8 @@ enum LedgerPostingKind {
   owed_claim
   reward
   demo_opening_balance
+  /// A detected on-chain deposit was re-orged out / reverted before it was credited: PENDING → CHAIN_CLEARING.
+  deposit_reversed
 }
 
 enum TxType {
@@ -305,6 +307,7 @@ model User {
   rgLimits           RgLimit[]
   selfExclusions     RgSelfExclusion[]
   rgSettings         RgSettings?
+  favouriteGames     UserFavouriteGame[]
   restrictions       UserRestriction[]
   referralsMade      Referral[]          @relation("referrer")
   referredBy         Referral?           @relation("referred")
@@ -331,6 +334,8 @@ model UserProfile {
   marketingOptIn          Boolean   @default(false) @map("marketing_opt_in")
   marketingOptInAt        DateTime? @map("marketing_opt_in_at")
   antiPhishingCode        String?   @map("anti_phishing_code")
+  /// Account preferences: language, time zone, notification channels, session settings (account module).
+  preferences             Json      @default("{}")
   kycLevel                KycLevel  @default(none) @map("kyc_level")
   vipTier                 VipTier   @default(bronze) @map("vip_tier")
   vipLevel                Int       @default(1) @map("vip_level")
@@ -519,6 +524,9 @@ model KycRecord {
   reviewedAt      DateTime? @map("reviewed_at")
   reviewerAdminId String?   @map("reviewer_admin_id") @db.Uuid
   rejectionReason String?   @map("rejection_reason")
+  /// Flow data from the KYC provider interface (personal details, document metadata, liveness, check results).
+  /// Never document images — those stay with the provider.
+  details         Json      @default("{}")
   isDemo          Boolean   @default(false) @map("is_demo")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
@@ -578,6 +586,8 @@ model RgLimit {
   pendingAmount      Decimal?    @map("pending_amount") @db.Decimal(20, 6)
   pendingMinutes     Int?        @map("pending_minutes")
   pendingEffectiveAt DateTime?   @map("pending_effective_at")
+  /// The pending change removes the limit (removal waits for the 24 h cool-down like an increase).
+  pendingRemoval     Boolean     @default(false) @map("pending_removal")
   isDemo             Boolean     @default(false) @map("is_demo")
   createdAt          DateTime    @default(now()) @map("created_at")
   updatedAt          DateTime    @updatedAt @map("updated_at")
@@ -607,13 +617,33 @@ model RgSelfExclusion {
 
 /// Reality-check reminders and session tracking.
 model RgSettings {
-  id                  String    @id @default(uuid()) @db.Uuid
-  userId              String    @unique @map("user_id") @db.Uuid
-  realityCheckMinutes Int       @default(60) @map("reality_check_minutes")
-  lastRealityCheckAt  DateTime? @map("last_reality_check_at")
-  sessionStartedAt    DateTime? @map("session_started_at")
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime  @updatedAt @map("updated_at")
+  id                         String    @id @default(uuid()) @db.Uuid
+  userId                     String    @unique @map("user_id") @db.Uuid
+  realityCheckMinutes        Int       @default(60) @map("reality_check_minutes")
+  lastRealityCheckAt         DateTime? @map("last_reality_check_at")
+  sessionStartedAt           DateTime? @map("session_started_at")
+  /// Pause the game until the player answers the reality check (default on — protective).
+  realityCheckPause          Boolean   @default(true) @map("reality_check_pause")
+  /// Push notification for reality checks (never default ON).
+  realityCheckPush           Boolean   @default(false) @map("reality_check_push")
+  /// Activity heartbeat: a session ends after RG_SESSION_IDLE_MINUTES without activity.
+  lastActivityAt             DateTime? @map("last_activity_at")
+  /// UTC day the played-time counters belong to.
+  playedDay                  DateTime? @map("played_day") @db.Date
+  playedTodaySeconds         Int       @default(0) @map("played_today_seconds")
+  sessionsToday              Int       @default(0) @map("sessions_today")
+  /// Per-session length limit (minutes); increases/removal wait 24 h.
+  sessionLimitMinutes        Int?      @map("session_limit_minutes")
+  pendingSessionLimitMinutes Int?      @map("pending_session_limit_minutes")
+  pendingSessionLimitRemoval Boolean   @default(false) @map("pending_session_limit_removal")
+  pendingSessionLimitAt      DateTime? @map("pending_session_limit_at")
+  /// Quiet hours (UTC minutes of day). Turning them on applies at once; turning them off waits 24 h.
+  quietHoursEnabled          Boolean   @default(false) @map("quiet_hours_enabled")
+  quietStartMinute           Int       @default(60) @map("quiet_start_minute")
+  quietEndMinute             Int       @default(420) @map("quiet_end_minute")
+  pendingQuietOffAt          DateTime? @map("pending_quiet_off_at")
+  createdAt                  DateTime  @default(now()) @map("created_at")
+  updatedAt                  DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -640,6 +670,10 @@ model Deposit {
   confirmations         Int           @default(0)
   requiredConfirmations Int           @map("required_confirmations")
   status                DepositStatus
+  /// Hash of the block the transfer log was seen in (re-org detection; null for DEMO simulations).
+  blockHash             String?       @map("block_hash")
+  /// Head block at which the watcher first saw the transfer missing from the canonical chain (re-org).
+  reorgSeenAtBlock      BigInt?       @map("reorg_seen_at_block")
   detectedAt            DateTime      @default(now()) @map("detected_at")
   creditedAt            DateTime?     @map("credited_at")
   isDemo                Boolean       @default(false) @map("is_demo")
@@ -898,6 +932,15 @@ model Round {
   settledAt           DateTime?   @map("settled_at")
   /// Round id used by the GlobalPoolRounds contract (= round number).
   onchainRoundId      BigInt?     @map("onchain_round_id")
+  /// Mirrored on-chain (GlobalPoolRounds): set when the round is opened while POOL_ONCHAIN_MIRROR=true.
+  chainMirror         Boolean     @default(false) @map("chain_mirror")
+  chainId             Int?        @map("chain_id")
+  contractAddress     String?     @map("contract_address")
+  /// keccak256 of the canonical rules document published with openRound.
+  rulesHash           String?     @map("rules_hash")
+  payoutsMerkleRoot   String?     @map("payouts_merkle_root")
+  /// Last observed GlobalPoolRounds.RoundStatus name (None, Open, Committed, DrawRequested, Fulfilled, Settled, Cancelled).
+  onchainStatus       String?     @map("onchain_status")
   isDemo              Boolean     @default(false) @map("is_demo")
   createdAt           DateTime    @default(now()) @map("created_at")
   updatedAt           DateTime    @updatedAt @map("updated_at")
@@ -909,6 +952,9 @@ model Round {
   postings           LedgerPosting[]
   poolLedger         PoolLedger[]
   transactions       Transaction[]
+  chainOps           RoundChainOp[]
+  entryCommitments   EntryCommitment[]
+  payouts            RoundPayout[]
 
   @@index([status, closesAt])
   @@map("rounds")
@@ -928,10 +974,11 @@ model Entry {
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
-  round       Round        @relation(fields: [roundId], references: [id])
-  user        User         @relation(fields: [userId], references: [id])
-  transaction Transaction? @relation(fields: [transactionId], references: [id])
+  round       Round            @relation(fields: [roundId], references: [id])
+  user        User             @relation(fields: [userId], references: [id])
+  transaction Transaction?     @relation(fields: [transactionId], references: [id])
   winner      Winner?
+  commitment  EntryCommitment?
 
   @@unique([roundId, seq])
   @@index([roundId, userId])
@@ -1036,10 +1083,26 @@ model Game {
   createdAt        DateTime     @default(now()) @map("created_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
 
-  sessions GameSession[]
+  sessions   GameSession[]
+  favourites UserFavouriteGame[]
 
   @@index([category, sortOrder])
   @@map("games")
+}
+
+/// Games a player pinned as favourites (USR-G7). Reminders are never auto-enabled.
+model UserFavouriteGame {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  gameId    String   @map("game_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+  @@index([userId, createdAt])
+  @@map("user_favourite_games")
 }
 
 /// Commit–reveal game session: serverSeedHash is shown before play, serverSeed revealed at the end.
@@ -1326,4 +1389,150 @@ model ChainCursor {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("chain_cursors")
+}
+
+// ─── On-chain mirroring & outbound transactions (TESTNET ONLY: Arbitrum Sepolia / local Anvil) ───────────
+
+enum ChainTxStatus {
+  /// Signed and stored, not yet accepted by the RPC node.
+  signed
+  /// Accepted by the node (in the mempool or mined, not yet confirmed).
+  broadcast
+  /// Mined successfully with the required confirmations.
+  mined
+  /// Mined but reverted (no state change except the nonce/gas).
+  reverted
+  /// Never mined: its nonce was used by another transaction.
+  dropped
+}
+
+enum RoundChainStep {
+  open
+  commit
+  cancel
+  request_draw
+  settle
+}
+
+enum RoundChainOpStatus {
+  pending
+  sent
+  confirmed
+  failed
+}
+
+/// DB-backed nonce manager: next nonce per signer and chain (row locked FOR UPDATE while a transaction is signed).
+model ChainSignerNonce {
+  id        String   @id @default(uuid()) @db.Uuid
+  chainId   Int      @map("chain_id")
+  address   String
+  nextNonce Int      @map("next_nonce")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([chainId, address])
+  @@map("chain_signer_nonces")
+}
+
+/// Outbox of every transaction the API signs (round mirroring, withdrawals). Each one is signed and stored BEFORE it
+/// is broadcast, so a crash can neither lose it nor send a different one: a retry rebroadcasts the same raw tx.
+model ChainTransaction {
+  id                String        @id @default(uuid()) @db.Uuid
+  chainId           Int           @map("chain_id")
+  fromAddress       String        @map("from_address")
+  nonce             Int
+  toAddress         String        @map("to_address")
+  /// round_op | withdrawal
+  purpose           String
+  /// RoundChainOp id / Withdrawal id.
+  refId             String?       @map("ref_id")
+  txHash            String        @unique @map("tx_hash")
+  rawTx             String        @map("raw_tx")
+  status            ChainTxStatus
+  gasLimit          String        @map("gas_limit")
+  maxFeePerGas      String        @map("max_fee_per_gas")
+  blockNumber       BigInt?       @map("block_number")
+  blockHash         String?       @map("block_hash")
+  gasUsed           String?       @map("gas_used")
+  error             String?
+  broadcastAttempts Int           @default(0) @map("broadcast_attempts")
+  lastBroadcastAt   DateTime?     @map("last_broadcast_at")
+  minedAt           DateTime?     @map("mined_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  roundOps RoundChainOp[]
+
+  @@unique([chainId, fromAddress, nonce])
+  @@index([purpose, refId])
+  @@index([status])
+  @@map("chain_transactions")
+}
+
+/// One mirroring step of a round on GlobalPoolRounds (idempotent per round + step + attempt).
+model RoundChainOp {
+  id          String             @id @default(uuid()) @db.Uuid
+  roundId     String             @map("round_id") @db.Uuid
+  step        RoundChainStep
+  attempt     Int                @default(1)
+  status      RoundChainOpStatus
+  chainTxId   String?            @map("chain_tx_id") @db.Uuid
+  txHash      String?            @map("tx_hash")
+  blockNumber BigInt?            @map("block_number")
+  error       String?
+  metadata    Json               @default("{}")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+
+  round   Round             @relation(fields: [roundId], references: [id])
+  chainTx ChainTransaction? @relation(fields: [chainTxId], references: [id])
+
+  @@unique([roundId, step, attempt])
+  @@index([status])
+  @@map("round_chain_ops")
+}
+
+/// Per-entry commitment frozen when the round closes (append-only). Leaf i of the entries Merkle tree is
+/// keccak256(abi.encode(index, entryIdBytes32, userCommitment)); the salt is encrypted at rest and shown only to
+/// the entry owner (receipt), so outsiders cannot link entries to players.
+model EntryCommitment {
+  entryId        String   @id @map("entry_id") @db.Uuid
+  roundId        String   @map("round_id") @db.Uuid
+  /// 0-based index in the canonical entry list (= seq − 1).
+  index          Int      @map("entry_index")
+  entryIdBytes32 String   @map("entry_id_bytes32")
+  userCommitment String   @map("user_commitment")
+  saltEnc        String   @map("salt_enc")
+  leaf           String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  entry Entry @relation(fields: [entryId], references: [id])
+  round Round @relation(fields: [roundId], references: [id])
+
+  @@unique([roundId, index])
+  @@map("entry_commitments")
+}
+
+/// Payout leaves recorded on-chain with recordSettlement (append-only), with their Merkle proofs.
+model RoundPayout {
+  id             String   @id @default(uuid()) @db.Uuid
+  roundId        String   @map("round_id") @db.Uuid
+  /// 1-based prize rank (on-chain rank = rank − 1).
+  rank           Int
+  entryIndex     Int      @map("entry_index")
+  entryIdBytes32 String   @map("entry_id_bytes32")
+  userCommitment String   @map("user_commitment")
+  amount         Decimal  @db.Decimal(20, 6)
+  /// Amount in USDT base units (6 decimals), exactly as hashed into the leaf.
+  amountUnits    String   @map("amount_units")
+  leaf           String
+  proof          Json
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  round Round @relation(fields: [roundId], references: [id])
+
+  @@unique([roundId, rank])
+  @@map("round_payouts")
 }

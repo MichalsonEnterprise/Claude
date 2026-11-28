@@ -2,7 +2,7 @@
   "name": "@gp/api",
   "version": "0.1.0",
   "private": true,
-  "description": "GLOBAL POOL API — NestJS 11 + Prisma 6 + PostgreSQL + Redis/BullMQ. Hybrid-custody double-entry ledger, Global Pool rounds with verifiable randomness, Privy player auth, separate admin auth. DEMO / testnet only.",
+  "description": "GLOBAL POOL API \u2014 NestJS 11 + Prisma 6 + PostgreSQL + Redis/BullMQ. Hybrid-custody double-entry ledger, Global Pool rounds with verifiable randomness, Privy player auth, separate admin auth. DEMO / testnet only.",
   "license": "UNLICENSED",
   "scripts": {
     "dev": "pnpm start:dev",

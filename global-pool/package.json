@@ -8,7 +8,7 @@
     "dev:services": "bash scripts/dev-services.sh start",
     "dev:web": "pnpm --filter @gp/web dev",
     "dev:api": "pnpm --filter @gp/api start:dev",
-    "build:packages": "pnpm --filter @gp/tokens --filter @gp/shared build",
+    "build:packages": "pnpm --filter @gp/tokens --filter @gp/shared build && pnpm --filter @gp/contracts build:ts",
     "build": "pnpm -r build",
     "typecheck": "pnpm build:packages && pnpm -r typecheck",
     "lint": "pnpm -r lint",

@@ -18,7 +18,8 @@ export function toCsv(header: readonly string[], rows: readonly (readonly CsvVal
   return `${lines.join('\r\n')}\r\n`;
 }
 
-export const sha256Hex = (content: string) => createHash('sha256').update(content, 'utf8').digest('hex');
+export const sha256Hex = (content: string) =>
+  createHash('sha256').update(content, 'utf8').digest('hex');
 
 /** Mask a handle for exports without personal data: "@nova.k" → "@n•••k". */
 export function maskHandle(handle: string | null | undefined): string {

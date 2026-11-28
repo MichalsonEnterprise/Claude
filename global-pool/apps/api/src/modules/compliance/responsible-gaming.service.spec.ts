@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { AppError } from '../../common/errors';
 import type { PrismaService } from '../../infra/prisma/prisma.service';
+import type { StepUpService } from '../security/step-up.service';
+import type { TotpService } from '../security/totp.service';
 import { ResponsibleGamingService } from './responsible-gaming.service';
 
 type Limit = {
@@ -14,6 +16,7 @@ type Limit = {
   pendingAmount: { toFixed(): string } | null;
   pendingMinutes: number | null;
   pendingEffectiveAt: Date | null;
+  pendingRemoval?: boolean;
 };
 
 const dec = (v: string | null | undefined) =>
@@ -77,6 +80,12 @@ function fakePrisma(opts: { spentToday?: string; selfExcludedUntil?: Date | null
             ? { duration: '7d', endsAt: opts.selfExcludedUntil }
             : null,
         ),
+      findMany: () =>
+        Promise.resolve(
+          opts.selfExcludedUntil !== undefined
+            ? [{ duration: '7d', startsAt: new Date(0), endsAt: opts.selfExcludedUntil }]
+            : [],
+        ),
     },
     rgSettings: { findUnique: () => Promise.resolve(null) },
     transaction: {
@@ -91,10 +100,17 @@ function fakePrisma(opts: { spentToday?: string; selfExcludedUntil?: Date | null
 
 const USER = 'u1';
 
+/** Stubs for the security services (2FA off). */
+const stepUp = {
+  assert: () => Promise.resolve({ method: 'totp' as const }),
+} as unknown as StepUpService;
+const totp = { status: () => Promise.resolve({ enabled: false }) } as unknown as TotpService;
+const service = (db: PrismaService) => new ResponsibleGamingService(db, stepUp, totp);
+
 describe('responsible gaming limits (server-side)', () => {
   it('a first limit and decreases apply immediately; increases wait for the 24 h cool-down', async () => {
     const { db } = fakePrisma();
-    const rg = new ResponsibleGamingService(db);
+    const rg = service(db);
     const now = new Date('2026-11-27T12:00:00Z');
     let state = await rg.updateLimit(
       USER,
@@ -129,7 +145,7 @@ describe('responsible gaming limits (server-side)', () => {
 
   it('blocks a purchase that would exceed the daily participation limit', async () => {
     const { db } = fakePrisma({ spentToday: '351.75' });
-    const rg = new ResponsibleGamingService(db);
+    const rg = service(db);
     await rg.updateLimit(USER, { type: 'participation', period: 'day', amount: '500.00' });
     await expect(rg.assertCanParticipate(USER, '100.50', db)).resolves.toBeUndefined(); // 452.25 ≤ 500
     const err = await rg.assertCanParticipate(USER, '160.80', db).catch((e: unknown) => e);
@@ -144,7 +160,7 @@ describe('responsible gaming limits (server-side)', () => {
 
   it('self-excluded players cannot participate or deposit', async () => {
     const { db } = fakePrisma({ selfExcludedUntil: new Date(Date.now() + 86_400_000) });
-    const rg = new ResponsibleGamingService(db);
+    const rg = service(db);
     await expect(rg.assertCanParticipate(USER, '10.05', db)).rejects.toMatchObject({
       code: 'SELF_EXCLUDED',
     });

@@ -21,10 +21,13 @@ describe('admin CSV export helpers', () => {
   });
 
   it('builds a CRLF CSV with a stable SHA-256', () => {
-    const csv = toCsv(['ref', 'amount'], [
-      ['DP-77412', '1000.00'],
-      ['WD-20931', '1500.00'],
-    ]);
+    const csv = toCsv(
+      ['ref', 'amount'],
+      [
+        ['DP-77412', '1000.00'],
+        ['WD-20931', '1500.00'],
+      ],
+    );
     expect(csv).toBe('ref,amount\r\nDP-77412,1000.00\r\nWD-20931,1500.00\r\n');
     expect(sha256Hex(csv)).toMatch(/^[0-9a-f]{64}$/);
     expect(sha256Hex(csv)).toBe(sha256Hex(csv));

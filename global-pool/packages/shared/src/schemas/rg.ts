@@ -61,7 +61,12 @@ export const realityCheckAckSchema = z.object({
 
 /** Per-session length limit (RG4). null removes it (removal waits 24 h). */
 export const rgSessionLimitSchema = z.object({
-  minutes: z.number().int().min(15).max(12 * 60).nullable(),
+  minutes: z
+    .number()
+    .int()
+    .min(15)
+    .max(12 * 60)
+    .nullable(),
 });
 
 /** "HH:MM" (UTC) for quiet hours. */
@@ -100,7 +105,10 @@ export const selfExclusionConfirmFormSchema = z.object({
       error: `Type ${SELF_EXCLUSION_CONFIRM_PHRASE} exactly`,
     }),
   acknowledged: z.literal(true, { error: 'Tick the box to confirm you understand' }),
-  totpCode: z.string().regex(/^\d{6}$/, { error: 'Enter the 6-digit code' }).optional(),
+  totpCode: z
+    .string()
+    .regex(/^\d{6}$/, { error: 'Enter the 6-digit code' })
+    .optional(),
 });
 export type SelfExclusionConfirmForm = z.infer<typeof selfExclusionConfirmFormSchema>;
 
@@ -194,3 +202,15 @@ export interface RgStateView {
   session: RgSessionView;
   twoFactorEnabled: boolean;
 }
+
+/** Cancel a pending (24 h) change to a setting: a session-length increase/removal or quiet hours turning off. */
+export const rgCancelSettingSchema = z.object({
+  target: z.enum(['session_limit', 'quiet_hours']),
+});
+export type RgCancelSetting = z.infer<typeof rgCancelSettingSchema>;
+
+/** GET /responsible-gaming/history?kind=limits|reality_checks|all */
+export const rgHistoryQuerySchema = z.object({
+  kind: z.enum(['limits', 'reality_checks', 'all']).default('all'),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});

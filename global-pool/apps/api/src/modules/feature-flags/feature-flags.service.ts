@@ -60,6 +60,11 @@ export class FeatureFlagsService {
     ];
   }
 
+  /** Drop the 15 s cache so a flag change (e.g. the dual-approved circuit breaker) applies at once. */
+  invalidate(): void {
+    this.cache = null;
+  }
+
   private async flags(): Promise<Map<string, boolean>> {
     if (this.cache && Date.now() - this.cache.at < 15_000) return this.cache.flags;
     const rows = await this.prisma.featureFlag.findMany();

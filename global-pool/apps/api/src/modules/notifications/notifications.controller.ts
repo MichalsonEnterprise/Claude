@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { CurrentUser, type AuthUser } from '../../common/request';
 import { createZodDto } from '../../common/zod';
 import { PlayerAuth } from '../auth/guards';
-import { NotificationsService } from './notifications.service';
+import { NOTIFICATION_CATEGORY_FILTERS, NotificationsService } from './notifications.service';
 
 class NotificationsQueryDto extends createZodDto(
   paginationQuerySchema.extend({
@@ -14,6 +14,7 @@ class NotificationsQueryDto extends createZodDto(
       .enum(['true', 'false'])
       .transform((v) => v === 'true')
       .optional(),
+    category: z.enum(NOTIFICATION_CATEGORY_FILTERS).optional(),
   }),
 ) {}
 
@@ -24,7 +25,10 @@ export class NotificationsController {
   constructor(private readonly notifications: NotificationsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Notifications (paginated, ?unread=true)' })
+  @ApiOperation({
+    summary:
+      'Notifications (paginated, ?unread=true, ?category=security|transactions|rounds|promotions|account)',
+  })
   list(@CurrentUser() user: AuthUser, @Query() query: NotificationsQueryDto) {
     return this.notifications.list(user.id, query);
   }

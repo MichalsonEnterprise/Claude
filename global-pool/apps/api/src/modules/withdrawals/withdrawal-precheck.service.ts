@@ -298,7 +298,7 @@ export class WithdrawalPrecheckService {
     const details = (alert?.details ?? null) as {
       reason?: string | null;
       decision?: string;
-      checks?: { name: string; passed: boolean; detail?: string }[];
+      checks?: { name: string; passed: boolean; detail?: string }[] | number;
     } | null;
     return {
       ...view,
@@ -308,7 +308,8 @@ export class WithdrawalPrecheckService {
             decision: details?.decision ?? null,
             reason: details?.reason ?? null,
             alertStatus: alert.status,
-            checks: details?.checks ?? [],
+            // DEMO seed rows store only a count; real screenings store the check list.
+            checks: Array.isArray(details?.checks) ? details.checks : [],
           }
         : null,
     };

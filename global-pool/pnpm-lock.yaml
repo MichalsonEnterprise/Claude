@@ -35,6 +35,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@gp/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@gp/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -177,6 +180,9 @@ importers:
       '@fontsource-variable/inter':
         specifier: ^5.3.0
         version: 5.3.0
+      '@gp/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@gp/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -222,6 +228,9 @@ importers:
       react-hook-form:
         specifier: ^7.92.0
         version: 7.92.0(@types/react@19.3.3)(react@19.3.1)
+      socket.io-client:
+        specifier: ^4.8.4
+        version: 4.8.4(bufferutil@4.2.0)(utf-8-validate@6.1.0)
       sonner:
         specifier: ^2.0.8
         version: 2.0.8(@types/react@19.3.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)

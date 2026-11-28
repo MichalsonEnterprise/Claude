@@ -12,7 +12,14 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { WITHDRAWAL_STATUSES } from '@gp/shared/enums';
-import { adminLoginSchema, paginationQuerySchema, totpCodeSchema } from '@gp/shared/schemas';
+import {
+  adminLoginSchema,
+  adminRestrictionApplySchema,
+  adminRestrictionLiftSchema,
+  adminUsersQuerySchema,
+  paginationQuerySchema,
+  totpCodeSchema,
+} from '@gp/shared/schemas';
 import { z } from 'zod';
 
 import { CurrentAdmin, ReqMeta, type AuthAdmin, type RequestMeta } from '../../common/request';
@@ -40,17 +47,13 @@ const sensitive = z.object({
 class LoginDto extends createZodDto(adminLoginSchema) {}
 class RefreshDto extends createZodDto(z.object({ refreshToken: z.string().min(20).max(200) })) {}
 class SensitiveDto extends createZodDto(sensitive) {}
-class RestrictionDto extends createZodDto(
-  sensitive.extend({
-    type: z.enum(['account_suspended', 'gaming_blocked', 'deposits_blocked', 'withdrawals_frozen']),
-  }),
-) {}
+/** Restriction apply: withdrawal holds / suspensions become a four-eyes REQUEST (RESTRICTION_REQUIRES_FOUR_EYES). */
+class RestrictionDto extends createZodDto(adminRestrictionApplySchema) {}
+class RestrictionLiftDto extends createZodDto(adminRestrictionLiftSchema) {}
 class AmlResolveDto extends createZodDto(
   sensitive.extend({ resolution: z.enum(['resolved', 'dismissed', 'escalated']) }),
 ) {}
-class UsersQueryDto extends createZodDto(
-  paginationQuerySchema.extend({ q: z.string().trim().min(1).max(64).optional() }),
-) {}
+class UsersQueryDto extends createZodDto(adminUsersQuerySchema) {}
 class WithdrawalQueueDto extends createZodDto(
   paginationQuerySchema.extend({ status: z.enum(WITHDRAWAL_STATUSES).optional() }),
 ) {}
@@ -150,7 +153,10 @@ export class AdminController {
   @Post('users/:id/restrictions')
   @HttpCode(201)
   @RequirePermissions('users.restrict')
-  @ApiOperation({ summary: 'Apply a restriction (reason + MFA re-auth; audited)' })
+  @ApiOperation({
+    summary:
+      'Apply a restriction (reason + MFA re-auth; audited). Withdrawal holds and suspensions need four eyes → returns a pending request',
+  })
   restrict(
     @CurrentAdmin() admin: AuthAdmin,
     @Param('id', ParseUUIDPipe) id: string,
@@ -168,7 +174,7 @@ export class AdminController {
     @CurrentAdmin() admin: AuthAdmin,
     @Param('id', ParseUUIDPipe) id: string,
     @Param('restrictionId', ParseUUIDPipe) restrictionId: string,
-    @Body() body: SensitiveDto,
+    @Body() body: RestrictionLiftDto,
     @ReqMeta() meta: RequestMeta,
   ) {
     return this.admin.liftRestriction(admin, id, restrictionId, body, meta);

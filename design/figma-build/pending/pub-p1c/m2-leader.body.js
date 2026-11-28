@@ -14,6 +14,8 @@ const FB = {
 };
 const INTRO = 'Climb the daily, weekly and monthly races. Points come from real wagers on GLOBAL POOL games — Global Pool entries never earn race points, and races never change your odds.';
 const shots = [];
+// small fix from m1 review: move the wrench in the 390 maintenance banner off the ticket stub text
+try { const mf = await figma.getNodeByIdAsync('215:81600'); const w = mf && mf.findOne(n => n.name === 'Art — open-end wrench'); if (w) { w.x = w.x + 26; w.y = w.y - 22; OUT.notes.push('maintenance 390: wrench moved'); } } catch (e) { OUT.notes.push('wrench fix: ' + e.message); }
 function inInst(n) { let p = n.parent; while (p && p.type !== 'PAGE') { if (p.type === 'INSTANCE') return true; p = p.parent; } return false; }
 async function readDesk(id) { try { const f = await figma.getNodeByIdAsync(id); if (!f) return null; const texts = f.findAll(n => n.type === 'TEXT' && !inInst(n)).map(t => t.characters); const insts = f.findAll(n => n.type === 'INSTANCE' && !inInst(n)); const rows = insts.filter(n => n.name.startsWith('Table/Leaderboard Row')).map(i => { const o = {}; for (const [k, v] of Object.entries(i.componentProperties)) if (v.type === 'TEXT') o[k.split('#')[0]] = v.value; return o; }); const btn = insts.find(n => n.name.startsWith('Button/Primary')); let cta = null; if (btn) for (const [k, v] of Object.entries(btn.componentProperties)) if (k.startsWith('Label#')) cta = v.value; return { texts, rows, cta }; } catch (e) { OUT.notes.push('readDesk ' + id + ': ' + e.message); return null; } }
 function parseLB(d, fb) {

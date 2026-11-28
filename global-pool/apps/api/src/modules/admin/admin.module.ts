@@ -3,18 +3,23 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { WithdrawalsModule } from '../withdrawals/withdrawals.module';
 import { AdminAuthService } from './admin-auth.service';
+import { AdminConsoleController } from './admin-console.controller';
+import { AdminConsoleService } from './admin-console.service';
 import { AdminSecurityService } from './admin-security.service';
 import { AdminAuthController, AdminController } from './admin.controller';
 import { AdminAuthGuard, PermissionsGuard } from './admin.guards';
 import { AdminService } from './admin.service';
+import { FourEyesService } from './four-eyes.service';
 
 @Module({
   imports: [JwtModule.register({}), WithdrawalsModule],
-  controllers: [AdminAuthController, AdminController],
+  controllers: [AdminAuthController, AdminController, AdminConsoleController],
   providers: [
     AdminAuthService,
     AdminSecurityService,
     AdminService,
+    AdminConsoleService,
+    FourEyesService,
     AdminAuthGuard,
     PermissionsGuard,
   ],

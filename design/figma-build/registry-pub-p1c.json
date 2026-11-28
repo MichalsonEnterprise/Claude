@@ -1,0 +1,17 @@
+{
+ "_note": "Slice pub-p1c (PUB-24/25/26 + PUB-06). No new library components; screens are composed from Shell/*, Tile/Game Generic, Input/Search, Menu/Filter Chip, Button/*, Button/Icon, Badge/*, User/Avatar, Tabs/Segmented, Control/Toggle, Notice/Licence, Footer Mega and Nav/Mobile Tab Bar. Mobile leaderboard rows are inline (Table/Leaderboard Row is a fixed 640 px desktop row with no 390 variant). Scripts: pending/pub-p1c.",
+ "Section/PUB-24/25/26 Errors & PUB-06 Leaderboard (page 03, X=70000)": {"id": "54:101508"},
+ "Doc/PUB-24-26 + PUB-06 header": {"id": "54:101509"},
+ "[PUB-24] 404 Not Found / 1440 / Default": {"id": "54:101512"},
+ "[PUB-25] 500 Server Error / 1440 / Default": {"id": "82:102573"},
+ "[PUB-26] Maintenance / 1440 / Scheduled — withdrawals available": {"id": "82:103376"},
+ "[PUB-06] Leaderboard / 1440 / Weekly (default)": {"id": "84:103900"},
+ "[PUB-06] Leaderboard / 1440 / Daily": {"id": "84:104905"},
+ "[PUB-06] Leaderboard / 1440 / Monthly": {"id": "84:105918"},
+ "Section/PUB-06/24/25/26 — Mobile (page 10, X=42000)": {"id": "215:78629"},
+ "[PUB-24] 404 Not Found / 390 / Default": {"id": "215:79244"},
+ "[PUB-25] 500 Server Error / 390 / Default": {"id": "215:80405"},
+ "[PUB-26] Maintenance / 390 / Scheduled — withdrawals available": {"id": "215:81600"},
+ "[PUB-06] Leaderboard / 390 / Weekly (default)": {"id": "216:81112"},
+ "[PUB-06] Leaderboard / 390 / Daily — not ranked yet": {"id": "216:82473"}
+}

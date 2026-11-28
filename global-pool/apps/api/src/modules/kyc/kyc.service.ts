@@ -4,6 +4,7 @@ import { DAILY_WITHDRAWAL_LIMIT } from '@gp/shared/limits';
 
 import { AppError } from '../../common/errors';
 import { PrismaService } from '../../infra/prisma/prisma.service';
+import { approveFlowDetails } from './kyc-flow.service';
 import { MockKycProvider, type KycProvider } from './kyc.provider';
 
 @Injectable()
@@ -75,9 +76,10 @@ export class KycService {
         orderBy: { createdAt: 'desc' },
       });
       if (pending) {
+        const details = approveFlowDetails(pending.details, now);
         await tx.kycRecord.update({
           where: { id: pending.id },
-          data: { status: 'verified', reviewedAt: now },
+          data: { status: 'verified', reviewedAt: now, ...(details ? { details } : {}) },
         });
       } else {
         await tx.kycRecord.create({
