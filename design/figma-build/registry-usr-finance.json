@@ -27,5 +27,9 @@
  "[USR-F4] Rewards / 1440 / Default": {
   "id": "86:49985",
   "type": "FRAME"
+ },
+ "[USR-F5] Refunds / 1440 / Default": {
+  "id": "88:50964",
+  "type": "FRAME"
  }
 }
