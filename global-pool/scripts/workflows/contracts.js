@@ -1,0 +1,25 @@
+export const meta = {
+  name: 'gp-contracts',
+  description: 'GLOBAL POOL smart contracts (Foundry): verifiable pool round registry + Chainlink VRF v2.5 consumer for Arbitrum Sepolia, tests, ABI export',
+  phases: [{ title: 'Contracts', detail: 'Foundry project + GlobalPool contract + tests' }],
+}
+const PROMPT = `You are a senior Solidity/Web3 engineer on GLOBAL POOL. FIRST read /home/user/Claude/global-pool/docs/DEV_CONVENTIONS.md (guardrails + owner decisions: HYBRID custody, MVP Arbitrum Sepolia 421614) and /home/user/Claude/design/figma-build/demo-data.md (round #1,248 numbers, prize split 50/20/10/10×2%). Do not git commit. Do not touch apps/ or other packages except adding exported ABIs as described.
+ASSIGNMENT — packages/contracts (Foundry):
+1. Install Foundry if missing (curl -L https://foundry.paradigm.xyz | bash; ~/.foundry/bin/foundryup) — report the version. Create the Foundry project in /home/user/Claude/global-pool/packages/contracts (foundry.toml with solc 0.8.24+, optimizer, via-ir if needed; remappings), dependencies via forge install (OpenZeppelin contracts v5, Chainlink contracts with VRF v2.5 + VRFCoordinatorV2_5Mock) or the equivalent npm packages if GitHub cloning fails. Add a package.json (@gp/contracts) with scripts build/test/lint (forge build, forge test, forge fmt --check) so the pnpm workspace runs it.
+2. Contract design (hybrid custody — player funds and payouts live in the platform's off-chain ledger; the contract makes every draw VERIFIABLE and IMMUTABLE, it holds no player funds in MVP):
+   GlobalPoolRounds.sol (AccessControl + Pausable, VRFConsumerBaseV2Plus):
+   - openRound(roundId, closesAt, entryPrice, feePerEntry, minParticipants, minPool, prizeSplitBps[] (sum 10000), rulesHash) by OPERATOR_ROLE; emits RoundOpened.
+   - commitEntries(roundId, entriesMerkleRoot, totalEntries, totalParticipants, poolAmount) — only after closesAt, only once, by OPERATOR_ROLE; the Merkle tree leaves are keccak256(abi.encode(index, entryId, userCommitment)) so anyone can verify an entry's index; emits EntriesCommitted.
+   - If thresholds not met → cancelRound(roundId, reasonCode) (refunds handled off-chain; emits RoundCancelled). Thresholds are checked on-chain from committed numbers.
+   - requestDraw(roundId) → requests VRF v2.5 randomness (subscription, keyHash, callbackGasLimit, requestConfirmations, numWords=1, nativePayment false) — only once per round; a re-request is allowed ONLY if the previous request is unfulfilled after a timeout (e.g. 24h) and must reuse the same committed entries (no re-roll after fulfilment).
+   - fulfillRandomWords stores the random word; computeWinners(roundId) view derives N distinct winning indices (N = number of prizes, e.g. 13) deterministically from the word + totalEntries (e.g. iterative keccak with rejection of duplicates); emits DrawFulfilled.
+   - recordSettlement(roundId, payoutsMerkleRoot, totalPaid) by SETTLER_ROLE, only after fulfilment; emits RoundSettled. NO function may set/override winners or random words; no admin path changes results. Pausable only blocks opening new rounds / committing (circuit breaker), never alters fulfilled draws.
+   - Events carry everything needed for off-chain verification; NatSpec on every function.
+3. Tests (forge test, VRFCoordinatorV2_5Mock): full lifecycle; thresholds → cancel; cannot commit before close or twice; cannot request twice; re-request only after timeout and unfulfilled; winners deterministic + distinct + within range; settlement only after fulfilment; roles enforced; pause blocks opening but not fulfilment; fuzz test for computeWinners; gas snapshot. Also a Merkle proof verification helper test (OpenZeppelin MerkleProof) with a TS/JS script that builds the same tree (use viem/ox or @openzeppelin/merkle-tree from npm — keep it in packages/contracts/scripts).
+4. script/Deploy.s.sol for Arbitrum Sepolia reading VRF coordinator/keyHash/subId and addresses from env (document the official Arbitrum Sepolia VRF v2.5 coordinator & key hash in README with a "verify before use" note); NEVER commit keys; no broadcast in this task.
+5. Export ABI JSON + a typed TS module (as const ABI for viem) to packages/contracts/abi/ and re-export from @gp/shared only if trivial (otherwise document the import path for the API agent).
+6. Write packages/contracts/README.md (design, trust model, what is on-chain vs off-chain under hybrid custody, verification procedure for players, threat model notes, audit TODOs) and docs/CONTRACTS.md in global-pool/docs.
+Verify: forge build, forge test -vv (all pass), forge fmt --check; report results with numbers.`
+const SCHEMA = { type: 'object', properties: { report: { type: 'string' }, verified: { type: 'array', items: { type: 'string' } }, failing: { type: 'array', items: { type: 'string' } }, decisions: { type: 'array', items: { type: 'string' } }, next: { type: 'array', items: { type: 'string' } } }, required: ['report', 'verified', 'failing', 'decisions', 'next'] }
+phase('Contracts')
+return await agent(PROMPT, { label: 'dev:contracts', phase: 'Contracts', schema: SCHEMA })

@@ -36,16 +36,18 @@ Ledger (306 rows incl. 12 added for catalogue/promotions): **75 verified · 11 b
 | Web: design system + casino shell | 🟡 | agent dev:web-design-system |
 | Web: Homepage (PUB-01) | ⬜→🟡 | agent dev:web-homepage (after design system) |
 | API: NestJS core, Prisma schema, auth, ledger, wallet, pool, admin, audit | 🟡 | agent dev:api-core |
-| Smart contracts (Foundry, VRF v2.5) | ❓ | waits for custody/chain decision |
+| Smart contracts (Foundry, VRF v2.5) | 🟡 | workflow `gp-contracts` (round registry + VRF consumer, Arbitrum Sepolia, tests) |
 | Auth, Dashboard, Wallet, Pool, Admin frontends | ⬜ | next batch after foundation |
 | Games (5) as simulations | ⬜ | P1 |
 
-## 4. Outstanding decisions (asked in Polish — see chat)
-1. ❓ Custody model (platform balances + on-chain pool settlement vs non-custodial vs custodial).
-2. ❓ MVP chain(s) for testnet.
-3. ❓ Auth approach (own email+password+TOTP+SIWE vs Privy).
-4. ❓ Code location (`global-pool/` in this repo vs separate repo).
-Later (not blocking now): KYC provider, AML/chain-analytics provider, email provider, hosting, licensing jurisdiction list.
+## 4. Decisions
+Answered 28 Nov 2026 (details in `global-pool/docs/DEV_CONVENTIONS.md` → Owner decisions):
+1. ✅ Custody = **hybrid**: platform balances on a double-entry ledger, with pool rounds committed and drawn on-chain (VRF), so results are verifiable.
+2. ✅ MVP chain = **Arbitrum Sepolia**. The other 4 networks are configured as "coming soon".
+3. ✅ Player auth = **Privy** (email OTP, social, wallets/embedded). Admins use their own auth with mandatory TOTP. Players have no passwords; step-up TOTP protects withdrawals. ⚠ This changes Figma AUTH-01/03 (email+password) to a code-based flow — the screens need a design update.
+4. ✅ Code in `global-pool/` in this repo.
+
+Still open (not blocking yet): KYC provider, AML/chain-analytics provider, e-mail provider, hosting, licensed jurisdictions/restricted-country list, Privy app credentials (dev runs on a mock until provided).
 
 ## 5. Guardrails (always on)
 DEMO/testnet only (`REAL_MONEY_ENABLED=false`), decimal-safe money, 0.05 USDT platform fee shown separately from network fee, append-only double-entry ledger, VRF/commit-reveal fairness, no admin result/winner/fund manipulation, RBAC + reason + MFA + four-eyes + hash-chained audit log, RG limits + self-exclusion server-side, no dark patterns / VPN hints.
