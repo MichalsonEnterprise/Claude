@@ -43,6 +43,7 @@ import { toast } from '@/components/ui/sonner';
 import { ApiRequestError, newIdempotencyKey } from '@/lib/api/client';
 import { describeError, failedQueries } from '@/lib/api/errors';
 import {
+  useAccountGate,
   useBalances,
   useCurrentRound,
   useDeposit,
@@ -59,6 +60,7 @@ import { publicEnv } from '@/lib/env';
 import { statePreviewEnabled } from '@/lib/home-preview';
 import { cn } from '@/lib/utils';
 
+import { AccountPauseNotice, accountPause, type AccountPause } from './account-pause';
 import { DepositLimitModal, MaintenanceModal, WalletStatusBanners, depositLimit } from './banners';
 import {
   FlowFooter,
@@ -198,6 +200,10 @@ export function DepositFlow() {
 
   const deposit = useDeposit(ref);
   const failed = deposit.data?.status === 'rejected';
+  // Q17: a break, self-exclusion, region or deposit block is said on step 1 — not discovered at the address step.
+  // Tracking a deposit already sent (?ref=…) stays available.
+  const gate = useAccountGate();
+  const paused = ref ? null : accountPause(gate.data, 'deposits');
   const refreshFinancials = useInvalidatePlayerFinancials();
   // Auto-advance once the deposit is credited (pending → confirmation). The credit (chain watcher or DEMO control)
   // moved Pending → Available on the server, so every cached balance is refreshed — not only on the DEMO paths.
@@ -235,11 +241,17 @@ export function DepositFlow() {
       background={<WalletOverview />}
       side={<DepositSide step={step} network={network} deposit={deposit.data} />}
     >
-      {step === 'network' && <NetworkStep onNext={() => go('token')} />}
-      {step === 'token' && (
+      {/* Step 1 says it up front (Continue off); a deep link to a later step gets the paused state instead. */}
+      {paused && step !== 'network' && <DepositsPaused pause={paused} />}
+      {step === 'network' && <NetworkStep pause={paused} onNext={() => go('token')} />}
+      {!paused && step === 'token' && (
         <TokenStep network={network} onBack={() => go('network')} onNext={() => go('address')} />
       )}
-      {(step === 'address' || step === 'qr') && (
+      {/* The deposit address is only requested once the account gate has answered (or failed). */}
+      {!paused && (step === 'address' || step === 'qr') && gate.isPending && (
+        <Skeleton className="h-80 w-full" />
+      )}
+      {!paused && (step === 'address' || step === 'qr') && !gate.isPending && (
         <AddressStep
           network={network}
           variant={step}
@@ -250,7 +262,7 @@ export function DepositFlow() {
           onDetected={(r) => go('pending', { ref: r })}
         />
       )}
-      {step === 'pending' && !ref && (
+      {!paused && step === 'pending' && !ref && (
         <WaitingStep
           network={network}
           onBack={() => go('address')}
@@ -280,9 +292,29 @@ export function DepositFlow() {
   );
 }
 
+/** Q17: deposits are paused on this account — why, until when, and what still works (withdrawals, history). */
+function DepositsPaused({ pause }: { pause: AccountPause }) {
+  return (
+    <>
+      <FlowHeading title="Deposits are paused on your account">
+        No deposit address is shown while deposits are paused, so nothing can be sent by mistake.
+        Your balance stays yours and withdrawals stay available.
+      </FlowHeading>
+      <AccountPauseNotice pause={pause} action="deposits" />
+      <FlowFooter
+        primary={
+          <Button asChild size="l" variant="secondary">
+            <Link href={WALLET_ROUTES.overview}>Go to wallet</Link>
+          </Button>
+        }
+      />
+    </>
+  );
+}
+
 // ── step 1 · network (WAL-03) ──────────────────────────────────────────────────────────────────
 
-function NetworkStep({ onNext }: { onNext: () => void }) {
+function NetworkStep({ pause, onNext }: { pause: AccountPause | null; onNext: () => void }) {
   const [selected, setSelected] = React.useState<ChainKey | null>('arbitrum');
   const status = useWalletStatus();
   const balances = useBalances();
@@ -306,8 +338,9 @@ function NetworkStep({ onNext }: { onNext: () => void }) {
           title="We couldn’t check your deposit status and limits"
         />
       )}
+      {pause && <AccountPauseNotice pause={pause} action="deposits" />}
       <WalletStatusBanners status={status.data} rg={rg.data} context="deposit" />
-      {isNew && (
+      {!pause && isNew && (
         <Alert type="info" title="First deposit? Set a deposit limit first (optional)">
           Limits help you stay in control and are checked on our side for every deposit. You can
           lower them any time; raising one takes 24 h.{' '}
@@ -365,7 +398,7 @@ function NetworkStep({ onNext }: { onNext: () => void }) {
       <FlowFooter
         note={!selected ? 'Choose a network to continue' : undefined}
         primary={
-          <NextButton disabled={!selected || Boolean(paused)} onClick={onNext}>
+          <NextButton disabled={!selected || Boolean(paused) || pause !== null} onClick={onNext}>
             Continue
           </NextButton>
         }
@@ -1175,9 +1208,14 @@ function ConfirmationStep({
     creditSeenAt,
   );
   const { isFetching, refetch } = balances;
+  // One automatic refetch per credit (R39b): a failed fetch never updates dataUpdatedAt, so "refetch while not fresh"
+  // looped as fast as the API answered (a request storm on 429 / 503). Further attempts are the player's Try again.
+  const autoRefetched = React.useRef<number | null>(null);
   React.useEffect(() => {
-    if (!fresh && !isFetching) void refetch();
-  }, [fresh, isFetching, refetch]);
+    if (fresh || isFetching || autoRefetched.current === creditSeenAt) return;
+    autoRefetched.current = creditSeenAt;
+    void refetch();
+  }, [fresh, isFetching, refetch, creditSeenAt]);
   if (!fresh && balances.isError) {
     return <QueryError error={balances.error} onRetry={() => void balances.refetch()} />;
   }

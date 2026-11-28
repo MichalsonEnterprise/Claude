@@ -37,9 +37,16 @@ import { CheckboxField } from '@/components/ui/checkbox';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ApiRequestError, isOutcomeUnknown, newIdempotencyKey } from '@/lib/api/client';
+import {
+  ApiRequestError,
+  isOutcomeUnknown,
+  newIdempotencyKey,
+  writeOutcome,
+  type WriteOutcome,
+} from '@/lib/api/client';
 import { failedQueries } from '@/lib/api/errors';
 import {
+  useAccountGate,
   useBalances,
   useInvalidateWallet,
   useLinkedWallets,
@@ -52,6 +59,7 @@ import {
 } from '@/lib/api/wallet';
 import { cn } from '@/lib/utils';
 
+import { AccountPauseNotice, accountPause, type AccountPause } from './account-pause';
 import { AddAddressModal } from './addresses';
 import { InsufficientFundsModal, MaintenanceModal, WalletStatusBanners } from './banners';
 import { BalanceBreakdown } from './balance-breakdown';
@@ -162,6 +170,9 @@ export function WithdrawFlow() {
   const balances = useBalances();
   const status = useWalletStatus();
   const withdrawal = useWithdrawal(ref);
+  // Q19: an AML hold (withdrawals_frozen) is said up front — not discovered as a missing quote at the amount step.
+  const gate = useAccountGate();
+  const hold = ref ? null : accountPause(gate.data, 'withdrawals');
 
   let step: StepKey = (sp.get('step') as StepKey | null) ?? 'asset';
   if (IDX[step] === undefined) step = 'asset';
@@ -218,6 +229,11 @@ export function WithdrawFlow() {
       side={<WithdrawSide draft={draft} step={step} />}
     >
       {!ref && <WalletStatusBanners status={status.data} rg={undefined} context="withdraw" />}
+      {/* Q19: the hold is said on every step; nothing can be reviewed or confirmed while it applies. */}
+      {hold && IDX[step] <= IDX.amount && (
+        <AccountPauseNotice pause={hold} action="withdrawals" />
+      )}
+      {hold && IDX[step] > IDX.amount && <WithdrawalHold hold={hold} />}
       {step === 'asset' && (
         <AssetStep
           available={balances.data?.available}
@@ -245,12 +261,13 @@ export function WithdrawFlow() {
       {step === 'amount' && (
         <AmountStep
           draft={draft}
+          hold={hold}
           onChange={(amount) => update({ amount, idempotencyKey: null, confirmed: false })}
           onBack={() => go('address')}
           onNext={() => go('fees')}
         />
       )}
-      {step === 'fees' && (
+      {!hold && step === 'fees' && (
         <FeesStep
           draft={draft}
           onConfirm={(confirmed) => update({ confirmed })}
@@ -261,7 +278,7 @@ export function WithdrawFlow() {
           }}
         />
       )}
-      {step === 'risk' && (
+      {!hold && step === 'risk' && (
         <RiskStep
           draft={draft}
           onBack={() => go('fees')}
@@ -269,7 +286,7 @@ export function WithdrawFlow() {
           onEdit={(s) => go(s)}
         />
       )}
-      {step === '2fa' && (
+      {!hold && step === '2fa' && (
         <TwoFactorStep
           draft={draft}
           ensureKey={() => {
@@ -307,6 +324,46 @@ export function WithdrawFlow() {
     </FlowShell>
   );
 }
+
+/** Q19: withdrawals are on hold for this account — the reason, the case reference and the way forward. */
+function WithdrawalHold({ hold }: { hold: AccountPause }) {
+  return (
+    <>
+      <FlowHeading title="Withdrawals are on hold">
+        Nothing has been sent and nothing was deducted. Your balance stays in your account.
+      </FlowHeading>
+      <AccountPauseNotice pause={hold} action="withdrawals" />
+      <FlowFooter
+        primary={
+          <Button asChild size="l" variant="secondary">
+            <Link href={`${WALLET_ROUTES.history}?type=withdrawal`}>Withdrawal history</Link>
+          </Button>
+        }
+      />
+    </>
+  );
+}
+
+/** A restriction refusal (`403 FORBIDDEN details.restriction`, e.g. withdrawals_frozen) as an account pause. */
+function restrictionPause(err: unknown): AccountPause | null {
+  if (!(err instanceof ApiRequestError) || err.code !== 'FORBIDDEN') return null;
+  const r = (err.details as { restriction?: unknown } | undefined)?.restriction;
+  return r === 'withdrawals_frozen' || r === 'account_suspended'
+    ? { kind: 'restriction', restriction: r, reference: null }
+    : null;
+}
+
+/**
+ * Withdrawal errors raised after the idempotency-key lookup (KYC / limit / cool-down checks, the ledger lock): as the
+ * answer to a retry they prove the earlier attempt with the same key was not committed (R41b). Anything else on a
+ * retry of an unanswered attempt (429, 401, policy 403, a wrong code…) says nothing about it.
+ */
+export const WITHDRAWAL_DEFINITE_CODES = [
+  'INSUFFICIENT_FUNDS',
+  'KYC_REQUIRED',
+  'VALIDATION_FAILED',
+  'ADDRESS_NOT_WHITELISTED',
+] as const;
 
 // ── step 1 · asset (WAL-10) ────────────────────────────────────────────────────────────────────
 
@@ -693,11 +750,14 @@ export function maxFillAmount(max: string): string {
 
 function AmountStep({
   draft,
+  hold,
   onChange,
   onBack,
   onNext,
 }: {
   draft: Draft;
+  /** Withdrawals are on hold (the notice above the step says why): no review / confirmation. */
+  hold: AccountPause | null;
   onChange: (a: string) => void;
   onBack: () => void;
   onNext: () => void;
@@ -717,7 +777,10 @@ function AmountStep({
   const over = valid && balances.data !== undefined && gt(v, available);
   const overLimit = valid && s && gt(v, remaining);
   const below = valid && lt(v, min);
-  const ok = valid && !over && !overLimit && !below && quote.data?.meetsMinimum !== false;
+  const quoteFailed = quote.isError && !quote.data;
+  const quoteHold = quoteFailed ? restrictionPause(quote.error) : null;
+  const ok =
+    valid && !over && !overLimit && !below && !quoteFailed && quote.data?.meetsMinimum !== false;
   const max = s && gt(available, remaining) ? remaining : available;
   const chips = ['100.00', '500.00', '1000.00', '5000.00'].filter((c) => !gt(c, max));
 
@@ -821,6 +884,19 @@ function AmountStep({
         loading={quote.isFetching}
         updatedAt={quote.dataUpdatedAt}
       />
+      {/* Q19: a refused / failed quote is said, never swallowed as "You receive —". */}
+      {hold ? null : quoteHold ? (
+        <AccountPauseNotice pause={quoteHold} action="withdrawals" />
+      ) : quoteFailed ? (
+        <ErrorState
+          variant="inline"
+          error={quote.error}
+          onRetry={() => void quote.refetch()}
+          retrying={quote.isFetching}
+          what="the fee quote"
+          note="Nothing has been sent."
+        />
+      ) : null}
       <p className="flex gap-2 rounded-md bg-bg-secondary p-3 text-caption text-text-secondary">
         <Lock aria-hidden className="size-4 shrink-0" />
         When you confirm with 2FA, the amount moves from Available to Locked until the network
@@ -832,7 +908,7 @@ function AmountStep({
         note="You can still change the amount at step 5"
         primary={
           <NextButton
-            disabled={!valid || limitReached}
+            disabled={!valid || limitReached || quoteFailed || hold !== null}
             onClick={() => (over ? setShortfall(true) : ok ? onNext() : undefined)}
           >
             Review fees
@@ -1219,6 +1295,9 @@ function TwoFactorStep({
   const [code, setCode] = React.useState('');
   const [shortfall, setShortfall] = React.useState(false);
   const [maintenance, setMaintenance] = React.useState<string | null>(null);
+  // R41b: once an attempt got no definite answer, a later refusal that says nothing about it keeps this state.
+  const [outcome, setOutcome] = React.useState<WriteOutcome | null>(null);
+  const unresolved = React.useRef(false);
   const invalidate = useInvalidateWallet();
   const balances = useBalances();
   const me = useMe();
@@ -1232,27 +1311,40 @@ function TwoFactorStep({
         totpCode,
       }),
     onSuccess: (w) => {
+      unresolved.current = false;
       void invalidate();
       onSubmitted(w.reference);
     },
     onError: (e) => {
       setCode('');
+      const o = writeOutcome(e, {
+        pendingUnknown: unresolved.current,
+        definiteCodes: WITHDRAWAL_DEFINITE_CODES,
+      });
+      unresolved.current = o === 'unknown';
+      setOutcome(o);
       // No definite answer: the request may have been accepted — show the real state (withdrawals, balances).
-      if (isOutcomeUnknown(e)) void invalidate();
+      if (o !== 'refused') void invalidate();
       if (e instanceof ApiRequestError) {
-        if (e.code === 'INSUFFICIENT_FUNDS') setShortfall(true);
+        if (o === 'refused' && e.code === 'INSUFFICIENT_FUNDS') setShortfall(true);
         if (e.code === 'SERVICE_UNAVAILABLE') setMaintenance(e.message);
       }
     },
   });
   const info = stepUpError(submit.error);
-  // Network drop / 5xx / still processing: never claim it "wasn't requested". The draft keeps its idempotency key,
-  // so confirming again re-sends the SAME request and the API answers with the existing withdrawal if there is one.
-  const unknown = Boolean(submit.error) && isOutcomeUnknown(submit.error);
+  // Network drop / 5xx / still processing — or a refusal of the retry that says nothing about the earlier attempt:
+  // never claim it "wasn't requested". The draft keeps its idempotency key, so confirming again re-sends the SAME
+  // request and the API answers with the existing withdrawal if there is one.
+  const unknown = Boolean(submit.error) && outcome === 'unknown';
+  const alreadyUsed = Boolean(submit.error) && outcome === 'already_used';
+  const retryRefusal =
+    unknown && !info && submit.error instanceof ApiRequestError && !isOutcomeUnknown(submit.error)
+      ? submit.error
+      : null;
   const other =
     submit.error &&
     !info &&
-    !unknown &&
+    outcome === 'refused' &&
     !(
       submit.error instanceof ApiRequestError &&
       ['INSUFFICIENT_FUNDS', 'SERVICE_UNAVAILABLE'].includes(submit.error.code)
@@ -1300,6 +1392,26 @@ function TwoFactorStep({
           The connection dropped before GLOBAL POOL answered, so this withdrawal may already be
           requested. Check your withdrawal history before you change anything. Enter a new code and
           confirm again to re-send this same request — it can’t be requested twice.
+          {retryRefusal && (
+            <span className="mt-1 block">
+              Your retry didn’t get through: {retryRefusal.message.replace(/[.!?]?$/, '.')} We still
+              don’t know whether the first attempt was requested.
+            </span>
+          )}
+        </Alert>
+      )}
+      {alreadyUsed && (
+        <Alert
+          type="warning"
+          title="This withdrawal was already requested"
+          actions={
+            <Button asChild size="s" variant="secondary">
+              <Link href={`${WALLET_ROUTES.history}?type=withdrawal`}>Withdrawal history</Link>
+            </Button>
+          }
+        >
+          GLOBAL POOL already has a request under this confirmation. Check your withdrawal history
+          before you start another one.
         </Alert>
       )}
       {other && (

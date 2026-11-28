@@ -184,7 +184,10 @@ export class AdminFinanceController {
 @AdminAuth()
 @Controller('admin/pool')
 export class AdminPoolController {
-  constructor(private readonly pool: AdminPoolService) {}
+  constructor(
+    private readonly pool: AdminPoolService,
+    private readonly finance: AdminFinanceService,
+  ) {}
 
   @Get('overview')
   @RequirePermissions('rounds.read')
@@ -231,6 +234,19 @@ export class AdminPoolController {
   @ApiOperation({ summary: 'Prize distribution and settlement status of a round (read-only)' })
   prizes(@Param('number', ParseIntPipe) number: number) {
     return this.pool.prizes(number);
+  }
+
+  @Get('refunds')
+  @RequirePermissions('rounds.read')
+  @ApiOperation({
+    summary:
+      'Refund status of cancelled rounds (ADM-P9, read-only): refunded to Owed, claimed, outstanding per round',
+  })
+  async refunds() {
+    // The pool view of GET /admin/finance/refunds for every role that monitors rounds (rounds.read). The finance-only
+    // part — returned withdrawals ("not refunds") — stays behind ledger.read.
+    const { rounds, totals, policy, generatedAt } = await this.finance.refunds();
+    return { rounds, totals, policy, generatedAt };
   }
 
   @Get('vrf')

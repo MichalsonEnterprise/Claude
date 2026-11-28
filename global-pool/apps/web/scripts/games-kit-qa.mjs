@@ -10,6 +10,7 @@
 import { mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { presetAgeGate } from './lib/age-gate.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -85,6 +86,8 @@ async function contextFor(browser, width, player) {
     deviceScaleFactor: 1,
     reducedMotion: 'reduce',
   });
+  // PUB-22: guest shots show the page, not the age-gate modal (members never get the gate).
+  await presetAgeGate(ctx, BASE);
   if (player) {
     const host = new URL(BASE).hostname;
     await ctx.addCookies([{ name: 'privy-token', value: player.token, domain: host, path: '/' }]);

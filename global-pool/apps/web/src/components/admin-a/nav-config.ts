@@ -40,6 +40,11 @@ export interface AdminNavGroup {
   children?: AdminNavChild[];
   /** Built by admin-a in this batch (other groups are owned by other modules). */
   owner?: 'admin-a' | 'admin-b';
+  /**
+   * Module not in this build yet: the sidebar shows it as "Soon" (never as an open, clickable module) and the command
+   * palette leaves it out — its URL only reaches the honest "not in this build" state (Q13).
+   */
+  planned?: true;
 }
 
 export const ADMIN_NAV: readonly AdminNavGroup[] = [
@@ -104,6 +109,7 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
     icon: Gamepad2,
     href: '/admin/games',
     anyOf: ['games.read'],
+    planned: true,
   },
   {
     key: 'pool',
@@ -132,6 +138,7 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
     icon: Blocks,
     href: '/admin/blockchain',
     anyOf: ['system.read', 'deposits.read'],
+    planned: true,
   },
   {
     key: 'compliance',
@@ -163,6 +170,7 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
     icon: BadgePercent,
     href: '/admin/affiliates',
     anyOf: ['affiliates.read'],
+    planned: true,
   },
   {
     key: 'marketing',
@@ -170,6 +178,7 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
     icon: Megaphone,
     href: '/admin/marketing',
     anyOf: ['marketing.promotions.read'],
+    planned: true,
   },
   {
     key: 'system',
@@ -218,9 +227,23 @@ export function adminDestinations(): {
   href: string;
   anyOf: readonly Permission[];
 }[] {
-  return ADMIN_NAV.flatMap((g) =>
+  return ADMIN_NAV.filter((g) => !g.planned).flatMap((g) =>
     g.children && g.children.length > 0
       ? g.children.map((c) => ({ label: c.label, group: g.label, href: c.href, anyOf: c.anyOf }))
       : [{ label: g.label, group: g.label, href: g.href, anyOf: g.anyOf }],
   );
+}
+
+/** Admin Tab Bar (< 768): Overview · Approvals · KYC · Alerts (+ More). */
+export const ADMIN_TABS: readonly { label: string; href: string; anyOf: readonly Permission[] }[] =
+  [
+    { label: 'Overview', href: '/admin', anyOf: ['dashboard.read'] },
+    { label: 'Approvals', href: '/admin/approvals', anyOf: ['dashboard.read'] },
+    { label: 'KYC', href: '/admin/compliance/kyc', anyOf: ['kyc.read'] },
+    { label: 'Alerts', href: '/admin/alerts', anyOf: ['dashboard.read'] },
+  ];
+
+/** The tabs this admin's role can open — permission-aware like the sidebar (Q11: no KYC tab for Finance). */
+export function visibleAdminTabs(canAny: (permissions: readonly Permission[]) => boolean) {
+  return ADMIN_TABS.filter((t) => canAny(t.anyOf));
 }

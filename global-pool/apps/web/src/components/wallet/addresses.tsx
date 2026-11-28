@@ -206,6 +206,10 @@ export function AddAddressModal({
     },
     mode: 'onChange',
   });
+  // Read on EVERY render (Q21): react-hook-form only keeps isValid up to date once it has been read. Behind
+  // `code.length !== 6 ||` it was first read after the address and ownership box were set, so it stayed false
+  // until another field (the optional label) changed.
+  const { isValid } = form.formState;
   React.useEffect(() => {
     if (open) {
       form.reset({
@@ -269,7 +273,7 @@ export function AddAddressModal({
             type="submit"
             form="wl-add"
             loading={add.isPending}
-            disabled={code.length !== 6 || !form.formState.isValid}
+            disabled={code.length !== 6 || !isValid}
           >
             Add to whitelist
           </Button>

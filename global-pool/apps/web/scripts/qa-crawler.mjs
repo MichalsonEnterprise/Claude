@@ -39,6 +39,7 @@ import { createHmac, randomBytes } from 'node:crypto';
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { presetAgeGate } from './lib/age-gate.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -574,6 +575,8 @@ async function crawlRole(browser, role, urls, results, shells) {
     viewport: { width: WIDTHS[0], height: 900 },
     deviceScaleFactor: 1,
   });
+  // PUB-22: guest shots show the page, not the age-gate modal (members never get the gate).
+  await presetAgeGate(context, BASE);
   const adminKey = ADMIN_ROLE_KEYS[role];
   let session = null;
   if (role === 'nova' || role === 'new-player') {

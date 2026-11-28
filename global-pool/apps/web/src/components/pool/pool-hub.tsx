@@ -29,6 +29,11 @@ import * as React from 'react';
 import { EntryTicket } from '@/components/home/art';
 import { initialsOf } from '@/components/home/primitives';
 import { ShellOverride } from '@/components/shell/shell-overrides';
+import {
+  AccountPauseNotice,
+  accountPause,
+  type AccountPause,
+} from '@/components/wallet/account-pause';
 import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { StatusBadge } from '@/components/ui/badge';
@@ -36,6 +41,7 @@ import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { MyRoundEntries, PoolRoundView, RgState } from '@/lib/api/pool';
+import { useAccountGate } from '@/lib/api/wallet';
 import { cn } from '@/lib/utils';
 
 import {
@@ -110,6 +116,9 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
   const mine = useMyRoundEntries(member && round ? round : null);
   const balances = useViewerBalances();
   const rg = useViewerRg();
+  const gate = useAccountGate();
+  // Q16: a break, self-exclusion or account restriction pauses entries — say so up front, never offer Participate.
+  const paused = member ? gamingPause(gate.data, rg.data) : null;
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -119,7 +128,11 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
 
   const myCount = member ? (mine.data?.entries ?? 0) : 0;
   const canEnter =
-    Boolean(round && phase && acceptsEntries(phase)) && !restricted && !has('no-round');
+    Boolean(round && phase && acceptsEntries(phase)) &&
+    !restricted &&
+    !has('no-round') &&
+    paused === null;
+  const pausedLabel = paused ? PAUSED_LABEL[paused.kind] : null;
   const participate = () => {
     if (!member) {
       if (auth.openAuth) auth.openAuth('sign-in', { next: POOL_ROUTES.hub });
@@ -198,6 +211,7 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
         <RestrictedNotice countryName={countryName} myEntries={myCount} round={round} />
       )}
       {member && <RefundOwedBanner />}
+      {paused && !restricted && <AccountPauseNotice pause={paused} action="gaming" />}
 
       {active && round ? (
         <ActiveHero
@@ -207,6 +221,7 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
           restricted={restricted}
           member={member}
           canEnter={canEnter}
+          pausedLabel={pausedLabel}
           onParticipate={participate}
         />
       ) : round && (phase === 'drawing' || phase === 'delayed') && !has('no-round') ? (
@@ -215,7 +230,7 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
         <NextRoundHero round={round} phase={has('no-round') ? null : phase} last={last} now={now} />
       )}
 
-      {member && rg.data && <RgStrip rg={rg.data} />}
+      {member && rg.data && <RgStrip rg={rg.data} paused={paused} />}
 
       {shown && (
         <div className="grid gap-4 laptop:grid-cols-[minmax(0,1fr)_minmax(240px,300px)]">
@@ -280,6 +295,7 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
         restricted={restricted}
         member={member}
         canEnter={canEnter}
+        pausedLabel={pausedLabel}
         onParticipate={participate}
       />
 
@@ -293,11 +309,38 @@ export function PoolHub({ previewFlags = [] }: { previewFlags?: PoolPreviewFlag[
           limits={rg.data?.limits ?? null}
           limitsStatus={rg.data ? 'ready' : rg.isError ? 'error' : 'loading'}
           onRetryLimits={() => void rg.refetch()}
+          paused={paused}
           wrongNetwork={has('wrong-network')}
         />
       )}
     </div>
   );
+}
+
+/** Button label while entries are paused on the account (the notice above the hero says why). */
+const PAUSED_LABEL: Record<AccountPause['kind'], string> = {
+  cooling_off: 'Paused during your break',
+  self_excluded: 'Paused · self-excluded',
+  region: 'Not available in your region',
+  restriction: 'Paused on your account',
+};
+
+/**
+ * What pauses entries for this member: the account gate (break, self-exclusion, region, admin restriction), or —
+ * while the gate is still loading or failed — the RG state's break / self-exclusion. Null = entries are open.
+ */
+export function gamingPause(
+  gate: Parameters<typeof accountPause>[0],
+  rg: Pick<RgState, 'selfExclusion' | 'exclusion'> | null | undefined,
+): AccountPause | null {
+  if (gate) return accountPause(gate, 'gaming');
+  if (rg?.selfExclusion.active) {
+    const endsAt = rg.exclusion?.endsAt ?? rg.selfExclusion.endsAt;
+    return rg.exclusion?.kind === 'cooling_off'
+      ? { kind: 'cooling_off', endsAt }
+      : { kind: 'self_excluded', endsAt };
+  }
+  return null;
 }
 
 // ── hero variants ─────────────────────────────────────────────────────────────────────────────
@@ -334,6 +377,7 @@ function ActiveHero({
   restricted,
   member,
   canEnter,
+  pausedLabel,
   onParticipate,
 }: {
   round: PoolRoundView;
@@ -342,6 +386,8 @@ function ActiveHero({
   restricted: boolean;
   member: boolean;
   canEnter: boolean;
+  /** Entries are paused on the account (break, self-exclusion, restriction): disabled button with the reason. */
+  pausedLabel: string | null;
   onParticipate: () => void;
 }) {
   const left = now !== null ? hmsUntil(round.closesAt, now) : null;
@@ -424,6 +470,10 @@ function ActiveHero({
           {restricted ? (
             <Button variant="gold" size="l" disabled leadingIcon={<TriangleAlert aria-hidden />}>
               Not available in your region
+            </Button>
+          ) : member && pausedLabel ? (
+            <Button variant="gold" size="l" disabled leadingIcon={<Lock aria-hidden />}>
+              {pausedLabel}
             </Button>
           ) : (
             <Button
@@ -679,7 +729,9 @@ function RefundOwedBanner() {
 
 // ── cards ─────────────────────────────────────────────────────────────────────────────────────
 
-function RgStrip({ rg }: { rg: RgState }) {
+function RgStrip({ rg, paused }: { rg: RgState; paused: AccountPause | null }) {
+  const onBreak =
+    paused && (paused.kind === 'cooling_off' || paused.kind === 'self_excluded') ? paused : null;
   const shown = rg.limits.filter(
     (l) => (l.type === 'participation' || l.type === 'loss') && l.limit !== null,
   );
@@ -722,9 +774,25 @@ function RgStrip({ rg }: { rg: RgState }) {
         <Button variant="ghost" size="s" asChild leadingIcon={<SlidersHorizontal aria-hidden />}>
           <Link href={POOL_ROUTES.rg}>Responsible gaming</Link>
         </Button>
-        <Button variant="secondary" size="s" asChild>
-          <Link href={`${POOL_ROUTES.rg}#take-a-break`}>Take a break</Link>
-        </Button>
+        {onBreak ? (
+          // A break / self-exclusion is already on: no "Take a break" offer, say what is on instead.
+          <StatusBadge
+            status="restricted"
+            label={
+              onBreak.kind === 'cooling_off'
+                ? onBreak.endsAt
+                  ? `On a break until ${formatDateTimeUTC(onBreak.endsAt)}`
+                  : 'On a break'
+                : onBreak.endsAt
+                  ? `Self-excluded until ${formatDateTimeUTC(onBreak.endsAt)}`
+                  : 'Self-excluded'
+            }
+          />
+        ) : (
+          <Button variant="secondary" size="s" asChild>
+            <Link href={`${POOL_ROUTES.rg}#take-a-break`}>Take a break</Link>
+          </Button>
+        )}
       </div>
     </section>
   );
@@ -1267,6 +1335,7 @@ function StickyParticipateBar({
   restricted,
   member,
   canEnter,
+  pausedLabel,
   onParticipate,
 }: {
   round: PoolRoundView | null;
@@ -1275,6 +1344,7 @@ function StickyParticipateBar({
   restricted: boolean;
   member: boolean;
   canEnter: boolean;
+  pausedLabel: string | null;
   onParticipate: () => void;
 }) {
   const left = round && active && now !== null ? hmsUntil(round.closesAt, now) : null;
@@ -1297,6 +1367,10 @@ function StickyParticipateBar({
         {restricted ? (
           <Button variant="gold" size="l" disabled>
             Not available
+          </Button>
+        ) : member && pausedLabel ? (
+          <Button variant="gold" size="l" disabled>
+            {pausedLabel.startsWith('Paused during') ? 'Paused · break' : 'Paused'}
           </Button>
         ) : (
           <Button

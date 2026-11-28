@@ -4,7 +4,6 @@
  * deposits blocked (UI + API 403 SELF_EXCLUDED) → withdrawal still possible → cannot shorten (API 409) →
  * signing in again lands on the self-excluded restricted page.
  */
-import { expect, test } from '@playwright/test';
 
 import {
   API,
@@ -12,14 +11,16 @@ import {
   bearer,
   createPlayer,
   currentRound,
+  expect,
   json,
   playerCode,
   shot,
   signIn,
   startWithdrawal,
+  test,
   uniq,
-  watch,
   VIEWPORT,
+  watch,
 } from './_journey';
 
 const J = 'j5';

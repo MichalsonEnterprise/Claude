@@ -25,7 +25,7 @@ import {
   useAdminMe,
   useBreaker,
   useDecideBreaker,
-  useRefunds,
+  usePoolRefunds,
   useRequestBreaker,
   useVrf,
   type VrfResponse,
@@ -243,7 +243,7 @@ export function VrfPage() {
 // ── P9 refund status ──────────────────────────────────────────────────────────────────────────
 
 export function PoolRefundsPage() {
-  const q = useRefunds();
+  const q = usePoolRefunds();
   const [round] = useRoundParam(null);
   return (
     <PageStack>

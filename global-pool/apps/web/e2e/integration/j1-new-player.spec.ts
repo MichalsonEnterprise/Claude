@@ -5,22 +5,23 @@
  * (30.00 + platform fee 0.15 on its own line, network fee 0.00) → wallet Available 69.85 / Locked 30.00 →
  * history shows the entry and the fee as separate lines.
  */
-import { expect, test } from '@playwright/test';
 
 import {
-  API,
   acceptsEntries,
+  API,
   balances,
   bearer,
   currentRound,
+  expect,
   json,
-  type Player,
+  MOBILE,
   psql,
   shot,
+  test,
+  type Player,
   uniq,
-  watch,
-  MOBILE,
   VIEWPORT,
+  watch,
 } from './_journey';
 
 const J = 'j1';

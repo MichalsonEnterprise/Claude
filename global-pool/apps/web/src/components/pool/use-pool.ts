@@ -23,6 +23,7 @@ import {
   type PoolRoundView,
   type RoundListQuery,
 } from '@/lib/api/pool';
+import { usePlayerDataReady } from '@/lib/api/player-ready';
 import { useAuth } from '@/lib/auth';
 import { DATA_SOURCE } from '@/lib/data/source';
 import { publicEnv } from '@/lib/env';
@@ -88,40 +89,44 @@ export const useVerification = (n: number) =>
 export const useRegionStatus = () =>
   useQuery({ queryKey: poolKeys.region(), queryFn: getRegion, staleTime: 5 * 60_000 });
 
-/** Player-only queries are enabled once the auth session is a member. */
+/**
+ * `member` drives what the page shows (signed-in vs guest). `ready` gates the player-only QUERIES: a member whose
+ * profile is still syncing, or who is about to be sent to /onboarding, would only get 403s back (Q12).
+ */
 export function useViewer() {
   const auth = useAuth();
   const member = auth.status === 'member';
-  return { auth, member, loading: auth.status === 'loading' };
+  const ready = usePlayerDataReady();
+  return { auth, member, ready, loading: auth.status === 'loading' };
 }
 
 export function useMyRoundEntries(round: PoolRoundView | null | undefined) {
-  const { member } = useViewer();
+  const { ready } = useViewer();
   return useQuery({
     queryKey: poolKeys.myRound(round?.id ?? 'none'),
     queryFn: () => getMyRoundEntries(round!),
-    enabled: member && Boolean(round),
+    enabled: ready && Boolean(round),
   });
 }
 
 export function useEntryHistory(page: number, pageSize = 10) {
-  const { member } = useViewer();
+  const { ready } = useViewer();
   return useQuery({
     queryKey: poolKeys.history(page, pageSize),
     queryFn: () => getEntryHistory(page, pageSize),
-    enabled: member,
+    enabled: ready,
     placeholderData: keepPreviousData,
   });
 }
 
 export function useViewerBalances() {
-  const { member } = useViewer();
-  return useQuery({ queryKey: poolKeys.balances(), queryFn: getBalances, enabled: member });
+  const { ready } = useViewer();
+  return useQuery({ queryKey: poolKeys.balances(), queryFn: getBalances, enabled: ready });
 }
 
 export function useViewerRg() {
-  const { member } = useViewer();
-  return useQuery({ queryKey: poolKeys.rg(), queryFn: getRgState, enabled: member });
+  const { ready } = useViewer();
+  return useQuery({ queryKey: poolKeys.rg(), queryFn: getRgState, enabled: ready });
 }
 
 // ── live socket (socket.io namespace /pool) ───────────────────────────────────────────────────

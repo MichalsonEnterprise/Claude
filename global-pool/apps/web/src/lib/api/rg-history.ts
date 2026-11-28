@@ -39,6 +39,7 @@ import { useAuth } from '@/lib/auth';
 
 import { apiRequest } from './client';
 import { invalidatePlayerFinancials } from './player-cache';
+import { usePlayerDataReady } from './player-ready';
 
 // ── types the API returns that are not shared schemas ─────────────────────────────────────────
 
@@ -119,13 +120,16 @@ export const historyKeys = {
 function useMemberQuery<T>(
   key: QueryKey,
   fn: () => Promise<T>,
-  opts: { refetchMs?: number; keepPrevious?: boolean } = {},
+  opts: { refetchMs?: number; keepPrevious?: boolean; beforeOnboarding?: boolean } = {},
 ) {
   const { status } = useAuth();
+  // History and balances need a finished onboarding on the API: they wait for the profile and never fire while the
+  // member is about to be sent to /onboarding (Q12). RG tools are open before onboarding (`beforeOnboarding`).
+  const ready = usePlayerDataReady();
   return useQuery({
     queryKey: key,
     queryFn: fn,
-    enabled: status === 'member',
+    enabled: opts.beforeOnboarding ? status === 'member' : ready,
     refetchInterval: opts.refetchMs,
     placeholderData: opts.keepPrevious ? keepPreviousData : undefined,
   });
@@ -205,11 +209,13 @@ export interface ExclusionResult {
 }
 
 export function useRgState() {
-  return useMemberQuery(rgKeys.state, rgApi.state, { refetchMs: 60_000 });
+  return useMemberQuery(rgKeys.state, rgApi.state, { refetchMs: 60_000, beforeOnboarding: true });
 }
 
 export function useRgHistory(kind: 'limits' | 'reality_checks' | 'all', limit = 10) {
-  return useMemberQuery(rgKeys.history(kind), () => rgApi.history(kind, limit));
+  return useMemberQuery(rgKeys.history(kind), () => rgApi.history(kind, limit), {
+    beforeOnboarding: true,
+  });
 }
 
 /**

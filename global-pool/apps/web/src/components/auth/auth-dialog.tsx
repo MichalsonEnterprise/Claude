@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Wallet,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -26,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { Field, Input } from '@/components/ui/input';
 import { OtpInput } from '@/components/ui/otp-input';
+import { authApi, authKeys } from '@/lib/api/auth';
 import { useAuth, useAuthCore } from '@/lib/auth/context';
 import { AuthFlowError, type OAuthProvider, type WalletProviderId } from '@/lib/auth/types';
 import { useAuthUi } from '@/lib/auth/ui-context';
@@ -46,6 +48,7 @@ import {
   StepBar,
 } from './auth-ui';
 import { maskEmail, useNow, formatUtcTime, formatCountdown } from './format';
+import { postSignInLanding } from './landing';
 import { WalletMark, WalletProviderList } from './wallet-providers';
 
 const RESEND_COOLDOWN_MS = 60_000;
@@ -748,20 +751,32 @@ function SuccessView({ email, intent }: { email: string | null; intent: 'sign-in
   const auth = useAuth();
   const ui = useAuthUi();
   const router = useRouter();
+  const pathname = usePathname() ?? '/';
   const profile = auth.profile ?? null;
-  const ready = auth.status === 'member' && profile !== null;
+  const signedIn = auth.status === 'member' && profile !== null;
   const needsOnboarding = profile?.onboardingRequired ?? false;
   const next = ui.dialog?.next;
+  // AUTH-18: the account gate decides the landing (a self-excluded player goes to /restricted/self-excluded, not to
+  // the lobby's Participate CTAs). A failed status check falls back to the usual landing — the API still refuses.
+  const accountStatus = useQuery({
+    queryKey: authKeys.accountStatus,
+    queryFn: authApi.accountStatus,
+    enabled: signedIn && !needsOnboarding,
+    retry: false,
+  });
+  const ready = signedIn && (needsOnboarding || !accountStatus.isPending);
 
   const proceed = () => {
+    const landing = postSignInLanding({
+      needsOnboarding,
+      next,
+      returnTo: ui.dialog?.returnTo,
+      pathname,
+      status: accountStatus.data,
+    });
     ui.closeDialog('done');
-    if (needsOnboarding) {
-      router.push(`/onboarding${next ? `?next=${encodeURIComponent(next)}` : ''}`);
-    } else if (next) {
-      router.push(next);
-    } else if (ui.dialog?.returnTo) {
-      router.replace(ui.dialog.returnTo);
-    }
+    if (landing?.mode === 'push') router.push(landing.to);
+    else if (landing) router.replace(landing.to);
   };
 
   const who = profile?.displayHandle ?? profile?.emailMasked ?? (email ? maskEmail(email) : null);

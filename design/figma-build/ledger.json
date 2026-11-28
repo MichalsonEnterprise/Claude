@@ -296,7 +296,8 @@
   "page": "02",
   "group": "",
   "status": "VERIFIED",
-  "by": "jackpot"
+  "by": "final-qa-a11y-2",
+  "note": "28 Nov 2026 (final-qa-a11y-2): RG/Limit Setter 23:21988 exposes its nested period Tabs/Segmented in all 9 variants (23:21480, 23:21530, 23:21591, 23:21653, 23:21703, 23:21764, 23:21826, 23:21876, 23:21937), and the set description documents Size=L for 390. Desktop and tablet instances keep M. Follow-ups: the Save/Cancel buttons are M (40 px), RG/Help Resources buttons are M, and the RG/Session Bar links are 16 px."
  },
  {
   "id": "PUB-01",
@@ -353,8 +354,8 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "All 8 frames exist and passed. Desktop 1440: Default, Filtered and Empty. Tablet 768: Default and Empty. Mobile 390: Default, Filters bottom sheet and Empty. Each was checked by a read-only audit (render bounds of every visible text node against its clipping ancestors and the frame edge: 0 flags) and by a screenshot in this run. Content: banner for latest settled round #1,247 (172,950.00 USDT, 13 winners, podium @lumen.eth / @orbit_77 / @sable). Stats strip: 522,400.00 paid by the last 3 settled rounds; biggest prize 90,515.00 @kestrel. Filters: game chips, minimum prize, period 24 h / 7 days / 30 days / All time, sort. Leaderboard of the 7-day top wins (12 rows on desktop, 8 stacked cards on mobile), each row with a Verify draw / Verify result link and DEMO badges. Filtered state shows 9 wins / 417,920.00 USDT (1st–3rd of rounds #1,244, #1,246, #1,247), with a note that round #1,245 was cancelled. Empty state: Originals, 24 h, minimum 50,000 USDT, recovery actions, and Card/Winner cards under 'Meanwhile — biggest wins'. Also: VRF / verify / privacy cards, licence and 18+.",
-  "by": "pub-p1a"
+  "note": "All 8 frames exist and passed. Desktop 1440: Default, Filtered and Empty. Tablet 768: Default and Empty. Mobile 390: Default, Filters bottom sheet and Empty. Each was checked by a read-only audit (render bounds of every visible text node against its clipping ancestors and the frame edge: 0 flags) and by a screenshot in this run. Content: banner for latest settled round #1,247 (172,950.00 USDT, 13 winners, podium @lumen.eth / @orbit_77 / @sable). Stats strip: 522,400.00 paid by the last 3 settled rounds; biggest prize 90,515.00 @kestrel. Filters: game chips, minimum prize, period 24 h / 7 days / 30 days / All time, sort. Leaderboard of the 7-day top wins (12 rows on desktop, 8 stacked cards on mobile), each row with a Verify draw / Verify result link and DEMO badges. Filtered state shows 9 wins / 417,920.00 USDT (1st–3rd of rounds #1,244, #1,246, #1,247), with a note that round #1,245 was cancelled. Empty state: Originals, 24 h, minimum 50,000 USDT, recovery actions, and Card/Winner cards under 'Meanwhile — biggest wins'. Also: VRF / verify / privacy cards, licence and 18+. 28 Nov (final-qa-a11y-2): the 390 period control is Tabs/Segmented Size=L (48 px) on Default 34:424074, Filters 34:448337 and Empty 34:464823. The Filters frame 34:448213 is a fixed 844, so its absolute bottom sheet 34:448276 (732 → 738) moved up from 112 to 106; the Show 9 wins footer still ends at 844. Default is now 4030 high and Empty 3517 (+6 each). Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "PUB-06",
@@ -365,8 +366,8 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "1440 Weekly (default) 84:103900, Daily 84:104905, Monthly 84:105918 + 390 Weekly (default) 216:81112 and Daily 'not ranked yet' 216:82473 exist. This run checked the Monthly 1440 screenshot, which was missing before. It found and fixed two defects in all three 1440 frames: (1) the Standings column header used fixed 730/120/120 cells that overflowed the 702 px row behind the right column; H/Player is now FILL and the columns match Table/Leaderboard Row (16 | 48·346·120·120 | 16, gap 12); (2) podium handles of 68–97 px overflowed a 51 px Handle frame and ran under the DEMO badge; the badge now sits in a 'Place' row under the handle. Post-fix screenshots of the Weekly, Daily and Monthly main grids pass, and the audit finds 0 overflow. Monthly at 390 is the same layout switched by tab (rule #16).",
-  "by": "pub-p1c"
+  "note": "1440 Weekly (default) 84:103900, Daily 84:104905, Monthly 84:105918 + 390 Weekly (default) 216:81112 and Daily 'not ranked yet' 216:82473 exist. This run checked the Monthly 1440 screenshot, which was missing before. It found and fixed two defects in all three 1440 frames: (1) the Standings column header used fixed 730/120/120 cells that overflowed the 702 px row behind the right column; H/Player is now FILL and the columns match Table/Leaderboard Row (16 | 48·346·120·120 | 16, gap 12); (2) podium handles of 68–97 px overflowed a 51 px Handle frame and ran under the DEMO badge; the badge now sits in a 'Place' row under the handle. Post-fix screenshots of the Weekly, Daily and Monthly main grids pass, and the audit finds 0 overflow. Monthly at 390 is the same layout switched by tab (rule #16). 28 Nov (final-qa-a11y-2): the 390 Daily | Weekly | Monthly control is Tabs/Segmented Size=L (48 px) on Weekly 216:81156 and Daily 216:82517. Each frame grew by 6 px. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "PUB-07",
@@ -377,7 +378,8 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "All 9 required frames exist: Empty, Verified and Failed at 1440, 768 and 390. Today I closed the two gaps the earlier run left open. (1) The 768 Failed copy fix is applied: text 34:501759 now reads 'Use Report this round in the verifier above…'; a screenshot passed. (2) A VRF-request-ID verifier now exists. New frames: '[PUB-07] Provably Fair / 1440 / Verified — Global Pool draw (VRF request ID)' (239:106172) and the 390 version (242:82136). In both, the Tabs/Segmented control has 'Global Pool draw · VRF' active. The verifier has inputs for Game, Round, VRF request ID 0x9f2c41d7a3e0…5b03e71a (Success state) and an optional Entry ID E-1248-00981. A read-only 'Fetched from Arbitrum' block shows random word 0x3e8a…b51f, fulfilment tx 0x71c3…5e28 and snapshot root 0x8c41…d9e3 as Tx/Hash instances with DEMO, plus a callout (icon + label) saying the proof is valid. Buttons: 'Verify draw' and 'Reset to on-chain values'. The report shows 'All 5 checks passed' and draw details: E-1248-00981 not selected. The offline replay code lines are rewritten for VRF. Every value matches GP-12 and demo-data. Screenshots passed after targeted fixes: the 1440 subtitle now wraps and the code lines fit the box; on 390 the check titles wrap and no longer overlap 'Pass'. On 390, nothing in the verifier section crosses the 16 px gutter."
+  "note": "All 9 required frames exist: Empty, Verified and Failed at 1440, 768 and 390. Today I closed the two gaps the earlier run left open. (1) The 768 Failed copy fix is applied: text 34:501759 now reads 'Use Report this round in the verifier above…'; a screenshot passed. (2) A VRF-request-ID verifier now exists. New frames: '[PUB-07] Provably Fair / 1440 / Verified — Global Pool draw (VRF request ID)' (239:106172) and the 390 version (242:82136). In both, the Tabs/Segmented control has 'Global Pool draw · VRF' active. The verifier has inputs for Game, Round, VRF request ID 0x9f2c41d7a3e0…5b03e71a (Success state) and an optional Entry ID E-1248-00981. A read-only 'Fetched from Arbitrum' block shows random word 0x3e8a…b51f, fulfilment tx 0x71c3…5e28 and snapshot root 0x8c41…d9e3 as Tx/Hash instances with DEMO, plus a callout (icon + label) saying the proof is valid. Buttons: 'Verify draw' and 'Reset to on-chain values'. The report shows 'All 5 checks passed' and draw details: E-1248-00981 not selected. The offline replay code lines are rewritten for VRF. Every value matches GP-12 and demo-data. Screenshots passed after targeted fixes: the 1440 subtitle now wraps and the code lines fit the box; on 390 the check titles wrap and no longer overlap 'Pass'. On 390, nothing in the verifier section crosses the 16 px gutter. 28 Nov (final-qa-a11y-2): the 390 verifier-mode control is Tabs/Segmented Size=L (48 px) on Empty 36:519206, Verified 36:526077, Failed 36:526607 and VRF 242:82273. Each frame grew by 6 px. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "PUB-08",
@@ -931,7 +933,8 @@
   "page": "05",
   "group": "Gaming",
   "status": "VERIFIED",
-  "note": "1440 and 390 Default re-checked after edits: #1,247 = 40 / 402.00, #1,246 = 24 / 241.20. Shortened the truncated desktop proof cell for cancelled round #1,245 to 'No draw · refunded / Settles 27 Nov, 21:00 UTC'."
+  "note": "1440 and 390 Default re-checked after edits: #1,247 = 40 / 402.00, #1,246 = 24 / 241.20. Shortened the truncated desktop proof cell for cancelled round #1,245 to 'No draw · refunded / Settles 27 Nov, 21:00 UTC'. 28 Nov (final-qa-a11y-2): the 390 Tabs/Segmented 34:503289 is Size=L (48 px). The frame 34:503168 is 2141 high (+6). Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "USR-G5",
@@ -953,7 +956,8 @@
   "page": "05",
   "group": "Gaming",
   "status": "VERIFIED",
-  "note": "1440 Default/Filters/Export passed. 390 Default passed (session strip now wraps 'Take a break' inside the card). 390 Export: fix 04 applied, filename on one line. NEW 390 Filters (229:241469): bottom sheet matching desktop Filters (Orbit Rush · Wins · 7 days, 0.10 min stake → 'Show 38 results', 38 of 486 bets), compacted to 731 px; Result uses Tabs/Segmented."
+  "note": "1440 Default/Filters/Export passed. 390 Default passed (session strip now wraps 'Take a break' inside the card). 390 Export: fix 04 applied, filename on one line. NEW 390 Filters (229:241469): bottom sheet matching desktop Filters (Orbit Rush · Wins · 7 days, 0.10 min stake → 'Show 38 results', 38 of 486 bets), compacted to 731 px; Result uses Tabs/Segmented. 28 Nov (final-qa-a11y-2): Result (All · Wins · Losses) in the 390 Filters sheet, 229:241740, is Tabs/Segmented Size=L. The frame 229:241469 is a fixed 844, so its absolute sheet 229:241677 (731 → 737) moved up from 113 to 107; the Show 38 results footer and the home indicator still end at 844. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "USR-G7",
@@ -1227,8 +1231,8 @@
   "page": "05",
   "group": "Referrals",
   "status": "VERIFIED",
-  "note": "Built and checked at 1440 and 390. Last 30 days: 612 clicks, 9 sign-ups, 6 verified, 58.80 earned. Funnel 612 → 9 → 6 → 5. Daily bars add up to 58.80; 24 Nov is 0.00 because round #1,245 was cancelled. Clicks by channel and active players 19 of 31.",
-  "by": "usr-vip-ref"
+  "note": "Built and checked at 1440 and 390. Last 30 days: 612 clicks, 9 sign-ups, 6 verified, 58.80 earned. Funnel 612 → 9 → 6 → 5. Daily bars add up to 58.80; 24 Nov is 0.00 because round #1,245 was cancelled. Clicks by channel and active players 19 of 31. 28 Nov (final-qa-a11y-2): the 390 Tabs/Segmented 353:121012 is Size=L (48 px). The frame 353:120929 is 1549 high (+6). Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "USR-R3",
@@ -1287,8 +1291,8 @@
   "page": "05",
   "group": "Responsible Gaming",
   "status": "VERIFIED",
-  "note": "Default + Pending increase (24 h cool-down), each at 1440 and 390. RG/Limit Setter was overridden to demo data: Weekly period, 5,000.00 USDT/week, 3,500.00 used, bar at 70%; pending increase to 7,500.00 starts 28 Nov 2026 16:42 UTC with Cancel increase / Keep pending. Also shows deposits this week (DP-77380, DP-77412), limit history and a How-it-works card. The duplicate Cancel button in the pending notice was removed.",
-  "by": "usr-rg"
+  "note": "Default + Pending increase (24 h cool-down), each at 1440 and 390. RG/Limit Setter was overridden to demo data: Weekly period, 5,000.00 USDT/week, 3,500.00 used, bar at 70%; pending increase to 7,500.00 starts 28 Nov 2026 16:42 UTC with Cancel increase / Keep pending. Also shows deposits this week (DP-77380, DP-77412), limit history and a How-it-works card. The duplicate Cancel button in the pending notice was removed. 28 Nov (final-qa-a11y-2): on both 390 frames the period control inside RG/Limit Setter is Size=L (48 px). It is an exposed nested instance, see CMP-18: Default I129:57918;23:21480 and Pending increase I129:58285;23:21530. Each Limit Setter grew by 6 px; desktop is unchanged. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "USR-RG3",
@@ -1299,8 +1303,8 @@
   "page": "05",
   "group": "Responsible Gaming",
   "status": "VERIFIED",
-  "note": "1440 + 390. Limit setter overridden to 500.00/day with 351.75 used (bar at 70.35%). Daily loss limit card (200.00 / −24.60 / 175.40; values changed to Number/S so they fit). What-counts card names the 0.05 USDT platform fee per qualifying entry. Today-at-a-glance card and help resources.",
-  "by": "usr-rg"
+  "note": "1440 + 390. Limit setter overridden to 500.00/day with 351.75 used (bar at 70.35%). Daily loss limit card (200.00 / −24.60 / 175.40; values changed to Number/S so they fit). What-counts card names the 0.05 USDT platform fee per qualifying entry. Today-at-a-glance card and help resources. 28 Nov (final-qa-a11y-2): on the 390 frame the period control inside RG/Limit Setter, I131:57641;23:21653, is Size=L (48 px) through the exposed nested instance. The frame is 2368 high (+6). Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "USR-RG4",
@@ -1311,8 +1315,8 @@
   "page": "05",
   "group": "Responsible Gaming",
   "status": "VERIFIED",
-  "note": "1440 + 390. Time limit 2 h/day with 1 h 12 min played (bar at 60%), session length 1 h 30 min, quiet hours toggle off (turning it off waits 24 h), when-time-is-up rules, today card.",
-  "by": "usr-rg"
+  "note": "1440 + 390. Time limit 2 h/day with 1 h 12 min played (bar at 60%), session length 1 h 30 min, quiet hours toggle off (turning it off waits 24 h), when-time-is-up rules, today card. 28 Nov (final-qa-a11y-2): on the 390 frame the period control inside RG/Limit Setter, I131:58005;23:21826, is Size=L (48 px) through the exposed nested instance. The frame is 2156 high (+6). Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "USR-RG5",
@@ -2073,8 +2077,8 @@
   "page": "08",
   "group": "Coinflip",
   "status": "VERIFIED",
-  "note": "All three sizes exist and passed screenshots this run: Desktop 1440 (36:535477), Tablet 768 with the collapsed sidebar (95:68989), Mobile 390 (104:48933). Each shows the bespoke coin-centred layout, 1.96× payout with 2.00% house edge, the RG session bar, 'You can lose your stake', the licence notice, 18+ and DEMO badges.",
-  "by": "g-coinflip"
+  "note": "All three sizes exist and passed screenshots this run: Desktop 1440 (36:535477), Tablet 768 with the collapsed sidebar (95:68989), Mobile 390 (104:48933). Each shows the bespoke coin-centred layout, 1.96× payout with 2.00% house edge, the RG session bar, 'You can lose your stake', the licence notice, 18+ and DEMO badges. 28 Nov (final-qa-a11y-2), 390 104:48933: the 3 header actions (104:48995, 104:49002, 104:49008) and the session-row button 104:49135 are Button/Icon L (48 × 48). The Game header gap is 8 px (it was 12), so the Title column is 142 px. The title and subtitle are FILL with HEIGHT auto-resize, so the subtitle wraps to two lines inside the 64 px header. The frame is 1350 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "CF-02",
@@ -2085,8 +2089,8 @@
   "page": "08",
   "group": "Coinflip",
   "status": "VERIFIED",
-  "note": "Desktop 1440 (90:62010) and Mobile 390 (104:49252) passed screenshots. Stake shown locked and the result fixed by nonce 418.",
-  "by": "g-coinflip"
+  "note": "Desktop 1440 (90:62010) and Mobile 390 (104:49252) passed screenshots. Stake shown locked and the result fixed by nonce 418. 28 Nov (final-qa-a11y-2), 390 104:49252: the header actions (104:49262, 104:49263, 104:49264) and the session-row button 104:49321 are Button/Icon L (48). The header gap is 8 and the subtitle wraps. The frame is 1370 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "CF-03",
@@ -2097,8 +2101,8 @@
   "page": "08",
   "group": "Coinflip",
   "status": "VERIFIED",
-  "note": "Win and Lose exist at 1440 (90:62838 / 90:63652) and 390 (104:49572 / 104:49901); all passed screenshots. Balances reconcile with demo-data: 9,215.30 → stake 10.00 locked (9,205.30) → win +9.60 (9,224.90) → CF-52108 loss −10.00 (9,214.90).",
-  "by": "g-coinflip"
+  "note": "Win and Lose exist at 1440 (90:62838 / 90:63652) and 390 (104:49572 / 104:49901); all passed screenshots. Balances reconcile with demo-data: 9,215.30 → stake 10.00 locked (9,205.30) → win +9.60 (9,224.90) → CF-52108 loss −10.00 (9,214.90). 28 Nov (final-qa-a11y-2), 390 Win 104:49572 and Lose 104:49901: the header actions and the session-row button are Button/Icon L (48). Verify (104:49890, 104:50229) is Ghost L (114 × 48). In Result meta (104:49885, 104:50224) the flip-id text wraps to two lines, so Verify stays on the row. Both frames are 1424 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "CF-04",
@@ -2109,8 +2113,8 @@
   "page": "08",
   "group": "Coinflip",
   "status": "VERIFIED",
-  "note": "Desktop 1440 (94:67170) already existed. Mobile 390 (288:203530) built this run: stacked flip cards, CF-52107 expanded with a Verify CTA, 24 flips, net −4.80. After the screenshot check I added the RG session strip and the Licence/18+ line. Both sizes passed screenshots.",
-  "by": "g-coinflip"
+  "note": "Desktop 1440 (94:67170) already existed. Mobile 390 (288:203530) built this run: stacked flip cards, CF-52107 expanded with a Verify CTA, 24 flips, net −4.80. After the screenshot check I added the RG session strip and the Licence/18+ line. Both sizes passed screenshots. 28 Nov (final-qa-a11y-2), 390 288:203530: the header actions and the session-row button are Button/Icon L. The Play | My flips | Fairness segments are 38 px in a 48 px track (288:203611). The 5 filter chips (288:203619…203648) are 44 px tall. The frame is 1668 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "CF-05",
@@ -2121,8 +2125,8 @@
   "page": "08",
   "group": "Coinflip",
   "status": "VERIFIED",
-  "note": "Desktop Verified (94:68249) and Verification failed (94:69000) already existed. Mobile 390 Verified (288:203895) built this run. I fixed the cramped 'Computed' rows (8px bound gap, label 'Seed hash check') and added the RG strip and Licence line. All passed screenshots. Per the breakpoint rule in decisions.md, no mobile 'Verification failed' frame was built: its layout is the same card with a red callout.",
-  "by": "g-coinflip"
+  "note": "Desktop Verified (94:68249) and Verification failed (94:69000) already existed. Mobile 390 Verified (288:203895) built this run. I fixed the cramped 'Computed' rows (8px bound gap, label 'Seed hash check') and added the RG strip and Licence line. All passed screenshots. Per the breakpoint rule in decisions.md, no mobile 'Verification failed' frame was built: its layout is the same card with a red callout. 28 Nov (final-qa-a11y-2), 390 288:203895: the header actions and the session-row button are Button/Icon L, and the game-tab segments are 38 px in a 48 px track. The frame is 1591 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "CF-06",
@@ -2133,8 +2137,8 @@
   "page": "08",
   "group": "Coinflip",
   "status": "VERIFIED",
-  "note": "Five desktop states exist (92:63915, 92:64713, 92:65610, 92:66530, 92:67339). Four mobile states built this run: Insufficient balance bottom sheet (287:201075), Daily loss limit reached (287:201425), Region restricted (287:201779), Connection lost (287:202101). All passed screenshots. In the desktop Region restricted frame I changed the sidebar locale to 'English · United States'. 'Bet above table maximum' has no 390 frame because it is a field-level error with no layout change.",
-  "by": "g-coinflip"
+  "note": "Five desktop states exist (92:63915, 92:64713, 92:65610, 92:66530, 92:67339). Four mobile states built this run: Insufficient balance bottom sheet (287:201075), Daily loss limit reached (287:201425), Region restricted (287:201779), Connection lost (287:202101). All passed screenshots. In the desktop Region restricted frame I changed the sidebar locale to 'English · United States'. 'Bet above table maximum' has no 390 frame because it is a field-level error with no layout change. 28 Nov (final-qa-a11y-2), on all 4 390 states the header actions and the session-row button are Button/Icon L. On Region the session strip is hidden, so the frame stays 1102. Insufficient balance (287:201075, 1350 high): the sheet close button 287:201373 is L and the full-height scrim was resized. Daily loss limit (287:201425, 1604 high): View limits and Take a break (287:201747) are stacked full-width 48 px buttons, as on CR-08. Connection lost (287:202101, 1548 high): Retry now 287:202396 is Secondary L. Region 287:201779: the Alert/Banner nested Withdraw funds button is still S (32 px), because a nested resize does not apply per instance. This is a library follow-up. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "BJ-01",
@@ -2286,7 +2290,8 @@
   "page": "09",
   "group": "",
   "status": "VERIFIED",
-  "note": "Overview with every brief KPI from demo-data plus system health, at D·L·T·M. 1440 Default + Restricted role (Support L2: money KPIs, liabilities, queues, pool chart and audit feed left out, not blurred; four-eyes list shows only AR-1045 with a role note). 1280 Default 222:126310 + Restricted 229:160132. 768 Default 224:95574 + Restricted 229:160932. 390 on page 10 226:80653 (2×4 KPI grid, queues, approvals, health, read-only round monitor, tab bar). All checked in screenshots, with no overflow."
+  "note": "Overview with every brief KPI from demo-data plus system health, at D·L·T·M. 1440 Default + Restricted role (Support L2: money KPIs, liabilities, queues, pool chart and audit feed left out, not blurred; four-eyes list shows only AR-1045 with a role note). 1280 Default 222:126310 + Restricted 229:160132. 768 Default 224:95574 + Restricted 229:160932. 390 on page 10 226:80653 (2×4 KPI grid, queues, approvals, health, read-only round monitor, tab bar). All checked in screenshots, with no overflow. 28 Nov (final-qa-a11y-2): the 390 Overview Tabs/Segmented 226:80695 is Size=L (48 px). The frame 226:80653 is 2549 high (+6). Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "ADM-U1",
@@ -3243,7 +3248,8 @@
   "page": "10",
   "group": "",
   "status": "VERIFIED",
-  "note": "Page 10, 'ADM — Mobile', second row at y 4164: Overview 226:80653, Alerts / Operations 226:81089 (severity chips, acknowledge is logged and never changes balances or results), Approvals queue 227:142765 (K. Osei; self-request and Super-Admin-only cards cannot be decided), Review AR-1042 bottom sheet 227:143053. Same inline admin top bar and Admin Tab Bar as the adm-bc/adm-finance mobile frames. Checked in screenshots after the clipping fixes."
+  "note": "Page 10, 'ADM — Mobile', second row at y 4164: Overview 226:80653, Alerts / Operations 226:81089 (severity chips, acknowledge is logged and never changes balances or results), Approvals queue 227:142765 (K. Osei; self-request and Super-Admin-only cards cannot be decided), Review AR-1042 bottom sheet 227:143053. Same inline admin top bar and Admin Tab Bar as the adm-bc/adm-finance mobile frames. Checked in screenshots after the clipping fixes. 28 Nov (final-qa-a11y-2): on Alerts / Operations 226:81089, the Compliance · 23 | Operations · 5 control 226:81131 is Tabs/Segmented Size=L (48 px), and the frame grew by 6 px. Overview gets the same change through ADM-02. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "MOB-12",
@@ -3386,8 +3392,8 @@
   "page": "12",
   "group": "",
   "status": "VERIFIED",
-  "note": "Board 272:963. 12 cells in 8 rows, each with module tag + ID + kind chip, a preview built from library instances (Table/Empty State No data/No results, User/Device Row, Tabs/Segmented, Input/Search, Table/Header Cell, Buttons, Badges), and Trigger/Copy/Recovery/Dev spec rows. Mobile example 281:97574. Every row was checked in an in-script screenshot; nothing is clipped or overlapping.",
-  "by": "err-a"
+  "note": "Board 272:963. 12 cells in 8 rows, each with module tag + ID + kind chip, a preview built from library instances (Table/Empty State No data/No results, User/Device Row, Tabs/Segmented, Input/Search, Table/Header Cell, Buttons, Badges), and Trigger/Copy/Recovery/Dev spec rows. Mobile example 281:97574. Every row was checked in an in-script screenshot; nothing is clipped or overlapping. 28 Nov (final-qa-a11y-2): on the mobile example 281:97574 (fixed 844), the All | Deposits | Withdrawals | Entries control 281:97613 is Tabs/Segmented Size=L (48 px). The fixed 669 px content column now uses 604 px, so nothing is clipped. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "ERR-02",
@@ -3482,8 +3488,8 @@
   "page": "08",
   "group": "Catalogue",
   "status": "VERIFIED",
-  "note": "Desktop Playing 33:218161, Cashed out 33:231778 and Hit (mine) 33:254288, plus mobile Playing 36:522639 (sticky Cash out CTA, tab bar), all passed screenshots. 5x5 board maths reconcile: with 3 mines, 4 gems = 1.71x (17.10 USDT) and 5 gems = 1.99x. Each frame has the bet panel, stage, history strip, Provably fair link, RG session bar, 1.00% house edge and 'You can lose your stake'.",
-  "by": "catalog-screens"
+  "note": "Desktop Playing 33:218161, Cashed out 33:231778 and Hit (mine) 33:254288, plus mobile Playing 36:522639 (sticky Cash out CTA, tab bar), all passed screenshots. 5x5 board maths reconcile: with 3 mines, 4 gems = 1.71x (17.10 USDT) and 5 gems = 1.99x. Each frame has the bet panel, stage, history strip, Provably fair link, RG session bar, 1.00% house edge and 'You can lose your stake'. 28 Nov (final-qa-a11y-2) 44 px audit of 390 36:522639: header tools, Manual | Auto, buttons and the CTA were already L, and the 56 × 56 tiles pass. Fixes: the Provably fair link row 36:522884 has a 44 px minimum height (it was 16), and the Input/Amount Max chip I36:522776;15:3380 is 44 × 44 (padding 4 → 14). The frame is 1689 high. Recent results pills are display-only. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "GM-04",
@@ -3494,8 +3500,8 @@
   "page": "08",
   "group": "Catalogue",
   "status": "VERIFIED",
-  "note": "Desktop Dropping 33:283189 and Result 33:303579, plus mobile Dropping 36:529337, passed screenshots. The 16-row bucket odds match the binomial distribution (0.0015% to 19.64%, about 99.0% RTP). Result shows bucket 14 of 17 at 4.00x with a 0.85% chance. Mobile replaces bucket labels with a colour legend.",
-  "by": "catalog-screens"
+  "note": "Desktop Dropping 33:283189 and Result 33:303579, plus mobile Dropping 36:529337, passed screenshots. The 16-row bucket odds match the binomial distribution (0.0015% to 19.64%, about 99.0% RTP). Result shows bucket 14 of 17 at 4.00x with a 0.85% chance. Mobile replaces bucket labels with a colour legend. 28 Nov (final-qa-a11y-2) 44 px audit of 390 36:529337: the Provably fair link row 36:529721 has a 44 px minimum height (it was 32), and the Max chip I36:529632;15:3292 is 44 × 44. Every other control was already 44 px or more (Risk Tabs/Segmented L, Rows trigger 44). The frame is 1749 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "GM-05",
@@ -3506,8 +3512,8 @@
   "page": "08",
   "group": "Catalogue",
   "status": "VERIFIED",
-  "note": "Desktop Win 34:334232 (3.47x) and Lose 34:354573 (1.32x), plus mobile Win 36:547984, passed screenshots. Win chance 49.50% at a 2.00x target (99 / target) is consistent across all panels. Lose frame adds the note that results are independent.",
-  "by": "catalog-screens"
+  "note": "Desktop Win 34:334232 (3.47x) and Lose 34:354573 (1.32x), plus mobile Win 36:547984, passed screenshots. Win chance 49.50% at a 2.00x target (99 / target) is consistent across all panels. Lose frame adds the note that results are independent. 28 Nov (final-qa-a11y-2) 44 px audit of 390 36:547984: the Provably fair link row 36:548279 has a 44 px minimum height, and the Max chip I36:548196;15:3292 is 44 × 44. The Target multiplier input is Input/Text L, and the target pill in the scene is display-only. The frame is 1567 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "GM-06",
@@ -3518,8 +3524,8 @@
   "page": "08",
   "group": "Catalogue",
   "status": "VERIFIED",
-  "note": "Desktop Spinning 34:380638 and Result 34:397670 (segment 19, 3.00x, 30.00 USDT), plus mobile Spinning 42:45652, passed screenshots. The 30-segment Medium risk table (0x 15, 1.5x 6, 1.7x 1, 2x 5, 3x 3) gives about 99.0% RTP.",
-  "by": "catalog-screens"
+  "note": "Desktop Spinning 34:380638 and Result 34:397670 (segment 19, 3.00x, 30.00 USDT), plus mobile Spinning 42:45652, passed screenshots. The 30-segment Medium risk table (0x 15, 1.5x 6, 1.7x 1, 2x 5, 3x 3) gives about 99.0% RTP. 28 Nov (final-qa-a11y-2) 44 px audit of 390 42:45652: the Provably fair link row 42:45901 has a 44 px minimum height, and the Max chip I42:45810;15:3380 is 44 × 44. Risk is Tabs/Segmented L and the Segments trigger is 44. The frame is 1743 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "GM-07",
@@ -3530,8 +3536,8 @@
   "page": "08",
   "group": "Catalogue",
   "status": "VERIFIED",
-  "note": "Desktop Picking 34:416315 and Drawn 34:429582 (3 of 6 hits, 2.50x), plus mobile Picking 44:45796, passed screenshots. The 6-pick Classic payout table matches the hypergeometric odds for 10 of 40 (15.47%, 37.13%, 32.13%, 12.69%, ...), about 99.0% RTP. Drawn numbers reconcile (10 drawn).",
-  "by": "catalog-screens"
+  "note": "Desktop Picking 34:416315 and Drawn 34:429582 (3 of 6 hits, 2.50x), plus mobile Picking 44:45796, passed screenshots. The 6-pick Classic payout table matches the hypergeometric odds for 10 of 40 (15.47%, 37.13%, 32.13%, 12.69%, ...), about 99.0% RTP. Drawn numbers reconcile (10 drawn). 28 Nov (final-qa-a11y-2) 44 px audit of 390 44:45796: Keno cells are 56 × 44 and Auto pick / Clear are L. The Provably fair link row 44:46118 has a 44 px minimum height, and the Max chip I44:46008;15:3292 is 44 × 44. The frame is 1893 high. RG/Session Bar text links are a component follow-up. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "GM-08",
@@ -3542,8 +3548,8 @@
   "page": "08",
   "group": "Catalogue",
   "status": "VERIFIED",
-  "note": "Desktop Playing 34:462956 and Result (wrong call) 34:481572, plus mobile Playing 49:63106, passed screenshots. Odds on the 4 of spades are 76.92% (1.28x) and 30.77% (3.21x). Run 7 to J to 4 gives 1.83x then 2.15x, so cash out is 10.75 USDT on a 5.00 bet. The wrong-call result shows a 5.00 USDT loss.",
-  "by": "catalog-screens"
+  "note": "Desktop Playing 34:462956 and Result (wrong call) 34:481572, plus mobile Playing 49:63106, passed screenshots. Odds on the 4 of spades are 76.92% (1.28x) and 30.77% (3.21x). Run 7 to J to 4 gives 1.83x then 2.15x, so cash out is 10.75 USDT on a 5.00 bet. The wrong-call result shows a 5.00 USDT loss. 28 Nov (final-qa-a11y-2) 44 px audit of 390 49:63106: the Higher/Lower call rows are 62 px and Skip is Ghost L. The Provably fair link row 49:63387 has a 44 px minimum height, and the Max chip I49:63321;15:3380 is 44 × 44. The frame is 1680 high. Checked by screenshot.",
+  "by": "final-qa-a11y-2"
  },
  {
   "id": "PROMO-01",

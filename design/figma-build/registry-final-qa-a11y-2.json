@@ -1,0 +1,15 @@
+{
+ "_note": "Agent final-qa-a11y-2 (28 Nov 2026): second mobile 44 px pass. No new screens and no new components. Library change: RG/Limit Setter exposes its nested Tabs/Segmented. Page 10 overrides: the last 390 Tabs/Segmented M instances are now Size=L; Double Side 390 controls are 48 px; GM-03…08 provably-fair link rows and the Input/Amount Max chip reach 44 px. See decisions.md #67.",
+ "RG/Limit Setter": {
+  "id": "23:21988",
+  "variants": { "Type": ["Deposit", "Participation", "Time"], "State": ["Default", "Pending increase", "Saved"] },
+  "exposedInstances": { "Tabs/Segmented (period)": ["23:21480", "23:21530", "23:21591", "23:21653", "23:21703", "23:21764", "23:21826", "23:21876", "23:21937"] },
+  "note": "The nested period control (Tabs/Segmented, Segments=3) is exposed in all 9 variants. Desktop and tablet instances keep Size=M (42 px). On 390 layouts set it to L: for (const x of limitSetter.exposedInstances) if the main component's parent is 20:6978, call x.setProperties({ Size: 'L' }). The Limit Setter grows by 6 px; labels and the Active segment are kept. Done on USR-RG2/3/4 390 (129:57918, 129:58285, 131:57641, 131:58005). Save limit / Cancel stay Button M (40 px); that is a follow-up."
+ },
+ "Input/Amount — Max chip on 390": {
+  "note": "There is no Size axis. Instance sublayer size overrides (resize / minHeight) on the nested 'Max chip' are silently ignored, but a padding override works: chip.paddingTop = chip.paddingBottom = 14 (from 4) gives a 44 × 44 chip and a 44 px Value row. Applied on GM-03…08 390 only (I36:522776;15:3380, I36:529632;15:3292, I36:548196;15:3292, I42:45810;15:3380, I44:46008;15:3292, I49:63321;15:3380). Other 390 frames that use Input/Amount still have a 24 px Max chip; that is a follow-up (a Size=L variant would be the cleaner library fix)."
+ },
+ "Alert/Banner — nested action on 390": {
+  "note": "The nested Button/Secondary S in Alert/Banner cannot be made 48 px per instance: after Size=L, the height stays 32 even with a FIXED resize. It was reverted to S on CF-06 Region 390 (I287:202082;30:16954, 135 × 32). Library follow-up: set that nested button to hug its height and expose it, the same way as RG/Limit Setter."
+ }
+}

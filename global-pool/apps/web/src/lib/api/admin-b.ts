@@ -459,6 +459,9 @@ export interface RefundsResponse {
   generatedAt: string;
 }
 
+/** GET /admin/pool/refunds (rounds.read): the pool view of the refunds — no finance-only returned withdrawals. */
+export type PoolRefundsResponse = Omit<RefundsResponse, 'notRefunds'>;
+
 export interface RevenueResponse {
   period: { days: number; from: string; to: string };
   gross: string;
@@ -921,6 +924,7 @@ export const adminBKeys = {
   ledgerIntegrity: () => ['admin-b', 'ledger-integrity'] as const,
   reconciliation: () => ['admin-b', 'reconciliation'] as const,
   refunds: () => ['admin-b', 'refunds'] as const,
+  poolRefunds: () => ['admin-b', 'pool', 'refunds'] as const,
   revenue: (days: number) => ['admin-b', 'revenue', days] as const,
   poolOverview: () => ['admin-b', 'pool', 'overview'] as const,
   poolBalance: () => ['admin-b', 'pool', 'balance'] as const,
@@ -1005,6 +1009,12 @@ export const useRefunds = () =>
   useQuery({
     queryKey: adminBKeys.refunds(),
     queryFn: () => admin<RefundsResponse>('/admin/finance/refunds'),
+  });
+/** ADM-P9 for every role that monitors rounds (rounds.read) — the finance view above needs ledger.read (Q08). */
+export const usePoolRefunds = () =>
+  useQuery({
+    queryKey: adminBKeys.poolRefunds(),
+    queryFn: () => admin<PoolRefundsResponse>('/admin/pool/refunds'),
   });
 export const useRevenue = (days: number) =>
   useQuery({

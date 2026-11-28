@@ -14,10 +14,10 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query';
 
-import { useAuth } from '@/lib/auth';
-
+import { authApi, authKeys } from './auth';
 import { apiRequest } from './client';
 import { invalidatePlayerFinancials } from './player-cache';
+import { usePlayerDataReady } from './player-ready';
 
 export type { WalletStatus, WithdrawalPrecheck };
 
@@ -340,10 +340,12 @@ export const walletKeys = {
 
 type Opts<T> = Omit<UseQueryOptions<T, Error, T, readonly unknown[]>, 'queryKey' | 'queryFn'>;
 
-/** Player queries run only for signed-in members (guests see the sign-in prompt instead). */
+/**
+ * Player queries run only for signed-in members (guests see the sign-in prompt instead), and not before the session
+ * layer knows the profile / while it is about to send the member to /onboarding (Q12: those calls only return 403).
+ */
 function useMember() {
-  const { status } = useAuth();
-  return status === 'member';
+  return usePlayerDataReady();
 }
 
 export function useBalances(opts: Opts<WalletBalances> = {}) {
@@ -483,6 +485,22 @@ export function useRg() {
     queryKey: walletKeys.rg(),
     queryFn: ({ signal }) => walletApi.rg(signal),
     enabled: member,
+  });
+}
+
+/**
+ * `GET /auth/account-status` (same cache entry as the auth module's restricted pages): what is paused on the account
+ * right now — gaming / deposits / withdrawals — and why (break, self-exclusion, region, admin restriction). The wallet
+ * and Global Pool flows read it to say so up front instead of failing at the last step (Q16 · Q17 · Q19). The API
+ * still enforces every policy on the write itself.
+ */
+export function useAccountGate() {
+  const member = useMember();
+  return useQuery({
+    queryKey: authKeys.accountStatus,
+    queryFn: authApi.accountStatus,
+    enabled: member,
+    staleTime: 30_000,
   });
 }
 

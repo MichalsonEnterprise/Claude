@@ -56,13 +56,13 @@ describe('rg-history formatting (decimal strings, never floats)', () => {
 });
 
 describe('transaction presentation', () => {
-  it('signs amounts by direction; entries include the platform fee; rejected withdrawals move nothing', () => {
+  it('signs amounts by direction; entries show the stake (the fee is its own line, Q26); rejected withdrawals move nothing', () => {
     expect(txAmount(tx({})).text).toBe('+1,000.00');
     expect(
       txAmount(
         tx({ type: 'entry_purchase', direction: 'out', amount: '350.00', netAmount: '351.75' }),
       ).text,
-    ).toBe('−351.75');
+    ).toBe('−350.00');
     expect(
       txAmount(tx({ type: 'withdrawal', direction: 'out', status: 'rejected', amount: '250.00' }))
         .tone,
@@ -93,9 +93,13 @@ describe('transaction presentation', () => {
         description: '35 entries · Round #1,248',
         amount: '350.00',
         platformFee: '1.75',
+        netAmount: '351.75',
       }),
     );
-    expect(t).toEqual({ title: 'Round #1,248 · 35 entries', sub: 'Entries 350.00 + fee 1.75' });
+    expect(t).toEqual({
+      title: 'Round #1,248 · 35 entries',
+      sub: 'Entries 350.00 · 351.75 paid with the platform fee below',
+    });
   });
 });
 

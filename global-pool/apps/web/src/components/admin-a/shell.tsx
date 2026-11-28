@@ -51,7 +51,13 @@ import { cn } from '@/lib/utils';
 
 import { CommandPalette, useCommandPaletteShortcut } from './command-palette';
 import { useAlerts, useApprovalsInbox, useDashboard, useSystemHealth } from './hooks';
-import { ADMIN_NAV, resolveAdminNav, type AdminNavChild, type AdminNavGroup } from './nav-config';
+import {
+  ADMIN_NAV,
+  resolveAdminNav,
+  visibleAdminTabs,
+  type AdminNavChild,
+  type AdminNavGroup,
+} from './nav-config';
 import { initialsOf, RoleChip } from './primitives';
 import { ADMIN_WARNING_SECONDS, useAdminSession } from './session';
 
@@ -116,6 +122,25 @@ function SidebarGroup({
   const Icon = group.icon;
   const count = group.countKey ? counts[group.countKey] : undefined;
   const hasChildren = (group.children?.length ?? 0) > 1 && allowed;
+
+  if (group.planned) {
+    // Q13: a module that is not in this build is never shown as an open module (and is not a link).
+    return (
+      <li>
+        <span
+          aria-disabled="true"
+          aria-label={`${group.label} — not in this build yet`}
+          className={cn(groupBase, 'cursor-default text-text-disabled')}
+        >
+          <Icon aria-hidden className="size-[18px] shrink-0" />
+          <span className="flex-1 truncate">{group.label}</span>
+          <span className="shrink-0 rounded-xs border border-border-subtle px-1.5 text-[10px] font-semibold tracking-wide text-text-tertiary uppercase">
+            Soon
+          </span>
+        </span>
+      </li>
+    );
+  }
 
   if (!allowed) {
     return (
@@ -506,15 +531,28 @@ function AdminMenuCompact() {
   );
 }
 
+const TAB_ICON: Record<string, typeof LayoutDashboard> = {
+  '/admin': LayoutDashboard,
+  '/admin/approvals': UserCheck,
+  '/admin/compliance/kyc': IdCard,
+  '/admin/alerts': ShieldAlert,
+};
+
 function MobileTabBar({ onMore }: { onMore: () => void }) {
   const pathname = usePathname() ?? '/admin';
   const counts = useAdminCounts();
-  const tabs = [
-    { label: 'Overview', href: '/admin', icon: LayoutDashboard, count: undefined },
-    { label: 'Approvals', href: '/admin/approvals', icon: UserCheck, count: counts.approvals },
-    { label: 'KYC', href: '/admin/compliance/kyc', icon: IdCard, count: counts.kycPending },
-    { label: 'Alerts', href: '/admin/alerts', icon: ShieldAlert, count: counts.alerts },
-  ];
+  const { canAny } = useAdminSession();
+  const count: Record<string, number | undefined> = {
+    '/admin/approvals': counts.approvals,
+    '/admin/compliance/kyc': counts.kycPending,
+    '/admin/alerts': counts.alerts,
+  };
+  // Permission-aware like the sidebar (Q11): a role never gets a tab that only leads to "can't open this page".
+  const tabs = visibleAdminTabs(canAny).map((t) => ({
+    ...t,
+    icon: TAB_ICON[t.href] ?? LayoutDashboard,
+    count: count[t.href],
+  }));
   const isActive = (href: string) =>
     href === '/admin'
       ? pathname === '/admin'
@@ -524,7 +562,10 @@ function MobileTabBar({ onMore }: { onMore: () => void }) {
       aria-label="Admin sections"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-border-subtle bg-bg-secondary pb-safe tablet:hidden"
     >
-      <ul className="grid grid-cols-5">
+      <ul
+        className="grid"
+        style={{ gridTemplateColumns: `repeat(${tabs.length + 1}, minmax(0, 1fr))` }}
+      >
         {tabs.map((t) => {
           const on = isActive(t.href);
           return (

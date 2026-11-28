@@ -33,7 +33,10 @@ export interface AmountInputProps {
 /**
  * Keep digits and one decimal point, at most `decimals` fraction digits. Exported for tests.
  * Separators, as the app formats amounts ("9,215.30"):
- * - both `,` and `.` present → the LAST one is the decimal point, the other is grouping ("9,215.30" / "9.215,30" → "9215.30");
+ * - both `,` and `.` present → `.` is the decimal point and `,` is grouping ("9,215.30" → "9215.30"), unless the
+ *   `,` comes last AND every `.` before it groups exactly three digits — the comma-decimal notation "9.215,30" →
+ *   "9215.30". The field value always uses `.`, so a `,` typed after its decimals is dropped ("12.5" + "," stays
+ *   "12.5", never "125." — R59b);
  * - only `,` in complete thousands groups → grouping ("1,000" / "1,000,000" → "1000" / "1000000");
  * - any other lone `,` is a decimal point ("1,5" → "1.5"; also "1," while typing — comma-decimal locales'
  *   `inputMode="decimal"` keypads offer no `.`).
@@ -41,8 +44,13 @@ export interface AmountInputProps {
 export function sanitizeAmount(raw: string, decimals: number): string {
   let cleaned = raw.replace(/[^\d.,]/g, '');
   if (cleaned.includes(',') && cleaned.includes('.')) {
-    const decimalSep = cleaned.lastIndexOf(',') > cleaned.lastIndexOf('.') ? ',' : '.';
-    cleaned = cleaned.replaceAll(decimalSep === ',' ? '.' : ',', '').replaceAll(',', '.');
+    const lastComma = cleaned.lastIndexOf(',');
+    const commaDecimal =
+      lastComma > cleaned.lastIndexOf('.') &&
+      /^\d{1,3}(?:\.\d{3})+$/.test(cleaned.slice(0, lastComma).replaceAll(',', ''));
+    cleaned = commaDecimal
+      ? cleaned.replaceAll('.', '').replaceAll(',', '.')
+      : cleaned.replaceAll(',', '');
   } else if (/^\d{1,3}(?:,\d{3})+$/.test(cleaned)) {
     cleaned = cleaned.replaceAll(',', '');
   } else {

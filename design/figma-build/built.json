@@ -7777,5 +7777,173 @@
    "One page-10 run failed partway: a nested-instance node went stale after a swap. Figma rolled the whole run back (verified), and the corrected rerun applied cleanly.",
    "Bookkeeping: /home/user/Claude/design/figma-build/registry-final-qa-a11y.json (Tabs/Segmented Size=L variant ids and usage) and decision #66 appended to /home/user/Claude/design/figma-build/decisions.md. ledger.json was not edited; merge this report. Its notes replace the existing notes on the reported rows. Nothing committed. From memory (note project_global_pool_figma.md): file QHF8iRUMFgGMcEn3bD25jl and the casino palette direction; no new memory items."
   ]
+ },
+ "final-qa-a11y-2": {
+  "section": "Page 10 '10 — Mobile Experience'. I changed existing frames in these sections: PUB-05/08/09/13 — Mobile 34:423942, PUB-06/24/25/26 — Mobile 215:78629, PUB-07/21/22 — Mobile 36:518991, USR — Mobile B 34:432314, USR — Mobile E 351:119957, USR — Mobile F 129:56039, ADM — Mobile 173:71503, ERR — Mobile 281:97573, Games — Mobile Coinflip 104:48932 and Games — Mobile Catalogue 34:497641. Five sections grew by 6–24 px (grow-only fit), and no frames overlap. Page 02: RG/Limit Setter set 23:21988 (metadata only). No new screens or components.",
+  "created": [
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-05 Default",
+    "id": "34:424074"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-05 Filters sheet (frame 34:448213, fixed 844)",
+    "id": "34:448337"
+   },
+   {
+    "name": "CHANGED PUB-05 Filters bottom sheet moved y 112→106 (732→738 high)",
+    "id": "34:448276"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-05 Empty",
+    "id": "34:464823"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-06 Weekly",
+    "id": "216:81156"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-06 Daily",
+    "id": "216:82517"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-07 Empty",
+    "id": "36:519206"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-07 Verified",
+    "id": "36:526077"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-07 Failed",
+    "id": "36:526607"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — PUB-07 VRF verifier",
+    "id": "242:82273"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — USR-G4",
+    "id": "34:503289"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — USR-G6 Filters sheet (frame 229:241469, fixed 844)",
+    "id": "229:241740"
+   },
+   {
+    "name": "CHANGED USR-G6 Filters bottom sheet moved y 113→107 (731→737 high)",
+    "id": "229:241677"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — USR-R2",
+    "id": "353:121012"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — ADM-02 390 Overview",
+    "id": "226:80695"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — MOB-11 Alerts",
+    "id": "226:81131"
+   },
+   {
+    "name": "CHANGED Tabs/Segmented M→L — ERR-01 mobile example (frame 281:97574, fixed 844; content uses 604 of 669 px)",
+    "id": "281:97613"
+   },
+   {
+    "name": "CHANGED RG/Limit Setter set — nested period Tabs/Segmented exposed in all 9 variants (23:21480, 23:21530, 23:21591, 23:21653, 23:21703, 23:21764, 23:21826, 23:21876, 23:21937), and the description updated",
+    "id": "23:21988"
+   },
+   {
+    "name": "CHANGED USR-RG2 Default 390 — exposed segmented Size=L",
+    "id": "I129:57918;23:21480"
+   },
+   {
+    "name": "CHANGED USR-RG2 Pending 390 — exposed segmented Size=L",
+    "id": "I129:58285;23:21530"
+   },
+   {
+    "name": "CHANGED USR-RG3 390 — exposed segmented Size=L",
+    "id": "I131:57641;23:21653"
+   },
+   {
+    "name": "CHANGED USR-RG4 390 — exposed segmented Size=L",
+    "id": "I131:58005;23:21826"
+   },
+   {
+    "name": "CHANGED CF-01 390 — header actions L (104:48995, 104:49002, 104:49008), session button L 104:49135, header 104:48969 gap 8 with the subtitle wrapping",
+    "id": "104:48933"
+   },
+   {
+    "name": "CHANGED CF-02 390 — header actions L (104:49262–64), session button L 104:49321, header gap 8",
+    "id": "104:49252"
+   },
+   {
+    "name": "CHANGED CF-03 Win 390 — header + session L, Verify Ghost L 104:49890, Result meta 104:49885 text wraps",
+    "id": "104:49572"
+   },
+   {
+    "name": "CHANGED CF-03 Lose 390 — header + session L, Verify Ghost L 104:50229, Result meta 104:50224 text wraps",
+    "id": "104:49901"
+   },
+   {
+    "name": "CHANGED CF-06 Insufficient balance 390 — header + session L, sheet close L 287:201373, scrim resized",
+    "id": "287:201075"
+   },
+   {
+    "name": "CHANGED CF-06 Daily loss limit 390 — header + session L, callout actions 287:201747 stacked full-width 48 px (287:201748, 287:201760)",
+    "id": "287:201425"
+   },
+   {
+    "name": "CHANGED CF-06 Region 390 — header actions L (Alert/Banner nested action left at S, see issues)",
+    "id": "287:201779"
+   },
+   {
+    "name": "CHANGED CF-06 Connection lost 390 — header + session L, Retry now Secondary L 287:202396",
+    "id": "287:202101"
+   },
+   {
+    "name": "CHANGED CF-04 390 — header + session L, game tabs 288:203611 segments 38 in a 48 px track, filter chips 288:203619/626/634/641/648 at 44 px",
+    "id": "288:203530"
+   },
+   {
+    "name": "CHANGED CF-05 390 — header + session L, game-tab segments 38 in a 48 px track",
+    "id": "288:203895"
+   },
+   {
+    "name": "CHANGED GM-03 390 — PF link row 36:522884 min 44, Max chip I36:522776;15:3380 44×44",
+    "id": "36:522639"
+   },
+   {
+    "name": "CHANGED GM-04 390 — PF link row 36:529721 min 44, Max chip I36:529632;15:3292 44×44",
+    "id": "36:529337"
+   },
+   {
+    "name": "CHANGED GM-05 390 — PF link row 36:548279 min 44, Max chip I36:548196;15:3292 44×44",
+    "id": "36:547984"
+   },
+   {
+    "name": "CHANGED GM-06 390 — PF link row 42:45901 min 44, Max chip I42:45810;15:3380 44×44",
+    "id": "42:45652"
+   },
+   {
+    "name": "CHANGED GM-07 390 — PF link row 44:46118 min 44, Max chip I44:46008;15:3292 44×44",
+    "id": "44:45796"
+   },
+   {
+    "name": "CHANGED GM-08 390 — PF link row 49:63387 min 44, Max chip I49:63321;15:3380 44×44",
+    "id": "49:63106"
+   }
+  ],
+  "issues": [
+   "(1) Tabs/Segmented is done. All 15 listed 390 instances are Size=L (48 px), with labels and Active segments kept. A getInstancesAsync scan of the M variants (20:6959/6967/6977) shows that the only Size=M instance left on page 10 is on the MOB-12 Tablet 768 frame (298:102737), which is correct for 768. Fixed 844 frames: on PUB-05 Filters (34:448213) and USR-G6 Filters (229:241469) the absolute bottom sheets grew by 6 px and moved up 6 px, so their footers still end at 844. ERR-01 MOB (281:97574) has a fixed 669 px content column that now uses 604 px. All three were checked in full-frame screenshots and nothing is clipped.",
+   "USR-RG2/3/4: I used the 'expose' option rather than adding variants. In all 9 RG/Limit Setter variants (set 23:21988, page 02) the nested Tabs/Segmented has isExposedInstance = true, and the set description explains how to use L on 390. Desktop and tablet instances are unchanged at M. On the four 390 Limit Setter instances the exposed control is Size=L. Each instance grows by 6 px and the frames grow by 6 px. Checked by screenshot.",
+   "(2) Double Side 390, all 10 CF frames: the 3 header actions and the session-row button are Button/Icon L (48 × 48). The header gap went from 12 to 8, giving a 142 px Title column; the title and subtitle are FILL with HEIGHT auto-resize, so the subtitle wraps to two lines inside the 64 px header. I also fixed every other under-44 px control in these frames: the CF-06 sheet close button is L; the CF-03 'Verify' button is Ghost L, with the flip id wrapping so Verify stays on the row; the CF-06 daily-limit View limits and Take a break buttons are stacked full-width at 48 px (the CR-08 pattern); CF-06 'Retry now' is L; the CF-04/05 game tabs are 38 px segments in a 48 px track; and the CF-04 filter chips are 44 px. A final read finds no Button, Tabs or Filter Chip under 44 px except the 38 px segments inside 48 px tracks, which matches the library L convention.",
+   "Not fixed (library follow-up): on CF-06 Region (287:201779), the Withdraw funds action nested in Alert/Banner (I287:202082;30:16954) cannot be made 48 px per instance. After Size=L its height stays 32, even with a FIXED resize. I reverted it to its original S (135 × 32). Two intermediate attempts had briefly squashed it to 22 px and turned on wrap; both were undone and the screenshot is back to the original look. Suggested fix: in the Alert/Banner variants, make the nested button hug its height and expose it, the same way as RG/Limit Setter.",
+   "(3) GM-03…08 390 audit: header tools (Button/Icon L), Manual | Auto and risk segmented controls (L), CTAs and secondary buttons were already L. Select/Field triggers are 44 px, Keno cells 56 × 44, Vault Sweeper tiles 56 × 56 and High Card call rows 62 px, so all pass. Two things were fixed in all 6 frames: the 'Provably fair link' row (Verify) now has a 44 px minimum height (it was 16 or 32), and the Input/Amount 'Max' chip is 44 × 44 through a padding override (4 → 14). A resize or minHeight on that instance sublayer is silently ignored; padding works. Display-only, so not changed: the Recent results pills and the Skyline target pill.",
+   "Follow-ups outside this pass: (a) Shell/Topbar Mobile still has Deposit Button/Primary S (77 × 32) and a 40 × 40 bell on every 390 frame; this is a shell change that touches every mobile frame. (b) The Input/Amount Max chip is still 24 px on every other 390 frame (wallet, Pool Dice, Orbit Rush, Pool Roulette, Twenty-One, Double Side). A Size=L variant would be the clean library fix. (c) RG/Limit Setter Save/Cancel and RG/Help Resources buttons are M (40 px). The RG sub-nav Tabs/Pill is 36 px and the Back link is Ghost S (32 px) on the USR-RG 390 frames. (d) The text links in RG/Session Bar ('Responsible gaming', 'Take a break') and Nav/Region Banner are 16–18 px. (e) The Double Side 'Provably fair' info chip (about 24 px) may act as a link; this was not audited.",
+   "Verification method: a single use_figma call seems to return at most about 5 inline screenshots. So I checked the changed containers through temporary contact-sheet frames that held clones and carried the screen's explicit Breakpoint/Color modes. Each sheet was removed in a finally block, and nothing is left on the canvas. I also took full-frame screenshots of PUB-05 Filters, USR-G6 Filters, ERR-01 MOB, CF-01, CF-04, the CF-06 sheet, CF-06 Daily limit, CF-06 Region and GM-07. Every one passed, with no clipping or overlap. The sections only grew (5 of them, by 6–24 px), and the overlap check found nothing.",
+   "Bookkeeping: I wrote /home/user/Claude/design/figma-build/registry-final-qa-a11y-2.json (the RG/Limit Setter exposed-instance ids and usage, the Max chip padding override, and the Alert/Banner limitation) and appended decision #67 to /home/user/Claude/design/figma-build/decisions.md. I did not edit ledger.json, so merge this report. Each ledger note above repeats the existing note and adds the 28 Nov change, so replacing the stored notes loses nothing. Nothing was committed. Scripts are in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/a11y2/. The page-02 expose call used a trimmed helper header (variables and fonts only) because it only edits metadata; every page-10 mutating call pasted helpers.js verbatim.",
+   "Memory: I did not read any memory notes. Candidate for saving, learned from this session's tool results: in this file, Plugin API size overrides (resize, minHeight) on nested frames inside instances are silently ignored, but padding overrides apply. Also, one use_figma call seems to return at most about 5 inline screenshots, so a temporary contact-sheet frame of clones that inherits the screen's explicit variable modes is an efficient way to check many changes at once."
+  ]
  }
 }

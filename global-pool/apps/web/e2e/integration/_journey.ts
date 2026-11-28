@@ -17,8 +17,10 @@ import { fileURLToPath } from 'node:url';
 
 import {
   expect,
+  test as base,
   type APIRequestContext,
   type APIResponse,
+  type BrowserContext,
   type Page,
   type TestInfo,
 } from '@playwright/test';
@@ -31,6 +33,34 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const SHOTS = path.join(HERE, '../../test-results/e2e-journeys-shots');
 
 export const uniq = () => Math.random().toString(36).slice(2, 10);
+
+// ── PUB-22 age gate ───────────────────────────────────────────────────────────────────────────
+
+/**
+ * The state a visitor has after confirming 18+ on the PUB-22 gate (cookie `gp_age_ok=<epoch s>.<country>`,
+ * src/components/compliance/storage.ts). Guest pages on gambling surfaces (/, /pool/**, /games/**) otherwise open
+ * behind the age-gate modal. The gate itself is covered by e2e/gates.spec.ts.
+ */
+export async function presetAgeGate(context: BrowserContext, baseURL = BASE, country = 'PT') {
+  await context.addCookies([
+    { name: 'gp_age_ok', value: `${Math.floor(Date.now() / 1000)}.${country}`, url: baseURL },
+  ]);
+}
+
+/**
+ * Journey `test`: every page context starts with the age gate confirmed (G05). Contexts a spec opens itself
+ * (`browser.newContext()`) call `presetAgeGate()` when they visit a guest gambling page.
+ */
+export const test = base.extend<{ ageGateConfirmed: void }>({
+  ageGateConfirmed: [
+    async ({ context, baseURL }, use) => {
+      await presetAgeGate(context, baseURL ?? BASE);
+      await use();
+    },
+    { auto: true },
+  ],
+});
+export { expect };
 
 /** E2E_VIEWPORT=390 runs the journeys on the mobile layout (390 × 844); default desktop 1440 × 1024. */
 export const MOBILE = process.env.E2E_VIEWPORT === '390';

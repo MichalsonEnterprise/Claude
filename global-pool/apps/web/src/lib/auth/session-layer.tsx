@@ -11,7 +11,7 @@ import { StepUpProvider } from '@/components/auth/step-up';
 import { WalletFlowProvider } from '@/components/auth/wallet-dialogs';
 import { authApi, authKeys, isUnauthenticated, type MeProfile } from '@/lib/api/auth';
 import { setPlayerTokenProvider } from '@/lib/api/client';
-import { clearPlayerData, resetPlayerData } from '@/lib/api/player-cache';
+import { clearPlayerData } from '@/lib/api/player-cache';
 import { publicEnv } from '@/lib/env';
 
 import { AuthContext, useAuthCore } from './context';
@@ -198,18 +198,34 @@ export function AuthSessionLayer({ children }: { children: React.ReactNode }) {
 
   // Clear stale API data when the core signs out (e.g. Privy logout in another tab) or another account takes over
   // the session without a sign-out in between.
+  //
+  // Removing the queries is not enough on its own: an observer that stays mounted keeps a reference to the last query
+  // that had data, so a hook with `placeholderData: keepPreviousData` (entry history, game bet lists, …) would show
+  // the previous player's rows to the next player until their own request returns (R38). So the player UI (this
+  // layer's children) is remounted once the old data is gone: every observer starts empty. Guest → member does not
+  // remount, so a sign-in never loses the page the player was on.
+  // The admin console (its own session, no player hooks) is never remounted by a player session change.
+  const [identityEpoch, setIdentityEpoch] = React.useState(0);
+  const pathRef = React.useRef(pathname);
+  pathRef.current = pathname;
+  const remountPlayerUi = React.useCallback(() => {
+    if (!/^\/admin(?:\/|$)/.test(pathRef.current ?? '')) setIdentityEpoch((e) => e + 1);
+  }, []);
   const prevStatus = React.useRef(core.status);
   const prevDid = React.useRef(did);
   React.useEffect(() => {
-    if (prevStatus.current === 'member' && core.status === 'guest') clearAuthData();
-    else if (prevDid.current !== null && did !== null && prevDid.current !== did) {
-      // Mounted screens are already querying for the new account: reset (drop + refetch) instead of removing.
+    if (prevStatus.current === 'member' && core.status === 'guest') {
+      clearAuthData();
+      remountPlayerUi();
+    } else if (prevDid.current !== null && did !== null && prevDid.current !== did) {
+      // Another account took over: drop the old player's data, then remount so the screens query for the new one.
       synced.current = null;
-      void resetPlayerData(qc);
+      clearPlayerData(qc);
+      remountPlayerUi();
     }
     prevStatus.current = core.status;
     if (did !== null || core.status === 'guest') prevDid.current = did;
-  }, [core.status, did, clearAuthData, qc]);
+  }, [core.status, did, clearAuthData, qc, remountPlayerUi]);
 
   // Onboarding guard: members without consents go to /onboarding before anything else.
   React.useEffect(() => {
@@ -252,7 +268,7 @@ export function AuthSessionLayer({ children }: { children: React.ReactNode }) {
       <AuthUiContext.Provider value={ui}>
         <StepUpProvider>
           <WalletFlowProvider>
-            {children}
+            <React.Fragment key={identityEpoch}>{children}</React.Fragment>
             <AuthDialog />
             <SessionExpiredDialog />
             {/* Seeded DEMO accounts (shared by every QA run) never auto-open AUTH-21; see /auth-preview. */}

@@ -215,6 +215,12 @@ export interface RgLimitView {
 export interface RgState {
   limits: RgLimitView[];
   selfExclusion: { active: boolean; endsAt: string | null };
+  /** Break vs self-exclusion (API `exclusion`; absent in the DEMO mock). */
+  exclusion?: {
+    active: boolean;
+    kind: 'cooling_off' | 'self_exclusion' | null;
+    endsAt: string | null;
+  };
 }
 
 export interface RegionView {

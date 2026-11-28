@@ -3,9 +3,6 @@
  * MAX (R49), deposit confirmation freshness (R39), homepage last-round caption (R30), shell member data (R37),
  * self-exclusion scope copy (R26) and "every navigation link resolves to a built page" (R11 R57).
  */
-import { readdirSync, statSync } from 'node:fs';
-import path from 'node:path';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
@@ -15,7 +12,6 @@ import { ADMIN_QUERY_ROOTS, clearAdminData } from '@/components/admin-a/session'
 import { RestrictedView } from '@/components/auth/restricted';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { lastRoundCaption } from '@/components/home/hero';
-import { LEGAL_DOC_KEYS } from '@/components/legal/legal-docs';
 import { poolKeys } from '@/components/pool/use-pool';
 import { AppShellFrame, SHELL_POOL_KEYS } from '@/components/shell/app-shell';
 import { FOOTER_COLUMNS } from '@/components/shell/footer-mega';
@@ -31,6 +27,8 @@ import {
 } from '@/lib/api/player-cache';
 import { useRgMutation } from '@/lib/api/rg-history';
 import { useInvalidateWallet } from '@/lib/api/wallet';
+
+import { resolves } from './support/routes';
 
 /** Every query key a module caches for the signed-in player (balances / limits live under several modules). */
 const PLAYER_KEYS = [
@@ -250,33 +248,6 @@ describe('self-exclusion copy (R26)', () => {
 
 // ── every navigation link resolves to a built page (R11 · R57) ──────────────────────────────────
 
-const APP = path.resolve(import.meta.dirname, '../src/app');
-function pageRoutes(dir = APP, segs: string[] = []): string[][] {
-  const out: string[][] = [];
-  for (const name of readdirSync(dir)) {
-    const full = path.join(dir, name);
-    if (statSync(full).isDirectory()) {
-      const isGroup = name.startsWith('(') && name.endsWith(')');
-      out.push(...pageRoutes(full, isGroup || name.startsWith('_') ? segs : [...segs, name]));
-    } else if (name === 'page.tsx') out.push(segs);
-  }
-  return out;
-}
-const ROUTE_PATTERNS = pageRoutes();
-function resolves(href: string): boolean {
-  const p = href.split('#')[0]!.split('?')[0]!;
-  const segs = p.split('/').filter(Boolean);
-  return ROUTE_PATTERNS.some((r) => {
-    if (r.at(-1)?.startsWith('[...')) {
-      const pre = r.slice(0, -1);
-      return segs.length > pre.length && pre.every((s, i) => s.startsWith('[') || s === segs[i]);
-    }
-    if (r.length !== segs.length) return false;
-    if (r.includes('[doc]'))
-      return segs[0] === 'legal' && (LEGAL_DOC_KEYS as readonly string[]).includes(segs[1]!);
-    return r.every((s, i) => s.startsWith('[') || s === segs[i]);
-  });
-}
 const flat = (items: NavItem[]): NavItem[] => items.flatMap((i) => [i, ...flat(i.children ?? [])]);
 
 describe('navigation targets exist (R11 · R57)', () => {

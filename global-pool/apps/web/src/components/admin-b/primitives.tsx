@@ -509,6 +509,8 @@ export function QueryError({ error, onRetry }: { error: unknown; onRetry?: () =>
       </div>
     );
   }
+  // 401 / 403: retrying the same request cannot succeed (the role lacks the permission, or the session ended — the
+  // admin session handles that), so there is no "Try again" here (Q08).
   const e = errorText(error);
   return (
     <div className="rounded-lg border border-border-subtle bg-surface-default p-6">
@@ -517,13 +519,6 @@ export function QueryError({ error, onRetry }: { error: unknown; onRetry?: () =>
         title={e.title}
         description={e.description}
         reference={e.reference}
-        actions={
-          onRetry ? (
-            <Button variant="secondary" size="s" onClick={onRetry}>
-              Try again
-            </Button>
-          ) : undefined
-        }
       />
     </div>
   );

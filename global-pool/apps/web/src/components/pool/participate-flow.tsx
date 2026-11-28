@@ -54,7 +54,13 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InfoTooltip } from '@/components/ui/tooltip';
-import { ApiRequestError, isOutcomeUnknown, newIdempotencyKey } from '@/lib/api/client';
+import { AccountPauseNotice, type AccountPause } from '@/components/wallet/account-pause';
+import {
+  ApiRequestError,
+  isOutcomeUnknown,
+  newIdempotencyKey,
+  writeOutcome,
+} from '@/lib/api/client';
 import {
   enterRound,
   type EntryPurchaseResult,
@@ -88,12 +94,29 @@ type Phase =
       limitsBefore: RgLimitView[] | null;
     }
   | { kind: 'closed'; entries: number }
-  /** `unknown`: no definite answer (network drop, 5xx, still processing) — the purchase may have gone through. */
-  | { kind: 'error'; entries: number; error: unknown; unknown: boolean };
+  /**
+   * `unknown`: no definite answer (network drop, 5xx, still processing) — the purchase may have gone through.
+   * `alreadyUsed`: the key was already committed for another request (IDEMPOTENCY_CONFLICT) — something was booked.
+   */
+  | { kind: 'error'; entries: number; error: unknown; unknown: boolean; alreadyUsed?: boolean };
+
+/**
+ * Errors the entry endpoint raises INSIDE its idempotent transaction (after the key lookup): as the answer to a
+ * retry they prove the earlier attempt with the same key was never committed. Anything else on a retry of an
+ * unanswered attempt (429, 401, policy 403…) is decided before the lookup and says nothing about it (R41b).
+ */
+export const ENTRY_DEFINITE_CODES = [
+  'INSUFFICIENT_FUNDS',
+  'RG_LIMIT_EXCEEDED',
+  'ROUND_NOT_OPEN',
+  'NOT_FOUND',
+] as const;
 
 /** One purchase intent: its idempotency key is reused on every retry of the same intent. */
 interface Intent {
   entries: number;
+  /** The round the intent buys into — a locked intent is never re-targeted at the next round (R41b). */
+  roundId: string;
   key: string;
   /** Set while the last attempt has no definite answer: the intent is locked until one arrives. */
   unknownError?: unknown;
@@ -113,6 +136,8 @@ export interface ParticipateFlowProps {
    */
   limitsStatus?: 'loading' | 'error' | 'ready';
   onRetryLimits?: () => void;
+  /** Entries are paused on the account (break, self-exclusion, restriction — Q16): say so and block Confirm. */
+  paused?: AccountPause | null;
   /** Wallet on the wrong network (GP-02 state). Entries are paid from the platform balance, so this only blocks. */
   wrongNetwork?: boolean;
   initialEntries?: number;
@@ -150,22 +175,39 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
   };
 
   const submit = async (requested: number) => {
-    // An unanswered attempt is retried as the SAME intent (entries + key) until a definite answer arrives.
-    const entries = intent.current?.unknownError !== undefined ? intent.current.entries : requested;
-    if (!intent.current || intent.current.entries !== entries)
-      intent.current = { entries, key: newIdempotencyKey() };
-    const attempt = { entries, key: intent.current.key };
+    // An unanswered attempt is retried as the SAME intent (entries + round + key) until a definite answer arrives.
+    const locked = intent.current?.unknownError !== undefined;
+    const entries = locked ? intent.current!.entries : requested;
+    if (
+      !intent.current ||
+      (!locked && (intent.current.entries !== entries || intent.current.roundId !== round.id))
+    )
+      intent.current = { entries, roundId: round.id, key: newIdempotencyKey() };
+    const attempt = { entries, roundId: intent.current.roundId, key: intent.current.key };
     setPhase({ kind: 'pending', entries });
     const before = { myEntriesBefore: props.myEntries, limitsBefore: props.limits };
     try {
-      const result = await enterRound(round.id, entries, attempt.key);
+      const result = await enterRound(attempt.roundId, entries, attempt.key);
       intent.current = null;
       setPhase({ kind: 'success', result, ...before });
       refreshAfterWrite();
     } catch (err) {
-      if (isOutcomeUnknown(err)) {
+      const outcome = writeOutcome(err, {
+        pendingUnknown: locked,
+        definiteCodes: ENTRY_DEFINITE_CODES,
+      });
+      if (outcome === 'unknown') {
+        // Still no definite answer about this purchase (or the retry was refused before the key was looked up):
+        // stay locked on the same intent and keep saying "couldn't confirm".
         intent.current = { ...attempt, unknownError: err ?? new Error('No response') };
         setPhase({ kind: 'error', entries, error: err, unknown: true });
+        refreshAfterWrite();
+        return;
+      }
+      if (outcome === 'already_used') {
+        // The key was committed for another request: something was booked. A new purchase needs a new key.
+        intent.current = null;
+        setPhase({ kind: 'error', entries, error: err, unknown: false, alreadyUsed: true });
         refreshAfterWrite();
         return;
       }
@@ -208,6 +250,7 @@ export function ParticipateFlow(props: ParticipateFlowProps) {
           {...props}
           error={phase.kind === 'error' ? phase.error : null}
           unknownOutcome={phase.kind === 'error' && phase.unknown}
+          alreadyUsed={phase.kind === 'error' && Boolean(phase.alreadyUsed)}
           defaultEntries={phase.kind === 'error' ? phase.entries : (props.initialEntries ?? 1)}
           onCancel={() => onOpenChange(false)}
           onSubmit={submit}
@@ -309,10 +352,12 @@ function PreviewStep({
   limits,
   limitsStatus = 'ready',
   onRetryLimits,
+  paused,
   wrongNetwork,
   defaultEntries,
   error,
   unknownOutcome,
+  alreadyUsed,
   onCancel,
   onSubmit,
   desktop,
@@ -321,6 +366,8 @@ function PreviewStep({
   error: unknown;
   /** The last attempt got no definite answer: entries are locked to that attempt and Confirm retries it. */
   unknownOutcome: boolean;
+  /** The last attempt's key had already been used for another purchase (something was booked). */
+  alreadyUsed: boolean;
   onCancel: () => void;
   onSubmit: (entries: number) => Promise<void>;
   desktop: boolean;
@@ -330,6 +377,9 @@ function PreviewStep({
     defaultValues: { entries: defaultEntries, consent: false },
     mode: 'onChange',
   });
+  // Read on EVERY render (R42b): react-hook-form only tracks isValid once it has been read, so reading it behind a
+  // short-circuit (e.g. while limits load) left it stale and Confirm disabled after the consent box was ticked.
+  const { isValid } = form.formState;
   const entriesRaw = useWatch({ control: form.control, name: 'entries' });
   const consent = useWatch({ control: form.control, name: 'consent' });
   const entries =
@@ -340,12 +390,15 @@ function PreviewStep({
   const odds = oddsAfter(round, myEntries, entries);
   const serverCode = error instanceof ApiRequestError ? error.code : null;
   const regulatory = regulatoryFromError(error);
+  // A retry of an unanswered attempt re-sends the same key, so it can never double-book: client-side balance / limit
+  // numbers (which may already include that purchase) must not lock the player out of it (R41b).
   const blocked =
-    check.insufficient ||
-    check.limitReached ||
-    limitsStatus !== 'ready' ||
+    (!unknownOutcome &&
+      (check.insufficient || check.limitReached || limitsStatus !== 'ready' || Boolean(paused))) ||
     Boolean(wrongNetwork) ||
-    !form.formState.isValid;
+    !isValid;
+  const retryRefusal =
+    unknownOutcome && error instanceof ApiRequestError && !isOutcomeUnknown(error) ? error : null;
   const entryWord = (n: number) => (n === 1 ? 'entry' : 'entries');
 
   const Body = desktop ? DialogBody : SheetBody;
@@ -358,6 +411,7 @@ function PreviewStep({
       onSubmit={form.handleSubmit((v) => onSubmit(v.entries))}
     >
       <Body className="flex flex-col gap-4">
+        {paused && !unknownOutcome && <AccountPauseNotice pause={paused} action="gaming" />}
         {wrongNetwork && (
           <Callout
             tone="warning"
@@ -379,6 +433,12 @@ function PreviewStep({
               before you buy again. Trying again re-sends this same purchase, so it can’t be charged
               twice.
             </p>
+            {retryRefusal && (
+              <p className="mt-1">
+                Your retry didn’t get through: {errorMessage(retryRefusal).replace(/[.!?]?$/, '.')} We
+                still don’t know whether the first attempt was placed.
+              </p>
+            )}
             {error instanceof ApiRequestError && error.requestId ? (
               <span className="block font-mono text-mono-s text-text-tertiary">
                 Ref {error.requestId}
@@ -386,12 +446,25 @@ function PreviewStep({
             ) : null}
           </Callout>
         )}
+        {alreadyUsed && (
+          <Callout tone="warning" icon={<TriangleAlert />} title="This purchase was already sent">
+            <p>
+              GLOBAL POOL had already recorded a purchase under this confirmation, so entries may have
+              been placed. Check{' '}
+              <Link href={POOL_ROUTES.entries} className="text-text-brand hover:underline">
+                My entries
+              </Link>{' '}
+              before you buy again — confirming now starts a new purchase.
+            </p>
+          </Callout>
+        )}
         {/* ERR-05: a regulatory refusal (region, self-exclusion / break) gets the shared notice with its next step. */}
-        {error !== null && !unknownOutcome && regulatory && (
+        {error !== null && !unknownOutcome && !alreadyUsed && regulatory && (
           <RegulatoryNotice kind={regulatory.kind} ctx={regulatory.ctx} />
         )}
         {error !== null &&
           !unknownOutcome &&
+          !alreadyUsed &&
           !regulatory &&
           serverCode !== 'INSUFFICIENT_FUNDS' &&
           serverCode !== 'RG_LIMIT_EXCEEDED' && (
@@ -524,7 +597,7 @@ function PreviewStep({
           )}
         </dl>
 
-        {(check.insufficient || serverCode === 'INSUFFICIENT_FUNDS') && (
+        {!unknownOutcome && (check.insufficient || serverCode === 'INSUFFICIENT_FUNDS') && (
           <Callout tone="danger" icon={<Wallet />} title="Not enough Available balance">
             <p>
               {check.shortBy
@@ -575,13 +648,17 @@ function PreviewStep({
           </div>
         </div>
 
-        <LimitCheck
-          check={check}
-          status={limitsStatus}
-          onRetry={onRetryLimits}
-          serverError={serverCode === 'RG_LIMIT_EXCEEDED' ? error : null}
-          onReduce={(n) => form.setValue('entries', n, { shouldValidate: true })}
-        />
+        {/* While entries are paused the limit meter would read as "you can buy" — the notice above says why not. */}
+        {!(paused && !unknownOutcome) && (
+          <LimitCheck
+            check={check}
+            status={limitsStatus}
+            onRetry={onRetryLimits}
+            serverError={serverCode === 'RG_LIMIT_EXCEEDED' ? error : null}
+            locked={unknownOutcome}
+            onReduce={(n) => form.setValue('entries', n, { shouldValidate: true })}
+          />
+        )}
 
         <LicenceCard />
 
@@ -651,12 +728,15 @@ function LimitCheck({
   status,
   onRetry,
   serverError,
+  locked = false,
   onReduce,
 }: {
   check: ParticipationCheck;
   status: 'loading' | 'error' | 'ready';
   onRetry?: () => void;
   serverError: unknown;
+  /** The entries count is locked to an unanswered attempt: no "Reduce to" shortcut past it. */
+  locked?: boolean;
   onReduce: (entries: number) => void;
 }) {
   const l = check.limit;
@@ -739,7 +819,7 @@ function LimitCheck({
       />
       {exceeded && (
         <div className="flex flex-wrap items-center gap-3 text-caption text-text-secondary">
-          {l && l.maxEntries > 0 ? (
+          {locked ? null : l && l.maxEntries > 0 ? (
             <Button
               size="s"
               variant="secondary"

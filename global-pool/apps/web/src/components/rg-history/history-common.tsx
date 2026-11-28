@@ -1,6 +1,7 @@
 'use client';
 
 import type { TxType } from '@gp/shared/enums';
+import { PLATFORM_FEE_PER_ENTRY } from '@gp/shared/fees';
 import { formatCount, formatDateUTC, formatTimeUTC } from '@gp/shared/format';
 import { isZero } from '@gp/shared/money';
 import {
@@ -285,7 +286,10 @@ export function txTitle(t: TxView): { title: string; sub: string } {
       const m = /^(\d+) entries · (Round #[\d,]+)$/.exec(t.description);
       return {
         title: m ? `${m[2]} · ${m[1]} entries` : t.description,
-        sub: `Entries ${num(t.amount)} + fee ${num(t.platformFee)}`,
+        // Q26: the fee is its own line under this one (txFeeLine); this line is the stake.
+        sub: isZero(t.platformFee)
+          ? `Entries ${num(t.amount)}`
+          : `Entries ${num(t.amount)} · ${num(t.netAmount)} paid with the platform fee below`,
       };
     }
     case 'refund':
@@ -303,7 +307,26 @@ export function txTitle(t: TxView): { title: string; sub: string } {
   }
 }
 
-/** Signed amount the player's balance moved by ('+1,000.00' / '−351.75'); rejected withdrawals move nothing. */
+/**
+ * Q26: the 0.05 USDT-per-entry platform fee of a purchase as its OWN line under the purchase (same transaction,
+ * booked to the fee ledger — never the prize pool), so "always its own line" is true in every list. Null otherwise.
+ */
+export function txFeeLine(t: TxView): { title: string; sub: string; text: string; tone: string } | null {
+  if (t.type !== 'entry_purchase' || isZero(t.platformFee)) return null;
+  const m = /^(\d+) entr(?:y|ies)\b/.exec(t.description);
+  const n = m ? Number(m[1]) : null;
+  return {
+    title: 'Platform fee',
+    sub: `${n !== null ? `${formatCount(n)} qualifying ${n === 1 ? 'entry' : 'entries'} × ${PLATFORM_FEE_PER_ENTRY} USDT · ` : ''}not added to the prize pool`,
+    text: `−${num(t.platformFee)}`,
+    tone: 'text-text-danger',
+  };
+}
+
+/**
+ * Signed amount the player's balance moved by ('+1,000.00' / '−350.00'); rejected withdrawals move nothing. An entry
+ * purchase shows its stake — its platform fee is the separate `txFeeLine` (stake + fee = what Available moved by).
+ */
 export function txAmount(t: TxView): { text: string; tone: string } {
   if (
     t.type === 'withdrawal' &&
@@ -311,7 +334,7 @@ export function txAmount(t: TxView): { text: string; tone: string } {
   ) {
     return { text: num(t.amount), tone: 'text-text-tertiary line-through' };
   }
-  const value = t.type === 'entry_purchase' ? t.netAmount : t.amount;
+  const value = t.amount;
   if (isZero(value)) return { text: num(value), tone: 'text-text-primary' };
   return t.direction === 'in'
     ? { text: `+${num(value)}`, tone: 'text-text-success' }
@@ -434,6 +457,7 @@ export function TxTable({
             const { title, sub } = txTitle(t);
             const st = txStatus(t, rounds);
             const amt = txAmount(t);
+            const fee = txFeeLine(t);
             const expanded = open === t.uuid;
             return (
               <React.Fragment key={t.uuid}>
@@ -481,6 +505,30 @@ export function TxTable({
                     </button>
                   </td>
                 </tr>
+                {fee && (
+                  <tr
+                    className="border-b border-border-subtle bg-bg-secondary/20"
+                    data-testid="tx-fee-line"
+                  >
+                    <td className="py-2 pr-4 pl-8">
+                      <span className="flex flex-col">
+                        <span className="text-body-s text-text-primary">{fee.title}</span>
+                        <span className="text-caption text-text-tertiary">{fee.sub}</span>
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-body-s">{TYPE_LABEL.platform_fee}</td>
+                    <td colSpan={3} className="px-3 py-2 text-caption text-text-tertiary">
+                      Part of {t.id} · no network fee
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                        <span className={cn('text-number-s tabular-nums', fee.tone)}>{fee.text}</span>
+                        <span className="text-caption text-text-tertiary">USDT</span>
+                      </span>
+                    </td>
+                    <td />
+                  </tr>
+                )}
                 {expanded && (
                   <tr className="border-b border-border-subtle bg-bg-secondary/40">
                     <td colSpan={7} className="px-4">
@@ -521,6 +569,7 @@ export function TxCards({ items, rounds }: { items: TxView[]; rounds?: RoundStat
             const { title, sub } = txTitle(t);
             const st = txStatus(t, rounds);
             const amt = txAmount(t);
+            const fee = txFeeLine(t);
             const expanded = open === t.uuid;
             return (
               <article
@@ -544,6 +593,21 @@ export function TxCards({ items, rounds }: { items: TxView[]; rounds?: RoundStat
                       <span className="text-caption text-text-tertiary">USDT</span>
                     </span>
                   </span>
+                  {fee && (
+                    <span
+                      className="flex items-center gap-3 rounded-md bg-bg-secondary px-3 py-2"
+                      data-testid="tx-fee-line"
+                    >
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <span className="text-body-s text-text-primary">{fee.title}</span>
+                        <span className="truncate text-caption text-text-tertiary">{fee.sub}</span>
+                      </span>
+                      <span className="flex flex-col items-end">
+                        <span className={cn('text-number-s tabular-nums', fee.tone)}>{fee.text}</span>
+                        <span className="text-caption text-text-tertiary">USDT</span>
+                      </span>
+                    </span>
+                  )}
                   <span className="flex flex-wrap items-center gap-2">
                     <StatusBadge status={st.status} label={st.label} />
                     {t.network && (

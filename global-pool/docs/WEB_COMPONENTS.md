@@ -64,7 +64,19 @@ signOut(), openAuth(view?, { next }), getAccessToken() }`. `profile` is the API 
   sign-out in another tab removes every player prefix (`clearPlayerData`), and every financial or RG write calls
   `invalidatePlayerFinancials()` (wallet, pool/me, account, history, rg, me, auth balances + account-status). Admin
   sign-out / idle expiry removes `['admin']` and `['admin-b']` (`clearAdminData`). `?next=` goes through `safeNext()`
-  (`safeAdminNext()` in the admin console): no control characters / whitespace / backslashes, same origin only.
+  (`safeAdminNext()` in the admin console): no control characters / whitespace / backslashes, same origin only, and
+  the normalised path must still start with a single `/` (dot segments such as `/.//host` are refused).
+  Signing out (or another account taking over the tab) also remounts the player UI below the session layer once the
+  old data is gone, so `keepPreviousData` observers never show the previous player's rows (not on `/admin/*`).
+- **Onboarding-gated player queries** (`usePlayerDataReady()`, `src/lib/api/player-ready.ts`): wallet, history and
+  Global Pool member queries wait until `GET /me` has answered and stay off while a member who still has to onboard is
+  about to be redirected (exempt pages such as `/responsible-gaming` keep them on); RG / 2FA / account-status are open
+  before onboarding. Money writes classify failures with `writeOutcome()` (`lib/api/client.ts`): `unknown` keeps the
+  intent (same idempotency key) locked even when a retry is refused before the key lookup (429, 401, policy 403),
+  `already_used` = IDEMPOTENCY_CONFLICT, `refused` = nothing was booked.
+  After sign-in the dialog lands via `postSignInLanding()` (`components/auth/landing.ts`): onboarding first; with
+  gaming paused by the account gate (self-exclusion / break, suspension, region, gaming hold) a gambling destination
+  becomes the matching `/restricted/*` page, while withdraw / wallet / history / account / RG destinations are kept.
   Writes whose response is lost (`isOutcomeUnknown()`) are shown as "couldn't confirm" and retried with the same key.
 - **Onboarding** `/onboarding` (`<OnboardingScreen>`): handle, country (prefilled from `GET /compliance/region`), date of
   birth (18+), consents never pre-checked (Terms + Privacy · 18+ + jurisdiction · optional marketing) →
@@ -132,7 +144,9 @@ control. No VPN / proxy / bypass hints anywhere (Figma decision #26 keeps one ex
 - **Memory** (`storage.ts`, every access in try/catch — blocked storage means "ask again", never "skip"): first-party
   cookie `gp_age_ok=<epoch s>.<country>` (30 days, SameSite=Lax, Secure on https) mirrored in localStorage `gp.ageGate`;
   "under 18" in sessionStorage `gp.ageGate.under18`. QA scripts that screenshot guest gambling pages pre-set the cookie
-  (`context.addCookies([{ name: 'gp_age_ok', value: '<epoch>.PT', url }])`) — the same state a visitor has after Enter.
+  (`context.addCookies([{ name: 'gp_age_ok', value: '<epoch>.PT', url }])`) — the same state a visitor has after Enter:
+  `scripts/lib/age-gate.mjs` `presetAgeGate(context, BASE)` (crawler, home / visual / games QA scripts) and, for the
+  journeys, `test` / `presetAgeGate()` from `e2e/integration/_journey.ts` (auto fixture on every page context).
 - **PUB-22 form** `<AgeGateForm>`: Yes / No radios (neither selected), country of residence prefilled with the detected
   country and checked by the API (`?declared=`), jurisdiction checkbox (never pre-checked), licence notice, Terms /
   Privacy / RG / Restricted countries, Leave + Enter (`ageGateAction()`: Enter only after Yes + the box for a permitted
@@ -267,8 +281,11 @@ Responsive: ≥ 1280 sidebar 240 (burger collapses to 72, saved in localStorage 
 (burger expands) · < 1024 burger opens the drawer · < 768 mobile top bar 56 + tab bar 56 (+ safe area).
 Shell member data: with `NEXT_PUBLIC_DATA_SOURCE=api` a signed-in member sees their own Available (`walletKeys.balances`),
 entries in the open round (`poolKeys.myRound`), unread notifications and the live pool amount (skeletons while loading);
-`DEMO_SHELL_MEMBER` is only the mock data source / `?state=member` preview. The region banner names the country only
-when the page passes `<ShellOverride restricted regionName=… />`.
+`DEMO_SHELL_MEMBER` is only the mock data source / `?state=member` preview. The handle is always `@handle`
+(`shellHandle()`). The region banner names the country only when the page passes `<ShellOverride restricted regionName=… />`.
+Homepage feeds that are still mock-only (live bets, rakeback, VIP tier) are never presented as a real member's own:
+`viewerIsDemoPlayer()` (`home/home-context.tsx`) is true only in the mock data source. The pool snapshot treats an
+`open` round whose `opensAt` is still ahead as the next round (no "Closes in" / Enter round before it opens).
 
 ## Homepage (PUB-01) — `src/components/home/*`
 
@@ -324,7 +341,7 @@ ADM-X1), `/admin/alerts` (MOB-11), `/admin/users` (U1), `/admin/users/[id]` + `/
 | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `session`: `AdminSessionProvider`, `useAdminSession()`               | `{status, admin, can(p), canAny(ps), login(), logout(), staySignedIn(), idleDeadline, expired}`; registers `setAdminTokenProvider`; access JWT in memory, rotating refresh token in sessionStorage; 15-min idle timeout with a 2-min warning (only "Stay signed in" extends it) |
 | `shell`: `AdminShell`, `AdminSidebar`, `AdminTopbar`, `SessionTimeoutDialog` | sidebar 248 (≥ 1280) / drawer (< 1280) / mobile top bar + Admin Tab Bar (< 768); env badge, ⌘K, approvals + alerts counts                       |
-| `nav-config`: `ADMIN_NAV`, `resolveAdminNav()`                       | the 10 groups; access = any of the group's permissions (lock state otherwise). Other modules add children additively                                   |
+| `nav-config`: `ADMIN_NAV`, `resolveAdminNav()`, `visibleAdminTabs()` | the 10 groups; access = any of the group's permissions (lock state otherwise); `planned` groups (Games, Blockchain, Affiliates, Marketing) show "Soon" and are not links or palette entries. The Admin Tab Bar shows only the tabs the role can open. Other modules add children additively |
 | `command-palette`: `CommandPalette`                                  | pages (permission-aware) + player search (`/admin/users?q=`)                                                                                             |
 | `four-eyes`: `ConfirmWithReasonDialog`, `ApprovalReviewDialog`, `actionErrorMessage()` | ADM-X1: reason category + reason + fresh 2FA (+ four-eyes notice → AR reference); second-approver review / self-approval blocked / decision trail |
 | `primitives`: `AdminPageHeader`, `Panel`, `KeyValue`, `KpiTile`, `RoleChip`, `KycChip`, `RiskChip`, `Meter`, `NoPermission`, `QueryErrorPanel`, `Pagination` | admin density building blocks                                                       |
@@ -372,7 +389,7 @@ API wrappers + TanStack hooks: `src/lib/api/rg-history.ts` (`rgApi`, `historyApi
 | `help-resources.tsx`    | `HelpResources` (RG/Help Resources — real help organisations, self-check, support)                                         |
 | `self-check.tsx`        | `SelfCheckDialog` (9 PGSI questions, answers never leave the dialog)                                                       |
 | `page-shell.tsx`        | `PageShell` (breadcrumb, title, desktop tabs / mobile pills), `MemberOnly`, `PageSkeleton`, `QueryError`                   |
-| `history-common.tsx`    | `FinancePage`, `GamingPage`, `Kpi`, `TxTable` (≥1024), `TxCards` (<1024), `txStatus/txTitle/txAmount`, `Pager`            |
+| `history-common.tsx`    | `FinancePage`, `GamingPage`, `Kpi`, `TxTable` (≥1024), `TxCards` (<1024), `txStatus/txTitle/txAmount`, `txFeeLine` (an entry purchase's platform fee as its own line under the stake), `Pager` |
 | `export-dialog.tsx`     | `ExportDialog` (period, types, separator, hashes → `GET /history/transactions/export`; dialog ≥768, bottom sheet <768)     |
 | `ui.tsx`                | `IconTile`, `Meter`, `Chip`, `KV`, `Bullet`, `NoteBox`, `Columns`, `CardHead`, `SectionHead`                                |
 
@@ -423,6 +440,7 @@ bottom sheet over the wallet page (MOB-06 / MOB-07). API wrappers + TanStack hoo
 | `history.tsx` · `tx-list.tsx` · `tx-detail.tsx` | `WalletHistory` (table ≥ 1280, cards below, CSV export of the page), `TxList`, `TxDetailDrawer` (right drawer / bottom sheet), `TxHash` |
 | `addresses.tsx`            | `WhitelistPage`, `AddAddressModal` (24 h cool-down, unchecked ownership box, 2FA), `ConnectedWalletsPage`                       |
 | `banners.tsx`              | WAL-24 `WalletStatusBanners`, `InsufficientFundsModal`, `DepositLimitModal`, `MaintenanceModal`                                  |
+| `account-pause.tsx`        | `accountPause(status, 'gaming' \| 'deposits' \| 'withdrawals')` (break · self-exclusion · region · admin restriction, from `useAccountGate()` = `GET /auth/account-status`), `AccountPauseNotice`, `restrictionCopy` — the deposit flow, the withdraw flow (hold) and the pool hub / participation modal say a pause up front |
 | `two-factor.tsx` · `timeline.tsx` · `responsive-modal.tsx` | `TwoFactorField`, `AntiPhishingCode`, `stepUpError`; `StatusTimeline`; `ResponsiveModal` (dialog / drawer ≥ 768, bottom sheet < 768) |
 
 Dev-only previews (`next dev` or `NEXT_PUBLIC_STATE_PREVIEW=true`): `/wallet/deposit?step=address&preview=wrong-network|expired`,

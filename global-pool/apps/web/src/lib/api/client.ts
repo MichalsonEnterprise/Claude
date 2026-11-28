@@ -157,6 +157,30 @@ export function isOutcomeUnknown(err: unknown): boolean {
   return err.status === 409 && err.code === 'CONFLICT';
 }
 
+/**
+ * How to read a failed attempt of an idempotent money write (R41b):
+ * - `unknown` — no definite answer (`isOutcomeUnknown`), OR an earlier attempt of the same intent is still
+ *   unanswered (`pendingUnknown`) and this refusal came from a check that runs BEFORE the idempotency lookup
+ *   (rate limit, expired session, policy 403, …). Such a refusal says nothing about the earlier attempt, so the
+ *   intent stays locked and the player is never told "nothing was charged".
+ * - `already_used` — IDEMPOTENCY_CONFLICT: the key was already committed for a different request, so something WAS
+ *   booked under it.
+ * - `refused` — a definite answer about this intent: nothing was booked. While an earlier attempt is unanswered,
+ *   only `definiteCodes` (errors raised inside the idempotent transaction, after the key lookup) count as that.
+ */
+export type WriteOutcome = 'unknown' | 'already_used' | 'refused';
+
+export function writeOutcome(
+  err: unknown,
+  opts: { pendingUnknown: boolean; definiteCodes: readonly string[] },
+): WriteOutcome {
+  if (isOutcomeUnknown(err)) return 'unknown';
+  const code = (err as ApiRequestError).code;
+  if (code === 'IDEMPOTENCY_CONFLICT') return 'already_used';
+  if (opts.pendingUnknown && !opts.definiteCodes.includes(code)) return 'unknown';
+  return 'refused';
+}
+
 /** One key per user intent (e.g. "confirm 35 entries"); reuse it when retrying the same intent. */
 export function newIdempotencyKey(): string {
   return globalThis.crypto.randomUUID();

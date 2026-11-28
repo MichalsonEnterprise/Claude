@@ -9,21 +9,22 @@
  *   2. close → draw (mock VRF) → settle — skipped (no helper; endpoints probed → 404);
  *   3. the latest settled round shows its results and the in-browser verifier (GP-12) passes.
  */
-import { expect, test } from '@playwright/test';
 
 import {
-  API,
   acceptsEntries,
+  API,
   balances,
   bearer,
   createPlayer,
   currentRound,
+  expect,
   json,
   shot,
   signIn,
+  test,
   uniq,
-  watch,
   VIEWPORT,
+  watch,
 } from './_journey';
 
 const J = 'j6';
