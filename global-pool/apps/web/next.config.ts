@@ -7,6 +7,8 @@ import type { NextConfig } from 'next';
  * (see ../../.env.example and the Dockerfile `web-build` stage).
  */
 const nextConfig: NextConfig = {
+  // Parallel agents/CI jobs may set NEXT_DIST_DIR (e.g. .next-wallet) so concurrent builds don't clobber each other.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   reactStrictMode: true,
   poweredByHeader: false,
   // The repo root has an unrelated package-lock.json; pin tracing to the pnpm workspace root
