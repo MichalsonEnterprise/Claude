@@ -39,7 +39,8 @@ const SPECS = {
 const SCHEMA = { type: 'object', properties: { report: { type: 'string' }, implemented: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, status: { type: 'string' }, note: { type: 'string' } }, required: ['id', 'status'] } }, verified: { type: 'array', items: { type: 'string' } }, failing: { type: 'array', items: { type: 'string' } }, decisions: { type: 'array', items: { type: 'string' } }, next: { type: 'array', items: { type: 'string' } } }, required: ['report', 'implemented', 'verified', 'failing', 'decisions', 'next'] }
 
 const PHASE_OF = { engine: 'Engine', kit: 'Kit', 'dice-coinflip': 'Games', roulette: 'Games', crash: 'Games', blackjack: 'Games' }
-const run = k => agent(COMMON + '\n\nYOUR KEY: ' + k + '\n' + SPECS[k], { label: 'games:' + k, phase: PHASE_OF[k], schema: SCHEMA }).then(r => ({ key: k, ...r }))
+const CONT = 'CONTINUATION RUN: an earlier run of this key was interrupted by a container restart. Partial work is on disk in your folders (components/games/<game>/**, your route, e2e/games-<key>.spec.ts, test/games-*.test.tsx). Read what exists first, keep what is correct, finish what is missing, then do the full VERIFY section. Remove any stale .next-<key> dir and dev servers from the earlier run (check ports with lsof/ss; kill only processes on YOUR ports).'
+const run = k0 => { const cont = k0.startsWith('cont:'); const k = cont ? k0.slice(5) : k0; return agent(COMMON + '\n\n' + (cont ? CONT + '\n\n' : '') + 'YOUR KEY: ' + k + '\n' + SPECS[k], { label: (cont ? 'games-cont:' : 'games:') + k, phase: PHASE_OF[k], schema: SCHEMA }).then(r => ({ key: k, ...r })) }
 
 const all = args === 'all' || (Array.isArray(args) && args.length === 1 && args[0] === 'all')
 if (!all) {
