@@ -1,0 +1,33 @@
+{
+ "note": "Slices to (re)run as continuation after the Figma MCP limit throttling (27\u201328 Nov 2026). Run with args ['cont:<key>', ...], max 2 agents at once.",
+ "stopped_before_finishing": [
+  "pub-p1a",
+  "pub-p1b",
+  "pub-p1c",
+  "usr-vip-ref",
+  "adm-games",
+  "adm-growth-sys",
+  "pub-p2",
+  "pub-legal",
+  "promos",
+  "catalog-screens",
+  "mob-patterns",
+  "pub-game-details",
+  "g-roulette",
+  "g-crash",
+  "auth-d",
+  "gp-history"
+ ],
+ "blocked_or_partial": [
+  "auth-c",
+  "auth-b",
+  "gp-draw",
+  "gp-hub"
+ ],
+ "after_screens": [
+  "proto-a",
+  "proto-b",
+  "err-a",
+  "err-b"
+ ]
+}

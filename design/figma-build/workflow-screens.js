@@ -91,5 +91,6 @@ const SCHEMA = { type: 'object', properties: {
 }, required: ['section', 'created', 'ledger', 'issues'] }
 const keys = Array.isArray(args) ? args : []
 phase('Screens')
-const results = await parallel(keys.map(k => () => agent(COMMON + '\n\n' + SPECS[k], { label: 'screens:' + k, phase: 'Screens', schema: SCHEMA }).then(r => ({ key: k, ...r }))))
+const CONT = `CONTINUATION RUN: an earlier run of this slice was interrupted by the Figma MCP tool-call limit. FIRST make ONE read-only use_figma call per involved page that lists every top-level frame in your section(s) (names, ids, width, height) — do not use get_metadata/get_screenshot. Treat existing frames as done unless their name/size shows they are incomplete (e.g. height exactly 800 with clipped content → set primaryAxisSizingMode='AUTO'). Build ONLY the missing frames/states, batching 2–3 related frames per use_figma call, and verify with node.screenshot() at the end of each build script. Follow conventions §10 (limit rules) strictly; if the limit blocks you 3 times in a row, stop and report exactly which frames remain.`
+const results = await parallel(keys.map(k0 => () => { const cont = k0.startsWith('cont:'); const k = cont ? k0.slice(5) : k0; return agent(COMMON + '\n\n' + (cont ? CONT + '\n\n' : '') + SPECS[k], { label: (cont ? 'cont:' : 'screens:') + k, phase: 'Screens', schema: SCHEMA }).then(r => ({ key: k, ...r })) }))
 return results
