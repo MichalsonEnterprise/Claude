@@ -39,7 +39,7 @@ import {
 } from '@gp/shared';
 import { generateSecret, generateURI } from 'otplib';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 
 import { decryptSecret, encryptSecret } from '../src/common/crypto';
@@ -195,7 +195,7 @@ async function seedRbacAndAdmins(tx: Tx) {
   if (key.length !== 32) throw new Error('TOTP_ENCRYPTION_KEY must be 32 bytes (base64)');
   const credentials: Record<string, unknown>[] = [];
   for (const a of DEMO.admins) {
-    const secret = generateSecret();
+    const secret = seedTotpSecret(`admin:${a.email}`);
     await tx.adminUser.create({
       data: {
         id: a.id,
@@ -313,9 +313,37 @@ async function seedCatalogue(tx: Tx) {
   });
 }
 
+/**
+ * Hosted DEMO test environments can't read apps/api/.dev from the container, so the seed can derive TOTP secrets
+ * from ADMIN_SEED_TOTP_MASTER (base32 of HMAC-SHA256(master, label), 20 bytes) — the operator computes the same
+ * secrets offline. Unset (default) → random secrets, as before. DEMO only (the seed refuses REAL_MONEY_ENABLED).
+ */
+function seedTotpSecret(label: string): string {
+  const master = process.env.ADMIN_SEED_TOTP_MASTER;
+  if (!master) return generateSecret();
+  const bytes = createHmac('sha256', master)
+    .update(`gp-seed-totp:${label}`)
+    .digest()
+    .subarray(0, 20);
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = 0;
+  let value = 0;
+  let out = '';
+  for (const b of bytes) {
+    value = (value << 8) | b;
+    bits += 8;
+    while (bits >= 5) {
+      out += alphabet[(value >>> (bits - 5)) & 31];
+      bits -= 5;
+    }
+  }
+  if (bits > 0) out += alphabet[(value << (5 - bits)) & 31];
+  return out;
+}
+
 async function seedNova(tx: Tx) {
   const key = Buffer.from(process.env.TOTP_ENCRYPTION_KEY ?? '', 'base64');
-  const totp = generateSecret();
+  const totp = seedTotpSecret('player:nova.k');
   const u = DEMO.user;
   const onboarded = T('2026-03-14T09:12:00Z');
   await tx.user.create({

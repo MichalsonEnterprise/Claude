@@ -14,3 +14,4 @@ packages/contracts/cache
 packages/contracts/out
 packages/contracts/broadcast
 *.log
+**/.dist-*
