@@ -63,11 +63,13 @@ describe('responsible gaming — limits, cool-downs and history', () => {
       .set(bearer(p.token))
       .send({ type: 'deposit', period: 'week' })
       .expect(200);
-    expect(cancelled.body.limits.find((l: { type: string }) => l.type === 'deposit')).toMatchObject({
-      limit: '5000.00',
-      pendingRemoval: null,
-      pendingIncrease: null,
-    });
+    expect(cancelled.body.limits.find((l: { type: string }) => l.type === 'deposit')).toMatchObject(
+      {
+        limit: '5000.00',
+        pendingRemoval: null,
+        pendingIncrease: null,
+      },
+    );
     await t
       .http()
       .post('/responsible-gaming/limits/cancel-pending')
@@ -179,7 +181,11 @@ describe('responsible gaming — quiet hours and session length', () => {
       .set(bearer(p.token))
       .send({ enabled: true, ...window })
       .expect(200);
-    expect(on.body.settings.quietHours).toMatchObject({ enabled: true, ...window, pendingOffAt: null });
+    expect(on.body.settings.quietHours).toMatchObject({
+      enabled: true,
+      ...window,
+      pendingOffAt: null,
+    });
     const blocked = await buy(p, round.id, 1).expect(422);
     expect(blocked.body.error.details.type).toBe('quiet_hours');
 
@@ -241,7 +247,10 @@ describe('breaks and self-exclusion', () => {
       .expect(200);
     expect(res.body).toMatchObject({ kind: 'cooling_off', duration: '7d' });
     const blocked = await buy(p, round.id, 1).expect(403);
-    expect(blocked.body.error).toMatchObject({ code: 'SELF_EXCLUDED', details: { kind: 'cooling_off' } });
+    expect(blocked.body.error).toMatchObject({
+      code: 'SELF_EXCLUDED',
+      details: { kind: 'cooling_off' },
+    });
     await t
       .http()
       .post('/dev/deposits/simulate')
@@ -260,7 +269,11 @@ describe('breaks and self-exclusion', () => {
       .expect(409);
     expect(shorter.body.error.code).toBe('CONFLICT');
     const state = await t.http().get('/responsible-gaming').set(bearer(p.token)).expect(200);
-    expect(state.body.exclusion).toMatchObject({ active: true, kind: 'cooling_off', duration: '7d' });
+    expect(state.body.exclusion).toMatchObject({
+      active: true,
+      kind: 'cooling_off',
+      duration: '7d',
+    });
     expect(state.body.session.blockedReason).toBe('excluded');
   });
 
@@ -293,10 +306,16 @@ describe('breaks and self-exclusion', () => {
       .http()
       .post('/responsible-gaming/self-exclusion')
       .set(bearer(p.token))
-      .send({ ...base, phrase: 'SELF-EXCLUDE', acknowledged: true, totpCode: await totp(secret, 1) })
+      .send({
+        ...base,
+        phrase: 'SELF-EXCLUDE',
+        acknowledged: true,
+        totpCode: await totp(secret, 1),
+      })
       .expect(200);
     expect(ok.body).toMatchObject({ kind: 'self_exclusion', duration: '5y' });
-    const years = (new Date(ok.body.endsAt).getTime() - new Date(ok.body.startsAt).getTime()) / 86_400_000;
+    const years =
+      (new Date(ok.body.endsAt).getTime() - new Date(ok.body.startsAt).getTime()) / 86_400_000;
     expect(Math.round(years / 365)).toBe(5);
     const audit = await t.prisma.auditLog.findFirst({
       where: { actorId: p.userId, action: 'user.rg.self_excluded' },
@@ -313,7 +332,11 @@ describe('breaks and self-exclusion', () => {
       .send({ duration: 'permanent', confirm: true, phrase: 'SELF-EXCLUDE', acknowledged: true })
       .expect(200);
     const state = await t.http().get('/responsible-gaming').set(bearer(p.token)).expect(200);
-    expect(state.body.exclusion).toMatchObject({ active: true, kind: 'self_exclusion', endsAt: null });
+    expect(state.body.exclusion).toMatchObject({
+      active: true,
+      kind: 'self_exclusion',
+      endsAt: null,
+    });
     await t
       .http()
       .post('/responsible-gaming/cooling-off')
@@ -355,7 +378,11 @@ describe('player history', () => {
       .set(bearer(p.token))
       .expect(200);
     expect(res.body.total).toBe(3);
-    expect(res.body.items[0]).toMatchObject({ type: 'entry_purchase', roundNumber, netAmount: '30.15' });
+    expect(res.body.items[0]).toMatchObject({
+      type: 'entry_purchase',
+      roundNumber,
+      netAmount: '30.15',
+    });
     const ref = res.body.items[0].id as string;
     const search = await t
       .http()
@@ -370,9 +397,13 @@ describe('player history', () => {
       .set(bearer(p.token))
       .expect(200);
     expect(csv.headers['content-type']).toMatch(/text\/csv/);
-    expect(csv.headers['content-disposition']).toMatch(/attachment; filename="globalpool_transactions_/);
+    expect(csv.headers['content-disposition']).toMatch(
+      /attachment; filename="globalpool_transactions_/,
+    );
     const lines = csv.text.trim().split('\r\n');
-    expect(lines[0]).toMatch(/^date_utc;reference;type;status;direction;amount_usdt;platform_fee_usdt/);
+    expect(lines[0]).toMatch(
+      /^date_utc;reference;type;status;direction;amount_usdt;platform_fee_usdt/,
+    );
     expect(lines).toHaveLength(3);
     const audit = await t.prisma.auditLog.findFirst({
       where: { actorId: p.userId, action: 'user.history.exported' },
@@ -382,10 +413,12 @@ describe('player history', () => {
 
   it('fee lines show 0.05 USDT per entry, separate from the stake', async () => {
     const res = await t.http().get('/history/fees').set(bearer(p.token)).expect(200);
-    expect(res.body.items.map((f: { amount: string; kind: string }) => [f.kind, f.amount])).toEqual([
-      ['platform_fee', '0.15'],
-      ['platform_fee', '0.25'],
-    ]);
+    expect(res.body.items.map((f: { amount: string; kind: string }) => [f.kind, f.amount])).toEqual(
+      [
+        ['platform_fee', '0.15'],
+        ['platform_fee', '0.25'],
+      ],
+    );
   });
 
   it('groups my entries by round with the odds share, and lists active rounds', async () => {
@@ -417,7 +450,11 @@ describe('player history', () => {
 
   it('favourites can be added (idempotent) and removed; game history starts empty', async () => {
     await t.http().put('/history/favourites/pool-dice').set(bearer(p.token)).expect(200);
-    const twice = await t.http().put('/history/favourites/pool-dice').set(bearer(p.token)).expect(200);
+    const twice = await t
+      .http()
+      .put('/history/favourites/pool-dice')
+      .set(bearer(p.token))
+      .expect(200);
     expect(twice.body.map((f: { slug: string }) => f.slug)).toEqual(['pool-dice']);
     await t.http().put('/history/favourites/no-such-game').set(bearer(p.token)).expect(404);
     const removed = await t
