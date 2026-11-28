@@ -13,3 +13,4 @@ packages/contracts/out/
 packages/contracts/broadcast/
 playwright-report/
 test-results/
+*.tsbuildinfo
