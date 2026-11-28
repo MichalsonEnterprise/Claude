@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T05:58Z",
+ "generated": "2026-11-28T13:10Z",
  "legend": "dev = status reported by the module agent after its own typecheck/lint/test/build/screenshots/e2e; orchestrator integration verification is tracked in PROJECT_STATUS.md",
  "rows": [
   {
@@ -573,6 +573,156 @@
    "report": "reports-p0-auth-account.json"
   },
   {
+   "id": "BJ-01",
+   "name": "Table + betting interface",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Table and betting: chip tray, bet spot, Undo/Clear/Rebet, Deal, 'If you win this hand' box (decimal.js), Fees 0.00, risk note, RG/Session bar, recent hands, table rules, seeds. Screenshots at 1440 and 390 (guest and member); e2e.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-02",
+   "name": "Dealing state",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Dealing: request in flight shows 'Dealing…', then cards land in shoe order (card-deal token, hole card face down). Unit test checks the reveal order over 300 real hands. The screenshot shows the in-flight state, not cards mid-flight.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-03",
+   "name": "Player decision (Hit/Stand/Double/Split/Insurance)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Your move, insurance (card on the table on desktop, bottom sheet on mobile, ≈7.4% edge note), split hand 1 of 2 with 'Split again' disabled. Only server-allowed actions are enabled (e2e asserts it). Keyboard H/S/D/P, Space to deal.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-04",
+   "name": "Dealer turn",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Dealer turn: hole card turns over, then the dealer draws card by card with a 'Dealer draws on N' status. Captured mid-reveal with motion on.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-05",
+   "name": "Result Screen variants (win/lose/push/blackjack/bust)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Win, lose, push, blackjack (gold only for 3:2) and bust at 1440, plus win at 390, all from real hands. Result card shows ref, time and Verify.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-06",
+   "name": "History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "My hands: KPIs, result chips filtered on the server (new outcome filter), period, search, table or cards, 'What happened' timeline, Verify, Export CSV. Deviation: the 4th KPI is W·L·P counts instead of 'Biggest win'.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-07",
+   "name": "Rules",
+   "pri": "P2",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Rules: how to play, table rules, payouts computed for a 10.00 bet, basic-strategy hard-totals chart, limits card. Deviation: 'Unfinished hands' says the hand stays open (the engine has no 24 h auto-stand).",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-08",
+   "name": "Provably-fair verification",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Fairness: load a hand, rotate and reveal, editable seeds re-derived with verifyInBrowser and the shared shoe, labelled shoe order, verified and failed states, hand data JSON download. e2e covers it.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "BJ-09",
+   "name": "Reconnect/recovery, error/limit/region states",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "blackjack",
+   "note": "Connection lost (same idempotency key; e2e drops a response and asserts exactly one stand), hand restored after reload, loading table, insufficient DEMO credits, loss limit, region (account-status mocked in QA, as other agents do), self-excluded.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CF-01",
+   "name": "Bet interface (Heads/Tails)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "Bet interface, Heads/Tails. Screenshots: default 1440/1280/768/390, tails picked (T key), guest, loading skeleton. Keyboard: ←→ inside the radio group, H/T, Space to flip; 44 px targets on mobile; sticky bet bar on mobile. Covered by e2e. Matches the Figma 1440/768/390 frames apart from the DEMO-cre",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CF-02",
+   "name": "Flipping state",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "Flipping state: stake locked, picks locked. The coin-flip token is 1600 ms, the coin turns ≥ 6 half-turns to the SERVER's side, and reduced motion shows the result instantly. Screenshots: CF-02_flipping (request held) and CF-02_flipping-motion (a real flip caught mid-turn) at 1440/1280/768/390. e2e ",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CF-03",
+   "name": "Result Screen (win/lose)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "Win/lose banner built from the settled bet (ref, nonce, Verify result). 'Flip again' CTA; 'a loss doesn't make the other side due' note. Screenshots at 1440/1280/768/390; e2e checks the banner against the server's outcome and balance.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CF-04",
+   "name": "History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "My flips: period, pick and result filters plus search (API filters), KPIs, table with an expandable detail row, cards on mobile, pagination, Export CSV, empty state. Screenshots at 1440/1280/768/390; e2e covers the filters and the detail row. Not built: the 'All flips' tab (no all-player feed exists",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CF-05",
+   "name": "Provably-fair verification",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "Fairness page states: verified, failed (63-character seed), secret seed with 'Rotate seeds & reveal'. Also the verify drawer on the game page. The browser re-derives the flip with verifyBet() from @gp/shared/fair (no duplicated maths). Screenshots at 1440/1280/768/390; covered by e2e.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CF-06",
+   "name": "Error/limit/region states",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "Screenshots of every state at 1440/390, connection lost and self-excluded also at 768/1280. States: insufficient DEMO credits (Reset instead of Deposit), above max ('Set to 1,000.00'), connection lost (new inline banner per Figma, same idempotency key), daily loss limit reached, region restricted (U",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
    "id": "CMP-01",
    "name": "Buttons",
    "pri": "P0",
@@ -713,6 +863,156 @@
    "report": ""
   },
   {
+   "id": "CR-01",
+   "name": "Pre-round betting",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "Pre-round betting: server-clock countdown + overlay, bet panel, If-the-round-reaches summary, Place bet over the socket. Verified: QA 1440/1280/768/390 (bets open, guest, loading skeleton) + e2e (countdown within 2.5 s of the server round, bet placed, balance 990.00).",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-02",
+   "name": "Active run (multiplier curve, cash-out)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "Active run: live multiplier from 100 ms server frames, curve on server frames only, Your position (cash-out value, profit, chance to reach T = m/T), Cash out. Verified: QA 4 widths + e2e manual cash-out (payout = stake × server multiplier).",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-03",
+   "name": "Cashed-out state",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "Cashed-out state (auto/manual) while the round runs; curve marker + callout. Verified: QA 1440/390, e2e auto cash-out at 1.01× = 10.10.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-04",
+   "name": "Crashed / Result screen",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "Crashed/result: ResultCard built from my settled bet only (win and stake-lost), red curve, next-round info. Verified: QA win + lost at 1440/390; e2e checks the result against the API crash point and the balance against 1,000 + net.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-05",
+   "name": "Round History + Game Statistics",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "/games/orbit-rush/rounds (Last 50/Today/7 days, round search, table/cards, pagination) + Game statistics (24h/7d/30d vs expected, distribution) + Your session; /my-bets with summary. Uses the new additive API endpoints, covered by an API e2e. Verified: QA 1440/1280/768/390 + e2e.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-06",
+   "name": "Auto cash-out settings",
+   "pri": "P2",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "crash",
+   "note": "Dialog (1440) and bottom sheet (390) verified: unticked consent, required stop-loss and auto cash-out, fixed bet, ≤100 rounds, Before you start summary; e2e checks Start stays disabled until stop-loss + tick. Not verified: a multi-round auto-play run end to end in the browser (only the kit's unit-te",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-07",
+   "name": "Provably-fair verification",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "/games/orbit-rush/fairness?round=N recomputes commitment, hash-chain position and crash point in the browser with @gp/shared/fair crash.*; edited seed shows the mismatch; seed-secret state for live rounds. Verified: QA verified + mismatch (1440/1280/768/390) + e2e.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "CR-08",
+   "name": "Error/connection-lost/limit/region states",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "crash",
+   "note": "Verified by QA at 1440/390: connection lost (real WebSocket drop: banner, Paused readout, Reconnecting n of 5 + Retry now, Cash out unavailable offline, live bets paused), insufficient DEMO credits, daily loss limit, self-excluded, guest, loading. Region restricted is a UI preview with a mocked acco",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "DI-01",
+   "name": "Dice interface (slider, over/under, bet panel)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Default and guest states at 1440 and 390. 768 not screenshotted.",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "DI-02",
+   "name": "Number selection + live probability/payout display",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Linked target / chance / multiplier inputs, over/under, keyboard slider (tested in e2e), out-of-range state screenshotted. The 'dragging' tooltip state is not screenshotted.",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "DI-03",
+   "name": "Rolling state",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "dice-coinflip",
+   "note": "Captured Pool Dice mid-roll with motion on: the readout showed 20.45, then settled exactly on the server's roll of 8.02 (1440); at 390 it went 51.92 → 52.49. Screenshots DI-03_rolling-motion_1440/390.png. No dice code changed.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "DI-04",
+   "name": "Result Screen (win/lose)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Win and lose result banners from the server's settled bet, at 1440 and 390, and checked in e2e.",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "DI-05",
+   "name": "History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "games-kit",
+   "note": "KPIs, All/Wins/Losses filter, table at 1440, cards at 390, pagination and Verify per row are verified. Not built: the all-players histogram (no API for it, and showing one would mean invented data) and the CSV export button.",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "DI-06",
+   "name": "Provably-fair verification",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Verify drawer: verified state and mismatch state, re-derived in the browser with @gp/shared/fair. Covered by e2e and screenshots at 1440 and 390.",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "DI-07",
+   "name": "Error/limit/region states",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Connection lost / reconnecting, insufficient DEMO credits, bet above max, out of range, loss limit, self-excluded (cooling-off) and region all screenshotted at 1440 and 390. The region state is a UI preview built by mocking the account-status response. The loading skeleton is built but not screensho",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
    "id": "DS-01",
    "name": "Brand / logo / cover",
    "pri": "P0",
@@ -786,61 +1086,71 @@
    "id": "ERR-01",
    "name": "Empty-state matrix per module (wallet, transactions, entries, winnings, referrals, notifications, devices, admin tables)",
    "pri": "P0",
-   "figma": "NOT STARTED",
-   "dev": "PER MODULE",
-   "module": "—",
-   "note": "States built inside each module; no cross-module audit yet",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "closeout-states",
+   "note": "Every list a fresh player reaches has an EmptyState. Added: recent draws empty state; empty states for 3 admin tables that rendered nothing; failed requests are no longer shown as empty states (\"Choose a round\", \"No settled round yet\", \"Not set\"). The Figma ERR-01 board is NOT STARTED in the ledger,",
+   "report": "reports-p0-closeout.json"
   },
   {
    "id": "ERR-02",
    "name": "Error matrix: network error, 4xx/5xx, timeout, validation, chain congestion, tx failed/dropped/replaced",
    "pri": "P0",
-   "figma": "NOT STARTED",
-   "dev": "PER MODULE",
-   "module": "—",
-   "note": "States built inside each module; no cross-module audit yet",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "closeout-states",
+   "note": "Readable copy per kind (offline, timeout, 429 with Retry-After countdown, 503 maintenance, 5xx with request id, validation field issues); never raw text; always Try again. Accepted: /admin/login 390 has a decorative status line hidden below 1024 px. Chain-level errors (congestion, tx dropped) alread",
+   "report": "reports-p0-closeout.json"
   },
   {
    "id": "ERR-03",
    "name": "Loading matrix: skeletons, spinners, progress, optimistic UI",
    "pri": "P0",
-   "figma": "NOT STARTED",
-   "dev": "PER MODULE",
-   "module": "—",
-   "note": "States built inside each module; no cross-module audit yet",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "closeout-states",
+   "note": "Skeletons only while a request is pending; a failed request is never \"still loading\". The 20 s client timeout is not auto-retried. Progress UI: confirmations ring and bar, withdrawal timeline, tx toasts. Optimistic UI is deliberately not used for money or RG (the server ledger is the authority). Als",
+   "report": "reports-p0-closeout.json"
   },
   {
    "id": "ERR-05",
    "name": "Regulatory states: restricted region, licence required, self-excluded, age-gate fail",
    "pri": "P0",
-   "figma": "NOT STARTED",
-   "dev": "NOT STARTED",
-   "module": "—",
-   "note": "P0 compliance gap: geo-block interstitial / age gate + licence modal / regulatory states not built yet",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "closeout-gates",
+   "note": "One shared set covers region, licence, KYC level required, self-excluded, cooling-off and age: copy model, error-to-state mapping, RegulatoryState (page or card), RegulatoryNotice, RegulatoryGuard, HelpOrganisations and RegulatoryFooter. Used by the PUB-21 and PUB-22 pages, the deposit-address modul",
+   "report": "reports-p0-closeout.json"
   },
   {
    "id": "ERR-07",
    "name": "Security warnings library (wrong network, new address, phishing warning, suspicious login)",
    "pri": "P0",
-   "figma": "NOT STARTED",
-   "dev": "PER MODULE",
-   "module": "—",
-   "note": "States built inside each module; no cross-module audit yet",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "closeout-states",
+   "note": "New library covering wrong-network, new-address, new-device, suspicious-login, phishing, anti-phishing and unverified-contract. Wrong network is now driven by the real linked wallet, with Switch. The anti-phishing code is never shown as \"Not set\" when it is unknown. New deposit look-alike token warn",
+   "report": "reports-p0-closeout.json"
   },
   {
    "id": "GM-01",
    "name": "Game session RG bar + reality-check popup (as designed within games)",
    "pri": "P0",
-   "figma": "NOT STARTED",
-   "dev": "PLANNED",
-   "module": "games",
-   "note": "P1 games workflow (kit agent)",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "PARTIAL",
+   "module": "games-kit",
+   "note": "Session bar (session time, net in DEMO credits, loss-limit meter, 18+, RG, Take a break, details popover or mobile sheet) and the reached state are verified. The approaching state is not screenshotted. The reality-check hold between bets is wired in, but not exercised end to end, because the shortes",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "GM-02",
+   "name": "Game catalogue — tiles for all games (Originals, Table, Slots, Live, Draws, Bingo)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Catalogue tiles for all 33 titles in Originals, Table, Slots, Live and Draws & bingo. Only games with an engine and a play screen can be played; the rest show an honest 'Soon' tag, 'Coming soon · Details' on hover and in the accessible name. Default, category view and restricted checked at 1440 and ",
+   "report": "reports-p1-games-kit.json"
   },
   {
    "id": "GP-01",
@@ -1156,11 +1466,21 @@
    "id": "PUB-03",
    "name": "Games Lobby",
    "pri": "P0",
-   "figma": "BUILT",
-   "dev": "PLANNED",
-   "module": "games",
-   "note": "P1 games workflow (kit agent)",
-   "report": ""
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "/games lobby checked by screenshot at 1440 and 390: default, search with empty result and matches in other categories, Table category, restricted dev preview; the 390 filters bottom sheet is built but not screenshotted. The tournament banner is replaced by a DEMO-credits card, because there is no to",
+   "report": "reports-p1-games-kit.json"
+  },
+  {
+   "id": "PUB-04",
+   "name": "Game Details (instances ×6)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "games-kit",
+   "note": "Details page at /games/<slug>/details, and at /games/<slug> for games without a play screen. Screenshotted for pool-dice, Neon Koi (no engine) and Skyline (engine, no play screen). Copy exists for Roulette, Crash, Double Side, Twenty-One and Global Pool, but those pages are not screenshotted; payout",
+   "report": "reports-p1-games-kit.json"
   },
   {
    "id": "PUB-07",
@@ -1177,20 +1497,110 @@
    "name": "Geo-block interstitial",
    "pri": "P0",
    "figma": "VERIFIED",
-   "dev": "NOT STARTED",
-   "module": "—",
-   "note": "P0 compliance gap: geo-block interstitial / age gate + licence modal / regulatory states not built yet",
-   "report": ""
+   "dev": "IMPLEMENTED",
+   "module": "closeout-gates",
+   "note": "The API decides the country. Order: DEV override (header or query, NODE_ENV=development only), then the trusted CDN header (TRUST_PROXY + GEO_COUNTRY_HEADER), then DEV_COUNTRY_OVERRIDE outside production. Checked against geo_rules, then RESTRICTED_COUNTRIES; fails closed in production when the count",
+   "report": "reports-p0-closeout.json"
   },
   {
    "id": "PUB-22",
    "name": "Age gate + licence notice modal",
    "pri": "P0",
    "figma": "VERIFIED",
-   "dev": "NOT STARTED",
-   "module": "—",
-   "note": "P0 compliance gap: geo-block interstitial / age gate + licence modal / regulatory states not built yet",
-   "report": ""
+   "dev": "IMPLEMENTED",
+   "module": "closeout-gates",
+   "note": "Modal at 768 px and wider, bottom sheet below. Yes/No radios are unselected, the jurisdiction checkbox is unchecked, and the country of residence is prefilled and checked by the API. Licence notice and the Terms / Privacy / RG / Restricted countries links are shown. Enter is disabled until answered;",
+   "report": "reports-p0-closeout.json"
+  },
+  {
+   "id": "RL-01",
+   "name": "Table (felt + chips + bet slip)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified: table empty / bets placed / guest / loading at 1440 + 390 against the live API; e2e places the decision #35 slip (Straight 19 5 + Red 10 + 2nd dozen 5 = 20.00, outcome preview +195.00, max payout 215.00, Fees 0.00 DEMO, DEMO credits · no cash value, You can lose your stake, session bar). C",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-02",
+   "name": "Number selection (inside bets)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified: split 17|20 line target + tooltip + covered-cell highlight (1440), bet-type bottom sheet for 19 (390), keyboard chooser (arrows + B) and Undo in the e2e.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-03",
+   "name": "Outside bets (Red/Black, Odd/Even, dozens, columns, 1–18/19–36)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified: 2nd column hover highlight (1440), mobile Outside bets view with big boxes (390); e2e places Red and 2nd dozen.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-04",
+   "name": "Spinning state",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified: 4.5 s wheel (wheel-spin token) in the e2e with motion on; stake locked (980.00), felt and chips disabled, No more bets. Reduced motion shows the result instantly (QA default). The pre-spin snapshot is now enforced and tested against a mid-spin credits refetch.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-05",
+   "name": "Result Screen (win/lose)",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified: the result pocket equals the server's settled pocket (data-pocket and result-pocket checked against GET /games/pool-roulette/bets); per-bet settlement and win/even/lose banner; balance = 1,000.00 + net with decimal.js; USDT wallet unchanged; Repeat only reloads the bets.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-06",
+   "name": "Bet History",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified: My bets with period and result filters, KPIs, expandable per-bet settlement and seeds, Verify spin, Repeat these bets, last-spins strip with the independence note (1440 + 390, e2e).",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-07",
+   "name": "Rules & payouts",
+   "pri": "P2",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified after a fix: the pay table at 390 was misreadable (looked like 135:1); now spaced. Mobile example table uses the vertical felt. Payouts computed from the shared rules; e2e checks 35:1 and 35,000.00 DEMO.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-08",
+   "name": "Provably-fair verification",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified in the e2e: secret seed → Rotate seeds & reveal → Verified with the pocket re-derived in the browser by @gp/shared/fair; an edited client seed shows the mismatch; Restore returns to Verified.",
+   "report": "reports-p1-games-ui.json"
+  },
+  {
+   "id": "RL-09",
+   "name": "Error/limit/region states",
+   "pri": "P1",
+   "figma": "VERIFIED",
+   "dev": "IMPLEMENTED",
+   "module": "roulette",
+   "note": "Verified at 1440 + 390: connection lost (e2e: dropped response replayed with the same idempotency key, exactly one spin), insufficient DEMO credits (4.20), over spot limit (1,200.00 flagged, never auto-changed; API 400), daily loss limit reached (no raise-limit CTA), self-excluded / cooling-off, reg",
+   "report": "reports-p1-games-ui.json"
   },
   {
    "id": "USR-00",
