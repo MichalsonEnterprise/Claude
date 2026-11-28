@@ -73,6 +73,16 @@ export function AuthDialog() {
     if (!open) setCode(null);
   }, [open]);
 
+  // Route pages (/sign-in, /sign-up, /verify) keep the address bar in sync with the step.
+  const syncUrl = ui.dialog?.syncUrl ?? false;
+  React.useEffect(() => {
+    if (!open || !syncUrl) return;
+    const path = view === 'code' ? '/verify' : view === 'sign-up' ? '/sign-up' : view === 'sign-in' ? '/sign-in' : null;
+    if (path && window.location.pathname !== path) {
+      window.history.replaceState(window.history.state, '', `${path}${window.location.search}`);
+    }
+  }, [open, syncUrl, view]);
+
   const title =
     view === 'code'
       ? 'Check your email'
@@ -197,7 +207,10 @@ function EmailView({
   const ui = useAuthUi();
   const [error, setError] = React.useState<string | null>(null);
   const [social, setSocial] = React.useState<OAuthProvider | null>(null);
-  const form = useForm<EmailForm>({ resolver: zodResolver(emailForm), defaultValues: { email: '' } });
+  const form = useForm<EmailForm>({
+    resolver: zodResolver(emailForm),
+    defaultValues: { email: ui.dialog?.email ?? '' },
+  });
 
   const submit = form.handleSubmit(async ({ email }) => {
     setError(null);

@@ -15,7 +15,7 @@ Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verifie
 | Figma throughput | **Blocker-ish:** Figma MCP tool-call limit on the Pro/Full seat (≈200/day + per-minute cap) throttles design work since 27 Nov 22:50 UTC; ~1 call/min effective. Agents saved ready-to-run scripts in `design/figma-build/pending/` and `queue/`. |
 
 ## 2. Figma progress (details: `FIGMA_PROGRESS.md`, ledger `design/figma-build/ledger.json`)
-Ledger (306 rows incl. 12 added for catalogue/promotions): **150 verified · 46 built · 19 in progress · 91 not started** (28 Nov ~04:30 UTC). P0: 87 verified / 11 built / 9 in progress / 19 not started. Figma MCP daily quota exhausted again; remaining slices have ready scripts (`design/figma-build/pending-slices.json`). Still running: admin P0 + mobile patterns.
+Ledger (306 rows incl. 12 added for catalogue/promotions): **178 verified · 44 built · 14 in progress · 70 not started** (28 Nov 04:05 UTC). P0: 98 verified / 11 built / 4 in progress / 13 not started. All Figma workflows are paused on the Figma MCP daily quota; a reminder to resume is scheduled for 08:05 UTC (prepared scripts in `design/figma-build/pending*`, plan in `pending-slices.json`).
 
 ### Screens ready for coding (verified/built in Figma)
 - **01/02 Design system & components:** DS-01…09, CMP-01…18, casino kit (shell, lobby, catalogue, promotions)
