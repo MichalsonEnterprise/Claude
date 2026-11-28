@@ -1,3 +1,11 @@
+# STATUS 28 Nov 2026 (continuation run): ALL 22 FRAMES BUILT in Figma — ids in ../../registry-usr-vip-ref.json.
+Sources were patched during the run (sources = what is now in Figma): DESK sidebar re-tint after variant swap, FILLC id set
+instead of node expando props, FIXEMPTY() collapses empty spacer/cell auto-layout frames (they default to 100 px tall),
+PAG() pagination helper, vipFix() for Card/VIP Tier benefit copy, SEARCH() placeholder helper, TWO(..., {w}) wrapping,
+points history reconciled with the financial-history demo data (#1,248 35 entries 18:05 · #1,247 40 entries 12:40 · #1,246 24 entries 19:12),
+mobile demo bar 'DEMO DATA — illustrative values only', mobile sub-nav pills scrolled so the active tab is visible.
+Re-running a batch rebuilds its frames by name (new node ids) — update the registry afterwards.
+
 # Pending scripts — agent usr-vip-ref (USR-V1..V4 VIP + USR-R1..R5 Referrals, desktop + mobile)
 
 Not run: the shared Figma MCP seat (Pro, Full — 200 calls/day, 10/min) returned "tool call limit" on every attempt

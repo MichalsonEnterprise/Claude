@@ -13,7 +13,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { maskEmail } from '../users/users.service';
 import { WithdrawalsService } from '../withdrawals/withdrawals.service';
 import { AdminSecurityService } from './admin-security.service';
-import { FourEyesService } from './four-eyes.service';
+import { approvalViewPermission, FourEyesService } from './four-eyes.service';
 
 /**
  * Admin back-office. By design there is NO capability to edit round results, choose winners, move funds
@@ -365,7 +365,13 @@ export class AdminService {
     return this.withdrawals.adminReject(admin, id, input.reason, meta);
   }
 
+  /**
+   * Four-eyes requests of the modules this admin may read — the same per-request rule as the inbox and the detail
+   * (withdrawals → withdrawals.read, restrictions → users.read, role changes → system.read, breaker →
+   * rounds.read): reasons and payloads (player handles, restriction types) never reach other roles.
+   */
   async approvals(
+    admin: Pick<AuthAdmin, 'permissions'>,
     status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'expired' = 'pending',
   ) {
     const rows = await this.prisma.adminApproval.findMany({
@@ -374,7 +380,8 @@ export class AdminService {
       take: 100,
       include: { requestedBy: { select: { name: true } }, decidedBy: { select: { name: true } } },
     });
-    return rows.map((a) => ({
+    const visible = rows.filter((a) => admin.permissions.includes(approvalViewPermission(a)));
+    return visible.map((a) => ({
       id: a.id,
       action: a.action,
       targetType: a.targetType,

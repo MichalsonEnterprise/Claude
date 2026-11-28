@@ -1,6 +1,6 @@
 # GLOBAL POOL — Project status
 
-_Last updated: 28 Nov 2026, 13:10 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
+_Last updated: 28 Nov 2026, 13:20 UTC · branch `claude/keen-wozniak-q8eb3p` · Figma: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl_
 
 Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verified · ⛔ blocked · ❓ waiting for owner decision · ⬜ not started
 
@@ -15,7 +15,7 @@ Legend: ✅ done & verified · 🟡 in progress · 🟠 built, not fully verifie
 | Figma throughput | **Blocker-ish:** Figma MCP tool-call limit on the Pro/Full seat (≈200/day + per-minute cap) throttles design work since 27 Nov 22:50 UTC; ~1 call/min effective. Agents saved ready-to-run scripts in `design/figma-build/pending/` and `queue/`. |
 
 ## 2. Figma progress (details: `FIGMA_PROGRESS.md`, ledger `design/figma-build/ledger.json`)
-Ledger (306 rows): **285 verified · 4 built · 17 not started** (28 Nov 12:05 UTC). P0 **123 / 126** (left: CMP-01 buttons + MOB-06 mobile deposit built-not-verified, MOB-08 mobile games umbrella row), P1 **134 / 135** (ADM-P6 built), P2 28 / 45. Wave 3 done: admin roles/permissions/audit logs (ADM-S1…S6, A1…A5, M1…M6), all 5 game slices, round history, tablet sheet, game details, FAQ/RG/restricted/cookies, admin games, catalogue, promotions. Final wave running: MOB-08, final QA (screens + page 00 decisions/ledger summary, library fixes + CMP-01), P2 VIP/affiliate/about/contact, legal pages, VIP & referral dashboards, leaderboard.
+Ledger (306 rows): **306 / 306 verified** (P0 126, P1 135, P2 45; 28 Nov 13:20 UTC) — the Figma screen inventory is complete, incl. prototypes (page 11), state matrices (page 12), decisions log #1–#62 and ledger summary on page 00. Owner action: set Cover 13:72 as the file thumbnail manually. Design follow-ups: see `FIGMA_PROGRESS.md`.
 
 ### Screens ready for coding (verified/built in Figma)
 - **01/02 Design system & components:** DS-01…09, CMP-01…18, casino kit (shell, lobby, catalogue, promotions)

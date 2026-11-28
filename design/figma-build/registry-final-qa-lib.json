@@ -1,0 +1,52 @@
+{
+ "_note": "Agent final-qa-lib (28 Nov 2026): library QA on pages 01/02. CMP-01 buttons audited (7 sets); additive variants only, so existing instances keep their layout. See decisions.md #65. I() picks the first matching variant, so omitting the new axes (Width, Density) returns the original variants.",
+ "Button/Wallet": {
+  "id": "7:859",
+  "variants": { "Size": ["M", "S"], "State": ["Disconnected", "Hover", "Pressed", "Focus", "Connecting", "Connected", "Wrong network", "Disabled"] },
+  "variantIds": { "Size=M, State=Pressed": "356:19504", "Size=M, State=Focus": "356:19507", "Size=S, State=Pressed": "356:19510", "Size=S, State=Focus": "356:19513" },
+  "note": "Pressed (brand/tint + border/brand) and Focus (2 px border/focus OUTSIDE) added."
+ },
+ "Control/Checkbox": {
+  "id": "20:3205",
+  "variants": { "Value": ["Unchecked", "Checked", "Indeterminate"], "State": ["Default", "Hover", "Focus", "Disabled", "Error"], "Width": ["Fixed", "Hug"] },
+  "props": { "Label": "TEXT", "Show description": "BOOLEAN" },
+  "variantIds": { "Value=Unchecked, State=Default, Width=Hug": "357:19520", "Value=Unchecked, State=Hover, Width=Hug": "357:19526", "Value=Unchecked, State=Focus, Width=Hug": "357:19532", "Value=Unchecked, State=Disabled, Width=Hug": "357:19538", "Value=Unchecked, State=Error, Width=Hug": "357:19544", "Value=Checked, State=Default, Width=Hug": "357:19556", "Value=Checked, State=Hover, Width=Hug": "357:19564", "Value=Checked, State=Focus, Width=Hug": "357:19572", "Value=Checked, State=Disabled, Width=Hug": "357:19580", "Value=Checked, State=Error, Width=Hug": "357:19588", "Value=Indeterminate, State=Default, Width=Hug": "357:19602", "Value=Indeterminate, State=Hover, Width=Hug": "357:19610", "Value=Indeterminate, State=Focus, Width=Hug": "357:19618", "Value=Indeterminate, State=Disabled, Width=Hug": "357:19626", "Value=Indeterminate, State=Error, Width=Hug": "357:19634" },
+  "note": "Width=Fixed = the original 360 px variants (default). Width=Hug hugs a one-line label, e.g. I('20:3205', {Value:'Unchecked', State:'Default', Width:'Hug'}, {Label:'Remember this device'})."
+ },
+ "Admin/Role Chip": {
+  "id": "23:18440",
+  "variants": { "Role": ["Super Admin", "Finance", "Compliance", "Support", "Read-only", "Marketing"], "Size": ["S", "M"] },
+  "variantIds": { "Role=Marketing, Size=S": "358:19539", "Role=Marketing, Size=M": "358:19548" },
+  "note": "Marketing = megaphone icon in status/warning."
+ },
+ "Admin/Queue Card": {
+  "id": "23:15571",
+  "variants": { "Queue": ["KYC", "Withdrawals"], "SLA": ["On track", "At risk", "Breached"], "Density": ["Default", "Compact"] },
+  "props": { "Show DEMO": "BOOLEAN" },
+  "variantIds": { "Queue=KYC, SLA=On track, Density=Compact": "358:19557", "Queue=KYC, SLA=At risk, Density=Compact": "358:19612", "Queue=KYC, SLA=Breached, Density=Compact": "358:19664", "Queue=Withdrawals, SLA=On track, Density=Compact": "358:19716", "Queue=Withdrawals, SLA=At risk, Density=Compact": "358:19766", "Queue=Withdrawals, SLA=Breached, Density=Compact": "358:19817" },
+  "note": "Compact = 358 px mobile card: metrics as label/value rows, SLA bar stretches, 'Updated … UTC' above a full-width Button/Secondary L 'Open queue'."
+ },
+ "Input/OTP": {
+  "id": "16:3761",
+  "note": "Description is now FILL width, wraps to max 2 lines then ellipsis. 6 page-10 instances whose copy is wider than the field keep a single-line instance override (no layout change): 263:205528, 34:420227, 266:213427, 109:51352, 34:436266, 263:205817."
+ },
+ "Nav/Command Palette": {
+  "id": "22:6663",
+  "variants": { "State": ["Results", "No results"] },
+  "props": { "Scope": "TEXT (key Scope#359:0, default 'Scoped to your role')" },
+  "note": "Footer text layer renamed 'Scope'. Existing instances keep 'Scoped to role: Super Admin' / 'Compliance Officer'."
+ },
+ "Toast": {
+  "id": "30:16872",
+  "note": "Nested Badge/DEMO text layer renamed 'DEMO label' in all 5 types; only the action link text layers are named 'Label'."
+ },
+ "Section/SEO Text": { "id": "25:16288", "note": "Paragraph 2 names GLOBAL POOL Originals / table games / GP Studios slots / live tables (no game count); contact heading 'Contact & support'." },
+ "Tile/Game Small": { "id": "23:17671", "note": "Art now nests Tile/Game Art (Global Pool, Pool Roulette, Orbit Rush, Pool Dice, Double Side, Twenty-One) at 100×133, label hidden. Feeds Strip/Recent Wins (23:20415)." },
+ "Table/Live Bets": { "id": "25:14776", "note": "10 thumbnails are Tile/Game Art at 30×40 (label hidden, radius/xs)." },
+ "Tile/Category": {
+  "id": "23:21105",
+  "artInstances": { "Global Pool": "361:20209", "Originals (Fortune Ring)": "361:20291", "Table games (Twenty-One)": "361:20335", "Instant games (Pool Dice)": "361:20369" },
+  "note": "Tile/Game Art illustration only (backdrop, scrim, label hidden), right-anchored and cropped by the tile edge. Provably fair keeps Art/Spot Shield and VIP Club keeps Art/Spot Crown (concrete objects, no glow layers found). Chips 'Browse Originals' / 'Browse tables' / 'Browse instant games'."
+ },
+ "Legacy": { "Art/Game": "23:14045", "Art/Spot": "23:10035", "note": "Descriptions now start with LEGACY: do not use in new screens. Still nested by Tile/Game, Row/Game Carousel, Banner/Hero (+Side, Carousel), Card/Draw Countdown, Card/Promo." }
+}

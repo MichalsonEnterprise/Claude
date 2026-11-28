@@ -216,6 +216,11 @@ export class DepositChainWatcherService {
   ): Promise<string[]> {
     const fresh: string[] = [];
     let rows = await this.prisma.deposit.findMany({ where: { network, txHash } });
+    // Every reopen / park below moves a row (status, log index): re-read before the next log, so a later log of the
+    // same group never acts on a stale copy (R15b: a batch re-included at shifted indices reopens every deposit).
+    const refresh = async () => {
+      rows = await this.prisma.deposit.findMany({ where: { network, txHash } });
+    };
     for (const [, group] of groupBy(scanned, (x) => transferKey(x.to, x.amount))) {
       const logs = [...group].sort((a, b) => a.logIndex - b.logIndex);
       const same = (d: Deposit) =>
@@ -225,9 +230,6 @@ export class DepositChainWatcherService {
       const scannedIdx = new Set(logs.map((l) => l.logIndex));
       const movedLive = live.filter((d) => !scannedIdx.has(d.logIndex)).length;
       const unmatched = logs.filter((l) => !live.some((d) => d.logIndex === l.logIndex));
-      const rejected = rows
-        .filter((d) => d.status === 'rejected' && same(d))
-        .sort((a, b) => a.logIndex - b.logIndex);
       for (const [i, log] of unmatched.entries()) {
         if (i < movedLive) continue; // a moved copy of a live deposit: reconcile re-indexes that row
         const slot = rows.find((d) => d.logIndex === log.logIndex);
@@ -241,10 +243,11 @@ export class DepositChainWatcherService {
           reopenable = slot;
         } else {
           if (slot) await this.park(slot); // a reversed deposit of another transfer: free its stale slot
-          reopenable = rejected.find((d) => d !== slot);
+          reopenable = rows
+            .filter((d) => d.status === 'rejected' && same(d) && d.id !== slot?.id)
+            .sort((a, b) => a.logIndex - b.logIndex)[0];
         }
         if (reopenable) {
-          if (rejected.includes(reopenable)) rejected.splice(rejected.indexOf(reopenable), 1);
           const reopened = await this.prisma.tx((tx) =>
             this.deposits.reopen(tx, reopenable, {
               blockNumber: log.blockNumber ?? 0n,
@@ -259,6 +262,7 @@ export class DepositChainWatcherService {
               `DP-${reopenable.number}: reversed deposit is back on the chain (reopened)`,
             );
           }
+          await refresh();
           continue;
         }
         const created = await this.prisma.tx((tx) =>
@@ -276,8 +280,8 @@ export class DepositChainWatcherService {
           }),
         );
         if (created) fresh.push(created.id);
+        await refresh();
       }
-      rows = await this.prisma.deposit.findMany({ where: { network, txHash } });
     }
     return fresh;
   }
@@ -408,7 +412,7 @@ export class DepositChainWatcherService {
    * Give every open deposit of a transaction a DISTINCT matching Transfer log of its receipt (same token, recipient
    * and exact amount): a deposit keeps its own log index while it still matches, the others take the remaining
    * matching indices in order. Indices held by credited deposits are never reused; a reversed deposit holding a needed
-   * index is parked on a negative index. All changes are applied in ONE DB transaction through temporary negative
+   * index, or an open one whose transfer is gone (about to be reversed), is parked on a negative index. All changes are applied in ONE DB transaction through temporary negative
    * indices, so a re-org that shifts the indices of several deposits can never collide with the unique
    * (network, txHash, logIndex) key. Returns deposit id → log index (null = no matching transfer left).
    */
@@ -464,8 +468,12 @@ export class DepositChainWatcherService {
     ) as [string, number][];
     if (moves.length === 0) return result;
     const targets = new Set(moves.map(([, idx]) => idx));
+    // A target index may still be held by a reversed deposit, or by an open deposit of this pass whose transfer is gone
+    // from the receipt (result null — reconcileTx reverses it right after): both move out of the way (R35b).
     const parked = all.filter(
-      (d) => d.status === 'rejected' && !openIds.has(d.id) && targets.has(d.logIndex),
+      (d) =>
+        targets.has(d.logIndex) &&
+        (openIds.has(d.id) ? result.get(d.id) === null : d.status === 'rejected'),
     );
     const minIndex = Math.min(0, ...all.map((d) => d.logIndex));
     await this.prisma.tx(async (tx) => {

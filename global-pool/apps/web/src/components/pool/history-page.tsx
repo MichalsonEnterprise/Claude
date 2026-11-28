@@ -26,7 +26,7 @@ import { DemoBadge } from '@/components/ui/demo-badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SearchInput } from '@/components/ui/search-input';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { EntryHistoryItem, PoolRoundView } from '@/lib/api/pool';
+import type { EntryHistoryItem, EntryResultKind, PoolRoundView } from '@/lib/api/pool';
 import { cn } from '@/lib/utils';
 
 import {
@@ -518,11 +518,37 @@ function ResultCell({ round }: { round: PoolRoundView }) {
   );
 }
 
+/**
+ * The player's result for ONE round, over ALL their purchases in it: the API reports each purchase's own prize and
+ * refund (R16), so the round figure is their sum — won if any purchase won (Σ prizes), else Σ refunds still owed, …
+ */
+export function roundResultOf(rows: readonly EntryHistoryItem[]): {
+  kind: EntryResultKind;
+  prize: string | null;
+  refund: string | null;
+} {
+  const of = (kind: EntryResultKind) => rows.filter((r) => r.result.kind === kind);
+  const total = (xs: EntryHistoryItem[], pick: (r: EntryHistoryItem) => string | null) =>
+    toUSDTString(sum(xs.map((r) => pick(r) ?? '0')));
+  const won = of('won');
+  if (won.length > 0) return { kind: 'won', prize: total(won, (r) => r.result.prize), refund: null };
+  for (const kind of ['refund_owed', 'refunded'] as const) {
+    const refunds = of(kind);
+    if (refunds.length > 0)
+      return { kind, prize: null, refund: total(refunds, (r) => r.result.refund) };
+  }
+  const kind =
+    (['not_selected', 'drawing', 'in_draw'] as const).find((k) => of(k).length > 0) ??
+    rows[0]?.result.kind ??
+    'in_draw';
+  return { kind, prize: null, refund: null };
+}
+
 function MineCell({ rows }: { rows: EntryHistoryItem[] | undefined }) {
   if (!rows?.length) return <span className="text-caption text-text-tertiary">—</span>;
   const entries = rows.reduce((n, r) => n + r.entries, 0);
   const total = toUSDTString(sum(rows.map((r) => r.total)));
-  const res = rows[0]!.result;
+  const res = roundResultOf(rows);
   return (
     <span className="flex flex-col gap-0.5">
       <span className="text-label-m text-text-primary">

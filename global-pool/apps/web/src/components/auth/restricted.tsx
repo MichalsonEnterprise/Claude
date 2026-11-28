@@ -89,8 +89,12 @@ interface VariantCopy {
 
 function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
   const sus = s.restrictions.find((r) => r.type === 'account_suspended');
+  // A review is any restriction short of a suspension, including an AML withdrawals freeze (gate under_review).
   const review = s.restrictions.find(
-    (r) => r.type === 'gaming_blocked' || r.type === 'deposits_blocked',
+    (r) =>
+      r.type === 'gaming_blocked' ||
+      r.type === 'deposits_blocked' ||
+      r.type === 'withdrawals_frozen',
   );
   const withdrawCan: Item = s.paused.withdrawals
     ? {
@@ -189,8 +193,10 @@ function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
         body: (
           <>
             Some features are paused while our team completes a review
-            {review ? ` (started ${formatUtcDateTime(review.since)})` : ''}. You don’t need to do
-            anything right now — withdrawals stay open.
+            {review ? ` (started ${formatUtcDateTime(review.since)})` : ''}.{' '}
+            {s.paused.withdrawals
+              ? 'Withdrawals are on hold until the review ends — support can explain what’s needed.'
+              : 'You don’t need to do anything right now — withdrawals stay open.'}
           </>
         ),
         meta: [
@@ -212,6 +218,14 @@ function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
         ],
         pausedTitle: 'Paused during the review',
         paused: [
+          ...(s.paused.withdrawals
+            ? [
+                {
+                  title: 'Withdrawals',
+                  body: 'A compliance hold applies until the review ends. Your balance stays in your account.',
+                },
+              ]
+            : []),
           ...(s.paused.deposits
             ? [{ title: 'New deposits', body: 'Back on as soon as the review ends.' }]
             : []),
@@ -244,13 +258,26 @@ function copyFor(variant: RestrictedVariant, s: AccountStatus): VariantCopy {
           },
         ],
         stepsNote: { icon: Mail, text: 'Real emails from us always show your anti-phishing code.' },
-        primary: {
-          label: 'Withdraw available balance',
-          href: ROUTES.wallet,
-          icon: ArrowUpFromLine,
-          withdraw: true,
-        },
-        secondary: { label: 'Contact support', href: '/support', icon: MessageCircle },
+        // With withdrawals on hold, support is the way forward (the withdraw button shows as unavailable).
+        ...(s.paused.withdrawals
+          ? {
+              primary: { label: 'Contact support', href: '/support', icon: MessageCircle },
+              secondary: {
+                label: 'Withdraw available balance',
+                href: ROUTES.wallet,
+                icon: ArrowUpFromLine,
+                withdraw: true,
+              },
+            }
+          : {
+              primary: {
+                label: 'Withdraw available balance',
+                href: ROUTES.wallet,
+                icon: ArrowUpFromLine,
+                withdraw: true,
+              },
+              secondary: { label: 'Contact support', href: '/support', icon: MessageCircle },
+            }),
         helpRef: review?.reference ?? null,
       };
     case 'self-excluded': {

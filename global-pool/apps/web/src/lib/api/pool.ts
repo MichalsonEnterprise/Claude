@@ -428,7 +428,7 @@ export async function getMyRoundEntries(round: PoolRoundView): Promise<MyRoundEn
         : [],
       odds:
         ids.length && round.entries
-          ? oddsDisclosure(ids.length, round.entries, Math.min(13, round.entries))
+          ? oddsDisclosure(ids.length, round.entries, Math.min(13, round.entries), 6)
           : null,
     });
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +27,8 @@ export type GateView = 'page' | 'hold' | 'geo' | 'age' | 'exit';
 
 export function gateView(input: {
   pathname: string;
+  /** Query string of the page (`null` = not known yet). `/wallet/deposit?ref=DP-…` tracks a sent deposit. */
+  search?: string | null;
   geo: { status: 'pending' | 'error' | 'success'; permitted: boolean | null };
   auth: 'loading' | 'guest' | 'member';
   ageConfirmed: boolean | null;
@@ -34,7 +36,7 @@ export function gateView(input: {
   /** The GLOBAL POOL sign-in dialog is open (the age question waits behind it). */
   authDialogOpen?: boolean;
 }): GateView {
-  const geoGated = isGeoGated(input.pathname);
+  const geoGated = isGeoGated(input.pathname, input.search);
   const ageGated = isAgeGated(input.pathname);
   if (geoGated) {
     if (input.geo.status === 'pending') return 'hold';
@@ -62,7 +64,9 @@ export function ComplianceGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const auth = useAuth();
   const ui = useAuthUi();
-  const gated = isGeoGated(pathname) || isAgeGated(pathname);
+  // The query string comes from <SearchProbe> (inside Suspense, so static pages still prerender); null until read.
+  const [search, setSearch] = React.useState<string | null>(null);
+  const gated = isGeoGated(pathname, search) || isAgeGated(pathname);
   const geo = useGeoDecision({ enabled: gated });
 
   // Browser memory is read after mount (cookie / localStorage, try/catch inside) so SSR and hydration match.
@@ -77,6 +81,7 @@ export function ComplianceGate({ children }: { children: React.ReactNode }) {
   const decision: GeoDecision | undefined = geo.data;
   const view = gateView({
     pathname,
+    search,
     geo: {
       status: !gated ? 'success' : geo.isError ? 'error' : decision ? 'success' : 'pending',
       permitted: decision ? decision.permitted : null,
@@ -91,10 +96,23 @@ export function ComplianceGate({ children }: { children: React.ReactNode }) {
     if (view === 'exit') router.replace(GATE_ROUTES.ageRestricted);
   }, [view, router]);
 
-  if (view === 'geo' && decision) return <GeoBlockInterstitial decision={decision} />;
+  const probe = (
+    <React.Suspense fallback={null}>
+      <SearchProbe onChange={setSearch} />
+    </React.Suspense>
+  );
+  if (view === 'geo' && decision) {
+    return (
+      <>
+        {probe}
+        <GeoBlockInterstitial decision={decision} />
+      </>
+    );
+  }
 
   return (
     <GateContext.Provider value={{ hold: view === 'hold' || view === 'exit' }}>
+      {probe}
       {children}
       <AgeGateDialog
         open={view === 'age'}
@@ -113,6 +131,13 @@ export function ComplianceGate({ children }: { children: React.ReactNode }) {
       />
     </GateContext.Provider>
   );
+}
+
+/** Reports the page's query string to the gate (re-renders on every search change, renders nothing). */
+function SearchProbe({ onChange }: { onChange: (search: string) => void }) {
+  const search = useSearchParams()?.toString() ?? '';
+  React.useEffect(() => onChange(search), [search, onChange]);
+  return null;
 }
 
 /**

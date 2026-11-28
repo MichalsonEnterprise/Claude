@@ -198,13 +198,23 @@ export const POSTAL_CODE_FORMATS: Readonly<Record<string, { pattern: RegExp; exa
   GB: { pattern: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i, example: 'SW1A 1AA' },
 };
 
+/**
+ * Only initials: single letters each followed by a dot and/or separated by spaces — "J.", "J. R.", "J.R.", "J R".
+ * Real short names pass: "Li", "Ng", "Wu", "Jo", and a one-letter name with no dot ("O").
+ */
+const INITIALS_ONLY = /^\p{L}(?:[.\s]+\p{L})*\.?$/u;
+export function isInitialsOnly(name: string): boolean {
+  const v = name.trim();
+  return INITIALS_ONLY.test(v) && !/^\p{L}$/u.test(v);
+}
+
 const legalNameSchema = (label: string) =>
   z
     .string()
     .trim()
-    .min(2, { error: `${label} — enter your full name as shown on your ID` })
+    .min(1, { error: `${label} — enter your full name as shown on your ID` })
     .max(80)
-    .refine((v) => !/^([A-Za-z]\.?\s*)+$/.test(v) || v.replace(/[.\s]/g, '').length > 2, {
+    .refine((v) => !isInitialsOnly(v), {
       error: `${label} — initials aren’t enough, enter it in full`,
     });
 

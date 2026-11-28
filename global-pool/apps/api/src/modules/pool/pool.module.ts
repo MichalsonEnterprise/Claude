@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 
+import { DevRoundsController, DevRoundsService } from './dev-rounds.controller';
 import { EntriesService } from './entries.service';
 import { EntryHistoryService } from './entry-history.service';
 import { PoolController } from './pool.controller';
@@ -11,7 +12,7 @@ import { RoundsService } from './rounds.service';
 
 @Global()
 @Module({
-  controllers: [PoolController],
+  controllers: [PoolController, DevRoundsController],
   providers: [
     PoolEventsService,
     RoundsService,
@@ -20,6 +21,7 @@ import { RoundsService } from './rounds.service';
     RoundLifecycleService,
     PoolGateway,
     RoundsProcessor,
+    DevRoundsService,
   ],
   exports: [RoundsService, EntriesService, RoundLifecycleService, PoolEventsService],
 })

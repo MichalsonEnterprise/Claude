@@ -56,6 +56,7 @@ import {
   type AccountRef,
   type PostingLineInput,
 } from '../src/modules/ledger/posting';
+import { demoPurchaseClock, demoRoundSeedStatus } from '../src/modules/pool/demo-round-clock';
 import { DEFAULT_PRIZE_SPLIT_BPS } from '../src/modules/randomness/selection';
 import type { PrismaService } from '../src/infra/prisma/prisma.service';
 import { findApiRoot, loadEnvFiles } from '../src/config/load-env';
@@ -76,6 +77,20 @@ const SHIFT_DAYS =
     ? Number(process.env.DEMO_SEED_SHIFT_DAYS)
     : Math.max(0, Math.ceil((Date.now() + 60_000 - BASE_CLOSE) / DAY));
 const T = (iso: string) => new Date(Date.parse(iso) + SHIFT_DAYS * DAY);
+
+// Round #1,248 follows the real clock (Q20 / Q07): `open` only once its 08:00 UTC opening has passed (else `scheduled`,
+// opened by the regular tick), and no seeded purchase lies in the future.
+const SEED_NOW = new Date();
+const CURRENT_OPENS = T(DEMO.currentRound.openedAt);
+const CURRENT_STATUS = demoRoundSeedStatus(CURRENT_OPENS, SEED_NOW);
+const purchaseAt = demoPurchaseClock(
+  CURRENT_OPENS.getTime(),
+  Math.max(
+    T('2026-11-27T18:42:00Z').getTime(),
+    ...DEMO.entriesFeed.map((f) => T(f.at).getTime()),
+  ),
+  SEED_NOW.getTime(),
+);
 
 const NOVA = DEMO_USER.id;
 const NOVA_DID = 'did:privy:demo-nova-k';
@@ -904,10 +919,19 @@ async function seedNovaLedger(tx: Tx) {
   ]);
 }
 
-/** Round #1,248 OPEN: 3,412 participants, 18,640 entries — @nova.k's 35 at E-1248-00981 … 01015. */
+/**
+ * Round #1,248: 3,412 participants, 18,640 entries — @nova.k's 35 at E-1248-00981 … 01015. OPEN once its opening time
+ * has passed, else SCHEDULED (the tick opens it); purchase times are mapped by `purchaseAt` (never in the future).
+ */
 async function seedCurrentRound(tx: Tx) {
   const r = DEMO.currentRound;
-  await tx.round.create({ data: { ...roundData(r), status: 'open' } });
+  await tx.round.create({
+    data: {
+      ...roundData(r),
+      status: CURRENT_STATUS,
+      openedAt: CURRENT_STATUS === 'open' ? CURRENT_OPENS : null,
+    },
+  });
   const opens = T(r.openedAt).getTime();
   const novaAt = T(DEMO.myEntries.purchasedAt).getTime();
   const lastAt = T('2026-11-27T18:42:00Z').getTime();
@@ -1019,7 +1043,7 @@ async function seedCurrentRound(tx: Tx) {
     const first = seq;
     const last = seq + p.entries - 1;
     const txId = randomUUID();
-    const at = new Date(p.at);
+    const at = new Date(purchaseAt(p.at));
     const reference = `EP-1248-${String(first).padStart(5, '0')}-${String(last).padStart(5, '0')}`;
     txRows.push({
       id: txId,
@@ -1145,7 +1169,7 @@ async function seedNotifications(tx: Tx) {
       title: n.title,
       body: n.body,
       isDemo: true,
-      createdAt: T(n.at),
+      createdAt: n.type === 'round.entries_confirmed' ? new Date(purchaseAt(T(n.at).getTime())) : T(n.at),
     })),
   });
 }

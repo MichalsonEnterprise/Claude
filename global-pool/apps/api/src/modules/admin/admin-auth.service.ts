@@ -37,6 +37,28 @@ export const sessionRef = (familyId: string) => `as_${sha256Hex(familyId).slice(
 /** `sessions.last_seen_at` is written at most once a minute per admin session. */
 const LAST_SEEN_WRITE_MS = 60_000;
 
+/** Sliding expiry of an unknown email's failed-attempt counter (see reserveUnknownEmailAttempt). */
+const UNKNOWN_EMAIL_COUNTER_TTL_MS = 30 * 86_400_000;
+/**
+ * KEYS[1] counter, KEYS[2] lock (value = locked-until epoch ms) · ARGV now ms, max attempts, locked-until ms, lock
+ * TTL ms, counter TTL ms. Returns {0, until} = still locked (not counted), {1, until} = this attempt locks,
+ * {2, attempts} = counted, not locked.
+ */
+const RESERVE_UNKNOWN_EMAIL_ATTEMPT = `
+local locked = redis.call('GET', KEYS[2])
+if locked and tonumber(locked) and tonumber(locked) > tonumber(ARGV[1]) then
+  return {0, locked}
+end
+local attempts = redis.call('INCR', KEYS[1])
+if attempts >= tonumber(ARGV[2]) then
+  redis.call('SET', KEYS[2], ARGV[3], 'PX', ARGV[4])
+  redis.call('DEL', KEYS[1])
+  return {1, ARGV[3]}
+end
+redis.call('PEXPIRE', KEYS[1], ARGV[5])
+return {2, tostring(attempts)}
+`;
+
 /**
  * Admin authentication — fully separate from players (no Privy): email + argon2id password + MANDATORY TOTP in one
  * step, lockout after ADMIN_LOGIN_MAX_ATTEMPTS failures, short-lived access JWT (ADMIN_JWT_ACCESS_SECRET) and an
@@ -168,7 +190,13 @@ export class AdminAuthService {
     });
   }
 
-  /** Same bookkeeping for an email with no active admin, kept in Redis per email hash (atomic INCR). */
+  /**
+   * Same bookkeeping for an email with no active admin, kept in Redis per email hash. One Lua script does the whole
+   * step atomically (lock check → INCR → lock on the max-th attempt + counter reset), so parallel guesses give
+   * exactly the sequence of the row-locked admin path (n−1 × 401, one 401 `locked`, then 403). The counter has a
+   * sliding 30-day expiry (bounded Redis memory) instead of the admin row's none — resetting it would take a gap
+   * of over 30 days between guesses at one email.
+   */
   private async reserveUnknownEmailAttempt(
     emailHash: string,
     now: Date,
@@ -176,15 +204,21 @@ export class AdminAuthService {
     const { ADMIN_LOGIN_MAX_ATTEMPTS: max, ADMIN_LOCKOUT_MINUTES: minutes } = this.config.env;
     const key = `gp:admin-login:unknown:${emailHash}`;
     const lockKey = `${key}:locked-until`;
-    const locked = await this.redis.get(lockKey);
-    if (locked && new Date(locked) > now) return { lockedUntil: new Date(locked), lockedNow: false };
-    const attempts = await this.redis.incr(key);
-    if (attempts === 1) await this.redis.expire(key, 86_400);
-    if (attempts < max) return { lockedUntil: null, lockedNow: false };
     const until = addMinutes(now, minutes);
-    await this.redis.set(lockKey, until.toISOString(), 'EX', minutes * 60);
-    await this.redis.del(key);
-    return { lockedUntil: until, lockedNow: true };
+    const [state, value] = (await this.redis.eval(
+      RESERVE_UNKNOWN_EMAIL_ATTEMPT,
+      2,
+      key,
+      lockKey,
+      String(now.getTime()),
+      String(max),
+      String(until.getTime()),
+      String(minutes * 60_000),
+      String(UNKNOWN_EMAIL_COUNTER_TTL_MS),
+    )) as [number, string];
+    if (state === 0) return { lockedUntil: new Date(Number(value)), lockedNow: false };
+    if (state === 1) return { lockedUntil: new Date(Number(value)), lockedNow: true };
+    return { lockedUntil: null, lockedNow: false };
   }
 
   /** Rotate the refresh token. Re-using a rotated token revokes the whole family (token theft signal). */

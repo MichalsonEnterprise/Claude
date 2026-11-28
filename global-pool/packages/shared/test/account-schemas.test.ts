@@ -37,6 +37,31 @@ describe('account schemas', () => {
     expect(r.error!.issues.find((i) => i.path[0] === 'postalCode')!.message).toContain('0000-000');
   });
 
+  it('KYC details: real short names pass, only initials are refused (Q22)', () => {
+    for (const [firstNames, lastNames] of [
+      ['Wei', 'Li'],
+      ['Anna', 'Ng'],
+      ['Jo', 'Silva'],
+      ['Min', 'O'],
+      ['Mei', 'Wu'],
+      ['Łu', 'Ów'],
+    ] as const) {
+      const r = kycDetailsSchema.safeParse({ ...VALID, firstNames, lastNames });
+      expect(r.success, `${firstNames} ${lastNames}`).toBe(true);
+    }
+    for (const initials of ['J.', 'J. R.', 'J.R.', 'J R', 'a.b.c.']) {
+      const r = kycDetailsSchema.safeParse({ ...VALID, firstNames: initials });
+      expect(r.success, initials).toBe(false);
+      expect(r.error!.issues[0]!.message).toBe(
+        'First name(s) — initials aren’t enough, enter it in full',
+      );
+    }
+    const empty = kycDetailsSchema.safeParse({ ...VALID, lastNames: '  ' });
+    expect(empty.error!.issues[0]!.message).toBe(
+      'Last name(s) — enter your full name as shown on your ID',
+    );
+  });
+
   it('KYC details: accepts a valid Portuguese address; PEP has no default', () => {
     expect(kycDetailsSchema.safeParse(VALID).success).toBe(true);
     const { pep: _pep, ...noPep } = VALID;

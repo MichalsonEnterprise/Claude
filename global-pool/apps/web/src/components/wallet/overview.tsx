@@ -276,7 +276,8 @@ function QuickAction({
   );
 }
 
-function InProgressCard({ balances }: { balances: WalletBalances | undefined }) {
+/** Exported for the close-out test: a failed deposits / withdrawals list is an error, never "Nothing in progress". */
+export function InProgressCard({ balances }: { balances: WalletBalances | undefined }) {
   const router = useRouter();
   const deposits = useDeposits();
   const withdrawals = useWithdrawals();

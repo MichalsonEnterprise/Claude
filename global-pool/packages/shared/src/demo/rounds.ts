@@ -116,6 +116,27 @@ export const DEMO_ROUND_1248_SETTLED: Round & DemoFlag = demo({
   ],
 });
 
+/** Fictional handles for the 2nd prize … 10th runner-up of the DEMO history snapshots (demo-data.md names 1st only). */
+const PRIZE_HANDLES = [
+  'lumen.eth',
+  'sable',
+  'quasar_9',
+  'velvet.io',
+  'ember_ray',
+  'northwind',
+  'cobalt.k',
+  'zephyr21',
+  'halcyon',
+  'rook.eth',
+  'lyra_v',
+  'drift.sol',
+] as const;
+
+/**
+ * A settled DEMO history snapshot, internally consistent (Q06): ALL 13 prizes of the split (Σ = the pool), and a DEMO
+ * participant count derived at the current round's ratio (3,412 participants / 18,640 entries) — above the 500
+ * minimum, as `thresholds.met` says. `extra` replaces the winner at its place (e.g. @nova.k's runner-up in #1,244).
+ */
 function settledRound(
   n: number,
   day: string,
@@ -125,6 +146,18 @@ function settledRound(
 ) {
   const entries = Number(BigInt(pool.split('.')[0]!) / 10n);
   const prizes = prizeBreakdown(pool).tiers;
+  const handles = PRIZE_HANDLES.filter((h) => h !== firstHandle);
+  const offset = n % handles.length;
+  const ranked: RoundWinner[] = prizes.flatMap((t) =>
+    Array.from({ length: t.winners }, () => ({ tier: t.tier, amount: t.amountEach })),
+  ).map((p, i) => ({
+    place: i + 1,
+    tier: p.tier,
+    handle: i === 0 ? firstHandle : handles[(offset + i - 1) % handles.length]!,
+    entryId: null,
+    amount: p.amount,
+  }));
+  const winners = ranked.map((w) => extra.find((x) => x.place === w.place) ?? w);
   return demo({
     id: demoId('round', n),
     number: n,
@@ -133,23 +166,14 @@ function settledRound(
     closesAt: `${day}T20:00:00Z`,
     entryPrice: ENTRY_PRICE,
     platformFeePerEntry: PLATFORM_FEE_PER_ENTRY,
-    participants: null,
+    participants: Math.round((entries * (DEMO_CURRENT_ROUND.participants ?? 0)) / DEMO_CURRENT_ROUND.entries),
     entries,
     poolBalance: pool,
     platformFees: feesForEntries(entries),
     thresholds: thresholds(true),
     prizeDistribution: prizes,
     draw: null,
-    winners: [
-      {
-        place: 1,
-        tier: 'first' as const,
-        handle: firstHandle,
-        entryId: null,
-        amount: prizes[0]!.amountEach,
-      },
-      ...extra,
-    ],
+    winners,
     cancellation: null,
   });
 }

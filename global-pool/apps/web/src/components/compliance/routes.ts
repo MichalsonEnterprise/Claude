@@ -2,7 +2,9 @@
  * Which pages the compliance gates cover (server- and client-safe, unit-tested in test/gates.test.ts).
  *
  * - Geo interstitial (PUB-21): gaming and financial pages — games, Global Pool, promotions, game lists and NEW
- *   deposits. Withdrawals, wallet overview, history, account, RG tools, legal pages and support always stay open,
+ *   deposits. Tracking a deposit already sent (`/wallet/deposit?ref=DP-…`: confirmations, DEMO blocks, receipt)
+ *   stays open like the API's `GET /deposits/ref/…`. Withdrawals, wallet overview, history, account, RG tools,
+ *   legal pages and support always stay open,
  *   so a restricted visitor can sign in, see the licence and withdraw. The homepage keeps its own restricted
  *   variant (PUB-01) instead of the interstitial.
  * - Age gate (PUB-22): every gambling surface = the lobby homepage + the geo-gated pages.
@@ -43,10 +45,22 @@ function normalise(pathname: string): string {
   return p.length > 1 ? p.replace(/\/+$/, '') : p;
 }
 
-/** PUB-21: show the geo interstitial on this page for a restricted location. */
-export function isGeoGated(pathname: string): boolean {
+/** `/wallet/deposit?ref=DP-…` follows a deposit that was already sent — only NEW deposits are geo-paused. */
+function isDepositTracker(path: string, search: string): boolean {
+  if (path !== '/wallet/deposit') return false;
+  const ref = new URLSearchParams(search).get('ref') ?? '';
+  return /^DP-\d{1,12}$/i.test(ref);
+}
+
+/**
+ * PUB-21: show the geo interstitial on this page for a restricted location. `search` is the query string (the
+ * part after `?` in `pathname` is used when it is not given); `null` = not known yet, so only the path decides.
+ */
+export function isGeoGated(pathname: string, search?: string | null): boolean {
   const p = normalise(pathname);
-  return !ALWAYS_OPEN.test(p) && GEO_GATED.test(p);
+  if (ALWAYS_OPEN.test(p) || !GEO_GATED.test(p)) return false;
+  const query = search ?? (pathname.includes('?') ? pathname.split('?')[1]!.split('#')[0]! : '');
+  return !isDepositTracker(p, query);
 }
 
 /** PUB-22: a gambling surface that needs the 18+ confirmation on first visit. */

@@ -17,7 +17,8 @@ const DEFAULT_STEP = 4;
 /**
  * DEMO-only progressive deposits (wallet deposit flow QA): a simulated test-USDT transfer is recorded as DETECTED with
  * 0 confirmations (posting CHAIN_CLEARING → PENDING, exactly like the watcher), then simulated blocks are added until
- * the required confirmations are reached and it is credited (PENDING → AVAILABLE) with the regular credit path.
+ * the required confirmations are reached and it is credited (PENDING → AVAILABLE) with the regular credit path — or
+ * kept in Pending by the same credit hold as a real deposit (account restriction, break, kill switch, RG limit).
  * Never available outside DEMO mode (the controller is @DemoOnly()).
  */
 @Injectable()
@@ -72,7 +73,15 @@ export class DemoDepositsService {
       if (d.status !== 'detected' && d.status !== 'confirming')
         throw new AppError('CONFLICT', `Deposit is ${d.status}`);
       const next = Math.min(d.requiredConfirmations, d.confirmations + step);
-      if (next >= d.requiredConfirmations) {
+      // At N confirmations the same holds as for an on-chain deposit apply (restriction, break, kill switch, RG
+      // deposit limit): it stays in Pending, and advancing again once the hold no longer applies credits it.
+      const hold =
+        next >= d.requiredConfirmations
+          ? await this.deposits.creditHold(tx, d, new Date(), { includeDemo: true })
+          : null;
+      if (next >= d.requiredConfirmations && hold) {
+        await this.deposits.markHeld(tx, d, next, hold);
+      } else if (next >= d.requiredConfirmations) {
         await this.deposits.credit(tx, d, next);
       } else {
         await tx.deposit.update({ where: { id: d.id }, data: { confirmations: next } });

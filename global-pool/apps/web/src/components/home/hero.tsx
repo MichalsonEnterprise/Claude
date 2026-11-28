@@ -7,6 +7,7 @@ import {
   formatTimeUTC,
 } from '@gp/shared/format';
 import { formatUSDT } from '@gp/shared/money';
+import { displayOddsPercent } from '@gp/shared/pool';
 import {
   Ban,
   BellRing,
@@ -219,7 +220,7 @@ function PoolSlide() {
             <Ticket aria-hidden className="size-3.5" />
             Your {myEntries.entries} entries · {formatUSDT(myEntries.total)}
             <span className="text-text-secondary">
-              · ≈{myEntries.odds.anyPrizeApproxPercent}% chance of any prize
+              · ≈{displayOddsPercent(myEntries.odds.anyPrizeApproxPercent)}% chance of any prize
             </span>
             {myEntries.isDemo && <DemoBadge size="xs" />}
           </p>
@@ -774,7 +775,7 @@ function DrawCard() {
             <span>
               {myEntries.firstEntryId} … {myEntries.lastEntryId.slice(-5)}
             </span>
-            <span>≈{myEntries.odds.anyPrizeApproxPercent}% any prize</span>
+            <span>≈{displayOddsPercent(myEntries.odds.anyPrizeApproxPercent)}% any prize</span>
           </p>
           {balance && (
             <p className="flex items-center justify-between gap-2 border-t border-border-subtle pt-1.5 text-caption text-text-secondary">

@@ -209,10 +209,16 @@ export class DepositsService {
    * refused, but the same server-side rules as the deposit routes apply before they reach Available: account
    * restrictions (`account_suspended`, `deposits_blocked`), a break / self-exclusion, the `deposits.enabled` kill
    * switch and the player's RG deposit limits. Deposit limits count deposits CREDITED in the current period (in
-   * credit order, so a deposit held over into a new period counts there). DEMO simulations check before recording.
+   * credit order, so a deposit held over into a new period counts there). Instant DEMO simulations check before
+   * recording; a progressive DEMO deposit credited later passes `includeDemo` so it is held exactly like a real one.
    */
-  async creditHold(tx: Tx, deposit: Deposit, now = new Date()): Promise<string | null> {
-    if (deposit.isDemo) return null;
+  async creditHold(
+    tx: Tx,
+    deposit: Deposit,
+    now = new Date(),
+    opts: { includeDemo?: boolean } = {},
+  ): Promise<string | null> {
+    if (deposit.isDemo && !opts.includeDemo) return null;
     const restrictions = await this.restrictions.active(deposit.userId, tx);
     if (restrictions.includes('account_suspended')) return 'the account is suspended';
     if (restrictions.includes('deposits_blocked')) return 'deposits are blocked on this account';

@@ -149,3 +149,14 @@ export function oddsDisclosure(
     firstPrizePercent: pct(new MoneyDecimal(myEntries).div(total)),
   };
 }
+
+/**
+ * Display rule for a disclosed chance (percent string in, percent digits out — no floats): ROUNDED DOWN, so a shown
+ * chance is never overstated, with 2 decimals from 1 %, 3 from 0.1 % and 4 below. Pass the 6-decimal disclosure.
+ * @example displayOddsPercent('0.187768') // '0.187' · displayOddsPercent('66.666666') // '66.66'
+ */
+export function displayOddsPercent(percent: MoneyInput): string {
+  const d = money(percent);
+  const places = d.gte(1) ? 2 : d.gte('0.1') ? 3 : 4;
+  return d.toDecimalPlaces(places, MoneyDecimal.ROUND_DOWN).toFixed(places);
+}

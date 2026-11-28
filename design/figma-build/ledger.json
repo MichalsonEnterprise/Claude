@@ -106,8 +106,9 @@
   "sizes": "",
   "page": "02",
   "group": "",
-  "status": "BUILT",
-  "by": "cover"
+  "status": "VERIFIED",
+  "by": "final-qa-lib",
+  "note": "I checked all 7 sets in screenshots and in a structural read: Button/Primary 7:193, Secondary 7:308, Ghost 7:423, Danger 7:538, Gold 7:653 (each 3 sizes × Default/Hover/Pressed/Focus/Disabled/Loading), Icon 7:774 (Ghost/Secondary × 3 sizes × 5 states) and Wallet 7:859. Labels are auto-width, so none clip. Icons are centred on both axes (16 px in S, 20 px in M/L) and tinted with the label token. Contrast: Primary is mint brand/primary-strong #2CD97D with a dark text/on-primary #151717 label (9.7:1); Gold accent/gold #F4C96C with text/on-gold (11.5:1) only on the jackpot CTA; Danger 4.5:1; Secondary 11.2:1. Focus is a 2 px border/focus stroke drawn OUTSIDE the button. Loading shows a spinner and keeps the label. Fixes: Button/Primary's description still described the old violet fill with a white label, so I rewrote it, and all 7 set descriptions now give tokens, states and focus/loading rules. Button/Wallet had no Pressed or Focus state; both are added for sizes M and S (356:19504/19507/19510/19513). Known nit, now documented in the descriptions: Secondary and Wallet are 2 px narrower in Focus than in their other states, because the 1 px inside border counts in auto layout and the outside ring does not."
  },
  {
   "id": "CMP-02",
@@ -362,8 +363,8 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "BUILT",
-  "note": "All required frames exist. 1440 Weekly (default) 84:103900, Daily 84:104905, Monthly 84:105918 (earlier run). 390 Weekly (default) 216:81112 and Daily 'not ranked yet' 216:82473 (this run, data read from the desktop frames, 0 overflow, screenshots checked). Weekly/Daily 1440 screenshots passed. Monthly 1440 passed the text-overflow check, but its screenshot was not returned, so it is not visually verified. Monthly at 390 is the same layout, switched by tab (rule #16).",
+  "status": "VERIFIED",
+  "note": "1440 Weekly (default) 84:103900, Daily 84:104905, Monthly 84:105918 + 390 Weekly (default) 216:81112 and Daily 'not ranked yet' 216:82473 exist. This run checked the Monthly 1440 screenshot, which was missing before. It found and fixed two defects in all three 1440 frames: (1) the Standings column header used fixed 730/120/120 cells that overflowed the 702 px row behind the right column; H/Player is now FILL and the columns match Table/Leaderboard Row (16 | 48·346·120·120 | 16, gap 12); (2) podium handles of 68–97 px overflowed a 51 px Handle frame and ran under the DEMO badge; the badge now sits in a 'Place' row under the handle. Post-fix screenshots of the Weekly, Daily and Monthly main grids pass, and the audit finds 0 overflow. Monthly at 390 is the same layout switched by tab (rule #16).",
   "by": "pub-p1c"
  },
  {
@@ -409,7 +410,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop 1440 + mobile 390. Includes hero with Card/VIP Tier preview, facts, 5 Card/VIP Tier, points ladder, weekly-reward example (@nova.k Gold III, 1,326 pts, 115.20 USDT, auto-settles Mon 30 Nov 10:00 UTC), how points work with a worked example (+600 pts), a benefits comparison table with a 'Same for every tier' block, the VIP level-up promo, a responsible-play card, FAQ, VIP host card and the licence notice. Copy matches the demo-data VIP extras and USR-V4. Overlapping hero art was fixed and re-checked in a screenshot.",
+  "by": "pub-p2"
  },
  {
   "id": "PUB-11",
@@ -419,7 +422,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop + mobile. Commission model: 20% of the 0.05 USDT fee, so 0.01 USDT per entry. Per-entry flow, earn/never-earn rules, a calculator (40 × 120 × 0.05 × 20% = 48.00 USDT/month, DEMO), payout schedule, partner terms grid and an apply band. Payout rules follow the referral rules: commission accrues per round, payouts can be requested from 20.00 USDT with KYC L2 + 2FA, and are paid in the Monday 10:00 UTC run to Available with a 0.00 fee. Fixed the dashboard stats wrap and the scenario-chip overflow and icons.",
+  "by": "pub-p2"
  },
  {
   "id": "PUB-12",
@@ -429,7 +434,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop + mobile. Mission, three principles (Card/Feature), a 'what we will never do' list, numbers (DEMO), timeline, team placeholders with fictional roles and DEMO badges, licence and company placeholders, Notice/Licence.",
+  "by": "pub-p2"
  },
  {
   "id": "PUB-13",
@@ -463,7 +470,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Desktop: Default, Validation error, Sending — loading, Sent — success and Send failed — error (5 frames). Mobile: Default, Validation error, Sent and Send failed (4 frames). Also: support channels, response times, RG/Help Resources and an anti-phishing notice. Fixed the topic placeholder in the error variant, the disabled-textarea helper, the success buttons overflow, the error note overflow, mobile email wrapping and the mobile textarea clipping; each fix was screenshot-checked.",
+  "by": "pub-p2"
  },
  {
   "id": "PUB-16",
@@ -473,7 +482,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "The desktop frame 336:238828 (7,245 tall) and the mobile frame 338:117638 (9,786 tall) both passed screenshots, with no text overflow and no override misses. There is an extra mobile state, 'Contents expanded' (341:182984): a 390×844 viewport scrolled to the open list, with all 11 contents rows visible. The page has 11 sections: Eligibility (18+, permitted jurisdictions), Account and verification, Deposits and withdrawals, Global Pool rules and fees (the 0.05 USDT fee as a separate line, plus a worked example marked DEMO: 35 entries = 350.00 + 1.75 = 351.75), Games and fairness, Responsible gaming, Restricted territories (including 'do not use a VPN'), Suspension and closure, Liability, Complaints and disputes, and Changes to these terms.",
+  "by": "pub-legal"
  },
  {
   "id": "PUB-17",
@@ -483,7 +494,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "The desktop frame 337:123899 (6,580 tall) and the mobile frame 339:118342 (8,857 tall) passed screenshots and a check of the template overrides: 10 sections, 10 contents rows, the section 8 data-export note, Privacy Policy selected in the document list, and no overflow.",
+  "by": "pub-legal"
  },
  {
   "id": "PUB-18",
@@ -505,7 +518,9 @@
   "sizes": "D·M",
   "page": "03",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "The desktop frame 337:125150 (6,510 tall) and the mobile frame 340:118936 (8,811 tall) passed screenshots and the same override check: 10 sections, KYC levels L1/L2/L3 with the 25,000.00 USDT limit, and two DEMO notes (typical review times, and the WD-20850 rejection of 600.00 USDT by sanctions screening). AML/KYC Policy is selected in the document list and nothing overflows.",
+  "by": "pub-legal"
  },
  {
   "id": "PUB-20",
@@ -562,7 +577,7 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "1440 Default 54:101512 (earlier run; screenshot checked) + 390 Default 215:79244 (built this run; 0 text overflow, screenshot checked). Two dice + cracked mint chip art, Back to lobby / Browse games, search + popular searches, Where to next incl. Status page, Popular-right-now tiles, licence, 18+.",
+  "note": "1440 Default 54:101512 + 390 Default 215:79244 already existed (inventory this run). Fixed in this run: on 3 'Popular right now' tiles, the HOT/NEW tag plus the player-count pill with its DEMO badge was wider than the 160 px tile and got clipped. The tag is now off via 'Show tag', and the post-fix screenshot passes. The only overflow left is the 7th tile, which the carousel edge crops on purpose.",
   "by": "pub-p1c"
  },
  {
@@ -574,7 +589,7 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "1440 Default 82:102573 (earlier run; screenshot checked, 0 overflow) + 390 Default 215:80405 (built this run). Reference ID GP-500-7F3A-9C21 with copy, Try again / Status page / Contact support, funds-safe, Global Pool schedule and mid-game reassurance, live status list; out-of-order slot machine art with reels 5 0 0 and an unplugged cable.",
+  "note": "1440 Default 82:102573 + 390 Default 215:80405 exist. The per-node overflow audit in this run found 0 issues. Earlier screenshots stand.",
   "by": "pub-p1c"
  },
  {
@@ -586,7 +601,7 @@
   "page": "03",
   "group": "",
   "status": "VERIFIED",
-  "note": "1440 82:103376 (earlier run; screenshot checked, 0 overflow) + 390 215:81600 (built this run). AN-88 window 1 Dec 2026 02:00–02:30 UTC; withdrawals stay available; deposits credited after the window; games paused; progress steps; email toggle off by default; Available 9,215.30. Sticky Withdraw funds + Status page above the tab bar. Ticket-stub + wrench art.",
+  "note": "1440 82:103376 + 390 215:81600 exist. Fixed in this run: the hero's 'Window / Status / Last update' facts row was 530 px, 10 px wider than its 520 px copy column. It now uses gap 20 (token) and FILL width, and the post-fix screenshot passes.",
   "by": "pub-p1c"
  },
  {
@@ -1150,7 +1165,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "VIP",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked in screenshots at 1440 and 390. Gold III, Level 14 of 29, 12,840 / 20,000 points. The level ladder runs Gold I to Platinum I. Weekly reward 115.20 Owed with an optional Claim button; it settles to Available by itself on Mon 30 Nov 10:00 UTC. Also shows a 'never chase a level' RG card with the 351.75 / 500.00 limit. Fixed: hero text overflowing under the art, and the limit row overflowing.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-V2",
@@ -1160,7 +1177,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "VIP",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked at 1440 and 390. KPIs: 12,840 / +1,286 / 5,032 / 7,160. The 8-row history was reconciled with the financial-history demo data (#1,248 35 entries at 18:05, #1,247 40 entries, #1,246 24 entries). Running balance runs 11,982 → 12,840 and crosses 12,000 at 19:30 on 25 Nov. Also a weekly chart, the roll-off schedule and a card on what does not earn points. Pagination 1–8 of 214, 27 pages.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-V3",
@@ -1170,7 +1189,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "VIP",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Default and 'Weekly reward claimed' at 1440, default at 390. 118.62 claimable (115.20 weekly reward + 3.42 rakeback), Claim all button, Coming-up list and reward history. Claimed state: Claimed badge, a new history row, a Success toast, Available 9,330.50, Owed 300.00, the Rewards tab count drops to 1. Claim states are covered as these two frames.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-V4",
@@ -1180,7 +1201,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "VIP",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked at 1440 and 390. Five-tier carousel (Card/VIP Tier, benefit copy overridden), comparison table with a 'Same for every tier' group (odds, VRF, withdrawal checks, RG), what Platinum adds, and the fair-play card. Mobile shows Gold vs Platinum stacked.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-R1",
@@ -1190,7 +1213,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked at 1440 and 390. Referral link globalpool.example/r/NOVAK27 with Copy, code NOVAK27, share buttons (Telegram, X, Email, QR). Hero art is entry tickets cropped by the edge on angled mint blocks. KPIs: 1,904 clicks, 48 sign-ups, 31 verified, 19 active. Earnings 142.50 = 90.00 + 48.60 + 3.90, how-it-works steps, RC-14 boost promo with terms and 18+, and a compliant-sharing row.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-R2",
@@ -1200,7 +1225,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked at 1440 and 390. Last 30 days: 612 clicks, 9 sign-ups, 6 verified, 58.80 earned. Funnel 612 → 9 → 6 → 5. Daily bars add up to 58.80; 24 Nov is 0.00 because round #1,245 was cancelled. Clicks by channel and active players 19 of 31.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-R3",
@@ -1210,7 +1237,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked at 1440 and 390. Masked handles with DEMO tags and a privacy note. Table: KYC, status, entries, fees, your 20%, earning-until date. Totals 14,250 / 712.50 / 142.50 reconcile with the top 10 plus the other 38 players. Filters 48 / 19 / 12 / 17. Mobile uses stacked cards.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-R4",
@@ -1220,7 +1249,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Built and checked at 1440 and 390. KPIs 142.50 / 48.60 / 3.90 / 90.00. Monthly chart Mar–Nov adds up to 142.50. November worked example: 5,250 × 0.05 × 20% = 52.50. Earnings by round #1,243–#1,248; #1,245 is cancelled with no commission.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-R5",
@@ -1230,7 +1261,9 @@
   "sizes": "D·M",
   "page": "05",
   "group": "Referrals",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "Default, Request payout modal and Payout locked at 1440; default and bottom sheet at 390. Requirements shown: minimum 20.00 USDT, KYC L2 and 2FA. Paid to Available, fee 0.00. History: PO-0412, PO-0388, and PO-0351 rejected. Modal: amount 48.60 with MAX, Available after payout 9,263.90, confirmation checkbox unchecked, Continue disabled. Locked state is a separate DEMO account: KYC L1, 14.30 USDT, Verify identity button, empty history.",
+  "by": "usr-vip-ref"
  },
  {
   "id": "USR-RG1",
@@ -2634,9 +2667,9 @@
   "sizes": "D·L",
   "page": "09",
   "group": "Global Pool Management",
-  "status": "BUILT",
-  "note": "D 80:59955 and L 80:61181 exist; the '2.00% each' text was shortened to '2.00%'. Defect: the Runner-up row's Share cell in 'Table — Split' renders blank on both frames, although its text is visible, 76×20 px and has a fill. Fix not applied because of the Figma MCP limit (3 consecutive refusals). Ready script: design/figma-build/pending/adm-pool/call8_p6cell.js (clones the 3rd-prize share cell, sets 2.00%).",
-  "by": "adm-pool"
+  "status": "VERIFIED",
+  "note": "The Runner-up Share cell renders 2.00% on 1440 (80:59955) and 1280 (80:61181); the earlier blank-cell defect is gone. Fixed: governance card titles now wrap inside their cards (they overflowed at 1280 and by 8 px at 1440), three Panel headers that were wider than their panels now fill them, and the Share column header is left-aligned to match its values. Both frames were re-checked with screenshots.",
+  "by": "final-qa-screens"
  },
  {
   "id": "ADM-P7",
@@ -3148,8 +3181,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "BUILT",
-  "note": "The deposit part is complete: bottom-sheet frames for all 7 deposit steps, plus Empty, Expired, Delayed, Failed and Unrecognised, in section 105:49686 (12 frames). All 12 now use the short DEMO notice 'DEMO DATA — illustrative values only' (decision #29). Left as BUILT because other slices may own the rest of MOB-06."
+  "status": "VERIFIED",
+  "note": "All required steps now exist at 390 as bottom sheets over the wallet, 14 frames in 105:49686: network, token, address, QR, pending (DP-77412 7/12 on Ethereum, per demo-data), confirmation, success, wrong network (new, 321:112563), below minimum (new, 321:113000), delayed, failed, expired, plus empty and unrecognised token. Both new frames are clones of step 3 (105:50420). Their alerts are built inline with tokens, the QR panel is hidden so the sheet fits 844, and DEMO is on the wallet/amount. An overflow audit of all 14 frames found 3 real defects in existing sheets, now fixed: step 1 Default/Empty Ethereum option (duplicate 'Congested' chip hidden), step 5 Confirming/Delayed timeline header (title now wraps so Processing + DEMO fit), step 7 receipt ('From address' shortened to 'From'). All passed the audit and screenshots afterwards.",
+  "by": "final-qa-screens"
  },
  {
   "id": "MOB-07",
@@ -3171,7 +3205,9 @@
   "sizes": "",
   "page": "10",
   "group": "",
-  "status": "NOT STARTED"
+  "status": "VERIFIED",
+  "note": "(a) 390 lobby exists: [PUB-03] Games Lobby / 390 / All games 36:531732 (Topbar Mobile, Input/Search, Tabs/Pill category pills, 21 Tile/Game Generic, Nav/Mobile Tab Bar Active=Games) and [GM-02] Game catalogue / 390 / Default 34:497645, so no lobby was rebuilt. (b) All five playable originals have 390 default + result frames: Pool Dice DI-01 33:288624 / DI-04 Win 33:315363, Lose 33:315810; Double Side CF-01 104:48933 / CF-03 Win 104:49572, Lose 104:49901; Pool Roulette RL-01 34:413030 / RL-05 Win 34:485123, Lose 34:485646; Orbit Rush CR-01 34:386552 / CR-04 34:420839; Twenty-One BJ-01 34:362883 / BJ-05 Win 34:389351. (c) New annotation frame 315:111233 (390 × 13,628, hug height) in section 315:111229. It shows the thumb-reach pattern on dice, roulette and crash using cropped clones of the real 390 frames, with numbered status/info callouts and a tinted bottom-third band. It covers: sticky bet bar with the primary action, 44 px minimum targets, amount presets above the bar, seeds/history/rules/sound behind a top-right button opening a top sheet, bottom sheets for bet slip, auto-play and verify, and the risk line. It also has a target-size audit, a coverage list and dev notes. Every block was checked in screenshots; fixes applied: same-slot strip made full-bleed, 2 callouts moved off the controls they described, demo values removed from coverage labels. Frame IDs are in design/figma-build/registry-mob-08.json; decision #62 added to decisions.md.",
+  "by": "mob-games"
  },
  {
   "id": "MOB-09",

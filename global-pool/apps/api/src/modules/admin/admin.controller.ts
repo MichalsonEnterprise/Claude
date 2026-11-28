@@ -224,9 +224,12 @@ export class AdminController {
 
   @Get('approvals')
   @RequirePermissions('withdrawals.read')
-  @ApiOperation({ summary: 'Four-eyes approvals awaiting a second admin' })
-  approvals() {
-    return this.admin.approvals('pending');
+  @ApiOperation({
+    summary:
+      'Four-eyes approvals awaiting a second admin — only requests of modules you may read (as the inbox)',
+  })
+  approvals(@CurrentAdmin() admin: AuthAdmin) {
+    return this.admin.approvals(admin, 'pending');
   }
 
   @Get('audit-logs')

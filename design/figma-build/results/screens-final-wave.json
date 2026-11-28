@@ -1,0 +1,744 @@
+[
+ {
+  "key": "mob-games",
+  "section": "315:111229",
+  "created": [
+   {
+    "name": "Section 'MOB-08 Mobile games' (page 10 — Mobile Experience, X=300000, Y=0)",
+    "id": "315:111229"
+   },
+   {
+    "name": "Section header — MOB-08",
+    "id": "315:111230"
+   },
+   {
+    "name": "MOB-08 Thumb-reach controls / 390 / Annotation — Pool Dice · Pool Roulette · Orbit Rush",
+    "id": "315:111233"
+   },
+   {
+    "name": "Doc header (zone legend)",
+    "id": "315:111240"
+   },
+   {
+    "name": "Rules (six thumb-reach rules)",
+    "id": "315:111265"
+   },
+   {
+    "name": "Block 01 — Pool Dice (DI-01 crop scrolled 265 px + 6 callouts)",
+    "id": "315:111317"
+   },
+   {
+    "name": "Block 02 — Pool Roulette (RL-01 crop + 6 callouts + secondary-zone outline)",
+    "id": "317:111470"
+   },
+   {
+    "name": "Block 03 — Orbit Rush (CR-01 crop scrolled 386 px + 6 callouts + CR-01/CR-02 same-slot strip)",
+    "id": "317:111680"
+   },
+   {
+    "name": "Block 04 — Bottom sheets (RL-02 bet slip, CR-06 auto-play, DI-05 verify crops)",
+    "id": "322:113050"
+   },
+   {
+    "name": "Block 05 — Secondary actions (RL-01 crop + inline top-sheet game menu)",
+    "id": "323:114260"
+   },
+   {
+    "name": "Top sheet — Game menu (inline, Menu/* instances)",
+    "id": "323:114420"
+   },
+   {
+    "name": "Block 06 — Target-size audit",
+    "id": "323:114519"
+   },
+   {
+    "name": "Block 07 — Coverage (lobby + 5 originals default/result frame IDs)",
+    "id": "323:114562"
+   },
+   {
+    "name": "Dev notes",
+    "id": "323:114681"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "MOB-08",
+    "status": "VERIFIED",
+    "note": "(a) 390 lobby exists: [PUB-03] Games Lobby / 390 / All games 36:531732 (Topbar Mobile, Input/Search, Tabs/Pill category pills, 21 Tile/Game Generic, Nav/Mobile Tab Bar Active=Games) and [GM-02] Game catalogue / 390 / Default 34:497645, so no lobby was rebuilt. (b) All five playable originals have 390 default + result frames: Pool Dice DI-01 33:288624 / DI-04 Win 33:315363, Lose 33:315810; Double Side CF-01 104:48933 / CF-03 Win 104:49572, Lose 104:49901; Pool Roulette RL-01 34:413030 / RL-05 Win 34:485123, Lose 34:485646; Orbit Rush CR-01 34:386552 / CR-04 34:420839; Twenty-One BJ-01 34:362883 / BJ-05 Win 34:389351. (c) New annotation frame 315:111233 (390 × 13,628, hug height) in section 315:111229. It shows the thumb-reach pattern on dice, roulette and crash using cropped clones of the real 390 frames, with numbered status/info callouts and a tinted bottom-third band. It covers: sticky bet bar with the primary action, 44 px minimum targets, amount presets above the bar, seeds/history/rules/sound behind a top-right button opening a top sheet, bottom sheets for bet slip, auto-play and verify, and the risk line. It also has a target-size audit, a coverage list and dev notes. Every block was checked in screenshots; fixes applied: same-slot strip made full-bleed, 2 callouts moved off the controls they described, demo values removed from coverage labels. Frame IDs are in design/figma-build/registry-mob-08.json; decision #62 added to decisions.md."
+   }
+  ],
+  "issues": [
+   "Target-size gap, not fixed because the frames belong to g-crash: in the Orbit Rush 390 frames (CR-01…CR-08) the quick amounts (½ · 2× · Min · Max) are Button/Secondary M at 75 × 40, and Back plus the Sound/Rules/Fairness header tools are Button/Icon M at 40 × 40. Both are below the 44 px mobile minimum; switch to Size L (48 px) as Pool Dice does. The MOB-08 frame flags this in Block 03 and Block 06.",
+   "Library gap: Tabs/Segmented renders 42 px tall (Over | Under in Pool Dice, Manual | Auto in Orbit Rush), and the Control/Checkbox consent row in CR-06 is 42 px. A 44 px mobile size or a padded hit area is needed.",
+   "Pre-existing overlap in RL-01 Pool Roulette 390 (34:413030) and its 390 clones: the game-header subtitle 'European · edge 2.70% · 0.10–1,000.00 per spot' is 269 px wide inside a 222 px Title frame, so it runs under the 48 px Sound button (x 282–330). Not fixed because the frame belongs to g-roulette; wrapping or shortening the subtitle would fix it.",
+   "Component gap: there is no Sheet/Top component. The game-menu top sheet in Block 05 is built inline from Menu/Section Label, Menu/Item (Type=Icon, resized to 48 px, Meta shown) and Menu/Divider instances. The annotation layer (24 px callout discs, thumb-zone band, dashed outline) is also inline, matching the existing MOB-0x spec boards; there is no Annotation component.",
+   "The existing 390 lobbies (PUB-03, GM-02) show the Guest state, so they have no member balance and no 'DEMO credits' card or Global Pool spotlight in the form the build-if-missing list described. They were not rebuilt because the brief only asked for a lobby where none existed. A Member-state 390 lobby could be added later if that card is wanted.",
+   "Crops are clones of the real frames, renamed 'Crop source — … (clone)' so the names don't collide with the originals. Scrolled viewports were made by setting the clone's Content to layoutMode NONE and shifting its children. If the source frames are edited later, the crops will not update.",
+   "Figma MCP: the Block 02/03 build call timed out after 60 s (it cloned 4 large frames and took 2 screenshots). A read-back showed it had completed, so nothing was duplicated. Later calls split building and screenshots into separate calls."
+  ]
+ },
+ {
+  "key": "final-qa-screens",
+  "section": "105:49686 (page '10 — Mobile Experience', 'WAL — Mobile B (Deposit)', MOB-06) · 67:52461 (page '09 — Admin Panel', ADM-P1..P10, ADM-P6 frames 80:59955 / 80:61181) · page '00 — Cover & Overview': Decisions log 14:2065 (frame 22:5712), Screen Ledger 14:2064 (summary 17:3926)",
+  "created": [
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Wrong-network warning — MOB-06 bottom sheet",
+    "id": "321:112563"
+   },
+   {
+    "name": "WAL-05 Deposit — Step 3 Deposit Address / 390 / Below minimum deposit — MOB-06 bottom sheet",
+    "id": "321:113000"
+   },
+   {
+    "name": "Badge/DEMO variant Size=XS, Tone=On gold (page 02)",
+    "id": "316:19501"
+   },
+   {
+    "name": "Badge/DEMO variant Size=S, Tone=On gold (page 02)",
+    "id": "316:19503"
+   },
+   {
+    "name": "Badge/DEMO variant Size=M, Tone=On gold (page 02)",
+    "id": "316:19505"
+   },
+   {
+    "name": "Decisions log frame extended with block 'Decisions 18–62' (44 one-line rows #18–#62)",
+    "id": "22:5712"
+   },
+   {
+    "name": "Ledger summary refreshed (status, priority and per-page counts, progress bar)",
+    "id": "17:3926"
+   },
+   {
+    "name": "Screen Ledger section: 12 new rows (GM-02…GM-08, PROMO-01…05), all 306 row statuses refreshed, groups restacked",
+    "id": "14:2064"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "MOB-06",
+    "status": "VERIFIED",
+    "note": "All required steps now exist at 390 as bottom sheets over the wallet, 14 frames in 105:49686: network, token, address, QR, pending (DP-77412 7/12 on Ethereum, per demo-data), confirmation, success, wrong network (new, 321:112563), below minimum (new, 321:113000), delayed, failed, expired, plus empty and unrecognised token. Both new frames are clones of step 3 (105:50420). Their alerts are built inline with tokens, the QR panel is hidden so the sheet fits 844, and DEMO is on the wallet/amount. An overflow audit of all 14 frames found 3 real defects in existing sheets, now fixed: step 1 Default/Empty Ethereum option (duplicate 'Congested' chip hidden), step 5 Confirming/Delayed timeline header (title now wraps so Processing + DEMO fit), step 7 receipt ('From address' shortened to 'From'). All passed the audit and screenshots afterwards."
+   },
+   {
+    "id": "ADM-P6",
+    "status": "VERIFIED",
+    "note": "The Runner-up Share cell renders 2.00% on 1440 (80:59955) and 1280 (80:61181); the earlier blank-cell defect is gone. Fixed: governance card titles now wrap inside their cards (they overflowed at 1280 and by 8 px at 1440), three Panel headers that were wider than their panels now fill them, and the Share column header is left-aligned to match its values. Both frames were re-checked with screenshots."
+   }
+  ],
+  "issues": [
+   "File thumbnail: the owner must set Cover frame 13:72 as the file thumbnail manually in Figma. The Plugin API cannot set it.",
+   "Library change on page 02: Badge/DEMO gained a Tone property. The existing variants were renamed to 'Size=XS|S|M, Tone=Default' (same IDs 6:120/6:122/6:124). New 'On gold' variants: 316:19501/19503/19505. The DEMO() helper still returns Default. The Shell/Sidebar Expanded Guest/Member gold tile DEMO (23:5661, 23:6014) now uses XS On gold. registry.json Badge/DEMO entry updated.",
+   "QA fix 3(a): on page 03, no Card/Promo DEMO overflowed its card (DEMO already sits inside the overline row). The real defect was in Banner/Promo (29:18042, 61 instances on page 03 and more elsewhere): DEMO floated over the art at the top-right and collided with the illustrations. Fixed in the component for all 7 types (DEMO XS moved into an 'Overline row' in the copy column) and confirmed on the PROMO-01 grid. PROMO-04 390 Live hero DEMO overflowed the card by 9 px: fixed (row fills, overline shortened to 'TOURNAMENT · 23 – 29 NOV'). No overflow flags on the page 05 PROMO frames.",
+   "QA fix 3(c): '46,850' remained in the Chart/Timeline Cancelled component (30:23220, also '4,685 entries'), USR-F5 Refunds 1440 (88:50964, 5 texts incl. Round card and lifecycle instance overrides) and USR-F5 390 (164:70290). All now read 41,200.00 / 50,000.00 and 4,120 entries. A grep found no '46,850', '4,685' or '234.25' on pages 02, 03, 05, 07 or 10. The registry-charts.json note was corrected.",
+   "Ledger summary on page 00 is computed from ledger.json with MOB-06 and ADM-P6 applied as VERIFIED. ledger.json itself was not edited, so the orchestrator should merge this report. Expected after merge: 306 total, 287 VERIFIED, 2 BUILT (CMP-01, PUB-06), 0 IN PROGRESS, 17 NOT STARTED (MOB-08 P0, plus P2 PUB-10/11/12/15/16/17/19, USR-V1–V4, USR-R1–R5). By priority: P0 126 (124 verified), P1 135 (135 verified), P2 45 (28 verified).",
+   "Page 00 layout: the 12 rows added to ledger.json after v1.0 had no Figma ledger rows, so they were added: GM-02…08 on 08, PROMO-01/04 on 03, PROMO-02/03/05 on 05 under a new 'PROMOTIONS' sub-group. All 294 old row statuses were stale (NOT STARTED/IN PROGRESS) and were refreshed. Group headers, Overview total/page index and the Resume card row count were updated. The Decisions log section moved to X 5800 and Resume here to X 4200, so the taller log (3,210 px) does not overlap the Screen Ledger. Not updated: the Resume card's 'Next ledger IDs' snapshot (27 Nov) and the Overview changelog.",
+   "Decision numbering in decisions.md has duplicates from parallel agents (28, 29×3, 31, 34, 35, 36) and one unnumbered entry. The Decisions log shows them in file order, suffixed b/c, with '—' for the unnumbered one. Decision #62 (this run) was appended to decisions.md.",
+   "Component gaps for MOB-06: Alert/Banner Inline is 720 wide with no mobile variant, so the danger and warning alerts in the new sheets are inline token builds. Shell/Topbar Mobile has no 'wrong network' state, so the mismatch is shown only inside the sheet. The 'pending n/20' in the brief was not used: the frame keeps the demo-data deposit DP-77412 on Ethereum, 7/12 confirmations.",
+   "Figma MCP behaviour, learned this session and worth remembering: use_figma calls can time out at 60 s yet still run later. One page-02 write did this; its state was checked before retrying, and a duplicated Banner/Promo description note was removed. One read-only page-09 audit also timed out. A follow-up page-00 script briefly overwrote the Overview total ('306' set to '7') through a too-broad selector; it was restored and the page-index counts were set correctly (verified by screenshot).",
+   "Memory used: only the project note on the GLOBAL POOL Figma file (file key and the BC.GAME-style direction), which matches conventions.md. Nothing in memory asked for actions outside the task.",
+   "Files written: registry-final-qa.json (new), registry.json (Badge/DEMO Tone), registry-charts.json (#1,245 note), decisions.md (#62). Scripts used are in /tmp/claude-0/-home-user-Claude/9871ef23-c9a5-595d-9e67-3ed608c9a6bf/scratchpad/qa/."
+  ]
+ },
+ {
+  "key": "pub-p2",
+  "section": "36:530715 (page '03 — Public Website', 'PUB-10/11/12/15 VIP, Affiliates, About, Contact', X 80000 Y 0) + 335:114596 (page '10 — Mobile Experience', 'PUB-10/11/12/15 — Mobile', X 49000 Y 0)",
+  "created": [
+   {
+    "name": "Section/PUB-10/11/12/15 VIP, Affiliates, About, Contact (page 03, pre-existing, refitted)",
+    "id": "36:530715"
+   },
+   {
+    "name": "Section/PUB-10/11/12/15 — Mobile (page 10)",
+    "id": "335:114596"
+   },
+   {
+    "name": "[PUB-10] VIP Program / 1440 / Default (logged out) — part A existed (was 800 px fixed, clipped); part B added and part A copy reconciled",
+    "id": "36:530716"
+   },
+   {
+    "name": "[PUB-11] Affiliate Program / 1440 / Default — calculator",
+    "id": "330:117038"
+   },
+   {
+    "name": "[PUB-12] About Us / 1440 / Default",
+    "id": "333:117841"
+   },
+   {
+    "name": "[PUB-15] Contact / 1440 / Default — empty form",
+    "id": "333:118907"
+   },
+   {
+    "name": "[PUB-15] Contact / 1440 / Validation error",
+    "id": "334:119477"
+   },
+   {
+    "name": "[PUB-15] Contact / 1440 / Sending — loading",
+    "id": "334:120083"
+   },
+   {
+    "name": "[PUB-15] Contact / 1440 / Sent — success",
+    "id": "334:120696"
+   },
+   {
+    "name": "[PUB-15] Contact / 1440 / Send failed — error",
+    "id": "334:121204"
+   },
+   {
+    "name": "[PUB-10] VIP Program / 390 / Default (logged out)",
+    "id": "335:114597"
+   },
+   {
+    "name": "[PUB-11] Affiliate Program / 390 / Default — calculator",
+    "id": "336:115755"
+   },
+   {
+    "name": "[PUB-12] About Us / 390 / Default",
+    "id": "335:115518"
+   },
+   {
+    "name": "[PUB-15] Contact / 390 / Default — empty form",
+    "id": "336:116422"
+   },
+   {
+    "name": "[PUB-15] Contact / 390 / Validation error",
+    "id": "336:116912"
+   },
+   {
+    "name": "[PUB-15] Contact / 390 / Sent — success",
+    "id": "336:117145"
+   },
+   {
+    "name": "[PUB-15] Contact / 390 / Send failed — error",
+    "id": "336:117595"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "PUB-10",
+    "status": "VERIFIED",
+    "note": "Desktop 1440 + mobile 390. Includes hero with Card/VIP Tier preview, facts, 5 Card/VIP Tier, points ladder, weekly-reward example (@nova.k Gold III, 1,326 pts, 115.20 USDT, auto-settles Mon 30 Nov 10:00 UTC), how points work with a worked example (+600 pts), a benefits comparison table with a 'Same for every tier' block, the VIP level-up promo, a responsible-play card, FAQ, VIP host card and the licence notice. Copy matches the demo-data VIP extras and USR-V4. Overlapping hero art was fixed and re-checked in a screenshot."
+   },
+   {
+    "id": "PUB-11",
+    "status": "VERIFIED",
+    "note": "Desktop + mobile. Commission model: 20% of the 0.05 USDT fee, so 0.01 USDT per entry. Per-entry flow, earn/never-earn rules, a calculator (40 × 120 × 0.05 × 20% = 48.00 USDT/month, DEMO), payout schedule, partner terms grid and an apply band. Payout rules follow the referral rules: commission accrues per round, payouts can be requested from 20.00 USDT with KYC L2 + 2FA, and are paid in the Monday 10:00 UTC run to Available with a 0.00 fee. Fixed the dashboard stats wrap and the scenario-chip overflow and icons."
+   },
+   {
+    "id": "PUB-12",
+    "status": "VERIFIED",
+    "note": "Desktop + mobile. Mission, three principles (Card/Feature), a 'what we will never do' list, numbers (DEMO), timeline, team placeholders with fictional roles and DEMO badges, licence and company placeholders, Notice/Licence."
+   },
+   {
+    "id": "PUB-15",
+    "status": "VERIFIED",
+    "note": "Desktop: Default, Validation error, Sending — loading, Sent — success and Send failed — error (5 frames). Mobile: Default, Validation error, Sent and Send failed (4 frames). Also: support channels, response times, RG/Help Resources and an anti-phishing notice. Fixed the topic placeholder in the error variant, the disabled-textarea helper, the success buttons overflow, the error note overflow, mobile email wrapping and the mobile textarea clipping; each fix was screenshot-checked."
+   }
+  ],
+  "issues": [
+   "Library: Card/VIP Tier (23:12669) variants still read 'Weekly reward 0.1%…1.0%' and 'Higher/Highest withdrawal limits'. This conflicts with the demo-data VIP extras and USR-V4 (no Bronze weekly reward, USDT rewards with no wagering, identical limits for every tier). Every Card/VIP Tier instance on PUB-10 (desktop and mobile) overrides its Benefit lines. The component itself should be updated.",
+   "Product conflict: the public Affiliate page uses the assigned standard plan (20% of the 0.05 USDT platform fee, never a share of losses). The ADM-A admin data (demo-data 'Admin — affiliates…') uses NGR revenue share of 25–35%, CPA 40.00, hybrid plans and monthly batches with a 25-day hold. These need a decision: either the media-partner plans move into the public terms, or the admin plans change.",
+   "Demo-data gap: the VIP weekly reward (115.20 for 16–22 Nov) cannot come from a %-of-stake rate given the weekly points (1,326 pts that week). The pending script's '23,040.00 × 0.5%' example was removed, and the public page explains the weekly reward without a rate.",
+   "Library quirks handled with instance overrides: Select/Field Error variant does not bind Value (it showed 'Select a type'); Input/Textarea Disabled variant has a hard-coded helper ('This ticket is closed…'); Menu/Filter Chip shows a chain-mark icon by default (Show icon is now set to false on the scenario and tier chips); Card/Feature's nested 'Icon' layer is renamed after an INSTANCE_SWAP, so tinting now finds the swapped instance through componentPropertyReferences.",
+   "Mobile Input/Textarea has a fixed height, so the long WD-20931 message clipped. The mobile Send-failed frame uses a shorter 106-character message; the desktop frames keep the full 195-character one.",
+   "Scripts and docs: the sources in design/figma-build/pending/pub-10-11-12-15 now match the canvas; assembled rerunnable scripts are in out/01…09 (see README.md); the originals are kept in orig/. The registry is updated in design/figma-build/registry-pub-vip-aff-about-contact.json, and decision #63 is appended to design/figma-build/decisions.md. Nothing was committed. ledger.json was not edited and is left to the orchestrator merge.",
+   "Memory: the repo note 'global-pool-figma-design' was read for context only (file key, casino direction). There are no new user facts to save."
+  ]
+ },
+ {
+  "key": "pub-legal",
+  "section": "335:236364",
+  "created": [
+   {
+    "name": "Section/PUB-16/17/19 Legal documents (page 03, X 90000, Y 0)",
+    "id": "335:236364"
+   },
+   {
+    "name": "Doc/PUB-16/17/19 header",
+    "id": "335:236365"
+   },
+   {
+    "name": "Template/Legal Document (component set)",
+    "id": "335:237300"
+   },
+   {
+    "name": "Template/Legal Document — Breakpoint=Desktop (1136 × 5951)",
+    "id": "335:236368"
+   },
+   {
+    "name": "Template/Legal Document — Breakpoint=Mobile (358 × 7696)",
+    "id": "335:236849"
+   },
+   {
+    "name": "[PUB-16] Terms & Conditions / 1440 / Default — long-form (logged out)",
+    "id": "336:238828"
+   },
+   {
+    "name": "[PUB-17] Privacy Policy / 1440 / Default — long-form (logged out)",
+    "id": "337:123899"
+   },
+   {
+    "name": "[PUB-19] AML/KYC Policy / 1440 / Default — long-form (logged out)",
+    "id": "337:125150"
+   },
+   {
+    "name": "Section/PUB-16/17/19 — Mobile (page 10, X 56000, Y 0)",
+    "id": "338:117637"
+   },
+   {
+    "name": "[PUB-16] Terms & Conditions / 390 / Default — long-form, contents collapsed",
+    "id": "338:117638"
+   },
+   {
+    "name": "[PUB-16] Terms & Conditions / 390 / Contents expanded (viewport 390×844, scrolled to contents)",
+    "id": "341:182984"
+   },
+   {
+    "name": "[PUB-17] Privacy Policy / 390 / Default — long-form, contents collapsed",
+    "id": "339:118342"
+   },
+   {
+    "name": "[PUB-19] AML/KYC Policy / 390 / Default — long-form, contents collapsed",
+    "id": "340:118936"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "PUB-16",
+    "status": "VERIFIED",
+    "note": "The desktop frame 336:238828 (7,245 tall) and the mobile frame 338:117638 (9,786 tall) both passed screenshots, with no text overflow and no override misses. There is an extra mobile state, 'Contents expanded' (341:182984): a 390×844 viewport scrolled to the open list, with all 11 contents rows visible. The page has 11 sections: Eligibility (18+, permitted jurisdictions), Account and verification, Deposits and withdrawals, Global Pool rules and fees (the 0.05 USDT fee as a separate line, plus a worked example marked DEMO: 35 entries = 350.00 + 1.75 = 351.75), Games and fairness, Responsible gaming, Restricted territories (including 'do not use a VPN'), Suspension and closure, Liability, Complaints and disputes, and Changes to these terms."
+   },
+   {
+    "id": "PUB-17",
+    "status": "VERIFIED",
+    "note": "The desktop frame 337:123899 (6,580 tall) and the mobile frame 339:118342 (8,857 tall) passed screenshots and a check of the template overrides: 10 sections, 10 contents rows, the section 8 data-export note, Privacy Policy selected in the document list, and no overflow."
+   },
+   {
+    "id": "PUB-19",
+    "status": "VERIFIED",
+    "note": "The desktop frame 337:125150 (6,510 tall) and the mobile frame 340:118936 (8,811 tall) passed screenshots and the same override check: 10 sections, KYC levels L1/L2/L3 with the 25,000.00 USDT limit, and two DEMO notes (typical review times, and the WD-20850 rejection of 600.00 USDT by sanctions screening). AML/KYC Policy is selected in the document list and nothing overflows."
+   }
+  ],
+  "issues": [
+   "Template/Legal Document (335:237300) sits in the module section on page 03, not on page 02. This follows the Template/Game Details precedent (registry-pub-04.json). It is recorded in registry-pub-legal.json and decisions.md #64.",
+   "One use_figma call that built 2 desktop frames plus screenshots hit the 60 s MCP timeout. Both frames had been created; a follow-up read-only call confirmed them and screenshot-verified them. The scripts now build one frame per call.",
+   "Shell/Sidebar has no Legal item, so the legal frames show no active sidebar item (Lobby was switched to Default). The mobile tab bar uses Active=Home, as on the other public pages.",
+   "On 390 frames the DEMO bar uses the short message 'DEMO DATA — illustrative values only' (decision #29), because the library default overflows at that width.",
+   "Operator, licence number, regulator, ADR body and licensing jurisdiction are '[… — DEMO placeholder]' text that matches the Footer Mega wording. Version numbers, dates and version history are marked DEMO.",
+   "Ledger sizes are D·M, so no laptop or tablet frames were built. Scripts and copy are in /home/user/Claude/design/figma-build/pending/pub-16-17-19/ (README.md, RUN-ORDER.json, data/*.js, out/*.js); the slice is marked COMPLETE there.",
+   "Memory: nothing new to save. The memory index was not needed beyond the conventions files."
+  ]
+ },
+ {
+  "key": "usr-vip-ref",
+  "section": "339:183126 (page '05 — User Dashboard', 'USR-V1..V4 VIP & USR-R1..R5 Referrals', X 48000 Y 0; 14160 x 4615) + 351:119957 (page '10 — Mobile Experience', 'USR — Mobile E', X 119000 Y 0; 4710 x 2586)",
+  "created": [
+   {
+    "name": "[USR-V1] VIP — Current Level & Progress / 1440 / Default",
+    "id": "341:63980"
+   },
+   {
+    "name": "[USR-V2] VIP — Points & History / 1440 / Default",
+    "id": "343:64516"
+   },
+   {
+    "name": "[USR-V3] VIP — Rewards / 1440 / Default",
+    "id": "343:65357"
+   },
+   {
+    "name": "[USR-V3] VIP — Rewards / 1440 / Weekly reward claimed",
+    "id": "343:66127"
+   },
+   {
+    "name": "[USR-V4] VIP — Benefits & Tier Comparison / 1440 / Default",
+    "id": "344:189375"
+   },
+   {
+    "name": "[USR-R1] Referrals — Link & Overview / 1440 / Default",
+    "id": "344:190448"
+   },
+   {
+    "name": "[USR-R2] Referrals — Statistics / 1440 / Default",
+    "id": "345:66960"
+   },
+   {
+    "name": "[USR-R3] Referrals — Invited Users / 1440 / Default",
+    "id": "345:67723"
+   },
+   {
+    "name": "[USR-R4] Referrals — Affiliate Earnings / 1440 / Default",
+    "id": "347:84275"
+   },
+   {
+    "name": "[USR-R5] Referrals — Payout History / 1440 / Default",
+    "id": "347:85153"
+   },
+   {
+    "name": "[USR-R5] Referrals — Payout History / 1440 / Request payout modal",
+    "id": "349:69070"
+   },
+   {
+    "name": "[USR-R5] Referrals — Payout History / 1440 / Payout locked — KYC L1 & below minimum (separate DEMO account)",
+    "id": "349:69819"
+   },
+   {
+    "name": "[USR-V1] VIP — Current Level & Progress / 390 / Default",
+    "id": "351:119958"
+   },
+   {
+    "name": "[USR-V2] VIP — Points & History / 390 / Default",
+    "id": "351:120218"
+   },
+   {
+    "name": "[USR-V3] VIP — Rewards / 390 / Default",
+    "id": "351:120505"
+   },
+   {
+    "name": "[USR-V4] VIP — Benefits & Tier Comparison / 390 / Default",
+    "id": "353:120338"
+   },
+   {
+    "name": "[USR-R1] Referrals — Link & Overview / 390 / Default",
+    "id": "353:120656"
+   },
+   {
+    "name": "[USR-R2] Referrals — Statistics / 390 / Default",
+    "id": "353:120929"
+   },
+   {
+    "name": "[USR-R3] Referrals — Invited Users / 390 / Default",
+    "id": "355:120760"
+   },
+   {
+    "name": "[USR-R4] Referrals — Affiliate Earnings / 390 / Default",
+    "id": "355:121107"
+   },
+   {
+    "name": "[USR-R5] Referrals — Payout History / 390 / Default",
+    "id": "356:196839"
+   },
+   {
+    "name": "[USR-R5] Referrals — Payout History / 390 / Request payout (bottom sheet)",
+    "id": "356:197069"
+   },
+   {
+    "name": "Section — USR-V1..V4 VIP & USR-R1..R5 Referrals (page 05)",
+    "id": "339:183126"
+   },
+   {
+    "name": "Section — USR — Mobile E (page 10)",
+    "id": "351:119957"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "USR-V1",
+    "status": "VERIFIED",
+    "note": "Built and checked in screenshots at 1440 and 390. Gold III, Level 14 of 29, 12,840 / 20,000 points. The level ladder runs Gold I to Platinum I. Weekly reward 115.20 Owed with an optional Claim button; it settles to Available by itself on Mon 30 Nov 10:00 UTC. Also shows a 'never chase a level' RG card with the 351.75 / 500.00 limit. Fixed: hero text overflowing under the art, and the limit row overflowing."
+   },
+   {
+    "id": "USR-V2",
+    "status": "VERIFIED",
+    "note": "Built and checked at 1440 and 390. KPIs: 12,840 / +1,286 / 5,032 / 7,160. The 8-row history was reconciled with the financial-history demo data (#1,248 35 entries at 18:05, #1,247 40 entries, #1,246 24 entries). Running balance runs 11,982 → 12,840 and crosses 12,000 at 19:30 on 25 Nov. Also a weekly chart, the roll-off schedule and a card on what does not earn points. Pagination 1–8 of 214, 27 pages."
+   },
+   {
+    "id": "USR-V3",
+    "status": "VERIFIED",
+    "note": "Default and 'Weekly reward claimed' at 1440, default at 390. 118.62 claimable (115.20 weekly reward + 3.42 rakeback), Claim all button, Coming-up list and reward history. Claimed state: Claimed badge, a new history row, a Success toast, Available 9,330.50, Owed 300.00, the Rewards tab count drops to 1. Claim states are covered as these two frames."
+   },
+   {
+    "id": "USR-V4",
+    "status": "VERIFIED",
+    "note": "Built and checked at 1440 and 390. Five-tier carousel (Card/VIP Tier, benefit copy overridden), comparison table with a 'Same for every tier' group (odds, VRF, withdrawal checks, RG), what Platinum adds, and the fair-play card. Mobile shows Gold vs Platinum stacked."
+   },
+   {
+    "id": "USR-R1",
+    "status": "VERIFIED",
+    "note": "Built and checked at 1440 and 390. Referral link globalpool.example/r/NOVAK27 with Copy, code NOVAK27, share buttons (Telegram, X, Email, QR). Hero art is entry tickets cropped by the edge on angled mint blocks. KPIs: 1,904 clicks, 48 sign-ups, 31 verified, 19 active. Earnings 142.50 = 90.00 + 48.60 + 3.90, how-it-works steps, RC-14 boost promo with terms and 18+, and a compliant-sharing row."
+   },
+   {
+    "id": "USR-R2",
+    "status": "VERIFIED",
+    "note": "Built and checked at 1440 and 390. Last 30 days: 612 clicks, 9 sign-ups, 6 verified, 58.80 earned. Funnel 612 → 9 → 6 → 5. Daily bars add up to 58.80; 24 Nov is 0.00 because round #1,245 was cancelled. Clicks by channel and active players 19 of 31."
+   },
+   {
+    "id": "USR-R3",
+    "status": "VERIFIED",
+    "note": "Built and checked at 1440 and 390. Masked handles with DEMO tags and a privacy note. Table: KYC, status, entries, fees, your 20%, earning-until date. Totals 14,250 / 712.50 / 142.50 reconcile with the top 10 plus the other 38 players. Filters 48 / 19 / 12 / 17. Mobile uses stacked cards."
+   },
+   {
+    "id": "USR-R4",
+    "status": "VERIFIED",
+    "note": "Built and checked at 1440 and 390. KPIs 142.50 / 48.60 / 3.90 / 90.00. Monthly chart Mar–Nov adds up to 142.50. November worked example: 5,250 × 0.05 × 20% = 52.50. Earnings by round #1,243–#1,248; #1,245 is cancelled with no commission."
+   },
+   {
+    "id": "USR-R5",
+    "status": "VERIFIED",
+    "note": "Default, Request payout modal and Payout locked at 1440; default and bottom sheet at 390. Requirements shown: minimum 20.00 USDT, KYC L2 and 2FA. Paid to Available, fee 0.00. History: PO-0412, PO-0388, and PO-0351 rejected. Modal: amount 48.60 with MAX, Available after payout 9,263.90, confirmation checkbox unchecked, Continue disabled. Locked state is a separate DEMO account: KYC L1, 14.30 USDT, Verify identity button, empty history."
+   }
+  ],
+  "issues": [
+   "Status: all 22 frames are built and each was checked in a screenshot. Nothing existed in either section before this run; the earlier runs had hit the MCP limit before building anything. No MCP limit errors this run. One fix script timed out after 60 s; a read-only check showed it had applied, so it was not repeated.",
+   "Prepared scripts in pending/usr-vip-ref had five bugs, fixed in the source files there. (1) The DESK sidebar re-tinted an icon node that the variant swap had already removed. (2) An expando property on Figma nodes (CELL.__fill) is not allowed; replaced with a Set of ids. (3) Two effect-style names were wrong: 'Elevation/3' and 'Elevation/4' must be the full names. (4) Empty ROW/CELL spacer frames default to 100 px tall and made table headers and total rows tall; the new FIXEMPTY() helper collapses them. (5) Several fixed-width texts overflowed and were changed to wrap or FILL.",
+   "Demo data reconciliation: the old scripts' points history contradicted the financial history (round #1,247 was 15 entries, #1,246 was 20). It now uses #1,247 40 entries / 400 pts at 12:40 and #1,246 24 entries / 240 pts at 19:12, and the balance still reaches 12,000 at 25 Nov 19:30.",
+   "Built inline because no library component fits: the payout request modal body (Modal/Base slot is fixed), the payout bottom sheet (Sheet/Bottom content is fixed), bar charts (Chart/Bar holds fixed fee data), KPI tiles, the level ladder, comparison-table cells, funnel steps and the scrolled mobile sub-nav wrapper.",
+   "Library follow-ups: Card/VIP Tier still has 'Weekly reward 0.1–1.0%' / 'Higher withdrawal limits' benefit copy, so every instance here overrides it (same as PUB-10). Notice/Demo Data needs a Mobile/wrapping variant; mobile frames use the short message 'DEMO DATA — illustrative values only' (decision #29). A Tabs/Pill bar that scrolls to the active tab would replace the inline wrapper.",
+   "On USR-V4 desktop the Platinum and Diamond tier cards are cut off by the carousel edge on purpose. This is a scrolling carousel with ‹ › arrows.",
+   "The locked-payout frame reuses the @nova.k desktop shell (sidebar shows VIP Gold) but is labelled as a separate DEMO account; its top-bar balance shows 342.10.",
+   "Updated: registry-usr-vip-ref.json (all frame and section ids, written in full) and pending/usr-vip-ref/README.md (status block). ledger.json was NOT edited; the orchestrator should merge these ledger rows.",
+   "Possible memory note (source: this run): in this Figma file, empty figma.createAutoLayout() frames used as spacers stay 100 px tall, and Figma nodes reject custom JS properties. Memory was not used for this task."
+  ]
+ },
+ {
+  "key": "pub-p1c",
+  "section": "54:101508 (page '03 — Public Website', 'PUB-24/25/26 Errors & PUB-06 Leaderboard', X=70000, Y=0) + 215:78629 (page '10 — Mobile Experience', 'PUB-06/24/25/26 — Mobile', X=42000, Y=0)",
+  "created": [
+   {
+    "name": "Section/PUB-24/25/26 Errors & PUB-06 Leaderboard (page 03, X=70000)",
+    "id": "54:101508"
+   },
+   {
+    "name": "Doc/PUB-24-26 + PUB-06 header",
+    "id": "54:101509"
+   },
+   {
+    "name": "[PUB-24] 404 Not Found / 1440 / Default",
+    "id": "54:101512"
+   },
+   {
+    "name": "[PUB-25] 500 Server Error / 1440 / Default",
+    "id": "82:102573"
+   },
+   {
+    "name": "[PUB-26] Maintenance / 1440 / Scheduled — withdrawals available",
+    "id": "82:103376"
+   },
+   {
+    "name": "[PUB-06] Leaderboard / 1440 / Weekly (default)",
+    "id": "84:103900"
+   },
+   {
+    "name": "[PUB-06] Leaderboard / 1440 / Daily",
+    "id": "84:104905"
+   },
+   {
+    "name": "[PUB-06] Leaderboard / 1440 / Monthly",
+    "id": "84:105918"
+   },
+   {
+    "name": "Section/PUB-06/24/25/26 — Mobile (page 10, X=42000)",
+    "id": "215:78629"
+   },
+   {
+    "name": "[PUB-24] 404 Not Found / 390 / Default",
+    "id": "215:79244"
+   },
+   {
+    "name": "[PUB-25] 500 Server Error / 390 / Default",
+    "id": "215:80405"
+   },
+   {
+    "name": "[PUB-26] Maintenance / 390 / Scheduled — withdrawals available",
+    "id": "215:81600"
+   },
+   {
+    "name": "[PUB-06] Leaderboard / 390 / Weekly (default)",
+    "id": "216:81112"
+   },
+   {
+    "name": "[PUB-06] Leaderboard / 390 / Daily — not ranked yet",
+    "id": "216:82473"
+   },
+   {
+    "name": "Podium 'Place' rows added by this run's fix (Weekly, Daily and Monthly, 3 each)",
+    "id": "343:190713,343:190714,343:190715,343:190716,343:190717,343:190718,343:190719,343:190720,343:190721"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "PUB-24",
+    "status": "VERIFIED",
+    "note": "1440 Default 54:101512 + 390 Default 215:79244 already existed (inventory this run). Fixed in this run: on 3 'Popular right now' tiles, the HOT/NEW tag plus the player-count pill with its DEMO badge was wider than the 160 px tile and got clipped. The tag is now off via 'Show tag', and the post-fix screenshot passes. The only overflow left is the 7th tile, which the carousel edge crops on purpose."
+   },
+   {
+    "id": "PUB-25",
+    "status": "VERIFIED",
+    "note": "1440 Default 82:102573 + 390 Default 215:80405 exist. The per-node overflow audit in this run found 0 issues. Earlier screenshots stand."
+   },
+   {
+    "id": "PUB-26",
+    "status": "VERIFIED",
+    "note": "1440 82:103376 + 390 215:81600 exist. Fixed in this run: the hero's 'Window / Status / Last update' facts row was 530 px, 10 px wider than its 520 px copy column. It now uses gap 20 (token) and FILL width, and the post-fix screenshot passes."
+   },
+   {
+    "id": "PUB-06",
+    "status": "VERIFIED",
+    "note": "1440 Weekly (default) 84:103900, Daily 84:104905, Monthly 84:105918 + 390 Weekly (default) 216:81112 and Daily 'not ranked yet' 216:82473 exist. This run checked the Monthly 1440 screenshot, which was missing before. It found and fixed two defects in all three 1440 frames: (1) the Standings column header used fixed 730/120/120 cells that overflowed the 702 px row behind the right column; H/Player is now FILL and the columns match Table/Leaderboard Row (16 | 48·346·120·120 | 16, gap 12); (2) podium handles of 68–97 px overflowed a 51 px Handle frame and ran under the DEMO badge; the badge now sits in a 'Place' row under the handle. Post-fix screenshots of the Weekly, Daily and Monthly main grids pass, and the audit finds 0 overflow. Monthly at 390 is the same layout switched by tab (rule #16)."
+   }
+  ],
+  "issues": [
+   "Library-level (not fixed in the component, page 02 untouched): Tile/Game Generic at 160 px wide clips when a Tag (HOT/NEW) and a 3–5 digit player pill with Badge/DEMO show together (8+38+4+1+4+111+8 = 174 px). Other screens using this tile at 160 px may show the same clipping. Suggest the component either drops the DEMO inside the pill at narrow widths or puts the tag on its own row.",
+   "Table/Leaderboard Row has no header variant. The header row is built inline per screen, so its column widths must be kept in step with the row by hand (now aligned: 48 / FILL / 120 / 120, padding 16, gap 12).",
+   "Nothing was missing in this slice, so no new frames were built. Fix scripts are saved as /home/user/Claude/design/figma-build/pending/pub-p1c/out/f1-leader-header-podium.js and /home/user/Claude/design/figma-build/pending/pub-p1c/out/f2-404tiles-maint-window.js (idempotent; bodies in the folder root). README.md and RUN-ORDER.json in /home/user/Claude/design/figma-build/pending/pub-p1c are updated. ledger.json was not edited directly; the statuses above are for the orchestrator to merge.",
+   "Figma MCP usage this run: 7 use_figma calls (2 page inventories, 2 read-only probes, 2 targeted fixes, 1 read-only post-fix screenshot). No limit errors."
+  ]
+ },
+ {
+  "key": "final-qa-lib",
+  "section": "Page '02 — Components' (existing sections, no new section). Page '01 — Design System' was scanned read-only: its 29 violet/hex matches are correct primitive docs and its 7 button instances are fine, so nothing changed there. Registry: /home/user/Claude/design/figma-build/registry-final-qa-lib.json. Decision #65 appended to /home/user/Claude/design/figma-build/decisions.md.",
+  "created": [
+   {
+    "name": "Button/Wallet — Size=M, State=Pressed",
+    "id": "356:19504"
+   },
+   {
+    "name": "Button/Wallet — Size=M, State=Focus",
+    "id": "356:19507"
+   },
+   {
+    "name": "Button/Wallet — Size=S, State=Pressed",
+    "id": "356:19510"
+   },
+   {
+    "name": "Button/Wallet — Size=S, State=Focus",
+    "id": "356:19513"
+   },
+   {
+    "name": "Control/Checkbox — Value=Unchecked, State=Default, Width=Hug",
+    "id": "357:19520"
+   },
+   {
+    "name": "Control/Checkbox — Value=Unchecked, State=Hover, Width=Hug",
+    "id": "357:19526"
+   },
+   {
+    "name": "Control/Checkbox — Value=Unchecked, State=Focus, Width=Hug",
+    "id": "357:19532"
+   },
+   {
+    "name": "Control/Checkbox — Value=Unchecked, State=Disabled, Width=Hug",
+    "id": "357:19538"
+   },
+   {
+    "name": "Control/Checkbox — Value=Unchecked, State=Error, Width=Hug",
+    "id": "357:19544"
+   },
+   {
+    "name": "Control/Checkbox — Value=Checked, State=Default, Width=Hug",
+    "id": "357:19556"
+   },
+   {
+    "name": "Control/Checkbox — Value=Checked, State=Hover, Width=Hug",
+    "id": "357:19564"
+   },
+   {
+    "name": "Control/Checkbox — Value=Checked, State=Focus, Width=Hug",
+    "id": "357:19572"
+   },
+   {
+    "name": "Control/Checkbox — Value=Checked, State=Disabled, Width=Hug",
+    "id": "357:19580"
+   },
+   {
+    "name": "Control/Checkbox — Value=Checked, State=Error, Width=Hug",
+    "id": "357:19588"
+   },
+   {
+    "name": "Control/Checkbox — Value=Indeterminate, State=Default, Width=Hug",
+    "id": "357:19602"
+   },
+   {
+    "name": "Control/Checkbox — Value=Indeterminate, State=Hover, Width=Hug",
+    "id": "357:19610"
+   },
+   {
+    "name": "Control/Checkbox — Value=Indeterminate, State=Focus, Width=Hug",
+    "id": "357:19618"
+   },
+   {
+    "name": "Control/Checkbox — Value=Indeterminate, State=Disabled, Width=Hug",
+    "id": "357:19626"
+   },
+   {
+    "name": "Control/Checkbox — Value=Indeterminate, State=Error, Width=Hug",
+    "id": "357:19634"
+   },
+   {
+    "name": "Admin/Role Chip — Role=Marketing, Size=S",
+    "id": "358:19539"
+   },
+   {
+    "name": "Admin/Role Chip — Role=Marketing, Size=M",
+    "id": "358:19548"
+   },
+   {
+    "name": "Admin/Queue Card — Queue=KYC, SLA=On track, Density=Compact",
+    "id": "358:19557"
+   },
+   {
+    "name": "Admin/Queue Card — Queue=KYC, SLA=At risk, Density=Compact",
+    "id": "358:19612"
+   },
+   {
+    "name": "Admin/Queue Card — Queue=KYC, SLA=Breached, Density=Compact",
+    "id": "358:19664"
+   },
+   {
+    "name": "Admin/Queue Card — Queue=Withdrawals, SLA=On track, Density=Compact",
+    "id": "358:19716"
+   },
+   {
+    "name": "Admin/Queue Card — Queue=Withdrawals, SLA=At risk, Density=Compact",
+    "id": "358:19766"
+   },
+   {
+    "name": "Admin/Queue Card — Queue=Withdrawals, SLA=Breached, Density=Compact",
+    "id": "358:19817"
+   },
+   {
+    "name": "Nav/Command Palette — TEXT property Scope (default 'Scoped to your role')",
+    "id": "Scope#359:0 on set 22:6663"
+   },
+   {
+    "name": "Tile/Category Global Pool — Art/Global Pool (Tile/Game Art illustration)",
+    "id": "361:20209"
+   },
+   {
+    "name": "Tile/Category Originals — Art/Fortune Ring",
+    "id": "361:20291"
+   },
+   {
+    "name": "Tile/Category Table games — Art/Twenty-One (table-edge arcs hidden)",
+    "id": "361:20335"
+   },
+   {
+    "name": "Tile/Category Instant games — Art/Pool Dice",
+    "id": "361:20369"
+   }
+  ],
+  "ledger": [
+   {
+    "id": "CMP-01",
+    "status": "VERIFIED",
+    "note": "I checked all 7 sets in screenshots and in a structural read: Button/Primary 7:193, Secondary 7:308, Ghost 7:423, Danger 7:538, Gold 7:653 (each 3 sizes × Default/Hover/Pressed/Focus/Disabled/Loading), Icon 7:774 (Ghost/Secondary × 3 sizes × 5 states) and Wallet 7:859. Labels are auto-width, so none clip. Icons are centred on both axes (16 px in S, 20 px in M/L) and tinted with the label token. Contrast: Primary is mint brand/primary-strong #2CD97D with a dark text/on-primary #151717 label (9.7:1); Gold accent/gold #F4C96C with text/on-gold (11.5:1) only on the jackpot CTA; Danger 4.5:1; Secondary 11.2:1. Focus is a 2 px border/focus stroke drawn OUTSIDE the button. Loading shows a spinner and keeps the label. Fixes: Button/Primary's description still described the old violet fill with a white label, so I rewrote it, and all 7 set descriptions now give tokens, states and focus/loading rules. Button/Wallet had no Pressed or Focus state; both are added for sizes M and S (356:19504/19507/19510/19513). Known nit, now documented in the descriptions: Secondary and Wallet are 2 px narrower in Focus than in their other states, because the 1 px inside border counts in auto layout and the outside ring does not."
+   }
+  ],
+  "issues": [
+   "APPLIED — Control/Checkbox 20:3205: the request was to make the checkbox hug its label. Changing the main component in place would break built screens: 13 instances still at the default 360 px would reflow, and instances resized to 208/248/280/288 px would overflow. So I added a Width property instead: Width=Fixed is the 15 original variants (default, unchanged), and Width=Hug is 15 new variants that hug a one-line label. I() still returns Fixed when Width is not given. Tested with 'Remember this device for 30 days' → 263 px wide.",
+   "APPLIED — Admin/Role Chip 23:18440: added Role=Marketing in sizes S and M (megaphone icon in status/warning). The ADM-S3 tablet frame still uses a cloned desktop chip with an overridden label; its owner can swap it to the new variant.",
+   "APPLIED — Admin/Queue Card 23:15571: added Density=Compact (358 px): metrics stack as label/value rows so 'Needs 2nd approver' no longer clips, the SLA bar stretches with the card, and 'Updated 27 Nov 2026, 18:42 UTC' sits above a full-width 48 px 'Open queue' button. The existing variants became Density=Default and are unchanged. The page-09/10 mobile instances (with the shortened '2nd approver' / '18:42 UTC' text) still use Default; swapping them to Compact is follow-up work for their owners.",
+   "APPLIED WITH PROTECTION — Input/OTP 16:3761: the description now fills the field width and wraps to at most 2 lines, then ends in an ellipsis. Of 82 instances, 76 fit on one line and look exactly the same. 6 instances on page 10 have copy wider than the field (263:205528, 34:420227, 34:436266, 263:205817 in AUTH-04 / PRO-01 sheets; 266:213427, 109:51352 in WAL-16 / PRO-04 sheets inside fixed 844 px frames with no free space). Wrapping would make them 16 px taller, so they keep their current single-line layout through an instance override (textAutoResize WIDTH_AND_HEIGHT). They still clip by 2–9 px as before; their owners should shorten the copy or remove the override to get the 2-line wrap. I checked: no OTP instance height changed.",
+   "APPLIED — Nav/Command Palette 22:6663: the footer text is now a TEXT property 'Scope' (key Scope#359:0), default 'Scoped to your role', and the layer is renamed 'Scope'. The 3 page-09 instances keep 'Scoped to role: Super Admin' / 'Scoped to role: Compliance Officer' (checked after the change).",
+   "APPLIED — Toast 30:16872: in all 5 types the nested Badge/DEMO text layer is renamed 'DEMO label'. The only layers still named 'Label' are the action links.",
+   "APPLIED — Section/SEO Text 25:16288: paragraph 2 no longer says 'five original games'. It now names GLOBAL POOL Originals (Orbit Rush, Vault Sweeper, Pool Dice), table games, GP Studios slots and illustrated live tables. The contact heading is 'Contact & support' instead of 'Help us improve', which the footer already uses. All 11 screen instances already overrode this text, so none of them changed.",
+   "APPLIED — Strip/Recent Wins 23:20415: it shows its art through Tile/Game Small 23:17671. Each of the 6 variants now nests the current Tile/Game Art (Global Pool, Pool Roulette, Orbit Rush, Pool Dice, Double Side, Twenty-One) at 100×133 with that art's own label hidden. Search and mobile rows that use Tile/Game Small also pick up the new art. I checked it on page 03 in Home H4: no layout change.",
+   "APPLIED — Table/Live Bets 25:14776: all 10 thumbnails (30×40) switched from Art/Game to Tile/Game Art (label hidden, radius/xs). The page-03 instance picks up the change.",
+   "APPLIED — Tile/Category 23:21105: the Orb, Dice, Cards and Comet motifs are replaced by Tile/Game Art illustrations (backdrop, scrim and label hidden), anchored right and cropped by the tile edge: Global Pool coins and tickets, Fortune Ring, Twenty-One (dashed and solid table-edge arcs hidden so nothing reads as an orbit ring), Pool Dice. Provably fair keeps the Art/Spot Shield and VIP Club the Crown; both are concrete objects and I found no glow, blur or particle layers in them. The default copy no longer hard-codes counts: chips read 'Browse Originals' / 'Browse tables' / 'Browse instant games'. The page-03 Home H3 grid picks up the new art. Its own copy overrides still say '11 games / 9 games / 8 games', and its Instant games line names Orbit Rush, Skyline and Pinfall while the art shows Pool Dice — left to the H3 owner.",
+   "DOCS — I corrected stale component descriptions: the Tile/Category anatomy, the Section/SEO Text summary, the Admin/Role Chip role list, and Row/Game Carousel's claim that there are 'exactly 6 titles'. Art/Game 23:14045 and Art/Spot 23:10035 descriptions now start with LEGACY: Orb, Coin and its motion arcs, Comet and Network break decision #23.",
+   "REMAINING (outside this assignment) — Art/Game and Art/Spot are still nested by Tile/Game (36 instances on page 02), Row/Game Carousel (24), Banner/Hero (6), Banner/Hero Side (3), Banner/Hero Carousel (4), Card/Draw Countdown (3) and Card/Promo (4). Wherever those are used, the orb, orbit-arc and light-ray motifs still show.",
+   "TOOLING NOTE — Cloning a variant inside a component set drops its componentPropertyReferences. This silently broke the Label property on the new Checkbox Width=Hug variants and Show DEMO on the Queue Card Density=Compact variants. I found it with test instances and re-bound both; the tests passed afterwards. Other agents who clone variants need to re-bind these references.",
+   "NOT IN THIS ASSIGNMENT, STILL OPEN (from results/*.json) — Notice/Demo Data has no wrapping mobile variant. Toast titles are auto-width and push the DEMO badge out. Tx/Hash, Tx/Status Timeline, Tx/Receipt Card and Wallet/Deposit Address Block need compact versions for 358 px. The Notice/Licence links row cannot wrap. Input/Textarea has a fixed 128 px field. RG/Session Bar 'Limit reached' renders at disabled contrast. Card/VIP Tier benefit copy is outdated. Some component defaults disagree with demo-data (Card/Round Cancelled, Card/Balance Owed, Alert/Banner Security/Maintenance, Input/Password placeholder, Wallet/Deposit Address Block 'Degraded'). Select/Network Option truncates at 358 px. Game/Provably Fair Verifier has no VRF mode. Modal/Participation Preview has no max-height variant. Shell/Topbar has no 768 variant.",
+   "Memory: I used the repo note on the GLOBAL POOL Figma project (file key, BC.GAME-style palette, casino layout) only as background; it matched conventions.md. There is nothing new to save to memory."
+  ]
+ }
+]

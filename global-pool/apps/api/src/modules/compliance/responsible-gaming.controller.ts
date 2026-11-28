@@ -35,9 +35,13 @@ class HistoryQueryDto extends createZodDto(rgHistoryQuerySchema) {}
 /**
  * Responsible gaming (USR-RG1..RG7). Every change is enforced server-side and written to the hash-chained audit log;
  * the same rows feed the player's limit history. Nothing here can ever block a withdrawal.
+ *
+ * Open from the first sign-in, before onboarding (like 2FA and the account status): limits, breaks and
+ * self-exclusion are protective tools, so a player must be able to read and set them before ever playing (the web
+ * exempts /responsible-gaming from the onboarding redirect). Gaming and money routes still require onboarding.
  */
 @ApiTags('responsible-gaming')
-@PlayerAuth()
+@PlayerAuth({ onboarded: false })
 @Controller('responsible-gaming')
 export class ResponsibleGamingController {
   constructor(

@@ -215,6 +215,29 @@ describe('deposit watcher: re-org shifting sibling log indices (R35)', () => {
     expect(await balances(x)).toMatchObject({ available: '40.00', pending: '0.00' });
     expect(await balances(y)).toMatchObject({ available: '60.00', pending: '0.00' });
   });
+
+  it('a sibling whose transfer is gone is moved out of the way and reversed; the shifted deposit is credited (R35b)', async () => {
+    const x = await newPlayer(t);
+    const y = await newPlayer(t);
+    const toX = await depositAddress(x);
+    const toY = await depositAddress(y);
+    const hash = chain.send([
+      { logIndex: 7, to: toX, amount: '43.00' },
+      { logIndex: 8, to: toY, amount: '63.00' },
+    ]);
+    expect(await watcher.watch()).toMatchObject({ status: 'ok', detected: 2 });
+    // Re-org: the transaction runs again on the new state and only emits X, at Y's old log index.
+    chain.drop(hash);
+    chain.include(hash, [{ logIndex: 8, to: toX, amount: '43.00' }]);
+    expect(await watcher.watch()).toMatchObject({ status: 'ok', detected: 0, reversed: 1 });
+    expect((await depositsOf(x.userId))[0]).toMatchObject({ logIndex: 8, status: 'confirming' });
+    expect((await depositsOf(y.userId))[0]).toMatchObject({ status: 'rejected' });
+    expect(await balances(y)).toMatchObject({ pending: '0.00', available: '0.00' });
+    chain.mine(N);
+    expect(await watcher.watch()).toMatchObject({ status: 'ok', credited: 1 });
+    expect(await balances(x)).toMatchObject({ available: '43.00', pending: '0.00' });
+    expect(await balances(y)).toMatchObject({ available: '0.00', pending: '0.00' });
+  });
 });
 
 describe('deposit watcher: reversed deposit re-included later (R15)', () => {
@@ -252,6 +275,38 @@ describe('deposit watcher: reversed deposit re-included later (R15)', () => {
       'deposit_reversed',
       'deposit_detected',
       'deposit_credited',
+    ]);
+  });
+
+  it('a batch of identical reversed transfers re-included at shifted indices reopens every deposit in one pass (R15b)', async () => {
+    const p = await newPlayer(t);
+    const to = await depositAddress(p);
+    const hash = chain.send([
+      { logIndex: 3, to, amount: '100.00' },
+      { logIndex: 5, to, amount: '100.00' },
+    ]);
+    expect(await watcher.watch()).toMatchObject({ detected: 2 });
+    chain.drop(hash);
+    chain.mine(1);
+    await watcher.watch();
+    chain.mine(N);
+    expect(await watcher.watch()).toMatchObject({ reversed: 2 });
+    expect(await balances(p)).toMatchObject({ pending: '0.00', available: '0.00' });
+
+    // Re-included one log earlier, and the next poll only comes after more than N blocks (Arbitrum ≈ 60 blocks per
+    // 15 s poll): this pass is the only one whose re-org window still covers the block.
+    chain.include(hash, [
+      { logIndex: 1, to, amount: '100.00' },
+      { logIndex: 3, to, amount: '100.00' },
+    ]);
+    chain.mine(N + 10);
+    expect(await watcher.watch()).toMatchObject({ status: 'ok', reopened: 2, credited: 2 });
+    expect(await watcher.watch()).toMatchObject({ reopened: 0, credited: 0, detected: 0 });
+    expect(await balances(p)).toMatchObject({ pending: '0.00', available: '200.00' });
+    const rows = await depositsOf(p.userId);
+    expect(rows.map((d) => [d.logIndex, d.status])).toEqual([
+      [1, 'credited'],
+      [3, 'credited'],
     ]);
   });
 });

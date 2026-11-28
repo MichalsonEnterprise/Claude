@@ -72,7 +72,10 @@ export class AccountStatusController {
           ? 'self_excluded'
           : !regionPermitted
             ? 'region'
-            : types.has('gaming_blocked') || types.has('deposits_blocked')
+            : // Any review restriction — an AML withdrawals freeze included — is never "no restrictions".
+              types.has('gaming_blocked') ||
+                types.has('deposits_blocked') ||
+                types.has('withdrawals_frozen')
               ? 'under_review'
               : 'ok';
     return {

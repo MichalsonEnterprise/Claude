@@ -12,6 +12,7 @@ import {
   PRIZES_PER_ROUND,
   feesForEntries,
   meetsThreshold,
+  displayOddsPercent,
   oddsDisclosure,
   poolForEntries,
   prizeBreakdown,
@@ -147,5 +148,17 @@ describe('pool rules', () => {
     expect(oddsDisclosure(1, 1500).firstPrizePercent).toBe('0.066');
     expect(oddsDisclosure(1, 1500, 13, 6).firstPrizePercent).toBe('0.066666');
     expect(oddsDisclosure(35, 18640, 13, 6).firstPrizePercent).toBe('0.187768');
+  });
+
+  it('displayed odds are rounded down too, with adaptive precision (R48b)', () => {
+    expect(displayOddsPercent('0.187768')).toBe('0.187'); // half-up to 2 dp would show 0.19
+    expect(displayOddsPercent('66.666666')).toBe('66.66'); // not 66.67
+    expect(displayOddsPercent('0.066666')).toBe('0.0666'); // not 0.07
+    expect(displayOddsPercent('0.866666')).toBe('0.866'); // not 0.87
+    expect(displayOddsPercent('2.440987')).toBe('2.44'); // 6-decimal API value shown at 2 dp
+    expect(displayOddsPercent('100')).toBe('100.00');
+    expect(displayOddsPercent('0')).toBe('0.0000');
+    const o = oddsDisclosure(1, 1500, 13, 6);
+    expect(displayOddsPercent(o.anyPrizeApproxPercent)).toBe('0.866'); // 0.866666…, not 0.87
   });
 });

@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import type { RgLimit, RgLimitType, RgPeriod, RgSettings } from '@prisma/client';
-import { isCoolingOffDuration, type SelfExclusionDuration } from '@gp/shared/enums';
+import {
+  isCoolingOffDuration,
+  SELF_EXCLUSION_DURATIONS,
+  type SelfExclusionDuration,
+} from '@gp/shared/enums';
 import {
   REALITY_CHECK_DEFAULT_MINUTES,
   RG_LIMIT_INCREASE_COOLDOWN_HOURS,
@@ -376,7 +380,16 @@ export class ResponsibleGamingService {
     if (current.active) {
       const currentEnd = current.endsAt ? new Date(current.endsAt) : null;
       const notLonger = currentEnd === null || (endsAt !== null && endsAt <= currentEnd);
-      if (notLonger) {
+      // A break while a break or self-exclusion of the same or a longer length is still running is refused (API.md:
+      // "409 when an equal or longer exclusion is active"), so repeating a 24 h break does not restart it. A longer
+      // break or a self-exclusion always extends; an ended long self-exclusion awaiting reopen can be renewed.
+      const sameOrLongerRunning =
+        isCoolingOffDuration(duration) &&
+        !current.reopen &&
+        current.duration !== null &&
+        SELF_EXCLUSION_DURATIONS.indexOf(current.duration) >=
+          SELF_EXCLUSION_DURATIONS.indexOf(duration);
+      if (notLonger || sameOrLongerRunning) {
         throw conflict(
           'You already have an active break or self-exclusion that lasts at least as long. It cannot be shortened.',
           { endsAt: current.endsAt, kind: current.kind },

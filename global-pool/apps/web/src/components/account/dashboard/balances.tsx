@@ -2,6 +2,7 @@
 
 import { formatCount, formatTimeUTC } from '@gp/shared/format';
 import { formatUSDT, money, mul } from '@gp/shared/money';
+import { displayOddsPercent } from '@gp/shared/pool';
 import { Activity, CircleHelp, Wallet } from 'lucide-react';
 import * as React from 'react';
 
@@ -304,9 +305,9 @@ function ZeroBalances({ balances }: { balances: BalancesView }) {
   );
 }
 
-/** "≈ 2.44%" helper for odds (string in, string out — no floats). */
+/** "2.44%" helper for odds (string in, string out — no floats): rounded DOWN, never overstated (R48b). */
 export function approxPercent(value: string): string {
-  return `${money(value).toDecimalPlaces(2).toFixed(2)}%`;
+  return `${displayOddsPercent(value)}%`;
 }
 
 /** Total paid for n entries (entry + platform fee lines kept separate). */
