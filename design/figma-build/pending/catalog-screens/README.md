@@ -16,3 +16,11 @@ shot10_0.js (mobile GM-02 x2, GM-03, GM-04, GM-05) · shot10_1.js (mobile GM-06,
 Check in particular: GM-02 Restricted region (desktop 33:186210 has 7 DEMO badges vs 39 in Default;
 mobile 36:504732 has 3 vs 36) — confirm restricted tiles still mark illustrative numbers as DEMO.
 If all pass, mark GM-02..GM-08 VERIFIED.
+
+## DONE — 28 Nov 2026 (continuation run)
+Read-only audit re-run (page 08: 16 frames, page 10: 8 frames, all hug-height, unchanged) and the
+screenshot pass completed for all 24 frames. All passed: no clipped/overlapping text outside the
+intentional scroll tracks, game maths reconcile (mines 1.71×/1.99×, plinko 16-row binomial ≈ 99.0% RTP,
+limbo 49.50% @ 2.00×, wheel 30-segment table ≈ 99.0% RTP, keno 6-pick hypergeometric table, hi-lo 76.92%/30.77%).
+Restricted region (desktop 7 / mobile 3 DEMO badges) is correct: locked tiles hide player counts, and the only
+visible digits without DEMO are game names, "18+" and "Search 33 games". GM-02..GM-08 = VERIFIED. Nothing left to run.
