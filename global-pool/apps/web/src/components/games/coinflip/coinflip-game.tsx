@@ -35,6 +35,7 @@ import {
   useReducedMotion,
   type AutoPlayDraft,
 } from '@/components/games/kit';
+import { holdRealityCheck } from '@/components/rg-history/reality-check';
 import { AgeBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
@@ -91,17 +92,17 @@ function RecentFlips({ onVerify }: { onVerify: (b: CoinflipBet) => void }) {
       className="flex scroll-mt-24 flex-col gap-3 rounded-xl border border-border-subtle bg-surface-default p-4 tablet:p-5"
     >
       <div className="flex items-start gap-3">
-        <Coins aria-hidden className="mt-0.5 size-5 text-icon-muted" />
-        <div className="flex min-w-0 flex-col">
+        <Coins aria-hidden className="mt-0.5 size-5 shrink-0 text-icon-muted" />
+        <div className="flex min-w-0 flex-1 flex-col">
           <h2 id="recent-flips" className="text-body-m-strong text-text-primary">
             Recent results
           </h2>
           <p className="text-caption text-text-tertiary">Your last {items.length || 12} flips · newest first</p>
         </div>
-        <DemoBadge size="s" className="ml-auto" />
+        <DemoBadge size="s" className="mt-0.5" />
         <Link
           href={COINFLIP_ROUTES.myFlips}
-          className="inline-flex min-h-11 items-center gap-1 text-label-m text-text-brand underline-offset-4 hover:underline tablet:min-h-0"
+          className="-mt-2.5 inline-flex min-h-11 shrink-0 items-center gap-1 whitespace-nowrap text-label-m text-text-brand underline-offset-4 hover:underline tablet:mt-0 tablet:min-h-0"
         >
           View all <ChevronRight aria-hidden className="size-4" />
         </Link>
@@ -208,6 +209,14 @@ export function CoinflipGame() {
   /** The last result is still on the stage (cleared when the player changes pick). */
   const [showResult, setShowResult] = React.useState(false);
   const [verifyId, setVerifyId] = React.useState<string | null>(null);
+  /** Reality checks only between flips: hold the reminder while the coin is still revealing the settled side. */
+  const revealHold = React.useRef<(() => void) | null>(null);
+  const endReveal = React.useCallback(() => {
+    setAnimating(false);
+    revealHold.current?.();
+    revealHold.current = null;
+  }, []);
+  React.useEffect(() => () => revealHold.current?.(), []);
 
   const balance = gate.credits?.balance ?? null;
   const limits = { min: INFO.minBet, max: INFO.maxBet, balance };
@@ -224,7 +233,11 @@ export function CoinflipGame() {
       onSettled: (bet) => {
         setLastBet(bet);
         setShowResult(true);
-        setAnimating(!reduced);
+        if (!reduced) {
+          revealHold.current?.();
+          revealHold.current = holdRealityCheck();
+          setAnimating(true);
+        }
         setCoinSide(bet.outcome.side);
         setFlipId((n) => n + 1);
       },
@@ -427,11 +440,16 @@ export function CoinflipGame() {
       `Double Side accepts ${formatAmount(INFO.minBet)} – ${formatAmount(INFO.maxBet)} DEMO per flip. Your pick stays on ${sideLabel(pick)}.`
     ) : undefined;
 
-  const tiles: { label: string; value: React.ReactNode; sub: React.ReactNode; tone?: string }[] = [
-    { label: 'Win chance', value: `${WIN_CHANCE}%`, sub: 'Same for Heads and Tails' },
-    { label: 'Payout', value: `${MULTIPLIER}×`, sub: `House edge ${HOUSE_EDGE}% · RTP ${INFO.rtpPercent}%` },
+  const tiles: { id: string; label: React.ReactNode; value: React.ReactNode; sub: React.ReactNode; tone?: string }[] = [
+    { id: 'chance', label: 'Win chance', value: `${WIN_CHANCE}%`, sub: 'Same for Heads and Tails' },
+    { id: 'payout', label: 'Payout', value: `${MULTIPLIER}×`, sub: `House edge ${HOUSE_EDGE}% · RTP ${INFO.rtpPercent}%` },
     {
-      label: 'Profit on win',
+      id: 'profit',
+      label: (
+        <>
+          Profit<span className="hidden tablet:inline"> on win</span>
+        </>
+      ),
       value: profit ? <CreditsAmount value={profit} signed /> : '—',
       sub: payout ? (
         <>
@@ -501,7 +519,7 @@ export function CoinflipGame() {
           </div>
           <dl className="grid grid-cols-3 gap-2 tablet:gap-3">
             {tiles.map((t) => (
-              <div key={t.label} className="flex min-w-0 flex-col gap-1 rounded-lg border border-border-subtle bg-surface-default p-2.5 tablet:bg-surface-raised tablet:p-3.5">
+              <div key={t.id} className="flex min-w-0 flex-col gap-1 rounded-lg border border-border-subtle bg-surface-default p-2.5 tablet:bg-surface-raised tablet:p-3.5">
                 <dt className="text-[10px] font-semibold tracking-[0.06em] text-text-tertiary uppercase tablet:text-overline">{t.label}</dt>
                 <dd className={cn('text-body-m-strong break-words text-text-primary tablet:text-number-m', t.tone)}>{t.value}</dd>
                 <dd className="hidden text-caption text-text-tertiary tablet:block">{t.sub}</dd>
@@ -585,7 +603,7 @@ export function CoinflipGame() {
       flipId={flipId}
       flipMs={FLIP_MS}
       instant={reduced}
-      onFlipEnd={() => setAnimating(false)}
+      onFlipEnd={endReveal}
       stake={stakeValid ? stakeOk : null}
       payout={payout}
       nonce={nextNonce}

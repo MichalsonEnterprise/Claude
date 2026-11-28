@@ -154,7 +154,8 @@ export interface MobileDrawerProps {
   member?: ShellMember | null;
   activeHref: string | null;
   counts?: SidebarCounts;
-  poolAmount: string | null;
+  /** null = loading (skeleton) · false = couldn't be loaded ("—"). */
+  poolAmount: string | null | false;
   demo?: boolean;
   onSignIn: () => void;
   onSignUp: () => void;
@@ -201,6 +202,8 @@ export function MobileDrawer({
                     <p className="flex items-center gap-2 text-number-s tabular-nums">
                       {member.available === null ? (
                         <Skeleton className="h-5 w-24" />
+                      ) : member.available === false ? (
+                        <span className="text-text-tertiary">Couldn’t load</span>
                       ) : (
                         formatUSDT(member.available)
                       )}

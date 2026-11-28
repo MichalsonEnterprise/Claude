@@ -241,12 +241,12 @@ export function SidebarNav({
 
 // ── promo tiles ────────────────────────────────────────────────────────────────────────────────
 
-/** `poolAmount` null = the live round is still loading (skeleton). */
+/** `poolAmount` null = the live round is still loading (skeleton); false = it couldn't be loaded ("—"). */
 export function SidebarPromoTiles({
   poolAmount,
   demo,
 }: {
-  poolAmount: string | null;
+  poolAmount: string | null | false;
   demo: boolean;
 }) {
   return (
@@ -261,6 +261,10 @@ export function SidebarPromoTiles({
           </span>
           {poolAmount === null ? (
             <Skeleton className="h-5 w-20 bg-ink-950/15" />
+          ) : poolAmount === false ? (
+            <span className="text-number-s font-semibold" title="Pool amount couldn’t be loaded">
+              —
+            </span>
           ) : (
             <span className="text-number-s font-semibold tabular-nums">
               {formatUSDT(poolAmount, { symbol: false })}
@@ -286,7 +290,7 @@ export function SidebarPromoTiles({
       <div className="hidden flex-col items-center gap-2 rail:flex">
         <RailTooltip
           label={
-            poolAmount === null
+            poolAmount === null || poolAmount === false
               ? 'Global Pool'
               : `Global Pool — ${formatUSDT(poolAmount)}${demo ? ' (DEMO)' : ''}`
           }
@@ -322,8 +326,8 @@ export interface SidebarProps {
   mode?: SidebarMode;
   activeHref: string | null;
   counts?: SidebarCounts;
-  /** Pool balance for the gold promo tile (decimal string). */
-  poolAmount: string | null;
+  /** Pool balance for the gold promo tile (decimal string); null = loading, false = couldn't be loaded. */
+  poolAmount: string | null | false;
   demo?: boolean;
   /** Hide promo tiles (e.g. while self-excluded, decision #30). */
   hidePromos?: boolean;

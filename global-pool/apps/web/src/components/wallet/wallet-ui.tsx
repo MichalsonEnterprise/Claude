@@ -23,8 +23,9 @@ import { StatusBadge, type BadgeStatus } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ApiRequestError } from '@/lib/api/client';
+import { describeError } from '@/lib/api/errors';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
@@ -221,7 +222,11 @@ export function KeyValueList({
   );
 }
 
-/** Error state for a failed query: plain reason + request id + retry. */
+/**
+ * Error state for a failed query (shared `<ErrorState>`): readable reason per error kind (offline, timeout, 429
+ * countdown, maintenance, 5xx), request id + Try again. `title` overrides the derived title for 5xx / unknown
+ * errors only — offline / timeout / rate-limit / maintenance keep their specific titles.
+ */
 export function QueryError({
   error,
   onRetry,
@@ -233,23 +238,14 @@ export function QueryError({
   title?: string;
   className?: string;
 }) {
-  const ref = error instanceof ApiRequestError ? error.requestId : undefined;
-  const message =
-    error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+  const kind = describeError(error).kind;
   return (
-    <EmptyState
-      type="error"
-      title={title}
-      description={message}
-      reference={ref ? `Request ${ref}` : undefined}
+    <ErrorState
+      error={error}
+      onRetry={onRetry}
+      title={kind === 'server' || kind === 'unknown' ? title : undefined}
+      note="Your balance is safe."
       className={className}
-      actions={
-        onRetry ? (
-          <Button variant="secondary" size="s" onClick={onRetry}>
-            Try again
-          </Button>
-        ) : undefined
-      }
     />
   );
 }

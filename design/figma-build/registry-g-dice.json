@@ -1,137 +1,42 @@
 {
- "_note": "Agent g-dice (DI-01..DI-07 + GM-01). NOTHING BUILT OR VERIFIED in Figma by the 28 Nov 2026 continuation run: all 3 attempts (including the read-only inventory) hit the Figma MCP seat limit. No section/frame/component ids exist yet from this run; an earlier interrupted run may have left frames in section 'DI Dice & GM-01' (page 08, X=32000,Y=0) or 'Games — Mobile Dice' (page 10, X=196000,Y=0) — run pending/g-dice/out/00a + 00b first. Ready-to-run idempotent scripts (helpers.js verbatim, <50k chars, mock dry-run OK): pending/g-dice/out/01…13 (see RUN-ORDER.json, README.md). No new library components are created; inline pieces (dice slider/track/thumb/roll marker, bet panel fields, linked target/chance/multiplier inputs, prompt cards, mobile RG strip, mobile odds tiles, mobile result card, roll cards, bottom sheets) are component gaps.",
- "frames_planned": [
-  {
-   "frame": "[DI-01] Dice interface / 1440 / Default — roll over 50.50",
-   "script": "out/01_d_di01_master.js"
-  },
-  {
-   "frame": "[DI-02] Number selection / 1440 / Dragging target to 34.00 — odds update live",
-   "script": "out/02_d_di02_states.js"
-  },
-  {
-   "frame": "[DI-02] Number selection / 1440 / Roll under 50.50 — 50.50% · 1.9604×",
-   "script": "out/02_d_di02_states.js"
-  },
-  {
-   "frame": "[DI-02] Number selection / 1440 / Out of range — win chance above 98.00%",
-   "script": "out/02_d_di02_states.js"
-  },
-  {
-   "frame": "[DI-03] Rolling / 1440 / Rolling — stake locked",
-   "script": "out/03_d_di03_di04.js"
-  },
-  {
-   "frame": "[DI-04] Result / 1440 / Win — rolled 73.21 (+10.00 USDT)",
-   "script": "out/03_d_di03_di04.js"
-  },
-  {
-   "frame": "[DI-04] Result / 1440 / Lose — rolled 31.07 (−10.00 USDT)",
-   "script": "out/03_d_di03_di04.js"
-  },
-  {
-   "frame": "[DI-05] History / 1440 / My rolls — today",
-   "script": "out/04_d_di05_history.js"
-  },
-  {
-   "frame": "[DI-06] Provably-fair verification / 1440 / Roll D-88213 verified",
-   "script": "out/05_d_di06_pf.js"
-  },
-  {
-   "frame": "[DI-06] Provably-fair verification / 1440 / Mismatch — server seed from another pair",
-   "script": "out/05_d_di06_pf.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 1440 / Loading game",
-   "script": "out/06_d_di07_a.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 1440 / Connection lost — roll held on server",
-   "script": "out/06_d_di07_a.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 1440 / Insufficient balance (DEMO account · Available 4.20 USDT)",
-   "script": "out/06_d_di07_a.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 1440 / Bet above table max (1,500.00 > 1,000.00 USDT)",
-   "script": "out/07_d_di07_b.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 1440 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)",
-   "script": "out/07_d_di07_b.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 1440 / Region restricted (United States)",
-   "script": "out/07_d_di07_b.js"
-  },
-  {
-   "frame": "[GM-01] Reality check / 1440 / 60-minute reminder over Pool Dice",
-   "script": "out/08_d_gm01_overlays.js"
-  },
-  {
-   "frame": "[GM-01] Session bar / 1440 / Approaching daily loss limit — session details open (DEMO scenario)",
-   "script": "out/08_d_gm01_overlays.js"
-  },
-  {
-   "frame": "[GM-01] Spec — Game session RG bar & reality check / Board",
-   "script": "out/08b_d_gm01_spec.js"
-  },
-  {
-   "frame": "[DI-01] Dice interface / 768 / Default — roll over 50.50",
-   "script": "out/09_t_di01_768.js"
-  },
-  {
-   "frame": "[DI-01] Dice interface / 390 / Default — roll over 50.50",
-   "script": "out/10_m_di01_di02_di03.js"
-  },
-  {
-   "frame": "[DI-02] Number selection / 390 / Dragging target to 34.00 — odds update live",
-   "script": "out/10_m_di01_di02_di03.js"
-  },
-  {
-   "frame": "[DI-03] Rolling / 390 / Rolling — stake locked",
-   "script": "out/10_m_di01_di02_di03.js"
-  },
-  {
-   "frame": "[DI-04] Result / 390 / Win — rolled 73.21 (+10.00 USDT)",
-   "script": "out/11_m_di04_gm01.js"
-  },
-  {
-   "frame": "[DI-04] Result / 390 / Lose — rolled 31.07 (−10.00 USDT)",
-   "script": "out/11_m_di04_gm01.js"
-  },
-  {
-   "frame": "[GM-01] Reality check / 390 / Bottom sheet over Pool Dice — 60 minutes",
-   "script": "out/11_m_di04_gm01.js"
-  },
-  {
-   "frame": "[GM-01] Session strip / 390 / Approaching daily loss limit — session sheet (DEMO scenario)",
-   "script": "out/11_m_di04_gm01.js"
-  },
-  {
-   "frame": "[DI-05] History / 390 / My rolls — today",
-   "script": "out/12_m_di05_di06.js"
-  },
-  {
-   "frame": "[DI-06] Provably-fair verification / 390 / Roll D-88213 verified",
-   "script": "out/12_m_di05_di06.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 390 / Connection lost — roll held on server",
-   "script": "out/13_m_di07.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 390 / Insufficient balance (DEMO account · Available 4.20 USDT)",
-   "script": "out/13_m_di07.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 390 / Daily loss limit reached (DEMO scenario · net −200.00 USDT)",
-   "script": "out/13_m_di07.js"
-  },
-  {
-   "frame": "[DI-07] Errors & limits / 390 / Region restricted (United States)",
-   "script": "out/13_m_di07.js"
-  }
- ]
+ "_note": "Agent g-dice (DI-01..DI-07 + GM-01). Continuation run 28 Nov 2026: section 'DI Dice & GM-01' (page 08, 32:91058) and 'Games - Mobile Dice' (page 10, 33:288623) already held 26 frames from an earlier run (built with the casino shell + library components); this run verified all of them with screenshots and added the missing states by cloning those frames (same layout and components) instead of running the differently styled pending/g-dice/out scripts. No new library components. Inline pieces that are component gaps: dice slider (well, zone bars, thumb, roll marker), recent-roll pills, mobile compact RG session strip, mobile odds tiles, mobile roll cards, bottom sheets, stage overlay cards, loading skeleton blocks.",
+ "sections": {
+  "DI Dice & GM-01 (08 — Games)": "32:91058",
+  "Games — Mobile Dice (10 — Mobile Experience)": "33:288623"
+ },
+ "frames": {
+  "DI-01 Pool Dice — Interface / 1440 / Default": "32:91059",
+  "DI-01 Pool Dice — Interface / 768 / Default": "33:264436",
+  "DI-01 Pool Dice — Interface / 390 / Default": "33:288624",
+  "DI-02 Pool Dice — Number selection / 1440 / Dragging target (live odds)": "32:107670",
+  "DI-02 Pool Dice — Number selection / 1440 / Out of range (98.50% > max)": "32:108704",
+  "DI-02 Pool Dice — Number selection / 1440 / Roll under 50.50 (50.50% · 1.9604×)": "232:173548",
+  "DI-02 Pool Dice — Number selection / 390 / Dragging target (live odds)": "33:314618",
+  "DI-03 Pool Dice — Rolling / 1440 / Rolling (stake locked)": "33:135979",
+  "DI-03 Pool Dice — Rolling / 390 / Rolling (stake locked)": "33:314924",
+  "DI-04 Pool Dice — Result / 1440 / Win (73.21)": "33:137030",
+  "DI-04 Pool Dice — Result / 1440 / Lose (27.65)": "33:138071",
+  "DI-04 Pool Dice — Result / 390 / Win (73.21)": "33:315363",
+  "DI-04 Pool Dice — Result / 390 / Lose (27.65)": "33:315810",
+  "DI-05 Pool Dice — History / 1440 / My bets (today, roll selected)": "33:234002",
+  "DI-05 Pool Dice — History / 390 / My bets + roll detail sheet": "34:335682",
+  "DI-06 Pool Dice — Provably fair / 1440 / Verified (D-88213)": "33:235174",
+  "DI-06 Pool Dice — Provably fair / 1440 / Verification failed": "33:236070",
+  "DI-06 Pool Dice — Provably fair / 390 / Verified (D-88213)": "34:336102",
+  "DI-07 Pool Dice — Error / 1440 / Insufficient balance (DEMO account 4.20 USDT)": "33:171221",
+  "DI-07 Pool Dice — Error / 1440 / Daily loss limit reached": "33:172235",
+  "DI-07 Pool Dice — Error / 1440 / Region restricted (United States)": "33:173350",
+  "DI-07 Pool Dice — Error / 1440 / Connection lost (reconnecting)": "33:174533",
+  "DI-07 Pool Dice — Error / 1440 / Bet above table max (1,500.00 > 1,000.00 USDT)": "232:174329",
+  "DI-07 Pool Dice — Error / 1440 / Loading game": "232:175311",
+  "DI-07 Pool Dice — Error / 390 / Region restricted (United States)": "34:359378",
+  "DI-07 Pool Dice — Error / 390 / Daily loss limit reached": "34:359699",
+  "DI-07 Pool Dice — Error / 390 / Connection lost (reconnecting)": "234:216106",
+  "DI-07 Pool Dice — Error / 390 / Insufficient balance (DEMO account 4.20 USDT)": "234:216542",
+  "GM-01 Game session RG — Reality check popup in Pool Dice / 1440 / Reality check (60 min)": "33:207090",
+  "GM-01 Game session RG — Session bar in Pool Dice / 1440 / Approaching daily loss limit": "33:207875",
+  "GM-01 Game session RG — Dev notes / Spec card": "235:71605",
+  "GM-01 Game session RG — Reality check in Pool Dice / 390 / Reality check sheet (60 min)": "34:360187",
+  "GM-01 Game session RG — Session strip in Pool Dice / 390 / Approaching daily loss limit (session sheet)": "234:216910"
+ }
 }

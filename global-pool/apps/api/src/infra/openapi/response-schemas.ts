@@ -310,6 +310,29 @@ export const MeView = z.looseObject({
   security: z.looseObject({ twoFactorEnabled: z.boolean() }),
 });
 
+/** GET /compliance/geo — PUB-21 / ERR-05 geo decision (no reason codes, no bypass hints). */
+export const GeoDecision = z.looseObject({
+  decision: z.enum(['permitted', 'restricted']),
+  permitted: z.boolean(),
+  country: z.string().length(2).nullable(),
+  countryName: z.string().nullable(),
+  source: z.enum(['header', 'dev_override', 'declared', 'unknown']),
+  declared: z
+    .looseObject({
+      code: z.string().length(2),
+      name: z.string().nullable(),
+      permitted: z.boolean(),
+    })
+    .nullable(),
+  minAge: z.number().int().min(18),
+  checkedAt: iso,
+  isDemo: z.boolean(),
+  stillAvailable: z.array(
+    z.enum(['sign_in', 'withdraw', 'history', 'responsible_gaming', 'support', 'licence_info']),
+  ),
+  paused: z.array(z.enum(['games', 'pool_entries', 'deposits', 'promotions'])),
+});
+
 const page = <T extends z.ZodType>(item: T) => pageMetaSchema.extend({ items: z.array(item) });
 
 /** name → schema (component names in #/components/schemas). */
@@ -332,6 +355,7 @@ export const RESPONSE_COMPONENTS = {
   WithdrawalPage: page(WithdrawalView),
   TransactionPage: page(TransactionView),
   MeView,
+  GeoDecision,
 } as const;
 export type ResponseComponent = keyof typeof RESPONSE_COMPONENTS;
 
@@ -356,6 +380,7 @@ export const OPERATION_RESPONSES: Record<string, [number, ResponseComponent]> = 
   'get /withdrawals': [200, 'WithdrawalPage'],
   'get /withdrawals/{id}': [200, 'WithdrawalView'],
   'get /transactions': [200, 'TransactionPage'],
+  'get /compliance/geo': [200, 'GeoDecision'],
 };
 
 type JsonSchema = Record<string, unknown>;

@@ -263,7 +263,7 @@ export function CoinflipStage(p: CoinflipStageProps) {
           <p className="text-caption text-text-secondary">{meta}</p>
         </div>
         <div className="flex items-center justify-center gap-1.5" aria-label={`Last ${p.last.length} flips, newest first`} role="group">
-          <span className="mr-1 text-caption text-text-tertiary">
+          <span className="mr-1 whitespace-nowrap text-caption text-text-tertiary">
             {p.last.length ? `Last ${Math.min(p.last.length, 6)}` : 'Last flips'}
           </span>
           {p.last.length ? (

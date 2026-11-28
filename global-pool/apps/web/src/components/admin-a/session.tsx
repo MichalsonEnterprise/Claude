@@ -24,7 +24,12 @@ import {
   type AdminProfile,
   type AdminTokens,
 } from '@/lib/api/admin-a';
-import { ApiRequestError, setAdminTokenProvider } from '@/lib/api/client';
+import {
+  ApiNetworkError,
+  ApiRequestError,
+  ApiTimeoutError,
+  setAdminTokenProvider,
+} from '@/lib/api/client';
 
 /**
  * Every admin query-key root: admin-a (['admin', …]) and the finance / pool / compliance pages (['admin-b', …],
@@ -45,7 +50,18 @@ export const ADMIN_WARNING_SECONDS = 120;
 const STORAGE_KEY = 'gp.admin.session';
 const EXPIRED_KEY = 'gp.admin.expired';
 
-export type AdminSessionStatus = 'loading' | 'signed_out' | 'signed_in';
+/**
+ * `unreachable`: the stored session could not be checked because the API did not answer (offline, timeout, 5xx,
+ * 429). The refresh token is kept — a transient outage never signs an admin out — and the console shows an
+ * error with "Try again" (`retryRestore`). A definite rejection (401) still ends the session.
+ */
+export type AdminSessionStatus = 'loading' | 'signed_out' | 'signed_in' | 'unreachable';
+
+/** No definite answer from the API (network, timeout, 5xx, 429) — keep the session and let the admin retry. */
+export function isTransientSessionError(err: unknown): boolean {
+  if (err instanceof ApiRequestError) return err.status >= 500 || err.status === 429 || err.status === 408;
+  return err instanceof ApiNetworkError || err instanceof ApiTimeoutError;
+}
 
 export interface ExpiredInfo {
   email: string;
@@ -74,6 +90,8 @@ export interface AdminSessionValue {
   login: (input: { email: string; password: string; totpCode: string }) => Promise<AdminProfile>;
   logout: () => Promise<void>;
   staySignedIn: () => Promise<void>;
+  /** Re-check the stored session after `unreachable`. */
+  retryRestore: () => void;
   clearExpired: () => void;
   can: (permission: Permission) => boolean;
   canAny: (permissions: readonly Permission[]) => boolean;
@@ -136,6 +154,8 @@ export function AdminSessionProvider({ children }: { children: React.ReactNode }
   const access = React.useRef<{ token: string; exp: number } | null>(null);
   const stored = React.useRef<Stored | null>(null);
   const refreshing = React.useRef<Promise<string | null> | null>(null);
+  /** Why the last refresh returned null (transient → keep the session, see `unreachable`). */
+  const lastRefreshError = React.useRef<unknown>(null);
   const lastActivity = React.useRef<number>(Date.now());
   const warningRef = React.useRef(false);
   const pathRef = React.useRef(pathname);
@@ -199,8 +219,10 @@ export function AdminSessionProvider({ children }: { children: React.ReactNode }
       try {
         const t = await adminRefresh(s.refreshToken);
         applyTokens(t, s);
+        lastRefreshError.current = null;
         return t.accessToken;
-      } catch {
+      } catch (err) {
+        lastRefreshError.current = err;
         return null;
       } finally {
         refreshing.current = null;
@@ -222,40 +244,54 @@ export function AdminSessionProvider({ children }: { children: React.ReactNode }
     return () => setAdminTokenProvider(() => Promise.resolve(null));
   }, [refresh]);
 
-  // Restore a session after a reload (refresh token in sessionStorage).
-  React.useEffect(() => {
-    setExpired(readExpired());
+  // Restore a session after a reload (refresh token in sessionStorage). A transient failure (API down, timeout,
+  // 5xx, 429) keeps the stored session and shows `unreachable` with Try again instead of signing the admin out.
+  const restoreRun = React.useRef(0);
+  const restore = React.useCallback(() => {
+    const run = ++restoreRun.current;
     const s = readStored();
     if (!s) {
       setStatus('signed_out');
       return;
     }
     stored.current = s;
-    let cancelled = false;
+    setStatus('loading');
     void (async () => {
       const token = await refresh();
-      if (cancelled) return;
+      if (run !== restoreRun.current) return;
       if (!token) {
+        if (isTransientSessionError(lastRefreshError.current)) {
+          setStatus('unreachable');
+          return;
+        }
         clearLocal();
         setStatus('signed_out');
         return;
       }
       try {
         const me = await adminMe();
-        if (cancelled) return;
+        if (run !== restoreRun.current) return;
         setAdmin(me);
         lastActivity.current = Date.now();
         setIdleDeadline(lastActivity.current + ADMIN_IDLE_MINUTES * 60_000);
         setStatus('signed_in');
-      } catch {
-        if (!cancelled) {
-          clearLocal();
-          setStatus('signed_out');
+      } catch (err) {
+        if (run !== restoreRun.current) return;
+        if (isTransientSessionError(err)) {
+          setStatus('unreachable');
+          return;
         }
+        clearLocal();
+        setStatus('signed_out');
       }
     })();
+  }, [refresh, clearLocal]);
+
+  React.useEffect(() => {
+    setExpired(readExpired());
+    restore();
     return () => {
-      cancelled = true;
+      restoreRun.current += 1; // ignore a restore still in flight after unmount
     };
     // run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -361,6 +397,7 @@ export function AdminSessionProvider({ children }: { children: React.ReactNode }
       login,
       logout,
       staySignedIn,
+      retryRestore: restore,
       clearExpired,
       can: (p) => perms.has(p),
       canAny: (ps) => ps.some((p) => perms.has(p)),
@@ -375,6 +412,7 @@ export function AdminSessionProvider({ children }: { children: React.ReactNode }
     login,
     logout,
     staySignedIn,
+    restore,
     clearExpired,
   ]);
 

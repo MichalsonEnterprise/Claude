@@ -15,7 +15,10 @@
 import { publicEnv } from '@/lib/env';
 import { ApiError } from '@/lib/data/source';
 
+import { fetchText, parseRetryAfter, statusMessage } from './transport';
+
 export { ApiError };
+export { ApiNetworkError, ApiTimeoutError } from './transport';
 
 export type AuthKind = 'player' | 'admin' | 'none';
 type TokenProvider = () => Promise<string | null>;
@@ -67,6 +70,8 @@ export interface ApiRequestOptions {
   stepUpToken?: string;
   signal?: AbortSignal;
   headers?: Record<string, string>;
+  /** Abort after this many ms (`ApiTimeoutError`); default `DEFAULT_API_TIMEOUT_MS` (20 s), 0 = no timeout. */
+  timeoutMs?: number;
 }
 
 function buildUrl(path: string, query?: ApiRequestOptions['query']): string {
@@ -80,7 +85,16 @@ function buildUrl(path: string, query?: ApiRequestOptions['query']): string {
 }
 
 export async function apiRequest<T>(path: string, opts: ApiRequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, query, auth = 'player', stepUpToken, signal, headers = {} } = opts;
+  const {
+    method = 'GET',
+    body,
+    query,
+    auth = 'player',
+    stepUpToken,
+    signal,
+    headers = {},
+    timeoutMs,
+  } = opts;
   const h: Record<string, string> = { accept: 'application/json', ...headers };
   if (body !== undefined) h['content-type'] = 'application/json';
   if (auth !== 'none') {
@@ -89,29 +103,34 @@ export async function apiRequest<T>(path: string, opts: ApiRequestOptions = {}):
   }
   if (stepUpToken) h['x-step-up-token'] = stepUpToken;
 
-  const res = await fetch(buildUrl(path, query), {
+  // Network failures and timeouts throw ApiNetworkError / ApiTimeoutError with readable messages (transport.ts).
+  const { res, text } = await fetchText(buildUrl(path, query), {
+    path,
     method,
     headers: h,
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: 'no-store',
     credentials: 'include',
     signal,
+    timeoutMs,
   });
 
   if (res.status === 204) return undefined as T;
-  const text = await res.text();
   const json: unknown = text ? safeJson(text) : undefined;
 
   if (!res.ok) {
-    const env = (json as Partial<ApiErrorEnvelope> | undefined)?.error;
+    const parsed = (json as Partial<ApiErrorEnvelope> | undefined)?.error;
+    // Only a real envelope's message is shown; a proxy's HTML / status text never reaches the UI.
+    const env = parsed && typeof parsed.message === 'string' ? parsed : undefined;
+    const retryAfterSeconds = parseRetryAfter(res.headers.get('retry-after'));
     throw new ApiRequestError(
       res.status,
       path,
-      env?.message ?? `${res.status} ${res.statusText}`,
+      env?.message ?? statusMessage(res.status),
       env?.code ?? 'HTTP_ERROR',
       env?.requestId ?? res.headers.get('x-request-id') ?? undefined,
       env?.issues,
-      env?.details,
+      retryAfterSeconds === undefined ? env?.details : { ...env?.details, retryAfterSeconds },
     );
   }
   return json as T;

@@ -3,7 +3,7 @@
 import { fairGame } from '@gp/shared/fair';
 import { formatAmount, money } from '@gp/shared/money';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronUp, CircleDot, Hash, Info, Layers, Loader2, LogIn, RotateCcw, Timer, Trash2, Undo2, WifiOff } from 'lucide-react';
+import { ChevronUp, CircleAlert, CircleDot, Hash, Info, Layers, Loader2, LogIn, RotateCcw, Timer, Trash2, TriangleAlert, Undo2, WifiOff } from 'lucide-react';
 import * as React from 'react';
 
 import {
@@ -227,7 +227,14 @@ export function RouletteGame() {
       },
     },
   );
-  React.useEffect(() => () => release.current?.(), []);
+  React.useEffect(
+    () => () => {
+      release.current?.();
+      // left the page while the wheel was turning: the spin is settled on the server — sync balance + history now
+      if (pending.current) applySettledBet(qc, SLUG, pending.current);
+    },
+    [qc],
+  );
 
   // "Repeat these bets" from My bets: /games/pool-roulette?repeat=1 loads them onto the felt (the player still spins)
   const repeatOnce = React.useRef(false);
@@ -420,25 +427,27 @@ export function RouletteGame() {
       </PanelNotice>
     ) : null;
 
-  const ctaLabel = reconnecting
-    ? 'Waiting for connection…'
-    : animating || runner.phase === 'placing'
-      ? 'Spinning…'
-      : gate.gate === 'loss_limit'
-        ? 'Paused — loss limit reached'
-        : gate.gate === 'region'
-          ? 'Not available in your region'
-          : !slip.length
-            ? settled && lastSpun.length
-              ? 'Place a bet to spin'
-              : 'Place a bet to spin'
-            : blocking.length
-              ? 'Fix the highlighted bet'
-              : insufficient
-                ? 'Not enough DEMO credits'
-                : `Spin · ${formatAmount(total)} DEMO`;
+  /** Full label (slip, ≥ 768) and a short one for the 390 sticky bar. */
+  const ctaLabels = (): [string, string] =>
+    reconnecting
+      ? ['Waiting for connection…', 'Reconnecting…']
+      : animating || runner.phase === 'placing'
+        ? ['Spinning…', 'Spinning…']
+        : gate.gate === 'loss_limit'
+          ? ['Paused — loss limit reached', 'Paused · loss limit']
+          : gate.gate === 'region'
+            ? ['Not available in your region', 'Not available here']
+            : gate.gate !== 'ok' && gate.gate !== 'loading'
+              ? ['Play paused', 'Play paused']
+              : !slip.length
+                ? ['Place a bet to spin', 'Place a bet']
+                : blocking.length
+                  ? ['Fix the highlighted bet', 'Fix your bets']
+                  : insufficient
+                    ? ['Not enough DEMO credits', 'Not enough credits']
+                    : [`Spin · ${formatAmount(total)} DEMO`, `Spin · ${formatAmount(total)}`];
 
-  const cta = (className?: string) =>
+  const cta = (className?: string, short = false) =>
     gate.gate === 'guest' ? (
       <Button size="l" block className={className} onClick={() => auth.signIn()} leadingIcon={<LogIn aria-hidden />}>
         Sign in to play
@@ -454,7 +463,9 @@ export function RouletteGame() {
         leadingIcon={<RotateCcw aria-hidden />}
         data-testid="roulette-repeat-cta"
       >
-        Repeat last bets · {formatAmount(slipTotal(lastSpun))}
+        <span className="truncate">
+          {short ? 'Repeat' : 'Repeat last bets'} · {formatAmount(slipTotal(lastSpun))}
+        </span>
       </Button>
     ) : (
       <Button
@@ -467,7 +478,7 @@ export function RouletteGame() {
         leadingIcon={<CircleDot aria-hidden />}
         data-testid="roulette-spin"
       >
-        {ctaLabel}
+        <span className="truncate">{ctaLabels()[short ? 1 : 0]}</span>
       </Button>
     );
 
@@ -530,6 +541,44 @@ export function RouletteGame() {
         </>
       );
     }
+    if (!hover && (over || tableMax || (insufficient && gate.gate === 'ok'))) {
+      return over && over.kind === 'spot_above_max' ? (
+        <>
+          <PhaseLabel icon={TriangleAlert} tone="warning">
+            Table limit
+          </PhaseLabel>
+          <h2 className="text-h3 text-text-primary">{over.label} is over the spot limit</h2>
+          <p className="text-body-s text-text-secondary">
+            One spot takes at most {formatAmount(RULES.maxPerSpot)} DEMO. Lower {over.label} by {formatAmount(over.over)} DEMO or move the
+            extra to another spot. The table maximum is {formatAmount(RULES.tableMax)} DEMO per spin. We never change your bet without
+            asking.
+          </p>
+        </>
+      ) : tableMax && tableMax.kind === 'table_max' ? (
+        <>
+          <PhaseLabel icon={TriangleAlert} tone="warning">
+            Table limit
+          </PhaseLabel>
+          <h2 className="text-h3 text-text-primary">Over the table max</h2>
+          <p className="text-body-s text-text-secondary">
+            Your bets add up to {formatAmount(tableMax.total)} DEMO; one spin takes at most {formatAmount(RULES.tableMax)}. Remove{' '}
+            {formatAmount(tableMax.over)} to spin.
+          </p>
+        </>
+      ) : (
+        <>
+          <PhaseLabel icon={CircleAlert} tone="danger">
+            Check your balance
+          </PhaseLabel>
+          <h2 className="text-h3 text-text-primary">Not enough DEMO credits to spin</h2>
+          <p className="text-body-s text-text-secondary">
+            Your bets add up to {formatAmount(insufficient!.total)} DEMO, but you have {formatAmount(insufficient!.balance)} DEMO available.
+            Remove bets until the total is {formatAmount(insufficient!.balance)} or less, or reset your DEMO credits (once per hour). DEMO
+            credits can’t be bought. Nothing has been charged.
+          </p>
+        </>
+      );
+    }
     if (hover) {
       const n = covers(hover).length;
       return (
@@ -545,7 +594,6 @@ export function RouletteGame() {
             {chanceOf(hover)}%), returning {formatAmount(returnsOf(hover.type, chip).toFixed(2))} DEMO.
             {isOutside(hover) ? ' Zero is never part of a column, dozen or even-money bet.' : ''}
           </p>
-          {slip.length > 0 && <OutcomePreviewCard slip={slip} />}
         </>
       );
     }
@@ -555,11 +603,14 @@ export function RouletteGame() {
           Place your bets
         </PhaseLabel>
         <h2 className="text-h3 text-text-primary">{slip.length ? `${slip.length} ${slip.length === 1 ? 'bet' : 'bets'} · ${formatAmount(total)} DEMO` : 'Place your bets'}</h2>
-        <p className="text-body-s text-text-secondary">
-          Pick a chip, then tap the felt. Bets close when you press Spin — the pocket is fixed by your seed pair, the wheel only
-          reveals it.
-        </p>
-        {slip.length > 0 && <OutcomePreviewCard slip={slip} />}
+        {slip.length > 0 ? (
+          <OutcomePreviewCard slip={slip} />
+        ) : (
+          <p className="text-body-s text-text-secondary">
+            Pick a chip, then tap the felt. Bets close when you press Spin — the pocket is fixed by your seed pair, the wheel only
+            reveals it.
+          </p>
+        )}
       </>
     );
   })();
@@ -625,10 +676,17 @@ export function RouletteGame() {
       </div>
 
       {wide ? (
-        <div className="grid items-start gap-6 tablet:grid-cols-[220px_minmax(0,1fr)] laptop:grid-cols-[260px_minmax(0,1fr)] desktop:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="grid items-start gap-6 tablet:grid-cols-[240px_minmax(0,1fr)] laptop:grid-cols-[280px_minmax(0,1fr)] desktop:grid-cols-[300px_minmax(0,1fr)]">
           {wheel('w-full')}
-          <div className="flex min-w-0 flex-col gap-3" aria-live="polite">
-            {status}
+          {/* While betting, the status text sits in a box as tall as the wheel: hovering a spot never moves the felt under
+              the pointer (or under a finger on touch screens). Spinning / result views take their natural height. */}
+          <div className={cn('relative min-w-0', !busy && !settled && 'self-stretch')}>
+            <div
+              className={cn('flex min-w-0 flex-col gap-3', !busy && !settled && 'absolute inset-0 overflow-y-auto pr-1')}
+              aria-live="polite"
+            >
+              {status}
+            </div>
           </div>
         </div>
       ) : (
@@ -761,6 +819,9 @@ export function RouletteGame() {
             )}
           </div>
 
+          {/* < 768 the slip lives in a sheet: show its limit / balance / refusal notice in the page */}
+          {panelNotice && !blocked && <div className="tablet:hidden">{panelNotice}</div>}
+
           <div
             className={cn('grid min-w-0 gap-5 tablet:grid-cols-2 laptop:grid-cols-1', blocked && 'opacity-60')}
             inert={blocked || undefined}
@@ -834,7 +895,7 @@ export function RouletteGame() {
         repeatTotal={lastSpun.length ? slipTotal(lastSpun) : null}
         tableOff={tableOff}
         onOpenSlip={() => setSlipOpen(true)}
-        cta={cta()}
+        cta={cta('min-w-0', true)}
         guest={gate.gate === 'guest'}
       />
 

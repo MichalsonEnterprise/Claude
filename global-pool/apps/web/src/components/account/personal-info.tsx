@@ -46,6 +46,7 @@ import {
   usePreferences,
   useTwoFactor,
 } from '@/lib/api/account';
+import { failedQueries } from '@/lib/api/errors';
 import { initialsFrom } from '@/lib/auth/types';
 import { cn } from '@/lib/utils';
 
@@ -134,6 +135,7 @@ export function PersonalInfo() {
       ]}
       title="Personal information"
       description="Your public profile, contact details and preferences. Legal details are locked after identity verification."
+      failure={{ ...failedQueries(me, prefs), what: 'your profile' }}
     >
       <div className="grid gap-6 laptop:grid-cols-[1fr_300px] desktop:grid-cols-[1fr_320px]">
         <form

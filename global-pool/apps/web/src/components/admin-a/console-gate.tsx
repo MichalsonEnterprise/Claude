@@ -1,18 +1,27 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { Logo } from '@/components/brand/logo';
+import { Button } from '@/components/ui/button';
 import { DemoBar } from '@/components/ui/demo-badge';
+import { ErrorState } from '@/components/ui/error-state';
+import { ApiNetworkError } from '@/lib/api/client';
 import { LoadingLabel, Skeleton } from '@/components/ui/skeleton';
 
 import { useAdminSession } from './session';
 import { AdminShell } from './shell';
 
-/** Redirects to /admin/login when signed out; shows a shell-shaped skeleton while the session restores. */
+const UNREACHABLE = new ApiNetworkError('/admin/auth/refresh');
+
+/**
+ * Redirects to /admin/login when signed out; shows a shell-shaped skeleton while the session restores, and an
+ * error with Try again when the API could not be reached (the session is kept — ERR-02).
+ */
 export function AdminConsoleGate({ children }: { children: React.ReactNode }) {
-  const { status } = useAdminSession();
+  const { status, retryRestore } = useAdminSession();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -22,6 +31,30 @@ export function AdminConsoleGate({ children }: { children: React.ReactNode }) {
       router.replace(`/admin/login${next}`);
     }
   }, [status, router, pathname]);
+
+  if (status === 'unreachable') {
+    return (
+      <div className="flex min-h-dvh flex-col bg-bg-base">
+        <DemoBar />
+        <main id="main" className="flex flex-1 items-center justify-center p-6">
+          <div className="flex w-full max-w-lg flex-col items-center gap-4 rounded-xl border border-border-subtle bg-surface-default p-6">
+            <Logo variant="mark" height={28} title="" />
+            <ErrorState
+              error={UNREACHABLE}
+              onRetry={retryRestore}
+              title="Can’t reach the admin API"
+              description="We couldn’t check your admin session because the API didn’t answer. You’re still signed in — try again in a moment."
+              actions={
+                <Button asChild variant="ghost" size="s">
+                  <Link href="/admin/login">Go to sign-in</Link>
+                </Button>
+              }
+            />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (status !== 'signed_in') {
     return (

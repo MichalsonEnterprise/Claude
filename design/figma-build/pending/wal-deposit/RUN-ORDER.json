@@ -1,0 +1,9 @@
+{
+ "slice": "wal-deposit (WAL-03..09 + MOB-06 deposit sheets)",
+ "note": "Continuation scripts, 28 Nov 2026. Each is idempotent: it skips frames whose name already exists in the section. All three were run successfully; keep only for rebuilds.",
+ "order": [
+  {"file": "out/A.js", "page": "06 — Wallet & Transactions", "builds": ["WAL-03 768 Empty — no deposits yet", "WAL-05 768 Expired address session"]},
+  {"file": "out/B.js", "page": "06 — Wallet & Transactions", "builds": ["WAL-07 768 Delayed — Ethereum congested", "WAL-09 768 Unrecognised token — not credited"]},
+  {"file": "out/M.js", "page": "10 — Mobile Experience", "builds": ["short DEMO notice on all 390 frames of 'WAL — Mobile B (Deposit)'", "WAL-03 390 Empty — no deposits yet", "WAL-09 390 Unrecognised token — not credited"]}
+ ]
+}

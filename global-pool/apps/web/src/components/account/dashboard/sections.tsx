@@ -31,6 +31,7 @@ import { AgeBadge, VipBadge, type VipTierName } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/sonner';
 import type {
@@ -505,10 +506,11 @@ export function RecentActivity({ demo, isNew }: { demo: boolean; isNew: boolean 
       {tx.isPending ? (
         <Skeleton className="h-60 w-full" />
       ) : tx.isError ? (
-        <EmptyState
-          type="error"
-          title="We couldn’t load your activity"
-          description="Try again in a moment."
+        <ErrorState
+          error={tx.error}
+          onRetry={() => void tx.refetch()}
+          retrying={tx.isFetching}
+          what="your activity"
         />
       ) : tx.data.items.length === 0 ? (
         <EmptyState

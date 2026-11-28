@@ -5,6 +5,7 @@ import * as React from 'react';
 
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { shouldRetryQuery } from '@/lib/api/errors';
 import { AuthProvider } from '@/lib/auth';
 
 /** Client providers: TanStack Query, auth (Privy or DEV MOCK), tooltips, toasts. */
@@ -13,7 +14,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
     () =>
       new QueryClient({
         defaultOptions: {
-          queries: { staleTime: 15_000, refetchOnWindowFocus: false, retry: 1 },
+          // One retry for transient failures only (network, timeout, 5xx) — never for 4xx / 429 / 503.
+          queries: { staleTime: 15_000, refetchOnWindowFocus: false, retry: shouldRetryQuery },
         },
       }),
   );

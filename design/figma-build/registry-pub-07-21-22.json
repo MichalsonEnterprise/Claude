@@ -50,5 +50,12 @@
  },
  "[PUB-22] Age gate + licence notice / 390 / Failure — You must be 18+": {
   "id": "51:146780"
- }
+ },
+ "[PUB-07] Provably Fair / 1440 / Verified — Global Pool draw (VRF request ID)": {
+  "id": "239:106172"
+ },
+ "[PUB-07] Provably Fair / 390 / Verified — Global Pool draw (VRF request ID)": {
+  "id": "242:82136"
+ },
+ "_continuation_28nov": "Continuation run 28 Nov 2026: added VRF-mode Verified frames (desktop 239:106172 at section-local 120,13975; mobile 242:82136 at 120,13580). Their verifier is built inline (card 239:106974 / 242:82521) because Game/Provably Fair Verifier has no VRF variant. The tablet row (34:494365/34:500470/34:501111) moved down to y=18863. The 768 Failed copy fix is applied (text 34:501759). DEMO values match GP-12: request 0x9f2c…e71a, random word 0x3e8a…b51f, fulfilment tx 0x71c3…5e28, snapshot root 0x8c41…d9e3, settlement tx 0x6b0e…41d2, entry E-1248-00981 not selected."
 }

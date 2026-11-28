@@ -3,7 +3,7 @@
 import { fairGame, type DiceCondition, type DiceOutcome, type DiceParams } from '@gp/shared/fair';
 import { formatAmount, money } from '@gp/shared/money';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronUp, Dice5, Link2, LogIn, Minus, Plus, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, Dice5, Download, Link2, LogIn, Minus, Plus, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 
 import {
@@ -40,8 +40,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Field, InputControl, InputGroup } from '@/components/ui/input';
 import { authKeys } from '@/lib/api/auth';
-import { gameKeys, useResetCredits, usePlaceBet, useSeeds, type GameBetView } from '@/lib/api/games';
-import { rgKeys } from '@/lib/api/rg-history';
+import { classifyGameError, gameKeys, useResetCredits, usePlaceBet, useSeeds, type GameBetView } from '@/lib/api/games';
+import { toast } from '@/components/ui/sonner';
+import { historyApi, rgKeys, saveCsv } from '@/lib/api/rg-history';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
@@ -112,6 +113,35 @@ function isTyping(el: EventTarget | null): boolean {
     el.getAttribute('role') === 'radio' ||
     el.getAttribute('role') === 'dialog' ||
     !!el.closest('[role="dialog"]')
+  );
+}
+
+/** DI-05 "Export CSV": my Pool Dice rolls with seeds and nonces (GET /history/game-rounds/export, audited). */
+function ExportRollsButton() {
+  const [busy, setBusy] = React.useState(false);
+  return (
+    <Button
+      variant="secondary"
+      size="s"
+      className="min-h-11 tablet:min-h-8"
+      loading={busy}
+      leadingIcon={<Download aria-hidden />}
+      onClick={() => {
+        setBusy(true);
+        historyApi
+          .exportGameRounds({ game: SLUG })
+          .then((csv) => {
+            saveCsv(typeof csv === 'string' ? csv : String(csv), `globalpool_pool-dice_${new Date().toISOString().slice(0, 10)}.csv`);
+            toast({ type: 'success', title: 'CSV exported', description: 'Seeds and nonces included · DEMO credits (no cash value).' });
+          })
+          .catch((err: unknown) =>
+            toast({ type: 'error', title: 'Could not export', description: classifyGameError(err).message }),
+          )
+          .finally(() => setBusy(false));
+      }}
+    >
+      Export CSV
+    </Button>
   );
 }
 
@@ -632,6 +662,7 @@ export function DiceGame() {
             summary={(b) => `${conditionLabel(b.outcome.condition, b.outcome.target)} · ${b.outcome.roll} · ${b.outcome.multiplier}×`}
             multiplier={(b) => b.outcome.multiplier}
             onVerify={(b) => setVerifyId(b.id)}
+            actions={<ExportRollsButton />}
           />
         </div>
         <SeedDisplay slug={SLUG} disabled={busy || auto.running} open={seedsOpen} onOpenChange={setSeedsOpen} />

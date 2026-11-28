@@ -10,6 +10,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { DemoBar } from '@/components/ui/demo-badge';
 import { accountApi, accountKeys } from '@/lib/api/account';
+import { useApiConnectivity } from '@/lib/api/connectivity';
 import { getCurrentRound, getMyRoundEntries } from '@/lib/api/pool';
 import { walletApi, walletKeys } from '@/lib/api/wallet';
 import { useAuth } from '@/lib/auth';
@@ -55,10 +56,12 @@ export interface AppShellFrameProps {
   /** Country named in the region banner (from the page's region check); omitted → no country is named. */
   regionName?: string | null;
   demoBar?: boolean;
-  /** null = the live round is still loading. */
-  poolAmount?: string | null;
+  /** null = the live round is still loading; false = it couldn't be loaded. */
+  poolAmount?: string | null | false;
   /** Game pages: start with the 72 px rail (≥ 1024); the burger expands it for this visit only. */
   collapseSidebar?: boolean;
+  /** API reachability (`useApiConnectivity`): shows the ERR-02 connection banner with Try again. */
+  connection?: { unreachable: boolean; offline: boolean; retry: () => void; retrying: boolean };
   children: React.ReactNode;
 }
 
@@ -80,6 +83,7 @@ export function AppShellFrame({
   demoBar = publicEnv.demoMode,
   poolAmount = DEMO_CURRENT_ROUND.poolBalance ?? '0.00',
   collapseSidebar = false,
+  connection,
   children,
 }: AppShellFrameProps) {
   const [mode, setMode] = React.useState<SidebarMode>('auto');
@@ -157,6 +161,27 @@ export function AppShellFrame({
         >
           GLOBAL POOL games are not available in your region{regionName ? ` (${regionName})` : ''}.
           You can still view your account and withdraw funds.
+        </Alert>
+      )}
+      {connection?.unreachable && (
+        <Alert
+          type="warning"
+          layout="full"
+          data-testid="connection-banner"
+          title={connection.offline ? 'You’re offline' : 'Can’t reach GLOBAL POOL right now'}
+          actions={
+            <Button
+              size="s"
+              variant="secondary"
+              onClick={connection.retry}
+              loading={connection.retrying}
+            >
+              Try again
+            </Button>
+          }
+        >
+          Check your internet connection. Figures on this page may be out of date until we reconnect —
+          your balance and entries are safe.
         </Alert>
       )}
       <div className="flex flex-1">
@@ -251,6 +276,18 @@ export const SHELL_POOL_KEYS = {
 const UNREAD_QUERY = { page: 1, pageSize: 1, unread: true };
 
 /**
+ * Shell figure from a query: the value · null while loading (skeleton) · false when the request failed ("—", never an
+ * endless skeleton — ERR-03). A failed refetch keeps showing the last good value.
+ */
+export function shellValue<T>(
+  query: { data: T | undefined; isError: boolean },
+  pick: (data: T) => string,
+): string | null | false {
+  if (query.data !== undefined) return pick(query.data);
+  return query.isError ? false : null;
+}
+
+/**
  * The signed-in member's own shell data in API mode — Available (GET /wallet/balances, shared with the wallet
  * pages), entries in the open round, unread notifications — and the live pool amount for everyone. Keys are the
  * modules' own, so every financial write that refreshes them (player-cache.ts) refreshes the shell too.
@@ -283,8 +320,9 @@ function useLiveShell(member: boolean) {
   });
   return {
     api,
-    poolAmount: api ? (round.data ? (round.data.poolBalance ?? '0.00') : null) : undefined,
-    available: balances.data?.available ?? null,
+    // no round yet (null) → 0.00, never an endless skeleton
+    poolAmount: api ? shellValue(round, (r) => r?.poolBalance ?? '0.00') : undefined,
+    available: shellValue(balances, (b) => b.available),
     activeEntries: open ? (mine.data?.entries ?? 0) : 0,
     notifications: unread.data?.unread ?? 0,
   };
@@ -305,6 +343,7 @@ function ConnectedShell({
   const user = auth.status === 'member' ? auth.user : null;
   const signedIn = Boolean(user);
   const live = useLiveShell(signedIn && !overrides.previewGuest);
+  const connection = useApiConnectivity();
   // API mode: the member's real data. Mock data source: the DEMO profile (with DEMO markers), like every mock view.
   const member: ShellMember | null = overrides.previewGuest
     ? null
@@ -345,6 +384,7 @@ function ConnectedShell({
       regionName={overrides.regionName}
       poolAmount={live.poolAmount}
       collapseSidebar={overrides.collapseSidebar}
+      connection={connection}
     >
       {children}
     </AppShellFrame>

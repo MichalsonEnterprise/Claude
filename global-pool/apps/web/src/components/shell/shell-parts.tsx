@@ -45,8 +45,11 @@ export interface ShellMember {
   initials: string;
   publicId?: string;
   vipTier?: VipTierName;
-  /** Available balance, decimal string. null while the player's real balance is loading (skeleton, never a guess). */
-  available: string | null;
+  /**
+   * Available balance, decimal string. null while the player's real balance is loading (skeleton, never a guess);
+   * false when it couldn't be loaded ("—", never an endless skeleton — ERR-03).
+   */
+  available: string | null | false;
   notifications: number;
   activeEntries: number;
   demo: boolean;
@@ -79,12 +82,21 @@ export function BalancePill({
         aria-label={
           member.available === null
             ? 'Available balance loading — open wallet'
-            : `Available balance ${formatUSDT(member.available)}${member.demo ? ' (demo)' : ''} — open wallet`
+            : member.available === false
+              ? 'Available balance couldn’t be loaded — open wallet'
+              : `Available balance ${formatUSDT(member.available)}${member.demo ? ' (demo)' : ''} — open wallet`
         }
       >
         <TokenMark size={compact ? 16 : 18} />
         {member.available === null ? (
           <Skeleton className={cn('h-4', compact ? 'w-12' : 'w-16')} />
+        ) : member.available === false ? (
+          <span
+            title="Balance couldn’t be loaded"
+            className={cn('text-text-tertiary', compact ? 'text-label-s' : 'text-label-m')}
+          >
+            —
+          </span>
         ) : (
           <span
             className={cn(
@@ -176,6 +188,8 @@ export function UserMenu({ member, onSignOut }: { member: ShellMember; onSignOut
           <p className="flex items-center gap-2 text-number-s tabular-nums">
             {member.available === null ? (
               <Skeleton className="h-5 w-24" />
+            ) : member.available === false ? (
+              <span className="text-text-tertiary">Couldn’t load</span>
             ) : (
               formatUSDT(member.available)
             )}

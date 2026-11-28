@@ -15,9 +15,8 @@ import * as React from 'react';
 
 import { Card } from '@/components/ui/card';
 import { DemoBadge } from '@/components/ui/demo-badge';
-import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ApiRequestError } from '@/lib/api/client';
 import { publicEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
 
@@ -372,23 +371,13 @@ export function QueryState({
 }) {
   if (query.isPending) return <>{skeleton ?? <CardSkeleton />}</>;
   if (query.isError) {
-    const ref = query.error instanceof ApiRequestError ? query.error.requestId : undefined;
     return (
       <Card>
-        <EmptyState
-          type="error"
-          title={`We couldn’t load ${label}`}
-          description="Your balance and settings are safe. Check your connection and try again."
-          reference={ref}
-          actions={
-            <button
-              type="button"
-              onClick={() => void query.refetch()}
-              className="inline-flex h-10 items-center rounded-md border border-border-default px-4 text-label-m hover:bg-surface-hover"
-            >
-              Try again
-            </button>
-          }
+        <ErrorState
+          error={query.error}
+          onRetry={() => void query.refetch()}
+          what={label}
+          note="Your balance and settings are safe."
         />
       </Card>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, LogIn, MessageCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LogIn, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -8,8 +8,8 @@ import { AgeBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ApiRequestError } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
@@ -212,24 +212,15 @@ export function PageSkeleton({ rows = 3 }: { rows?: number }) {
   );
 }
 
-/** Error card with retry; shows the API request id when present. */
+/** Error card with retry (shared `<ErrorState>`): readable reason per error kind + API request id. */
 export function QueryError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
-  const ref = error instanceof ApiRequestError ? error.requestId : undefined;
-  const message =
-    error instanceof Error && error.message ? error.message : 'We could not load this page.';
   return (
     <div className="rounded-xl border border-border-subtle bg-surface-default">
-      <EmptyState
-        type="error"
-        title="Something went wrong"
-        description={message}
-        reference={ref}
-        actions={
-          <Button variant="secondary" onClick={onRetry}>
-            <RefreshCw aria-hidden />
-            Try again
-          </Button>
-        }
+      <ErrorState
+        error={error}
+        onRetry={onRetry}
+        what="this page"
+        note="Your limits and balance are not affected."
       />
     </div>
   );

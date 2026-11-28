@@ -18,6 +18,7 @@ import { ShellOverride } from '@/components/shell/shell-overrides';
 import { Alert } from '@/components/ui/alert';
 import { VipBadge, type VipTierName } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/ui/error-state';
 import {
   useAccountStatus,
   useBalances,
@@ -33,6 +34,7 @@ import {
   type AccountStatusView,
   type MeView,
 } from '@/lib/api/account';
+import { failedQueries } from '@/lib/api/errors';
 import { statePreviewEnabled } from '@/lib/home-preview';
 
 import { DashboardPage } from '../page-shell';
@@ -101,6 +103,7 @@ export function DashboardOverview() {
   React.useEffect(() => setNow(new Date()), []);
 
   const demo = me.data?.isDemo ?? false;
+  const partial = failedQueries(status, lifetime, round, mine, games, notes, rg, tfa, deposits);
   const gate = restrictionCopy(status.data, previewRestricted);
   const restricted = gate.restricted;
   const depositsPaused = previewRestricted || (status.data?.paused.deposits ?? false);
@@ -212,8 +215,18 @@ export function DashboardOverview() {
       actions={actions}
       demo={demo}
       banner={banner}
+      failure={{ ...failedQueries(me, balances), what: 'your dashboard' }}
     >
       {restricted && <ShellOverride restricted regionName={gate.country} />}
+      {partial.failed && (
+        <ErrorState
+          variant="inline"
+          error={partial.error}
+          onRetry={partial.retry}
+          retrying={partial.retrying}
+          title="Some sections couldn’t load"
+        />
+      )}
       {isNew && me.data ? (
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 laptop:grid-cols-[minmax(0,1fr)_360px]">
           <SetupChecklist
@@ -232,40 +245,51 @@ export function DashboardOverview() {
         me.data && !restricted && <VipStrip me={me.data} balances={balances.data} demo={demo} />
       )}
 
-      <BalancesSection
-        balances={balances.data}
-        lifetime={lifetime.data}
-        dailyLimit={undefined}
-        demo={demo}
-        updatedAt={balances.dataUpdatedAt}
-        isNew={isNew}
-      />
-
-      <ActivePoolSection
-        round={round.data}
-        mine={mine.data}
-        restricted={restricted}
-        canEnter={canEnter}
-        enterBlockedReason={blockedReason}
-        demo={round.data?.isDemo ?? demo}
-      />
-
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 laptop:grid-cols-[minmax(0,1fr)_360px]">
-        <GamesPreview
-          games={games.data}
-          restricted={restricted}
-          title={isNew ? 'Popular right now' : 'Games'}
-          demo={games.data?.some((g) => g.isDemo) ?? demo}
-        />
-        <NotificationsPreview
-          items={notes.data?.items}
-          unread={notes.data?.unread ?? 0}
+      {/* A section whose data failed is left out (the inline error above says so) — never an endless skeleton. */}
+      {!lifetime.isError && (
+        <BalancesSection
+          balances={balances.data}
+          lifetime={lifetime.data}
+          dailyLimit={undefined}
           demo={demo}
+          updatedAt={balances.dataUpdatedAt}
+          isNew={isNew}
         />
-      </div>
+      )}
+
+      {!round.isError && !mine.isError && (
+        <ActivePoolSection
+          round={round.data}
+          mine={mine.data}
+          restricted={restricted}
+          canEnter={canEnter}
+          enterBlockedReason={blockedReason}
+          demo={round.data?.isDemo ?? demo}
+        />
+      )}
+
+      {(!games.isError || !notes.isError) && (
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 laptop:grid-cols-[minmax(0,1fr)_360px]">
+          {!games.isError && (
+            <GamesPreview
+              games={games.data}
+              restricted={restricted}
+              title={isNew ? 'Popular right now' : 'Games'}
+              demo={games.data?.some((g) => g.isDemo) ?? demo}
+            />
+          )}
+          {!notes.isError && (
+            <NotificationsPreview
+              items={notes.data?.items}
+              unread={notes.data?.unread ?? 0}
+              demo={demo}
+            />
+          )}
+        </div>
+      )}
 
       <RecentActivity demo={demo} isNew={isNew} />
-      <RgModule rg={rg.data} isNew={isNew} />
+      {!rg.isError && <RgModule rg={rg.data} isNew={isNew} />}
       {balances.data && money(balances.data.owed).gt(0) && restricted && (
         <p className="text-caption text-text-tertiary">
           {formatUSDT(balances.data.owed)} is owed to you and can still be claimed and withdrawn.

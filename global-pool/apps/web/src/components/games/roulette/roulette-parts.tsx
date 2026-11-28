@@ -234,13 +234,13 @@ export function OutcomePreviewCard({ slip, className }: { slip: Slip; className?
   const groups = outcomePreview(slip);
   const total = slipTotal(slip);
   return (
-    <div className={cn('flex flex-col gap-2.5 rounded-lg border border-border-subtle bg-bg-secondary p-4', className)} data-testid="outcome-preview">
+    <div className={cn('flex flex-col gap-2 rounded-lg border border-border-subtle bg-bg-secondary p-3 laptop:p-4', className)} data-testid="outcome-preview">
       <div className="flex items-center gap-2">
         <Target aria-hidden className="size-4 text-icon-brand" />
         <p className="text-body-s-strong text-text-primary">If the ball lands on…</p>
         <DemoBadge size="xs" className="ml-auto" />
       </div>
-      <ul className="flex flex-col gap-1.5">
+      <ul className="flex flex-col gap-1">
         {groups.slice(0, 6).map((g) => {
           const d = money(g.net);
           return (

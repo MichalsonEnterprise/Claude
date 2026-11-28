@@ -21,8 +21,9 @@ import * as React from 'react';
 import { AgeBadge, CountBadge, StatusBadge, type BadgeStatus } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
-import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { ApiRequestError } from '@/lib/api/client';
+import { describeError } from '@/lib/api/errors';
 import { cn } from '@/lib/utils';
 
 export const POOL_ROUTES = {
@@ -657,6 +658,7 @@ export function errorMessage(err: unknown): string {
   return 'Something went wrong.';
 }
 
+/** Failed query card (shared `<ErrorState>`): readable reason per error kind, request id, Try again. */
 export function QueryError({
   error,
   onRetry,
@@ -668,21 +670,14 @@ export function QueryError({
   title?: string;
   className?: string;
 }) {
-  const ref = error instanceof ApiRequestError ? error.requestId : undefined;
+  const kind = describeError(error).kind;
   return (
     <div className={cn(cardCls, 'p-6', className)}>
-      <EmptyState
-        type="error"
-        title={title}
-        description={`${errorMessage(error)} Your balance and entries are not affected.`}
-        reference={ref ? `Request ${ref}` : undefined}
-        actions={
-          onRetry ? (
-            <Button variant="secondary" onClick={onRetry}>
-              Try again
-            </Button>
-          ) : undefined
-        }
+      <ErrorState
+        error={error}
+        onRetry={onRetry}
+        title={kind === 'server' || kind === 'unknown' ? title : undefined}
+        note="Your balance and entries are not affected."
       />
     </div>
   );

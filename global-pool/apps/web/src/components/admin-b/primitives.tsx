@@ -25,6 +25,7 @@ import { AdminPageHeader } from '@/components/admin-a/primitives';
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiRequestError } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
@@ -495,7 +496,19 @@ export function errorText(error: unknown): {
   };
 }
 
+/**
+ * Failed query panel: admin-specific copy for 401 / 403 (`errorText`), everything else through the shared
+ * `<ErrorState>` (offline, timeout, 429 countdown, maintenance, 5xx — never raw transport text).
+ */
 export function QueryError({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
+  const status = error instanceof ApiRequestError ? error.status : 0;
+  if (status !== 401 && status !== 403) {
+    return (
+      <div className="rounded-lg border border-border-subtle bg-surface-default p-6">
+        <ErrorState error={error} onRetry={onRetry} what="this data" />
+      </div>
+    );
+  }
   const e = errorText(error);
   return (
     <div className="rounded-lg border border-border-subtle bg-surface-default p-6">

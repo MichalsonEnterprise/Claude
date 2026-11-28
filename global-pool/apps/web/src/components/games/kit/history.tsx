@@ -48,6 +48,7 @@ export function BetHistory<B extends GameBetView>({
   noun = 'bet',
   pageSize = 10,
   className,
+  actions,
 }: {
   slug: string;
   columns: HistoryColumn<B>[];
@@ -60,6 +61,8 @@ export function BetHistory<B extends GameBetView>({
   noun?: string;
   pageSize?: number;
   className?: string;
+  /** Extra header actions (e.g. "Export CSV"), rendered before the result filter. */
+  actions?: React.ReactNode;
 }) {
   const [page, setPage] = React.useState(1);
   const [filter, setFilter] = React.useState<ResultFilter>('all');
@@ -80,7 +83,12 @@ export function BetHistory<B extends GameBetView>({
           {title}
         </h2>
         <DemoBadge size="s" label="DEMO credits" />
-        <div role="group" aria-label="Filter results" className="ml-auto flex gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1">
+        {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
+        <div
+          role="group"
+          aria-label="Filter results"
+          className={cn('flex gap-1 rounded-md border border-border-subtle bg-bg-secondary p-1', !actions && 'ml-auto')}
+        >
           {(['all', 'wins', 'losses'] as const).map((f) => (
             <button
               key={f}

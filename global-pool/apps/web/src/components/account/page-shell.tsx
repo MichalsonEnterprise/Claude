@@ -9,6 +9,7 @@ import { CountBadge } from '@/components/ui/badge';
 import { Button, IconButton } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import {
   Sheet,
   SheetBody,
@@ -52,6 +53,11 @@ export interface DashboardPageProps {
   demo?: boolean;
   /** Full-width banner above the header (e.g. restricted region). */
   banner?: React.ReactNode;
+  /**
+   * The page's essential queries failed with nothing to show (`failedQueries(...)` from `@/lib/api/errors`): the
+   * body is replaced by an `<ErrorState>` with Try again — never endless skeletons or a blank, editable form.
+   */
+  failure?: { failed: boolean; error: unknown; retry: () => void; retrying: boolean; what?: string };
   children: React.ReactNode;
   className?: string;
 }
@@ -71,6 +77,7 @@ export function DashboardPage({
   actions,
   demo = false,
   banner,
+  failure,
   children,
   className,
 }: DashboardPageProps) {
@@ -229,7 +236,21 @@ export function DashboardPage({
         </div>
       )}
 
-      <div className="flex min-w-0 flex-col gap-6">{children}</div>
+      <div className="flex min-w-0 flex-col gap-6">
+        {failure?.failed ? (
+          <Card>
+            <ErrorState
+              error={failure.error}
+              onRetry={failure.retry}
+              retrying={failure.retrying}
+              what={failure.what ?? 'this page'}
+              note="Your balance and settings are safe."
+            />
+          </Card>
+        ) : (
+          children
+        )}
+      </div>
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="bottom" className="max-h-[88dvh]">

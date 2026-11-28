@@ -115,7 +115,7 @@ function NumberCell({
         tabIndex={focus ? 0 : -1}
         disabled={disabled}
         data-testid={`felt-${n}`}
-        aria-label={`${n} ${color}${n === 0 ? '' : ''} — straight pays 35:1${bet ? `, your bet ${bet.amount} DEMO` : ''}${winning ? ', winning number' : ''}`}
+        aria-label={`${n} ${color} — straight pays 35:1${bet ? `, your bet ${bet.amount} DEMO` : ''}${winning ? ', winning number' : ''}`}
         onClick={onPlace}
         onContextMenu={(e) => {
           e.preventDefault();

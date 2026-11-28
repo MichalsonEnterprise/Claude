@@ -399,3 +399,46 @@ MOCK players per run; fails on horizontal overflow / console errors) → `test-r
 (lobby → dice → roll → balance = 1,000.00 ± net, USDT wallet unchanged → verify drawer (rotate & reveal, browser
 re-derivation, mismatch state) → dropped response replayed with the same idempotency key → auto-play (constant stake) →
 details; plus `403 REAL_MONEY_DISABLED` for a non-DEMO currency). Unit tests: `test/games-kit.test.ts`.
+
+### Pool Roulette (key "roulette") — `src/components/games/roulette/*`
+
+European single zero on the kit (decision #35), DEMO credits only (no cash value), Fees 0.00. What a bet covers and pays
+always comes from `roulette.coveredNumbers` / `ROULETTE_PAYOUTS` in `@gp/shared/fair` (the server's rule module).
+
+| Route | Component | Notes |
+| --- | --- | --- |
+| `/games/pool-roulette` | `RouletteGame` (`roulette-game.tsx`) | RL-01…05 + RL-09. Own layout built from kit parts (`GameHeader` + `chips`, `GameSessionBar` above the table, `GameNotice` over the dimmed table, `DemoCreditsChip`, `BeforeYouBet`, `SeedDisplay`, `BetHistory`, `VerifyDrawer`, `useBetRunner`, `useGameGate`): [stage \| 340 px slip] ≥ 1280, stacked below. `RouletteWheel` (SVG, wheel order, 4 500 ms `wheel-spin` token with `--ease-wheel`, ball drops at 71 %, lands exactly on the server's pocket; reduced motion = instant). `RouletteFelt` (≥ 768): 0 · 1–36 · 2:1 · dozens · even-money; pointer targets on lines / edges / crossings (`feltZones()` = 60 splits, 14 streets incl. trios, 23 corners incl. first four, 11 lines); keyboard: roving arrows, Enter = straight, B = bet-type chooser, Delete = take a chip off, Space = spin, Backspace / Ctrl+Z = undo; right-click removes. `RouletteFeltVertical` + `OutsidePanel` (< 768, "Numbers \| Outside bets"), `BetTypeSheet` (bottom sheet on mobile, dialog on desktop), sticky chip tray + Undo / Clear / Repeat + Spin above the tab bar, slip in a bottom sheet. `BetSlip` (Empty · Filled · Over limit · Locked), outcome preview ("If the ball lands on…", expected return), locked card while spinning, per-bet settlement + result banner (win / even / lose) from the server's outcome. Limits are flagged, never auto-changed ("Set Straight · 19 to 1,000.00"). The balance shown while the wheel turns is the pre-spin balance minus the stake (frozen snapshot), so the result is never revealed early; the reality check is held until the wheel stops. "Repeat" only loads the last bets onto the felt — the player still presses Spin. |
+| `/games/pool-roulette/my-bets` | `RouletteHistoryPage` (`roulette-pages.tsx`) | RL-06: period (Today / 7 / 30 days / All, UTC) + result filters sent to `GET /games/pool-roulette/bets?from&result` (KPIs follow the filters), table ≥ 1024 / cards below, row details (per-bet settlement, seeds, Verify, "Repeat these bets" → `/games/pool-roulette?repeat=1`), your last 50 pockets with the independence note, session & limits card. |
+| `/games/pool-roulette/rules` | `RouletteRulesPage` | RL-07: "Where each bet goes" (static felt with example chips), inside / outside pay tables computed from the shared rules, how a spin works, limits (largest single win = 1,000.00 × 35), RG card. |
+| `/games/pool-roulette/fairness` | `RouletteFairnessPage` | RL-08: choose a spin (`?bet=<id>`), rotate & reveal, editable seeds, five steps recomputed in the browser with `verifyInBrowser()` (HMAC block 0 → f → × 37 → pocket → per-bet sum), "check it yourself" pseudo-code. |
+
+Kit fix (shared, behaviour-preserving): `verifyInBrowser` compared outcome values with `JSON.stringify`, which is key-order
+sensitive — a roulette outcome (nested `bets[]`) read back from JSONB therefore showed a false "doesn't match"; it now
+compares key-sorted JSON (`test/games-roulette.test.ts` covers it).
+
+QA: `BASE_URL=http://localhost:3114 API_URL=http://localhost:4214 node scripts/games-roulette-qa.mjs [RL-0x…]` →
+`test-results/visual/games/roulette/*.png` (+ `_vp` viewport shots on mobile); e2e:
+`E2E_BASE_URL=http://localhost:3114 E2E_API_URL=http://localhost:4214 pnpm --filter @gp/web exec playwright test e2e/games-roulette.spec.ts`.
+Unit tests: `test/games-roulette.test.ts`.
+
+### Double Side (key "dice-coinflip") — `src/components/games/coinflip/*`
+
+DEMO credits only ("DEMO credits · no cash value"); the side always comes from the server's commit–reveal seeds and the
+browser re-derives it with `verifyBet()` (`@gp/shared/fair`). Fees 0.00 on every bet panel.
+
+| Route | Component | Notes |
+| --- | --- | --- |
+| `/games/double-side` | `CoinflipGame` (`coinflip-game.tsx`) | CF-01…03 + CF-06 on `GameLayout arrangement="stacked" sessionBarPosition="above" panelCredits={false} headerChips` (CF frames: one card, Heads card \| coin \| Tails card ≥ 1024, coin + compact picks below; full-width bet bar with Manual/Auto + DEMO credits chip, Bet amount, "This flip" tiles, Fees 0.00 line, `StakeRiskNote`, CTA "Flip for Heads · 10.00 DEMO"). `CoinflipStage` (`coinflip-stage.tsx`, `role="radiogroup"` "Your pick", ←→ / H / T, Space flips), `FlipCoin` (`coin.tsx`: CSS 3D + Web Animations, `coin-flip` 1 600 ms token, ≥ 6 half-turns to the SERVER's side via `landingAngle()` — spin length never depends on win/lose; instant under reduced motion; reality check held until the coin lands), `CoinFace` (Heads mint + logo medallion, Tails silver + pool glyph, never gold), `SideDisc` (H/T). States: loading skeleton, guest, insufficient DEMO credits ("Bet X instead" / reset), above max ("Set to 1,000.00"), connection lost (same idempotency key), loss / time limit, self-excluded, region, offline (kit `GameNotice`). Recent results (last 12 landed sides, counts, `#my-bets`) + "How Double Side works" + `SeedDisplay` + `MoreGamesRail`. |
+| `/games/double-side/my-flips` | `MyFlipsPage` (`my-flips.tsx`) | CF-04: period (Today · 7 days · 30 days · All, UTC) + Picked Heads/Tails + Wins/Losses + search (flip ID or nonce) → `GET /games/double-side/bets?from&pick&result&search` (KPIs follow the filters: flips, wagered, net, landed Heads/Tails), table ≥ 1024 with expandable detail row (hash, client seed, nonce, `0.2288 → below 0.5000 → Heads`, Verify this flip, Copy details) / cards below, rows per page + pagination, Export CSV (`/history/game-rounds/export?game=double-side`). |
+| `/games/double-side/fairness` | `CoinflipFairnessPage` (`fairness.tsx`) | CF-05: load a flip (`?bet=<id>` or flip ID / nonce), secret seed → "Rotate seeds & reveal", editable server seed / client seed / nonce re-derived with `verifyInBrowser()` (verified / failed — e.g. a 63-char seed), "Verify with your own tools" with the flip's real HMAC values, "Your seeds" (previous pair revealed, new commitment, client seed, rotate), "How a flip is decided" (commit → combine → scale `u32 ÷ 2³²` → map → pay). |
+
+Shared: `CoinflipSubpage` + `CoinflipTabs` (`coinflip-pages.tsx`: breadcrumb, session bar, Play · My flips · Fairness · Rules
+& payouts — "All flips" is left out, there is no all-player feed), `coinflip-math.ts` (pure helpers, unit-tested),
+`routes.ts` (`COINFLIP_ROUTES`). Kit additions (additive): `GameLayout` props `arrangement`, `sessionBarPosition`,
+`panelCredits`, `headerChips`; `GameHeader` `chips` (second row); `BetHistory` `actions` (Pool Dice now has DI-05 "Export
+CSV"); `useGameBets(slug, page, pageSize, filters?)` / `gamesApi.bets(…, filters?)` + `GameBetsFilters`.
+
+QA: `BASE_URL=http://localhost:3113 API_URL=http://localhost:4213 node scripts/games-coinflip-qa.mjs [CF-0x…]` →
+`test-results/visual/games/dice-coinflip/*.png` (fresh DEV MOCK players; fails on overflow / console errors); e2e:
+`E2E_BASE_URL=http://localhost:3113 E2E_API_URL=http://localhost:4213 pnpm --filter @gp/web exec playwright test e2e/games-dice-coinflip.spec.ts`.
+Unit tests: `test/games-coinflip.test.tsx`.

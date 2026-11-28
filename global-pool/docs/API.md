@@ -241,7 +241,7 @@ fee ledgers; no fee on game bets). Provably fair (commit–reveal seeds, HMAC-SH
 | GET    | `/games/{slug}/seeds` | player | Active seed pair (server seed hash, client seed, nonce) + revealed pairs |
 | POST   | `/games/{slug}/seeds/client` · `/seeds/rotate` | player | Change the client seed / rotate: reveals the server seed, commits a new one (409 while a round is open) |
 | POST   | `/games/{slug}/bets` | player | Instant bet (Pool Dice, Double Side, Pool Roulette, Skyline, Fortune Ring, Pool Keno, Pinfall) — idempotent |
-| GET    | `/games/{slug}/bets` | player | My bets for a game (paginated) + totals |
+| GET    | `/games/{slug}/bets` | player | My bets for a game (paginated) + totals. Optional filters (applied to the page AND the summary): `from` / `to` (ISO), `result=win\|lose`, `pick=heads\|tails` (Double Side), `search` (ref `CF-52107` / `52107` or nonce); summary adds `wins`, `losses` and, for Double Side, `landed { heads, tails }` |
 | GET    | `/games/bets/{id}` · `/games/bets/{id}/verify` | player | One bet · verification bundle (re-derived by the API once the seed is revealed) |
 | GET/POST | `/games/twenty-one/hands[/current]` · `/hands/{id}/action` | player | Twenty-One: deal, `hit|stand|double|split|insurance`, reconnect |
 | GET/POST | `/games/vault-sweeper/rounds[/current]` · `/{id}/reveal` · `/{id}/cashout` | player | Vault Sweeper (mines) |

@@ -311,7 +311,7 @@ export function RouletteHistoryPage() {
                   {l}
                   <DemoBadge size="xs" />
                 </dt>
-                <dd className={cn('flex items-center gap-2 text-number-m text-text-primary', tone as string)}>
+                <dd className={cn('flex flex-wrap items-center gap-x-2 text-number-s text-text-primary tablet:text-number-m', tone as string)}>
                   {l === 'Net result' && s && (money(s.net).gte(0) ? <TrendingUp aria-hidden className="size-5" /> : <TrendingDown aria-hidden className="size-5" />)}
                   {v}
                 </dd>
@@ -403,7 +403,7 @@ export function RouletteHistoryPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-mono-s text-text-primary">{b.ref}</span>
                       <DemoBadge size="xs" />
-                      <span className="ml-auto text-caption text-text-tertiary">{formatTimeUTC(b.createdAt)} UTC</span>
+                      <span className="ml-auto text-caption text-text-tertiary">{formatTimeUTC(b.createdAt)}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <PocketDisc n={b.outcome.pocket} size={40} />
@@ -679,7 +679,7 @@ function Step({ n, title, ok, children, mono }: { n: number; title: string; ok: 
         </p>
         <div className="text-body-s text-text-secondary">{children}</div>
         {mono && (
-          <code className="w-fit max-w-full truncate rounded-sm border border-border-subtle bg-bg-secondary px-2.5 py-1.5 font-mono text-mono-s text-text-primary">
+          <code className="w-fit max-w-full break-all whitespace-pre-wrap rounded-sm border border-border-subtle bg-bg-secondary px-2.5 py-1.5 font-mono text-mono-s text-text-primary">
             {mono}
           </code>
         )}

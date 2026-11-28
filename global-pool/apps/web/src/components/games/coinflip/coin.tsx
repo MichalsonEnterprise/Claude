@@ -7,6 +7,8 @@ import * as React from 'react';
 import { LogoMark } from '@/components/brand/logo';
 import { cn } from '@/lib/utils';
 
+import { faceAngle, landingAngle } from './coinflip-math';
+
 /**
  * Double Side coin (Figma Game/Coin 24:14951): Heads = mint with the GLOBAL POOL medallion, Tails = silver with the
  * pool glyph. Never gold (gold is reserved for the jackpot). Pure CSS / inline SVG — concrete object, no glow or
@@ -92,27 +94,6 @@ export function SideDisc({
       {heads ? 'H' : 'T'}
     </span>
   );
-}
-
-export const sideName = (s: CoinSide) => (s === 'heads' ? 'Heads' : 'Tails');
-
-/**
- * Angle (deg, rotateY) the coin lands on: at least `halfTurns` half-turns past `from` and showing `side`
- * (heads = 0 mod 360, tails = 180 mod 360). The spin length never depends on whether the player won — only on where
- * the coin starts and the side the SERVER settled (no near-miss staging).
- */
-export function landingAngle(from: number, side: CoinSide, halfTurns = 6): number {
-  const base = from + halfTurns * 180;
-  const mod = ((base % 360) + 360) % 360;
-  const want = side === 'heads' ? 0 : 180;
-  return base + ((want - mod + 360) % 360);
-}
-
-/** Nearest angle ≥ `from` that shows `side` (quick turn when the player switches pick). */
-export function faceAngle(from: number, side: CoinSide): number {
-  const mod = ((from % 360) + 360) % 360;
-  const want = side === 'heads' ? 0 : 180;
-  return from + ((want - mod + 360) % 360);
 }
 
 export interface FlipCoinProps {

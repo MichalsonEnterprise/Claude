@@ -13,7 +13,6 @@ import {
   Landmark,
   Lock,
   Megaphone,
-  RefreshCw,
   ShieldCheck,
   type LucideIcon,
 } from 'lucide-react';
@@ -22,8 +21,10 @@ import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/demo-badge';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiRequestError } from '@/lib/api/client';
+import { describeError } from '@/lib/api/errors';
 import { cn } from '@/lib/utils';
 
 // ── page header ─────────────────────────────────────────────────────────────────────────────────
@@ -504,27 +505,16 @@ export function QueryErrorPanel({
     const missing = (error.details?.missingPermissions as Permission[] | undefined) ?? [];
     return <NoPermission permissions={missing} role={role} compact />;
   }
-  const message = error instanceof Error ? error.message : 'Unknown error';
-  const ref = error instanceof ApiRequestError ? error.requestId : undefined;
+  // Shared ERR-02 copy per error kind (offline, timeout, 429 countdown, maintenance, 5xx) — never raw text.
+  const kind = describeError(error, what).kind;
   return (
-    <div
-      role="alert"
-      className="flex flex-col items-start gap-3 rounded-lg border border-status-danger/35 bg-status-danger-tint p-5"
-    >
-      <p className="text-label-l text-text-primary">Couldn&apos;t load {what}</p>
-      <p className="text-body-s text-text-secondary">{message}</p>
-      {ref && <p className="font-mono text-mono-s text-text-tertiary">Ref {ref}</p>}
-      {onRetry && (
-        <Button
-          variant="secondary"
-          size="s"
-          leadingIcon={<RefreshCw aria-hidden />}
-          onClick={onRetry}
-        >
-          Try again
-        </Button>
-      )}
-    </div>
+    <ErrorState
+      variant="inline"
+      error={error}
+      onRetry={onRetry}
+      what={what}
+      title={kind === 'server' || kind === 'unknown' ? `Couldn’t load ${what}` : undefined}
+    />
   );
 }
 

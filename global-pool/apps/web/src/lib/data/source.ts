@@ -9,6 +9,7 @@
  * Set NEXT_PUBLIC_DATA_SOURCE=api at build time to switch. Values are inlined by Next.js, so each variable is
  * read with a literal `process.env.NEXT_PUBLIC_…` access.
  */
+import { fetchText, statusMessage } from '@/lib/api/transport';
 import { publicEnv } from '@/lib/env';
 
 export type DataSource = 'mock' | 'api';
@@ -27,24 +28,33 @@ export class ApiError extends Error {
   }
 }
 
-/** GET a JSON resource from the API. Errors use the shared error envelope's `message` when present. */
-export async function apiGet<T>(path: string, init?: { signal?: AbortSignal }): Promise<T> {
-  const res = await fetch(`${publicEnv.apiUrl}${path}`, {
+/**
+ * GET a JSON resource from the API. Errors use the shared error envelope's `message` when present, otherwise readable
+ * copy for the status (never raw status text / HTML). Times out like `apiRequest()` (`ApiTimeoutError`); a request
+ * that never got an answer throws `ApiNetworkError` (src/lib/api/transport.ts).
+ */
+export async function apiGet<T>(
+  path: string,
+  init?: { signal?: AbortSignal; timeoutMs?: number },
+): Promise<T> {
+  const { res, text } = await fetchText(`${publicEnv.apiUrl}${path}`, {
+    path,
     headers: { accept: 'application/json' },
     cache: 'no-store',
     signal: init?.signal,
+    timeoutMs: init?.timeoutMs,
   });
   if (!res.ok) {
-    let message = `${res.status} ${res.statusText}`;
+    let message = statusMessage(res.status);
     try {
-      const body = (await res.json()) as { error?: { message?: string }; message?: string };
-      message = body.error?.message ?? body.message ?? message;
+      const body = JSON.parse(text) as { error?: { message?: unknown } };
+      if (typeof body.error?.message === 'string') message = body.error.message;
     } catch {
-      /* not JSON */
+      /* not JSON (e.g. a proxy's HTML error page) */
     }
     throw new ApiError(res.status, path, message);
   }
-  return (await res.json()) as T;
+  return JSON.parse(text) as T;
 }
 
 /**
