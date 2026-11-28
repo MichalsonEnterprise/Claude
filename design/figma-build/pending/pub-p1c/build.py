@@ -3,9 +3,9 @@ import os, glob, subprocess
 here = os.path.dirname(os.path.abspath(__file__))
 helpers = open(os.path.join(here, '..', '..', 'helpers.js')).read()
 art = open(os.path.join(here, 'art.js')).read()
-for b in sorted(glob.glob(os.path.join(here, '*.body.js'))):
+for b in sorted(glob.glob(os.path.join(here, 'm*.body.js'))):
     name = os.path.basename(b).replace('.body.js', '')
-    lib = open(os.path.join(here, 'lib-d.js' if name.startswith('d') else 'lib-m.js')).read()
+    lib = open(os.path.join(here, 'lib-m.js')).read()
     code = helpers + '\n' + lib + '\n' + art + '\n' + open(b).read()
     out = os.path.join(here, 'out', name + '.js')
     open(out, 'w').write(code)

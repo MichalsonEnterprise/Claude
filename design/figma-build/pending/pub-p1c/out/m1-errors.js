@@ -111,7 +111,7 @@ async function mfinish(S, o = {}) {
   if (o.tab !== false) { const tab = await I('22:5413', { Active: o.tab || 'Home' }); tab.name = 'Nav/Mobile Tab Bar — fixed to viewport bottom'; add(S.f, [tab, 'FILL']); }
   S.f.primaryAxisSizingMode = 'AUTO';
 }
-async function statusChip(kind, label, icon) { const m = { ok: ['check-circle', 'status/success-tint', 'text/success'], warn: ['alert-triangle', 'status/warning-tint', 'text/warning'], info: ['info', 'status/info-tint', 'text/info'], bad: ['x-circle', 'status/danger-tint', 'text/danger'], pause: ['pause-circle', 'status/warning-tint', 'text/warning'], work: ['wrench', 'status/info-tint', 'text/info'] }[kind]; const c = AL('HORIZONTAL', { name: 'Status — ' + label, gap: 6, p: [4, 10, 4, 8], r: 9999, fill: m[1], align: 'CENTER' }); add(c, await IC(icon || m[0], 14, m[2]), await T(label, 'Label/S', m[2])); return c; }
+async function statusChip(kind, label, icon) { const m = { ok: ['check-circle', 'status/success-tint', 'text/success'], warn: ['alert-triangle', 'status/warning-tint', 'text/warning'], info: ['info', 'status/info-tint', 'text/info'], bad: ['x-circle', 'status/danger-tint', 'text/danger'], pause: ['pause-circle', 'status/warning-tint', 'text/warning'], work: ['wrench', 'status/info-tint', 'text/info'], clock: ['clock', 'status/info-tint', 'text/info'] }[kind]; const c = AL('HORIZONTAL', { name: 'Status — ' + label, gap: 6, p: [4, 10, 4, 8], r: 9999, fill: m[1], align: 'CENTER' }); add(c, await IC(icon || m[0], 14, m[2]), await T(label, 'Label/S', m[2])); return c; }
 async function linkRow(label, icon = 'arrow-right') { const r = AL('HORIZONTAL', { name: 'Link — ' + label, gap: 6, align: 'CENTER', p: [12, 0, 12, 0] }); add(r, await T(label, 'Label/M', 'text/brand'), await IC(icon, 16, 'icon/brand')); return r; }
 async function iconTile(ic, tint = 'brand/tint', col = 'icon/brand', size = 18) { const b = AL('HORIZONTAL', { name: 'Icon tile — ' + ic, fill: tint, r: 10, p: 8 }); add(b, await IC(ic, size, col)); return b; }
 async function navRow(ic, title, body, o = {}) { const r = AL('HORIZONTAL', { name: 'Row — ' + title, gap: 12, p: [12, 0, 12, 0], align: 'CENTER' }); if (o.line) strokeSides(r, 'border/subtle', { b: 1 }); const t = AL('VERTICAL', { gap: 2 }); const tr = AL('HORIZONTAL', { gap: 6, align: 'CENTER' }); add(tr, await T(title, 'Body/M Strong', 'text/primary')); if (o.demo) add(tr, await DEMO('XS')); add(t, tr, [await T(body, 'Body/S', 'text/secondary', { w: 230 }), 'FILL']); add(r, await iconTile(ic, o.tint, o.ic), [t, 'FILL']); if (o.chev !== false) add(r, await IC('chevron-right', 20, 'icon/muted')); return r; }
@@ -149,9 +149,14 @@ function art404() {
   return svgArt(svg, 'Art — two dice + cracked chip (404)');
 }
 // 500: slot machine with a drooping lever, its power cable unplugged from the wall socket
-function art500() {
-  const svg = `<svg width="620" height="450" viewBox="0 0 620 450" xmlns="http://www.w3.org/2000/svg"><rect x="74" y="34" width="300" height="372" rx="30" fill="#8A2C2F"/><rect x="60" y="24" width="300" height="372" rx="30" fill="#E5484D"/><rect x="88" y="48" width="244" height="60" rx="14" fill="#F1F1F1"/><rect x="108" y="72" width="70" height="12" rx="6" fill="#BDBDBD"/><rect x="242" y="72" width="70" height="12" rx="6" fill="#BDBDBD"/><rect x="200" y="58" width="20" height="28" rx="6" fill="#141414"/><rect x="200" y="90" width="20" height="10" rx="5" fill="#141414"/><rect x="88" y="126" width="244" height="130" rx="16" fill="#141414"/><rect x="100" y="138" width="68" height="106" rx="10" fill="#F1F1F1"/><rect x="176" y="138" width="68" height="106" rx="10" fill="#F1F1F1"/><rect x="252" y="138" width="68" height="106" rx="10" fill="#F1F1F1"/><rect x="116" y="185" width="36" height="12" rx="6" fill="#BDBDBD"/><rect x="192" y="185" width="36" height="12" rx="6" fill="#BDBDBD"/><rect x="268" y="185" width="36" height="12" rx="6" fill="#BDBDBD"/><rect x="88" y="274" width="244" height="44" rx="12" fill="#141414"/><circle cx="128" cy="296" r="11" fill="#BDBDBD"/><circle cx="168" cy="296" r="11" fill="#BDBDBD"/><circle cx="208" cy="296" r="11" fill="#BDBDBD"/><rect x="244" y="286" width="72" height="20" rx="10" fill="#BDBDBD"/><rect x="108" y="336" width="204" height="40" rx="12" fill="#141414"/><rect x="356" y="222" width="36" height="60" rx="10" fill="#BDBDBD"/><g transform="rotate(34 384 252)"><rect x="376" y="102" width="16" height="152" rx="8" fill="#BDBDBD"/><circle cx="384" cy="96" r="26" fill="#F1F1F1"/></g><path d="M300 396 C 300 436, 396 438, 438 404" fill="none" stroke="#141414" stroke-width="12" stroke-linecap="round"/><rect x="434" y="384" width="56" height="40" rx="10" fill="#BDBDBD"/><rect x="490" y="392" width="24" height="7" rx="3" fill="#BDBDBD"/><rect x="490" y="408" width="24" height="7" rx="3" fill="#BDBDBD"/><rect x="552" y="350" width="72" height="96" rx="14" fill="#F1F1F1"/><rect x="570" y="384" width="9" height="20" rx="3" fill="#141414"/><rect x="596" y="384" width="9" height="20" rx="3" fill="#141414"/></svg>`;
-  return svgArt(svg, 'Art — unplugged slot machine (500)');
+async function art500(reels = false) {
+  const svg = `<svg width="620" height="450" viewBox="0 0 620 450" xmlns="http://www.w3.org/2000/svg"><rect x="74" y="34" width="300" height="372" rx="30" fill="#8A2C2F"/><rect x="60" y="24" width="300" height="372" rx="30" fill="#E5484D"/><rect x="88" y="48" width="244" height="60" rx="14" fill="#F1F1F1"/><rect x="108" y="72" width="70" height="12" rx="6" fill="#BDBDBD"/><rect x="242" y="72" width="70" height="12" rx="6" fill="#BDBDBD"/><rect x="200" y="58" width="20" height="28" rx="6" fill="#141414"/><rect x="200" y="90" width="20" height="10" rx="5" fill="#141414"/><rect x="88" y="126" width="244" height="130" rx="16" fill="#141414"/><rect x="100" y="138" width="68" height="106" rx="10" fill="#F1F1F1"/><rect x="176" y="138" width="68" height="106" rx="10" fill="#F1F1F1"/><rect x="252" y="138" width="68" height="106" rx="10" fill="#F1F1F1"/>${reels ? '' : '<rect x="116" y="185" width="36" height="12" rx="6" fill="#BDBDBD"/><rect x="192" y="185" width="36" height="12" rx="6" fill="#BDBDBD"/><rect x="268" y="185" width="36" height="12" rx="6" fill="#BDBDBD"/>'}<rect x="88" y="274" width="244" height="44" rx="12" fill="#141414"/><circle cx="128" cy="296" r="11" fill="#BDBDBD"/><circle cx="168" cy="296" r="11" fill="#BDBDBD"/><circle cx="208" cy="296" r="11" fill="#BDBDBD"/><rect x="244" y="286" width="72" height="20" rx="10" fill="#BDBDBD"/><rect x="108" y="336" width="204" height="40" rx="12" fill="#141414"/><rect x="356" y="222" width="36" height="60" rx="10" fill="#BDBDBD"/><g transform="rotate(34 384 252)"><rect x="376" y="102" width="16" height="152" rx="8" fill="#BDBDBD"/><circle cx="384" cy="96" r="26" fill="#F1F1F1"/></g><path d="M300 396 C 300 436, 396 438, 438 404" fill="none" stroke="#141414" stroke-width="12" stroke-linecap="round"/><rect x="434" y="384" width="56" height="40" rx="10" fill="#BDBDBD"/><rect x="490" y="392" width="24" height="7" rx="3" fill="#BDBDBD"/><rect x="490" y="408" width="24" height="7" rx="3" fill="#BDBDBD"/><rect x="552" y="350" width="72" height="96" rx="14" fill="#F1F1F1"/><rect x="570" y="384" width="9" height="20" rx="3" fill="#141414"/><rect x="596" y="384" width="9" height="20" rx="3" fill="#141414"/></svg>`;
+  const f = svgArt(svg, 'Art — unplugged slot machine (500)');
+  if (reels) {
+    for (const [i, d] of [[0, '5'], [1, '0'], [2, '0']]) { const t = await T(d, 'Display/M', cv('ink/900'), { name: 'Reel ' + (i + 1) + ' — ' + d }); f.appendChild(t); t.textAlignHorizontal = 'CENTER'; t.resize(68, t.height); t.x = 100 + i * 76; t.y = Math.round(138 + (106 - t.height) / 2); }
+    const sign = AL('HORIZONTAL', { name: 'Sign — OUT OF ORDER', fill: cv('paper/50'), r: 6, p: [6, 14, 6, 14] }); stroke(sign, 'status/danger', 3); add(sign, await T('OUT OF ORDER', 'Label/L', 'status/danger')); f.appendChild(sign); sign.rotation = 9; sign.x = 116; sign.y = 236;
+  }
+  return f;
 }
 // Maintenance: open-end wrench + hex nut (vectors); the ticket stub is built from real text layers (see ticket()).
 function artWrench() { return svgArt(`<svg width="160" height="420" viewBox="0 0 160 420" xmlns="http://www.w3.org/2000/svg"><path d="M20 10 L20 70 Q20 110 60 110 L60 400 Q60 418 80 418 Q100 418 100 400 L100 110 Q140 110 140 70 L140 10 L112 10 L112 62 L48 62 L48 10 Z" fill="#BDBDBD"/><circle cx="80" cy="372" r="11" fill="#141414"/></svg>`, 'Art — open-end wrench'); }
@@ -162,7 +167,7 @@ function artTrophy() { return svgArt(`<svg width="300" height="320" viewBox="0 0
 async function ticket(scale = 1) {
   const t = AL('HORIZONTAL', { name: 'Object — maintenance ticket stub', fill: cv('paper/50'), r: 14, clip: true });
   const m = AL('VERTICAL', { name: 'Ticket main', p: [24, 24, 24, 28], gap: 6 });
-  add(m, await T('MAINTENANCE WINDOW', 'Overline', cv('ink/700')), await T('Back at 02:30 UTC', 'Heading/H3', 'text/on-primary'), await T('Tue 1 Dec 2026 · 02:00–02:30 UTC', 'Body/S', cv('ink/700')), await T('Notice AN-88', 'Mono/S', cv('ink/700')));
+  add(m, await T('BACK AT', 'Overline', cv('ink/700')), await T('02:30 UTC', 'Heading/H2', 'text/on-primary'), await T('1 DEC 2026', 'Label/M', cv('ink/700')), await T('Notice AN-88', 'Mono/S', cv('ink/700')));
   const perf = AL('VERTICAL', { name: 'Perforation', p: [10, 0, 10, 0], gap: 10, justify: 'CENTER' }); for (let i = 0; i < 9; i++) perf.appendChild(ellipse(8, 8, cv('paper/300'), 'Hole'));
   const s = AL('VERTICAL', { name: 'Ticket stub', p: [24, 24, 24, 20], gap: 4, justify: 'CENTER' });
   add(s, await T('WITHDRAWALS', 'Overline', cv('ink/700')), await T('OPEN', 'Heading/H3', cv('mint/700')));
@@ -172,81 +177,85 @@ async function ticket(scale = 1) {
 }
 // ===== end ART =====
 
-// ===== m1: [PUB-24] 404 / 390 (Guest) · [PUB-25] 500 / 390 (Member) · [PUB-26] Maintenance / 390 (focused, no tab bar) =====
-const M404 = '[PUB-24] 404 — Page not found / 390 / Default';
-const M500 = '[PUB-25] 500 — Server error / 390 / Default';
-const MMNT = '[PUB-26] Maintenance / 390 / Scheduled window — in progress, withdrawals available';
+// ===== m1: 390 frames for [PUB-24] 404 · [PUB-25] 500 · [PUB-26] Maintenance — copy mirrors the desktop frames
+// 54:101512 / 82:102573 / 82:103376 (page 03, section 54:101508); auth state is read from each desktop top bar.
+const M404 = '[PUB-24] 404 Not Found / 390 / Default';
+const M500 = '[PUB-25] 500 Server Error / 390 / Default';
+const MMNT = '[PUB-26] Maintenance / 390 / Scheduled — withdrawals available';
 const shots = [];
+async function authOf(id) { try { const f = await figma.getNodeByIdAsync(id); const tb = f && f.findOne(n => n.type === 'INSTANCE' && /Topbar/.test(n.name)); if (!tb) return 'Guest'; const mc = await tb.getMainComponentAsync(); return mc && /Member/.test(mc.name) ? 'Member' : 'Guest'; } catch (e) { return 'Guest'; } }
+async function dtext(id, start, fb) { try { const f = await figma.getNodeByIdAsync(id); const t = f && f.findOne(n => n.type === 'TEXT' && n.characters.startsWith(start)); return t ? t.characters : fb; } catch (e) { return fb; } }
 async function tile(game, players, tag) { const p = { Art: ART[game], Players: players, 'House edge': game === 'Global Pool' ? 'Fee 0.05 USDT / entry' : 'House edge 1.00%' }; if (tag) { p['Show tag'] = true; p.Tag = tag; } const t = await I('28:16529', { State: 'Default' }, p); t.name = 'Tile/Game Generic — ' + game; t.rescale(171 / 160); return t; }
-async function heading(C, chip, over, title, body) { const ov = AL('HORIZONTAL', { gap: 8, align: 'CENTER', wrap: true, cgap: 6 }); add(ov, chip, await T(over, 'Overline', 'text/brand')); add(C, [ov, 'FILL']); const v = AL('VERTICAL', { name: 'Title + intro', gap: 10 }); add(v, [await T(title, 'Heading/H2', 'text/primary', { w: 358 }), 'FILL'], [await T(body, 'Body/M', 'text/secondary', { w: 358 }), 'FILL']); add(C, [v, 'FILL']); }
+async function heading(C, chip, title, body) { add(C, chip); const v = AL('VERTICAL', { name: 'Title + intro', gap: 10 }); add(v, [await T(title, 'Heading/H2', 'text/primary', { w: 358 }), 'FILL'], [await T(body, 'Body/M', 'text/secondary', { w: 358 }), 'FILL']); add(C, [v, 'FILL']); }
+async function svcRow(ic, name, kind, label, note, line) { const r = AL('VERTICAL', { name: 'Service — ' + name, gap: 6, p: [12, 0, 12, 0] }); if (line) strokeSides(r, 'border/subtle', { b: 1 }); const h = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(h, await IC(ic, 18, 'icon/muted'), [await T(name, 'Body/S Strong', 'text/primary', { w: 150 }), 'FILL'], await statusChip(kind, label)); add(r, [h, 'FILL']); if (note) add(r, [await T(note, 'Caption', 'text/secondary', { w: 326 }), 'FILL']); return r; }
+async function chip(label) { const c = await I('17:2766', { State: 'Default' }, { Label: label }); c.name = 'Chip — ' + label; return c; }
 
 if (need(M404)) {
-  const S = await mshell(M404, 120, 160, { auth: 'Guest' }); const C = S.C;
+  const S = await mshell(M404, 120, 160, { auth: await authOf('54:101512') }); const C = S.C;
   const b = mbanner(C, 'Banner — 404 art (cropped)', 230); const a = art404(); a.rescale(0.5); abs(b, a, 44, 18);
-  await heading(C, await statusChip('warn', 'Error 404', 'alert-circle'), 'PAGE NOT FOUND', 'This page rolled off the table', 'The link may be mistyped, out of date, or the page moved when a promotion ended. Nothing you were doing has been lost.');
-  const u = AL('VERTICAL', { name: 'Requested URL', gap: 6 }); const ur = AL('HORIZONTAL', { gap: 6, align: 'CENTER' }); add(ur, await T('You asked for', 'Caption', 'text/tertiary'), await DEMO('XS')); const chipU = AL('HORIZONTAL', { name: 'URL chip', fill: 'surface/raised', r: 6, p: [6, 10, 6, 10], gap: 6, align: 'CENTER' }); stroke(chipU, 'border/default'); add(chipU, await IC('link', 14, 'icon/muted'), await T('globalpool.example/promos/summer-race-2025', 'Mono/S', 'text/secondary')); add(u, ur, chipU); add(C, [u, 'FILL']);
-  const srch = await I('16:3820', { Size: 'M', State: 'Default' }, { 'Show shortcut': false }); srch.name = 'Input/Search — Search games, rounds…'; add(C, [srch, 'FILL']);
-  await stack(C, [await BTN('Primary', 'Back to lobby', { size: 'L', lead: 'home' }), await BTN('Secondary', 'Contact support', { size: 'L', lead: 'chat' })]);
-  const hl = AL('HORIZONTAL', { name: 'Helper links', gap: 20, align: 'CENTER' }); add(hl, await linkRow('System status', 'external-link'), await linkRow('Help centre')); add(C, hl);
+  await heading(C, await statusChip('warn', 'Error 404 · Page not found', 'alert-circle'), 'This page rolled off the table', await dtext('54:101512', 'We couldn', 'We couldn’t find the page you asked for. The link may be out of date or the page has moved. Your balance, entries and open bets are not affected.'));
+  const rq = AL('HORIZONTAL', { name: 'Requested', gap: 8, align: 'CENTER', wrap: true, cgap: 6 }); const chipU = AL('HORIZONTAL', { name: 'URL chip', fill: 'surface/raised', r: 6, p: [6, 10, 6, 10], gap: 6, align: 'CENTER' }); stroke(chipU, 'border/default'); add(chipU, await IC('link', 14, 'icon/muted'), await T('/promotions/autumn-raffle', 'Mono/S', 'text/secondary'));
+  add(rq, await T('Requested', 'Caption', 'text/tertiary'), chipU, await T('· HTTP 404', 'Caption', 'text/tertiary')); add(C, [rq, 'FILL']);
+  await stack(C, [await BTN('Primary', 'Back to lobby', { size: 'L', lead: 'home' }), await BTN('Secondary', 'Browse games', { size: 'L', lead: 'games' })]);
+  const si = box('Search instead', { gap: 12 }); add(si, await T('Search instead', 'Heading/H5', 'text/primary'), [await T('Find a game, a round number or a help article.', 'Body/S', 'text/secondary', { w: 326 }), 'FILL']);
+  const srch = await I('16:3820', { Size: 'M', State: 'Default' }, { 'Show shortcut': false }); srch.name = 'Input/Search'; add(si, [srch, 'FILL'], await T('Popular searches', 'Caption', 'text/tertiary'));
+  const cs = AL('HORIZONTAL', { name: 'Popular searches', gap: 8, wrap: true, cgap: 8 }); for (const l of ['Orbit Rush', 'Round #1,248', 'Withdrawals', 'Provably fair', 'Daily rewards', 'Responsible gaming']) add(cs, await chip(l)); add(si, [cs, 'FILL']); add(C, [si, 'FILL']);
+  add(C, [await mhead('WHERE TO NEXT', 'Pick up where you were going'), 'FILL']);
+  const ql = box('Where to next', { gap: 0, p: [4, 16, 4, 16] });
+  add(ql, [await navRow('pool', 'Global Pool', 'Round #1,248 is open and closes 27 Nov 2026, 20:00 UTC.', { line: true, demo: true, tint: 'accent/gold-tint', ic: 'icon/gold' }), 'FILL'], [await navRow('gift', 'Promotions', 'Welcome offer, daily rewards and races — terms apply.', { line: true }), 'FILL'], [await navRow('help-circle', 'Help centre & support', 'Deposits, withdrawals, KYC and limits — or chat with support 24/7.', { line: true }), 'FILL']);
+  const stR = await navRow('activity', 'Status page', 'Checked 27 Nov 2026, 16:42 UTC'); const stT = stR.children[1]; add(stT, await statusChip('ok', 'All systems operational')); add(ql, [stR, 'FILL']); add(C, [ql, 'FILL']);
   add(C, [await mhead('POPULAR RIGHT NOW', 'Jump back in', await DEMO('XS')), 'FILL']);
   const g = AL('HORIZONTAL', { name: 'Tiles — 2-column grid', gap: 16, wrap: true, cgap: 16 }); add(C, [g, 'FILL']);
-  for (const [gm, n, tg] of [['Global Pool', '3,412', 'HOT'], ['Orbit Rush', '1,062', 'HOT'], ['Skyline', '206', 'NEW'], ['Vault Sweeper', '146']]) add(g, await tile(gm, n, tg));
-  add(C, [await mhead('OR GO STRAIGHT TO', 'Where most people were heading'), 'FILL']);
-  const ql = box('Quick links', { gap: 0, p: [4, 16, 4, 16] });
-  add(ql, [await navRow('pool', 'Global Pool', 'Round #1,248 is open — 186,400.00 USDT, closes 27 Nov 2026, 20:00 UTC.', { line: true, demo: true, tint: 'accent/gold-tint', ic: 'icon/gold' }), 'FILL'], [await navRow('gift', 'Promotions', 'Welcome offer, daily rewards, rakeback. Terms apply.', { line: true }), 'FILL'], [await navRow('help-circle', 'Help centre', 'Fees, withdrawals, fairness and KYC.', { line: true }), 'FILL'], [await navRow('shield-check', 'Provably Fair', 'Check any draw or bet yourself.'), 'FILL']);
-  add(C, [ql, 'FILL']);
+  for (const [gm, n, tg] of [['Global Pool', '3,412', 'HOT'], ['Orbit Rush', '1,062', 'HOT'], ['Skyline', '206', 'NEW'], ['Vault Sweeper', '146', 'NEW']]) add(g, await tile(gm, n, tg));
   await mlic(C);
   await mfinish(S, { tab: 'Home' }); audit(S.f); shots.push(S.f);
 }
 
 if (need(M500)) {
-  const S = await mshell(M500, 630, 160, { auth: 'Member' }); const C = S.C;
-  const b = mbanner(C, 'Banner — 500 art (cropped)', 240, { block: 'status/danger-tint', stripe: 'status/danger' }); const a = art500(); a.rescale(0.5); abs(b, a, 56, 14);
-  await heading(C, await statusChip('bad', 'Error 500', 'server'), 'SOMETHING BROKE ON OUR SIDE', 'This machine needs a restart', 'Transaction history didn’t load because of a problem on our servers — not your connection. Nothing was charged and nothing was lost.');
-  const inc = box('Incident reference', { gap: 8, fill: 'surface/raised', stroke: 'border/default' });
-  const ir = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(ir, await T('INCIDENT REFERENCE', 'Overline', 'text/tertiary'), await DEMO('XS')); add(inc, ir);
-  const idr = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(idr, [await T('INC-20261127-4F7A', 'Mono/M', 'text/primary'), 'FILL']); const cp = await I('7:774', { Type: 'Secondary', Size: 'L', State: 'Default' }, { Icon: ICONS.copy }); cp.name = 'Copy reference (44 px)'; add(idr, cp); add(inc, [idr, 'FILL']);
-  add(inc, [await T('27 Nov 2026, 18:46:12 UTC · /account/history. Quote this reference to support so we can find the exact request.', 'Caption', 'text/secondary', { w: 326 }), 'FILL']); add(C, [inc, 'FILL']);
-  const acts = await stack(C, [await BTN('Primary', 'Try again', { size: 'L', lead: 'refresh' }), await BTN('Secondary', 'Status page', { size: 'L', lead: 'activity', trail: 'external-link' }), await BTN('Ghost', 'Contact support', { size: 'L', lead: 'chat' })]);
-  add(acts, [await T('Retrying is safe — it never repeats a deposit, withdrawal or entry.', 'Caption', 'text/tertiary', { w: 358 }), 'FILL']);
-  const safe = box('Your money is safe', { gap: 0, p: [4, 16, 4, 16] });
-  add(safe, [await navRow('shield-check', 'Available 9,215.30 USDT', 'Read from the ledger. Total 12,480.50 USDT incl. locked, pending and owed.', { line: true, demo: true, tint: 'status/success-tint', ic: 'text/success', chev: false }), 'FILL'], [await navRow('pool', 'Round #1,248 unaffected', 'Your 35 entries are recorded; entries close 20:00 UTC, the draw runs on Chainlink VRF.', { demo: true, tint: 'accent/gold-tint', ic: 'icon/gold', chev: false }), 'FILL']);
-  add(C, [safe, 'FILL']);
-  const st = box('What’s happening', { gap: 10 }); const sr = AL('HORIZONTAL', { gap: 8, align: 'CENTER', wrap: true, cgap: 6 }); add(sr, await statusChip('warn', 'Partial outage · Transaction history'), await DEMO('XS')); add(st, [sr, 'FILL'], [await T('Investigating since 18:44 UTC. Wallet, deposits, withdrawals, games and Global Pool: operational.', 'Body/S', 'text/secondary', { w: 326 }), 'FILL'], await linkRow('status.globalpool.example', 'external-link')); add(C, [st, 'FILL']);
+  const S = await mshell(M500, 630, 160, { auth: await authOf('82:102573') }); const C = S.C;
+  const b = mbanner(C, 'Banner — 500 art: out-of-order slot machine (cropped)', 240, { block: 'status/danger-tint', stripe: 'status/danger' }); const a = await art500(true); a.rescale(0.5); abs(b, a, 56, 14);
+  await heading(C, await statusChip('bad', 'Error 500 · Server error', 'alert-triangle'), 'Something went wrong on our side', await dtext('82:102573', 'Our server hit', 'Our server hit an unexpected error while loading this page — it’s not something you did. Try again in a moment. If it keeps happening, check the status page or contact support.'));
+  const inc = box('Reference ID', { gap: 10, fill: 'surface/raised', stroke: 'border/default' });
+  const ir = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(ir, await T('REFERENCE ID', 'Overline', 'text/tertiary'), await DEMO('XS')); add(inc, ir);
+  const idr = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(idr, [await T('GP-500-7F3A-9C21', 'Mono/M', 'text/primary'), 'FILL']); const cp = await I('7:774', { Type: 'Secondary', Size: 'L', State: 'Default' }, { Icon: ICONS.copy }); cp.name = 'Copy reference (44 px)'; add(idr, cp); add(inc, [idr, 'FILL']);
+  const tm = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(tm, await T('Time', 'Caption', 'text/tertiary'), await T('27 Nov 2026, 16:42:18 UTC', 'Mono/S', 'text/secondary')); add(inc, tm); add(C, [inc, 'FILL']);
+  const acts = await stack(C, [await BTN('Primary', 'Try again', { size: 'L', lead: 'refresh' }), await BTN('Secondary', 'Status page', { size: 'L', lead: 'activity', trail: 'external-link' })]);
+  const sf = AL('HORIZONTAL', { name: 'Still failing', gap: 6, align: 'CENTER', wrap: true, cgap: 0 }); add(sf, await IC('chat', 16, 'icon/muted'), await T('Still failing? Quote the reference ID —', 'Caption', 'text/secondary'), await linkRow('Contact support')); add(acts, [sf, 'FILL']);
+  const safe = box('Reassurance', { gap: 0, p: [4, 16, 4, 16] });
+  add(safe, [await navRow('shield-check', 'Your funds are safe', 'A server error never changes balances, entries or results. Every movement is written to the ledger first, and on-chain settlements are final.', { line: true, tint: 'status/success-tint', ic: 'text/success', chev: false }), 'FILL']);
+  add(safe, [await navRow('pool', 'Global Pool keeps its schedule', 'Confirmed entries stay in the round; the close time and Chainlink VRF draw are not affected. Round #1,248 · closes 20:00 UTC.', { line: true, demo: true, tint: 'accent/gold-tint', ic: 'icon/gold', chev: false }), 'FILL']);
+  add(safe, [await navRow('dice', 'Mid-game? Your bet is settled', 'The outcome is still settled from the committed seed. Check Bet history and verify it under Provably Fair.'), 'FILL']); add(C, [safe, 'FILL']);
+  const st = box('Live status', { gap: 0, p: [14, 16, 4, 16] }); const sh = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(sh, [await T('Live status', 'Heading/H5', 'text/primary'), 'FILL'], await DEMO('M')); add(st, [sh, 'FILL'], await T('Updated 27 Nov 2026, 16:42 UTC', 'Caption', 'text/tertiary'));
+  add(st, [await svcRow('monitor', 'Website & lobby', 'warn', 'Degraded', 'Elevated error rate on some pages. Investigating since 16:38 UTC.', true), 'FILL'], [await svcRow('games', 'Games — Originals, tables, slots', 'ok', 'Operational', 'Bets and settlements running normally.', true), 'FILL'], [await svcRow('wallet', 'Wallet — deposits & withdrawals', 'ok', 'Operational', 'All 5 networks processing. Ethereum is congested (slower).', true), 'FILL'], [await svcRow('pool', 'Global Pool & VRF draws', 'ok', 'Operational', 'Round #1,248 open; draw scheduled 20:00 UTC.', false), 'FILL'], await linkRow('status.globalpool.example', 'external-link'));
+  add(C, [st, 'FILL']);
   await mlic(C);
-  await mfinish(S, { tab: 'Wallet' }); audit(S.f); shots.push(S.f);
+  await mfinish(S, { tab: 'Home' }); audit(S.f); shots.push(S.f);
 }
 
 if (need(MMNT)) {
-  const S = await mshell(MMNT, 1140, 160, { topbar: false, gap: 24 }); const C = S.C;
-  const bar = AL('HORIZONTAL', { name: 'Top bar — maintenance mode', fill: 'bg/secondary', p: [6, 8, 6, 16], gap: 10, align: 'CENTER' }); strokeSides(bar, 'border/subtle', { b: 1 });
-  const lm = await I('4:792'); lm.name = 'Brand/Logo Mark'; add(bar, lm, await statusChip('work', 'Maintenance', 'wrench')); const sp = AL('HORIZONTAL', { name: 'Spacer' }); add(bar, [sp, 'FILL']);
-  const sb = await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS.activity }); sb.name = 'Status page (44 px)'; const hb = await I('7:774', { Type: 'Ghost', Size: 'L', State: 'Default' }, { Icon: ICONS.chat }); hb.name = 'Support (44 px)'; add(bar, sb, hb);
-  S.f.insertChild(1, bar); bar.layoutSizingHorizontal = 'FILL';
-  const b = mbanner(C, 'Banner — ticket stub + wrench (cropped)', 220, { bx: 200 }); const tk = await ticket(0.72); abs(b, tk, 28, 52, 8); const wr = artWrench(); wr.rescale(0.5); abs(b, wr, 280, -18, -30);
-  await heading(C, await statusChip('work', 'In progress · 02:12 UTC', 'wrench'), 'SCHEDULED MAINTENANCE', 'We’re upgrading the tables', 'Games are paused from 02:00 to 02:30 UTC on Tue 1 Dec 2026. Withdrawals remain available the whole time.');
-  const win = box('Maintenance window', { gap: 12, fill: 'surface/raised', stroke: 'border/default' });
-  const wr2 = AL('HORIZONTAL', { gap: 16 }); for (const [k, v] of [['Started', '02:00 UTC'], ['Expected back', '02:30 UTC']]) { const c = AL('VERTICAL', { gap: 4 }); add(c, await T(k, 'Caption', 'text/tertiary'), await T(v, 'Number/S', 'text/primary')); add(wr2, [c, 'FILL']); } add(win, [wr2, 'FILL']);
-  add(win, [await T('Your time (Lisbon, WET): 02:00–02:30 — same as UTC', 'Caption', 'text/secondary', { w: 326 }), 'FILL']);
-  const track = AL('HORIZONTAL', { name: 'Progress — 12 of 30 min', fill: 'surface/default', r: 9999, h: 8, clip: true }); add(track, rect(130, 8, 'brand/primary', 9999, 'Elapsed 40%')); add(win, [track, 'FILL']);
-  const wc = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(wc, [await T('Back in about 18 min. If it runs late we post the new time here.', 'Caption', 'text/secondary', { w: 280 }), 'FILL'], await DEMO('XS')); add(win, [wc, 'FILL']); add(C, [win, 'FILL']);
-  const av = box('Available now', { gap: 0, p: [12, 16, 4, 16] }); add(av, await statusChip('ok', 'Available now'));
-  for (const [ic, t, d, l] of [['withdraw', 'Withdrawals on all 5 networks', 'Normal limits, fees and security checks.', true], ['log-in', 'Sign-in, account & security', 'Limits, 2FA and whitelisted addresses.', true], ['heart', 'Responsible gaming tools', 'Limits, cooling-off and self-exclusion.', false]]) add(av, [await navRow(ic, t, d, { line: l, chev: false }), 'FILL']);
-  add(C, [av, 'FILL']);
-  const pa = box('Paused until 02:30 UTC', { gap: 0, p: [12, 16, 4, 16] }); add(pa, await statusChip('pause', 'Paused until 02:30 UTC'));
-  for (const [ic, t, d, l] of [['games', 'Originals & table games', 'New bets paused; open rounds settled at 02:00 UTC.', true], ['deposit', 'Deposit crediting', 'Still detected on-chain, credited after 02:30 UTC — don’t send twice.', true], ['gift', 'Promotion deadlines', 'Streaks and missions in the window get +30 min.', false]]) add(pa, [await navRow(ic, t, d, { line: l, chev: false, tint: 'status/warning-tint', ic: 'text/warning' }), 'FILL']);
-  add(C, [pa, 'FILL']);
-  const bal = box('Your balance & Global Pool', { gap: 0, p: [4, 16, 4, 16] });
-  add(bal, [await navRow('shield-check', 'Balances don’t move', 'Nothing is debited, locked or expired by maintenance.', { line: true, chev: false }), 'FILL'], [await navRow('pool', 'No round is affected', 'Round #1,252 opens 1 Dec 2026, 08:00 UTC as scheduled.', { chev: false, tint: 'accent/gold-tint', ic: 'icon/gold' }), 'FILL']);
-  add(C, [bal, 'FILL']);
-  const up = box('Live updates', { gap: 0, p: [12, 16, 4, 16] }); const uh = AL('HORIZONTAL', { gap: 8, align: 'CENTER', p: [0, 0, 4, 0] }); add(uh, [await T('Live updates', 'Heading/H5', 'text/primary'), 'FILL'], await DEMO('M')); add(up, [uh, 'FILL']);
-  const ups = [['02:12 UTC', 'Game servers 3 of 5 migrated — on schedule.'], ['02:00 UTC', 'Maintenance started; withdrawals online.'], ['26 Nov, 10:00 UTC', 'Announced by email and in-app (notice AN-88).']];
-  for (let i = 0; i < ups.length; i++) { const r = AL('VERTICAL', { name: 'Update — ' + ups[i][0], gap: 4, p: [10, 0, 10, 0] }); if (i < ups.length - 1) strokeSides(r, 'border/subtle', { b: 1 }); add(r, await T(ups[i][0], 'Mono/S', 'text/tertiary'), [await T(ups[i][1], 'Body/S', 'text/primary', { w: 326 }), 'FILL']); add(up, [r, 'FILL']); }
-  add(C, [up, 'FILL']);
+  const S = await mshell(MMNT, 1140, 160, { auth: await authOf('82:103376'), gap: 24 }); const C = S.C;
+  const b = mbanner(C, 'Banner — ticket stub + wrench (cropped)', 220, { bx: 200 }); const tk = await ticket(0.72); abs(b, tk, 26, 48, 8); const wr = artWrench(); wr.rescale(0.5); abs(b, wr, 282, -20, -30);
+  await heading(C, await statusChip('work', 'Scheduled maintenance · AN-88', 'wrench'), 'Games are paused for a 30-minute upgrade', await dtext('82:103376', 'We’re upgrading', await dtext('82:103376', "We're upgrading", 'We’re upgrading the game servers and the ledger database. Withdrawals stay open the whole time and your balance is safe. Games reopen automatically when the work is done.')));
+  const kv = box('Window & status', { gap: 0, p: [4, 16, 4, 16], fill: 'surface/raised', stroke: 'border/default' });
+  for (const [k, v, ic, i] of [['Window', '1 Dec 2026, 02:00 – 02:30 UTC', null, 0], ['Status', 'In progress', 'spinner', 1], ['Last update', '02:12 UTC', null, 2]]) { const r = AL('HORIZONTAL', { name: 'Row — ' + k, gap: 12, p: [12, 0, 12, 0], align: 'CENTER' }); if (i < 2) strokeSides(r, 'border/subtle', { b: 1 }); add(r, [await T(k, 'Body/S', 'text/secondary', { w: 100 }), 'FILL']); const vv = AL('HORIZONTAL', { gap: 6, align: 'CENTER' }); if (ic) add(vv, await IC(ic, 14, 'text/info')); add(vv, await T(v, 'Label/M', ic ? 'text/info' : 'text/primary')); add(r, vv); add(kv, [r, 'FILL']); }
+  add(C, [kv, 'FILL']);
+  const wd = box('Available to withdraw now', { gap: 8, fill: 'surface/selected', stroke: 'border/brand' }); add(wd, await T('Available to withdraw now', 'Caption', 'text/secondary')); const am = AL('HORIZONTAL', { gap: 6, align: 'MAX' }); add(am, await T('9,215.30', 'Number/L', 'balance/available'), await T('USDT', 'Label/M', 'text/secondary'), await DEMO('S')); add(wd, am);
+  add(wd, [await T('Locked 1,850.00 · Pending 1,000.00 · Owed 415.20 USDT — locked funds include pending withdrawal WD-20931, which keeps processing.', 'Caption', 'text/secondary', { w: 326 }), 'FILL'], await linkRow('Go to wallet')); add(C, [wd, 'FILL']);
+  add(C, [await mhead('WHAT WORKS DURING MAINTENANCE', 'Only play is paused'), 'FILL'], [await T('Everything that touches your money out of the platform stays open.', 'Body/S', 'text/secondary', { w: 358 }), 'FILL']);
+  const ww = box('What works during maintenance', { gap: 0, p: [4, 16, 4, 16] });
+  const items = [['withdraw', 'Withdrawals', 'ok', 'Available', 'Request as usual from Wallet. Network fees are shown before you confirm; manual reviews may take a little longer tonight.'], ['shield-check', 'Limits, cooling-off & self-exclusion', 'ok', 'Available', 'Responsible-gaming tools keep working and changes apply as normal.'], ['chat', 'Support', 'ok', 'Available', 'Chat and email stay open 24/7.'], ['deposit', 'Deposits', 'clock', 'Credited after maintenance', 'Deposits sent now are detected on-chain and credited automatically after 02:30 UTC. Please don’t send them twice.'], ['games', 'Games', 'pause', 'Paused', 'Originals, table games, slots and live tables reopen at 02:30 UTC. All bets were closed and settled before 02:00 UTC.'], ['pool', 'Global Pool', 'pause', 'No open round', 'No round is open during this window. The next round opens as scheduled at 08:00 UTC.']];
+  for (let i = 0; i < items.length; i++) { const [ic, n, k, l, d] = items[i]; add(ww, [await svcRow(ic, n, k, l, d, i < items.length - 1), 'FILL']); }
+  add(C, [ww, 'FILL']);
+  const pg = box('Progress', { gap: 0, p: [14, 16, 6, 16] }); add(pg, await T('Progress', 'Heading/H5', 'text/primary'));
+  const steps = [['check-circle', 'text/success', 'New bets paused', '02:00 UTC'], ['check-circle', 'text/success', 'Open game rounds settled', '02:01 UTC'], ['spinner', 'text/info', 'Game servers & ledger database upgrade', 'In progress'], ['clock', 'icon/muted', 'Reconciliation check — ledger vs on-chain', 'Up next'], ['clock', 'icon/muted', 'Games reopen', 'by 02:30 UTC']];
+  for (const [ic, col, t, w] of steps) { const r = AL('HORIZONTAL', { name: 'Step — ' + t, gap: 10, p: [10, 0, 10, 0], align: 'CENTER' }); add(r, await IC(ic, 18, col), [await T(t, 'Body/S', 'text/primary', { w: 200 }), 'FILL'], await T(w, 'Caption', col === 'icon/muted' ? 'text/tertiary' : col)); add(pg, [r, 'FILL']); }
+  add(C, [pg, 'FILL']);
+  const tg = await I('20:3309', { On: 'No', State: 'Default' }, { Label: 'Email me when games reopen', Description: 'Sent to n•••@example.com · off by default', 'Show description': true }); tg.name = 'Control/Toggle — Email me when games reopen (off)'; add(C, [tg, 'FILL']);
+  const q = AL('HORIZONTAL', { name: 'Support line', gap: 6, align: 'CENTER', wrap: true, cgap: 0 }); add(q, await IC('chat', 16, 'icon/muted'), await T('Questions about a deposit or withdrawal?', 'Caption', 'text/secondary'), await linkRow('Contact support')); add(C, [q, 'FILL']);
   await mlic(C, 'Responsible-gaming tools stay available during maintenance. 18+ · permitted jurisdictions only.');
-  const stk = AL('VERTICAL', { name: 'Sticky CTA — pinned to viewport bottom', fill: 'bg/secondary', p: [12, 16, 4, 16], gap: 8 }); strokeSides(stk, 'border/subtle', { t: 1 });
-  add(stk, [await BTN('Primary', 'Sign in to withdraw', { size: 'L', lead: 'withdraw' }), 'FILL'], [await BTN('Ghost', 'Status page', { size: 'L', lead: 'activity', trail: 'external-link' }), 'FILL']); homeIndicator(stk);
-  await mfinish(S, { footer: false, tab: false, sticky: stk }); audit(S.f); shots.push(S.f);
+  const stk = AL('VERTICAL', { name: 'Sticky CTA — pinned above tab bar', fill: 'bg/secondary', p: [12, 16, 12, 16], gap: 8 }); strokeSides(stk, 'border/subtle', { t: 1 });
+  const sr = AL('HORIZONTAL', { gap: 8 }); add(sr, [await BTN('Primary', 'Withdraw funds', { size: 'L', lead: 'withdraw' }), 'FILL'], [await BTN('Secondary', 'Status page', { size: 'L', trail: 'external-link' }), 'FILL']); add(stk, [sr, 'FILL']);
+  await mfinish(S, { sticky: stk, tab: 'Wallet' }); audit(S.f); shots.push(S.f);
 }
 fitSection(sec);
 for (const f of shots) await f.screenshot({ scale: 0.6 });

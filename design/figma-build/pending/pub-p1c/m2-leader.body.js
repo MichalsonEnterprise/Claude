@@ -47,12 +47,12 @@ async function buildLB(name, x, y, P) {
   const seg = await I('20:6978', { Segments: '3' }); segLabels(seg, ['Daily', 'Weekly', 'Monthly'], P.tab); add(C, [seg, 'FILL']);
   // race hero card with a cropped trophy object
   const hc = AL('VERTICAL', { name: 'Race card — ' + P.title, fill: 'surface/default', r: 20, p: 20, gap: 12, clip: true }); stroke(hc, 'border/gold'); add(C, [hc, 'FILL']);
-  abs(hc, rect(220, 600, 'accent/gold-tint', 0, 'Angled colour block'), 250, -160, 14); const tro = artTrophy(); tro.rescale(0.42); abs(hc, tro, 236, -6);
-  const ov = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(ov, await IC('trophy', 16, 'icon/gold'), await T(P.over, 'Overline', 'text/gold')); add(hc, ov);
+  abs(hc, rect(220, 600, 'accent/gold-tint', 0, 'Angled colour block'), 250, -160, 14); const tro = artTrophy(); tro.rescale(0.34); abs(hc, tro, 262, -2);
+  const ov = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(ov, await IC('trophy', 16, 'icon/gold'), await T(P.over, 'Overline', 'text/gold', { w: 196 })); add(hc, ov);
   add(hc, [await T(P.title, 'Heading/H3', 'text/primary', { w: 220 }), 'FILL']);
-  const pr = AL('HORIZONTAL', { gap: 6, align: 'MAX' }); add(pr, await T(P.pool, 'Number/L', 'text/gold'), await T('USDT prize pool', 'Caption', 'text/secondary'), await DEMO('S')); add(hc, pr);
+  const pr = AL('HORIZONTAL', { gap: 6, align: 'MAX' }); add(pr, await T(P.pool, 'Number/L', 'text/gold'), await T('USDT prize pool', 'Caption', 'text/secondary')); add(hc, pr);
   add(hc, await T('Ends in', 'Caption', 'text/tertiary')); const cdr = AL('HORIZONTAL', { name: 'Countdown — real end time', gap: 8 }); for (const [v, u] of P.cd) { const bx = AL('VERTICAL', { name: 'Box ' + u, fill: 'surface/raised', r: 10, p: [8, 10, 8, 10], gap: 0, align: 'CENTER' }); add(bx, await T(v, 'Number/S', 'text/primary'), await T(u, 'Caption', 'text/tertiary')); add(cdr, [bx, 'FILL']); } add(hc, [cdr, 'FILL']);
-  add(hc, await T(P.ends, 'Label/S', 'text/secondary'), await T(P.meta, 'Caption', 'text/tertiary'), [await BTN('Primary', P.cta, { size: 'L' }), 'FILL']);
+  const er = AL('HORIZONTAL', { gap: 8, align: 'CENTER' }); add(er, await T(P.ends, 'Label/S', 'text/secondary'), await DEMO('S')); add(hc, er, await T(P.meta, 'Caption', 'text/tertiary'), [await BTN('Primary', P.cta, { size: 'L' }), 'FILL']);
   const trm = AL('HORIZONTAL', { gap: 10, align: 'CENTER' }); add(trm, await linkRow('Terms apply', 'external-link'), await I('6:159')); add(hc, trm);
   // podium
   const pod = AL('HORIZONTAL', { name: 'Podium — top 3', gap: 8 }); add(C, [pod, 'FILL']);
