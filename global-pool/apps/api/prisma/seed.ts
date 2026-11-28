@@ -59,6 +59,7 @@ import {
 import { DEFAULT_PRIZE_SPLIT_BPS } from '../src/modules/randomness/selection';
 import type { PrismaService } from '../src/infra/prisma/prisma.service';
 import { findApiRoot, loadEnvFiles } from '../src/config/load-env';
+import { seedAccountDemo } from './seed-account';
 
 loadEnvFiles();
 
@@ -1199,6 +1200,9 @@ async function main() {
 
 /** Verify balances / reconciliation, record the seed in the audit chain, write the dev credential files. */
 async function finalize(started: number) {
+  // Account module DEMO rows (KYC documents on file, notification centre) — idempotent.
+  const account = await seedAccountDemo(prisma);
+  console.info(`Account DEMO data: ${JSON.stringify(account)}`);
   const key = Buffer.from(process.env.TOTP_ENCRYPTION_KEY ?? '', 'base64');
   const round = await prisma.round.findUniqueOrThrow({
     where: { number: DEMO.currentRound.number },

@@ -126,6 +126,7 @@ export async function seedAccountDemo(prisma: PrismaClient): Promise<{ kyc: bool
       title: 'New sign-in — Windows · Edge',
       body: 'Madrid, Spain · first sign-in from this device. Not you? Secure your account from Login history.',
       at: '2026-11-25T22:41:00Z',
+      read: true,
     },
     {
       n: 2,
@@ -173,6 +174,7 @@ export async function seedAccountDemo(prisma: PrismaClient): Promise<{ kyc: bool
       title: 'Round #1,248 closes at 20:00 UTC',
       body: 'You hold 35 entries. This is the one reminder you asked for — no further nudges.',
       at: '2026-11-27T19:00:00Z',
+      read: true,
     },
     {
       n: 8,
