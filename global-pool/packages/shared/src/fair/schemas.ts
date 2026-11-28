@@ -103,6 +103,17 @@ export const crashBetSchema = z.object({
 
 export const resetCreditsSchema = z.object({ idempotencyKey: idempotencyKey.optional() });
 
+/** Values of the `outcome` filter of GET /games/:slug/bets (the last three are Twenty-One only). */
+export const BET_OUTCOME_FILTERS = [
+  'win',
+  'lose',
+  'push',
+  'blackjack',
+  'bust',
+  'split_double',
+] as const;
+export type BetOutcomeFilter = (typeof BET_OUTCOME_FILTERS)[number];
+
 export const gameBetsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
@@ -115,6 +126,11 @@ export const gameBetsQuerySchema = z.object({
   result: z.enum(['win', 'lose']).optional(),
   /** Double Side only: the side the player picked. */
   pick: z.enum(['heads', 'tails']).optional(),
+  /**
+   * Settled result by NET (payout vs stake): win (payout > stake) · lose (payout < stake) · push (payout = stake).
+   * Twenty-One adds: blackjack / bust (any hand of the bet) · split_double (a split or a doubled hand).
+   */
+  outcome: z.enum(BET_OUTCOME_FILTERS).optional(),
   /** Bet reference ("CF-52107" or "52107") or nonce ("418"). */
   search: z
     .string()
