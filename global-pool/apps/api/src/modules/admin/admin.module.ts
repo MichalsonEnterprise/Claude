@@ -18,5 +18,7 @@ import { AdminService } from './admin.service';
     AdminAuthGuard,
     PermissionsGuard,
   ],
+  // Exported so other back-office modules (e.g. admin-ops) can use the admin guards + MFA checks.
+  exports: [AdminAuthService, AdminSecurityService, AdminAuthGuard, PermissionsGuard],
 })
 export class AdminModule {}

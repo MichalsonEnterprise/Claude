@@ -111,5 +111,15 @@
    "err-a",
    "err-b"
   ]
- }
+ },
+ "after_limit_reset_28nov": [
+  "g-dice",
+  "g-roulette",
+  "g-coinflip",
+  "g-crash",
+  "g-blackjack",
+  "auth-b (verify AUTH-08/09 desktop)",
+  "gp-hub (GP-04 verify)"
+ ],
+ "note2": "Figma MCP daily/per-minute quota is shared by design agents AND coding agents (get_screenshot). Run continuation with args [\"cont:<slice>\"]; scripts ready in pending/<slice>/out (see README/RUN-ORDER)."
 }

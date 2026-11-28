@@ -8,7 +8,10 @@ File: https://www.figma.com/design/QHF8iRUMFgGMcEn3bD25jl (13 pages). Build kit 
 - **Run continuation:** Workflow `design/figma-build/workflow-screens.js` with args `["cont:<slice>", …]` (max ~2 agents at a time because of the Figma MCP limit).
 - **Rules for agents:** `design/figma-build/conventions.md` (tokens, casino direction, the AI-look ban, limit rules §10), `demo-data.md`, `decisions.md`.
 
-## Status snapshot (28 Nov 2026 01:00 UTC)
+## Status snapshot (28 Nov 2026 03:55 UTC)
+141 verified · 25 built · 13 in progress · 127 not started (P0: 87 verified / 11 built / 9 in progress / 19 not started). Games: Twenty-One 8/9 verified, Orbit Rush 5 verified + 3 built, Double Side built; Pool Dice & Pool Roulette scripts prepared (pending/g-dice, pending/g-roulette) — run after the Figma limit resets.
+
+## Older snapshot (28 Nov 2026 01:00 UTC)
 75 verified · 11 built · 19 in progress · 201 not started. Running: continuation workflows for wallet withdraw 1–5, 2FA/wallet connect, KYC, draw/results, pool hub, RG, restrictions, account, gaming and financial history.
 
 ## Known QA items for the final pass

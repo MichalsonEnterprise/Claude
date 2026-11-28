@@ -12,7 +12,8 @@ import { NEW_DEVICE_ALERT_WINDOW_DAYS, NEW_DEVICE_REASON } from './player-identi
 
 /** Player-facing case reference for a restriction row (never exposes the internal admin reason). */
 export function restrictionRef(type: string, id: string): string {
-  const prefix = type === 'account_suspended' ? 'SUS' : type === 'withdrawals_frozen' ? 'FRZ' : 'REV';
+  const prefix =
+    type === 'account_suspended' ? 'SUS' : type === 'withdrawals_frozen' ? 'FRZ' : 'REV';
   return `${prefix}-${id.replace(/-/g, '').slice(0, 6).toUpperCase()}`;
 }
 
@@ -80,9 +81,16 @@ export class AccountStatusController {
       status: user.status,
       restrictions,
       paused: {
-        gaming: types.has('account_suspended') || types.has('gaming_blocked') || !!exclusion || !regionPermitted,
+        gaming:
+          types.has('account_suspended') ||
+          types.has('gaming_blocked') ||
+          !!exclusion ||
+          !regionPermitted,
         deposits:
-          types.has('account_suspended') || types.has('deposits_blocked') || !!exclusion || !regionPermitted,
+          types.has('account_suspended') ||
+          types.has('deposits_blocked') ||
+          !!exclusion ||
+          !regionPermitted,
         // Withdrawals stay available while self-excluded or abroad (no obstruction); only AML freezes pause them.
         withdrawals: types.has('withdrawals_frozen'),
       },

@@ -31,7 +31,7 @@ describe('GET /auth/account-status (web route guards, AUTH-18)', () => {
   });
 
   it('maps admin restrictions to suspended / under review without exposing the internal reason', async () => {
-    const admin = await createAdmin(t, 'compliance_officer');
+    const admin = await createAdmin(t, 'compliance');
     const p = await newPlayer(t);
     await t.prisma.userRestriction.create({
       data: {
@@ -48,7 +48,12 @@ describe('GET /auth/account-status (web route guards, AUTH-18)', () => {
     expect(review.body.restrictions[0].reference).toMatch(/^REV-[0-9A-F]{6}$/);
 
     await t.prisma.userRestriction.create({
-      data: { userId: p.userId, type: 'account_suspended', reason: 'x', appliedByAdminId: admin.id },
+      data: {
+        userId: p.userId,
+        type: 'account_suspended',
+        reason: 'x',
+        appliedByAdminId: admin.id,
+      },
     });
     const sus = await t.http().get('/auth/account-status').set(bearer(p.token)).expect(200);
     expect(sus.body.gate).toBe('suspended');
@@ -74,7 +79,12 @@ describe('GET /auth/account-status (web route guards, AUTH-18)', () => {
 describe('AUTH-21 new-device alerts', () => {
   async function signIn(did: string, userAgent: string) {
     const { token } = await t.app.get(PrivyService).issueMockToken({ did });
-    await t.http().post('/auth/session').set(bearer(token)).set('User-Agent', userAgent).expect(200);
+    await t
+      .http()
+      .post('/auth/session')
+      .set(bearer(token))
+      .set('User-Agent', userAgent)
+      .expect(200);
     return token;
   }
   const MAC_CHROME =
